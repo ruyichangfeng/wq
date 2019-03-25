@@ -1,0 +1,135 @@
+{template 'web/common/header'}
+
+
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" >
+                    <h5>微信会员卡管理</h5>
+                    <a class="btn btn-outline btn-default" style="float: right;margin-top: -10px;" href="{php echo $this->createWebUrl('wechatcardpackage')}">
+                        <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                </div>
+                <div class="ibox-content">
+                    <a href="{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'wechatcardpackageset'))}"  class="btn btn-warning"><i class="fa fa-gears"></i>&nbsp;引导设置</a>
+                    <a onclick="CardPackageBasis()"  class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;添加会员卡详细</a>
+                    {if $getCardPackageSetting['cpi_card_id'] != null}
+                    <button type="button" class="btn btn-primary" data-container="body" data-toggle="popover" data-placement="left" data-content="{$getCardPackageSetting['cpi_card_id']}" data-original-title="" title="">
+                    会员card_id
+                    </button>
+                    <a href="{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'deletemembercard'))}" class="btn btn-success"><i class="fa fa-trash"></i>&nbsp;删除会员卡</a>
+                    {/if}
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">id</th>
+                                <th>会员姓名</th>
+                                <th>会员卡包code</th>
+                                <th>会员卡号</th>
+                                <th>会员openid</th>
+                                <th>激活时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $wechatcardreceivelist $wechatcardreceivev}
+                            <input type="hidden" value="{php echo $memberinfo = util::getMobileMemberInfoOpenidData($wechatcardreceivev['wccr_memberopenid'])}"  />
+                            <tr>
+                                <td>
+                                    {$wechatcardreceivev['id']}
+                                </td>
+
+                                <td>{$memberinfo['mem_memberName']}</td>
+                                <td>{$wechatcardreceivev['wccr_membercode']}</td>
+                                <td>{$wechatcardreceivev['wccr_cardnumber']}</td>
+                                <td>
+                                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="" data-original-title="{$wechatcardreceivev['wccr_memberopenid']}">
+                                    会员OpenID
+                                </button>
+                                </td>
+                                <td>{php echo date('Y-m-d H:i:s', $wechatcardreceivev[wccr_addtime]);}</td>
+                                <td>
+                                <span>
+								<button  type="button" onclick="btn_deleteWeChatCarDreceive({$wechatcardreceivev['id']})" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</button>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $wechatcardreceivelist}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+<script>
+    function CardPackageBasis(){
+        var url = "{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'AjaxSubmitCard'))}";
+        var index = parent.layer.open({
+            type: 2,
+            title: '添加原生微信会员卡',
+            area : ['1100px' , '700px'],
+            content: url
+        });
+    }
+    function btn_deleteWeChatCarDreceive(cardid){
+        var cardid = cardid;
+        var url =  "{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'ajaxdeleteWeChatCarDreceive'))}";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: {cardid:cardid},
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 1) {
+                    swal({
+                            title: "删除成功",
+                            text: "删除信息成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            location.reload(true);
+                        });
+                }
+                else{
+                    swal({
+                            title: "失败",
+                            text: "删除信息成功",
+                            confirmButtonText: "确定",
+                            type: "error",
+                        },
+                        function(){
+                            location.reload(true);
+                        });
+                }
+            }
+        });
+
+    }
+</script>
+
+
+
+{template 'web/common/footer'}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+<style type="text/css">
+    .active{color: #1890ff;}
+</style>
+<body style="background-color: #fff; min-width: auto !important;">
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('store')}" style="font-weight:800;color:#1E9FFF;">{$storeinfo['title']}</a>
+        <span style="font-size:12px;color: #888;padding:0 10px;">{php echo date('Y-m-d',$storeinfo['createtime'])}</span>
+        <span style="font-size:12px;color: #888;padding:0 10px;">会员：{$storeinfo['usercount']}</span>
+        <span style="font-size:12px;color: #888;padding:0 10px;">类型：{$storeinfo['category_name']}</span>
+        
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('store', array('op' => 'update','id'=>$storeinfo['id']))}">修改店面</a>
+    </div>
+    <div class="layui-tab layui-tab-brief" lay-filter="test1">
+      <ul class="layui-tab-title">
+        <li class="{if $op=='article'}layui-this{/if} lay-tab" lay-href="{php echo $this->createWebUrl('storemanage',array('storeid'=>$storeinfo['id']))}">文章管理</li>
+        <li class="lay-tab {if $op == 'product'}layui-this{/if}" lay-href="{php echo $this->createWebUrl('storemanage',array('op'=>'product','storeid'=>$storeinfo['id']))}">产品管理</li>
+        <li class="lay-tab {if $op == 'account'}layui-this{/if}" lay-href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','storeid'=>$storeinfo['id']))}" >财务</li>
+        <li class="lay-tab {if $op == 'storerules'}layui-this{/if}" lay-href="{php echo $this->createWebUrl('storemanage',array('op'=>'storerules','storeid'=>$storeinfo['id']))}" >规则</li>
+        <li class="lay-tab {if $op == 'coupon'}layui-this{/if}" lay-href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','storeid'=>$storeinfo['id']))}" >优惠券</li>
+      </ul>
+    </div>
+    <script>
+    $(".lay-tab").click(function(){
+
+        var url = $(this).attr("lay-href");
+
+        window.location.href=url;
+
+    });
+    </script>
+    {if $op == 'article'}
+        <div style="padding: 10px;">
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'article','type'=>'category','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='category'}active{/if}" style="display: none;">文章分类</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'article','type'=>'article','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='article'}active{/if}" style="margin-left: 0;">文章管理</a>
+            {if $type == 'category'}
+            <a class="layui-btn layui-btn-sm" style="float: right;" href="{php echo $this->createWebUrl('storemanage',array('op'=>'article','type'=>'category','active'=>'add','storeid'=>$storeinfo['id']))}">添加分类</a>
+            {elseif $type == 'article'}
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'article','type'=>'article','active'=>'add','storeid'=>$storeinfo['id']))}" style="float: right;" class="layui-btn layui-btn-sm">添加文章</a>
+            {/if}
+        </div>
+        {if $type == 'category'}
+            {php echo $this->storeArticleCategory($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'article'}
+            {php echo $this->storeArticleManage($_W,$_GPC['storeid'],$_GPC);}
+        {/if}
+    {elseif $op == 'product'}
+     <div style="padding: 10px;">
+         <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'product','type'=>'category','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='category'}active{/if}" style="display: none;">产品分类</a>
+         <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'product','type'=>'product','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='product'}active{/if}" style="margin-left: 0;">产品管理</a>
+         {if $type == 'category'}
+         <a class="layui-btn layui-btn-sm" style="float: right;" href="{php echo $this->createWebUrl('storemanage',array('op'=>'product','type'=>'category','active'=>'add','storeid'=>$storeinfo['id']))}">添加分类</a>
+         {elseif $type == 'product'}
+         <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'product','type'=>'product','active'=>'add','storeid'=>$storeinfo['id']))}" style="float: right;" class="layui-btn layui-btn-sm">添加产品</a>
+         {/if}
+     </div>
+        {if $type == 'category'}
+            {php echo $this->storeProductCategory($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'product'}
+            {php echo $this->storeProductManage($_W,$_GPC['storeid'],$_GPC);}
+        {/if}
+    {elseif $op == 'account'}
+        <div style="padding: 10px;">
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','type'=>'account','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='account'}active{/if}">总账单</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','type'=>'recharge','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='recharge'}active{/if}">充值记录</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','type'=>'consum','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='consum'}active{/if}">消费记录</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','type'=>'credit1','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='credit1'}active{/if}">积分记录</a>
+            <a class="layui-btn layui-btn-sm" style="float: right;" href="{php echo $this->createWebUrl('storemanage',array('op'=>'account','type'=>$type,'active'=>'excel','storeid'=>$storeinfo['id']))}">导出</a>
+        </div>
+        {if $type == 'account'}
+            {php echo $this->storeAccountAccount($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'recharge'}
+            {php echo $this->storeAccountRecharge($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'consum'}
+            {php echo $this->storeAccountConsum($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'credit1'}
+            {php echo $this->storeAccountCredit1($_W,$_GPC['storeid'],$_GPC);}
+        {/if}
+    {elseif $op == 'storerules'}
+        <div style="padding: 10px 0;">
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'storerules','type'=>'rules','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='rules'}active{/if}">储值规则</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'storerules','type'=>'consum','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='consum'}active{/if}">消费规则</a>
+            {if $type == 'rules'}
+            <a class="layui-btn layui-btn-sm" style="float: right; margin-right: 10px;" href="{php echo $this->createWebUrl('storemanage',array('op'=>'storerules','type'=>'rules','active'=>'add','storeid'=>$storeinfo['id']))}">添加储值规则</a>
+            {elseif $type == 'consum'}
+            <a class="layui-btn layui-btn-sm" style="float: right; margin-right: 10px;" href="{php echo $this->createWebUrl('storemanage',array('op'=>'storerules','type'=>'consum','active'=>'add','storeid'=>$storeinfo['id']))}">添加消费规则</a>
+            {/if}
+            <button class="layui-btn layui-btn-sm" style="float: right; margin-right: 10px;" onclick="javascript:document.getElementById('blockquote').style.display='block';">
+                <i class="layui-icon">&#xe702;</i>提示
+            </button>           
+        </div>
+        <blockquote class="layui-elem-quote layui-quote-nm" style="display: none;color: #1E9FFF;font-size: 14px;position: relative;padding-right: 90px;" id="blockquote">
+            提示：规则添加优惠券时,可以添加平台下匹配的多店优惠券
+            <div class="layui-btn layui-btn-primary layui-btn-sm" style="position: absolute;right: 15px;top: 50%;margin-top: -15px;" onclick="javascript:this.parentNode.style.display='none';">关闭</div>
+        </blockquote>
+        {if $type == 'rules'}
+            {php echo $this->storeRulesRecharge($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'consum'}
+            {php echo $this->storeRulesConsum($_W,$_GPC['storeid'],$_GPC);}
+        {/if}
+    {elseif $op == 'coupon'}
+        <div style="padding: 10px;">
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','type'=>'coupon','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='coupon'}active{/if}">优惠券管理</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','type'=>'couponlog','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='couponlog'}active{/if}">优惠券记录</a>
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','type'=>'couponmemlog','storeid'=>$storeinfo['id']))}" class="layui-btn-sm layui-btn layui-btn-primary {if $type=='couponmemlog'}active{/if}">优惠券领取记录</a>
+            {if $type == 'coupon'}
+            <a href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'add','storeid'=>$storeinfo['id']))}" style="float: right; margin-right: 10px;" class="layui-btn layui-btn-sm">添加优惠券</a>
+            <button class="layui-btn layui-btn-sm" style="float: right; margin-right: 10px;" onclick="javascript:document.getElementById('blockquote').style.display='block';">
+                <i class="layui-icon">&#xe702;</i>提示
+            </button>
+            {/if}
+        </div>
+        <blockquote class="layui-elem-quote layui-quote-nm" style="display: none;color: #1E9FFF;font-size: 14px;position: relative;padding-right: 90px;" id="blockquote">
+        提示：只能添加、修改、删除该店铺下的优惠券  列表可能显示<red>包含该店铺平台下的多店优惠券,但不能操作多店优惠券</red>
+        <div class="layui-btn layui-btn-primary layui-btn-sm" style="position: absolute;right: 15px;top: 50%;margin-top: -15px;" onclick="javascript:this.parentNode.style.display='none';">关闭</div>
+        </blockquote>
+        {if $type == 'coupon'}
+            {php echo $this->storeCoupon($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'couponlog'}
+            {php echo $this->storeCouponLog($_W,$_GPC['storeid'],$_GPC);}
+        {elseif $type == 'couponmemlog'}
+            {php echo $this->storeCouponMemLog($_W,$_GPC['storeid'],$_GPC);}
+        {/if}
+    {/if}
+</body>
+
+</html>

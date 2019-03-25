@@ -1,0 +1,69 @@
+{template 'common/header'}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>红包配置</strong>
+    </div>
+    <div class="panel-body">
+        <form id="rdForm" action="{php echo $this->createWebUrl('updateconfig')}" method="post">
+            <div class="form-group">
+                <label >单个红包最小金额（单位：分）</label>
+                <input type="number" class="form-control" id="minAmount" name="minAmount" value="{$config['min_amount']}" placeholder="">
+            </div>
+            <div class="form-group">
+                <label >单个红包最大金额（单位：分）</label>
+                <input type="number" class="form-control" id="maxAmount" name="maxAmount" value="{$config['max_amount']}" placeholder="">
+            </div>
+            <div class="form-group">
+                <label >本次活动红包总金额（单位：分）</label>
+                <input type="number" class="form-control" id="totalAmount" name="totalAmount" value="{$config['max_total_amount']}" placeholder="">
+            </div>
+            <div class="form-group">
+                <label >红包发完提示语</label>
+                <input type="text" class="form-control" id="totalAmountTip" name="totalAmountTip" value="{$config['max_total_amount_tip']}" placeholder="">
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="doSmt()">1.更新配置</button>
+            <button type="button" class="btn btn-primary" onclick="refreshCache()">2.刷新缓存</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function doSmt(){
+        var min = $("#minAmount").val();
+        min = parseInt(min);
+        if(isNaN(min) || min<100){
+            alert("最小金额不正确");
+            return;
+        }
+
+        var max = $("#maxAmount").val();
+        max = parseInt(max);
+        if(isNaN(max) || max<100 || max<min){
+            alert("最大金额不正确");
+            return;
+        }
+
+        var total = $("#totalAmount").val();
+        total = parseInt(total);
+        if(isNaN(total) || total<100 || total<max){
+            alert("总金额不正确");
+            return;
+        }
+
+        var tip = $("#totalAmountTip").val();
+        if(tip == ""){
+            alert("超额提示不能为空");
+            return;
+        }
+
+        var form = document.getElementById("rdForm");
+        form.submit();
+    }
+
+    function refreshCache(){
+        var form = document.getElementById("rdForm");
+        form.action = "{php echo $this->createWebUrl('updateconfigcache')}";
+        form.submit();
+    }
+</script>

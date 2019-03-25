@@ -1,0 +1,154 @@
+{template 'common/header'}
+<head>
+    <style>
+        html,
+        body,
+        .mui-content {
+            height: 0px;
+            margin: 0px;
+            background-color: #f5fafe;
+        }
+        h5.mui-content-padded {
+            margin-left: 3px;
+            margin-top: 20px !important;
+        }
+        h5.mui-content-padded:first-child {
+            margin-top: 12px !important;
+        }
+        .mui-btn {
+            font-size: 16px;
+            padding: 8px;
+            margin: 3px;
+        }
+        .ui-alert {
+            text-align: center;
+            padding: 10px  1px;
+            font-size: 16px;
+        }
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">延期</h1>
+</header>
+<div class="mui-content">
+    <div class="mui-card" style="margin-top: 10%">
+        <div style="text-align: center;margin-top: 40px;">
+            <img src="{HLMMS_MOBILE_ICOS}Delay.png"/>
+            <h3>延期</h3>
+            <div class="mui-content-padded" style="margin-top: 10%">
+                <button id='time4' data-options='{"type":"date"}' class="btn mui-btn mui-btn-block"style="height: 60px;float: left">
+                    <input name="newtime" id='newtime' class="ui-alert" value="" readOnly="true" style="float: left"/>
+                    <h4 style="margin-top: 4%">请选择时间</h4>
+                </button>
+                <input type="hidden" name="memberid" id="memberid" value="{$memberid}">
+            </div>
+            <div class="mui-content-padded" align="center">
+                <button name="button_submit" id="button_submit" value="确认" type="button" class="mui-btn mui-btn-primary " style="width: 50%;height: 50px;margin-bottom: 10%;margin-top: 10%" />确认</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("button_submit").addEventListener('tap', function() {
+        var url ='{php echo $this->createMobileUrl('member',array('op' => 'timeextension'))}';
+        var newtime = mui("#newtime")[0].value;
+        var memberid = mui("#memberid")[0].value;
+        mui.ajax(url,{
+            data:{
+                newtime:newtime,
+                memberid:memberid,
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+                var code1 = data['message']['code'];
+                mui.toast(code1);
+                if(code1 == 0){
+                    mui.openWindow({
+                        url: '{php echo $this->createMobileUrl('member',array('op'=>'indexoperating'))}&memberid='+ memberid,
+                        preload: true,
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+
+                }
+                else{
+
+                    mui.toast('延期失败！');
+                }
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('失败');
+            }
+        });
+    });
+</script>
+<script>
+    (function($) {
+        $.init();
+        var result = $('#newtime')[0];
+        var btns = $('.btn');
+        btns.each(function(i, btn) {
+            btn.addEventListener('tap', function() {
+                var _self = this;
+                if(_self.picker) {
+                    _self.picker.show(function (rs) {
+                        result.value =  rs.text;
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                } else {
+                    var optionsJson = this.getAttribute('data-options') || '{}';
+                    var options = JSON.parse(optionsJson);
+                    var id = this.getAttribute('id');
+                    /*
+                     * 首次显示时实例化组件
+                     * 示例为了简洁，将 options 放在了按钮的 dom 上
+                     * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+                     */
+                    _self.picker = new $.DtPicker(options);
+                    _self.picker.show(function(rs) {
+                        /*
+                         * rs.value 拼合后的 value
+                         * rs.text 拼合后的 text
+                         * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+                         * rs.m 月，用法同年
+                         * rs.d 日，用法同年
+                         * rs.h 时，用法同年
+                         * rs.i 分（minutes 的第二个字母），用法同年
+                         */
+                        result.value =  rs.text;
+                        /*
+                         * 返回 false 可以阻止选择框的关闭
+                         * return false;
+                         */
+                        /*
+                         * 释放组件资源，释放后将将不能再操作组件
+                         * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+                         * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+                         * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+                         */
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                }
+
+            }, false);
+        });
+    })(mui);
+</script>
+</body>
+

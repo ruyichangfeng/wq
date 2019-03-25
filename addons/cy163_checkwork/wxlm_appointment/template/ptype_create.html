@@ -1,0 +1,90 @@
+{template 'common/header'}
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('ptype', array('op'=>'display'));}">项目类型管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('ptype', array('op'=>'create'));}">添加项目类型</a></li>
+    </ul>
+    <form action="{php echo $this->createWebUrl('ptype', array('op'=>'create'))}" method="post" class="form-horizontal form" id="ptype_form">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">{if $op == 'create'}添加项目类型{else if $op == 'modify'}编辑项目类型{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" hidden>
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="ptype[ptype_id]"  class="form-control" value="{$ptype['ptype_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>排序</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="ptype[ptype_order]"  class="form-control" value="{$ptype['ptype_order']}" />
+                        <div class="help-block">序号越大越靠前</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>所属商家</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="ptype[ptype_businessid]" class="form-control" id="">
+                            <option value="" selected>请选择</option>
+                            {loop $business $key $item}
+                            <option value="{$item['business_id']}" {if $ptype['ptype_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>项目类型名称</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="ptype[ptype_title]"  class="form-control" value="{$ptype['ptype_title']}" maxlength="20"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+    $(function () {
+
+
+    })
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#ptype_form').submit(function(){
+
+
+                if($('input[name="ptype[ptype_order]"]').val() == ''){
+                    util.message('未填写排序.');
+                    return false;
+                }
+                if($('select[name="ptype[ptype_businessid]"]').val() == ''){
+                    util.message('未选择所属商家.');
+                    return false;
+                }
+                if($('input[name="ptype[ptype_title]"]').val() == ''){
+                    util.message('未填写项目类型名称.');
+                    return false;
+                }
+
+
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

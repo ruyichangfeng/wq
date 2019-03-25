@@ -1,0 +1,96 @@
+﻿<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0" >
+	<title>订单列表</title>
+	<style type="text/css">
+		*{margin: 0px; padding:0px;}
+		body{background-color: #eee; font-family: "Microsoft Yahei";}
+		div	{display: block;}
+		a {text-decoration: none;}
+		li{list-style: none;}
+
+		.integration-list{width: 100%; height: 40px;}
+		.list-nav {width: 100%; height: 40px; background-color: #fff; float: left;}
+		.list-nav li {width: 25%; float: left; text-align: center; padding-top: 10px;}
+		.list-nav li a{font-size: 14px; color: #555; font-weight: bold;}
+
+		.list-content{width: 100%; margin-top: 5px;}
+		.list-content li{padding-bottom: 5px; float: left;}
+		.list-content .list-top{width: 100%; height: 30px;background-color: #fff; float: left; }
+		.list-content .list-top .status-l{width: 30%; float: left; font-size: 12px; margin-left: 2%; margin-top: 8px; color: #555;}
+		
+		.list-top .status-r{font-size: 12px; color: #f43530; float:right; margin-top:8px; margin-right:3%; font-weight: bold;}
+
+		.list-body{width: 100%; float: left;}
+		.list-body .left-pic{float: left; width: 20%; height: 83px;}
+		.list-body .left-pic img{margin-top: 8px; margin-left: 8%; float: left;}
+		.list-body .center-txt{width: 60%; float: left; height: 83px; overflow: hidden;}
+		.list-body .center-txt p {font-size: 12px; margin-top:12px; margin-left: 5%; color: #666;}
+
+		.list-body .right-txt{width: 20%; float: left; height: 83px; text-align: right;}
+		.list-body .right-txt p{font-size: 14px; margin-top: 13px; margin-right: 15px; font-weight: bold; color: #666;}
+		.list-body .right-txt p.price{color:#f43530; font-size: 15px; margin-right: 15px;}
+
+		.list-footer {width: 100%; height: 40px; background-color: #fff; float: left;} 
+		.list-footer .total {padding-bottom: 22px; padding-right: 5%; border-bottom: 1px solid #ddd; margin-top: 10px; margin-left: 2%; margin-right: 2%;}
+		.list-footer .total .number {font-size: 14px; color: #666; float: left; margin-left:40%; }
+		.list-footer .total p{font-size: 14px; color: #666; float: right;}
+	</style>
+
+
+</head>
+<body>
+	<div class="integration-list">
+		<div class="list-nav">
+			<ul>
+				<li><a href="{php echo $this->createMobileUrl('account', array('action' => 'order_list'))}">全部</a></li>
+				<li><a href="{php echo $this->createMobileUrl('account', array('action' => 'order_list', 'whe' => 'status', 'status' => 0))}">待付款</a></li>
+				<li><a href="{php echo $this->createMobileUrl('account', array('action' => 'order_list', 'whe' => 'groups', 'status' => 0))}">已付款</a></li>
+				<li><a href="{php echo $this->createMobileUrl('account', array('action' => 'order_list', 'whe' => 'groups', 'status' => 1))}">成功组团</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="list-content">
+		<ul>
+
+			{loop $orders $order}
+			<a href="{php echo $this->createMobileUrl('account', array('action' => 'order_info', 'uid' => $order['uid']))}">
+			<li>
+				<!-- <div > 
+					<img style="margin-left:2%;" src="{php echo $_SESSION[C('session_prefix').'user']['avatar']}" width="13%" height="40">
+						<p><strong>{php echo $_SESSION[C('session_prefix').'user']['nickname']}</strong></p>
+						
+				</div>-->
+				
+				<div class="list-top">
+					<p class="status-l">订单状态</p>
+					<p class="status-r">{php echo status2string($order['status']);}</p>
+				</div>
+				<div class="list-body">
+					<div class="left-pic">
+						<img src="{$_W['attachurl']}{$order['logo']}" width="90%" height="67">
+					</div>
+					<div class="center-txt">
+						<p>{$order['goodsname']}</p>
+					</div>
+					<div class="right-txt">
+						<p class="price">￥<span>{if $order['buyway'] == 'groups'}{$order['gprice']}{else}{$order['sprice']}{/if}</span></p>
+						<p>×<span style="font-size:15px;">{$order['goodsnums']}</span></p>
+					</div>
+				</div>
+				<div class="list-footer">
+					<div class="total">
+						<p class="number">共{$order['goodsnums']}件商品</p>
+						<p>合计：￥<span>{$order['fee']}</span></p>
+					</div>
+				</div>
+			</li>
+			</a>
+			{/loop}
+		</ul>
+			
+	</div>
+</body>
+</html>

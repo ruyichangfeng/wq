@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{$school['title']}</title>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=yes" />
+        <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/bindingFormFor.css" />
+        <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+        <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/jquery-emoji.css?v=4.9" />
+        <!--<link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/bjqCss.css?v=4.9">-->
+        <script type="text/javascript" src="{OSSURL}public/mobile/js/jquery-1.11.3.min.js?v=4.6"></script>
+        {php echo register_jssdk();}
+        <!--<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>-->
+        <script src="{OSSURL}public/mobile/js/tx.js"></script>
+        <script type="text/javascript" src="{OSSURL}public/mobile/js/swipe.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="{OSSURL}public/mobile/js/jquery.js"></script>
+        <script src="{OSSURL}public/mobile/js/PromptBoxUtil.js"></script>
+        <style>
+
+            #birthday{
+                border-bottom:1px solid #c6c6c6;position:relative;display:block;height:30px;line-height:30px;opacity:1;
+            }
+            #selMonth{
+                margin-left:-40px;
+                position:relative;
+                z-index:10;
+                opacity:0;
+            }
+            .bangdingForm{margin:5px 10px;background:#fff;border:1px solid #d0d0d0;border-radius:5px;}
+            .bangdingBox .changeBox{margin:10px;display:none;}
+            .bangdingBox .changeBox ul{width:95%;}
+            .bangdingBox .changeBox ul li{width:99%;position:relative;padding:10px 0;overflow:hidden;}
+            .bangdingBox .changeBox ul li span{display:block;height:30px;line-height:30px;}
+            .bangdingBox .changeBox ul li span textarea{border:none;height:30px;font-size:15px;width:100%;border-bottom:1px solid #c6c6c6;}
+            .bangdingBox .changeBox ul li span input{border:none;height:30px;font-size:15px;width:100%;border-bottom:1px solid #c6c6c6;}
+            .bangdingBox .changeBox ul li span.l{position:absolute;width:100px;left:0;top:10px;color:#313131;}
+            .bangdingBox .changeBox ul li span.r{margin-left:100px;border-bottom:1px solid #c6c6c6;position:relative;}
+            .bangdingBox .changeBox ul li span.r label{width:100%;height:100%;display: block;text-align: left;}
+            .bangdingBox .changeBox ul li span.r select{position:absolute;left:0;top:0;width:100%;height:100%;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;}
+            .bangdingBox .changeBox ul li span.r i{width:0;height:0;border-width:0 0 6px 6px;border-style:solid;border-color:transparent transparent #666 transparent;position:absolute;right:5px;bottom:5px;}
+            .bangdingBox .changeBox ul li span.remind{margin-left:100px;overflow:hidden;display:block;height:auto;}
+            .bangdingBox .changeBox ul li span.remind i{float:left;width:12px;height:12px;margin-top:5px;}
+            .bangdingBox .changeBox ul li span.remind i img{width:100%;height:100%;}
+            .bangdingBox .changeBox ul li span.remind label{display:block;margin-left:15px;line-height:auto;font-size:14px;line-height:22px;text-align:left;}
+            .submitBtn{margin:2px 10px 10px 10px;height:50px;line-height:50px;border-radius:5px;text-align:center;color:white;cursor:pointer;}
+            .imagePage{
+                position:relative;
+                width:25%;
+                float:left;
+            }
+            .boxImages{
+                height:65px;
+                width:86%;
+                margin-top:10px;
+                margin-right:5px;
+            }
+        </style>
+    </head>
+<body>
+<div class="all">
+    <div class="header mainColor">
+        <div class="l">
+            <a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
+        </div>
+        <div class="m">
+            <span>闲书上架</span>
+        </div>
+    </div>
+    <div class="_header" style="30px;"></div>
+    <div class="bangdingForm">
+        <div class="bangdingBox">
+            <div id="parentBox" class="changeBox activeBox">
+                <ul>
+                    <li>
+                        <span class="l">书&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</span>
+								<span class="r">
+									<input id="name" type="text" value="{$book['title']}" disabled/>
+								</span>
+                    </li>
+                    <li>
+                        <span class="l">作&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;者：</span>
+								<span class="r">
+									<input id="author" type="text" value="{$book['author']}" disabled/>
+								</span>
+                    </li>
+                    <li>
+                        <span class="l">价&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格：</span>
+								<span class="r">
+									<input id="price" type="text" value="{$book['price']}" {if $book['price'] > 0}disabled{/if}/>
+								</span>
+                    </li>
+                    <li>
+                        <span class="l">闲书类别：</span>
+								<span class="r">
+									<label>{if $book['cat_id']}{$book_lb[$book['cat_id']]['sname']}{else}请选择{/if}</label>
+										<select id="cat_id">
+                                            <option value="">请选择</option>
+                                            {loop $book_lb $lb}
+                                            {if $book['cat_id'] == $lb['sid']}
+                                            <option value="{$lb['sid']}" selected>{$lb['sname']}</option>
+                                            {else}
+                                            <option value="{$lb['sid']}">{$lb['sname']}</option>
+                                            {/if}
+                                            {/loop}
+                                        </select>
+									<i></i>
+								</span>
+                    </li>
+                    <!--<li>-->
+                        <!--<span class="l">接受互换：</span>-->
+                               <!--<span class="r">-->
+									<!--<label>请选择</label>-->
+										<!--<select id="is_accept_exchange">-->
+                                            <!--<option value="">请选择</option>-->
+                                            <!--<option value="1">不接受</option>-->
+                                            <!--<option value="2">接受</option>-->
+                                        <!--</select>-->
+									<!--<i></i>-->
+								<!--</span>-->
+                    <!--</li>-->
+                    <li>
+                        <span class="l">适合年龄：</span>
+								<span class="r">
+									<label>{if $book['age_id']}{$book_age[$book['age_id']]['sname']}{else}请选择{/if}</label>
+										<select id="age_id">
+                                            <option value="">请选择</option>
+                                            {loop $book_age $age}
+                                            {if $book['age_id'] == $age['sid']}
+                                            <option value="{$age['sid']}" selected>{$age['sname']}</option>
+                                            {else}
+                                            <option value="{$age['sid']}">{$age['sname']}</option>
+                                            {/if}
+                                            {/loop}
+                                        </select>
+									<i></i>
+								</span>
+                    </li>
+                    <!--上传正面图片-->
+                    <li style="height: 100px; margin-top:10px;margin-right:5px;">
+                        <span class="l">正面照片：</span>
+								<span class="r" style="border-bottom:0px solid #c6c6c6;">
+                                    <input type="hidden" id="coverImage" name="coverImage"/>
+                                    <img id = "img_cover" alt="image"   onclick="uploadImg('coverImage','img_cover')" src="http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/insertImage.png" style="height:80px;width:80%;margin: 10px 5px 10px 0;">
+                                </span>
+                    </li>
+                    <!--上传反面图片-->
+                    <li style="height: 100px; margin-top:10px;margin-right:5px;">
+                        <span class="l">反面照片：</span>
+								<span class="r" style="border-bottom:0px solid #c6c6c6;">
+                                    <input type="hidden" id="backImage" name="backImage"/>
+                                    <img id = "img_back" alt="image"  onclick="uploadImg('backImage','img_back')" src="http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/insertImage.png" style="height:80px;width:80%;margin: 10px 5px 10px 0;">
+                                </span>
+                    </li>
+                </ul>
+                <div class="submitBtn mainColor" onclick="Tijiao();">提交</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    $(document).ready(function() {
+        $("#cat_id").change(function() {
+            changeCat();
+        });
+        $("#age_id").change(function() {
+            changeAge();
+        });
+    });
+    function changeCat(){
+        $("#cat_id").parent().find("label").html($("#cat_id").find("option:selected").text());
+    }
+    function changeAge(){
+        $("#age_id").parent().find("label").html($("#age_id").find("option:selected").text());
+    }
+    function changeAccept(){
+        $("#is_accept_exchange").parent().find("label").html($("#is_accept_exchange").find("option:selected").text());
+    }
+    function Tijiao(){
+        var activeBoxID = $(".bangdingBox").find(".activeBox").attr("id");
+        if(activeBoxID == "parentBox"){
+            if($("#cat_id").val() == null || $("#cat_id").val() == ""){
+                PB.prompt("闲书类别必选！");
+                return;
+            }
+            if($("#age_id").val() == null || $("#age_id").val() == ""){
+                PB.prompt("闲书适合年龄必选！");
+                return;
+            }
+        }
+        if(confirm("确认提交？")){
+            var submitData = {
+                openid :"{$openid}",
+                schoolid :"{$schoolid}",
+                weid : "{$weid}",
+                id : "{$book['id']}",
+                cat_id : $("#cat_id").val(),
+                age_id : $("#age_id").val(),
+                price : $("#price").val(),
+                coverImg: $("#coverImage").val(),
+                backImg:$("#backImage").val(),
+                isbn : "{$isbn}"
+            };
+            $.post("{php echo $this->createMobileUrl('addbook',array('op'=>'add'))}",submitData,function(data){
+                if(data.result){
+                    PB.prompt(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('mybook', array('schoolid' => $schoolid), true)}"
+                }else{
+                    PB.prompt(data.msg);
+                }
+            },'json');
+        }
+    }
+    var images = {
+        localId: [],
+        serverId: []
+    };
+
+    function uploadImg(id,show_id){
+
+        wxChooseImage(id,show_id);
+    }
+
+    /**
+     * 微信选择图片
+     */
+    function wxChooseImage(id,show_id){
+        wx.chooseImage({
+            success: function (res) {
+                images.localId = res.localIds;
+                var obj=new Image();
+                obj.src=res.localIds[0];
+                imagesUploadWx(id,show_id);
+            }
+        });
+    };
+
+    function imagesUploadWx(id,show_id) {
+        wx.uploadImage({
+            localId: images.localId[0],
+            isShowProgressTips:1,//// 默认为1，显示进度提示
+            success: function (res) {
+                $("#"+id).val(res.serverId);
+                $("#"+show_id).attr('src','http://file.api.weixin.qq.com/cgi-bin/media/get?access_token='+"{$token2}"+'&media_id='+res.serverId);
+//                saveImage(id,show_id);
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+    };
+    function saveImage(id,show_id) {
+        PB.prompt("照片上传中，请稍等~","forever");
+        var url = "{php echo $this->createMobileUrl('addbook',array('op'=>'uploadImg'))}";
+        var submitData = {
+            bigImage:$("#"+id).val(),
+            openid :"{$openid}",
+            schoolid :"{$schoolid}",
+            weid : "{$weid}",
+            isbn : "{$isbn}",
+            cat_id : $("#cat_id").val(),
+            age_id : $("#age_id").val(),
+            id : "{$book['id']}",
+            type : show_id
+        };
+        $.post(url, submitData, function(data) {
+            if (data.result) {
+                PB.prompt(data.msg);
+                location.reload();
+            } else {
+                PB.prompt(data.msg);
+            }
+        },'json');
+    }
+
+    /**
+     * 新增图片
+     */
+    function addImages(base64){
+        var DivFixedPosition = document.getElementById("DivFixedPosition");
+        var imageBoxBody = document.getElementById("imageBoxBody");
+        var imagePage = document.createElement("div");
+        imagePage.setAttribute("class","imagePage");
+        imageBoxBody.insertBefore(imagePage,DivFixedPosition);
+        $(imagePage).html('<img alt="image" src="'+base64+'"  class="boxImages baseUploadImg"><span class="deleteImage" style= "background: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/deleteImage.png); background-size: 100%;display: inline;float: right;height: 25%;position: absolute;right: 0px;width: 25%;z-index: 4;" onclick="deleteImage(this)"></span>');
+        setImageHeight();
+        imagesTotal()
+    }
+
+    /**
+     * 新增图片
+     */
+    function loadImages(id,url){
+        var DivFixedPosition = document.getElementById("DivFixedPosition");
+        var imageBoxBody = document.getElementById("imageBoxBody");
+        var imagePage = document.createElement("div");
+        imagePage.setAttribute("class","imagePage");
+        imageBoxBody.insertBefore(imagePage,DivFixedPosition);
+        $(imagePage).html('<img alt="image" src="'+url+'" id='+id+'  class="boxImages wxUploadImg"><span class="deleteImage" style= "background: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/deleteImage.png); background-size: 100%;display: inline;float: right;height: 25%;position: absolute;right: 0px;width: 25%;z-index: 4;" onclick="deleteImage(this)"></span>');
+        setImageHeight();
+        imagesTotal()
+    }
+
+
+    /**
+     * 删除图片
+     * @param span
+     */
+    function deleteImage(span){
+        //todo删除图片
+        var deleteNode = span.parentNode;
+        var arrayIndex = $.inArray($(span.parentNode).find('img').attr("src"),images.localId)
+        images.localId.splice(arrayIndex,1);
+        images.serverId.splice(arrayIndex,1);
+        deleteNode.parentNode.removeChild(span.parentNode);
+        imagesTotal();
+    }
+
+    /**
+     * 设置图片的高
+     */
+    function setImageHeight(){
+        var imageWidth = $(".boxImages")[0].offsetWidth;
+        $(".boxImages").height(imageWidth);
+    }
+</script>
+</html>

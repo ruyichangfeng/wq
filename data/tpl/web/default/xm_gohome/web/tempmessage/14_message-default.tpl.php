@@ -1,0 +1,241 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<ul class="nav nav-tabs">
+    <li><a href="<?php  echo $this->createWebUrl('tempmessage', array('foo'=>'index'));?>">模板消息列表</a></li>
+    <li><a href="<?php  echo $this->createWebUrl('tempmessage', array('foo'=>'add'));?>">添加模板消息</a></li>
+    <li  class="active"><a href="<?php  echo  $this->createWebUrl('tempmessage', array('foo'=>'default'));?>">默认模板消息</a></li>
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="<?php  echo $this->createWebUrl('Tempmessage', array('foo'=>'defaultok'));?>" method="post">
+
+    <input type="hidden" name="id" value="<?php  echo $item['id'];?>" >    
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                审核模板消息设置
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">个人审核模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="stmpmsg_id" id="stmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['stmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['stmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司审核模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="ctmpmsg_id" id="ctmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['ctmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['ctmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商铺审核模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="mtmpmsg_id" id="mtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['mtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['mtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>   
+                        <span class="help_block"></span>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                项目模板消息设置
+            </div>
+            <div class="panel-body">        
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">项目订单推送给服务人员默认模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="otmpmsg_id" id="otmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['otmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['otmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务人员抢单推送给用户默认模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="qtmpmsg_id" id="qtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['qtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['qtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户选定服务人员推送给选定人默认模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="xtmpmsg_id" id="xtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['xtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['xtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务人员确认价格推送给用户默认模板消息</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="wtmpmsg_id" id="wtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['wtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['wtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+            </div>    
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                商铺下单模板消息设置
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户下单推送给商铺接单模板消息
+                    </label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="ttmpmsg_id" id="ttmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['ttmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['ttmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当用户下单后推送给下单商铺的模板消息</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">
+                    商铺接单推送给用户的模板消息
+                    </label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="utmpmsg_id" id="utmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['utmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['utmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">
+                    商铺确认后给用户的模板消息
+                    </label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="quetmpmsg_id" id="quetmpmsg_id" class="form-control  input-s-lg">
+                            <option value="">---选择默认模板消息---</option>
+                            <option value="0" <?php  if($item['quetmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" <?php  if($item['quetmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help_block">当商铺送货上门确认以后，发送给用户的模板消息</span>
+                    </div>
+                </div>
+            </div>    
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    商铺竞价模板消息设置
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户竞价订单推送模板消息</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <select name="needtmpmsg_id" id="needtmpmsg_id" class="form-control  input-s-lg">
+                                <option value="">---选择默认模板消息---</option>
+                                <option value="0" <?php  if($item['needtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                                <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                                <option value="<?php  echo $vo['id'];?>" <?php  if($item['needtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                            <span class="help_block">当用户发布竞价信息时，推送给相应商铺的模板消息</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">商铺抢单报价推送模板消息</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <select name="grabtmpmsg_id" id="grabtmpmsg_id" class="form-control  input-s-lg">
+                                <option value="">---选择默认模板消息---</option>
+                                <option value="0" <?php  if($item['grabtmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                                <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                                <option value="<?php  echo $vo['id'];?>" <?php  if($item['grabtmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                            <span class="help_block">当商铺抢单报价以后，推送给用户的模板消息</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户选定竞价商铺推送模板消息</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <select name="suretmpmsg_id" id="suretmpmsg_id" class="form-control  input-s-lg">
+                                <option value="">---选择默认模板消息---</option>
+                                <option value="0" <?php  if($item['suretmpmsg_id'] == 0) { ?> selected <?php  } ?>>不发送模板消息</option>
+                                <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                                <option value="<?php  echo $vo['id'];?>" <?php  if($item['suretmpmsg_id'] == $vo['id']) { ?> selected <?php  } ?>><?php  echo $vo['message_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                            <span class="help_block">当用户选定竞价商铺时，推送给相应商铺的模板消息</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>     
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" type="submit" value="保存" class="btn btn-primary btn-block" />
+                        <input type="hidden" name="token" value="<?php  echo $_W['token'];?>" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

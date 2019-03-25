@@ -1,0 +1,86 @@
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-api-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/demo_base.js"></script>
+<script>
+	window.alert = function (e) {
+		if (e != null && e.indexOf("提示内容")>-1){
+		}else {
+		}
+	};
+	function getQueryStr(str) {
+		var LocString = String(window.document.location.href);
+		var rs = new RegExp("(^|)" + str + "=([^&]*)(&|$)", "gi").exec(LocString), tmp;
+		if (tmp = rs) {
+			return decodeURIComponent(tmp[2]);
+		}
+		return "";
+	}
+	$(function () {
+		var api = TISAPI.New("{php echo $this->createWebUrl('interface')}", { tisId: getQueryStr("tisId") }, false);
+		console.log(api);
+		window.tis = TIS(".tis-container", {
+			api: api,                               //必须
+			//clientid:"clientId1"                  //可选，默认随机生成
+			name: '.',                           //可选，默认为Anonymous
+			image: '.',          //可选，默认未定义
+			generateUserEvent: true,             //可选，默认为true
+			template:           {onReceiveMessage: onReceiveMessage},     //界面模版
+			//以下均可选
+			failure: function (error, when) {       //某个操作失败时调用
+				if (typeof error != "string") {
+					if (when == "sendMsg" && error.code == 400 && error.error == "instance closed") {
+						alert("TIS实例已关闭");
+						return;
+					}
+					alert(when + "操作失败");
+				} else {
+					alert("操作失败：" + error);
+				}
+			},
+			onSendSuccess: function (data) {
+				//当发送消息成功时调用
+				console.log("消息发送成功");
+			},
+			onReconnect: function () {
+				//当需要与服务器重新连接时调用
+				console.log("正在与服务器重连");
+			},
+			onConnect: function () {
+				//当与服务器连接成功时调用
+				console.log('我进来了');
+				console.log("与服务器重连接成功");
+				var loginInfo = {
+					'identifier': 'user_0', //当前用户ID,必须是否字符串类型，选填
+					'uid':0,
+					'id':{$cid},
+					'identifierNick': '{$data["nickname"]}', //当前用户昵称，选填
+					'headurl': '{$data["headimgurl"]}', //当前用户默认头像，选填
+					'isadmin':0,
+					'rid':{$data["rid"]},
+					'shutup':0,
+					'type':'grouppacket',
+					'siteroot':"{$_W['siteroot']}"
+				};
+				console.log(11);
+				tis.SendMessage({$data['content']},'',JSON.stringify(loginInfo));
+				history.go(-1);
+			},
+			onLoadComponent: function () {
+				//当组件加载完成时调用
+				console.log("组件加载完成");
+			},
+			updateUser: function (total, clientId) {
+				//当generateUserEvent=true,并且在线人数发生变化时调用
+				console.log("在线人数:",total);
+			}
+		});
+
+	});
+
+</script>
+<script>
+	$(function(){
+		
+	})
+</script>

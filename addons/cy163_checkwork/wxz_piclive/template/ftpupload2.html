@@ -1,0 +1,99 @@
+{template 'common/header'}
+
+<script type="text/javascript" src="resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/images/uploadify_t.css" />
+<style type='text/css'>
+	.tab-pane {padding:20px 0 20px 0;}
+</style>
+
+<div class="main">
+	<div class="panel panel-default" id="resultImage">
+		<div class="panel-heading">
+			注意：以下图片需要再次处理！总共图片<span id="ftpImageNum">{$ftpImageNum}</span>张<br/>
+		</div>
+		<div class="form-group col-sm-12" style="margin-top: 10px;">
+			<input type="button" name="submit" value="一键处理" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+		<div class="panel-body table-responsive">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width:100px;">编号</th>
+						<th>图片路径</th>
+						<th style="width:100px;">是否处理</th>
+					</tr>
+				</thead>
+				<tbody id="dealImage">
+					{loop $ftpimageRows $item}
+					<tr>
+						<td>{$item['fid']}</td>
+						<td>{$item['picpath']}</td>
+						<td>{if $item['is_deal'] == 0}未处理{else}已处理{/if}</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			<input type="hidden" name="lid" value="{$lid}" />
+		</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function () {
+		window.optionchanged = false;
+		$('#myTab a').click(function (e) {
+			e.preventDefault();//阻止a链接的跳转行为
+			$(this).tab('show');//显示当前选中的链接及关联的content
+		})
+
+		$("input[name=submit]").click(function(){
+			var imagepath = $("#imagepath").val();
+			var lid = $("input[name=lid]").val();
+			//开始处理图片
+			$.ajax({
+                url: "{php echo $this->createWebUrl('ftpupload', array('op' => 'dealImage', 'lid' => $lid))}",
+                type: 'POST',
+                data: {},
+                success:function(res){console.log(res);
+                	var result = JSON.parse(res);
+                    if(result.err > 0){
+						alert(result.msg);return false;
+					}
+					alert(result.msg);
+                    location.href = "{php echo $this->createWebUrl('liveManage')}";
+                },
+                error:function(){
+                    alert('ajax error');
+                }
+            });
+			// $.post("{php echo $this->createWebUrl('ftpupload', array('op' => 'setImageList', 'lid' => $lid))}"
+			// 	,{imagepath: imagepath}
+			// 	,function(result){
+			// 		if(result.err > 0){
+			// 			alert(result.msg);return false;
+			// 		}
+			// 		//开始处理图片
+			// 		$.ajax({
+	  //                   url: "{php echo $this->createWebUrl('ftpupload', array('op' => 'getImageList', 'lid' => $lid))}",
+	  //                   type: 'POST',
+	  //                   data: {
+	  //                   },
+	  //                   success:function(res){
+	  //                       alert('ok');
+	  //                   },
+	  //                   error:function(){
+	  //                       alert('ajax error');
+	  //                   }
+	  //               });
+			// 	}
+			// 	,"json"
+			// );
+		});
+	});
+</script>
+
+
+{template 'common/footer'}

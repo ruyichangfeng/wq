@@ -1,0 +1,58 @@
+{php define('MUI', true);}
+{template 'common/header'}
+<div class="mui-content scan-pay">
+	<form action="{php echo url('mc/card/consume')}" method="post" id="pay-form">
+		<div class="mui-pa10 mui-bg-white">
+			<h5 class="mui-desc-title">请选择门店</h5>
+			<div class="mui-input-row">
+				 <input class="js-user-options" type="text" value="" readonly="" placeholder="请选择门店">
+				 <input type="hidden" name="store_id">
+			</div>
+			<h5 class="mui-desc-title">设置付款金额</h5>
+			<div class="mui-input-row"><input type="text" value="" name="fee" placeholder="输入金额"/></div>
+			<button class="mui-btn mui-btn-success mui-btn-block">付款</button>
+			<input type="hidden" name="token" value="{$_W['token']}"/>
+			<input type="hidden" name="submit" value="{$_W['token']}"/>
+		</div>
+	</form>
+</div>
+<script>
+require(['jquery.qrcode'], function(){
+	stores = {php echo json_encode($stores_data)};
+	$('#pay-form').submit(function(){
+		var fee = $.trim($('#pay-form :text[name="fee"]').val());
+		var store_id = $('input[name="store_id"]').val();
+		reg = /^[0-9]+([.]{1}[0-9]{1,2})?$/;
+		if (stores.data.length >= 1) {
+			if (!store_id) {
+				util.toast('请选择门店', '', 'error');
+				return false;
+			}
+		}
+		if(!fee) {
+			util.toast('付款金额应大于0', '', 'error');
+			return false;
+		}
+		if (!reg.test(fee)) {
+			$('#pay-form :text[name="fee"]').val('');
+			util.toast('付款金额有误', '', 'error')
+			return false;
+		}
+		return true;
+	});
+	$(".js-user-options").on("tap", function(){
+		if (stores.data.length == 0) {
+			util.toast('当前无可用门店');
+			return false;
+		}
+		var $this = $(this);
+		util.poppicker(stores, function(items){
+			$('input[name="store_id"]').val(items[0].value);
+			$this.val(items[0].text);
+		});
+	});
+});
+</script>
+{template 'mc/footer'}
+{template 'common/footer'}
+

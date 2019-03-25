@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{if !empty($cfg['title'])}{$cfg['title']}{else}附近门店{/if}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<link href="../addons/wx_lbsmap/css/style.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="{$_W['siteroot']}addons/wx_lbsmap/css/style_menu.css"/>
+	<link rel="stylesheet" href="{$_W['siteroot']}addons/wx_lbsmap/template/mobile/style/weui.css"/>
+    <link rel="stylesheet" href="{$_W['siteroot']}addons/wx_lbsmap/template/mobile/example.css"/>
+    <style type="text/css">
+        body, html, #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        #golist {
+            display: none;
+        }
+
+        @media (max-device-width: 780px) {
+            #golist {
+                display: block !important;
+            }
+        }
+    </style>
+    <style>
+        @charset "utf-8";
+        /* CSS Document */
+        body {
+            font-family: Arial, "微软雅黑", sans-serif;
+        }
+
+        img {
+            border: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .fl {
+            float: left;
+        }
+
+        .fr {
+            float: right;
+        }
+
+        .clear {
+            clear: both;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .fenge {
+            width: 100%;
+            height: 2px;
+            background-color: #ccc;
+        }
+
+        div, body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .info-txt {
+            position: relative;
+            height: 30px;
+            overflow: hidden;
+        }
+
+        .info-txt span {
+            float: left;
+            font-size: 16px;
+            height: 24px;
+            line-height: 24px;
+            margin: 2px;
+        }
+
+        .info-txt img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .info-txt .no {
+            display: none;
+        }
+
+        .info-txt-icon {
+            border: 1px #ff6b2a solid;
+            color: #ff6b2a;
+            font-size: 12px;
+            float: left;
+            height: 16px;
+            line-height: 16px;
+            margin-top: 3px;
+            margin-bottom: 3px;
+            margin-left: 2px;
+        }
+
+        .info-txt2 {
+            position: relative;
+            font-size: 12px;
+            color: #898989;
+            line-height: 18px;
+            overflow: hidden;
+            margin: 8px 5px 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .info-txt3 {
+            position: relative;
+            font-size: 14px;
+            color: #ff6b2a;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .info-icon {
+            position: relative;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .info-icon .item {
+            padding-left: 15px;
+            line-height: 19px;
+            float: left;
+            margin-right: 10px;
+        }
+
+        .info-icon .yes {
+            background: url(/weChat/lbs/rsBike/images/d_07.jpg) no-repeat left center;
+            color: #333;
+        }
+
+        .info-icon .no {
+            background: url(/weChat/lbs/rsBike/images/d_09.jpg) no-repeat left center;
+            color: #9FA0A0;
+        }
+
+        .info-btn {
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            margin: 10px auto 0;
+        }
+
+        .info-btn a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .info-btn-l {
+            float: left;
+            background: #ff6b2a;
+            margin: 0 0 0 5px;
+            border-radius: 5px;
+            width: 45%;
+            text-align: center;
+            line-height: 32px;
+        }
+
+        .info-btn-r {
+            float: right;
+            margin: 0 5px 0;
+            background: #ff6b2a;
+            border-radius: 5px;
+            width: 45%;
+            text-align: center;
+            line-height: 32px;
+        }
+
+        .hide {
+            display: none !important
+        }
+
+        .btn-sm {
+            background-color: #f2f2f2;
+        }
+
+        .mobile-hds {
+            height: 45px;
+            line-height: 45px;
+            font-size: 14px;
+            padding: 0 10px;
+            color: #fff;
+            background-color: #dd514c;
+        }
+
+        .mobile-hds span {
+            height: 35px;
+            margin-top: 5px;
+        }
+
+        .mobile-hds span img {
+            filter: Alpha(opacity=70);
+            height: 30px;
+            line-height: 45px;
+            background-color: #fff;
+            padding: 2px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        .mobile-hds .listbn {
+            display: inline-block;
+            height: 30px;
+            line-height: 48px;
+            padding: 0 10px;
+            font-size: 30px;
+            color: #FFF;
+            text-decoration: none;
+        }
+
+        .mobile-hds .list {
+            filter: Alpha(opacity=80);
+            max-height: 280px;
+            list-style: none;
+            padding: 0px;
+            top: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            z-index: 9999;
+            right: 0;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        .mobile-hds .list li > a {
+            display: block;
+            padding: 0 10px;
+            min-width: 100px;
+            height: 35px;
+            line-height: 35px;
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .mobile-hds .list li > a i {
+            display: inline-block;
+            width: 20px;
+            margin-right: 5px;
+        }
+
+        .mobile-hds .list li > a i img {
+            height: 20px;
+        }
+
+        .mobile-hds .list li > a.smtype {
+            padding-left: 15px;
+            font-size: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px
+        }
+
+        .btn:focus, .btn:active:focus, .btn.active:focus {
+            outline: thin dotted;
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px
+        }
+
+        .btn:hover, .btn:focus {
+            color: #333;
+            text-decoration: none
+        }
+
+        .btn:active, .btn.active {
+            background-image: none;
+            outline: 0;
+            -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
+        }
+
+        .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+            pointer-events: none;
+            cursor: not-allowed;
+            filter: alpha(opacity=65);
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            opacity: .65
+        }
+
+        a.toplink {
+            display: inline-block;
+            float: left;
+            margin: 0;
+            color: #fff;
+            width: 33.3%;
+            text-align: center;
+        }
+
+        a.toplink:nth-child(1) {
+            text-align: left;
+        }
+
+        a.toplink:nth-child(3) {
+            text-align: right;
+        }
+        .BMap_Marker div img{
+            display: block;
+            border: none;
+            margin-left: 0px;
+            margin-top: 0px;
+            width: 92%;
+            height: 92%;
+        }
+    </style>
+
+	
+	
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+    <script src="{$_W['siteroot']}addons/wx_lbsmap/template/mobile/example.js"></script>
+	
+    <script type="text/javascript" src="{$http_type}api.map.baidu.com/api?v=2.0&ak=XAshfSy1j96X1nFGnScMf7ejDbpQfrgB"></script>
+    <script type="text/javascript" src="{$http_type}api.map.baidu.com/getscript?v=2.0&ak=XAshfSy1j96X1nFGnScMf7ejDbpQfrgB&services=&t=20170707103901"></script>
+    <script src="{$_W['siteroot']}addons/wx_lbsmap/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+	<script src="{$_W['siteroot']}/addons/wx_lbsmap/js/jquery-1.8.0.min.js"></script>
+
+</head>
+<body>
+
+<!--百度地图容器-->
+{if $cfg['menu']}
+<div class="btn3 clearfix" style="z-index:999;">
+
+{if !empty($menu[0])}
+    <div class="menu" style="width:{$width}%;">
+        <div class="bt-name"><a href="{if empty($sub_menu[0])}{$menu[0]['url']}{else}javascript:;{/if}">{$menu[0]['name']}</a></div>
+		{if !empty($sub_menu[0])}
+        <div class="sanjiao"></div>
+        <div class="new-sub">
+            <ul >
+				{loop $sub_menu[0] $row}
+                <li><a href="{$row['url']}">{$row['name']}</a></li>
+				{/loop}
+            </ul>
+            <div class="tiggle"></div>
+            <div class="innertiggle"></div>
+        </div>
+		{/if}
+    </div><!--menu-->
+{/if}
+{if !empty($menu[1])}
+    <div class="menu" style="width:{$width}%;">
+        <div class="bt-name"><a href="{if empty($sub_menu[1])}{$menu[1]['url']}{else}javascript:;{/if}">{$menu[1]['name']}</a></div>
+		{if !empty($sub_menu[1])}
+        <div class="sanjiao"></div>
+        <div class="new-sub">
+            <ul >
+				{loop $sub_menu[1] $row}
+                <li><a href="{$row['url']}">{$row['name']}</a></li>
+				{/loop}
+            </ul>
+            <div class="tiggle"></div>
+            <div class="innertiggle"></div>
+        </div>
+		{/if}
+    </div><!--menu-->
+{/if}
+{if !empty($menu[2])}
+    <div class="menu" style="width:{$width}%;">
+		<div class="bt-name"><a href="{if empty($sub_menu[2])}{$menu[2]['url']}{else}javascript:;{/if}">{$menu[2]['name']}</a></div>
+		{if !empty($sub_menu[2])}
+        <div class="sanjiao"></div>
+        <div class="new-sub">
+            <ul >
+				{loop $sub_menu[2] $row}
+                <li><a href="{$row['url']}">{$row['name']}</a></li>
+				{/loop}
+            </ul>
+            <div class="tiggle"></div>
+            <div class="innertiggle"></div>
+        </div>
+		{/if}
+    </div><!--menu-->
+{/if}
+</div><!--btn3-->
+{/if}
+
+<div id="map" style="overflow: hidden; position: relative; z-index: 0; background-color: rgb(243, 241, 236); color: rgb(0, 0, 0); text-align: left;"></div>
+<div id="aa" style="position:absolute;width:100%;height:100%;z-index:1;top:-100%;"></div>
+<!-- 弹出式菜单 -->
+	<div  style="position:absolute;right: 12px;top:90px;">
+        <div href="javascript:;"  style="width:30px;height:30px;background:url('{$_W['siteroot']}/addons/wx_lbsmap/images/menu.png') center no-repeat;background-size:contain;" id="showIOSActionSheet"></div>
+    </div>
+    <!--BEGIN actionSheet-->
+
+<script type="text/javascript">    //创建和初始化地图函数：
+
+	$(".menu").click(function(){
+		console.log("helloworld");
+			if ($(this).hasClass("cura")) {
+				$(this).children(".new-sub").hide(); //当前菜单下的二级菜单隐藏
+				$(".menu").removeClass("cura"); //同一级的菜单项
+			} else {
+				$(".menu").removeClass("cura"); //移除所有的样式
+				$(this).addClass("cura"); //给当前菜单添加特定样式
+				$(".menu").children(".new-sub").slideUp("fast"); //隐藏所有的二级菜单
+				$(this).children(".new-sub").slideDown("fast"); //展示当前的二级菜单
+			}
+		});
+		
+   $('#showIOSActionSheet').on('click', function () {
+        weui.picker([
+		<!-- {loop $category $row} -->
+                
+		{
+            label: '{$row['catename']}',
+            value: '{$row['id']}'
+        },
+        <!-- {/loop} -->
+		 ],{
+           
+            onConfirm: function (result) {
+               //window.location.href="<?php echo $this->createMobileUrl('getlbs', array('catenameid' => ".?>"+result+"<?php ."));?>";	
+			   window.location.href="{$_W['siteroot']}?i={$_W['uniacid']}&c=entry&do=getlbs&m=wx_lbsmap&catenameid="+result;
+            }
+        });
+    });
+   
+
+	
+function initMap() {
+    createMap();//创建地图
+    setMapEvent();//设置地图事件
+    addMapControl();//向地图添加控件
+    addMapOverlay();//向地图添加覆盖物
+}
+function createMap() {
+    var lng = "{$lng}";
+    var lat = "{$lat}";
+	var stCtrl = new BMap.PanoramaControl(); //构造全景控件
+	stCtrl.setOffset(new BMap.Size(50, 10));
+    map = new BMap.Map("map");
+    map.centerAndZoom(new BMap.Point(lng, lat), {$level});
+	var myIcon = new BMap.Icon("{$marker}", new BMap.Size(40,40));
+    var gpsPoint = new BMap.Point(lng, lat);
+    map.addControl(new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_LARGE}));
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.centerAndZoom(gpsPoint, {$level});
+	var marker=new BMap.Marker(gpsPoint,{icon:myIcon});
+    map.addOverlay(marker);
+	{if $cfg['vr']}map.addControl(stCtrl);{/if}
+	//marker.setAnimation(BMAP_ANIMATION_BOUNCE)
+
+    // 添加定位控件
+    var geolocationControl = new BMap.GeolocationControl({
+        anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+        showAddressBar: false,
+        offset: new BMap.Size(5, 55)
+    });
+    geolocationControl.addEventListener("locationSuccess", function (e) {
+        // 定位成功事件
+        var address = '';
+		
+        address += e.addressComponent.province;
+        address += e.addressComponent.city;
+        address += e.addressComponent.district;
+        address += e.addressComponent.street;
+        address += e.addressComponent.streetNumber;
+		//console.trace(e.point);
+        alert("当前定位地址为：" + address);
+    });
+    geolocationControl.addEventListener("locationError", function (e) {
+        // 定位失败事件
+        alert(e.message);
+    });
+    map.addControl(geolocationControl);
+}
+function setMapEvent() {
+    map.enableScrollWheelZoom();
+    map.enableKeyboard();
+    map.enableDragging();
+    map.enableDoubleClickZoom()
+}
+function clo(){
+$("#aa").animate({top:'-100%'});
+$('.dianzhang_box').hide();
+}
+function addClickHandler(target, window) {
+    target.addEventListener("click", function () {
+        $("#aa").html(window);
+		$("#aa").animate({top:'0%'});
+    });
+}
+function addMapOverlay() {
+    var markers = {$json_maps};
+    for (var index = 0; index < markers.length; index++) {
+        var point = new BMap.Point(markers[index].position.lng, markers[index].position.lat);
+			var marker = new BMap.Marker(point, {
+				icon: new BMap.Icon(markers[index].sthumb, new BMap.Size(50, 50), {
+					imageOffset: new BMap.Size(markers[index].imageOffset.width, markers[index].imageOffset.height)
+				})
+			});
+			var label = new BMap.Label(markers[index].sname+"距您"+markers[index].dist,{offset: new BMap.Size(15, -25)});
+			label.setStyle({
+				fontSize: "12px",
+				border: "1px solid #1296db",
+				borderRadius:"5px",
+				padding: "3px 5px",
+				color:"#000",
+				textAlign: "center",
+				background:"#fff",
+				cursor: "pointer"
+			});
+			if(markers[index].showc==1)
+			{
+				var infoWindow = '';
+				infoWindow += "<div class='markers_box'>";
+				infoWindow += "<div class='img_box'><img class='markers_img' src='" + markers[index].sthumb + "'>";
+				infoWindow += "<img class='markers_peple' src='../addons/wx_lbsmap/images/markers_peple.png' onclick='dianzhang();'>";
+				infoWindow += "<div class='name_box'><p class='markers_name'>"+ markers[index].sname +"</p><p class='markers_level'>";
+				if(markers[index].level==1)
+				{
+					infoWindow+="★";
+				}
+				else if(markers[index].level==2)
+				{
+					infoWindow+="★★";
+				}
+				else if(markers[index].level==3)
+				{
+					infoWindow+="★★★";
+				}
+				else if(markers[index].level==4)
+				{
+					infoWindow+="★★★★";
+				}
+				else if(markers[index].level==5)
+				{
+					infoWindow+="★★★★★";
+				}
+				infoWindow += "</p></div></div>";
+				infoWindow += "<p class='markers_tel'>电话："+markers[index].stel+"</p>";
+				infoWindow += "<p class='markers_tel'>门店地址："+markers[index].saddress+"</p>";
+				infoWindow += "<img class='markers_clo' src='../addons/wx_lbsmap/images/x.png' onclick='clo();''>";
+				infoWindow += "<a href='tel:"+markers[index].stel+"'><div class='markers_tel_btn'>电话</div></a>";
+				infoWindow += "<a href='https://api.map.baidu.com/marker?location=" + markers[index].position.lat + "," + markers[index].position.lng + "&title=" + markers[index].sname + "&content=" + markers[index].saddress + " 电话:" + markers[index].stel + "&output=html'>";
+				infoWindow += "<div class='markers_saddress'>一键导航</div></a>";
+				if(markers[index].showbtn==1)
+				{
+				infoWindow += "<a href='"+ markers[index].diyurl +"'><div style='width: 90%;height:10%;margin:1% 5%;color:white;background:#1296db;text-align:center;border-radius:2px;line-height:36px;display:inline-block;'>"+ markers[index].diyurl_name +"</div></a>";
+				}
+				infoWindow += "<div class='dianzhang_box' style='overflow:auto;'>";
+				infoWindow += "<img src='" + markers[index].cthumb + "' class='dianzhang_touxiang'>";
+				infoWindow += "<div class='dianzhang_ziliao'>";
+				infoWindow += "<p class='markers_tel'>姓名："+ markers[index].cname +"</p>";
+				infoWindow += "<a href='tel:"+markers[index].stel+"'><p class='markers_tel'>电话："+ markers[index].ctel +"</p></a>";
+				infoWindow += "<p class='markers_tel'>店长简介："+ markers[index].info +"</p>";
+				infoWindow+="</div></div></div>";
+			}
+			else
+			{
+			var infoWindow = '';
+				infoWindow += "<div class='markers_box'>";
+				infoWindow += "<div class='img_box'><img class='markers_img' src='" + markers[index].sthumb + "'>";
+				infoWindow += "<div class='name_box'><p class='markers_name'>"+ markers[index].sname +"</p><p class='markers_level'>";
+				if(markers[index].level==1)
+				{
+					infoWindow+="★";
+				}
+				else if(markers[index].level==2)
+				{
+					infoWindow+="★★";
+				}
+				else if(markers[index].level==3)
+				{
+					infoWindow+="★★★";
+				}
+				else if(markers[index].level==4)
+				{
+					infoWindow+="★★★★";
+				}
+				else if(markers[index].level==5)
+				{
+					infoWindow+="★★★★★";
+				}
+				infoWindow += "</p></div></div>";
+				infoWindow += "<p class='markers_tel'>电话："+markers[index].stel+"</p>";
+				infoWindow += "<p class='markers_tel'>门店地址："+markers[index].saddress+"</p>";
+				infoWindow += "<img class='markers_clo' src='../addons/wx_lbsmap/images/x.png' onclick='clo();''>";
+				infoWindow += "<a href='tel:"+markers[index].stel+"'><div class='markers_tel_btn'>电话</div></a>";
+				infoWindow += "<a href='https://api.map.baidu.com/marker?location=" + markers[index].position.lat + "," + markers[index].position.lng + "&title=" + markers[index].sname + "&content=" + markers[index].saddress + "电话" + markers[index].stel + "&output=html'>";
+				infoWindow += "<div class='markers_saddress'>一键导航</div></a>";
+				if(markers[index].showbtn==1)
+				{
+				infoWindow += "<a href='"+ markers[index].diyurl +"'><div style='width: 90%;height:10%;margin:1% 5%;color:white;background:#1296db;text-align:center;border-radius:2px;line-height:36px;display:inline-block;'>"+ markers[index].diyurl_name +"</div></a>";
+				}
+				else
+				{
+								infoWindow +="</div>"
+				}
+			}
+			{if $cfg['label']}marker.setLabel(label);{/if}
+			addClickHandler(marker, infoWindow);
+			map.addOverlay(marker);
+    }
+
+}
+
+//向地图添加控件
+function addMapControl() {
+    //var scaleControl = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});
+//		scaleControl.setUnit(BMAP_UNIT_IMPERIAL);
+    //map.addControl(scaleControl);
+    //var navControl = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_LARGE});
+   // map.addControl(navControl);
+    var cr = new BMap.CopyrightControl({anchor: BMAP_ANCHOR_BOTTOM_LEFT});  //设置版权控件位置
+    map.addControl(cr); //添加版权控件
+    var bs = map.getBounds();
+    cr.addCopyright({id: 1, content: "", bounds: bs});
+}
+var map;
+initMap();
+function dianzhang(){
+    $('.dianzhang_box').toggle();
+}
+//$(function(){
+//    navigator.geolocation.getCurrentPosition(translatePoint); //定位
+//});
+//function translatePoint(position){
+//    var currentLat = position.coords.latitude;
+//    var currentLon = position.coords.longitude;
+//    var gpsPoint = new BMap.Point(currentLon, currentLat);
+//    BMap.Convertor.translate(gpsPoint, 0, initMap); //转换坐标
+//}
+
+</script>
+
+</body>
+</html>

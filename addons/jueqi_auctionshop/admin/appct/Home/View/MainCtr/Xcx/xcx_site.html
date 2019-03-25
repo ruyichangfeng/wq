@@ -1,0 +1,103 @@
+﻿<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>规则管理</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" 
+
+title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form " action="{:U('Home/MainCtr/Food/food_list')}"  method="post" style="width:95%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label" style="width:160px;">小程序页面：https://</label>
+                <div class="layui-input-block" style="display:flex;align-items:baseline;">
+                	<input style="width:200px;" lay-verify="required" type="text" name="xcx_site" id="xcx_site" value="{$xcx_site['xcx_site']}" placeholder="请输入内嵌网址" autocomplete="off" class="layui-input">                	
+                </div>
+				<div style="margin-top:10px;">
+					<span style="color:red;">如：www.baidu.com</span>        
+				</div>         
+              </div>
+	    <div class="layui-form-item">
+                <label class="layui-form-label" style="width:160px;">APPID</label>
+                <div class="layui-input-block" style="display:flex;align-items:baseline;">
+                	<input style="width:200px;" lay-verify="required" type="text" name="xcx_appid" id="xcx_appid" value="{$xcx_site['xcx_appid']}" placeholder="请输入小程序APPID" autocomplete="off" class="layui-input">                	
+                </div>      
+        </div>
+	    <div class="layui-form-item">
+            <label class="layui-form-label" style="width:160px;">SECRET</label>
+            <div class="layui-input-block" style="display:flex;align-items:baseline;">
+            	<input style="width:200px;" lay-verify="required" type="text" name="xcx_secret" id="xcx_secret" value="{$xcx_site['xcx_secret']}" placeholder="请输入小程序SECRET" autocomplete="off" class="layui-input">                	
+            </div>                
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width:160px;">顶部导航颜色自定义</label>
+            <div class="layui-input-block" style="display:flex;align-items:baseline;">
+				<input id='xcx_color' name="xcx_color" value="{$xcx_site['xcx_color']}" style="width:200px;color:{$xcx_site['xcx_color']}" autocomplete="off" class="layui-input" />
+            </div>                
+        </div>
+            </div>
+	    <input type="button" value="保存" class="layui-btn" onclick="xcx_add()" />             
+        </form>
+
+    </div>
+    <include file="Public/footer.html"/>       
+    <script type="text/javascript" src="__ROOT__/Public/js/jquery.js"></script>
+    <script type="text/javascript" src="__ROOT__/Public/js/jquery.colorpicker.js"></script>
+    <script>
+		$("#xcx_color").colorpicker({
+		    fillcolor:true
+		});
+    </script>
+    <script>    	
+        layui.use(['form','layer','element'], function(){
+          layer = layui.layer;
+          form = layui.form;
+          $ = layui.jquery;
+          
+        });
+        
+        function xcx_add(){
+        	var xcx_site = $('#xcx_site').val();
+			var xcx_appid = $('#xcx_appid').val();
+			var xcx_secret = $('#xcx_secret').val();
+			var xcx_title = $('#xcx_title').val();
+			var xcx_color = $('#xcx_color').val();
+        	$.post('{:U("Home/MainCtr/Xcx/do_xcx")}',{'xcx_site':xcx_site,'xcx_appid':xcx_appid,'xcx_secret':xcx_secret,'xcx_color':xcx_color},function(data){
+        		if(data == '1') {
+					var index = parent.layer.getFrameIndex(window.name);
+					parent.layer.msg('提交成功', {
+						icon: 1,
+						offset: '40%',
+						time: 2000,
+						shade: 0.3
+					}, function() {
+						window.location.reload();
+					})
+					} else if(data == '2') {
+						parent.layer.msg('提交失败', {
+							icon: 2,
+							offset: '40%',
+							time: 2000,
+							shade: 0.3
+						});
+					} else if(data == '3') {
+						parent.layer.msg('网址不能开头不能有http或https', {
+							icon: 2,
+							offset: '40%',
+							time: 2000,
+							shade: 0.3
+						});
+					}				
+        	},'json');
+        }
+        
+        function beds_show(title,url,w,h){
+            x_admin_show(title,url,w,h);
+        }
+ </script>   
+</body>

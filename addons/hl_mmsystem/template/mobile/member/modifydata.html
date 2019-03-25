@@ -1,0 +1,170 @@
+{template 'common/header_base'}
+<style>
+    html,
+    body {
+        background-color: #efeff4;
+    }
+
+    .mui-table-view {
+        margin-top: 20px;
+    }
+
+    .head {
+        height: 40px;
+    }
+    #head {
+        line-height: 40px;
+    }
+    .head-img {
+        width: 40px;
+        height: 40px;
+    }
+    #head-img1 {
+        position: absolute;
+        bottom: 10px;
+        right: 40px;
+        width: 40px;
+        height: 40px;
+    }
+
+</style>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">修改资料</h1>
+</header>
+<div class="mui-content">
+    <div class="mui-card">
+        <ul class="mui-table-view">
+            <div class="mui-collapse-content">
+    <form class="mui-input-group"method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+            <li class="mui-table-view-cell">
+                <a id="head" class="mui-navigate-right">头像
+                    <span class="mui-pull-right head">
+								<img class="head-img mui-action-preview" id="head-img1" src="{php echo tomedia($mobilememberinfo['mem_memberPicture'])}"/>
+							</span>
+                </a>
+            </li>
+            <div class="mui-input-row">
+                <label>卡号</label>
+                {$mobilememberinfo['mem_memberCardNum']}
+            </div>
+            <div class="mui-input-row">
+                <label>会员卡有效期</label>
+                {if $mobilememberinfo[mem_specifiedEndTime] == 2147483647}
+                <span class="mui-badge mui-badge-danger">永久有效</span>
+                {else}
+                <span class="mui-pull-right">{php echo date('Y-m-d H:i:s', $mobilememberinfo[mem_specifiedEndTime]);}</span>
+                {/if}
+            </div>
+
+        <div class="mui-input-row">
+            <label>姓名</label>
+            <input type="text" id="memberName" name="memberName" value="{$mobilememberinfo['mem_memberName']}" placeholder="请输入真实姓名">
+        </div>
+
+        <div class="mui-input-row mui-radio">
+            <label>男</label>
+            <input name="memberSex" type="radio" value="1" {if $mobilememberinfo['mem_memberSex'] == 1}checked{/if}>
+        </div>
+
+        <div class="mui-input-row mui-radio">
+            <label>女</label>
+            <input name="memberSex" type="radio" value="2" {if $mobilememberinfo['mem_memberSex'] == 2}checked{/if} >
+        </div>
+
+        <div class="mui-input-row">
+            <label>手机号</label>
+            <input type="text" id="memberMobile" name="memberMobile" value="{$mobilememberinfo['mem_memberMobile']}" placeholder="请输入手机号">
+        </div>
+        <div class="mui-input-row">
+            <label>身份证</label>
+            <input type="text" class="mui-input-clear" id="memberIdentityNum" name="memberIdentityNum" value="{$mobilememberinfo['mem_memberIdentityNum']}" placeholder="请输入身份证号">
+        </div>
+        <div class="mui-input-row">
+            <label>微信号</label>
+            <input type="text" class="mui-input-clear" id="memberWechat" name="memberWechat" value="{$mobilememberinfo['mem_memberWechat']}" placeholder="请输入微信号">
+        </div>
+        <div class="mui-input-row">
+            <label>出生日期</label>
+            {php echo tpl_app_fans_form('birth', array('year' => $mobilememberinfo['mem_memberBirthdayYear'], 'month' => $mobilememberinfo['mem_memberBirthdayMonth'], 'day' => $mobilememberinfo['mem_memberBirthdayDay']))}
+        </div>
+
+            <div class="mui-input-row mui-radio">
+                <label>公历</label>
+                <input name="memberBirthdayType" value="1" type="radio" {if $mobilememberinfo['mem_memberBirthdayType'] == 1}checked{/if}>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>农历</label>
+                <input name="memberBirthdayType" value="2" type="radio"  {if $mobilememberinfo['mem_memberBirthdayType'] == 2}checked{/if}>
+            </div>
+
+
+        <div class="mui-input-row">
+            <label>城市</label>
+            {php echo tpl_app_form_field_district('reside', array('province' => $mobilememberinfo['province'],'city' => $mobilememberinfo['city'],'district' => $mobilememberinfo['district']));}
+        </div>
+            <div class="mui-input-row">
+                <label>详细地址</label>
+            <textarea id="textarea" rows="3" name="memberDetailAddress" placeholder="请输入详细地址,礼品等收货地址">{$mobilememberinfo['mem_memberDetailAddress']}</textarea>
+        </div>
+
+            <div class="mui-button-row">
+                <input type="submit" class="mui-btn mui-btn-primary " name="addsubmit" style="background-color: green" value="提交信息">
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+    </form>
+            </div>
+        </ul>
+    </div>
+</div>
+<script>
+    $(function(){
+        $('form').submit(function(){
+            var msg = '请认真填写您的';
+
+            if($(this).find('radio[name="memberSex"]').val() == ''){
+                mui.alert(msg+'性别');
+                return false;
+            }
+            if(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test($(this).find('input[name="memberIdentityNum"]').val()) === false) {
+                mui.alert(msg+'身份证号');
+                return false;
+            }
+            if($(this).find('radio[name="memberBirthdayType"]').val() == ''){
+                mui.alert(msg+'出生日期类型');
+                return false;
+            }
+            if($(this).find('select[name="birth[year]"]').val() == ''){
+                mui.alert(msg+"出生年份");
+                return false;
+            }
+            if($(this).find('select[name="birth[month]"]').val() == ''){
+                mui.alert(msg+"出生月份");
+                return false;
+            }
+            if($(this).find('select[name="birth[day]"]').val() == '0'){
+                mui.alert(msg+"出生日期");
+                return false;
+            }
+            if($(this).find('select[name="reside[province]"]').val() == ''){
+                mui.alert(msg+"所在省份");
+                return false;
+            }
+            if($(this).find('select[name="reside[city]"]').val() == ''){
+                mui.alert(msg+"所在市");
+                return false;
+            }
+            if($(this).find('select[name="reside[district]"]').val() == ''){
+                mui.alert(msg+"所在县区");
+                return false;
+            }
+            if($(this).find('textarea[name="memberDetailAddress"]').val() == ''){
+                mui.alert(msg+'详细地址');
+                return false;
+            }
+
+        return true;
+       });
+    })
+</script>
+{template 'common/footer_base'}

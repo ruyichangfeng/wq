@@ -1,0 +1,107 @@
+{template 'common/header'}
+
+<form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+	<div class="main">
+		<form action="" method="post" class="form-horizontal form" id="setting-form">
+			<input type="hidden" name="id" value="{$set['id']}">
+			<div class="panel panel-default">
+				<div class="panel-heading">参数设置</div>
+				<div class="panel-body">
+					<div class="tab-content">
+						<!--代理设置-->
+						<div class="tab-pane  active" id="tab_basic">
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">开启</label>
+									<div class="col-xs-12 col-sm-9">
+										<label class="checkbox-inline">
+											<input type="radio" name="open" value="0" {if $settings['open'] == 0}checked{/if}> 不开启
+										</label>
+										<label class="checkbox-inline">
+											<input type="radio" name="open" value="1" {if $settings['open'] == 1}checked{/if}> 开启
+										</label>
+										<span class="help-block" style="color:#ff0000">开启后，还需要进入公众平台，接口权限，对话服务->用户管理->获取用户地理位置，开启（用户进行对话时上报一次）</span>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">忽略新关注：（秒）</label>
+									<div class="col-xs-12 col-sm-9">
+										<input type="text" name="ignoreNew" value="{php echo $settings['ignoreNew']?$settings['ignoreNew']:'0'}" class="form-control" placeholder="数字" >
+										<span class="help-block">新关注的粉丝，多少秒内不打招呼。0为不忽略，新关注也打招呼。</span>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">时间间隔：（秒）</label>
+									<div class="col-xs-12 col-sm-9">
+										<input type="text" name="interval" value="{php echo $settings['interval']?$settings['interval']:'3600'}" class="form-control" placeholder="数字" >
+										<span class="help-block">间隔多少秒内，只回复一次</span>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">触发关键词：</label>
+									<div class="col-xs-12 col-sm-9">
+										<input type="text" name="keywords" value="{$settings['keywords']}" class="form-control" placeholder="精准关键词" >
+										<span class="help-block">多个关键词用<span style="color: red">逗号</span> ,（中英文逗号都兼容） 隔开<br />配合系统自带的自动回复，可以实现推送 多图文/文本/语音/视频/音乐。无需触发请留空</span>
+									</div>
+								</div>
+
+								<div class="form-group hide">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">顺序</label>
+									<div class="col-xs-12 col-sm-9">
+										<label class="checkbox-inline">
+											<input type="radio" name="sort" value="0" {if $settings['sort'] == 0}checked{/if}> 先触发关键词
+										</label>
+										<label class="checkbox-inline">
+											<input type="radio" name="sort" value="1" {if $settings['sort'] == 1}checked{/if}> 先发送招呼语
+										</label>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label">招呼语</label>
+									<div class="col-sm-9 col-xs-12" style="margin-top: 6px;">
+										<textarea style="height: 9em" name="words" class="form-control" >{php echo $settings['words']?$settings['words']:($settings['open']?"":"#时间#好，#昵称# !\n听说你在美丽的#省份##城市#\n请问想了解我们的什么业务？请点击下方小键盘咨询，我为你解惑！如果不方便打字也可以点击小喇叭发语音！")}</textarea>
+										<div class="help-block" style="line-height:30px;">
+											<b>可用变量：</b>
+											<br><span style="color: red">#时间#：</span>上午/中午/下午/晚上
+                                            <br><span style="color: red">#昵称#：</span>用户的微信昵称
+                                            <br><span style="color: red">#省份#：</span>用户所在省份
+                                            <br><span style="color: red">#城市#：</span>用户所在城市
+
+										</div>
+									</div>
+								</div>
+
+							</div>
+
+							<div class="form-group col-sm-12">
+								<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+								<input type="hidden" name="token" value="{$_W['token']}" />
+							</div>
+						</div>
+						<!--结束-->
+							</div>
+				</div>
+		</form>
+		<script>
+            require(['jquery', 'util'], function($, u){
+                $(function(){
+                    u.editor($('.richtext')[0]);
+                });
+            });
+            $(function () {
+                window.optionchanged = false;
+                $('#myTab a').click(function (e) {
+                    e.preventDefault();//阻止a链接的跳转行为
+                    $(this).tab('show');//显示当前选中的链接及关联的content
+                })
+            });
+		</script>
+
+		<!--编辑内容结束-->
+		{template 'common/footer'}

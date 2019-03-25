@@ -1,0 +1,102 @@
+{template 'header'}
+<div id="settings">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">个人资料</h1>
+    </div>
+    <div class="mui-content">
+        <form class="mui-input-group">
+            <div class="mui-input-row head">
+                <label>头像</label>
+                <span class="head"><img class="head-img mui-action-preview" id="head-img1" src="{$_W['fans']['tag']['avatar']}"/></span>
+            </div>
+            <div class="mui-input-row">
+                <label>昵称</label>
+                <input class="mui-input-clear" type="text" placeholder="您的昵称" value="{$_W['fans']['tag']['nickname']}" disabled />
+            </div>
+            <div class="mui-input-row">
+                <label>姓名</label>
+                <input class="mui-input-clear" type="text" name="fullName" value="{$user['fullname']}" placeholder="您的真实姓名" />
+            </div>
+            <div class="mui-input-row">
+                <label>手机号</label>
+                <input class="mui-input-clear" type="text" name="mobile" value="{$user['mobile']}" />
+            </div>
+            <div class="mui-input-row">
+                <label>性别</label>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>男</label>
+                <input name="gender" type="radio" value="1" {if $user['gender'] == 1} checked {/if}>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>女</label>
+                <input name="gender" type="radio" value="0" {if $user['gender'] == 0} checked {/if}>
+            </div>
+
+            <div class="jiazhang-settings-save">
+                <button type="button" id="but" class="mui-btn mui-btn-success mui-btn-block btn-save">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("button").click(function () {
+            var fullName = $("input[name='fullName']").val();//真实姓名
+            var mobile = $("input[name='mobile']").val();//手机号
+            var gender = $("input[name='gender']:checked").val();//性别
+
+            if (fullName == "") {
+                mui.alert("请输入您的姓名"); return;
+            }
+
+            if (mobile)
+            {
+                //验证手机号格式
+                var reg = /(1[3-9]\d{9}$)/;
+                if(!reg.test(mobile))
+                {
+                    mui.alert("请输入正确的手机号码"); return;
+                }
+            }
+            else
+            {
+                mui.alert("请输入手机号码"); return;
+            }
+
+            $.post("<?php echo $this->createMobileUrl('tutor', array('action' => 'ajax_mobile_two')) ?>", {
+                mobile: mobile
+            }, function (response) {
+                if (response.status == 'success')
+                {
+                    $('#but').attr("disabled",'disabled');
+                    $.post("<?php echo $this->createMobileUrl('tutor', array('action' => 'user_edit')) ?>", {
+                        fullName: fullName,
+                        mobile: mobile,
+                        gender: gender
+                    }, function (response) {
+                        if (response.status == 'success')
+                        {
+                            mui.alert('修改成功', function () {
+                                window.location.href = "<?php echo $this->createMobileUrl('tutor', array('page' => 'settings')) ?>";
+                            });
+                        }
+                        else
+                        {
+                            mui.alert('修改失败，请重试！');
+                            $('#but').removeAttr("disabled");
+                        }
+                    }, "json");
+                }
+                else
+                {
+                    mui.alert('此手机号已被注册!');
+                }
+            }, "json");
+        });
+    });
+</script>
+{template 'footer'}

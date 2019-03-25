@@ -1,0 +1,91 @@
+{php define('MUI', true);}
+{template 'common/header_base'}
+
+<div class="mui-content mc-login">
+    <div class="avatar mui-text-center">
+        <img src="{if tomedia('headimg_'.$_W['acid'].'.jpg')}{php echo tomedia('headimg_'.$_W['acid'].'.jpg');}{else}resource/images/MicroEngine.ico{/if}" class="mui-img-circle"/>
+    </div>
+
+    <form action="#" method="post" enctype="multipart/form-data" class="js-ajax-form">
+        <div class="mui-control-content mui-active" id="login-basic">
+            <div class="mui-input-group">
+                <div class="mui-input-row">
+                    <label class="mui-label-icon"><i class="fa fa-user"></i></label>
+                    <input name ="mobile" type="text" placeholder="请输入手机号码" id="mobile"/>
+                </div>
+                <div class="mui-input-row mui-help">
+                    <label class="mui-label-icon"><i class="fa fa-lock"></i></label>
+                    <input name="code" type="number" placeholder="验证码" id="code"/>
+                    <input type="hidden" id="_code">
+                    <div class="mui-help-info mui-text-right"><a href="#" onclick="sendVerifyCode()" id="verifyCodeBtn">获取验证码</a></div>
+                </div>
+            </div>
+        </div>
+        <div class="mui-content-padded">
+            <input type="hidden" name="mode" value="basic">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <button class="mui-btn mui-btn-success mui-btn-block login-basic" type="submit" name="submit" value="提交" id="submit">手机号登录</button>
+        </div>
+    </form>
+    <div class="mui-content-padded">
+        <div class="mui-text-center mui-mt15">
+            <a href="{php echo $this->createMobileUrl('auth',array('op' => 'register','forward' => $_GPC['forward']))}">注册账号</a>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+    <script type="text/javascript">
+        $(function () {
+            $("#submit").click(function () {
+                var code = $("#code").val();
+                var _code = $("#_code").val();
+                if (_code) {
+                    if (_code != code) {
+                        alert('验证码错误');
+                        return false;
+                    }
+                }
+                var mobile = $("#mobile").val();
+                $.post("{php echo $this->createMobileUrl('auth',array('op' => 'login'))}",{mobile:mobile},function (result) {
+                    if(result.status == 2){
+                        alert(result.content);return false;
+                    }
+                },'json')
+            })
+        })
+        function sendVerifyCode() {
+            var mobile = $('#mobile').val();
+            if (!mobile) {
+                alert('请输入您的手机号码！');
+                return false;
+            }
+            if (mobile.search(/^1[3|5|7|4|5|8|][0-9]\d{4,8}$/) == -1) {
+                alert('请输入正确的手机号码！');
+                return false;
+            }
+            $('#verifyCodeBtn').addClass('active');
+            $('#verifyCodeBtn').attr('disabled', true);
+            var countdown = 60;
+            timer = setInterval(function () {
+                $('#verifyCodeBtn').html(countdown--);
+                if (countdown == 0) {
+                    $('#verifyCodeBtn').removeClass('active');
+                    $('#verifyCodeBtn').html('重新发送');
+                    clearInterval(timer);
+                    $('#verifyCodeBtn').attr('disabled', false);
+                }
+            }, 1000);
+            $.post("{php echo $this->createMobileUrl('api',array('op' => 'verity'))}&mobile=" + mobile,
+                function (data) {
+                if(data=''){
+                    alert('获取失败，请重新在试');return false;
+                }
+                else
+                {
+                    $("#_code").val(data);
+                }
+            }, 'json');
+        }
+</script>

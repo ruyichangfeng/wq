@@ -1,0 +1,116 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>店铺信息管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('store')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <div class="col-xs-2">
+                                <a href="javascript:;" class="btn btn-w-m btn-primary" id="store">
+                                    <i class="fa fa-plus"></i>添加店铺信息</a>
+                            </div>
+                            <div class="col-xs-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="keyword" placeholder="输入关键字..."/>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                    <form class="form-horizontal form" method="post">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">ID</th>
+                                <th>店铺名称</th>
+                                <th>店铺状态</th>
+                                <th>所属上级机构</th>
+                                <th>店铺详细地址</th>
+                                <th>操作员</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $index $item}
+                            <tr>
+                                <td>{$index}</td>
+                                <td>{$item['sto_name']}</td>
+                                <td><input type="checkbox" name="status" data="{$item['sto_status']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['sto_status'] == 1 }checked="checked"{/if}></td>
+                                <td>&nbsp;<i class="fa fa-check-square-o" style="color: #b41e2b"></i>&nbsp;{php echo util::getOrganizAtionOne($item['sto_upHierarchy']);}</td>
+                                <td>{$item['province']} {$item['city']} {$item['district']} {$item['sto_detailAdress']}</td>
+                                <td>{php echo util::getRoleUser($item['roleuser_id'])}</td>
+
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('store', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('store',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var id = $this.attr('data-id');
+            var status = this.checked ? 1 : 2;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('store')}",{id:id,status:status},function () {
+            })
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+</script>
+<script>
+    $('#store').on('click', function(){
+        parent.layer.open({
+            type: 2,
+            title: '添加店铺信息',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['1100px' , '700px'],
+            content: '{php echo $this->createWebUrl('store', array('op' => 'add'));}'
+        });
+    });
+</script>
+{if empty($_GPC['id'])}
+<script>
+    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+    setTimeout(function(){
+        parent.layer.close(index); //再执行关闭
+    }, 100);
+</script>
+{/if}
+{template 'web/common/footer'}

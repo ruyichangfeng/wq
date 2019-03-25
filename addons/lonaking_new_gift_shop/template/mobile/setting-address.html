@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+{php $good = $html['gift'];}
+{php $address = $html['address'];}
+<html data-address-setting-api="{$resource['urls']['AddressApi']}" data-user-id="{$html['user']['id']}" data-good-id="{$good['id']}" data-address-id="{$address['id']}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no"/>
+    <title>填写收货地址</title>
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/normalize.min.css">
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/address-v12.24.css">
+    <style>
+        #submit{background-color: {$html['config']['theme_color']};}
+        .plus,.num{color: {$html['config']['theme_color']};}
+    </style>
+</head>
+<body>
+<div id ="db-content">
+    <div class="item-info">
+        <div class="info-group">
+            <label>商品名称</label>
+            <p>{$good['title']}</p>
+        </div>
+        <div class="info-group">
+            <label>支付价格</label>
+            <p>
+                <span class="num">
+                    {if $good['buy_type'] == 1}
+                    <span class="num theme-color">{$good['score']}</span><span class="unit theme-color">积分</span>
+                    {elseif $good['buy_type'] == 2}
+                    <span class="num theme-color">{$good['money']}</span><span class="unit theme-color">元</span>
+                    {elseif $good['buy_type'] == 3}
+                    <span class="num theme-color">{$good['score']}</span><span class="unit theme-color">积分</span>
+                    <span class="plus">＋</span>
+                    <span class="num theme-color">{$good['money']}</span><span class="unit theme-color">元</span>
+                    {/if}
+                </span>
+                <span class="num" id="allPrice">
+                </span>
+                <span class="express" id="expressPrice">
+                    {if $good['trans_fee'] == 0}（包邮）{else}（运费￥{$good['trans_fee']}）{/if}
+                </span>
+            </p>
+        </div>
+    </div>
+    <div class="form-family">
+        <div class="form-group">
+            <label class="form-label" for="receiver">收货人</label>
+            <div class="form-combination">
+                <input class="form-control" id="receiver" name="receiver" maxlength="10" value="{$address['name']}" placeholder="请输入收货人名字">
+            </div>
+        </div>
+        <div class="form-group tel">
+            <label class="form-label" for="tel">手机号码</label>
+            <div class="form-combination">
+                <input class="form-control" id="tel" name="tel" type="tel" maxlength="11" value="{$address['mobile']}" placeholder="收货人的电话，方便联系">
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="province">省份</label>
+            <div class="form-combination">
+                <span class="province-val form-control"></span>
+            </div>
+            <select class="mock-select" id="province"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="city">城市</label>
+            <div class="form-combination">
+                <span class="city-val form-control"></span>
+            </div>
+            <select class="mock-select" id="city"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="area">地区</label>
+            <div class="form-combination">
+                <span class="area-val form-control"></span>
+            </div>
+            <select class="mock-select" id="area"></select>
+        </div>
+        <div class="form-group detail">
+            <label class="form-label" for="detail">详细地址</label>
+            <div class ="form-combination">
+                <textarea class="form-control" id="detail" name="detail" type="text" placeholder="请输入街道、门牌等详细地址信息">{$address['address']}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="form-group ps">
+        <label class="form-label" for="ps">备注信息</label>
+        <div class ="form-combination">
+            <input class="form-control" id="ps" name="ps" type="text" maxlength="20" placeholder="选填，需要我们特别注意的，20字内" value="{$address['remark']}">
+        </div>
+    </div>
+    <div class="btn-group">
+        <button id="submit" type="button">保存地址</button>
+    </div>
+</div>
+<div class="captcha">
+    <div class="captcha-dialog">
+    </div>
+</div>
+</body>
+<script src ="{$resource['prefix']}assets/js/zepto.min.js"></script>
+<script src ="{$resource['prefix']}assets/js/fastclick-v1.0.6.min.js"></script>
+<script src ="{$resource['prefix']}assets/js/areaText.min.js?t=20160116"></script>
+<script src ="{$resource['prefix']}assets/js/modal.min.js"></script>
+<script>
+    $(function(){
+        FastClick.attach(document.body);
+        var cbProvince="{$address['province']}";
+        var cbCity="{$address['city']}";
+        var cbArea="{$address['area']}";
+        var _province,_city,_area;
+        $('#province').append('<option value="">选择省份</option>');
+        for(var i =0;i<areaText['0'].length;i++){
+            $('#province').append('<option>'+areaText[0][i]+'</option>');
+        }
+        //地区
+        $('#area').change(function(){
+            var _val =$(this).val();
+            $('.area-val').html(_val==''?'选择区县<i></i>':_val+'<i></i>');
+        })
+        //城市
+        $('#city').change(function(){
+            _city    =$(this).find('option:selected').index()-1;
+            var _val =$(this).val();
+            $('.city-val').html(_val==''?'选择城市<i></i>':_val+'<i></i>');
+            $('.area-val').html('选择区县<i></i>');
+            $('#area').html('<option value="">选择区县</option>');
+            if(areaText['0_'+_province+'_'+_city] !=undefined){
+                for(var i=0;i<areaText['0_'+_province+'_'+_city].length;i++){
+                    $('#area').append('<option>'+areaText['0_'+_province+"_"+_city][i]+'</option>');
+                }
+            }
+        })
+
+        //省份
+        $('#province').change(function(){
+            _province =$(this).find('option:selected').index()-1;
+            var _val  =$(this).val();
+            $('.province-val').html(_val==''?'选择省份<i></i>':_val+'<i></i>');
+            $('.city-val').html('选择城市<i></i>');
+            $('.area-val').html('选择区县<i></i>');
+            $('#city').html('<option value="">选择城市</option>');
+            $('#area').html('<option value="">选择区县</option>');
+            if(areaText['0_'+_province] ==undefined){return false;}
+            for(var i =0;i<areaText['0_'+_province].length;i++){
+                $('#city').append('<option>'+areaText['0_'+_province][i]+'</option>');
+            }
+        })
+        if(cbProvince !=''){ $('#province').val(cbProvince).trigger('change');}else{$('.province-val').html('选择省份<i></i>');}
+        if(cbCity     !=''){ $('#city').val(cbCity).trigger('change');}else{$('.city-val').html('选择城市<i></i>');}
+        if(cbArea     !=''){ $('#area').val(cbArea).trigger('change');}else{$('.area-val').html('选择区县<i></i>');}
+        //提交
+        $('#submit').on('click',function(){
+            var vaild=true;
+            $('.form-family input,.form-family select,#detail').each(function(index,obj){
+                if(obj.localName=='input' || obj.localName=='textarea'){
+                    if($.trim($(obj).val())==''){
+                        $(obj).parent().parent('.form-group').addClass('error');
+                        vaild=false;
+                    }else{
+                        if(obj.id=='tel' && !$('#tel').val().match(/0?(1)[0-9]{10}/)){
+                            $(obj).parent().parent('.form-group').addClass('error');
+                            vaild=false;
+                        }else{
+                            $(obj).parent().parent('.form-group').removeClass('error');
+                        }
+                    }
+                }else if(obj.localName=='select'){
+                    if($(obj).find('option:selected').val()==''){
+                        $(obj).parent('.form-group').addClass('error');
+                        vaild=false;
+                    }else{
+                        $(obj).parent('.form-group').removeClass('error');
+                    }
+                }
+            })
+            if(vaild){
+                $('.error-tip').remove();
+            }else{
+                if($('.btn-group .error-tip').length==0){
+                    $('.btn-group').prepend('<div class="error-tip"><i></i><span>请正确输入联系人信息</span></div>')
+                }
+                return false;
+            };
+
+            window.province=$('#province').children('option:selected').val();
+            window.city=$('#city').children('option:selected').val();
+            window.area=$('#area').children('option:selected').val();
+            province =province=='请选择'?'':province;
+            city     =city=='请选择'?'':city;
+            area     =area=='请选择'?'':area;
+            //针对运费模板的计算运费
+            /*
+            var expressPrice = '';
+            var expressTemplateId = '';
+
+            var appendHtml = "<br>支付价格：1金币&nbsp;";
+            var salePrice = '0';
+            if(salePrice >0 || expressPrice > 0){
+                var allPrice = (salePrice == '' ? 0 : salePrice/100) + (expressPrice == '' ? 0 : expressPrice/100)+"";
+                appendHtml += '+&nbsp;'+allPrice+'元';
+                if(expressPrice >0 ){
+                    appendHtml += '&nbsp;(含运费￥'+expressPrice/100+'元)'
+                }
+                if(expressPrice == 0){
+                    appendHtml += '&nbsp;(包邮)'
+                }
+            }
+            if(expressPrice == null){
+                appendHtml += '&nbsp;(包邮)'
+            }
+            */
+
+            $.modal({
+                type:'confirm',
+                title:'确认收货信息',
+                section:'<p class="check-info">姓名：'+$('#receiver').val()+'<br>'+'电话：'+$('#tel').val()+'<br>'+'地址：'+province+'&nbsp;'+city+'&nbsp;'+area+'<br>'+'详细地址：'+$('#detail').val()+'</p>',
+                callback:{
+                    save:function(){
+                        window.loading=$.modal({
+                            type:'loading',
+                            title:'正在处理，请稍后···'
+                        });
+                        var settingApi = $("html").data("address-setting-api");
+                        var data = {
+                            'good' :$("html").data("good-id"),
+                            'name' : $('#receiver').val(),
+                            'user_id' : $("html").data("user-id"),
+                            'mobile' : $('#tel').val(),
+                            'province' : province,
+                            'city' : city,
+                            'area' : area,
+                            'address' : $('#detail').val(),
+                            'remark' : $("#ps").val()
+                        };
+                        var address_id = $("html").data("address-id");
+                        if(null != address_id && address_id != ""){
+                            data.id = address_id;
+                        }
+                        $.post(settingApi,data,function(res){
+                            var json = JSON.parse(res);
+                            if(json.status == 200){
+                                window.location.href = json.data.redirect;
+                            }else{
+                                alert(json.message);
+                            }
+                        });
+                    }
+                }
+            })
+        });
+    })
+</script>
+</html>

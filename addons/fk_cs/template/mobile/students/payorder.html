@@ -1,0 +1,91 @@
+<html lang="zh-CN">
+<head>
+    <style type="text/css">@charset "UTF-8";
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
+        display: none !important;
+    }
+
+    ng\:form {
+        display: block;
+    }</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta content="telephone=no" name="format-detection">
+    <title>订单支付</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    {php echo register_jssdk();}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/jquery-1.11.3.min.js?v=4.6"></script>
+    <script src="{OSSURL}public/mobile/js/jquery.js"></script>
+    <script src="{OSSURL}public/mobile/js/PromptBoxUtil.js"></script>
+    <style type="text/css">@media screen {
+        .smnoscreen {
+            display: none
+        }
+    }
+
+    @media print {
+        .smnoprint {
+            display: none
+        }
+    }
+    .flow {display: table;padding: 10px 0;height: 45px;overflow:hidden;}
+    .flow .flow-item:{width: 1%;display:table-cell;text-align:center;font-size:14px;height:24px;line-height:24px;border-right:1px solid #eeeeee;}
+    .ddb-branch-introduction {
+        background-color: white;
+        padding-left: 10px;
+        padding-right: 10px;
+        max-width: 100%
+    }
+    </style>
+</head>
+<body>
+<div class="page__bd">
+    <article class="weui-article">
+        <h1>长按下图付款码进行付款</h1>
+        <section>
+            <section>
+                <p>
+                    <img src="{php echo tomedia($teacher['qrImg'])" alt="">
+                </p>
+            </section>
+        </section>
+    </article>
+</div>
+{php include $this->template('footer');}
+<script type="text/javascript">
+    var PB = new PromptBox();
+    WeixinJSHideAllNonBaseMenuItem();
+    /**微信隐藏工具条**/
+    function WeixinJSHideAllNonBaseMenuItem(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+
+                wx.hideAllNonBaseMenuItem();
+            });
+        }
+    }
+    function checkin(kbid,flowid){
+        var submitData = {
+            schoolid :"{$schoolid}",
+            weid :"{$weid}",
+            kbid :kbid,
+            flowid:flowid,
+            tid:"{$item['tid']}",
+            op:'POST'
+        };
+        $.post("{php echo $this->createMobileUrl('newchecklog')}",submitData,function(data){
+            if(data.result){
+                PB.prompt(data.msg);
+                window.location.href = "{php echo $this->createMobileUrl('mykcdetailt', array('schoolid' => $schoolid), true)}"+'&id='+kbid;
+            }else{
+                PB.prompt(data.msg);
+            }
+        },'json');
+    }
+</script>
+</body>
+</html>

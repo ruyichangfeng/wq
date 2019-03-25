@@ -1,0 +1,54 @@
+<?php defined('IN_IA') or exit('Access Denied');?><style>
+    body{background:#fafafa !important;}
+    .weui-navbar__item:after{border: 0 !important;}
+    .weui-bar__item_on{background: none !important;}
+    .weui-navbar:after{border: none}
+    .weui-navbar{background: #fff;}
+    .ui-header {
+        height: 50px;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        background: #FFFFFF;
+        z-index: 1010;
+        border-bottom: 1px solid #e8e8e8 !important;
+    }
+    .ui-icon-left {
+        float: left;
+    }
+    .icon-back {
+        background: url(<?php echo MODULE_URL;?>/static/new/images/icon/back.png) center no-repeat;
+        background-size: 20px 20px;
+    }
+    .ui-icon {
+        display: block;
+        width: 50px;
+        height: 50px;
+    }
+    .ui-header .ui-title {
+        height: 50px;
+        line-height: 50px;
+        position: absolute;
+        right: 50px;
+        left: 50px;
+        padding-left: 15px;
+    }
+    .ui-header .ui-title:before {
+        content: '　';
+        display: block;
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: 0;
+        background: #e1e1e1;
+        width: 1px;
+    }
+</style>
+<script>
+    $(function(){
+        $(".icon-back").click(function(){
+            history.back();
+        });
+    });
+</script>

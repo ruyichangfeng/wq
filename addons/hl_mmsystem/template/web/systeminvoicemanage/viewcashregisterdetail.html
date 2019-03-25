@@ -1,0 +1,150 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <div class="contact-box" style="margin-bottom: 0px;padding-top: 10px;padding-bottom: 5px">
+
+                        <div class="col-sm-12">
+                            <table class="table table-striped table-bordered table-hover">
+                                <tbody>
+                                <tr>
+                                    <td>会员卡号：</td>
+                                    <td>{$getconsumeinvoice['sc_memberCardNum']}</td>
+                                    <td>会员姓名</td>
+                                    <td>{$getconsumeinvoice['sc_memberName']}</td>
+                                </tr>
+                                <tr>
+                                    <td>单据号</td>
+                                    <td>{$getconsumeinvoice['sc_invoiceCode']}</td>
+                                    <td>操作员：</td>
+                                    <td>{php echo util::getAccountUser($getconsumeinvoice['roleuser_id'])['username'];}</td>
+                                </tr>
+                                {if $getconsumeinvoice['sc_consumeType'] != '积分兑换'}
+                                <tr>
+                                    <td>应付金额：</td>
+                                    <td>{$getconsumeinvoice['sc_handleMoneyCount']}</td>
+                                    <td>实付金额：</td>
+                                    <td>{$getconsumeinvoice['sc_realMoneyCount']}</td>
+                              </tr>
+                                <tr>
+                                    <td>微信支付：</td>
+                                    <td>{$getconsumeinvoice['sc_wechatPaymentCount']}</td>
+                                    <td>支付宝支付：</td>
+                                    <td>{$getconsumeinvoice['sc_alipayPaymentCount']}</td>
+                                </tr>
+                                <tr>
+                                    <td>现金支付：</td>
+                                    <td>{$getconsumeinvoice['sc_cashPaymentCount']}</td>
+                                    <td>储值支付：</td>
+                                    <td>{$getconsumeinvoice['sc_rechargePaymentCount']}</td>
+                                </tr>
+                                <tr>
+                                    <td>一码付：</td>
+                                    <td>{$getconsumeinvoice['sc_otherPaymentCount']}</td>
+                                    <td>积分抵现：</td>
+                                    <td>{$getconsumeinvoice['sc_pointPaymentCount']}</td>
+                                </tr>
+                                <tr>
+                                    <td>优惠金额：</td>
+                                    <td>{$getconsumeinvoice['sc_preferentialMoney']}</td>
+                                    <td>获得积分：</td>
+                                    <td>{$getconsumeinvoice['sc_getPoint']}</td>
+                                </tr>
+                                <tr>
+                                    <td>消费时间：</td>
+                                    <td>{php echo date('Y-m-d H:i:s', $getconsumeinvoice[sc_addTime]);}</td>
+                                    <td>备注：</td>
+                                    <td>{$getconsumeinvoice['sc_note']}</td>
+                                </tr>
+                                {else}
+                                <tr>
+                                    <td>实扣积分：</td>
+                                    <td>{$getconsumeinvoice['sc_pointPaymentCount']} 积分</td>
+                                    <td>本次兑换完剩：</td>
+                                    <td>{$getconsumeinvoice['sc_nowPointCount']} 积分</td>
+                                </tr>
+                                <tr>
+                                    <td>兑换时间：</td>
+                                    <td>{php echo date('Y-m-d H:i:s', $getconsumeinvoice[sc_addTime]);}</td>
+                                    <td>备注：</td>
+                                    <td>{$getconsumeinvoice['sc_note']}</td>
+                                </tr>
+                                {/if}
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                {if $getconsumeinvoice['sc_consumeType'] == '积分兑换'}
+                <div class="ibox-content">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th width="100px">兑换项目</th>
+                            <th>数量</th>
+                            <th>单价（积分）</th>
+                            <th>总积分</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $getpointsorderlist $getpointsorderitem}
+                        <tr>
+                            <td>{$getpointsorderitem['po_pointProductName']}</td>
+                            <td>{$getpointsorderitem['po_orderNumber']}</td>
+                            <td>{$getpointsorderitem['po_orderPricePoint']} 积分</td>
+                            <td>{$getpointsorderitem['po_priceSubtotal']} 积分</td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                </div>
+                {/if}
+                {if $getconsumeinvoice['sc_consumeType'] == '消费收银' || $getconsumeinvoice['sc_consumeType'] == '微信商城购买'}
+                <div class="ibox-content">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th width="100px">消费项目</th>
+                            <th>编码</th>
+                            <th>数量</th>
+                            <th>原价</th>
+                            <th>折后金额</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $getconsumeinvoicedetaillist $getconsumeinvoicedetailitem}
+                        <tr>
+                            <td>{$getconsumeinvoicedetailitem['cid_goo_name']}</td>
+                            <td>{$getconsumeinvoicedetailitem['cid_goo_code']}</td>
+                            <td>{$getconsumeinvoicedetailitem['cid_consumeNumber']}</td>
+                            <td>{$getconsumeinvoicedetailitem['cid_goo_price']} 元</td>
+                            <td>{$getconsumeinvoicedetailitem['cid_goo_bargainPrice']}</td>
+                            <td>{$getconsumeinvoicedetailitem['cid_note']}</td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                    <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                        <thead>
+                        {if $getconsumeinvoicedetaillist}
+                        <tr>
+                            <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                        </tr>
+                        {else}
+                        <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                        {/if}
+                        </thead>
+                    </table>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>
+{template 'web/common/footer'}

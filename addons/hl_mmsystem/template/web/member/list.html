@@ -1,0 +1,497 @@
+{template 'web/common/header'}
+<script src="{HLMMS_JS}plugins/bootstrap-table/bootstrap-table-export.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/xlsx.core.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/FileSaver.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/html2canvas.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.plugin.autotable.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/tableExport.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a style="color: #1ab394" href="#tab_memberlist"><i class="fa fa-lg  fa-users" style="color: #ed8902"></i>会员列表</a>
+                            </li>
+                            <li >
+                                <a href="{php echo $this->createWebUrl('member', array('op' => 'memberrecyclelist', 'storeid' => $storeid))}"><i class="fa fa-lg fa-recycle" style="color: #e10c14"></i>会员回收站</a>
+                            </li>
+                            <li >
+                                <a href="{php echo $this->createWebUrl('member', array('op' => 'inactivemember', 'storeid' => $storeid))}"><i class="fa fa-street-view" style="color: #e10c14"></i>未激活会员</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-default" id="uploaddata" style="display: none;">
+                        <div class="panel-body">
+                            <form action="" method="post" class="navbar-form navbar-left" enctype="multipart/form-data">
+                                <input type="hidden" name="leadExcel" value="true">
+                                <input type="hidden" name="c" value="site" />
+                                <input type="hidden" name="a" value="entry" />
+                                <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                                <input type="hidden" name="do" value="UploadExcel" />
+                                <input type="hidden" name="ac" value="member" />
+                                <input type="hidden" name="storeid" value="{$storeid}" />
+                                <span class="input-group">
+                    <input name="viewfile" id="viewfile" type="text" value="" class="form-control" style="width:300px;" readonly>
+			        <span class="input-group-btn">
+                        <a class="btn btn-default ms_br">
+                            <label for="unload" class="ms_mp" >选择...</label>
+                        </a>
+                        <input type="submit" style="border-radius: 0px;" class="btn btn-success" value="上传"
+                               onclick="if(document.getElementById('viewfile').value==''){alert('请先选择上传文件!');return false;}">
+                        <a class="btn btn-primary ms_mb" href="{$_W['siteroot']}addons/hl_mmsystem/example/example_member.xls">下载导入模板
+                        </a>
+                    </span>
+                    <input type="file" name="inputExcel" id="unload" class="form-control" style="display: none;"
+                           onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
+                </span>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tabs-container" style="margin-top: 20px">
+                        <a href="{php echo $this->createWebUrl('member', array('op' => 'add'));}" class="btn btn-primary">
+                            <i class="fa fa-plus-square-o"></i>&nbsp;添加会员信息</a>
+                        <input type="hidden" name="token" value="{$_W['token']}"/>
+                        <a class="btn btn-success" href="#" onclick="$('#uploaddata').slideToggle();"><i class="fa fa-share-square"></i> 批量导入</a>
+                        <button type="button" id="submit_rule"  class="btn btn-primary"><i class="fa fa-trash"></i> 批量删除到回收站</button>
+                        <button type="button" id="submit_message"  class="btn btn-primary"><i class="fa fa-exchange"></i> 批量修改会员信息</button>
+                        <div class="col-sm-2" style="float:right ;width: 10%;padding-left: 5px;padding-right: 5px;">
+                            <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('member', array('op' => 'list', 'storeid' => $storeid))}" >
+                                <i class="fa fa-refresh fa-spin" style="color: #0abc89"></i>  刷新本页</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="tab-content">
+                        <div id="tab_memberlist" class="tab-pane active">
+
+                            <div class="panel-body">
+
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="membercardnum" id="membercardnum" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员姓名</span>
+                                        <input type="text" name="membername" id="membername" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">手机号</span>
+                                        <input type="text" name="membermobile" id="membermobile" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择会员卡级别"  class="chosen-select" name="selectoperator" id="selectoperator"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $membercardsql) }
+                                        <option value="0"   hassubinfo="true" selected>无会员卡级别</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无会员卡级别</option>
+                                        {/if}
+                                        {loop $membercardsql $key $value}
+                                        <option value="{$value['id']}" hassubinfo="true">{$value['mcl_levelName']}</option>
+                                        {/loop}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatorconsumption" id="selectoperatorconsumption"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $accountlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['uid']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#memberlisttabledata').bootstrapTable('refresh');"><i class="fa fa-search"></i> 搜索</button>
+
+                                </div>
+                                <table id="memberlisttabledata" data-mobile-responsive="true" >
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+
+
+
+
+    $(document).ready(function(){
+        memberlist();//
+
+
+        $('#selectoperator').chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 1,
+            no_results_text: '暂无选项！',
+            enable_split_word_search:true,
+            width: '95%'
+        });
+    });
+
+    /****会员列表----start  **/
+    function memberlist(){
+
+        $('#memberlisttabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('member', array('op' => 'memberlist'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportTypes:[ 'csv', 'pdf','txt' ,'excel', 'xlsx', ],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 760,
+            uniqueId: "id",
+            columns: [{
+                checkbox: true,
+            },
+                {
+                    field: 'mem_memberCardNum',
+                    title: '卡号',
+                    align: "center",
+                    valign: "middle",
+                    formatter:memberCardNum
+                },{
+                    field: 'mcl_levelName',
+                    title: '级别',
+                    align: "center",
+                    valign: "middle",
+                    formatter:membercardlevel
+
+                },{
+                    field: 'mem_memberMobile',
+                    title: '手机号',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mem_memberName',
+                    title: '姓名',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mem_memberSex',
+                    title: '性别',
+                    align: "center",
+                    valign: "middle",
+                    formatter:formemberSex
+                },{
+                    field: 'mem_memberIdentityNum',
+                    title: '身份证号码',
+                    align: "center",
+                    valign: "middle",
+                    visible: false
+                }, {
+                    field: 'mem_memberMoneyCount',
+                    title: '储值总金额',
+                    align: "center",
+                    valign: "middle",
+                    formatter:memberMoneyCount
+                },{
+                    field: 'mem_memberNumberCount',
+                    title: '总次数',
+                    align: "center",
+                    valign: "middle",
+                    formatter:memberNumberCount
+                },{
+                    field: 'mem_memberPointsCount',
+                    title: '总积分',
+                    align: "center",
+                    valign: "middle",
+                    formatter:memberPointsCount
+                }, {
+                    field: 'mem_memberAddtime',
+                    title: '加入时间',
+                    align: "center",
+                    valign: "middle",
+                    formatter:consumeinvoiceaddTime
+                },{
+                    field: 'username',
+                    title: '操作员',
+                    align: "center",
+                    valign: "middle",
+                    visible: false,
+                    formatter:consumeinvoiceusername
+                },{
+                    field: 'openid',
+                    title: 'openID',
+                    align: "center",
+                    valign: "middle",
+                    formatter:foropenid,
+                    visible: false
+
+                }, {
+                    field: 'id',
+                    title: '操作',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                membercardnum: $("#membercardnum").val(),
+                membername: $("#membername").val(),
+                membermobile: $("#membermobile").val(),
+                selectoperatorconsumption: $("#selectoperatorconsumption").val(),
+                selectoperator: $("#selectoperator").val(),
+
+
+            };
+            return temp;
+        }
+        $("#submit_rule").click(function () {
+            var memberid=$('#memberId').val();
+            var arrselections = $("#memberlisttabledata").bootstrapTable('getSelections');
+            var ids="";
+            for(var i=0;i<arrselections.length;i++){
+                if(i==0 || i=="0"){
+                    ids+=arrselections[i].id;
+                }else{
+                    ids+=","+arrselections[i].id;
+                }
+            }
+            var idArrdata=ids.split(",")
+            if (arrselections.length <= 0) {
+                swal("操作有误", "请选择要设置的项目！","error");
+                return;
+            }
+            else{
+                $.ajax({
+                    type: "post",
+                    dataType: 'json',
+                    url: "{php echo $this->createWebUrl('member', array('op' => 'deleteall'))}",
+                    data: { idArr:idArrdata,memberid:memberid },
+                    success: function (data) {
+                        $("#memberlisttabledata").bootstrapTable('refresh');
+                        swal("删除成功", "","success");
+                    },
+                    error: function () {
+                        swal("操作有误", "请关闭重新操作！","error");
+                    },
+                    complete: function () {
+                    }
+
+                });
+            }
+
+        });
+        $("#submit_message").click(function () {
+            var memberid=$('#memberId').val();
+            var arrselections = $("#memberlisttabledata").bootstrapTable('getSelections');
+            var ids="";
+            for(var i=0;i<arrselections.length;i++){
+                if(i==0 || i=="0"){
+                    ids+=arrselections[i].id;
+                }else{
+                    ids+=","+arrselections[i].id;
+                }
+            }
+            var idArrdata=ids.split(",")
+            if (arrselections.length <= 0) {
+                swal("操作有误", "请选择要修改的会员！","error");
+                return;
+            }
+            else{
+                var url ="{php echo $this->createWebUrl('member', array('op' => 'batchupdate'))}&idArr="+idArrdata+"&memberid="+memberid
+                parent.layer.open({
+                    type: 2,
+                    title: '批量更新会员信息',
+                    maxmin: false,
+                    shadeClose: true, //点击遮罩关闭层
+                    area : ['650px' , '350px'],
+                    content: url
+                });
+            }
+
+        });
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='修改'><i class='glyphicon glyphicon-pencil'>修改</i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"Deletedatacountbuffer(" + id + ")\" title='删除项目'><i class='fa fa-trash-o'>删除</i></button>";
+            return result;
+        }
+        function membercardlevel(value, row, index) {
+            var result = "";
+            if(value==null||value==undefined||value==""){
+                result += "<span class='label'>普通(微信)会员</span>";
+            }
+            else{
+
+                result += "<span class='label label-info'>"+value+"</span>";
+
+            }
+            return result;
+        }
+        function formemberSex(value, row, index) {
+
+            if(value == 1){
+
+                var result = "<span><i class='badge badge-primary'>男</i></span>";
+            }
+            else if(value == 2){
+                var result = "<span><i class='badge badge-danger'>女</i></span>";
+            }
+            else {
+                var result = "<span><i class='badge badge-primary'>未知</i></span>";
+            }
+
+
+            return result;
+        }
+        function memberNumberCount(value, row, index) {
+            var content = value;
+            if(content==null||content==undefined||content==""){
+                var result = "<span class='label label-warning'>0</span>";
+            }
+            else{
+                var result = "<span class='label label-warning'>"+content+"</span>";
+            }
+            return result;
+        }
+        function memberPointsCount(value, row, index) {
+            var content = value;
+            if(content==null||content==undefined||content==""){
+                var result = "<span class='label label-primary'>0</span>";
+            }
+            else{
+                var result = "<span class='label label-primary'>"+content+"</span>";
+            }
+            return result;
+        }
+        function memberMoneyCount(value, row, index) {
+
+            var content = value;
+
+            if(content==null||content==undefined||content==""){
+
+
+                var result = "<span class='badge badge-danger'>0</span>";
+
+            }
+            else{
+
+                var result = "<span class='badge badge-danger'>"+content+"</span>";
+            }
+
+            return result;
+        }
+        function memberCardNum(value, row, index) {
+
+            var id = value;
+            var result = "<a  class='btn btn-outline btn-success dim btn-sm'  href='{php echo $this->createWebUrl('memberinfo')}&memberCardNum="+id+"' >"+id+"</a>";
+            return result;
+        }
+        function foropenid(value, row, index) {
+            var id = value;
+            var result = "";
+            if(id==null||id==undefined||id==""){
+                result += "<span class='btn btn-xs btn-danger'   title='"+ id +"'>无openID</span>";
+            }
+            else{
+
+                result += "<span class='btn btn-xs btn-warning'title='"+ id +"' value='"+ id +"'>"+ id +"</span>";
+            }
+            return result;
+        }
+        function consumeinvoiceusername(value, row, index) {
+            var valueusername = value;
+            var result = "";
+            if(valueusername == null || valueusername == ''){
+                result += '超级管理员';
+            }
+            else{
+
+                result += valueusername;
+            }
+            return result;
+        }
+
+    }
+    function ViewDetails(memberCardNum){
+        var url = "{php echo $this->createWebUrl('memberinfo')}&memberCardNum=" + memberCardNum;
+        parent.layer.open({
+            type: 2,
+            title: '查看会员信息',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    function ViewCashRegister(cashRegisterid){
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'add'))}&id=" + cashRegisterid;
+        parent.layer.open({
+            type: 2,
+            title: '修改',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+
+    function Deletedatacountbuffer(countbufferid){
+        $.ajax({
+            type: "post",
+            dataType: 'json',
+            url: "{php echo $this->createWebUrl('member', array('op' => 'delete'))}",
+            data: { countbufferid:countbufferid },
+            success: function (data) {
+                $("#memberlisttabledata").bootstrapTable('refresh');
+                swal("删除成功", "","success");
+
+            },
+            error: function () {
+                swal("操作有误", "请关闭重新操作！","error");
+            },
+            complete: function () {
+
+            }
+
+        });
+    }
+
+
+
+
+    //时间转换
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+
+
+</script>
+
+
+{template 'web/common/footer'}

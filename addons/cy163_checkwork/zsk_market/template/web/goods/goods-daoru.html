@@ -1,0 +1,148 @@
+{template 'public/header'}
+<style type="text/css">
+	.header-one{color:#E55D48;font-size: 12px;}
+	.control-label span{float: right;}
+	.ok-one{display:none;}
+	.ok-ones{display:none;}
+	.ok-two{display: block !important;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('goods.index');?>">商品管理</a></li>
+		  <?php if(intval($goods['id'])>0){?>
+		   <li class="active">{$goods['name']}</li>
+		  <?php }?>
+		  <li class="active"><?php if(intval($_GPC['gid'])>0){ echo '编辑商品';}else{
+		  	echo '添加商品';}?></li>
+		</ol></div>
+	<div class="panel-body">
+		<div style="padding: 10px; background-color: #FCE9E5;border:1px solid #ECDBD9;border-radius:5px;">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-card-header header-one">尽量在服务器空闲时间来操作，会暂用大量内存和带宽，在上传过程中，当前页面请不要进行任何操作。</div>
+			</div>
+		</div>
+		<div class="layui-col-md10" style="margin-top: 3%;border:1px solid #F9F9F9;">
+			<div class="layui-card">
+				<div class="layui-card-body "style="font-size: 12px; color: #80807F;">
+					使用方法：<br>
+					<?php echo "<p style='color:red;'>1.表格上传文件名不能为中文。</p>"; ?>
+					2.图片压缩打包上传，格式可为：2019/1/ 可一个商品一个文件夹，2019为主目录，1为商品图片文件夹。<br>
+					实例文件：<br>
+					<a href="<?php echo ZSK_STATIC .'xiazai/'.Excel.'.'.xlsx; ?>" download="Excel.xlsx" >Excel实例文件下载</a><br>
+					<a href="<?php echo ZSK_STATIC .'xiazai/'.Zip.'.'.zip; ?>" download="Zip.zip" >Zip实例文件下载</a><br>
+				</div>
+			</div>
+		</div>
+		<div class="form-group layui-col-md10 " style="margin-top: 1%;">
+			<label for="inputPassword3" class="col-sm-2 control-label" style="margin-top: 8px;">
+				<span>Excel:</span>
+			</label>
+			<div class="col-sm-4">
+				<button type="button" class="layui-btn" id="test3">
+					<i class="layui-icon"></i>
+					上传文件
+				</button>
+				<i class="layui-icon layui-icon-ok ok-one" style="font-size: 30px;width: 10%;float: right; color:#009688;"></i>
+				<span style="color: #761c19;">上传Excel文件不能为中文</span>
+			</div>
+		</div>
+		<div class="form-group layui-col-md10">
+			<label for="inputPassword3" class="col-sm-2 control-label">
+				<span>Zip:</span>
+			</label>
+			<div class="col-sm-4">
+				<div class="layui-upload-drag" id="test10" style="width: 90%;">
+					<i class="layui-icon"></i>
+					<p>点击上传，或将压缩文件拖拽到此处</p>
+				</div>
+				<i class="layui-icon layui-icon-ok ok-ones" style="font-size: 30px;width: 10%;float: right;color:#009688;"></i>
+			</div>
+			<!--<div  class="col-sm-8" style="text-align: center; margin-top: 2%;">-->
+				<!--<button class="layui-btn" type="button" id="upload">确认上传</button>-->
+			<!--</div>-->
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript" src="{ZSK_STATIC}layui/layui.all.js"></script>
+<script type="text/javascript">
+	layui.use('upload', function(){
+		var $ = layui.jquery,
+				upload = layui.upload;
+		var i = 0;
+		//指定允许上传的文件类型
+		upload.render({
+			elem: '#test3',
+			url: '<?php echo $this->routeUrl("goods.shangcuanFile");?>',
+			accept: 'file', //普通文件
+			acceptMime:'xlsx',
+			auto:true,
+			exts:'xlsx',
+			// bindAction:'#upload',
+			field:'xlsx',
+			multiple:false,
+			number:1,
+			done: function(res){
+				if(res.code){
+					// layer.msg('选择Xlsx文件成功!');
+					$('.ok-one').addClass('ok-two');
+					$('.ok-two').attr('value','1');
+					layer.alert(res.msg, {
+						icon: 6,
+						skin: 'layer-ext-moon'
+					});
+				}else{
+					layer.alert(res.msg, {
+						icon: 5,
+						skin: 'layer-ext-moon'
+					});
+					return false;
+				}
+			},
+		});
+		//拖拽上传
+		upload.render({
+			elem: '#test10',
+			url: '<?php echo $this->routeUrl("goods.shangcuanFile");?>',
+			accept: 'zip', //普通文件
+			exts:'zip',
+			auto:true,
+			bindAction:'#upload',
+			field:'zip',
+			size:'0',
+			multiple:false,
+			number:1,
+			drag:true,
+			choose:function(obj){
+				var oktwo = $('.ok-two').attr('value');
+				if(oktwo == 1){
+					// layer.msg('选择压缩文件成功');
+					$('.ok-ones').addClass('ok-two');
+				}
+				// else{
+				// 	layer.msg('请选择正确的压缩文件');
+				// 	return false;
+				// }
+
+			},
+			done: function(res){
+				if(res.code == true){
+					layer.msg(res.msg);
+				}else{
+					layer.msg(res.msg);
+				}
+			}
+		});
+	});
+	// function sub(){
+	// 	if(valid_easy('form-control')){
+	// 		modalDlg("是否继续？",function(){
+	// 			$("#memForm").submit();
+	// 		})
+	//
+	// 	}
+	//
+	// }
+</script>
+{template 'public/footer'}

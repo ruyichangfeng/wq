@@ -1,0 +1,372 @@
+{template 'common/header'}
+<meta http-equiv="cache-control" content="no-cache">
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('templet', array('op'=>'display'));}">模板信息</a></li>
+    <li class="active">{if isset($templet[templet_id])}<a href="javascript:;">编辑模板</a>{else}<a href="{php echo $this->createWebUrl('templet', array('op'=>'create'));}">添加模板{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="templetform">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">模板设置说明</div>
+			<div class="panel-body">
+				<p>请先设置“图片宽度”和“图片高度”，最终将合成此宽度和高度的图片。</p>
+				<p>图片合成时将按照［底层背景图／用户上传的图片／上层背景图／文字］这个顺序逐个合成到节日祝福图片内，顺序靠后的会覆盖靠前的项目。</p>
+				<p>所有上传的图片均可支持透明背景图片，可以合成出更多的特殊效果。</p>
+				<p>图片合成参数内的设置，图片尺寸不要大于整个图片的尺寸，坐标不要超出整个图片尺寸，否则会造成无法正常显示。</p>
+				<p>温馨提示：制作模板时建议将尺寸固定为统一尺寸。</p>
+			</div>
+		</div>
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">{if isset($templet[templet_id])}编辑图片{else}添加图片{/if}</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="templet[templet_id]" class="form-control" value="{$templet['templet_id']}" />
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>标题名称</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="templet[templet_title]" class="form-control" value="{$templet['templet_title']}" {if $templet['templet_number']!=""}readonly{/if} maxlength="25" />
+					</div>
+				</div>
+<!-- 				<div class="form-group">
+					<label class="col-xs-12 col-sm-3  col-lg-2 control-label">节日</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<select id="order_sendtype" class="form-control" style="width:100%;" name="templet[templet_festivalid]">
+                            <option value="">请选择</option>
+                            {loop $festival_list $key $item}
+                            <option value="{$item['festival_id']}" {if $templet['templet_festivalid']==$item['festival_id']}selected{/if}>{$item['festival_title']}</option>
+                            {/loop}
+                        </select>
+					</div>
+					</div> -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>图片宽度</label>
+                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_width]" class="form-control" value="{$templet['templet_width']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>图片高度</label>
+					<div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+						<input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_height]" class="form-control" value="{$templet['templet_height']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+				</div>
+                 <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>底层背景图</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					{php echo tpl_form_field_image('templet[templet_pic_bg]',$templet['templet_pic_bg']);}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>上层背景图</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					{if $templet['templet_number']!=""&&$templet['templet_temstate']==1}
+						{php echo tpl_form_field_image('templet[templet_pic_topbg]',dirname(RES).'/'.$templet['templet_pic_topbg']);}
+					{else}
+						{php echo tpl_form_field_image('templet[templet_pic_topbg]',$templet['templet_pic_topbg']);}
+					{/if}
+					</div>
+				</div>
+				
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>状态开启</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					<label class="radio-inline">
+					  <input type="radio" name="templet[templet_state]" id="inlineRadio1" value="1" {if $templet['templet_state']==1}checked{/if}> 开启
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="templet[templet_state]" id="inlineRadio2" value="2" {if empty($templet)||$templet['templet_state']==2}checked{/if}> 关闭
+					</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>开启手机端剪裁</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					<label class="radio-inline">
+					  <input type="radio" name="templet[templet_cut_state]" value="2" {if $templet['templet_cut_state']==2 || empty($templet['templet_cut_state'])}checked{/if}> 开启
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="templet[templet_cut_state]" value="1" {if $templet['templet_cut_state']==1}checked{/if}> 关闭
+					</label>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="number" name="templet[templet_order]" class="form-control" value="{$templet['templet_order']}" maxlength="25" />
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="panel panel-primary" style="margin-top:-3px;">
+        	<div class="panel-heading">祝福语参数设置</div>
+			<div class="panel-body">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">字号</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>2)value=value.slice(0,2)" name="templet[templet_holidaygreetings_size]" class="form-control" value="{$templet['templet_holidaygreetings_size']}"    {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+					<label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label">最小字符</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>2)value=value.slice(0,2)" name="templet[templet_holidaygreetings_min]" class="form-control" value="{$templet['templet_holidaygreetings_min']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+					<label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label">最大字符</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>2)value=value.slice(0,2)" name="templet[templet_holidaygreetings_max]" class="form-control" value="{$templet['templet_holidaygreetings_max']}"    {if $templet['templet_number']!=""}readonly{/if}/>
+					</div> 
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">颜色</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2" >
+                        {php echo tpl_form_field_color('templet[templet_holidaygreetings_color]',$templet['templet_holidaygreetings_color']);}
+					</div>
+					<label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label">横坐标</label>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_holidaygreetings_x]" class="form-control" value="{$templet['templet_holidaygreetings_x']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+					<label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label">纵坐标</label>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_holidaygreetings_y]" class="form-control" value="{$templet['templet_holidaygreetings_y']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">节日祝福语</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="templet[templet_example_Blesslang]" class="form-control" value="{$templet['templet_example_Blesslang']}" maxlength="50" {if $templet['templet_number']!=""}readonly{/if}/>
+						<div class="help-block">模板展示中节日祝福语样例</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-heading">图片合成参数</div>
+			<div class="panel-body">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"></label>
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2">图片宽度</label>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2">图片高度</label>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2">横坐标</label>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2">纵坐标</label>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>用户背景图片参数设置</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_memberconfig_width]" class="form-control" value="{$templet['templet_memberconfig_width']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_memberconfig_height]" class="form-control" value="{$templet['templet_memberconfig_height']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_memberconfig_x]" class="form-control" value="{$templet['templet_memberconfig_x']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_memberconfig_y]" class="form-control" value="{$templet['templet_memberconfig_y']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>底层背景图片参数设置</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_bg_width]" class="form-control" value="{$templet['templet_bg_width']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_bg_height]" class="form-control" value="{$templet['templet_bg_height']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_bg_x]" class="form-control" value="{$templet['templet_bg_x']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_bg_y]" class="form-control" value="{$templet['templet_bg_y']}"   {if $templet['templet_number']!=""}readonly{/if}/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>上层背景图片参数设置</label>
+					<div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+						<input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_topbgconfig_width]" class="form-control" value="{$templet['templet_topbgconfig_width']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_topbgconfig_height]" class="form-control" value="{$templet['templet_topbgconfig_height']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_topbgconfig_x]" class="form-control" value="{$templet['templet_topbgconfig_x']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+                    <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2">
+                        <input type="number"  oninput="if(value.length>4)value=value.slice(0,4)" name="templet[templet_topbgconfig_y]" class="form-control" value="{$templet['templet_topbgconfig_y']}"  {if $templet['templet_number']!=""}readonly{/if} />
+					</div>
+				</div>
+				 <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="templet[templet_pic_preview]" id="templet_pic_preview" type="hidden" value=""  />
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+						<button type="button" class="btn btn-default" data-toggle="modal" onclick="yulanpicture()" style="width:150px;" data-target="#myModal">预览</button>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
+        <h4 class="modal-title" id="myModalLabel">模版预览(添加内容为测试预览信息！)</h4>
+      </div>
+      <div class="modal-body" id="img">
+        <img id='img' src="" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="close" >关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#templetform').submit(function(){
+			if($('input[name="templet[templet_title]"]').val() == ''){
+				util.message('标题名称不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_width]"]').val() == ''){
+				util.message('图片宽度不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_height]"]').val() == ''){
+				util.message('图片高度不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_state]"]').val() == ''){
+				util.message('状态不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_order]"]').val() == ''){
+				util.message('排序不能为空.');
+				return false;
+			}
+			//用户背景图片参数设置
+			if($('input[name="templet[templet_memberconfig_width]"]').val() == ''){
+				util.message('图片宽度不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_memberconfig_height]"]').val() == ''){
+				util.message('图片高度不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_memberconfig_x]"]').val() == ''){
+				util.message('横坐标不能为空.');
+				return false;
+			}
+			if($('input[name="templet[templet_memberconfig_y]"]').val() == ''){
+				util.message('纵坐标不能为空.');
+				return false;
+			}
+			//底层背景参数设置
+			if($('input[name="templet[templet_bg_width]"]').val() != ''){
+				if($('input[name="templet[templet_bg_height]"]').val() == ''){
+					util.message('底层背景图片高度不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_bg_x]"]').val() == ''){
+					util.message('底层背景横坐标不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_bg_y]"]').val() == ''){
+					util.message('底层背景纵坐标不能为空.');
+					return false;
+				}
+			}else{
+				$('input[name="templet[templet_bg_y]"]').val('');
+				$('input[name="templet[templet_bg_x]"]').val('');
+				$('input[name="templet[templet_bg_height]"]').val('');
+			}
+			//上层背景图片参数设置
+			if($('input[name="templet[templet_topbgconfig_width]"]').val() != ''){
+				if($('input[name="templet[templet_topbgconfig_height]"]').val() == ''){
+					util.message('上层背景图片高度不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_topbgconfig_x]"]').val() == ''){
+					util.message('上层背景横坐标不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_topbgconfig_y]"]').val() == ''){
+					util.message('上层背景纵坐标不能为空.');
+					return false;
+				}
+			}else{
+				$('input[name="templet[templet_topbgconfig_height]"]').val('');
+				$('input[name="templet[templet_topbgconfig_x]"]').val('');
+				$('input[name="templet[templet_topbgconfig_y]"]').val('');
+			}
+			//节日祝福语
+			if($('input[name="templet[templet_sloganconfig_size]"]').val() != ''){
+				if($('input[name="templet[templet_holidaygreetings_color]"]').val() == ''){
+					util.message('祝福语字体颜色不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_holidaygreetings_min]"]').val() == ''){
+					util.message('祝福语最小字符不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_holidaygreetings_max]"]').val() == ''){
+					util.message('祝福语最大字符不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_holidaygreetings_x]"]').val() == ''){
+					util.message('祝福语横坐标不能为空.');
+					return false;
+				}
+				if($('input[name="templet[templet_holidaygreetings_y]"]').val() == ''){
+					util.message('祝福语纵坐标不能为空.');
+					return false;
+				}
+			}else{
+				$('input[name="templet[templet_holidaygreetings_max]"]').val('');
+				$('input[name="templet[templet_holidaygreetings_min]"]').val('');
+				$('input[name="templet[templet_holidaygreetings_y]"]').val('');
+				$('input[name="templet[templet_holidaygreetings_x]"]').val('');
+				$('input[name="templet[templet_holidaygreetings_color]"]').val('');
+			}
+			if($('#templet_pic_preview').val()=="")
+			{
+				yulanpicture();
+			}
+				return true;	
+		});
+	});
+});
+function yulanpicture(){
+	$("#img").empty();
+	$.ajax({  
+	     type:"POST",
+	     url: "{php echo $this->createWebUrl('pictureajax', array('op'=>'pictureajax'));}",
+	     data:$('#templetform').serialize(),
+	     dataType:"json",
+	     async:false,
+	     success:function(data){
+	       	if(data.result=="success")
+	        {
+	        	$('#img').append("<img  src='"+data.image+"' style='width:560px;'/>");
+	        	$('#templet_pic_preview').val(data.image);
+	        }
+	    }   
+	});
+}
+{if $templet['templet_number']!=""}
+function showImageDialog()
+{
+	javascript:;
+
+}
+
+{/if}
+</script>
+{template 'common/footer'}

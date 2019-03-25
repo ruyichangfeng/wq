@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  {template 'web/header'}
+
+</head>
+
+<body>
+
+    <!-- 内容主体区域 -->
+
+    <div class="layui-elem-quote lineh38 fontsize16">
+
+      <a href="{php echo $this->createWebUrl('importcredit', array('op' => 'display'))}">余额列表</a>
+
+      <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('importcredit', array('op' => 'list'))}">余额导入</a>
+
+    </div>
+
+{if $op=="list"}
+
+<form action="" class="layui-form layui-form-pane"  method="post" enctype="multipart/form-data">
+
+    <div class="layui-form-item" >
+
+        <label  class="layui-form-label" >说明</label>
+
+        <div class="layui-input-inline layui-input" style="width:75%; height:130px;" >
+
+            <span class="help-block">							
+
+                <strong class="text-danger">文件格式: </strong>A列：手机号码，B列：余额，还有注意excel单元格格式设置成文本，然后填写内容！从第二行开始为有效数据，如下图：<br />
+
+                <img src="../addons/hy_supstore/template/web/images/1.png"/><br />
+
+            </span>					
+
+        </div>
+
+    </div>
+
+    <div class="layui-form-item"  >
+
+        <label    class="layui-form-label">文件</label>
+
+        <div class="layui-input"  style="border:0px;"><div  class="layui-box layui-upload-button">
+
+            <input type="file" name="file" value=""  class="layui-upload-file"  lay-title="上传文件"><span class="layui-upload-icon"><i class="layui-icon"></i>上传文件</span>
+
+            <span class="help-block"></span></div>
+
+        </div>
+
+    </div>
+
+    <div class="form-group">
+
+        <div class="col-sm-12">
+
+            <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo"   value="提交">立即提交</button>
+
+            <input type="hidden" name="token" value="{$_W['token']}" />
+
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+
+function message(msg){
+
+    require(['util'],function(util){
+
+        util.message(msg);
+
+    })
+
+}
+
+$(function(){
+
+	$('form').submit(function(){
+
+		if($.trim($('input[name="file"]').val()) == '') {
+
+			message('必须上传更新文件.', '', 'error');
+
+			return false;
+
+		}
+
+		if( !confirm('你确认导入数据格式正确，此操作不可恢复！\n\n请谨慎操作！') ){
+
+			return false;
+
+		}
+
+		return true;
+
+	});
+
+});
+
+</script>
+
+{elseif $op=="display"} 
+
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+
+<table class="layui-table">
+
+    <thead class="navbar-inner">
+
+        <tr>
+
+            <th width="60">ID</th>
+
+            <th>手机号</th>
+
+            <th>余额</th>
+
+            <th>状态</th>
+
+            <th>操作</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {loop $list $item}
+
+        <tr>
+
+            <td style="text-align:center"><input type="checkbox" name="delete[]" value="{$item['id']}" > {$item['id']}</th>
+
+            <td style="text-align:center;">{$item['mobile']}</th>
+
+            <td style="text-align:center;">{$item['amount']}元</th>
+
+            <td style="text-align:center;">{if $item['isdel']==1}已承兑{else}未承兑{/if}</th>
+
+            <td style="text-align:center;">
+
+            	<a href="" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete">删除</a>
+
+            </td>
+
+        </tr>
+
+        {/loop}
+
+        <tr>
+
+        	<td style="text-align:center;"><input type="checkbox" id="ckall" style="display:block;margin: 0 auto;"></td>
+
+            <td colspan="4"><input type="submit" name="submit" value="批量删除" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete"></td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+</form>
+
+<div class="fenye">{$pager}</div>
+
+<script>
+
+layui.use(['laydate', 'laypage','form', 'layer', 'table', 'carousel', 'upload', 'element'], function(){
+
+  var $ = layui.jquery
+
+  ,form = layui.form
+
+  ,layer = layui.layer //弹层
+
+  ,element = layui.element; //元素操作
+
+  
+
+  $('.item-action-delete').click(function(){
+
+	  var href  = $(this).attr('href') ;
+
+	  layer.confirm('该操作不可逆，请确认是否删除？',function(){
+
+		  layer.closeAll();
+
+		  location.href  = href;
+
+	  })
+
+	  return false ;
+
+  })
+
+  
+
+  
+
+});
+
+$('#ckall').click(function(){
+
+	var ck = this.checked;$(" :checkbox").each(function(){this.checked=ck});
+
+});
+
+</script>
+
+{/if}
+
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+    
+<ul class="nav nav-tabs">
+	<li ><a href="{php echo $this->createWebUrl('store', array('op'=>'display'));}">门店信息管理</a></li>
+	<li ><a href="{php echo $this->createWebUrl('storetype', array('op'=>'display'));}">门店分类</a></li>
+	<li ><a href="{php echo $this->createWebUrl('storecircle', array('op'=>'display'));}">商圈信息</a></li>
+	<li class="active"><a href="{php echo $this->createWebUrl('comment', array('op'=>'display'));}">门店评论</a></li>
+    <li><a href="{php echo $this->createWebUrl('storecircle', array('op'=>'create'));}">添加商圈范围</a></li>
+</ul>
+
+<div class="main">
+    <!-- <div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">商圈名称</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[storecircle_name]" value="{$data['search']['storecircle_name']}" placeholder="可模糊查询"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div> -->
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">商圈信息</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:4%;">序号</th>
+								<th style="width:15%;">所属门店</th>
+                                <th style="width:10%;">粉丝信息</th>
+                                <th style="width:40%;">评论信息</th>
+                                <th style="width:21%;">状态</th>
+								<th style="width:10%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['comment_store']}
+								</td>
+								<td>
+                                    <img src="{php echo tomedia($item['comment_avatar'])}" alt="" style="height:25px;">{$item['comment_nickname']}
+								</td>
+								<td>
+                                    {$item['comment_remark']}
+								</td>
+								
+								<td>
+									{if $item['comment_shstate']==1}
+									<label class="radio-inline">
+									  <input type="radio" name="state{$item['comment_id']}"   id="state1" value="1" disabled {if $item['comment_state']==1}checked{/if} > 待审核
+									</label>
+									<label class="radio-inline">
+									  <input type="radio" name="state{$item['comment_id']}" onClick="changestate({$item['comment_id']},2)" id="state2" value="2" {if $item['comment_state']==2}checked{/if}> 通过
+									</label>
+									<label class="radio-inline">
+									  <input type="radio" name="state{$item['comment_id']}" onClick="changestate({$item['comment_id']},3)" id="state3" value="3" {if $item['comment_state']==3}checked{/if}> 未通过
+									</label>
+									{else}
+									无需审核
+									{/if}
+								</td>
+
+								<td >
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('comment', array('op'=>'delete', 'store_id'=>$_GPC['store_id'],'comment_id'=>$item['comment_id']));}" class="btn btn-danger">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#store_state_0").prop("checked",'checked')
+}
+function changestate(commentid,state){
+	if(confirm('确认更改审核状态！'))
+	{
+		$.ajax({  
+	        type:"POST",
+	        url: "{php echo $this->createWebUrl('comment');}",
+	        data:{comment_id:commentid,state:state,op:'create'},
+	        dataType:"json",
+	        // dataType:"text",
+	        async:false,
+	        success: function(data){
+	            if(data.rs=='success')
+	            {
+	            	alert('审核状态更改成功');
+	            }else{
+	            	alert('审核状态更改失败');
+	            }
+	        }
+	    });
+	}
+
+	
+}
+</script>
+{template 'common/footer'}

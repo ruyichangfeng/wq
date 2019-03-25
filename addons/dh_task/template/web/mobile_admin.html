@@ -1,0 +1,139 @@
+{template 'public/header'}
+{template 'public/comhead'}
+<ul class="nav nav-tabs">
+    <li {if $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('mobile_admin', array('op' => 'display'))}">前台管理员</a></li>
+    <li {if $operation == 'post'}class="active"{/if}><a href="{php echo $this->createWebUrl('mobile_admin', array('op' => 'post'))}">{if $id}编辑{else}添加{/if}前台管理员</a></li>
+</ul>
+{if $operation == 'display'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" >
+        <div class="panel panel-default">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover" style="display: block;width:100%;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:10%">id</th>
+                        <th style="width:15%">昵称</th>
+                        <th style="width:5%">状态</th>
+                        <th style="width:15%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $item}
+                    <tr>
+                        <td>{$item['id']}</td>
+						<td>{if $item['username']}{$item['username']}{else}{$item['nickname']}{/if}</td>
+                        <td>
+                            {if $item['status'] == 0}
+                            <span class="label label-danger">禁用</span>
+                            {else}
+                            <span class="label label-success">正常</span>
+                            {/if}
+                        </td>
+                        <td>
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('mobile_admin', array('id' => $item['id'], 'op' => 'post', 'storeid' => $storeid))}"><i class="fa fa-search"></i>编辑</a>
+                            {if $_W['isfounder'] || $_W['role'] == 'manager'}
+                            {if $item['status'] == 1}
+                            <a class="btn btn-default btn-sm" onclick="return confirm('您确定要禁止领取任务吗？');return false;" href="{php echo $this->createWebUrl('mobile_admin', array('id' => $item['id'], 'status' => $item['status'], 'op' => 'setstatus', 'storeid' => $storeid))}"
+ title="冻结"><i class="fa fa-lock"></i>禁用</a>
+                            {else}
+                            <a class="btn btn-default btn-sm" onclick="return confirm('您确定要解除禁止状态吗？');return false;" href="{php echo $this->createWebUrl('mobile_admin', array('id' => $item['id'], 'status' => $item['status'], 'op' => 'setstatus', 'storeid' => $storeid))}"
+                                title="解冻"><i class="fa fa-unlock"></i>启用</a>
+                            {/if}
+                            {/if}
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {$pager}
+</div>
+
+{elseif $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="invitative">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                用户信息
+            </div>
+            <div class="panel-body">
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">选择会员</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <select name="fans_id">
+							{loop $fanslist $v}
+								<option value="{$v['id']}" {if !empty($info['fans_id']) && $info['fans_id']==$v['id']}selected{/if} >{if !empty($v['username'])}{$v['username']}{else}{$v['nickname']}{/if}</option>
+							{/loop}
+							</select>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">管理权限</label>
+                    <div class="col-sm-9">
+                        {loop $operalist $v}
+                        <label>
+                            <input type="checkbox" {if $v['checked']}checked{/if} name="opera_auth[]" value="{$v['id']}">{$v['title']}
+                        </label>
+                        {/loop}
+                        <br>
+                        <span>不选择代表拥有所有权限</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">标签权限</label>
+                    <div class="col-sm-9">
+                        {loop $catelist $v}
+                        <label>
+                            <input type="checkbox" {if $v['checked']}checked{/if} name="label_auth[]" value="{$v['id']}">{$v['title']}
+                        </label>
+                        {/loop}
+                        <br>
+                        <span>不选择将能够管理所有标签任务</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务管理范围</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline">
+                            <input type="radio" name="task_scope" value="1" {if $info['task_scope']==1 || empty($info['task_scope'])}checked{/if}>仅管理自己发布的任务
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="task_scope" value="2" {if $info['task_scope']==2}checked{/if}>可管理标签下所有任务
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">管理员状态</label>
+                    <div class="col-sm-9">
+                        {if $info['status'] == 1 || !isset($info['status'])}
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="1" checked>启用
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="0">禁用
+                        </label>
+                        {else}
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="1">启用
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="0" checked>禁用
+                        </label>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="保存" class="btn btn-primary col-lg-3"/>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+{/if}
+{template 'common/footer'}

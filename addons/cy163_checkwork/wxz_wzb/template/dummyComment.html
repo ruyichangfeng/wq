@@ -1,0 +1,172 @@
+{template 'common/header'}
+<div class="main">
+{template 'list_nav'}
+		<!--模板设置-->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+				<a data-toggle="collapse" data-parent="#accordion"
+					href="#collapse1">
+					虚拟评论
+				</a>
+				</h4>
+			</div>
+			<div id="collapse1" class="panel-collapse collapse in">
+				
+					<div class="panel-body">
+						<div class="form-horizontal form">
+							<input type="hidden" name="item" value="ajax">
+							<input type="hidden" name="key" value="setting">
+							<input type="hidden" name="rid" class="form-control" value="{$rid}">
+							<div class="form-group">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称：</label>
+								<div class="col-sm-9 col-xs-12">
+									<input type="text" class="form-control span7" name="nickname" value="">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">头像：</label>
+								<div class="col-sm-9 col-xs-12">
+									{php echo tpl_form_field_image("headimgurl", $list['headimgurl'])}
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">评论内容：</label>
+								<div class="col-sm-8 col-xs-12 col-md-9">		
+									<input type="text" class="form-control span7" name="content" value="">
+								</div>
+							</div>
+														<div class="form-group">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+								<div class="col-sm-9 col-xs-12">
+									<button class="btn btn-primary" name="btn-setting" type="submit">提交</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-api-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/demo_base.js"></script>
+<script>
+	window.alert = function (e) {
+		if (e != null && e.indexOf("提示内容")>-1){
+		}else {
+		}
+	};
+	function getQueryStr(str) {
+		var LocString = String(window.document.location.href);
+		var rs = new RegExp("(^|)" + str + "=([^&]*)(&|$)", "gi").exec(LocString), tmp;
+		if (tmp = rs) {
+			return decodeURIComponent(tmp[2]);
+		}
+		return "";
+	}
+	$(function () {
+		var api = TISAPI.New("{php echo $this->createWebUrl('interface')}", { tisId: getQueryStr("tisId") }, false);
+		console.log(api);
+		window.tis = TIS(".tis-container", {
+			api: api,                               //必须
+			//clientid:"clientId1"                  //可选，默认随机生成
+			name: '.',                           //可选，默认为Anonymous
+			image: '.',          //可选，默认未定义
+			generateUserEvent: true,             //可选，默认为true
+			template:           {onReceiveMessage: onReceiveMessage},     //界面模版
+			//以下均可选
+			failure: function (error, when) {       //某个操作失败时调用
+				if (typeof error != "string") {
+					if (when == "sendMsg" && error.code == 400 && error.error == "instance closed") {
+						alert("TIS实例已关闭");
+						return;
+					}
+					alert(when + "操作失败");
+				} else {
+					alert("操作失败：" + error);
+				}
+			},
+			onSendSuccess: function (data) {
+				//当发送消息成功时调用
+				console.log("消息发送成功");
+			},
+			onReconnect: function () {
+				//当需要与服务器重新连接时调用
+				console.log("正在与服务器重连");
+			},
+			onConnect: function () {
+				//当与服务器连接成功时调用
+				console.log('我进来了');
+				console.log("与服务器重连接成功");
+			},
+			onLoadComponent: function () {
+				//当组件加载完成时调用
+				console.log("组件加载完成");
+			},
+			updateUser: function (total, clientId) {
+				//当generateUserEvent=true,并且在线人数发生变化时调用
+				console.log("在线人数:",total);
+			}
+		});
+
+	});
+
+</script>
+
+<script>
+    require(['bootstrap','util'],function($,util){
+        $('button[name=btn-setting]').click(function(){
+			console.log(3434);
+            setting.save_setting();
+        });
+
+        var setting = {
+            save_setting:function(){
+                $.ajax({
+                    url: "{php echo wurl('site/entry/dummyComment',array('m'=>'wxz_wzb','op'=>'setting','item'=>'ajax','key'=>'setting'));}",
+                    type: 'POST',
+					dataType: 'json',
+                    data: {
+                        rid: $("input[name='rid']").val(),
+                        nickname: $("input[name='nickname']").val(),
+                        content: $("input[name='content']").val(),
+                        headimgurl: $("input[name='headimgurl']").attr('url'),
+                    },
+                    success:function(data){
+						alert('发送成功');
+                        if(data.s==1){
+							var result = data.data;
+							var loginInfo = {
+								'identifier': 'user_0', //当前用户ID,必须是否字符串类型，选填
+								'uid':0,
+								'id':result.id,
+								'identifierNick': result.nickname, //当前用户昵称，选填
+								'headurl': result.headimgurl, //当前用户默认头像，选填
+								'isadmin':0,
+								'rid':result.rid,
+								'shutup':0,
+								'type':'comment',
+								'siteroot':"{$_W['siteroot']}"
+							};
+							loginInfo.times=result.dateline;
+							console.log(loginInfo);
+							tis.SendMessage(result.content,'',JSON.stringify(loginInfo));
+                            util.message('消息提示: 设置成功','', 'success');
+
+                        }else{
+                            util.message('消息提示: 设置失败','', 'error');
+                        }
+						window.location.reload();
+                    },
+                    error:function(){
+                        alert('ajax error');
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+{template 'common/footer'}

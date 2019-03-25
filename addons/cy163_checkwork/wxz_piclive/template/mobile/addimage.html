@@ -1,0 +1,266 @@
+﻿<!doctype html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link href="<?php  echo $_W['siteroot'];?>app/resource/css/common.min.css" rel="stylesheet">
+        <link href="../addons/wxz_piclive/css/addImage/mui.css" rel="stylesheet" />
+        <link href="../addons/wxz_piclive/css/addImage/tempSale_css.css" rel="stylesheet" />
+        <!--App自定义的css-->
+        <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/css/addImage/app.css" />
+        <link href="../addons/wxz_piclive/css/addImage/mui.picker.css" rel="stylesheet" />
+        <link href="../addons/wxz_piclive/css/addImage/mui.poppicker.css" rel="stylesheet" />
+        <script src="../addons/wxz_piclive/css/sellercentral/jquery-1.11.1.min.js"></script>
+        <script src="../addons/wxz_piclive/template/mobile/js/util.js?v11"></script>
+        <script src="<?php  echo $_W['siteroot'];?>app/resource/js/require.js"></script>
+        <script type="text/javascript" src="<?php  echo $_W['siteroot'];?>app/resource/js/app/common.js"></script>
+        <style>
+            input[type='submit'], .mui-btn-primary, .mui-btn-blue {
+                color: #fff;
+                border: 1px solid #04be02;
+                background-color: #04be02;
+            }
+            .mui-toast-container{bottom:1000px;margin-left:0px;}
+            #chooseImage{
+                display:inline-block;width:42px;height:42px;background-image: url(../addons/wxz_piclive/template/mobile/images/addBtn.png);
+
+            }
+        </style>
+    </head>
+    <script>
+        wx.config({
+            debug: false,
+            appId: "{$_W['account']['jssdkconfig']['appId']}",
+            timestamp: "{$_W['account']['jssdkconfig']['timestamp']}",
+            nonceStr: "{$_W['account']['jssdkconfig']['nonceStr']}",
+            signature: "{$_W['account']['jssdkconfig']['signature']}",
+            jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline", "onMenuShareQQ", 'chooseImage',
+                'previewImage',
+                'uploadImage']
+        });
+        wx.ready(function() {
+            sharedata = {
+                title: "{php echo htmlspecialchars_decode($live['live_name'])}",
+                desc: "{php echo htmlspecialchars_decode($live['live_brief'])}",
+                link: "{php echo $_W['siteroot'].str_replace('./','app/',$this->createMobileurl('index',array('i' => $_W['weid'],'lid'=>$live['id'],'share_uid'=>$_W['fans']['uid'])))}",
+                imgUrl: "{php echo tomedia($live['original_img'])}",
+                success: function() {
+                    //alert(111);
+                },
+                cancel: function() {
+                    //alert('分享取消');
+                }
+            };
+            wx.onMenuShareTimeline(sharedata);
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareQQ(sharedata);
+        });
+    </script>
+    <body>
+        <link href="../addons/wxz_piclive/css/sellercentral/mui-switch.css" rel="stylesheet" type="text/css">
+        <script src="../addons/wxz_piclive/template/mobile/js/mui.min.js"></script>
+        <script type="text/javascript">
+        mui.init()
+        </script>
+        <form id="imageform" method="post"  enctype="multipart/form-data" action="<?php  echo $actionUrl;?>" onsubmit="return checkForm()">
+            <div style="height: 10px;"></div>
+            <div>
+                <ul class="mui-table-view btn_box" id="oul" style="background: none;">
+                    <li class="mui-table-view-cell">
+                        <a class="mui-navigate-right" id='showUserPicker'>
+                            <div class="pic_present_font"style="float: left;">所属分类</div>
+                            <div class="temp_text_list" id="userResult">选择分类</div>
+                            <input type="hidden" name="topic_type" id="typeid" value="0">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="present_img_box" style='padding:0px;'>
+                <div style='padding:14px;'>图片上传</div>
+                <div class="present_img" style="padding-left:20px;padding-bottom:10px;">
+                    <span id="chooseImage" >&nbsp;</span>
+                    <div id="previewimg"></div>
+                    <span id="originalimg"></span>
+                    <!--<div class="mui-input-cell">
+                               {php echo tpl_app_form_field_image('original_img111', '');}
+                    </div>-->
+                </div>
+            </div>
+            <input type="hidden" name="show_type" value="0" id="show_type">
+
+            <div <?php if($_W['setting']['remote']['type'] != 3){echo "style='display:none;'";}?>>
+                <ul class="mui-table-view btn_box" style="background: none;">
+                    <li class="mui-table-view-cell" style="margin-bottom: 0;">
+                        <a class="mui-navigate-right" id='fenlei'>
+                            <div class="pic_present_font"style="float: left;">七牛图片样式(小图)</div>
+                            <div class="temp_text_list" id="userinfo_001">选择分类</div>
+                            <input type="hidden" name="qiniu_sid" value="0" id="qiniu_sid">
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell">
+                        <a class="mui-navigate-right" id='fenlei2'>
+                            <div class="pic_present_font"style="float: left;">七牛图片样(大图)</div>
+                            <div class="temp_text_list" id="userinfo_002">选择分类</div>
+                            <input type="hidden" name="qiniu_sid_big" value="0" id="qiniu_sid_big">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-group col-sm-12" style='text-align: center;'>
+                <input type="submit" name="submit" value="提 交" class="btn btn-primary col-lg-1">
+            </div>
+        </from>
+
+        <script src="../addons/wxz_piclive/template/mobile/js/mui.picker.js"></script>
+        <script src="../addons/wxz_piclive/template/mobile/js/mui.poppicker.js"></script>
+        <script type="text/javascript">
+            var remoteType = "<?php echo $_W['setting']['remote']['type'];?>";
+            //mui初始化
+            mui.init({
+                swipeBack: true //启用右滑关闭功能
+            });
+
+            (function($, doc) {
+                $.init();
+                $.ready(function() {
+                    /**
+                     * 获取对象属性的值
+                     * 主要用于过滤三级联动中，可能出现的最低级的数据不存在的情况，实际开发中需要注意这一点；
+                     * @param {Object} obj 对象
+                     * @param {String} param 属性名
+                     */
+                    var _getParam = function(obj, param) {
+                        return obj[param] || '';
+                    };
+                    var func_url = "{php echo $addImageUrl}";
+                    mui.ajax(func_url, {
+                        data: {},
+                        dataType: 'json',
+                        type: 'post',
+                        timeout: 3000,
+                        success: function(result) {
+                            // var str = JSON.stringify(result);
+                            //普通示例
+                            var userPicker = new $.PopPicker();
+                            userPicker.setData(result.live_type_list);
+                            //七牛图片样
+                            var qiniuPicker = new $.PopPicker();
+                            qiniuPicker.setData(result.qiniuStyleList);
+
+                            //七牛图片样2
+                            var qiniuPicker2 = new $.PopPicker();
+                            qiniuPicker2.setData(result.qiniuStyleList);
+
+
+                            var showUserPickerButton = doc.getElementById('showUserPicker');
+                            var userResult = doc.getElementById('userResult');
+                            showUserPickerButton.addEventListener('tap', function(event) {
+                                userPicker.show(function(items) {
+                                    userResult.innerText = items[0].text;
+                                    doc.getElementById('typeid').value = items[0].value;
+                                    //返回 false 可以阻止选择框的关闭
+                                    //return false;
+                                });
+                            }, false);
+
+                            var qiniuPickerButton = doc.getElementById('fenlei');
+                            var qiniuResult = doc.getElementById('userinfo_001');
+                            qiniuPickerButton.addEventListener('tap', function(event) {
+                                qiniuPicker.show(function(items) {
+                                    qiniuResult.innerText = items[0].text;
+                                    doc.getElementById('qiniu_sid').value = items[0].value;
+                                    //返回 false 可以阻止选择框的关闭
+                                    //return false;
+                                });
+                            }, false);
+
+                            var qiniu2PickerButton = doc.getElementById('fenlei2');
+                            var qiniu2Result = doc.getElementById('userinfo_002');
+                            qiniu2PickerButton.addEventListener('tap', function(event) {
+                                qiniuPicker2.show(function(items) {
+                                    qiniu2Result.innerText = items[0].text;
+                                    doc.getElementById('qiniu_sid_big').value = items[0].value;
+                                    //返回 false 可以阻止选择框的关闭
+                                    //return false;
+                                });
+                            }, false);
+                        },
+                        error: function(xhr, type, errorThrown) {
+                            mui.toast('啊呀~没网络了！请检查网络再试!');
+                        }
+                    })
+                });
+            })(mui, document);
+
+            var info = document.getElementById("infosect");
+            document.querySelector('.mui-table-view.mui-table-view-radio').addEventListener('selected', function(e) {
+                info.innerHTML = "当前选中的为：" + e.detail.el.innerText;
+                document.getElementById("show_type").value = e.detail.el.getAttribute('showType');
+            });
+
+            function checkForm() {
+                var typeid = $("#typeid").val();
+                var qiniu_sid = $("#qiniu_sid").val();
+                var qiniu_sid_big = $("#qiniu_sid_big").val();
+
+                if (typeid == 0) {
+                    alert("请选择分类！");
+                    return false;
+                }
+                if ((qiniu_sid == 0 || qiniu_sid_big == 0) && remoteType == 3) {
+                    alert("请选择图片样式！");
+                    return false;
+                }
+                return true;
+            }
+        </script>
+        <script>
+            $("#chooseImage").click(function(){
+                wx.chooseImage({
+                    count: 5, // 默认5
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function(res) {
+                        var localIds = res.localIds;
+			syncUpload(localIds);
+                    },
+                    cancel: function() {
+                        alert("已取消选择");
+                    }
+                });
+            });
+            var syncUpload = function(localIds){
+                    var localId = localIds.pop();
+                    $("#previewimg").append('<img src="' + localId + '" style="width:70px; height:70px;margin-right:5px;"/>');
+                    wx.uploadImage({
+                        localId: localId,
+                        isShowProgressTips: 1,
+                        success: function (res) {
+                            var serverId = res.serverId; // 返回图片的服务器端ID
+                            var url = '{php echo $wxUploadUrl}';
+                            $.post(url, {mediaId: serverId}, function(result) {
+                                if (result.err == 0) {
+                                    $("#originalimg").append('<input type="hidden" value="' + result.imgUrl + '" name="original_img[]" />');
+                                } else {
+                                    alert(result.msg);
+                                    return false;
+                                }
+                            }, 'json');
+                            //其他对serverId做处理的代码
+                            if(localIds.length > 0){
+                                syncUpload(localIds);
+                            }
+                        },
+                        fail: function(res) {
+                            alert('上传失败，请重新上传！');
+                        }
+                    });
+            };
+        </script>
+</body>
+
+</html>

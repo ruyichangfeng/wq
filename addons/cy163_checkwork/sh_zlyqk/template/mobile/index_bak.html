@@ -1,0 +1,190 @@
+{template "header"}
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp&key=VY3BZ-WRWWQ-WUP5C-GKZ6R-WNOSV-G3BZR"></script>
+<style>
+    .img-box2 img{width:1.5rem;height:1.5rem;overflow: hidden}
+    .hold{background-color: #89e5d2}
+    {if !$setting['them'] && !$setting['scene'] && !$setting['level'] }
+        .part1{display: none}
+    {/if}
+    {if !$setting['scene'] && !$setting['level'] }
+    .part1{ padding-bottom: 0 !important; }
+    {/if}
+</style>
+<div class="menu-overly"></div>
+<div class="wrap page1">
+    <div class="part1">
+        {if $setting['them']}
+        <div class="title"><img src="{MODULE_URL}/static/mobile/images/icon11.png" alt="" class="icon"><span class="tit">{$_SESSION['app_name']}</span></div>
+        {/if}
+        {if $setting['scene']}
+        <div class="list list1"  {if !$setting['them']} style="margin-top:10px;padding-top:15px;" {/if}>
+            <img src="{MODULE_URL}/static/mobile/images/icon12.png" alt="" class="icon">
+            {loop $sceneList $scene}
+            <span id="scene" data-id="{$scene['id']}" {if $scene['is_default']==1} class="on" {/if}>{$scene['name']}</span>
+            {/loop}
+        </div>
+        {/if}
+        {if $setting['level']}
+        <div class="list list2" {if !$setting['them'] && !$setting['scene'] } style="margin-top:10px;padding-top:15px;" {/if}>
+            <img src="{MODULE_URL}/static/mobile/images/icon13.png" alt="" class="icon">
+            {loop $levelList $level}
+            <span id="level" data-id="{$level['id']}" {if $level['is_default']==1} class="on" {/if}>{$level['name']}</span>
+            {/loop}
+        </div>
+        {/if}
+    </div>
+    <div class="part2">
+        {if $setting['title']}
+        <div class="title" {if !$setting['label']} style="padding-left:.7rem" {/if}>
+            <img src="{MODULE_URL}/static/mobile/images/icon14.png" alt="" class="icon"><span>{$setting['label']}</span>
+            <input type="text" placeholder="{$setting['label_content']}" id="title">
+        </div>
+        {/if}
+        <div class="txt">
+            <textarea id="content" cols="30" rows="10" placeholder="{$setting['content']}"></textarea>
+        </div>
+        {if $setting['photo']}
+        <ul class="img-box2">
+        </ul>
+        {/if}
+        <div class="operate-line">
+            {if $setting['photo']}
+            <div class="upload1 photo"></div>
+            {/if}
+            {if $setting['voice']}
+            <div class="upload2 voice"></div>
+            <div class="voice-box"  style="display: none" >
+                <span class="play">3'15"</span>
+                <a href="" class="btn-close vic"></a>
+            </div>
+            {/if}
+        </div>
+        {if $setting['location'] || $setting['self_filed'] }
+        <div class="addr" {if  !$setting['self_filed']} style="height:50px;" {/if} {if !$setting['location'] && $setting['self_filed'] } style="padding: 0 0 0rem .2rem !important;" {/if} >
+            {if $setting['location']}
+            <img src="{MODULE_URL}/static/mobile/images/icon15.png" alt="" class="icon local" {if  !$setting['self_filed']} style="top:.2rem" {/if}>
+            <input type="hidden" id="lat">
+            <input type="hidden" id="lnt">
+            <h3 class="local" style="font-size:14px;">我的位置</h3>
+            {/if}
+            {if $setting['self_filed']}
+            <input type="text" id="address" placeholder="{$setting['self_content']}">
+            {/if}
+        </div>
+        {/if}
+    </div>
+    <div class="operate" style="z-index: 99">
+        <a href="javascript:" class="btn submit">保存</a>
+    </div>
+</div>
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/main.js"></script>
+{template "wx_js"}
+<script>
+
+    //删除图片和录音
+    $("body").on('click','.btn-close',function(){
+        if($(this).hasClass("vic")){
+            $(this).parent().css("display",'none');
+            voiceId="";
+            voiceServerId="";
+        }else{
+            var id=$(this).attr("data-id");
+            localId.splice(id,1);
+            serverId.splice(id,1);
+            $(this).parent().remove();
+        }
+        return false;
+    });
+
+    //提交数据
+    var post = new Object();
+
+    post.them="";
+    post.scene="";
+    post.level="";
+
+    post.title="";
+    post.desc="";
+
+    post.photo="";
+    post.voice="";
+
+    post.lat=0;
+    post.lnt=0;
+    post.address="";
+    post.voice_len="";
+    post.other="";
+
+    var lay;
+
+    $(".submit").click(function(){
+        //如果主题存在
+        var them_node=$(".tit");
+        if(them_node !='undefined'){
+            post.them=them_node.html();
+        }
+        //如果场景标签存在
+        var scene_node=$(".list1");
+        if(scene_node !='undefined'){
+            post.scene=scene_node.find(".on").attr('data-id');
+        }
+        //如果级别标签存在
+        var level_node=$(".list2");
+        if(level_node !='undefined'){
+            post.level=level_node.find(".on").attr('data-id');
+        }
+        //如果标题存在
+        var title_node=$("#title");
+        if(title_node !='undefined'){
+            post.title=title_node.val();
+        }
+        //如果内容存在
+        var content_node=$("#content");
+        if(content_node !='undefined'){
+            post.desc=content_node.val();
+        }
+        //如果自定义字段存在
+        var other_node=$("#address");
+        if(other_node !='undefined'){
+            post.other=other_node.val();
+        }
+        //如果位置存在
+        var location_node=$("#lat");
+        if(location_node !='undefined'){
+            post.lat=location_node.val();
+            post.lnt=$("#lnt").val();
+        }
+        //图片
+        post.photo=serverId;
+        post.voice=voiceServerId;
+        post.voice_len=voice_len;
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('addRecorder')}",
+            data:post,
+            dataType:"json",
+            beforeSend:function(){
+                if(post.photo!="" || post.voice.length>0){
+                    lay = layer.open({type: 2,content: '提交中请稍等'});
+                }
+            },
+            success:function(result){
+                if(post.photo!="" || post.voice!=""){
+                    layer.close(lay);
+                }
+                layer.open({
+                    content: result.msg
+                    ,skin: 'msg'
+                    ,time: 1
+                });
+                if(result.code==1){
+                    setTimeout(function(){
+                        location.reload();
+                    },1100);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

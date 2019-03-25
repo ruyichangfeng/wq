@@ -1,0 +1,93 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<div class="main">
+    <form class="form-horizontal form" id="setting-form" action=""
+          method="post">
+        <div class="panel panel-default">
+            <div class="panel-heading">配置中心</div>
+            <div class="panel-body">
+                <!-- title-->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">积分排行榜标题</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[title_credit1]"
+                               value="<?php  echo $settings['title_credit1'];?>"/>
+                        <span class="help-block">积分排行榜标题</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">余额排行榜标题</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[title_credit2]"
+                               value="<?php  echo $settings['title_credit2'];?>"/>
+                        <span class="help-block">余额排行榜标题</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">积分日志标题</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[title_credit1_log]"
+                               value="<?php  echo $settings['title_credit1_log'];?>"/>
+                        <span class="help-block">积分日志标题</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">余额日志标题</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[title_credit2_log]"
+                               value="<?php  echo $settings['title_credit2_log'];?>"/>
+                        <span class="help-block">余额日志标题</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">积分商城链接</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[gift_shop_url]"
+                               value="<?php  echo $settings['gift_shop_url'];?>"/>
+                        <span class="help-block">积分商城链接</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-danger hide">
+            <div class="panel-heading">微信分享设置</div>
+            <div class="panel-body">
+                <!-- title-->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">分享页标题设置</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[share_title]"
+                               value="<?php  echo $settings['share_title'];?>" />
+                        <span class="help-block">此项为网页title，微信分享也会使用此项，默认为“**祝您端午节快乐”</span>
+                    </div>
+                </div>
+
+                <!-- name-->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">分享描述</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="data[share_description]"
+                               value="<?php  echo $settings['share_description'];?>"/>
+                        <span class="help-block">对应描述信息，分享内容使用这里的描述内容，建议字数为20-40字</span>
+                    </div>
+                </div>
+                <!-- sharelogo-->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享logo</label>
+                    <div class="col-sm-8">
+                        <?php  echo tpl_form_field_image('data[share_logo]', $settings['share_logo'])?>
+                        <span class="help-block">这个logo是用户分享到朋友圈显示的logo，请务必设置的好看一点</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <input name="token" type="hidden" value="<?php  echo $_W['token'];?>" /> <input
+                type="submit" class="btn btn-primary col-lg-1" name="submit"
+                value="提交" />
+        </div>
+    </form>
+</div>
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

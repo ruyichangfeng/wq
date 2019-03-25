@@ -1,0 +1,119 @@
+<html lang="zh-CN" style="height: 100%;"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>支付订单 </title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width">
+
+<meta content="telephone=no" name="format-detection">
+        <link rel="stylesheet" href="../addons/hc_credit_shopping/style/img/p/yymobile/1509301730/css/common.css">
+        <link rel="stylesheet" href="../addons/hc_credit_shopping/style/img/p/yymobile/1509301730/css/pay.css">
+
+		<script src="../addons/hc_credit_shopping/style/js/jquery-1.11.1.min.js"></script>
+<style type="text/css">object,embed{                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;                -o-animation-duration:.001s;-o-animation-name:playerInserted;                animation-duration:.001s;animation-name:playerInserted;}                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}</style><style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -100px !important;
+    width: 200px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+</style></head>
+
+{loop $list $item}
+	{php $price += $item['total'] * $item['marketprice'];}
+	{php $goods = $item['goods']}
+{/loop}
+
+<body>
+    <form action="{php echo $this->createMobileUrl('pay_credit_shoppingbi')}" id="pay_credit" method="post">
+	<div class="m-pay-order">
+        <div data-pro="list"><div id="pro-view-1"><div data-pro="entry" class="m-pay-order-list"><div class="m-pay-order-list-item" id="pro-view-2"><span class="m-pay-order-list-item-name">
+        {loop $list $item}
+        {$item['goods']['title']} &nbsp
+        {/loop}</span><span class="m-pay-order-list-item-num">商品合计：<b class="txt-red">{$price}积分</b></span></div></div></div></div>
+        <div class="m-login">
+			<div class="m-login-tips" id="tips"></div>
+			<div class="m-login-form w-form">
+				<div class="w-form-item m-login-form-account w-inputBar w-bar" id="dvAccount"><div class="w-bar-label">收货地址：</div><a data-pro="clear" href="javascript:void(0);" class="w-bar-input-clear">×</a><div class="w-bar-control"><input  autocapitalize="off" data-pro="input" class="w-bar-input" type="text" name="address" value="{$address['address']}"></div></div>
+				<div class="w-form-item m-login-form-password w-inputBar w-bar" id="dvPassword"><div class="w-bar-label">联系方式：</div><a data-pro="clear" href="javascript:void(0);" class="w-bar-input-clear">×</a><div class="w-bar-control"><input autocapitalize="off" data-pro="input" class="w-bar-input" type="text" name="mobile" value="{$address['mobile']}"></div></div>
+				<div class="m-login-menu" id="autoCmpl" style="display:none;"></div>
+				<div class="w-form-item m-login-form-password w-inputBar w-bar" id="dvPassword"><div class="w-bar-label">收货人姓名：</div><a data-pro="clear" href="javascript:void(0);" class="w-bar-input-clear">×</a><div class="w-bar-control"><input autocapitalize="off" data-pro="input" class="w-bar-input" type="text" name="realname" value="{$address['realname']}"></div></div>
+				<div class="m-login-menu" id="autoCmpl" style="display:none;"></div>
+			</div>
+		</div>
+        <div data-pro="options" class="m-pay-order-options" style="margin-top:20px">
+			<div class="w-option w-option-unfold" id="pro-view-6">
+				<div class="w-bar-content" data-pro="groupItems">
+					<span class="pro-radioGroup" id="pro-view-7">
+						<div class="w-radioBar w-bar" id="pay_credit_shoppingbi" onclick="credit_shoppingbi()">
+							<b class="w-radio"></b>
+							积分支付
+							<span class="txt-red w-bar-extText">剩余积分：{$credit_shoppingbi}</span>
+							<div class="w-bar-ext">
+								<input name="pro-radio34" value="2404" type="radio">
+							</div>
+						</div>
+						<div class="w-radioBar w-bar" id="pay_weixin" onclick="weixin()">
+							<b class="w-radio"></b>
+							购买积分
+							<div class="w-bar-ext">
+								<input name="pro-radio34" value="9999" type="radio" >
+							</div>
+						</div>
+					</span>
+				</div>
+			</div>
+		</div>
+		<textarea style="width:100%;height:100px;margin-top:5px;border:0px;" id="remark" name="remark" placeholder="订单备注"></textarea>
+		<input type="hidden" name="way" id="way">
+        <div data-pro="submit" class="m-pay-order-submit" onclick="submit()"><button class="w-button w-button-main w-button-l" id="pro-view-20">确认支付</button></div>
+    </div>
+</form>
+<script>
+	$('#pay_credit_shoppingbi').click();
+
+function weixin(){
+	$('#pay_weixin').removeAttr('class');
+	$('#pay_credit_shoppingbi').removeAttr('class');
+	$('#pay_weixin').attr('class','w-radioBar w-bar w-radioBar-checked');
+	$('#pay_credit_shoppingbi').attr('class','w-radioBar w-bar');
+	$('#way').val('pay_weixin');
+}
+
+function credit_shoppingbi(){
+	$('#pay_weixin').removeAttr('class');
+	$('#pay_credit_shoppingbi').removeAttr('class');
+	$('#pay_weixin').attr('class','w-radioBar w-bar');
+	$('#pay_credit_shoppingbi').attr('class','w-radioBar w-bar  w-radioBar-checked');
+	$('#way').val('pay_credit_shoppingbi');
+
+}
+
+function submit(){
+	var way = $('#way').val();
+	if(way == 'pay_weixin'){
+		location.href="{php echo $this->createMobileUrl('bi_order')}";
+		//location.href="{php echo $this->createMobileUrl('pay_weixin')}";
+	}else if(way == 'pay_credit_shoppingbi'){
+		$('#pay_credit').submit();
+		//var remark = $('#remark').val();
+		//location.href="{php echo $this->createMobileUrl('pay_credit_shoppingbi')}&remark="+remark;
+	}else{
+		alert('请选择支付方式');
+	}
+}
+
+</script>
+
+
+
+	<div class="m-simpleHeader" id="pro-view-0">
+		<a href="javascript:void(0);" data-pro="back" data-back="true" class="m-simpleHeader-back"><i class="ico ico-back" style="height:13px;margin-top:13px;"></i></a><h1>支付订单</h1>
+	</div>
+</body>
+</html>

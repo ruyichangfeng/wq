@@ -1,0 +1,335 @@
+{template "base/child_header"}
+<style>
+</style>
+<form  class="layui-form">
+<blockquote class="layui-elem-quote ">
+    <div class="layui-inline">
+        <div class="layui-input-inline" style="width: 150px;">
+            <input type="text" value="{$_GPC['title']}" id="name" placeholder="搜索标题" class="layui-input search_input title">
+        </div>
+        <div class="layui-inline">
+            <div class="layui-input-inline"  style="width: 150px;">
+                <select name="quiz" class="app_id" lay-filter="app_id">
+                    <option value="0">选择应用</option>
+                    {loop $apps $app}
+                    <option value="{$app['id']}" {if $app['id']==$_GPC['app']}selected{/if}>{$app['name']}</option>
+                    {/loop}
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <div class="layui-input-inline"  style="width: 150px;">
+                <select name="quiz" id="node_id"  lay-filter="node_id">
+                    <option value="-2">选择节点</option>
+                    {loop $nodeList $node}
+                        <option value="{$node['id']}" {if $node['id']==$_GPC['node_id']}selected{/if}>{$node['name']}</option>
+                    {/loop}
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline"  style="width: 150px;">
+            <div class="layui-input-inline">
+                <select name="quiz" id="status_id">
+                    <option value="-2">选择状态</option>
+                    {loop $statusList $key $status}
+                        <option value="{$key}" {if $key==$_GPC['status_id']}selected{/if}>{$status['status']}</option>
+                    {/loop}
+                </select>
+            </div>
+        </div>
+        <div class="layui-input-inline" style="margin-top: 15px;margin-left:10px;">
+            <div class="layui-form-item">
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input class="layui-input start" name="start" value="{$_GPC['start']}" placeholder="起始日期" id="LAY_demorange_s">
+                </div>
+                <div class="layui-input-inline "  style="width: 100px;">
+                    <input class="layui-input end" name="end" value="{$_GPC['end']}" placeholder="结束日期" id="LAY_demorange_e">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <a class="layui-btn" lay-submit lay-filter="search">搜索</a>
+        <a class="layui-btn layui-btn-danger batchDel">删除</a>
+    </div>
+</blockquote>
+</form>
+<div class="layui-form news_list">
+    <table class="layui-table" style="overflow: scroll">
+        <colgroup>
+            <col width="40">
+            <col width="120">
+            <col width="150">
+            <col width="150">
+            <col width="150">
+            <col width="200">
+            <col width="150">
+            <col width="110">
+            <col width="150">
+            <col width="150">
+            <col width="150">
+            <col width="200">
+        </colgroup>
+        <thead>
+        <tr>
+            <th><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose" id="allChoose"></th>
+            <th>标签</th>
+            <th>运用</th>
+            <th>状态</th>
+            <th>标题</th>
+            <th>地址</th>
+            <th>其他</th>
+            <th>用户</th>
+            <th>完成时间</th>
+            <th>创建时间</th>
+            <th>取消时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody class="news_content">
+        {loop $dataList $key $recorder}
+        {if $key>=0}
+        <tr>
+            <td style="text-align: center !important;">
+                <input type="checkbox" name="checked" value="{$recorder['id']}" lay-skin="primary" lay-filter="choose">
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                    <i class="layui-icon"></i>
+                </div>
+            </td>
+            <td align="left">
+                {if $recorder['scene_name']}
+                    <button class="layui-btn layui-btn-mini layui-btn-warm">{$recorder['scene_name']}</button>
+                {/if}
+                {if $recorder['level_name']}
+                <button class="layui-btn layui-btn-mini layui-btn-primary">{$recorder['level_name']}</button>
+                {/if}
+            </td>
+            <td>{$recorder['app_name']}</td>
+            <td>{$recorder['deal_node_name']}({$recorder['deal_status_name']})</td>
+            <td>{$recorder['title']}</td>
+            <td>{$recorder['address']}</td>
+            <td>{$recorder['other']}</td>
+            <td>{$recorder['name']}</td>
+            <td>{$recorder['do_time']}</td>
+            <td>{$recorder['create_time']}</td>
+            <td>{$recorder['cancel_time']}</td>
+            <td>
+                <a class="layui-btn layui-btn-mini news_edit" data-id="{$recorder['id']}">
+                    <i class="iconfont icon-edit"></i> 编辑
+                </a>
+                <a class="layui-btn layui-btn-danger layui-btn-mini news_del" data-id="{$recorder['id']}">
+                    <i class="layui-icon"></i> 删除
+                </a>
+            </td>
+        </tr>
+        {/if}
+        {/loop}
+        </tbody>
+    </table>
+</div>
+<div id="page"></div>
+<script>
+    layui.use(['form','jquery','laypage','laytpl'], function(){
+
+        var title,app,start,end,status_id,node_id;
+        var setting =new Object();
+        var laytpl = layui.laytpl;
+        var $ = layui.jquery;
+        var form = layui.form();
+
+        form.on('select(app_id)', function(data){
+            var appId=data.value;
+
+            $.post("{php echo $this->createWebUrl('getNode')}&id="+appId,{},function (response) {
+                var getTpl = demo.innerHTML;
+                var view = document.getElementById('node_id');
+                laytpl(getTpl).render(response, function(html){
+                    view.innerHTML = html;
+                });
+                $("#status_id").html("<option value='-2'>选择状态</option>");
+                form.render('select');
+            },"json");
+        });
+
+        form.on('select(node_id)', function(data){
+            var nodeId=data.value;
+            $.post("{php echo $this->createWebUrl('getStatus')}&id="+nodeId,{},function (response) {
+                var getTpl = tp_status.innerHTML;
+                var view = document.getElementById('status_id');
+                laytpl(getTpl).render(response.data, function(html){
+                    view.innerHTML = html;
+                });
+                form.render('select');
+            },"json");
+        });
+
+        form.on('submit(search)', function(data){
+            title=$(".title").val();
+            app=$(".app_id").val();
+            start=$(".start").val();
+            end=$(".end").val();
+            status_id=$("#status_id").val();
+            node_id = $("#node_id").val();
+            url = "{php echo $this->createWebUrl('list',array('tb'=>'recorder'))}"+"&title="+title+"&app="+app+"&start="+start+"&end="+end+"&status_id="+status_id+"&node_id="+node_id;
+            location.href=url;
+            return false;
+        });
+
+        //分页
+        setting.cont="page";
+        setting.pages="{$totalPage}";
+        setting.curr="{$page}";
+        setting.skip=true;
+        setting.hash="page";
+        setting.jump=function(obj, first){
+            title=$(".title").val();
+            app=$(".app_id").val();
+            start=$(".start").val();
+            end=$(".end").val();
+            status_id=$("#status_id").val();
+            node_id = $("#node_id").val();
+            if(first!=true){
+                url = "{php echo $this->createWebUrl('list',array('tb'=>'recorder'))}"+"&title="+title+"&app="+app+"&start="+start+"&end="+end+"&page="+obj.curr+"&status_id="+status_id+"&node_id="+node_id;
+                window.location.href =url;
+            }
+        };
+        layui.laypage(setting);
+
+        //删除操作
+        $(".news_del").on("click",function(){
+            var _this = $(this);
+            layer.confirm('确定删除此信息？',{icon:3, title:'提示信息'},function(index){
+                var id =_this.attr("data-id");
+                $.post("{php echo $this->createWebUrl('delete')}&tb=recorder&id="+id,function(response){
+                    layer.msg(response.msg,{icon: response.code});
+                    if(response.code==1){
+                       _this.parents("tr").remove();
+                    }
+                },'json');
+            });
+        });
+
+        //标记操作
+        $(".news_edit").on("click",function(){
+            var id = $(this).attr("data-id");
+            var url = "{php echo $this->createWebUrl('Edit',array('tb'=>'recorder'))}&id="+id;
+            var index = layui.layer.open({
+                title : "查看消息",
+                type : 2,
+                content : url,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layui.layer.tips('点击此处返回消息列表', '.layui-layer-setwin .layui-layer-close', {tips: 3});
+                    },500)
+                }
+            });
+            layui.layer.full(index);
+        });
+
+        //二维码
+        $(".news_qr").on("click",function(){
+            layer.open({
+                type: 2,
+                title: false,
+                area: ['630px', '360px'],
+                shade: 0.8,
+                closeBtn: 0,
+                shadeClose: true,
+                content: '//player.youku.com/embed/XMjY3MzgzODg0'
+            });
+        });
+
+        $(".newsAdd_btn").click(function(){
+            var url = $(this).attr("data-url");
+            var index = layui.layer.open({
+                title : "添加员工",
+                type : 2,
+                content : url,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layui.layer.tips('点击此处返回员工列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500)
+                }
+            });
+            layui.layer.full(index);
+        });
+
+        //批量删除
+        $(".batchDel").click(function(){
+            var $checkbox = $('.news_list tbody input[type="checkbox"][name="checked"]:checked');
+            if($checkbox.is(":checked")){
+                layer.confirm('确定删除选中的信息？',{icon:3, title:'提示信息'},function(index){
+                    var id="";
+                    $checkbox.each(function(){
+                        id += (id=="") ? $(this).val() :","+$(this).val();
+                    });
+                    $.post("{php echo $this->createWebUrl('delete')}&tb=admin&id="+id,function(response){
+                        layer.msg(response.msg,{icon: response.code});
+                        if(response.code==1){
+                            setTimeout(function(){
+                                location.reload();
+                            },1200);
+                        }
+                    },'json');
+                    layer.msg("删除成功");
+                })
+            }else{
+                layer.msg("请选择需要删除的文章");
+            }
+        });
+
+        //全选
+        form.on('checkbox(allChoose)', function(data){
+            var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"])');
+            child.each(function(index, item){
+                item.checked = data.elem.checked;
+            });
+            form.render('checkbox');
+        });
+    });
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        var start = {
+            max: '2099-06-16 23:59:59'
+            ,istoday: true
+            ,choose: function(datas){
+                end.min = datas;
+                end.start = datas;
+            }
+        };
+
+        var end = {
+            max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas;
+            }
+        };
+
+        document.getElementById('LAY_demorange_s').onclick = function(){
+            start.elem = this;
+            laydate(start);
+        };
+        document.getElementById('LAY_demorange_e').onclick = function(){
+            end.elem = this
+            laydate(end);
+        };
+    });
+</script>
+<script id="demo" type="text/html">
+    <option value="-2">选择节点</option>
+    {{#  layui.each(d.data, function(index, item){ }}
+        <option value="{{item.id}}">{{item.name}}</option>
+    {{#  }); }}
+</script>
+<script id="tp_status" type="text/html">
+    <option value="-2">选择状态</option>
+    {{#  layui.each(d.status_list, function(index, item){ }}
+    <option value="{{index}}">{{item.status}}</option>
+    {{#  }); }}
+</script>
+{template "base/child_footer"}

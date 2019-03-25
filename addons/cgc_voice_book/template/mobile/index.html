@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="telephone=no" name="format-detection">	
+    <link href="{MODULE_URL}template/style/css/audioplayer.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/flex.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/app.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/weike.css">
+    <script src="{MODULE_URL}template/style/js/mui.min.js"></script>
+    <script src="{MODULE_URL}template/style/js/mui.pullToRefresh.js"></script>
+    <script src="{MODULE_URL}template/style/js/mui.pullToRefresh.material.js"></script>
+    <script src="{MODULE_URL}template/style/js/jquery-2.1.1.min.js"></script>  
+    <script src="{MODULE_URL}template/style/js/base.js"></script>
+    <script src="{MODULE_URL}template/style/js/utils.js"></script>
+    <script src="{MODULE_URL}template/style/js/jquery.lazyload.min.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}template/style/js/layer/layer.js"></script>
+    <script src="{MODULE_URL}template/style/js/audioplayer.js"></script>
+    
+    {php echo register_jssdk(false);} 
+    
+  	<script type="text/javascript">
+  
+  	var params = {
+          title: "{$settings['sharetitle']}".replace('{fromuser}','{$member[nickname]}'),
+          desc: "{$settings['sharedescription']}".replace('{fromuser}','{$member[nickname]}'),
+          link: "{php echo $_W['siteroot'] . 'app/' . substr($this->createMobileUrl('index',array()), 2)}",
+          imgUrl: "{php echo tomedia($settings['shareimage'])}",
+          success: function(){
+        	  {if $settings['share_type']==1}
+        	  $.ajax({
+        		  type: 'POST',
+	       	       url: '{php echo $this->createMobileUrl("share",array())}',
+	       	       dataType : 'json',
+	       		   success: function(resp){
+	       			   if(resp.status == 1){
+	       				    alert("获取会员成功");
+	       				 	window.location.href= window.location.href+'&'+Math.random();
+	       			   }else{
+	       					alert("获取会员失败");
+	       			   }
+	       		   }
+        	  });
+        	  {/if}
+          }
+      };
+  	
+      wx.ready(function () {
+
+          wx.showOptionMenu();
+
+          wx.onMenuShareAppMessage.call(this, params);
+
+          wx.onMenuShareTimeline.call(this, params);
+
+      });
+      
+   </script>
+
+    <script>
+        SC.BASE_URL = "{$_W['siteroot']}";
+        SC.THEME_URL = "{MODULE_URL}template/style";
+        SC.PLAY_URL = "{php echo 'app/' . substr($this->createMobileUrl('cgc_voice_book', array('op'=>'detail')), 2);}";
+        SC.GET_MORE_LIST = "{php echo 'app/' . substr($this->createMobileUrl('index', array('op'=>'more','class_id'=>$_GPC['class_id'])), 2);}";
+        SC.PAY_URL = "{php echo 'app/' . substr($this->createMobileUrl('pay', array('class_id'=>$class_id)), 2);}";
+        var pay_type = "{$settings['pay_type']}";
+    </script>
+    
+    
+    {if $settings['pay_type']==1}
+	<script>
+	var TEE_API_URL="<?php echo constant('TEE_API_URL')?>";
+	var client_id =  "<?php echo constant('TEE_CLIENT_ID')?>";
+	</script>
+	
+	<script src="<?php echo constant('TEE_SITE_URL')?>jslib/t-charging.min.js"></script>
+	{/if}
+<title>{$settings['name']}</title></head>
+
+<body class="body-xq-zt" id="page-wrap" data-name="{$settings['name']}" data-id="1" data-isspecial="1" data-buy="{$member['status']}" data-userid="{$member['id']}" data-buymask="2">
+
+<!--弹出层-分享-->
+<div class="mask-share mask" style="display: none;">
+    <img src="{MODULE_URL}template/style/images/mask_share.png" alt="">
+</div>
+<!--弹出层-分享-->
+
+<!--弹出层-购买选项-->
+
+
+<!--弹出层-收听完课程-提示评价-->
+<!-- <div class="mask">
+    <div class="mask-pingjia-content">
+        <h3>您已收听完本课程</h3>
+        <div class="input-grjs mui-input-row">
+            <textarea rows="5" placeholder="给课程来个评价吧"></textarea>
+        </div>
+
+        <div flex="box:mean">
+            <div class="btn-luguo btn-pj-ty">路过</div>
+            <div class="btn-pingjia btn-pj-ty">评价</div>
+        </div>
+    </div>
+</div> -->
+
+<div class="bar-bottom-zt" flex="dir:left">
+    <div class="left" flex-box="0">
+        <img src="{MODULE_URL}template/style/images/share-icon.png" alt="" class="btn-share">
+
+    </div>
+    <div class="right" flex-box="1">
+	    {if empty($settings['free_sign'])}
+        <div class="free-pipe btn-buy-zt">
+	            免费通道
+        </div>
+        {else}
+        <div class="free-pipe1 btn-buy-zt">
+        </div>
+	    {/if}
+    </div>
+    <div class="right" flex-box="1">
+    	{if $member['status']==0 || $member['free_status']==1}
+    	<div id="btn-buy" class="btn-buy-zt">
+    		&yen;{php echo sprintf('%.2f',$settings['fee'])} 立即购买
+    	</div>
+    	{if empty($settings['pay_type'])}
+    	<form id="pay_wechat" action="{php echo url('mc/cash/wechat');}" method="post">
+			<input id="pay_wechat_params" type="hidden" name="params" value="" />
+		</form>
+		{/if}
+    	{else}
+         <div class="pay-pipe btn-buy-zt">
+            已购买        </div> 
+        {/if}
+    </div>
+</div>
+
+<!--专题课程-选项卡-->
+<div id="slider" class="mui-slider-2 none">
+</div>
+
+<!-- 新版列表 -->
+<div class="grid-wrap">
+    <div class="title-wrap">
+        <div class="course-name" data-imgurl="">{$settings['name']}</div>
+        <div class="tips">
+                        <div class="update-num">已更新<span>{$total}</span>期</div>
+                        <div class="listen-num">{$total_pv}</div>
+        </div>
+    </div>
+    <div class="single-pic none">
+        <img data-src="" alt="" class="cou-img" src="">
+    </div>
+    <div class="grid-list">
+    	<ul>
+    		{loop $list $index $item}
+    		{if $index%3==0}
+    		<li>
+    		{/if}
+    		<div class="list-item cou-img ml-item" data-id="{$item['id']}" data-read="{$item['isread']}">
+                <div class="pic-wrap  {if !empty($item['isread'])}grid-isread{/if}">
+                    <img src="{php echo tomedia($item['cover']);}" alt="" class="cou-img">
+                </div>
+                <div class="pic-desc">{$item['title']}</div>
+                <div class="bott">
+                    <div class="listen-num">
+                        <span>{$item['pv']}</span>
+                    </div>
+                    <div class="commt-num">
+                        <span>{$item['commt']}</span>
+                    </div>
+                </div>
+            </div>
+            {if $index%3==2}
+    		</li>
+    		{/if}
+    		{/loop}
+        </ul>
+                <div class="no-content-tips">
+            <img class="loading none" src="{MODULE_URL}template/style/images/loading.png">
+        </div>
+    </div>
+</div>
+
+<div class="sqr-mask none">
+    <div class="wrap">
+        <div class="close-btn">
+            <img src="{MODULE_URL}template/style/images/sqr-close.png">
+        </div>    
+        <div class="tips">
+   {if empty($settings['guanzhu_note'])}     
+          长按识别二维码，关注{$settings['gzh']}。<br><br>
+          聊天框回复“<font color="#FF0000">{$settings['free_keyword']}</font> ”到{$settings['gzh']}公众号，根据提示操作可获取优惠码，每日优惠码有限。
+  {else}
+    {php echo str_replace(array("\n", "\r\n") , "<BR />", $settings['guanzhu_note'])}   
+   {/if}
+</div>
+
+
+        <div class="sqr-pic">
+            <img src="{php echo tomedia($settings['gzh_qrcode']);}">
+        </div>
+    </div>
+</div>
+
+<!--专题课程-选项卡-->
+
+<script src="{MODULE_URL}template/style/js/page-course-detail.js"></script>
+<script src="{MODULE_URL}template/style/js/img_placeholder.js"></script>
+
+</body>
+</html>

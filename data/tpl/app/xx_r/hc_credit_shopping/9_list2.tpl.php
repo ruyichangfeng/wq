@@ -1,0 +1,279 @@
+<?php defined('IN_IA') or exit('Access Denied');?><html lang="zh-CN"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品分类 - 积分商城</title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width">
+
+<meta content="telephone=no" name="format-detection">
+        <link rel="stylesheet" href="../addons/hc_credit_shopping/style/img/p/yymobile/1509301730/css/common.css">
+        <link rel="stylesheet" href="../addons/hc_credit_shopping/style/img/p/yymobile/1509301730/css/list.css">
+
+			<script type="text/javascript" src="http://china.nidecun.cn/app/resource/js/lib/jquery-1.11.1.min.js"></script>
+
+<script type="text/javascript" src="../addons/ewei_shopping/images/jquery.gcjs.js"></script>
+<script type='text/javascript' src='../addons/ewei_shopping/images/touchslider.min.js'></script>
+<script language='javascript' src='../addons/ewei_shopping/images/photoswipe/simple-inheritance.min.js'></script>
+<script language='javascript' src='../addons/ewei_shopping/images/photoswipe/photoswipe-1.0.11.min.js'></script>
+<script language="javascript" src="../addons/ewei_shopping/images/touchslider.min.js"></script>
+<script language="javascript" src="../addons/ewei_shopping/images/swipe.js"></script>
+<link type="text/css" rel="stylesheet" href="../addons/ewei_shopping/images/style.css?<?php echo TIMESTAMP;?>"></head>
+
+
+<style type='text/css'>
+	#poptip { position: fixed; top:40%;left:50%;width:160px;margin-left:-80px;height: 27px;background:#000; opacity: 0.7;filter:alpha(opacity=0.7); color:#fff;z-index: 999;  border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;}
+	#poptip_content { position: fixed; top:40%;left:50%;width:160px;margin-left:-80px; height: 27px; color:#fff;text-align:center;font-size:14px;z-index: 9909}
+</style>
+
+
+
+<body style="padding-top:0px">
+<div class="g-header">
+
+    <!-- 导航栏 -->
+    <div class="m-nav">
+        <div class="g-wrap">
+            <ul class="m-nav-list">
+                    <li ><a href="<?php  echo $this->createMobileUrl('list')?>"><span>首页<span></span></span></a></li>
+                    <li class="selected"><a href="<?php  echo $this->createMobileUrl('list2')?>"><span>全部商品<span></span></span></a></li>
+                    <li><a href="<?php  echo $this->createMobileUrl('check_order')?>"><span>购物车<span></span></span></a></li>
+                    <li><a href="<?php  echo $this->createMobileUrl('home')?>"><span>个人中心<span></span></span></a></li>
+                            </ul>
+        </div>
+    </div>
+</div>
+			<input type="hidden" name="page" id="page" value="0">
+
+<div class="g-body">
+    <div class="m-list">
+        <!-- 二级导航 -->
+        <div class="g-wrap g-body-hd m-list-nav">
+            <div class="m-list-nav-catlog selected">
+                <a href="javascript:void(0)" class=""><span class="txt-red">全部商品</span><i class="ico ico-arrow ico-arrow-s-gray ico-arrow-down"></i></a>
+            </div>
+            <div class="m-list-types">
+                <ul class="m-list-types-list" style="left: 0px; width:100%">
+                        <li <?php  if($sort==0) { ?> <?php  if($sortb0=="asc") { ?> class='selected up' <?php  } else { ?> class='selected down' <?php  } ?> <?php  } else { ?>class=""<?php  } ?> >
+							<a onclick="location.href='<?php  echo $sorturl;?>&sort=0&sortb0=<?php  echo $sortb00;?>'">最新<i class="ico ico-sort2Arrow"></i></a>
+						</li>
+						<li <?php  if($sort==1) { ?> <?php  if($sortb1=="asc") { ?> class='selected up' <?php  } else { ?> class='selected down' <?php  } ?> <?php  } else { ?>class=""<?php  } ?>>
+							<a onclick="location.href='<?php  echo $sorturl;?>&sort=1&sortb1=<?php  echo $sortb11;?>'">人气<i class="ico ico-sort2Arrow"></i></a>
+						</li>
+						<li <?php  if($sort==2) { ?> <?php  if($sortb2=="asc") { ?> class='selected up' <?php  } else { ?> class='selected down' <?php  } ?> <?php  } else { ?>class=""<?php  } ?>>
+							<a onclick="location.href='<?php  echo $sorturl;?>&sort=2&sortb2=<?php  echo $sortb22;?>'">剩余商品<i class="ico ico-sort2Arrow"></i></a>
+						</li>
+						<li <?php  if($sort==3) { ?> <?php  if($sortb3=="asc") { ?> class='selected up' <?php  } else { ?> class='selected down' <?php  } ?> <?php  } else { ?>class=""<?php  } ?>>
+							<a onclick="location.href='<?php  echo $sorturl;?>&sort=3&sortb3=<?php  echo $sortb33;?>'">库存商品<i class="ico ico-sort2Arrow"></i></a>
+                        </li>
+                </ul>
+            </div>
+            <!-- 所有分类列表 -->
+            <div class="m-list-catlog" style="display: none;" afmoldstyle="block">
+                <ul class="m-list-catlog-list">
+				<?php  if(is_array($category)) { foreach($category as $item) { ?>
+                        <li class="selected"><a href="<?php  echo $this->createMobileUrl('list2', array('pcate' => $item['id']))?>"><i class="ico ico-type ico-type-0"></i><?php  echo $item['name'];?></a></li>
+						<?php  } } ?>
+                </ul>
+            </div>
+        </div>
+        <!-- 正文 -->
+        <div class="g-wrap g-body-bd">
+            <div class="g-body-bd-mask" style="display: none;" afmoldstyle="block"></div>
+            <!-- 商品列表 -->
+            <div class="m-list-content">
+                <div class="w-loading" afmoldstyle="block" style="display: none;">
+                    <img style="display:inline;vertical-align:middle" width="20" height="20" src="http://mimg.127.net/p/yymobile/lib/img/common/loading.gif"> 正在努力加载中……
+                </div>
+				
+            <div id="pro-view-2">
+			<ul class="w-goodsList w-goodsList-l m-list-goodsList" data-pro="entry" id="content">
+				<?php  if(is_array($list)) { foreach($list as $item) { ?>
+
+				<li class="w-goodsList-item" id="pro-view-3">
+					<div class="w-goods w-goods-l w-goods-ing">
+					<div class="w-goods-pic">
+						<a href="<?php  echo $this->createMobileUrl('detail', array('id' => $item['id']))?>">
+							<img src="<?php  echo tomedia($item['thumb']);?>" 
+							onerror="this.src='../addons/hc_credit_shopping/style/img/m.png'" class="">
+						</a>
+					</div>
+					<div class="w-goods-info">
+						<p class="w-goods-title f-txtabb f-breakword">
+							<a href="<?php  echo $this->createMobileUrl('detail', array('id' => $item['id']))?>"><?php  echo $item['title'];?></a>
+						</p>
+					<p class="w-goods-price">库存：<?php  echo $item['total'];?> </p>
+					<div class="w-progressBar">
+						<p class="wrap">
+							<span class="bar" style="width:<?php  echo round($item['sales']*100/($item['total']+$item['sales']) ,2) ?>%"><i class="color"></i></span>
+						</p>
+						<ul class="txt">
+							<li class="txt-l">
+								<p><b><?php  echo $item['sales'];?></b>已购买</p>
+							</li>
+							<li class="txt-r">
+								<!--<p>剩余<b class="txt-blue"><?php  echo $item['total']?></b></p>-->
+							</li>
+						</ul>
+					</div>
+					</div>
+						<div class="w-goods-shortFunc">
+							<button data-pro="addToCart" onclick="addtocart(<?php  echo $item['id'];?>)" class="w-button w-button-round w-button-addToCart"></button>
+						</div>
+					</div>
+				</li>
+					<?php  } } ?>				
+			</ul>
+			
+			<div data-pro="more"><div class="w-more" id="pro-view-13"><div data-pro="link"><a onclick="loadgoods()" id="isdata">点击加载</a></div><div data-pro="loading" style="display:none"><b class="ico ico-loading"></b> 努力加载中</div><div data-pro="disable" style="display:none">已经没有更多</div></div></div></div></div>
+        </div>
+    </div>
+</div>
+
+
+<script src="../addons/hc_credit_shopping/style/js/require2.min.js"></script>
+<script type="text/javascript">
+    function addtocart(goodsid) {
+        tip("正在处理数据...");
+        var total = $("#total").val();
+        var stock = parseInt($('#stock').text());
+        if (stock == 0) {
+            tip('库存不足，无法购买。');
+            return;
+        }
+        var url = "<?php  echo murl('entry//mycart',array('op'=>'add','m'=>'hc_credit_shopping'),true)?>&id="+goodsid+"&optionid=" + $("#optionid").val() + "&total=" + total;
+		console.log(url);
+        $.getJSON(url, function (s) {
+            if (s.result == 0) {
+                tip("只能购买 " + s.maxbuy + " 件!");
+            } else {
+                tip_close();
+                tip("已加入购物车!");
+                $('#carttotal').css({
+                    'width': '50px',
+                    'height': '50px',
+                    'line-height': '50px'
+                }).html(s.total).animate({'width': '20px', 'height': '20px', 'line-height': '20px'}, 'slow');
+            }
+        });
+    }
+	
+	
+	
+	
+	
+</script>
+<script src="../addons/hc_credit_shopping/style/js/base.js"></script>
+<script language='javascript'>
+function tip(msg,autoClose){
+	var div = $("#poptip");
+	var content =$("#poptip_content");
+	if(div.length<=0){
+		div = $("<div id='poptip'></div>").appendTo(document.body);
+		content =$("<div id='poptip_content'>" + msg + "</div>").appendTo(document.body);
+	}else{
+		content.html(msg);
+		content.show(); div.show();
+	}
+	if(autoClose) {
+		setTimeout(function(){
+			content.fadeOut(500);
+			div.fadeOut(500);
+		},1000);
+	}
+}
+function tip_close(){
+	$("#poptip").fadeOut(500);
+	$("#poptip_content").fadeOut(500);
+}
+</script>
+
+<!--下拉加载-->
+<script type="text/javascript">
+var emp = 0;
+function loadgoods(){
+	var range = 0;             //距下边界长度/单位px
+        var elemt = 500;           //插入元素高度/单位px
+        var maxnum = 20;            //设置加载最多次数
+        var num = 1;
+        var totalheight = 0; 
+        var main = $("#content");                     //主体元素
+      
+            var srollPos = $(window).scrollTop();    //滚动条距顶部距离(页面超出窗口的高度)
+            
+            //console.log("滚动条到顶部的垂直高度: "+$(document).scrollTop());
+            //console.log("页面的文档高度 ："+$(document).height());
+            //console.log('浏览器的高度：'+$(window).height());
+			//页面的文档高度-距下边界长度 <= 浏览器高度 + 滚动条距顶部距离（页面超出窗口的高度）
+            totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
+			console.log($(document).height()-range);
+			console.log($(window).height());
+			//console.log("浏览器高度 + 滚动条距顶部距离: "+totalheight);
+			
+    		if(($(document).height()-range) == $(window).height()  && num != maxnum) {
+				//alert(window.location.href);
+				if(emp == 5){
+					$('#isdata').html('没有数据了');
+					console.log('没有数据了');
+					return;
+				}
+						var page = $('#page').val();
+						page++;
+						num++
+						console.log("page="+page);
+						$.ajax({
+                         "type": "post",
+                         "url": window.location.href+"&ajax=ajax&page="+page,
+                         "data": {"id": 1},
+                         "dataType": "json",
+                         "success": function(data){
+							  if(data.success){
+                                   if(data.error == 'error'){
+									alert(data.message);
+								   }else{
+										if(data.emp == 5){
+											$('#isdata').html('没有数据了');
+											emp = 5;
+										}else{
+											$('#page').val(page);
+											var goods = data.goods;
+											console.log(goods);
+											if(goods.length !=0){
+												for(var aaa in goods){
+													var width = goods[aaa]['ticket_total'] *100/ goods[aaa]['total'];
+													width = width.toFixed(2);
+													var reduce = goods[aaa]['total'] - goods[aaa]['ticket_total'];
+													var text = "<li class='w-goodsList-item' id='pro-view-3'><div class='w-goods w-goods-l w-goods-ing'><div class='w-goods-pic'><a href='<?php  echo $this->createMobileUrl('detail')?>&id="+goods[aaa]['id']+"'><img src='/attachment/"+goods[aaa]['thumb']+"' onerror='this.src='../addons/hc_zhongchou/style/img/m.png''class=''></a></div><div class='w-goods-info'><p class='w-goods-title f-txtabb f-breakword'><a href='<?php  echo $this->createMobileUrl('detail')?>&id="+goods[aaa]['id']+"'>"+goods[aaa]['title']+"</a></p><p class='w-goods-price'>库存："+goods[aaa]['total']+" </p><div class='w-progressBar'><p class='wrap'><span class='bar' style='width:"+width+"%'><i class='color'></i></span></p><ul class='txt'><li class='txt-l'><p><b>"+goods[aaa]['ticket_total']+"</b>已购买</p></li><li class='txt-r'></li></ul></div></div><div class='w-goods-shortFunc'><button data-pro='addToCart' onclick='addtocart("+goods[aaa]['id']+")' class='w-button w-button-round w-button-addToCart'></button></div></div></li>";
+											
+													main.append(text);
+												}
+												
+											}
+										}
+										
+									
+								   }
+                              }else{
+                                   alert('操作失败，可能是网络有问题');
+                              }
+                         }
+                    });
+			
+
+
+
+
+
+			}
+       
+}    
+
+</script>
+
+
+
+
+
+
+
+
+
+<button class="w-button w-button-round w-button-backToTop" style="display:none" id="pro-view-0">返回顶部</button><a class="w-miniCart" href="<?php  echo $this->createMobileUrl('check_order')?>" id="pro-view-1"><span class="w-miniCart-text">清单</span><i class="ico ico-miniCart"></i><b class="w-miniCart-count" data-pro="count" style="display:none">0</b></a><script>;</script><script type="text/javascript" src="http://simplife.cc/app/index.php?i=9&c=utility&a=visit&do=showjs&m=hc_credit_shopping"></script></body></html>

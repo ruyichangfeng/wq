@@ -1,0 +1,106 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >分类管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('cate.brand');?>" method="post" id="keyform">
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" name="name" class="form-control" placeholder="请输入品牌名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+					  <?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+			        <a href="javascript:void(0);" class="btn btn-default" style="display: inline-block;" onclick="addCate(0,'品牌分类')">添加品牌</a>
+			      	<?php } ?>
+
+				  </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 100px;">品牌ID</th>
+					<th style="width: 100px;">排序</th>
+					<th style="width: 100px;">关联商品分类</th>
+					<th style="width: 250px;">品牌名称</th>
+					<th style="width: 100px;">图片</th>
+					<th style="">状态</th>
+					<?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					<th  >操作</th>
+					<?php } ?>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $res $index $item}
+				<tr>
+					<td>{$item['id']} </td>
+					<td>{$item['sort']} </td>
+					<td><?php foreach($category as $k => $v){
+							if($v['id'] == $item['category_id']){
+								echo $v['name'];
+							}
+						}
+						?> </td>
+					<td>
+						<span style="padding-right: 10px;">&nbsp;{$item['name']}&nbsp;</span>
+					</td>
+					<td><img src="<?php echo $_W['attachurl']. $item['logo'];?>" style="widows:30px;height: 30px;"/> </td>
+					<?php if($item['status'] < 2){ ?>
+					<td> 上架 </td>
+					<?php }else{ ?>
+					<td> 下架 </td>
+					<?php } ?>
+					<?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					<td>
+							<a href="javascript:void(0);" class="linkbtn" onclick="cateEdit({$item['id']},'{$item['name']}')">编辑</a>
+						 
+						<?php if($item['parentid']=="0"){?>
+							<a href="javascript:void(0);" class="linkbtn" onclick="addCate({$item['id']},'{$item['name']}')">添加子分类</a>
+						<?php } ?>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+					<?php } ?>
+				</tr>
+
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function addCate(id,name){ 
+	 window.location.href="<?php echo $this->routeUrl('cate.brandAdd');?>&pid="+id+"&name="+name;
+	}
+	function cateEdit(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('cate.brandAdd');?>&cid="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除"+text+"所有品牌分类?",function(){
+		window.location.href="<?php echo $this->routeUrl('cate.brandDelect');?>&cid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

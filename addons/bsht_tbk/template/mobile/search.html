@@ -1,0 +1,180 @@
+   {template 'header'}
+
+<script src="../addons/bsht_tbk/res/js/main.js"></script>
+
+	<input type="hidden" id="key" name="key" x-webkit-speech="" value="{if $_GPC['keywords']}{$_GPC['keywords']}{/if}" />
+
+    <div id="msv">
+     <link rel="stylesheet" type="text/css" href="{$res}static/jwap/css/newpulic.css" />
+    </div>
+	
+    <div id="goods">
+     <section class="{if $setting['skin']!=4}goods{else}goods_list index_goodslist{/if}" id="pageCon">
+      <ul class="{if $setting['skin']!=4}{if $setting['skin']!=5}goods-list{/if} list_box clear{else}list_box skin4ul{/if}" id="list_box">
+      </ul>
+     </section>
+	 <div id="list_more" class="loading" style="margin-top:10px"><span class="am-text-secondary doclick" id="list_more2">查看更多</span></div>
+
+    </div>
+ 
+	
+<script type="text/javascript">
+$(document).ready(function(){ 
+var limit = 1;
+function get_list(ty){
+    
+    if(ty==1){
+	   var keywords=$("input[name='key']").val();
+	   if(keywords==""){
+	      //dialog2("请输入要搜索的关键字！");
+		  layer.msg('请输入关键字！');
+		  //return false;
+	   }
+	   $("#pageCon .list_box").html('');
+	}else{
+	   $("#list_more2").html('<span class="am-icon-spinner am-icon-spin"></span> 卖命加载中...');
+	   var keywords=$("input[name='key']").val();
+	   
+	}
+	
+	$.ajax({
+	    type : "post",
+	    url : "{php echo $this->createMobileUrl('search_ajax')}",
+	    data : {
+	    	limit:limit,
+			keywords:keywords,
+	    },
+        dataType : "json",		
+	    success : function(data) {
+	    	if(data.status==200){
+						var list = data.content;
+						var content = '';
+						for(var i=0; i<list.length; i++){
+
+                           
+{if $setting['isdtk']==2}
+//大淘客2
+
+{if $setting['skin']==2}
+
+         content += '<li class="picCon"><a class="goods-a" href="'+list[i]['url']+'" target="_self">'
+		 +'<img class="loazd lazy-bk" src="../addons/bsht_tbk/res/images/load.gif" data-bk="'+list[i]['pic']+'{$setting['maxpic']}.jpg" />'+list[i]['isnew']+'<span style="background:url('+list[i]['icon']+') no-repeat 0 0;height:0;overflow:hidden; padding-bottom:15px; width: 15px;position:absolute;bottom:5px; right:5px;z-index:15;"></span></a>'
+		 +'<a href="'+list[i]['url']+'" target="_self">'
+		 +'<h3>'+list[i]['title']+'</h3>'
+         +'<div class="list-price buy">'
+         +'<span class="price-new"><i>券后 ￥</i>'+list[i]['jiage']+'</span>'
+         +'<!--span class="qhj" style="margin-left:5px">'+list[i]['tag']+'</span-->'
+         +'<a id="J_weixin" href="'+list[i]['url']+'" target="_self" class="coupon"><span class="good-btn" style="color:#999">销量'+list[i]['itemmsell']+'</span></a>'
+         +'</div></a>'
+         +'<div class="lingquan">'
+         +'<a id="J_weixin" href="'+list[i]['yhjurl']+'" target="_self" class="coupon"><span>'+list[i]['jiage2']+'元券</span></a>'
+         +'</div></li>';
+
+{/if}
+
+
+//大淘客2
+{/if}
+
+
+
+
+						}
+                        $("#pageCon .list_box").append(content);
+						
+						var aa = $(".goods-list li").innerWidth();
+                        $(".goods-list li img").css('height',aa);
+						if(list.length=={if $setting['pageno']}{$setting['pageno']}{else}10{/if}){
+							$("#list_more2").html('点击查看更多');
+						}else{
+							$("#list_more2").html('没有更多记录');
+
+						}		
+	                    limit++;
+
+						
+
+
+lazy_img();
+
+		    }else if(data.status==-103){
+	    		$("#list_more2").html('<span onclick="location.reload();">没有更多记录，点击刷新！</span>');
+				
+
+	    	}else if(data.status==301){
+	    		$("#list_more2").html('没有搜索到内容');
+
+				
+	    	}else{
+			    $("#list_more2").html('没有更多记录');
+
+			}    	
+	    },
+	    error : function(xhr, type) {
+
+	    }
+	});
+	    
+
+}
+
+
+get_list(1);
+
+
+$(".doclick").off("click").on("click",function(){
+       
+	   get_list(0);
+
+
+});
+
+
+
+
+$(window).scroll(function () {
+var scrollTop = $(this).scrollTop();
+var scrollHeight = $(document).height();
+var windowHeight = $(this).height();
+if (scrollTop + windowHeight == scrollHeight) {
+setTimeout(get_list(0),1000);
+}
+});
+
+
+function waterfall(limit){
+$container = $('#list_box');
+$container.masonry('reload');
+	$container.imagesLoaded(function() {
+		lazy_img();
+		$container.masonry({
+			itemSelector: '.picCon',
+			isFitWidth: false,//是否根据浏览器窗口大小自动适应默认false
+			//gutter: 20,
+			isAnimated: false,//是否采用jquery动画进行重拍版
+			isRTL:false,//设置布局的排列方式，即：定位砖块时，是从左向右排列还是从右向左排列。默认值为false，即从左向右
+            isResizable: true,//是否自动布局默认true
+			});
+		});
+}
+
+
+}); 
+
+function yhjjumpurl(obj){
+{if $setting['skin1tip']==1} 
+ var url = obj.name;
+ //alert(url);
+ layer.open({
+  type: 2,
+  title: false,
+  shadeClose: true,
+  shade: 0.8,
+  area: ['85%', '85%'],
+  content: url
+}); 
+{/if}
+}
+</script>
+
+	{template 'footer'}

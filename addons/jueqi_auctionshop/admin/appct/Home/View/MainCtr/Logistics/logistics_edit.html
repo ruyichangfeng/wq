@@ -1,0 +1,133 @@
+<include file="Public/header.html" />
+</head>
+
+<body>
+	<div class="x-body">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label for="role" class="layui-form-label">
+                        <span class="x-red">*</span>物流公司
+                    </label>
+				<div class="layui-input-block">
+					<select name="wuliugs">
+						<option value="顺丰速运" <?php if($logistics[ 'wuliugs']=='顺丰速运' ){ echo 'selected';};?> >顺丰速运</option>
+						<option value="圆通速递" <?php if($logistics[ 'wuliugs']=='圆通速递' ){ echo 'selected';};?> >圆通速递</option>
+						<option value="韵达快递" <?php if($logistics[ 'wuliugs']=='韵达快递' ){ echo 'selected';};?> >韵达快递</option>
+						<option value="申通快递" <?php if($logistics[ 'wuliugs']=='申通快递' ){ echo 'selected';};?> >申通快递</option>
+						<option value="中通快递" <?php if($logistics[ 'wuliugs']=='中通快递' ){ echo 'selected';};?> >中通快递</option>
+						<option value="EMS" <?php if($logistics[ 'wuliugs']=='EMS' ){ echo 'selected';};?> >EMS</option>
+						<option value="优速物流" <?php if($logistics[ 'wuliugs']=='优速物流' ){ echo 'selected';};?> >优速物流</option>
+						<option value="天天快递" <?php if($logistics[ 'wuliugs']=='天天快递' ){ echo 'selected';};?> >天天快递</option>
+					</select>
+					<div class="layui-unselect layui-form-select layui-form-selected">
+						<div class="layui-select-title"><input type="text" placeholder="请选择角色" value="" readonly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>
+						<dl class="layui-anim layui-anim-upbit" style="">
+							<dd lay-value="顺丰" class="">顺丰</dd>
+							<dd lay-value="圆通" class="">圆通</dd>
+							<dd lay-value="韵达" class="">韵达</dd>
+							<dd lay-value="申通" class="">申通</dd>
+							<dd lay-value="中通" class="">中通</dd>
+							<dd lay-value="EMS" class="">EMS</dd>
+							<dd lay-value="优速" class="">优速</dd>
+							<dd lay-value="天天" class="">天天</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">物流号</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="wuliunum" autocomplete="off" value="{$logistics['wuliunum']}" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">收件人：</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$area['name']}" readonly="readonly"/>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">手机号：</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$area['phone']}" readonly="readonly"/>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">收货地址：</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$area['area']}  {$area['address']}" readonly="readonly"/>					
+				</div>
+			</div>
+						
+			<!--<div class="layui-form-item">
+				<label class="layui-form-label">订单号</label>
+				<div class="layui-input-block">
+					<input type="text" name="orderno" autocomplete="off" value="{$logistics['orderno']}" class="layui-input">
+				</div>
+			</div>-->
+
+			<input type="hidden" name="id" value="{$logistics['id']}" />
+			<input type="hidden" name="oid" value="{$oid}" />
+			<input type="hidden" name="uid" value="{$uid}" />
+			<div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+                <button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+            </div>
+
+		</form>
+	</div>
+
+	<include file="Public/footer.html" />
+
+	<script>
+		layui.use(['form', 'layer'], function() {
+			$ = layui.jquery;
+			var form = layui.form;
+			var layer = layui.layer;
+
+			form.on('submit(save)', function(data) {
+
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Logistics/do_logistics')}",
+					data: data.field,
+					dataType: 'text',
+					success: function(data) {
+						if(data == '1') {
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								parent.location.href="{:U('Home/MainCtr/Logistics/logistics_list')}";
+							})
+						} else if(data == '2') {
+							parent.layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						} else {
+							parent.layer.msg(data, {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+
+				return false;
+			});
+
+		});
+	</script>
+
+</body>
+
+</html>

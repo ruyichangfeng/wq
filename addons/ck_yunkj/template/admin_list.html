@@ -1,0 +1,135 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $op == ''}class="active"{/if}><a href="{$urlt}">管理员管理</a></li>
+	<li {if $op == 'add'}class="active"{/if}><a href="{$urlt}&op=add">添加管理员</a></li>
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+</style>
+{if $op == 'add' || $op == 'edit'}
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+		<input type="hidden" name="token" value="{$_W['token']}" />
+    	<input type="hidden" name="id" value="{$srdb['id']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">管理员信息</div>
+            <div class="panel-body">
+				
+				{if $op == 'edit'}
+				{if $srdb['uid']}
+				<input type="hidden" name="uid" value="{$srdb['uid']}" />
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_form_field_image('avatar', $profile['avatar'])}
+                    </div>
+                </div>
+				{else}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+						<p style="color:#666666; padding-top:10px;">该账号未关注公众号，不能修改头像！</p>
+                    </div>
+                </div>
+				{/if}
+				{/if}
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户名</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="username" id="" type="text" value="{$srdb['username']}" style="width:200px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">设置密码</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="password" id="" type="password" value="" style="width:200px;">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputName2">用户ID</label>
+				<input type="text" class="form-control" name="id" value="{$_GPC['id']}">&nbsp;&nbsp;&nbsp;&nbsp;
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">用户名</label>
+				<input type="txt" class="form-control" name="username"  value="{$_GPC['username']}">
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+   
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="100">ID</th>
+			<th>用户名</th>
+			<th>状态</th>
+			<th >操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td>{$value[id]}</td>
+			<td>{$value[username]}</td>
+			<td>{if $value['uid']}<font color="#006600">已关注公众号</font>{else}<font color="#CC0000">未关注公众号</font>{/if}</td>
+			<td>
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="5">{$pager}</td>
+		</tr>
+		{/if}
+	  </table>
+	</div>
+
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

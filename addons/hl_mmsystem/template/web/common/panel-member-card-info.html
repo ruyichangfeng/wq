@@ -1,0 +1,100 @@
+{if $rfid1statedata == 1}
+<script language="javascript" src="http://127.0.0.1:8008/YOWOCloudRFIDReader.js"></script>
+<script src="{HLMMS_JS}YOWOReaderBase.js"></script>
+<script language="javascript" type="text/javascript">
+    key('1', function(){
+        ReadBlock();
+    });
+    rfidreader.onResult(function(resultdata) {
+            switch(resultdata.FunctionID)
+            {
+                case 14:
+                    document.getElementById("CloudReaderVer").value = resultdata.strData;
+                    break;
+                case 7:
+                    if(resultdata.Result>0)
+                    {
+                        $(".sweet-alert.show-input.showSweetAlert ").find('input').val(resultdata.strData);
+                        //document.getElementById("DataRead").value = resultdata.strData;
+                    }
+                    else
+                    {
+                        $(".sweet-alert.show-input.showSweetAlert ").find('.sa-error-container show').find('p').text(resultdata.strData);
+                        //document.getElementById("DataRead").value = GetErrStr(resultdata.Result);
+                    }
+
+                    break;
+            }
+        }
+    );
+    function ReadBlock() {
+        var SectorID;
+        var Key;
+        var rfid3statedata = "{php echo $rfid3statedata}";
+        if(rfid3statedata == 1){
+            SectorID = {php echo $rfid2statedata};
+        }
+        Key =document.getElementById("KeyCard").value;
+        rfidreader.KeyMode=0;
+        rfidreader.KeyStringMode=0;
+        rfidreader.KeyString=Key;
+        rfidreader.Repeat=0
+        rfidreader.M1ReadSector(SectorID, 1);
+    }
+
+</script>
+{/if}
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <i class="fa fa-id-card" aria-hidden="true"></i> 会员信息
+    </div>
+    <div class="panel-body">
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">会员卡号</button> </span>
+                <input type="text" name="memberCardNum" id="memberCardNum"  class="form-control" readonly>
+                <input type="hidden" name="memberId" id="memberId"  class="form-control" >
+                <input name="CloudReaderVer" type="hidden" id="CloudReaderVer" maxlength="10" readonly="readonly" />
+                <input name="KeyCard" type="hidden" id="KeyCard" value="FFFFFFFFFFFF" size="15" maxlength="12">
+            </div>
+        </div>
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">会员姓名</button> </span>
+                <input type="text" name="memberName" id="memberName" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">会员级别</button> </span>
+                <input type="text" name="membercardlevel" id="membercardlevel" class="form-control" readonly>
+            </div>
+        </div>
+
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">会员手机号</button> </span>
+                <input type="text" name="memberMobile" id="memberMobile" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">可用积分</button> </span>
+                <input type="text" name="memberPointsCount" id="memberPointsCount"  class="form-control" readonly>
+            </div>
+        </div>
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">可用储值</button> </span>
+                <input type="text" name="memberMoneyCount" id="memberMoneyCount"  class="form-control" readonly>
+            </div>
+        </div>
+
+        <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">有效期</button> </span>
+                <input type="text"  name="specifiedEndTime" id="specifiedEndTime"  class="form-control" readonly>
+            </div>
+        </div>
+        <div class="col-sm-8" style="padding-left: 5px;padding-right: 5px;">
+            <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">备注</button> </span>
+                <input type="text"  name="memberNote" id="memberNote" class="form-control" readonly>
+            </div>
+        </div>
+
+
+    </div>
+</div>

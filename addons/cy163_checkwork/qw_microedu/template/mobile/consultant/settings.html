@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微早教-顾问端-个人资料</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/app.css">
+</head>
+<body>
+<div id="settings">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">个人资料</h1>
+    </div>
+    <div class="mui-content">
+        <div class="mui-input-group">
+            <div class="mui-input-row head">
+                <label>头像</label>
+                <span class="head"><img class="head-img mui-action-preview" id="head-img1" src="{php echo tomedia($userinfo['avatar'])}"/></span>
+            </div>
+            <div class="mui-input-row">
+                <label>昵称</label>
+                <input class="mui-input-clear" name="nickname" type="text" value="{$userinfo['nickname']}" readonly />
+            </div>
+            <div class="mui-input-row">
+                <label>姓名</label>
+                <input class="mui-input-clear" type="text" name="username" value="您的姓名" />
+            </div>
+            {if $users_xq['mobile']}
+            <div class="mui-input-row">
+                <label>手机号</label>
+                <input class="mui-input-clear" type="text" value="{$users_xq['mobile']}" style="width:40%;float:left;" readonly />
+            </div>
+            {else}
+            <div class="mui-input-row">
+                <label>手机号</label>
+                <input class="mui-input-clear" type="text" name="mobile" style="width:40%;float:left;" />
+                <button class="mui-btn mui-btn-outlined mui-pull-right btn-yzm">获取验证码</button>
+            </div>
+            <div class="mui-input-row">
+                <label>验证码</label>
+                <input class="mui-input-clear" name="yanzhengma" type="text" placeholder="请输入验证码" value="" />
+            </div>
+            {/if}
+            <div class="mui-input-row">
+                <label>性别</label>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>男</label>
+                <input name="radio1" type="radio" value="1" {if $users_xq['gender']==1}checked{/if} >
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>女</label>
+                <input name="radio1" type="radio"  value="2" {if $users_xq['gender']!=1}checked{/if}>
+            </div>
+
+            <div class="jiazhang-settings-save">
+                <button type="button" class="mui-btn mui-btn-success mui-btn-block btn-save personsave" onclick="return false;">保存</button>
+            </div>
+       </div>
+    </div>
+</div>
+<script src="{MODULE_URL}assets/js/mui.min.js">  </script>
+<script src="{MODULE_URL}assets/js/jquery.min.js"></script>
+<script>
+    mui.init({
+        swipeBack:true //启用右滑关闭功能
+    });
+</script>
+<script>
+    var HuoquButton = $(".btn-yzm");
+    var is_in = "{$is_in}";
+    $("document").ready(function(){
+        $(".personsave").click(function(){
+            if(is_in!=1) {
+                if (!checkMobile()) {
+                    return false;
+                }
+                var yanzhengma = $("input[name='yanzhengma']").val();
+                var username = $("input[name='username']").val();
+                var mobile = $("input[name='mobile']").val();
+                var sex = $("input[name='radio1']:checked").val();
+                var Url = "{php echo $this->createMobileurl('consultant')}";
+                var Vdata = {mobile:mobile,code:yanzhengma,caozuo:"mobileadd",username:username,sex:sex};
+                $.post(Url,Vdata,function(data){
+                    if(data.error==1){
+                        mui.toast(data.message);
+                    }else{
+                        mui.toast(data.message);
+                    }
+                },'json')
+            }else{
+                var username = $("input[name='username']").val();
+                var sex = $("input[name='radio1']:checked").val();
+                var Url = "{php echo $this->createMobileurl('consultant')}";
+                var Vdata = {caozuo:"mobileedit",username:username,sex:sex};
+                $.post(Url,Vdata,function(data){
+                    if(data.error==1){
+                        mui.toast(data.message);
+                    }else{
+                        mui.toast(data.message);
+                    }
+                },'json');
+            }
+        })
+        $(".btn-yzm").click(function(){
+            //提交到后台获取验证码
+            if(HuoquButton.hasClass("active")){
+                mui.toast("不要重复获取");
+            }else{
+                if(!checkMobile()){
+                    return false;
+                }
+                var Url = "{php echo $this->createMobileurl('consultant')}";
+                var mobile = $("input[name='mobile']").val();
+                var Vdata = {mobile:mobile,caozuo:'yanzhengma'};
+                $.post(Url,Vdata,function(data){
+                    if(data.error==1){
+                        alert(data.message);
+                        RemainTime();
+                    }else{
+                        mui.toast("请重新获取");
+                    }
+                },'json');
+
+            }
+            return false;
+        })
+    })
+    var iTime = 10;
+    var Account;
+    function RemainTime(){
+        HuoquButton.addClass("active");
+        var iSecond,sSecond="",sTime="";
+        if (iTime >= 0){
+            iSecond = parseInt(iTime%60);
+            iMinute = parseInt(iTime/60)
+            if (iSecond >= 0){
+                if(iMinute>0){
+                    sSecond = iMinute + "分" + iSecond + "秒";
+                }else{
+                    sSecond = iSecond + "秒";
+                }
+            }
+            sTime=sSecond;
+            if(iTime==0){
+                clearTimeout(Account);
+                sTime='获取手机验证码';
+                iTime = 59;
+                HuoquButton.removeClass("active");
+            }else{
+                Account = setTimeout("RemainTime()",1000);
+                iTime=iTime-1;
+            }
+        }else{
+            sTime='没有倒计时';
+        }
+        HuoquButton.text(sTime);
+    }
+    function checkMobile(){
+        var mobile = $("input[name='mobile']").val();
+        //检测手机号
+        var mobilereg = /^((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}))+\d{8}$/;
+        if(mobile.length==0){
+            mui.toast("请输入手机号");
+            return false;
+        }
+        if(!mobilereg.test(mobile)){
+            mui.toast("手机号不合法");
+            mobile.value="";
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

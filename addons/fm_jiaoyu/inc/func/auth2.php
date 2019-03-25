@@ -1,0 +1,1 @@
+<?php if(!defined('IN_IA')) {exit('Access Denied');}if(!defined('FM_JIAOYU_HOST')) {define('FM_JIAOYU_HOST', 'www.daren007.com');}

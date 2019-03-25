@@ -1,0 +1,8 @@
+<?php
+/*   __________________________________________________
+    |  Obfuscated by YAK Pro - Php Obfuscator          |
+    |              on 2018-05-27 10:27:02              |
+    |    GitHub: https://github.com/pk-fr/yakpro-po    |
+    |__________________________________________________|
+*/
+ namespace Core\common; class Response { public static function json($data) { goto lQeuf; lQeuf: header("\x63\x6f\x6e\164\x65\x6e\x74\x2d\x74\171\x70\145\72\x61\160\160\154\151\x63\141\164\151\157\x6e\x2f\x6a\163\157\x6e"); goto lTLTP; lTLTP: echo json_encode($data); goto eilPG; eilPG: die; goto sbWjV; sbWjV: } public static function img($file) { try { goto WVAqf; X8Vzw: if ($data) { goto eK9of; } goto s8WEH; DUA_s: $imgData = file_get_contents($file, null, $context); goto A2iVn; Vht4m: ob_clean(); goto UGh1b; UGh1b: echo $imgData; goto vRwOI; s8WEH: die("\345\x9b\xbe\xe7\211\207\xe6\x97\240\xe6\x95\x88"); goto tH3I3; WVAqf: if (strpos($file, "\x68\164\x74\x70\x3a\x2f\57") === 0 || strpos($file, "\x68\x74\x74\160\163\x3a\57\57") === 0) { goto kREho; } goto A7ngE; ESBGW: header("\x63\157\156\164\x65\x6e\x74\x2d\x74\171\x70\x65\72" . $data["\155\x69\x6d\x65"]); goto Vht4m; XJsVc: $context = stream_context_create(array("\x68\x74\164\160" => array("\164\151\x6d\x65\157\165\x74" => 5))); goto DUA_s; AgzOP: kREho: goto XJsVc; A2iVn: $data = getimagesizefromstring($imgData); goto X8Vzw; tH3I3: eK9of: goto ESBGW; A7ngE: $file = IA_ROOT . $file; goto AgzOP; vRwOI: } catch (\Exception $e) { echo "\350\257\273\345\x8f\x96\xe5\x9b\xbe\347\x89\x87\xe5\244\261\350\xb4\xa5"; } die; } }

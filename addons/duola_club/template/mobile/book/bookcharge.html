@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>押金余额</title>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>    {php echo register_jssdk()}
+</head>
+<body>
+<style type="text/css">
+    body,html{height:100%;-webkit-tap-highlight-color:transparent}.page,body{background-color:#fbf9fe}.page{overflow-y:auto;-webkit-overflow-scrolling:touch}.hd{padding:2em 0}.page_title{text-align:center;font-size:34px;color:#3cc51f;font-weight:400;margin:0 15%}
+</style>
+<div class="page">
+    <div class="hd">
+        <h1 class="page_title">押金提额</h1>
+    </div>
+    <div class="weui_cells">
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                充值方式
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select class="weui_select" name="select2">
+                    <option value="1">微信支付</option>
+                </select>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="width: 7em;">押金金额</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" placeholder="请输入充值金额" name="money" id="money">
+                <input type="hidden" id="logid">
+            </div>
+        </div>
+        <div class="weui_cell" style="display: none;" id="xsb">
+            <div class="weui_cell_hd"><label class="weui_label" style="width: 7em;">可兑换闲书币</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" placeholder="" name="money" id="money1">
+                <input type="hidden" id="logid1">
+            </div>
+        </div>
+    </div>
+    <div class="weui_btn_area">
+        <button class="weui_btn weui_btn_primary weui_btn_disabled" id="btn">立即充值</button>
+    </div>
+    <div class="page__hd">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__bd">
+                <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+        <div class="weui-media-box__bd">
+            <h4 class="weui-media-box__title">押金说明</h4>
+            <p class="page__desc">①押金提额是在闲书币不足情况下临时提额的快速工具。</p>
+            <p class="page__desc">②押金与闲书币的兑换比例为：1:3，即充值1元人民币兑换3元闲书币，以此类推。</p>
+            <p class="page__desc">③单次充值不超过200元，押金余额不超过2000元</p>
+            <p class="page__desc">④用户可随时申请押金提现，用多余闲书币兑回押金</p>
+        </div>
+                </a>
+                </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="schoolid" value="{$data['schoolid']}" id="schoolid">
+<script src="{MODULE_URL}template/mobile/style/js/jquery-1.8.3.min.js"></script>
+<script src="{MODULE_URL}template/mobile/style/js/weui.js"></script>
+<script type="text/javascript">
+    var flag = 0;
+    $('#money').keyup(function(event) {
+        var money = $("#money").val()*1;
+        if(money > 0){
+            var rate = "{$data['data']['rate']}"*1;
+            $("#xsb").show();
+            $("#money1").val((money*rate).toFixed(2));
+            $("#btn").removeClass("weui_btn_disabled");
+            flag = 1;
+        }else{
+            $("#btn").addClass("weui_btn_disabled");
+            flag = 0;
+        }
+
+    });
+    $('#btn').click(function() {
+
+        if (flag == 1) {
+            var money = $("#money").val();
+            var logid = $("#logid").val();
+            var maxAmount = "{$data['data']['margin']['maxAmount']}";
+            if(maxAmount > 0){
+                if(money > maxAmount){
+                    $("#btn").addClass("weui_btn_disabled");
+                    flag = 0;
+                    Weui.alert({"title":"支付异常","content":"超过最大充值限额"});
+                    return;
+                }
+            }
+            $("#btn").addClass("weui_btn_disabled");
+            flag = 0;
+            $.ajax({
+                url: '{php echo $this->createMobileUrl('paybook',array('type'=>'wechat','payopenid'=>$data['data']['payopenid']))}',
+                type: 'post',
+                dataType: 'json',
+                data: {money: money,logid:logid},
+                success:function(data){
+                    if (data.status == 1) {
+                        $("#logid").val(data.logid);
+                        WeixinJSBridge.invoke('getBrandWCPayRequest', {
+                            'appId': data.wechat.appid ? data.wechat.appid : data.wechat.appId,
+                            'timeStamp': data.wechat.timeStamp,
+                            'nonceStr': data.wechat.nonceStr,
+                            'package': data.wechat.package,
+                            'signType': data.wechat.signType,
+                            'paySign': data.wechat.paySign,
+                        }, function (res) {
+//                            var url = '{php echo $this->createMobileUrl('bookpay',array('op' => 'cz'))}'+'&tid='+data.logid+'&schoolid='+$("#schoolid").val();
+//                            $.post(url,'',function(d){
+//                            },'json');
+                            if (res.err_msg == 'get_brand_wcpay_request:ok') {
+                                //支付成功回调
+                                window.location.href = '{php echo $this->createMobileUrl('bookmap')}'+'&schoolid='+$("#schoolid").val();
+                            } else if(res.err_msg=='get_brand_wcpay_request:cancel') {
+                                $("#btn").removeClass("weui_btn_disabled");
+                                flag = 1;
+                                Weui.alert({"title":"","content":"取消支付"});
+                            } else {
+                                $("#btn").removeClass("weui_btn_disabled");
+                                Weui.alert({"title":"","content":res.err_msg});
+                                flag = 1;
+                            }
+                        });
+                    }else{
+                        Weui.alert({"title":"","content":data.msg});
+                    }
+                }
+            });
+        }
+    });
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+</script>
+</body>
+</html>

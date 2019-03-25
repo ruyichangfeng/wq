@@ -1,0 +1,111 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('service_allocation', array('did' => $did));}">订单分配</a></li>
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+</style>
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			<input type="hidden" name="did" value="{$did}">
+			  <div class="form-group">
+				<label for="exampleInputName2">会员ID</label>
+				<input type="text" class="form-control" name="id" value="{$_GPC['id']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">会员姓名</label>
+				<input type="txt" class="form-control" name="name"  value="{$_GPC['name']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">手机号码</label>
+				<input type="txt" class="form-control" name="phone"  value="{$_GPC['phone']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">所属职位</label>
+				<select name="type" class="form-control">
+					<option value="" >不限</option>
+					{loop $category $row1}
+					<option value="{$row1['cid']}" {if $row1['cid'] == $_GPC['type']} selected="selected"{/if}>{$row1['name']}</option>
+					{/loop}
+				</select>
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+   <form method="post" class="form">
+	<input name="token" type="hidden" value="{$_W['token']}" />
+	<input type="hidden" name="did" value="{$did}">
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="80">选择</th>
+			<th width="100">头像</th>
+			<th >姓名</th>
+			<th >手机号码</th>
+			<th >职位</th>
+			<th >状态</th>
+		</tr>
+		{loop $list $key $value}
+		{php $staff_class = pdo_get('cwgl_staff_class', array('cid' => $value['type'],'cid' => $value['type']));}
+		{php $usershow = pdo_get('mc_members', array('uid' => $value['uid']));}
+		<tr >
+			<td><input type="radio" name="ygid" value="{$value['id']}" /></td>
+			<td>
+				{if $usershow[avatar]}
+				<img src="{php echo tomedia($usershow[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+				{else}
+				<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+				{/if}
+			</td>
+			<td>{$value[name]}</td>
+			<td>{$value['phone']}</td>
+			<td>{$staff_class['name']}</td>
+			<td>{if $value['uid']}<font color="#006600">已关注公众号</font>{else}<font color="#CC0000">未关注公众号</font>{/if}</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="6">{$pager}</td>
+		</tr>
+		{/if}
+		<tr >
+			<td colspan="6" align="center">
+				<input type="submit" name="listsubmit" value="提交" class="btn btn-default">
+			</td>
+		</tr>
+	  </table>
+	</div>
+	</form>
+  </div>
+</div>
+
+{template 'common/footer'}

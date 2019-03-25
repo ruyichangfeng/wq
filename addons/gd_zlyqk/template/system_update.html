@@ -1,0 +1,100 @@
+{template "base/child_header"}
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <colgroup>
+            <col width="15%">
+            <col width="15%">
+            <col width="40%">
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <td colspan="4">
+                <div class="notice" style="color: #1AA094;height:40px;line-height: 40px;padding-left: 10px;text-align: left;display: none">
+                    更新进度:
+                    <span class="has sp">0</span>/
+                    <span class="total">0</span>
+                    <span class="file sp"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>版本</th>
+            <th>更新时间</th>
+            <th>更新内容</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody class="news_content">
+        {loop $serverVersion $index $version}
+        <tr>
+            <td align="left">{$version['version']}</td>
+            <td>{php echo date("Y-m-d H:i:s",$version['create_time'])}</td>
+            <td align="left">{$version['desc']}</td>
+            <td>
+                {if $index==0}
+                <a class="layui-btn .layui-btn-blue  layui-btn-mini" target="_blank" href="javascript:" onclick="update('{$version["version"]}')">
+                    检查更新
+                </a>
+                {/if}
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+</div>
+<div id="page"></div>
+<script>
+    var key =0;
+    var fileList ;
+    var total =0;
+    var has = 0;
+    var nameList =new Array();
+    var localList = new Array();
+    var $;
+    layui.use(['form','jquery'], function(){
+       $ = layui.jquery;
+    });
+
+    function update(version){
+        $.post("{php echo $this->createWebUrl('parseUpdate')}",{version:version},function ($data) {
+            if($data.total>0){
+                total = $data.total;
+                $(".notice").css("display","block");
+                $(".total").html($data.total);
+                fileList = $data.file;
+                $(".has").html(has);
+                for(var x in  fileList){
+                    nameList[key]=fileList[x].name;
+                    localList[key]=fileList[x].local;
+                    key ++;
+                }
+                syncFile();
+            }
+        },"json");
+    }
+
+    //开始更新文件
+    function syncFile(){
+        var handel = setInterval(function(){
+            var name =nameList[has];
+            var local = localList[has];
+            $.post("{php echo $this->createWebUrl('getFile')}",{name:name,local:local},function(data){
+                has ++;
+                if(has<=total){
+                    $(".has").html(has);
+                    $(".file").html(name);
+                }
+            });
+            if(has==total){
+                clearTimeout(handel);
+                $(".file").html("更新完成");
+                setTimeout(function(){
+                    location.reload();
+                },2000);
+            }
+        },1100);
+    }
+
+</script>
+{template "base/child_footer"}

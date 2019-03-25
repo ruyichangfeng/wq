@@ -1,0 +1,77 @@
+{template "base/child_header"}
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <input type="hidden" name="id" value="{$recorder['id']}">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[name]" value="{$recorder['name']}" required="" style="width: 400px;" lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[mobile]" required="" value="{$recorder['mobile']}" style="width: 400px;" lay-verify="phone" placeholder="请输入电话" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">部门</label>
+        <div class="layui-input-block" style="width: 400px;">
+            <select name="in[department]">
+                <option value="0">选择部门</option>
+                {loop $departments $department}
+                <option value="{$department['id']}" {if $department['id']==$recorder['department']}selected{/if}>{$department['name']}</option>
+                {/loop}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">帐号</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[account]" required="" value="{$recorder['account']}" style="width: 400px;" lay-verify="require" placeholder="请输入帐号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="in[password]" required="" value="{$recorder['password']}" style="width: 400px;" lay-verify="require" placeholder="请输入密码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">职位</label>
+        <div class="layui-input-block">
+            <input type="radio" name="in[organize]" title="员工" value="1" {if $recorder['organize']==1 || empty($recorder['organize'])} checked {/if}>
+            <input type="radio" name="in[organize]" title="领导" value="2" {if $recorder['organize']==2} checked {/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="in[status]" title="正常" value="1" {if $recorder['status']==1} checked {/if}>
+            <input type="radio" name="in[status]" title="禁用" value="0" {if $recorder['status']==0} checked {/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','jquery'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        form.on('submit(addAdmin)', function(data){
+            $.post("{php echo $this->createWebUrl($_GPC['do'],array('tb'=>'admin'))}&Ajax=",data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+    });
+</script>
+{template "base/child_footer"}

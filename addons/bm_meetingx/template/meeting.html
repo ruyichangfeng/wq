@@ -1,0 +1,118 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op == 'display'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('meeting', array('op' => 'display','id' => $id))}">日程管理</a>
+  </li>
+  <li {if $op == 'post'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('meeting', array('op' => 'post','id' => $id))}">新增日程</a>
+  </li>
+</ul>
+{if $op == 'post'}
+<div class="panel panel-default">
+	<div class="panel-heading">
+     	日程设置
+    </div>
+	<div class="panel-body">
+		<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data" >
+			<input type="hidden" name="mid" value="{$item['id']}">
+			<input type="hidden" name="id" value="{$id}">
+			<input type="hidden" name="op" value="post">
+			<div class="panel panel-default">
+			<div class="panel-body">
+			 	<div class="form-group">
+			 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+			 		<div class="col-sm-9">
+			 			 <input type="text" name="sort" class="form-control" value="{$item['sort']}" />
+			 		</div>
+			 	</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 是否显示</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' value='0' name='status' {if $item['status']=='0'}checked{/if}>否
+						</label> 
+						<label class='radio-inline'>
+							<input type='radio' value='1' name='status' {if $item['status']=='1'}checked{/if}>是
+						</label>
+					</div>
+				</div>
+			 	<div class="form-group">
+			 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">日程名称</label>
+			 		<div class="col-sm-8">
+						<input type="text" name="name" class="form-control" value="{$item['name']}" />
+			 		</div>
+			 	</div>		
+			 	<div class="form-group">
+			 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">日程图片</label>
+			 		<div class="col-sm-8">
+						 {php echo tpl_form_field_image('picurl', $item['picurl'])}
+			 		</div>
+			 	</div>
+			 	<div class="form-group">
+			 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">日程介绍</label>
+			 		<div class="col-sm-8">
+			 			<textarea name="memo" class="form-control" id="reply-add-text" cols="50">{$item['memo']}</textarea>
+			 			
+			 		</div>
+			 	</div>
+				<div class="form-group">
+			 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">时间</label>
+			 		<div class="col-sm-8">
+			 			<input type="text" name="datetime" class="form-control" value="{$item['datetime']}" />
+			 			<span class="help-block">填写时间安排，例如"2015-01-01 上午"</span>
+			 		</div>
+			 	</div>					
+	 		</div>
+			</div>
+			 <div class="form-group">
+			 <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+			 <div class="col-sm-8">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			 </div> 
+			 </div>			
+		</form>
+	</div>
+</div>	
+<script type="text/javascript">
+<!--
+  var category = {php echo json_encode($children)};
+  kindeditor($('.richtext-clone'));
+//-->
+</script>
+{elseif $op == 'display'}
+<div style="padding:15px;">
+	<table class="table table-hover">
+		<tr>
+			<td style="width:10%;text-align:center;" >序号</td>
+			<td style="width:10%;text-align:center;" >显示顺序</td>
+			<td style="width:30%;text-align:center;" >日程名称</td>
+			<td style="width:30%;text-align:center;" >时间</td>
+			<td style="width:10%;text-align:center;" >状态</td>
+			<td style="width:10%;text-align:center;" >操作</td>
+		</tr>
+		{loop $list $item}
+		<tr>
+			<td style="text-align:center;">{$item['id']}</td>
+			<td style="text-align:center;">{$item['sort']}</td>
+			<td style="text-align:center;">{$item['name']}</td>
+			<td style="text-align:center;">{$item['datetime']}</td>
+			<td style="text-align:center;">
+			{if $item['status']=='1'}
+			<span class="label label-success">显示</span>
+			{else}
+			<span class="label label-warning">不显示</span>
+			{/if}
+			</td>
+			<td style="text-align:center;">
+			<a href="{php echo $this->createWebUrl('meeting',array('id' => $id , 'mid' => $item['id'] ,'op' => 'post'))}">编辑
+			</a>
+			<a href="{php echo $this->createWebUrl('meeting',array('id' => $id , 'mid' => $item['id'],'op' => 'delete'))}">删除
+			</a>
+		</td>
+		</tr>
+		{/loop}
+	</table>
+</div>
+{/if}
+{template 'common/footer'}

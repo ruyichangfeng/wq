@@ -1,0 +1,70 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li <?php if(WG_METHOD_NAME=='index'){?> class="active" <?php }?> ><a href="{php echo $this->createWebUrl('setting');}">网站设置</a></li>
+    <li <?php if(WG_METHOD_NAME=='menu'){?> class="active" <?php }?> ><a href="{php echo $this->createWebUrl('setting',['_wg' => 'menu']);}">底部菜单</a></li>
+</ul>
+<div class="clearfix">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            菜单配置
+        </div>
+        <div class="panel-body">
+
+            <div class="l_table_tit clearfix">
+                <div class="btn-group l_table_search">
+                    <a href="{php echo $this->createWebUrl('setting', array('_wg' => 'add'))}" class="btn btn-success">添加菜单</a>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <tr>
+                    <th>排序</th>
+                    <th>名称</th>
+                    <th>图标</th>
+                    <th>操作</th>
+                </tr>
+                {loop $list $row}
+                <tr>
+                    <td>
+                        <p class="form-control-static">
+                           {$row['rank']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static" >
+                            {$row['name']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static" >
+                            <img src="{$_W['attachurl']}{$row['unselect']}">
+                        </p>
+                    </td>
+                    <td style="width: 130px;">
+                        <p class="form-control-static">
+                            <a target="_blank" class="btn btn-success" href="{php echo $this->createWebUrl('setting', array('rank' => $row['rank'],'_wg' => 'add'))}" >编辑</a>
+                            <a href="javascript:void(0);" class="del-menu btn btn-default btn-sm" data-id="{$row['rank']}" >删除</a>
+
+                        </p>
+                    </td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    var url_del = "{php echo $this->createWebUrl('setting',['_wg' => 'delete']);}";
+    $('.del-menu').click(function () {
+        if(!confirm('确认删除此菜单？')) {
+            return false;
+        }
+        var rank = $(this).attr('data-id');
+        $.post(url_del,{rank:rank},function (data) {
+            location.reload();
+        });
+    });
+    </script>
+{template 'common/footer'}

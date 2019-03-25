@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+{php $MOBILE = '../addons/'.$this->modulename.'/template/mobile/';}
+<head>
+<meta charset="UTF-8">
+<title>奖品核销</title>
+ <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+ <script type="text/javascript" src="{$MOBILE}js/jquery-1.7.2.min.js"></script>
+ <script type="text/javascript" src="{$MOBILE}js/sweetalert.min.js"></script>
+ <link rel="stylesheet" href="{$MOBILE}css/sweetalert.css">
+ <link rel="stylesheet" href="{$MOBILE}css/style.css?t={TIMESTAMP}">
+ <style>
+ .btn{
+   border: 1px solid gainsboro;
+  border-radius: 5px;
+  padding: 5px 50px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+  background: orangered;
+}
+ </style>
+</head>
+<body style="text-align: center;background: #c0c0c0;">
+	<img style="max-width: 100%;margin-top: 50px;margin-bottom: 10px;" src="{php echo toimage($award['prizepic'])}">
+	<p style="font-size: 20px;font-weight: bold;">{$award['prizename']}</p>
+	<button class="btn">领奖</button>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+$('.btn').click(function(){
+	$(this).hide();
+	$.ajax({
+		url:"{php echo $this->createMobileUrl('award',array('pid'=>$pid,'rid'=>$rid))}",
+		type:'post',
+		success:function(msg){
+			if(msg == '1'){
+				swal('领奖成功！','','success');
+			}else swal('领奖失败！','请联系管理员！','error')
+		},
+		error:function(){
+			sawl('网络请求失败，请重试!','','error');
+		}
+	});
+});
+
+    var appid = '{$_W['account']['jssdkconfig']['appId']}';
+    var timestamp = '{$_W['account']['jssdkconfig']['timestamp']}';
+    var nonceStr = '{$_W['account']['jssdkconfig']['nonceStr']}';
+    var signature = '{$_W['account']['jssdkconfig']['signature']}';
+    wx.config({
+        debug: false,
+        appId: appid,
+        timestamp: timestamp,
+        nonceStr: nonceStr,
+        signature: signature,
+        jsApiList: [
+        ]
+    });
+	 wx.ready(function () {wx.hideOptionMenu();});
+</script>
+</html>

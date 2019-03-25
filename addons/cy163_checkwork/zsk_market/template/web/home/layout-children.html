@@ -1,0 +1,88 @@
+{template 'public/header'}  
+<style type="text/css">
+	.topicpic{width: 100px; }
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" > 
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('parent.index');?>">首页栏目</a></li>
+		  <?php if(intval($parent['id'])>0){?>
+		   <li class="active">{$parent['name']}</li>
+		  <?php }?>
+		  <li><a href="#">栏目内容</a></li> 
+		</ol> 
+	</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo $this->routeUrl('topic.listview');?>" method="post" id="keyform"> <div class="col-xs-4 col-sm-4 paddingx">
+				<div class="input-group">
+			      <input type="text" name="name" placeholder="有个搜索栏更好看" value="{$params['name']}" class="form-control" style="display: inline-block;" />
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button" style="display: inline-block;" onclick="edit1()">添加栏目</button>  
+			      </span>
+			    </div>  
+			</div>
+			</form> 
+		</div> 
+		<table class="table ">
+			<thead>
+				<tr>
+					<th style="width: 200px;">栏目标题</th>  
+					<th style="width: 120px;">类型</th> 
+					<th style="width: 80px;">状态</th>
+
+					<th style="width: 80px;">排序</th>
+					<th style="width: 150px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $mods $index $item}
+				<tr>
+					<td>{$item['name']}</td> 
+					<td>
+						{$item['typename']}
+					</td>
+				 
+					<td> 
+					<?php if(intval($item['status'])>0){ ?>
+						<a class="linkbtn " onclick="status(0,'{$item['name']}')">显示</a>
+					<?php }else { ?>
+						<a class="linkbtn linkbtn-gray" onclick="status(1,'{$item['name']}')">隐藏</a>
+					<?php } ?>
+					</td>
+					<td>
+						{$item['sort']}
+					</td>
+					<td> 
+					 
+						<a href="<?php echo $this->routeUrl('topic.editview');?>&tid={$item['id']}" class='linkbtn'>编辑</a>
+						<a href="<?php echo $this->routeUrl('homeparent.manage');?>&pid={$item['id']}" class='linkbtn'>管理</a>
+						<?php if(intval($item['deletable'])>0){?>
+						<a href="javascript:void(0);" onclick="deltopic({$item['id']},'{$item['title']}')" class='linkbtn linkbtn-red'>删除</a>
+						<?php }?>
+						
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="8" align="center">
+						{template 'public/pagenation'}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</div>
+ 
+<script type="text/javascript">
+	function edit1(id){ 
+		window.location.href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$parent['id']}";
+	}
+	function deltopic(id,name){
+		modalDlg("是否删除"+name+"?",function(){
+			window.location.href="<?php echo $this->routeUrl('topic.deltopic');?>&tid="+id;
+		});
+	}
+</script>
+{template 'public/footer'}

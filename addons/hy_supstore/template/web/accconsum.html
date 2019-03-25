@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {template 'web/header'}
+</head>
+<body>
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+      <a href="{php echo $this->createWebUrl('accconsum')}">赠送列表</a>
+    </div>
+{if $op == 'list'}
+<style>
+.layui-table td{ text-align:center;}
+</style>
+<form action="" method="post" class="layui-form"  enctype="multipart/form-data">
+<table class="layui-table"  style="width:98%;  margin:0 auto;">
+    <thead class="navbar-inner">
+        <tr>
+            <th width="50">ID</th>
+            <th width="100">会员名称</th>
+            <th width="80">手机号</th>
+            <th width="80">金额</th>
+            <th width="60">类型</th>
+            <th width="80">余额变化</th>
+            <th width="80">余额</th>
+            <th width="150">时间</th>
+            <th>门店</th>
+            <th width="50">操作</th>
+            <th width="100">备注</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $list $item}
+        <tr>
+        	<td><input type="checkbox" name="delete[]" value="{$item['id']}"> {$item['id']}</td>
+        	<td>
+            	<img src="{$item['avatar']}" style=" height:38px; border-radius:50%;"><br>
+            	<a href="{php echo $this->createWebUrl("account", array("op" => "list","mid"=>$item['mid']))}">{$item['nickname']}</a>
+            </td>
+        	<td>{$item['mobile']}</td>
+        	<td>{if $item['type']==3}-{else}+{/if}{$item['fee']}元</td>
+            <td>
+            {if $item['type']==1}
+            	{if $item['chaneltype']==1}现金
+                {elseif $item['chaneltype']==5}微信
+                {/if}充值
+            {elseif $item['type']==2}
+            	充值赠送
+            {elseif $item['type']==3}
+            	{if $item['chaneltype']==1}现金
+            	{elseif $item['chaneltype']==2}余额
+            	{elseif $item['chaneltype']==3}其他
+                {elseif $item['chaneltype']==6}扫码
+                {/if}消费
+            {/if}
+            </td>
+        	<td>{if $item['type']==3}-{else}+{/if}{$item['fee']}元</td>
+        	<td>{$item['usercredit2']}元</td>
+        	<td>{$item['createtime']}</td>
+        	<td>{$item['storename']}</td>
+        	<td>
+            {if $item['otype']==1}本人
+            {else}
+            	{if $item['paytype']=="store"}店长
+            	{else}管理员
+            	{/if}
+            {/if}
+            </td>
+        	<td>{$item['content']}</td>
+        </tr>
+        {/loop}
+        <tr>
+        	<td><input type="checkbox" id="ckall" style="display:block;margin: 0 auto;"></td>
+            <td colspan="10" style="text-align:left;">
+            	<input type="submit" name="submit" value="批量删除" class="layui-btn layui-btn-sm layui-btn-danger">
+                <input type="hidden" name="token" value="{$_W["token"]}" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>
+<div class="fenye">{$pager}</div>
+<script>
+$('#ckall').click(function(){
+	var ck = this.checked;$(" :checkbox").each(function(){this.checked=ck});
+});
+</script>
+{/if}
+</body>
+</html>

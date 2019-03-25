@@ -1,0 +1,290 @@
+{template 'common/header'}
+	<style type="text/css">
+	html{
+		overflow:visible;
+		width:100%;
+	}
+	a{
+		text-decoration:none;
+		color:#444;
+		display: block;
+
+	}
+	.subbar{
+	    position: absolute;
+	    top: 44px;
+	    height: 44px;
+	    width: 100%;
+	    overflow-x:overlay;
+	}
+	.subbar ul{
+		display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+	    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+	    display: -ms-flexbox;      /* TWEENER - IE 10 */
+	    display: -webkit-flex;     /* NEW - Chrome */
+	    display: flex;            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+	    height:100%;
+	}
+	.subbar ul li{
+		float:left;
+		width:20%;
+		text-align:center;
+		height:100%;
+		line-height:44px;
+	}
+	.clear_fix{
+		clear:both;
+	}
+	.active{
+		color:{if $setting_result['setting_sub_color']}{$setting_result['setting_sub_color']}{else}#66cc33{/if};
+		border-bottom:2px solid {if $setting_result['setting_sub_color']}{$setting_result['setting_sub_color']}{else}#66cc33{/if};
+	}
+	.active a{
+		color:{if $setting_result['setting_sub_color']}{$setting_result['setting_sub_color']}{else}#66cc33{/if};
+	}
+	.swiper-slide{     
+		height:180px;
+	}
+	.swiper-slide img {
+		width:100%;
+		height:100%;
+
+	}
+	.swiper-container{
+		width:100%;
+		position:relative;
+	}
+	.swiper-pagination{
+		top: 10px;
+    	right: 20px;
+	}
+	.item h2{
+		overflow: visible;
+	    text-overflow: clip;
+	    white-space: normal;
+	}
+	.ion-ios-eye-outline:before {
+	    content: "\f424";
+	    font-size: 24px;
+	    position: relative;
+	    top: 3px;
+	    left: -5px;
+	}
+	.news_info{
+		position: absolute;
+    	bottom: 10px;
+	}
+	.news_info i{
+		margin-right: 5px;
+	}
+	.news_info span{
+		margin-right: 10px;
+	}
+	.ion-ios-clock-outline:before {
+	    content: "\f402";
+	    font-size: 16px;
+	}
+	.content{
+		width:100%;
+		overflow-x:hidden;
+	}
+	.slide_doit{
+		position: absolute;
+	    width: 100%;
+	    bottom: 0;
+	    height: 40px;
+	}
+	.slide_title{
+		position: absolute;
+	    bottom: 0;
+	    height: 40px;
+	    line-height: 40px;
+	    width: 100%;
+	    padding-left: 20px;
+	    color:#fff;
+	    background: rgba(0,0,0,0.3);
+	}
+	.title{
+		color:{if $setting_result['setting_bar_color']}{$setting_result['setting_bar_color']}{else}#fff{/if};
+	}
+	.bar-setting{
+		background-color:{if $setting_result['setting_bar_bg']}{$setting_result['setting_bar_bg']}{else}#33cd5f{/if};
+	}
+	
+	</style>
+		
+    <script>
+// 自定义分享数据的调用
+	var link = "<?php echo $_W['siteurl'] ?>";
+	var image_url ='{php echo tomedia($slide_results[0]["slide_image_url"])}'
+	wx.ready(function () {
+		sharedata = {
+			title: '新闻互动',
+			desc: '本地欣慰服务平台',
+			link: link,
+			imgUrl: image_url,
+			success: function(){
+				alert('分享成功！');
+			},
+			cancel: function(){
+				alert('分享取消！');
+			}
+		};
+		wx.onMenuShareTimeline(sharedata);
+	});
+
+	</script>
+
+	<div class="bar bar-header bar-setting">
+		<h4 class="title">{if $setting_result['setting_title']}{$setting_result['setting_title']}{else}首页{/if}</h4>
+	</div>
+	<div class="subbar scroll" scroll-x="fasle">
+		<ul>
+			{loop $results $val}
+				<li data-id="{$val['nav_id']}" class="{if $_GPC['id']==$val['nav_id']}active{/if}" >
+				<a href="{php echo $this->createMobileUrl('index1',array('id'=>$val['nav_id']))}">{$val['nav_title']}</a></li>
+			{/loop}
+			<div class="clear_fix"></div>
+		</ul>
+	</div>
+	<div class="content has-header has-subheader">
+		<div class="swiper-container">
+			<div class="swiper-wrapper">
+			{loop $slide_results $row}
+			<div class="swiper-slide">
+			<a href="{if $row['slide_link_url'] !=''}{$row['slide_link_url']} {else}javascript:;{/if}"><img src="{php echo tomedia($row['slide_image_url'])}"></a>
+			<div class="slide_title">{$row['slide_title']}</div>
+			</div>	
+			{/loop}
+			</div>
+			<div class="slide_doit">
+				<div class="swiper-pagination"></div>
+			</div>
+		</div>
+		<div class="list">
+			{loop $news_results $result}
+			<a href="{if $result['news_wai_link']==''}{php echo $this->createMobileUrl('news_detail',array('id'=>$result['news_id']))}{else} {php echo $result['news_wai_link'] } {/if}">
+			<div class="item item-thumbnail-left">
+				<img src="{php echo tomedia($result['news_thumbnail'])}">
+				<h2>{$result['news_title']}</h2>
+				<p class="news_info">
+					<i class="icon ion-ios-clock-outline"></i><span>{$result['news_date']}</span>
+					{if !$result['news_wai_link']}<i class="icon ion-ios-eye-outline"></i><span>{$result['news_count']}</span>{/if}
+				</p>
+			</div>
+			</a>
+			{/loop}
+		</div>
+		
+	</div>
+
+	<script type="text/javascript">
+		$(function(){
+			var page = 3;
+			var i = core.querystring('i');
+			var j = core.querystring('j');
+			// var url = './index.php?i='+i+'&j='+j+'&c=entry&do=news_list'+'&m=test_aa';
+			 var more_url = './index.php?i='+i+'&j='+j+'&c=entry&do=news_list_more'+'&m=server_news';
+			// $('.subbar ul li').click(function(){
+			// 	$('.subbar ul li').removeClass('active');
+			// 	$(this).addClass('active');
+			// 	var id = $(this).data('id');
+			// 	page=3;
+			// 	$.ajax({
+			// 		url:url,
+			// 		dataType:'json',
+			// 		async:true,
+			// 		data:{"id":id},
+			// 		type:'POST',   
+			// 		success:function(data){
+			// 			var html ='';
+						
+			// 			for(i=0; i<data.length; i++){
+			// 				html +='<div class="item item-thumbnail-left"><img src=" ' + data[i].news_thumbnail + ' " ' + '><h2>'+ data[i].news_title +'</h2><p class="news_info"><i class="icon ion-ios-clock-outline">'+ data[i].news_date +'</i><i class="icon ion-ios-eye-outline">'+ data[i].news_count +'</i></div>';
+			// 			}
+			// 			$('.list').html(html);
+			// 		},
+			// 		error: function(XMLHttpRequest, textStatus, errorThrown) {
+			// 			alert(textStatus);
+			// 			alert(errorThrown);
+	  //      			}
+			// 	})
+			// 	// $.get(url,{'id':id},function(data){
+			// 	// 	alert(data);
+			// 	// })
+			// });
+
+			var width =(20*<?php echo $total ?>)+'%';
+			var total_num = <?php echo $total ?>;
+			if(total_num<=5){
+				width="100%";
+				var li_width = 100/total_num + '%';
+				$('.subbar ul li').css('width',li_width)
+			}
+			$('.subbar ul').css('width',width);
+			var mySwiper = new Swiper('.swiper-container', {
+				autoplay: 5000,//可选选项，自动滑动
+				pagination : '.swiper-pagination',
+				autoplayDisableOnInteraction:false,
+			})
+			//下拉刷新，上拉加载更多
+			
+			
+			
+			 $('.content').dropload({
+		        scrollArea : window,
+		      
+		       		 domDown : {
+		            domClass   : 'dropload-down',
+		            domRefresh : '<div class="dropload-refresh">↑上拉加载更多-自定义内容</div>',
+		            domLoad    : '<div class="dropload-load"><span class="loading"></span>加载中-自定义内容...</div>',
+		            domNoData  : '<div class="dropload-noData">暂无数据-自定义内容</div>'
+		        },
+		
+	       	         loadDownFn : function(me){
+	       	         	var id = $('li.active').data('id');
+	       	
+			            $.ajax({
+			                type: 'GET',
+			                url: more_url,
+			                dataType: 'json',
+			                data:{"id":id,'page': page},
+			                success: function(data){
+			                    page++;
+			                   	var result='';
+			                   	
+			                    for(var i = 0; i<data.length; i++){
+			            
+			                    	result +='<a href=" ' + data[i]['link'] + ' "><div class="item item-thumbnail-left"><img src=" ' + data[i].news_thumbnail + ' " ' + '><h2>'+ data[i].news_title +'</h2><p class="news_info"><i class="icon ion-ios-clock-outline">'+ data[i].news_date +'</i><i class="icon ion-ios-eye-outline">'+ data[i].news_count +'</i></div></a>';
+
+			                    };
+			                    switch(data.length){
+			                   	   case 0:
+			                   	    me.lock();
+		                            //无数据
+		                            me.noData();
+		                       
+			                   	   break;
+			                   	 
+
+			                   };
+			                 
+			                    // 为了测试，延迟1秒加载
+			                    setTimeout(function(){
+			                        $('.list').append(result);
+			                        // 每次数据加载完，必须重置
+			                        me.resetload();
+			                    },1000);
+			                },
+			                error: function(xhr, type){
+			                    alert('Ajax error!');
+			                    // 即使加载出错，也得重置
+			                    me.resetload();
+			                }
+			            });
+			        },
+			        threshold : 50
+			    });
+		})
+	</script>
+{template 'common/footer'}

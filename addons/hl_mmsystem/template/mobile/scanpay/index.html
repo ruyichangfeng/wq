@@ -1,0 +1,138 @@
+{template 'common/header'}
+<style>
+    body {
+        font-family: initial;
+        background-color: #ffffff;
+    }
+    .table {
+        border: 1px solid #cad9ea;
+        color: #666;
+    }
+
+    .table th {
+        background-repeat: repeat-x;
+        height: 20px;
+    }
+
+    .table td,
+    .table th {
+        border: 1px solid #cad9ea;
+        padding: 0 1em 0;
+    }
+
+    .table tr.alter {
+        background-color: #f5fafe;
+    }
+    .mui-control-content {
+        background-color: white;
+        min-height: 750px;
+    }
+    .mui-control-content .mui-loading {
+        margin-top: 50px;
+    }
+</style>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">单据流水</h1>
+</header>
+<body>
+<div class="mui-content">
+    <div id="slider" class="mui-slider">
+        <div style="padding: 10px 10px;">
+            <div id="segmentedControl" class="mui-segmented-control">
+                <a class="mui-control-item mui-active" href="#item1mobile">消费收银</a>
+                <a class="mui-control-item" href="#item2mobile">增次收费</a>
+            </div>
+        </div>
+        <div class="mui-slider-group">
+            <div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+                <div id="scroll1" class="mui-scroll-wrapper">
+                    <div class="mui-scroll">
+                        <ul class="mui-table-view">
+                            {loop $list $item}
+                            <li class="mui-table-view-cell mui-collapse" style="margin: 3%;background-color: #f5f5f5">
+                                <a >
+                                    <span class="vacation_title  mui-btn-danger mui-btn-outlined" style="font-weight:bold;float: left;">&nbsp;单据号：&nbsp;</span>&nbsp;{$item['sc_invoiceCode']}
+                                </a>
+                                <a class="mui-navigate-right"id="1"  href="" style="background-color: #f5f5f5">
+                                    <span class="vacation_title mui-btn-danger mui-btn-outlined" style="font-weight:bold">&nbsp;生成时间： </span>&nbsp;{php echo date('Y-m-d H:i', $item[sc_addTime]);}
+                                </a>
+                                <div class="mui-collapse-content" id="2">
+                                    <table width="100%" class="table" id="tablevalue">
+                                        <tr>
+                                            <th width=50%>消费方式</th>
+                                            <th width=50%>
+                                                {if $item['sc_consumeType'] == '积分兑换' || $item['sc_consumeType'] == '积分扣除'}
+                                                消耗积分
+                                                {elseif $item['sc_consumeType'] == '积分增加'}
+                                                收入积分
+                                                {elseif $item['sc_consumeType'] == '计次消费'}
+                                                计次消费
+                                                {else}
+                                                消费金额
+                                                {/if}
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td>{$item['sc_consumeType']}</td>
+                                            <td>{if $item['sc_consumeType'] == '积分兑换' || $item['sc_consumeType'] == '积分扣除'}
+                                                {$item['sc_pointPaymentCount']}积分
+                                                {elseif $item['sc_consumeType'] == '积分增加'}
+                                                {$item['sc_getPoint']}积分
+                                                {elseif $item['sc_consumeType'] == '计次消费'}
+                                                {$item['cid_consumeNumber']}次
+                                                {else}
+                                                {$item['sc_realMoneyCount']}元
+                                                {/if}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </li>
+                            {/loop}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="item2mobile" class="mui-slider-item mui-control-content">
+                <div id="scroll2" class="mui-scroll-wrapper">
+                    <div class="mui-scroll">
+                        <div class="mui-loading">
+                            <div class="mui-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mui.init({
+        swipeBack: false
+    });
+    (function($) {
+        $('.mui-scroll-wrapper').scroll({
+            indicators: true //是否显示滚动条
+        });
+        var html2 = '<ul class="mui-table-view">{loop $invoicelist $invoicelistitem}<li class="mui-table-view-cell mui-collapse" style="margin: 3%;background-color: #f5f5f5"> <a ><span class="vacation_title  mui-btn-danger mui-btn-outlined" style="font-weight:bold;float: left;">&nbsp;单据号：&nbsp;</span>&nbsp;{$invoicelistitem['mrci_invoiceCode']} </a><a class="mui-navigate-right"id="1"  href="" style="background-color: #f5f5f5"><span class="vacation_title mui-btn-danger mui-btn-outlined" style="font-weight:bold">&nbsp;生成时间： </span>&nbsp;{php echo date('Y-m-d H:i', $invoicelistitem[mrci_addTime]);} </a><div class="mui-collapse-content" id="2"><table width="100%" class="table" id="tablevalue"><tr><th width=50%>消费方式</th><th width=50%>消费金额</th></tr><tr><td>{$invoicelistitem['mrci_doStyle']}</td><td>{$invoicelistitem['mrci_realMoneyCount']}</td></tr></table></div></li>{/loop}</ul>';
+        var item2 = document.getElementById('item2mobile');
+        document.getElementById('slider').addEventListener('slide', function(e) {
+            if (e.detail.slideNumber === 1) {
+                if (item2.querySelector('.mui-loading')) {
+                    setTimeout(function() {
+                        item2.querySelector('.mui-scroll').innerHTML = html2;
+                    }, 500);
+                }
+            }
+        });
+        var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+        $('.mui-input-group').on('change', 'input', function() {
+            if (this.checked) {
+                sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+                sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+            }
+        });
+    })(mui);
+</script>
+</body>
+

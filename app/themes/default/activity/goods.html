@@ -1,0 +1,203 @@
+{php define('MUI', true);}
+{template 'common/header'}
+{if $do == 'display'}
+<div class="mui-content activity-exchange">
+	<div class="mui-table nav">
+		<a href="{php echo url('activity/coupon')}" class="mui-table-cell">
+			卡券
+		</a>
+		<a href="{php echo url('activity/goods')}" class="mui-table-cell mui-active">
+			实物
+		</a>
+	</div>
+	<div class="entity">
+		<div class="mui-row">
+			{loop $lists $row}
+			<div class="mui-col-xs-6">
+				<div class="mui-card mui-border-radius0 mui-mt10">
+					<div class="img-container"><img class="mui-card-img-top mui-border-radius0" src="{php echo tomedia($row['thumb'])}"></div>
+					<div class="mui-card-block">
+						<div class="mui-card-title mui-small">{$row['title']}</div>
+						<div class="mui-row exchange-action">
+							<div class="mui-col-xs-6 mui-text-info"><img src="resource/images/icon-signed.png" alt=""/><span>{$row['credit']}</span></div>
+							<div class="mui-col-xs-6 mui-text-right"><a href="{php echo url('activity/goods/deliver', array('id' => $row['id']))}" class="mui-badge mui-badge-blue">兑换 <span class="fa fa-angle-right"></span></a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{/loop}
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	require(['util'], function(u){
+		$('.con').click(function(){
+			var description = $(this).find('.derpn').text();
+			if (description.indexOf('<') >= 0) {
+				$(this).find('.derpn').html(description);
+			}
+			$(this).find('.derpn').slideToggle(500);
+		});
+
+		$('.use-token').click(function(){
+			var id = parseInt($(this).data('id'));
+			if(!id) {
+				return false;
+			}
+			$.post("{php echo url('activity/goods/post');}", {'id':id}, function(data) {
+				var data = $.parseJSON(data);
+				if(data.message.errno < 0) {
+					u.message(data.message.message, '', 'error');
+				} else {
+					u.message(data.message.message, "{php echo rtrim(url('activity/goods/deliver'), '&');}"+'&tid='+data.message.errno, 'success');
+				}
+				return false;
+			});
+		});
+	});
+</script>
+{elseif $do == 'deliver'}
+<div class="mui-content activity-entity-content">
+	<div class="img-container">
+		<img class="mui-card-img-top mui-border-radius0" src="{php echo tomedia($goods_info['thumb'])}"/>
+		<div class="title">{$goods_info['title']}</div>
+	</div>
+	<div class="mui-row mui-bg-white mui-pa10">
+		<div class="mui-col-xs-4">
+			<span class="fa fa-database"></span>
+			{$goods_info['credit']}
+		</div>
+		<div class="mui-col-xs-4 mui-text-muted">(剩余{$goods_info['reside']}件)</div>
+		<div class="mui-col-xs-4 mui-text-center"><a href="javascript:;" class="mui-btn mui-btn-green mui-btn-outlined js-address-info">{$is_exchange['name']}</a></div>
+	</div>
+	<div class="mui-content-padded">
+		<div class="mui-segmented-control mui-segmented-control-info">
+			<a class="mui-control-item mui-active" href="#exchange-info">兑换说明</a>
+			<a class="mui-control-item" href="#address-info">收货信息</a>
+		</div>
+	</div>
+	<div id="exchange-info" class="mui-control-content mui-active">
+		<div class="mui-bg-white mui-mt10 mui-pa10">
+			<div class="mui-big mui-mt10 mui-mb10">兑换说明</div>
+			<div class="mui-text-muted state">
+				<div>{$goods_info['exp_date']}</div>
+				<div>每人只可兑换{$goods_info['pretotal']}件此商品</div>
+			</div>
+			<div class="mui-big mui-mt10 mui-mb10">产品简介</div>
+			<div class="mui-text-muted introduction">{$goods_info['description']}</div>
+		</div>
+	</div>
+	<div id="address-info" class="mui-control-content">
+		<div class="mui-bg-white mui-mt10 mui-pa10">
+			<div class="mui-big mui-mt10 mui-mb10">收货信息</div>
+			<div class="state">
+				<label for="">收货人姓名:</label>
+				{php echo tpl_app_fans_form('username', $address_data['username'], '收货人姓名');}
+				<label for="">收货人电话:</label>
+				{php echo tpl_app_fans_form('mobile', $address_data['mobile'], '收货人电话');}
+				<label for="">收货人邮编:</label>
+				{php echo tpl_app_fans_form('zipcode', $address_data['zipcode'], '收货人邮编');}
+				<label>收货人地址:</label>
+				{php echo tpl_app_form_field_district('address',array('province' => $address_data['province'],'city' => $address_data['city'],'district' => $address_data['district']));}
+				{php echo tpl_app_fans_form('address[address]', $address_data['address'], '收货人地址');}
+			</div>
+			</div>
+			<div class="mui-content-padded">
+				{if $is_exchange['error'] == '1'}
+				<button class="mui-btn mui-btn-success mui-btn-block js-exchange" type="button" data-id="{$goods_info['id']}" data-tid="{$tid}">提交</button>
+				{elseif $is_exchange['error'] == '-1'}
+				<button class="mui-btn mui-btn-block mui-btn-danger">{$is_exchange['name']}</button>
+				{/if}
+			</div>
+		</div>
+		
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).on('click', '.js-address-info', function() {
+		$('#exchange-info').removeClass('mui-active');
+		$('#address-info').addClass('mui-active');
+		$('a[href="#exchange-info"]').removeClass('mui-active');
+		$('a[href="#address-info"]').addClass('mui-active');
+	});
+	$(document).on('click', '.js-exchange', function() {
+		$(this).addClass('mui-disabled');
+		username = $('input[name="username"]').val();
+		mobile = $('input[name="mobile"]').val();
+		zipcode = $('input[name="zipcode"]').val();
+		address_province = $('input[name="address[province]"]').val();
+		address_city = $('input[name="address[city]"]').val();
+		address_district = $('input[name="address[district]"]').val();
+		address_addr = $('input[name="address[address]"]').val();
+		type = "{$type}";
+		id = $(this).data('id');
+		tid = $(this).data('tid');
+		if (!(username && mobile && zipcode && address_province && address_city && address_district && address_addr)) {
+			util.toast('请填写收货人信息', '', 'error');
+			return;
+		}
+		if (type == 'edit') {
+			ajax_url = "{php echo url('activity/goods/deliver')}";
+		} else {
+			ajax_url = "{php echo url('activity/goods/post')}";
+		}
+		$.post(ajax_url, {'username' : username, 'mobile' : mobile, 'zipcode' : zipcode, 'address_province' : address_province, 'address_city' : address_city, 'address_district' : address_district, 'address_addr' : address_addr, 'id' : id, 'tid' : tid}, function(data) {
+			data = $.parseJSON(data);
+			if (data.message.errno < 0) {
+				util.toast(data.message.message, '', 'error');
+			} else {
+				util.toast(data.message.message, data.redirect, 'success');
+			}
+		});
+	});
+</script>
+{elseif $do == 'mine'} 
+<div class="mui-content activity-exchange">
+	<div class="entity">
+		<div class="mui-row">
+			{loop $lists $row}
+			{if ($row['status'] == '' || $row['status'] == 0)}
+			<a href="{php echo url('activity/goods/deliver', array('id' => $row['gid'], 'type' => 'edit', 'tid' => $row['tid']))}">
+			{/if}
+			<div class="mui-col-xs-6">
+				<div class="mui-card mui-border-radius0 mui-mt10">
+					<div class="img-container"><img class="mui-card-img-top mui-border-radius0" src="{php echo tomedia($row['thumb'])}"></div>
+					<div class="mui-card-block">
+						<div class="mui-card-title mui-small">{$row['title']}</div>
+						<div class="mui-row exchange-action">
+							<div class="mui-col-xs-12 mui-text-right">
+							{if $row['status'] == '1'}
+							<a href="javascript:;" class="mui-badge mui-badge-blue js-shipping-confirm" data-tid="{$row['tid']}">确认收货<span class="fa fa-angle-right"></span>
+							{elseif ($row['status'] == '' || $row['status'] == 0)}
+							<a href="{php echo url('activity/goods/deliver', array('id' => $row['gid'], 'type' => 'edit', 'tid' => $row['tid']))}" class="mui-badge mui-badge-blue">待发货<span class="fa fa-angle-right"></span>
+							{elseif $row['status'] == '2'}
+							<a href="javascript:;" class="mui-badge mui-badge-disabled">已完成<span class="fa fa-angle-right"></span>
+							{/if}
+							</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{if ($row['status'] == '' || $row['status'] == 0)}
+			</a>
+			{/if}
+			{/loop}
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).on('click', '.js-shipping-confirm', function() {
+		tid = $(this).data('tid');
+		$.post("{php echo url('activity/goods/confirm')}", {'tid' : tid}, function(data) {
+			data = $.parseJSON(data);
+			if (data.message.errno > 0) {
+				util.toast(data.message.message, data.redirect, 'success');
+			} else {
+				util.toast(data.message.message, '', 'error');
+			}
+		})
+	})
+</script>
+{/if}
+{template 'common/footer'}

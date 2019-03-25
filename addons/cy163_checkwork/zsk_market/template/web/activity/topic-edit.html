@@ -1,0 +1,98 @@
+{template 'public/header'}  
+<?php 
+ load()->func('tpl');
+?>
+
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('topic.listview');?>">专题管理</a></li>
+		  <?php if(intval($topic['id'])>0){?>
+		   <li class="active">{$topic['title']}</li>
+		  <?php }?>
+		  <li class="active"><?php if(intval($_GPC['tid'])>0){ echo '编辑专题';}else{
+		  	echo '添加专题';}?></li>
+		</ol></div>
+	<div class="panel-body">
+		<form class="form-horizontal" method="post" id="memForm"  action="<?php echo $this->routeUrl('topic.save');?>&tid={$_GPC['tid']}">
+		   <input type="hidden" name="gid" value="{$topic['id']}">
+		  <div class="form-group" style="margin-top:20px;">
+		    <label for="inputEmail3" class="col-sm-2 control-label">标题</label>
+		    <div class="col-sm-4">
+		      <input type="text" class="form-control" id="name" valid="length|1|50" name="title" placeholder="标题，20字以内" value="{$topic['title']}" valid-msg="标题不正确" >
+
+		    </div> 
+		    <label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*必填</label>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">封面缩略图片</label>
+		    <div class="col-sm-6">
+		      {php echo tpl_form_field_images('picture_cover',$topic['picture_cover']);}
+		    </div>
+		    <label   class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*建议尺寸比例2:1，大小500*250像素</label>
+		  </div>		     
+		  <div class="form-group" style="margin-top:20px;">
+		    <label for="inputEmail3" class="col-sm-2 control-label">商品编号</label>
+		    <div class="col-sm-6">
+		    	<div class="input-group">
+			      <input type="text" name="goodsnumber" id="goodsnumber" placeholder="输入商品编号，点击生成代码"   class="form-control" style="display: inline-block;" />
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button" onclick="getwxappcode()">生成</button> 
+			      </span>
+			    </div>  
+		    	<br/>
+		      <textarea  class="form-control" style="resize: none;word-break: break-all;" rows="4" readonly disabled id="codearea"> </textarea>
+
+		    </div> 
+		    <label for="inputEmail3" class="col-sm-2 control-label" style="color:orange;text-align: left;">&nbsp;*如果要在专题文章中插入商品链接，需要转换成小程序标签，复制代码粘贴到指定位置即可，可插入多个商品。</label>
+		  </div> 
+		   
+		  
+		  <div class="form-group">
+		    <label class="col-sm-2 control-label">专题内容</label>
+		    <div class="col-sm-6">
+		     {php echo tpl_ueditor('content',$topic['content']);}
+		    </div>
+		    
+		  </div> 
+		   
+		  <div class="form-group" style="text-align: center;"> 
+		     <div class="col-sm-6" style="text-align: center;">
+		        <button type="button" class="mybtn" style="margin:0 auto;" onclick="sub()">保存
+		      	</button>
+		    </div>
+		    
+		  </div>
+		   
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	function getwxappcode(){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('topic.getGoodsInfo');?>",
+			type:"post",
+			dataType:"json",
+			data:{number:$("#goodsnumber").val()},
+			success:function(goods){
+				var code="未找到商品";
+				console.log(goods)
+				if(parseInt(goods.id)>0){
+					code="<goods number='"+goods.number+"' style='color:red;font-weight:800;' src='"+goods.src+"'  name='"+goods.name+"'>【商品链接："+goods.name+"】</goods>";
+				
+				} 
+				$("#codearea").val(code);
+			}
+		});
+	}
+	function sub(){
+		if(valid_easy('form-control')){ 
+			modalDlg("是否继续？",function(){
+				$("#memForm").submit();
+			})
+			
+		}
+		 
+	}
+</script>
+{template 'public/footer'}

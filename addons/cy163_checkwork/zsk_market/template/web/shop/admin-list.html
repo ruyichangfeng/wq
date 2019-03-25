@@ -1,0 +1,82 @@
+{template 'public/header'} 
+<div>
+<div class="panel panel-info">
+	<div class="panel-heading" >微信管理员</div>
+	<div class="panel-body">
+		<div class="row form-row">
+		<p>扫码绑定：
+		<span style="color:#ff4444;">
+		<?php if(strlen($token)<50){ ?>
+			获取小程序码失败,{$tk['errmsg']}
+		<?php }else if(strlen($qrcode['base64'])<50){?>
+			获取小程序码失败,{$qrcode['errmsg']}
+		<?php } ?>
+		</span>
+		</p>
+			<img src="{$qrcode['base64']}" style="width:180px;height: 180px;">;
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 100px;">昵称</th> 
+					<th style="width: 120px;">地区</th>
+					<th style="width: 100px;">头像</th> 
+					<th style="width: 100px;">性别</th> 
+					<th style="width: 100px;">上次登录</th> 
+					<th style="width: 100px;">操作</th>  
+				</tr> 
+			</thead>
+			<tbody>
+				{loop $memberlist $index $item}
+				<tr>
+					<td>{$item['nickname']}</td> 
+					<td>{$item['city']} </td>
+					<td><img src="{$item['avatar']}" style="width: 50px;height: 50px;"> </td>
+					<td> <?php if(intval($item['gender'])==1){ echo "男";}else if(intval($item['gender'])==2){ echo "女";}else{ echo "<span style='color:#ccc;'>未设置</span>";}?></td>
+					<td> {$item['lastlogin']}</td> 
+					<td>
+						<a href="javascript:void(0);" class="linkbtn"  onclick="memCart()" title="开发中。。。" style="
+						display: none;">购物车</a>
+						<?php if(intval($item['adminshopid'])<=0){?>
+							<a href="javascript:void(0);" class="linkbtn" onclick="bindAdmin('{$item['openid']}','{$item['nickname']}',1)">设为商户</a>
+						<?php }else if(intval($item['adminshopid'])==getShopID()){ ?>
+							<a href="javascript:void(0);" class="linkbtn linkbtn-red" onclick="bindAdmin('{$item['openid']}','{$item['nickname']}',0)">取消商户</a>
+						<?php }else{ ?>
+						<a href="javascript:void(0);" class="linkbtn linkbtn-gray"  >其他商户</a>
+					 <?php }?>
+						
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="6" align="center">
+						{template 'public/pagenation'}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</div>
+
+ 
+</div> 
+<script type="text/javascript">
+
+	function memCart(){
+		modalMsg("功能还在开发中。。。")
+	}
+	function bindAdmin(openid,nickname,sts){
+		if(sts>0){
+			modalDlg("是否将 "+nickname+" 设置为当前店铺的管理员<br/>每个微信用户只能绑定一个店铺",function(){
+			window.location.href="<?php echo $this->routeUrl('member.setMemberAdmin');?>&openid="+openid+"&sts="+sts;
+			});
+		}else{
+			modalDlg("是否取消 "+nickname+" 的商户管理员权限",function(){
+			window.location.href="<?php echo $this->routeUrl('shop.setMemberAdmin');?>&openid="+openid+"&sts="+sts;
+			});
+		}
+		
+	}
+</script>
+{template 'public/footer'}

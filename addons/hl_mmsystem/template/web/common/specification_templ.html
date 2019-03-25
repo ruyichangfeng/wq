@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消费收银</title>
+</head>
+<body>
+{loop $specificationjson $specificationjsonloop}
+<li style="margin-top: 3px; width: 100%;"><button type="button" onclick="specificationadd({title:'{$specificationjsonloop['specification_title']}',goodsid:'{$params['goodsid']}',optype:'{$params['optype']}',consumeNum:'{$params['consumeNum']}',memberCardNum:'{$params['memberCardNum']}',memberId:'{$params['memberId']}'})" class="btn btn-w-m btn-success">规格:{$specificationjsonloop['specification_title']}--编码:{$specificationjsonloop['specification_code']}--条码:{$specificationjsonloop['specification_barcode']}--价格:{$specificationjsonloop['specification_price']}--库存:{$specificationjsonloop['specification_stock']}</button></li>
+{/loop}
+<input type="hidden" id="consumehangupid" name="consumehangupid" value="{php echo $consumehangupid}"/>
+<script>
+
+    function specificationadd(x) {
+        var consumehangupid = $("#consumehangupid").val();
+       var params = {
+           'goodsid': x.goodsid,
+           'consumehangupid': consumehangupid,
+           'optype':x.optype,
+           'consumeNum': x.consumeNum,
+           'memberCardNum':x.memberCardNum,
+           'memberId':x.memberId,
+           'operatingtype':'operatingspecification',
+
+       };
+        $('body').find('.flavr-container').each(function() {
+            var a = $(this).data('flavr').instance;
+            a.close()
+        });
+
+        var url = "{php echo $this->createWebUrl('UpdateConsumeNumOfGoods', array('storeid' => $storeid))}&goo_specification="+x.title;
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if(data['message']['code'] != 0){
+                    swal({
+                        title: "操作有误",
+                        text: data['message']['msg'],
+                        type: "error",
+                    });
+                    return;
+                }
+                else {
+                    $('#consumeCartBody').html(data['message']['cart']);
+                    $('#carttotalprice').html('<i class="fa fa-rmb"></i> '+ parseFloat(data['message']['totalprice'])+ ' 元');
+                    $('#carttotalcount').html('<i class="fa fa-database"></i> '+ data['message']['totalcount']+' 件');
+                    $('#carttotalintegral').html('<i class="label label-info"></i> '+ data['message']['discountgive']+' 积分');
+                    //discountgive = "<i class='label label-info'></i> "+ data['message']['discountgive']+" 积分";
+
+                    $("#hidde_carttotalintegral").attr("value",data['message']['discountgive']);
+                    $("#hidde_carttotalcount").attr("value",data['message']['totalcount']);
+                    $("#hidde_carttotalprice").attr("value",data['message']['totalprice']);
+                    $("#handleMoneyCount").attr("value",data['message']['totalprice']);
+                    $("#realMoneyCount").attr("value",data['message']['totalprice']);
+                    $("#hidden_realMoneyCount").attr("value",data['message']['totalprice']);
+                    $('#consumeCart').bootstrapTable('resetView');
+                    //alert(data['message']['msg']);
+                    doSelectBtn();
+                    btnYesOrNoHangUp();
+                }
+            }
+        });
+    }
+</script>
+</body>
+
+</html>

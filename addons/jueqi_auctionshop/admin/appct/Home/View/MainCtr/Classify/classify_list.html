@@ -1,0 +1,107 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>商品管理</cite></a>
+          <a><cite>分类管理</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    
+    <ul id="demo"></ul>
+    
+    <div class="x-body">
+        <xblock>
+            <button class="layui-btn" onclick="classify_add('添加分类','{:U('Home/MainCtr/Classify/classify_add')}','600','420')"><i class="layui-icon">&#xe608;</i>添加</button>
+       </xblock>
+       
+     <form id="delform">
+       <table class="layui-table">
+	        <thead>
+	            <tr>
+	                <th>ID</th>
+	                <th>分类名称 </th> 
+	              <!--  <th>分类图片</th>-->
+	                <th>序号</th>
+	                <th>所属分类</th>
+	                <th>操作</th>
+	            </tr>
+	        </thead>
+            <tbody id="formdata">
+              <volist name="list" id="v">	
+                <tr>
+                    <td>{$v.id}</td>
+                    <td ><u style="cursor:pointer" onclick="toGoods('{$v.name}')">{$v.name}</u></td>
+                  <!--  <td><img src="__ROOT__/Uploads/{$v.classify_img}"></td>-->
+                    <td >{$v.rank}</td>
+                    <td>{$v.classify_name}</td>
+                    <td class="td-manage">
+                    	
+                        <a title="编辑" href="javascript:;" onclick="classify_edit('编辑','{:U('Home/MainCtr/Classify/classify_add',array('id'=>$v['id']))}','4','660','420')"  class="ml-5" style="text-decoration:none">
+                        	<i class="layui-icon">&#xe642;</i>
+                        </a>
+                        <a title="删除" href="javascript:;" onclick="classify_del('{$v.id}')"  style="text-decoration:none">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+                        
+                    </td>
+                </tr>
+              </volist>  
+            </tbody>
+           </table>
+        </form>
+    </div>
+    
+    
+     <include file="Public/footer.html"/>
+     
+     <script>
+     	
+        layui.use(['element','layer'], function(){
+          var layer = layui.layer;//弹出层
+          $ = layui.jquery; 
+        });
+        
+        function toGoods(name){
+        	parent.$("#togoods").click();
+        	var $purl = "{:U('Home/MainCtr/Goods/goods_list',array('cly_name'=>'classify_name'))}"
+        	parent.$(".ttogoods").attr('src',$purl.replace('classify_name',name));
+        }
+        
+        function classify_add(title,url,w,h){
+            x_admin_edit(title,url,w,h);
+        }
+        
+        function classify_edit (title,url,id,w,h) {
+            x_admin_edit(title,url,w,h); 
+        }
+        
+        function classify_del(id){
+		   var par = {"id":id};
+			layer.confirm('确认要删除吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Classify/classify_del')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('删除成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('删除失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+        
+        
+        
+ </script>
+      
+   
+</body>
+</html>

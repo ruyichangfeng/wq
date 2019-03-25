@@ -1,0 +1,113 @@
+{template 'header'}
+<div id="settings">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">个人资料</h1>
+    </div>
+    <div class="mui-content">
+        <form class="mui-input-group">
+            <div class="mui-input-row head">
+                <label>头像</label>
+                <span class="head"><img class="head-img mui-action-preview" id="head-img1" src="{$_W['fans']['tag']['avatar']}"/></span>
+            </div>
+            <div class="mui-input-row">
+                <label>昵称</label>
+                <input class="mui-input-clear" type="text" placeholder="您的昵称" value="{$_W['fans']['tag']['nickname']}" disabled />
+            </div>
+            <div class="mui-input-row">
+                <label>姓名</label>
+                <input class="mui-input-clear" type="text" name="fullName" placeholder="您的真实姓名" />
+            </div>
+            <div class="mui-input-row">
+                <label>手机号</label>
+                <input class="mui-input-clear" type="text" name="mobile" style="width:40%;float:left;" />
+                <a href="javascript:;" class="mui-btn mui-btn-outlined mui-pull-right btn-yzm">验证码</a>
+            </div>
+            <div class="mui-input-row">
+                <label>验证码</label>
+                <input class="mui-input-clear" type="text" name="captcha" placeholder="开发期：123456" value="" />
+            </div>
+            <div class="mui-input-row">
+                <label>性别</label>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>男</label>
+                <input name="gender" type="radio" value="1">
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>女</label>
+                <input name="gender" type="radio" value="0" checked>
+            </div>
+
+            <div class="jiazhang-settings-save">
+                <button type="button" id="but" class="mui-btn mui-btn-success mui-btn-block btn-save">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("button").click(function () {
+            var fullName = $("input[name='fullName']").val();
+            var mobile = $("input[name='mobile']").val();
+            var captcha = $("input[name='captcha']").val();
+            var gender = $("input[name='gender']:checked").val();
+
+            if (fullName == "") {
+                mui.alert("请输入您的姓名"); return;
+            }
+
+            if (mobile)
+            {
+                //验证手机号格式
+                var reg = /(1[3-9]\d{9}$)/;
+                if(!reg.test(mobile))
+                {
+                    mui.alert("请输入正确的手机号码"); return;
+                }
+            }
+            else
+            {
+                mui.alert("请输入手机号码"); return;
+            }
+
+            if (captcha == "") {
+                mui.alert("请输入验证码"); return;
+            }
+
+            $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'ajax_mobile_one')) ?>", {
+                mobile: mobile
+            }, function (response) {
+                if (response.status == 'success')
+                {
+                    $('#but').attr("disabled",'disabled');
+                    $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'postSettings')) ?>", {
+                        fullName: fullName,
+                        mobile: mobile,
+                        captcha: captcha,
+                        gender: gender
+                    }, function (response) {
+                        if (response.status == 'success')
+                        {
+                            mui.alert('资料完善成功', function () {
+                                window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'tiao')) ?>";
+                            });
+                        }
+                        else
+                        {
+                            mui.alert('资料完善失败，请重试！');
+                            $('#but').removeAttr("disabled");
+                        }
+                    }, "json");
+                }
+                else
+                {
+                    mui.alert('此手机号已被注册!');
+                }
+            }, "json");
+        });
+    });
+</script>
+{template 'footer'}

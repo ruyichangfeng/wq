@@ -1,0 +1,107 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('visitlog', array('op'=>'display'));}">回访记录</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" >回访员工</label>
+                            <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="text" class="form-control" name="search[staff_name]" value="{$search['staff_name']}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" >回访客户</label>
+                            <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="text" class="form-control" name="search[archive_name]" value="{$search['archive_name']}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">回访列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" >
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width: 10%">序号</th>
+                        <th style="width: 10%">客户</th>
+                        <th style="width: 10%">员工</th>
+                        <th style="width: 30%">内容</th>
+                        <th style="width: 20%">时间</th>
+                        <th style="width: 20%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = ($pindex - 1) * $psize + 1;}
+                    {loop $visitlogs $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['archive_name']}</td>
+                        <td>{$item['staff_name']}</td>
+                        <td><p style="line-height: 20px; height: 40px; overflow-y: hidden">{$item['visitlog_content']}</p></td>
+                        <td>{$item['visitlog_time_add']}</td>
+                        <td>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('visitlog', array('op'=>'delete', 'id'=>$item['visitlog_id']))}">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($visitlogs)}
+                    <tr>
+                        <td colspan="6">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="6">
+                            暂无回访记录
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+</script>
+{template 'common/footer'}

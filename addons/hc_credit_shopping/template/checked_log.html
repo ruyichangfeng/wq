@@ -1,0 +1,50 @@
+{template 'common/header'}
+{template 'common'}
+<ul class="nav nav-tabs">
+	<li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('Checked_log')}">已核销</a></li>
+	<li {if $op == 'unchecked'}class="active"{/if}><a href="{php echo $this->createWebUrl('Checked_log', array('op'=>'unchecked'))}">未核销</a></li>
+</ul>
+<div class="main panel panel-default">
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th>姓名</th>
+					<th>电话</th>
+					<th>商品名称</th>
+					<th>购买数量</th>
+					<th>购买时间</th>
+					{if $op=='display'}<th>核销时间</th>{/if}
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $adv}
+				<tr>
+					<td>{$addr['realname'][$adv['addressid']]}</td>
+					<td>{$addr['mobile'][$adv['addressid']]}</td>
+					<td>{$good[$adv['goodsid']]}</td>
+					<td>{$adv['total']}</td>
+					<td>{php echo date('Y-m-d H:i:s',$adv['createtime'])}</td>
+					{if $op=='display'}<td>{php echo date('Y-m-d H:i:s',$adv['checkedtime'])}</td>{/if}
+					<td>
+						<a href="{php echo $this->createWebUrl('goods', array('op' => 'post', 'id' => $adv['goodsid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="商品">商品</a>
+						<a href="{php echo $this->createWebUrl('order', array('op' => 'detail', 'id' => $adv['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="订单">订单</a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+	});
+</script>
+{template 'common/footer'}

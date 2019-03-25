@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-title" content="xx">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>{$activity['name']}</title>
+    <link rel="stylesheet" href="{STATIC_ROOT}/css/style.css">
+    <style>
+        .share-to-friend {
+            width: 160px;
+            height: 30px;
+            background: #ffdc63;
+            border-radius: 15px;
+            line-height: 30px;
+            text-align: center;
+            color: red;
+            font-size: 16px;
+        }
+        a{
+            text-decoration: none;
+        }
+        </style>
+</head>
+<body style="background:{$activity['background_color']};">
+
+{template 'public/footer_nav'}
+
+
+<div class="call">
+
+    <div class="banner">
+        <img src="{$_W['attachurl']}{$activity['background_image']}" alt="">
+        <?php if($user_prize){?>
+        <div class="marquee">
+            <marquee direction=up  scrolldelay="10" scrollamount="1" loop="-1" behavior="scroll" hspace="20" vspace="10"  width="100%" height="34px">
+                <?php foreach($user_prize as $u){?>
+                <p>{$u['user']['nickname']}<span>获得</span>{$u['prize']['name']}</p>
+                <?php }?>
+            </marquee>
+        </div>
+        <?php } ?>
+    </div>
+    <?php if($user){?>
+    <div class="click-area call-user" data-id="{$user['id']}">
+			<span class="icon-eye">
+				<img src="{STATIC_ROOT}/img/icon.png" alt="">
+			</span>
+        <span class="num user-<?php echo (int)$activity_user['uid'];?>"><?php echo (int)$activity_user['times'];?></span>
+        <span class="header">
+				<img src="{$user['headimgurl']}" alt="">
+			</span>
+    </div>
+
+    <p class="info">
+        <span>{$user['nickname']} </span><br>
+        为TA抛了一个媚眼...
+    </p>
+
+    <div class="f-list">
+        <ul id="f-list">
+        </ul>
+        <div class="look-more" id="look-more">为TA打call的人</div>
+    </div>
+    <?php } ?>
+
+    <?php if($user_info){?>
+    <div class="f-list">
+        <div class="look-more share-to-friend">
+            <a style="color: #fff;" href="{php echo $this->createMobileUrl('index',['id' => $activity['id'],'uuid' => $user_info['id']])}">我也要参加</a><br>
+        </div>
+    </div>
+</div>
+    <?php } ?>
+    <ul class="exchange-area">
+        <?php foreach($prize as $p){?>
+        <li>
+            <img src="{$_W['attachurl']}{$p['logo']}" alt="">
+            <div class="exchange-btn" data-id="<?php echo $p['id'];?>" data-need="<?php echo $p['need_call'];?>">
+                <p>兑换</p>
+                <div>
+                    <img src="{STATIC_ROOT}/img/icon.png" alt="">
+                    <?php echo $p['need_call'];?>
+                </div>
+            </div>
+        </li>
+        <?php } ?>
+    </ul>
+    <div class="rank-logo"></div>
+    <ul class="ranklist" id="ranklist">
+
+    </ul>
+</div>
+
+<div class="hd-rec brief-title">活动介绍</div>
+<div class="hd-rec" style="top:220px;"><a style="color: #ffe26e;" href="{php echo $this->createMobileUrl('my')}">个人中心</a></div>
+
+<!-- pop-mask -->
+<div class="mask"></div>
+<!-- pop-1 -->
+<div class="pop-1">
+    <img class="friend-pic" src="{$user['headimgurl']}" alt="">
+    <img class="pop-icon-e" src="{STATIC_ROOT}/img/icon.png" alt="">
+    <button class="pop-btn" id="call-btn">抛个媚眼</button>
+</div>
+<!-- pop-2 -->
+<div class="pop-2">
+    <p class="pop-tit">温馨提示</p>
+    <p class="pop-txt" id="notice-msg">人气不足 继续加油</p>
+    <button class="pop-btn">确定</button>
+</div>
+
+
+<!-- 活动结束pop -->
+<div class="pop-rec">
+    <div class="pop-rec-close"></div>
+    <div class="rec-name"></div>
+    <!--<p class="rec-tit">【活动时间】&emsp;2018年05月15日-5月24日</p>-->
+    <!--<p class="rec-tit">【活动方式】</p>-->
+    <!--<p class="rec-txt">兼容众多浏览器兼容众多浏览器兼容众多浏览器兼容众多浏览器兼容众多浏览器</p>-->
+    <!--<p class="rec-tit">【奖项设置】</p>-->
+    <!--<p class="rec-txt">-->
+        <!--1.兼容众多浏览器<br>-->
+        <!--2.兼容众多浏览器兼容众<br>-->
+        <!--3.多浏览器兼容众多浏览器兼容众多浏览器</p>-->
+    <!--<p class="rec-tit">【联系我们】</p>-->
+    <!--<p class="rec-txt">-->
+        <!--地址：多浏览器兼容众多浏览器兼容众多浏览器兼容众多浏览器-->
+        <!--电话：132333333333-->
+    <!--</p>-->
+    <p class="rec-txt"><?php
+    $brief = str_replace("\r\n","<br>",$activity['brief']);
+        echo str_replace("\n","<br>",$brief);
+        ?></p>
+</div>
+
+</body>
+<script src="{STATIC_ROOT}/js/jquery.js"></script>
+<script src="{STATIC_ROOT}/js/template.min.js"></script>
+{template 'public/more_new'}
+<script id="tpl-rank" type="text/html">
+    <%for(var i in list){%>
+    <li class="rank-detail" data-id="<%=list[i].uid%>">
+        <%if(list[i].rank > 3){%>
+        <i class="rank-num <%=list[i].class%>"><%=list[i].rank%></i>
+        <%}else{%>
+        <i class="rank-num <%=list[i].class%>"></i>
+        <%}%>
+        <img class="head-img" src="<%=list[i].headimgurl%>" alt="">
+        <span><%=list[i].nickname%></span>
+        <img src="{STATIC_ROOT}/img/icon.png" alt="" class="icon-e">
+        <em class="user-<%=list[i].uid%>"><%=list[i].times%></em>
+    </li>
+    <%}%>
+</script>
+<script id="tpl-user" type="text/html">
+    <%for(var i in list){%>
+    <li><img src="<%=list[i].headimgurl%>" alt=""></li>
+    <%}%>
+</script>
+<script>
+    $(function(){
+        var activity_id = "{$activity['id']}";
+        var call_url = "{php echo $this->createMobileUrl('index',['op' => 'post'])}";
+        var uuid = "{$user['id']}";
+        var usrc = "{$user['headimgurl']}";
+        // 查看更多
+        var lookMore = $('#look-more')
+
+            $('.f-list ul').toggleClass('active')
+
+
+
+        // 打call
+        $('.call-user').click(function(){
+            $('.mask').addClass('active')
+            $('.pop-1').addClass('active');
+            uuid = $(this).attr('data-id');
+            $('.friend-pic').attr('src',usrc);
+        })
+
+        // 确定打call
+        $('#call-btn').click(function(){
+            $('.mask').removeClass('active');
+            $('.pop-1').removeClass('active');
+
+            $.get(call_url,{activity_id:activity_id,uuid:uuid},function (data) {
+                if(data.code!=200) {
+                    $('.mask').addClass('active');
+                    $('.pop-2').addClass('active');
+                    $('#notice-msg').html(data.msg);
+                }else {
+                    showNotice('抛媚眼成功');
+                    var t1 = parseInt($('.user-'+uuid).html());
+                    $('.user-'+uuid).html(t1+1);
+                }
+            },'JSON');
+        });
+        $('.pop-btn').click(function () {
+            $(this).parent().removeClass('active');
+            $('.mask').removeClass('active');
+        });
+
+        // 打开活动结束
+        $('.brief-title').click(function(){
+            $('.mask').addClass('active')
+            $('.pop-rec').addClass('active')
+        })
+
+        // 关闭活动结束弹窗
+        $('.pop-rec-close').click(function(){
+            $('.mask').removeClass('active')
+            $('.pop-rec').removeClass('active')
+        })
+
+        var url_prize = "{php echo $this->createMobileUrl('index',['op' => 'prize','activity_id' => $activity['id']])}";
+        // 兑奖按钮
+        $('.exchange-btn').click(function(){
+
+            var prize_id = $(this).attr('data-id');
+
+            confirmNotice('确定兑换次奖品？','所需点数：'+$(this).attr('data-need'),function () {
+                $.get(url_prize,{prize_id:prize_id},function (data) {
+                    $('.mask').addClass('active');
+                    $('.pop-2').addClass('active');
+                    $('#notice-msg').html(data.msg);
+                },'JSON');
+            });
+
+
+        });
+        var url = "{php echo $this->createMobileUrl('index',['op' => 'morerank','activity_id' => $activity['id'],'uuid' => $user['id']])}";
+        initLoadingData_new(true, url, 1, $('#tpl-rank').html(), 'ranklist');
+
+        var url_user = "{php echo $this->createMobileUrl('index',['op' => 'moreuser','activity_id' => $activity['id'],'uuid' => $user['id']])}";
+//
+        $.get(url_user,{},function (data) {
+            data = data.data;
+            var html = template($('#tpl-user').html(), data);
+            $('#f-list').append(html);
+        },'JSON');
+
+        $('#ranklist').delegate(".rank-detail", "click", function() {
+            var dom_in = $(this);
+            uuid = dom_in.attr('data-id');
+            var imgsrc = dom_in.find('.head-img').attr('src');
+            $('.mask').addClass('active')
+            $('.pop-1').addClass('active');
+            $('.friend-pic').attr('src',imgsrc);
+        });
+    })
+</script>
+{template 'public/share'}
+{template 'public/fast_menu'}
+</html>

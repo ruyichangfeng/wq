@@ -1,0 +1,222 @@
+{template 'common/header'}
+
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+</style>
+<ul class="nav nav-tabs">
+{template 'config_header'}
+	
+</ul>
+<div class="main">
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+    	<input type="hidden" name="id" value="{$srdb['id']}" />
+		<input type="hidden" name="idd" value="{$idd}" />
+		{$showurl}
+        <div class="panel panel-default">
+            <div class="panel-heading">全局设置</div>
+            <div class="panel-body">
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">站点名称</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="webtitle" id="" type="text" value="{$srdb['webtitle']}">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">底部版权</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<textarea style="height:80px;" class="form-control" name="copyright" cols="70" id="reply-add-text">{$srdb['copyright']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">系统授权码</label>
+                    <div class="col-xs-12 col-sm-9" >{if $keyok=='1'}<font color="#FF0000">√ 您使用的是正版系统</font><input class="form-control" name="mbid100" id="" type="hidden" value="{$srdb['mbid100']}">
+						{else}<input class="form-control" name="mbid100" id="" type="text" value=""  placeholder="请联系开发者，获取您的授权码">{/if}
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">微信公众号二维码</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_form_field_image('qrcode', $srdb['qrcode'])}
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">微信公众号代码标识</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="gzh_logo" id="" type="text" value="{$srdb['gzh_logo']}">
+						<span style="float:left; margin-top:10px;">（前台一键关注公众号需要的公众号代码标识，<a href="{php echo $this->createWebUrl('tutorial_show');}" >查找代码标识教程</a>）</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">会员中心邀请好友开关</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">
+							<input type="radio" name="invite_open" value="0" {if $srdb[invite_open]=='0'}checked{/if}/>开&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="invite_open" value="1" {if $srdb[invite_open]=='1'}checked{/if}/>关
+						</p>
+                    </div>
+                </div>
+            </div>
+			
+			<div class="panel-heading">
+				<strong style="font-size:16px;">模板消息设置</strong>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">模板消息开启</label>
+                    <div class="col-xs-12 col-sm-9">
+						<p class="form-control-static">
+						<input type="radio" name="mb_open" value="0" {if $srdb[mb_open]=='0'}checked{/if}/>关&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="radio" name="mb_open" value="1" {if $srdb[mb_open]=='1'}checked{/if}/>开
+						<span style="color:#999999; ">&nbsp;&nbsp;&nbsp;&nbsp;请在“微信公众平台”选择行业为：“IT科技 — 互联网|电子商务”</span>
+						</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">缴费提醒</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="mbid1" id="" type="text" value="{$srdb['mbid1']}">
+						<span style="color:#999999; ">添加标题为：“缴费提醒”，编号为：“OPENTM401887512”的模板</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付成功通知</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="mbid2" id="" type="text" value="{$srdb['mbid2']}">
+						<span style="color:#999999; ">添加标题为：“支付成功通知”，编号为：“OPENTM400231951”的模板</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务进度提醒</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="mbid3" id="" type="text" value="{$srdb['mbid3']}">
+						<span style="color:#999999; ">添加标题为：“服务进度提醒”，编号为：“OPENTM401306909”的模板</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">新订单通知</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="mbid4" id="" type="text" value="{$srdb['mbid4']}">
+						<span style="color:#999999; ">添加标题为：“新订单通知”，编号为：“TM00351”的模板</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">接单提醒</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="mbid5" id="" type="text" value="{$srdb['mbid5']}">
+						<span style="color:#999999; ">添加标题为：“接单提醒”，编号为：“OPENTM205704706”的模板</span>
+                    </div>
+                </div>
+			</div>
+			
+			<div class="panel-heading">
+				<strong style="font-size:16px;">会员服务设置</strong>
+			</div>
+            <div class="panel-body">
+			
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务月费(元/月)</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="month_money" id="" type="text" value="{$srdb['month_money']}" onkeyup="value=value.replace(/[^\d.]/g,'')" style="width:100px;">  
+						<span style=" color:#666666; margin-top:15px;">该服务费只是针对购买成为正式会员的，默认期限一个月，之后服务费根据情况再对具体客户设定服务费。</span>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务介绍</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_ueditor('fw_message', $srdb['fw_message']);}
+                    </div>
+                </div>
+				
+            </div>
+			
+			<div class="panel-heading">
+				<strong style="font-size:16px;">服务费用优惠设置</strong>
+				<p style=" color:#CC0000;">如：打9折，者输入0.9。对应客户续交服务费能用。</p>
+			</div>
+            <div class="panel-body">
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">一个月</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="cost_youhui1" id="" type="text" value="{$srdb['cost_youhui1']}" style="width:100px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">三个月</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="cost_youhui2" id="" type="text" value="{$srdb['cost_youhui2']}" style="width:100px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">半年</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="cost_youhui3" id="" type="text" value="{$srdb['cost_youhui3']}" style="width:100px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">一年</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="cost_youhui4" id="" type="text" value="{$srdb['cost_youhui4']}" style="width:100px;">
+                    </div>
+                </div>
+				
+            </div>
+			
+			<div class="panel-heading">
+				<strong style="font-size:16px;">短信平台接口设置</strong>
+				<p style="color:#666666;">请正确填写 用户名 与 密码，如果还没有请 <a href="http://www.ihuyi.com/" target="_blank">点击此处</a> 申请。</p>
+			</div>
+            <div class="panel-body">
+				
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">开启</label>
+					<div class="col-sm-10">
+					  <p class="form-control-static">
+						  <input type="radio" name="sms_open" value="0" {if $srdb[sms_open]=='0'}checked{/if}/>&nbsp;关&nbsp;&nbsp;&nbsp;&nbsp;
+						  <input type="radio" name="sms_open" value="1" {if $srdb[sms_open]=='1'}checked{/if}/>&nbsp;开
+					  </p>
+					</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">APIID</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="sms_name" id="" type="text" value="{$srdb['sms_name']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">APIKEY</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="sms_password" id="" type="password" value="{$srdb['sms_password']}">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">参数获取示意图</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<img src="../addons/{$_GPC['m']}/template/sem_img.png" style="max-width:100%;"/>
+                    </div>
+                </div>
+				
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			{if $srdb}
+			<input type="submit" name="edit_submit" value="保存" class="btn btn-primary col-lg-1" />
+			{else}
+			<input type="submit" name="add_submit" value="保存" class="btn btn-primary col-lg-1" />
+			{/if}
+		</div>
+  </form>
+</div>
+
+
+{template 'common/footer'}

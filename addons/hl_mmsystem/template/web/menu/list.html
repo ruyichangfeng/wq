@@ -1,0 +1,107 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>系统菜单管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('menu')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <a href="{php echo $this->createWebUrl('menu', array('op' => 'add'));}" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>添加系统菜单</a>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="90px">显示顺序</th>
+                                <th>菜单名称</th>
+                                <th>菜单控制器</th>
+                                <th>菜单操作</th>
+                                <th>菜单行为</th>
+                                <th>菜单类别</th>
+                                <th>菜单状态</th>
+                                <th>菜单URL</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $key $row}
+                            {if $row}
+                            <tr>
+                                <td>
+                                    {$row['men_displayorder']}
+                                </td>
+                                <td><i class="fa fa-plus-square" style="color: #02a2b4"></i>&nbsp;&nbsp;{$row['men_title']}</td>
+                                <td>{$row['men_controller']}</td>
+                                <td>{$row['men_action']}</td>
+                                <td>{$row['men_do']}</td>
+                                <td>{if $row['men_class']==1}管理类型{else}设置类型{/if}</td>
+                                <td><input type="checkbox" name="status" data="{$row['men_status']}" data-id="{$row['id']}" class="js-switch_{$row['id']}" {if $row['men_status'] == 1 }checked="checked"{/if}></td>
+                                <td>{if $row['men_url']=='#'}{else}<button type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="{$row['men_url']}">{$row['men_url']}</button>{/if}</td>
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('menu', array('op' => 'add', 'id'=>$row['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('menu',array('op'=>'delete','id'=>$row['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {if $children[$row['id']]}
+                            {loop $children[$row['id']] $k $item}
+                            {if $item}
+                            <tr>
+                                <td>
+                                    {$item['men_displayorder']}
+                                </td>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-minus-square" style="color: #04adff"></i>&nbsp;&nbsp;{$item['men_title']}</td>
+                                <td>{$item['men_controller']}</td>
+                                <td>{$item['men_action']}</td>
+                                <td>{$item['men_do']}</td>
+                                <td>{if $item['men_class']==1}管理类型{else}设置类型{/if}</td>
+                                <td><input type="checkbox" name="status" data="{$item['men_status']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['men_status'] == 1 }checked="checked"{/if}></td>
+                                <td>{if $item['men_url']=='#'}{else}<button type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="{$item['men_url']}">查看URL</button>{/if}</td>
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('menu', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('menu',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {/if}
+                            {/loop}
+                            {/if}
+                            {/if}
+                            {/loop}
+                            </tbody>
+                        </table>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var id = $this.attr('data-id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('menu')}",{id:id,status:status},function () {
+            })
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+
+</script>
+{template 'web/common/footer'}

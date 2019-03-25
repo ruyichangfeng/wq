@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {template 'web/header'}
+</head>
+<body class="layui-layout-body">
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+      <a href="{php echo $this->createWebUrl('center')}">会员列表</a>
+    </div>
+{if $op == 'list'}
+	<script>
+    function  createcode($id,$ermurl){
+        $('#erm'+$id).qrcode({
+            render: "canvas", 
+            width: 100,
+            height: 100, 
+            text	: $ermurl
+        });
+    }
+    </script>
+    <table class="layui-table">
+      <thead>
+        <tr>
+          <th style="width:150px; text-align:center;">店面名称</th>
+          <th style="width:130px;text-align:center;">付款二维码</th>
+          <th style="text-align:center;">关注二维码</th>
+          <th style="text-align:center;">负责人</th>
+          <th style="text-align:center;">会员数</th>
+          <th style="text-align:center;">充值总额</th>
+          <th style="text-align:center;">消费总额</th>
+          <th  style="text-align:center;">添加时间</th>
+		  <th  style="text-align:center;">操作</th>
+        </tr> 
+      </thead>
+      <tbody>
+        {loop $tags $tag}
+        <tr>
+          <td>{if $tag["thumb"]}<img src="{php echo tomedia($tag['thumb'])}" style="max-height:40px; margin-right:6px;">{/if}{$tag["title"]}</td>
+          <td><p id="erm{$tag['id']}" style="height:100px;"><script>createcode("{$tag['id']}","{$tag['ermurl']}");</script></p></td>
+          <td  style="width: 173px;" >{if $tag['ticket']}<a href="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={$tag['ticket']}"  target="_blank"><img src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={$tag['ticket']}" style="width:115px; height:115px;" /></a>{/if}</td>
+          <td  style="width: 173px;" >
+            <div class="" style="margin: 0 auto;overflow: hidden; width:200px;">
+            {loop $tag['user'] $user}
+            <p style="float: left;margin-right: 13px;"><img src="{if !empty($user['avatar'])}{$user['avatar']}{else}resource/images/noavatar_middle.gif{/if}" width="38" style="border-radius:38px;"><br />
+              {$user['name']}            </p>
+            
+
+
+            {/loop}            </div>          </td>
+
+          <td   >{$tag["usercount"]}</td>
+          <td>{if $tag["rechargeamount"]>0}{$tag["rechargeamount"]}元{/if}</td>
+          <td>{if $tag["amount"]>0}{$tag["amount"]}元{/if}</td>
+          <td>{$tag["createtime"]}</td>
+          <td><a class="layui-btn layui-btn-small"  href="{php echo $this->createWebUrl('store', array('op' => 'post','menunumber' =>  $menunumber))}&id={$tag['id']}">修改店面</a>
+          <a href="{php echo $this->createWebUrl('store', array('op' => 'delete','menunumber' =>  $menunumber,'id' => $tag['id']))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;"    class="layui-btn layui-btn-small layui-btn-danger">删除店面</a>	</td>
+        </tr>
+        {/loop} 
+      </tbody>
+    </table>
+{elseif $op == 'post'}
+    
+{/if}
+</body>
+</html>

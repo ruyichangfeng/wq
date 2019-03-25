@@ -1,0 +1,348 @@
+{if $active == 'update' || 'add'}
+<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+<link href="./resource/css/common.css" rel="stylesheet">
+<script type="text/javascript">
+if (navigator.appName == 'Microsoft Internet Explorer') {
+    if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+        alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+    }
+}
+window.sysinfo = {
+    'uniacid': '{$_W['uniacid']}',
+    'acid': '{$_W['account']['acid']}',
+    'uid': '{$_W['uid']}',
+    'isfounder': '{$_W['isfounder']}',
+    'family': 'v',
+    'siteroot': '{$_W['siteroot']}',
+    'siteurl': '{$_W['siteurl']}',
+    'attachurl': '{$_W['attachurl']}',
+    'attachurl_local': '{$_W['attachurl_local']}',
+    'attachurl_remote': '{$_W['attachurl_remote']}',
+    'module': { 'url': '', 'name': '' },
+    'cookie': { 'pre': 'mendian' },
+};
+</script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/util.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/common.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/require.js"></script>
+<script type="text/javascript" src="../addons/hy_supstore/template/web/js/lazyload.min.js"></script>
+{/if}  
+<style>
+body{
+    background-color: #fff!important;
+    min-width: auto !important;
+}
+.layui-elem-field legend{
+    margin: 0 0 0 20px;
+    border-bottom: 0;
+    width: auto;
+}
+</style>
+{if $active == 'list'}
+<style>
+#articleTable {
+    margin-top: 20px;
+    text-align: center;
+}
+.btn-block {
+    margin-top: 15px;
+}
+.digest-box{
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    height:38px;
+    word-break: break-all;
+}
+.layui-table img{
+    max-width: 200px !important;
+    max-height: 55px !important;
+}
+@media screen and (max-width:1100px) {
+    .delete-btn{
+        margin-left: 0 !important;
+    }
+}
+@media screen and (max-width:970px) {
+    .article-title{
+        overflow : hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        height:38px;
+        word-break: break-all;
+    }
+}
+ @media screen and (max-width:1600px){
+    .layui-btn.delete-btn{margin-left: 0 !important;}
+ }
+</style>
+
+<fieldset class="layui-elem-field">
+    <legend>文章列表</legend>
+    <div class="layui-field-box">
+        <blockquote class="layui-elem-quote layui-quote-nm" style="color: #666; font-size: 14px;line-height: 30px; display: none; position: relative;" id="createUrlBlock">生成文章详情url：<input type="text" style="border: 0;display: inline-block; width: 76%;background-color: #fff;" id="createUrl" disabled="disabled"> <div class="right" style="position: absolute; top: 15px; right: 15px; background-color: #fff; padding-left: 15px;"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm mr10" onclick="createUrl()" >复制</a> <input type="text" style="position: absolute;top: 0;left: 0;opacity: 0;z-index: -10;" id="copyUrl"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm" onclick="closeUrl()" id="closeUrl">关闭</a></div></blockquote>
+        <table class="layui-table" id="articleTable">
+            <colgroup>
+                <col width="60">
+                <col width="50">
+                <col width="100">
+                <col width="100">
+                <col width="100">
+                <col width="160">
+                <col width="80">
+                <col width="80">
+                <col width="100">
+                <col width="80">
+                <col width="100">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>排序</th>
+                    <th>名称</th>
+                    <th>分类</th>
+                    <th>缩略图</th>
+                    <th>摘要</th>
+                    <th>上传时间</th>
+                    <th>阅读数</th>
+                    <th>修改时间</th>
+                    <th>生成url</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $key $value}
+                <tr>
+                    <td>{$value['id']}</td>
+                    <td>{$value['rank']}</td>
+                    <td><div class="article-title">{$value['name']}</div></td>
+                    <td>{$value['category_name']}</td>
+                    <td><img class="lazyload" data-original="{$_W['attachurl']}{$value['img_url']}" alt=""></td>
+                    <td><div class="digest-box">{$value['digest']}</div></td>
+                    <td>{$value['release_time']}</td>
+                    <td>{$value['read_num']}</td>
+                    <td>{php echo date('Y-m-d H:i:s',$value['update_time'])}</td>
+                    <td><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary" onclick="showCreatUrl({$value['id']})">生成</a></td>
+                    <td><a href="{php echo $this->createWebUrl('storemanage', array('op'=>'article','type'=>'article','active'=>'update','storeid'=>$storeinfo['id'],'id'=>$value['id']))}" class="layui-btn layui-btn-sm layui-btn-normal">修改</a><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-danger delete-btn" onclick="deleteArticle({$value['id']})">删除</a></td>
+                </tr>
+                {/loop}
+                {if count($list) == 0}
+                <tr><td colspan="11" style="color: red;text-align: center;line-height: 50px;font-weight: bold;">列表数据为空</td></tr>
+                {/if}
+            </tbody>
+        </table>
+        {$pagination}
+    </div>
+</fieldset>
+<script>
+//懒加载
+$('img.lazyload').lazyload({threshold:200,effect:"fadeIn"});
+//layui
+layui.use(['layer'], function() {
+    var layer = layui.layer;//弹层
+});
+//删除
+function deleteArticle(id) {
+    layer.confirm('您确定删除数据吗?', function() {
+        $.post('{php echo $this->createWebUrl("article", array("op"=>"delete"))}', { id: id }, function(data) {
+            if(data == true){
+                layer.msg('删除文章成功', function() {
+                    window.location.reload();
+                });
+            }else{
+                layer.msg('删除文章失败 '+data, function() {
+                    window.location.reload();
+                });
+            }
+        })
+    })
+}
+//生成url
+function showCreatUrl(id){
+    var url = '{$_W["siteroot"]}app/index.php?i={$_W["uniacid"]}&c=entry&op=info&id='+id+'&do=article&m=hy_supstore';
+    $('#createUrl').val(url);
+    $('#createUrlBlock').show();
+}
+//复制url
+function createUrl(){
+    var text = document.getElementById("createUrl").value;
+    var input = document.getElementById("copyUrl");
+    input.value = text; // 修改文本框的内容
+    input.select(); // 选中文本
+    document.execCommand("copy"); // 执行浏览器复制命令
+    layer.msg('复制成功');
+}
+//关闭url
+function closeUrl(){
+    //关闭弹窗
+    $('#closeUrl').parent().parent().hide();
+}
+</script>
+{elseif $active == 'update'}
+
+<fieldset class="layui-elem-field">
+    <legend>修改选项</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" method="post" action="{php echo $this->createWebUrl('storemanage', array('op'=>'article','type'=>'article','active'=>'update','storeid'=>$storeinfo['id']))}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="articleName" required lay-verify="required" placeholder="请输入文章名称" autocomplete="off" class="layui-input" style="width: 60%" value="{$row['name']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类:</label>
+                <div class="layui-input-block">
+                    <div style="width: 60%">
+                        <select name="articleClass" lay-verify="required">
+                            <option value="0" data-depth="0">文章基类</option>
+                            {loop $listCategory $key $value}
+                            <option value="{$value['id']}" data-depth="{$value['depth']}" {if $row['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{$row['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">缩略图</label>
+                <div class="layui-input-block" style="width: 60%;">
+                    {php echo tpl_form_field_image('articleUrl',$row['img_url'],$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">400x252最好</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章摘要:</label>
+                <div class="layui-input-block">
+                    <textarea name="articleDigest" placeholder="请输入文章摘要" class="layui-textarea" style="width: 60%">{$row['digest']}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">上传时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="articleTime" required lay-verify="required" placeholder="请选择时间" autocomplete="off" class="layui-input" style="width: 30%;" id="dateTime" value="{$row['release_time']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">阅读数:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="articleReadNum" required lay-verify="required" placeholder="请输入阅读数" autocomplete="off" class="layui-input" style="width: 30%;" value="{$row['read_num']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章内容:</label>
+                <div class="layui-input-block" style="width: 60%;">
+                    {php echo tpl_ueditor('articleContent', $row['content'], array('height'=>300,'width'=>'100%'));}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%;" value="{$row['rank']}">
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" value="提交">立即生成</button>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['form', 'laydate'], function() {
+    var form = layui.form;
+    var laydate = layui.laydate;
+
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#dateTime',
+        value: '{$row["release_time"]}',
+    });
+});
+</script>
+{elseif $active == 'add'}
+<fieldset class="layui-elem-field">
+    <legend>添加选项</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" method="post" action="{php echo $this->createWebUrl('storemanage', array('op'=>'article','type'=>'article','active'=>'add','storeid'=>$storeinfo['id']))}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="articleName" required lay-verify="required" placeholder="请输入文章名称" autocomplete="off" class="layui-input" style="width: 60%">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类:</label>
+                <div class="layui-input-block">
+                    <div style="width: 60%">
+                        <select name="articleClass" lay-verify="required">
+                            <option value="0" data-depth="0">文章基类</option>
+                            {loop $listCategory $key $value}
+                            <option value="{$value['id']}" data-depth="{$value['depth']}" {if $row['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">缩略图</label>
+                <div class="layui-input-block" style="width: 60%;">
+                    {php echo tpl_form_field_image('articleUrl','',$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">400x252最好</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章摘要:</label>
+                <div class="layui-input-block">
+                    <textarea name="articleDigest" placeholder="请输入文章摘要" class="layui-textarea" style="width: 60%"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">上传时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="articleTime" required lay-verify="required" placeholder="请选择时间" autocomplete="off" class="layui-input" style="width: 30%;" id="dateTime">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">阅读数:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="articleReadNum" required lay-verify="required" placeholder="请输入阅读数" autocomplete="off" class="layui-input" style="width: 30%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">文章内容:</label>
+                <div class="layui-input-block" style="width: 60%;">
+                {php echo tpl_ueditor('articleContent', $value = '请输入文章内容', array('height'=>300,'width'=>'100%'));}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%;">
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" value="提交">立即生成</button>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['form', 'laydate'], function() {
+    var form = layui.form;
+    var laydate = layui.laydate;
+
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#dateTime' //指定元素
+    });
+});
+</script>
+{/if}

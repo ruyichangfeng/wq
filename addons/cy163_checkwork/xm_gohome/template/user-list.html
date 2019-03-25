@@ -1,0 +1,115 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li class="active"><a href="{php echo  $this->createWebUrl('userlist', array('foo'=>'index'));}">用户管理</a></li>
+</ul>
+
+<div class="clearfix">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="do" value="userlist" />
+                <input type="hidden" name="foo" value="index" />
+                <input type="hidden" name="m" value="xm_gohome" />
+                <!--
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">用户昵称</label>
+                    <div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+                        <input class="form-control" name="nickname" id="nickname" type="text" value="{$_GPC['nickname']}" placeholder="用户昵称">
+                    </div>
+                </div>-->
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">用户昵称</label>
+                    <div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+                        <input class="form-control" name="nickname" id="nickname" type="text" value="{$_GPC['nickname']}" placeholder="用户昵称">
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-1 col-lg-1">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+ 
+    <div class="panel panel-default">
+    	<div class="panel-heading">
+            用户列表
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <table class="table table-hover">
+            	<thead>
+                	<tr class="active">
+                    	<td width="50">ID编号</td>
+                    	<td width="200">OpenID</td>
+                        <td width="100">用户昵称</td>
+                        <td width="100">真实姓名</td>
+                        <td width="50">性别</td>
+                        <td width="100">手机号码</td>
+                        <td width="100">个人审核</td>
+                        <td width="200">操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                	{loop $list $val}
+                	<tr>
+                    	<td>{$val[uid]}</td>
+                    	<td>{$val[openid]}</td>
+                        <td>
+                        	{if $val[nickname] == ''}
+                        		昵称为空
+                        	{else}
+                        		{$val[nickname]}
+                        	{/if}
+                        </td>
+                        <td>
+                        	{php echo $this->getFansInfo($val[uid], 'realname')}
+                        </td>
+						<td>
+                        {if $this->getFansInfo($val[uid], 'gender') == 0}
+                        保密
+                        {/if}
+                        {if $this->getFansInfo($val[uid], 'gender') == 1}
+                        男
+                        {/if}
+                        {if $this->getFansInfo($val[uid], 'gender') == 2}
+                        女
+                        {/if}
+                        </td>
+                        <td>{php echo $this->getFansInfo($val[uid], 'mobile')}</td>
+						<td>
+						{if $this->checkexamine($val['openid']) == 1}
+                        	已审核
+                        {else}
+                        	未审核
+                        {/if}
+						</td>
+                        <td style="overflow:visible;">
+                        	<div class="btn-group btn-group-sm">
+                            	{if $this->checkexamine($val['openid']) == 0}
+                            	   <a class="btn btn-default" href="{php echo $this->createWebUrl('userlist',array('foo'=>'examineok', 'openid'=>$val['openid']));}" onClick="return confirm('确认通过审核?');">
+                                        <i class="fa fa-unlock"></i> 审核通过
+                                    </a>
+                                {else}
+                                    <a class="btn btn-default" href="{php echo $this->createWebUrl('userlist',array('foo'=>'examineno', 'openid'=>$val['openid']));}" onClick="return confirm('确认取消审核?');">
+                                        <i class="fa fa-lock"></i> 取消审核
+                                    </a>
+                                {/if}
+                            </div>
+                        </td>
+                    </tr>
+                    {/loop}
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="panel-body text-center">
+            {$pager}
+        </div>
+    </div>
+</div>
+
+{template 'common/footer'}

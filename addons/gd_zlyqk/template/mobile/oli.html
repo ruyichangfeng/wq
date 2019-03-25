@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <title>油卡充值</title>
+    <link rel="stylesheet" href="{MODULE_URL}/static/oli/bootstrap.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}/static/oli/phone.css">
+    <style type="text/css">
+        .STYLE1 {color: #969696}
+        .weui-btn{
+            position: relative;
+            display: block;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 14px;
+            padding-right: 14px;
+            box-sizing: border-box;
+            font-size: 18px;
+            text-align: center;
+            text-decoration: none;
+            color: #FFFFFF;
+            line-height: 2.2;
+            border-radius: 5px;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            overflow: hidden;
+            background: #ddd;
+            margin-bottom: 30px;
+        }
+        .disabled{background: #ddd;}
+        .active{background: dodgerblue}
+    </style>
+</head>
+<body>
+<div class="container">
+    {if $appInfo['cover']}
+    <img src="{$appInfo['cover']}" style="width: 100%">
+    {/if}
+    <form method="post" id="form" action="{php echo $this->createMobileUrl('addInfo')}">
+        <input type='hidden' name='app_id' value='{$appInfo['id']}'>
+        <input type='hidden' name='_fm' value='index'>
+        {loop $html $row}
+        {if $row['type']=="search"}
+        <div class="row user-phone" style="border-top:0;">
+            <input id="phone" style="font-size:2rem;color:#333;" data-id="{$row['pl']}" data-name="" class="col-xs-11 search_change" type="text"  placeholder="{$row['label']}">
+            <input type="hidden" class="p_data" name="{$row['py']}" value="">
+            <span class="col-xs-1 icon-user"></span>
+        </div>
+        {/if}
+
+        {if $row['type']=='select'}
+        {php $payList = explode(",",$row['pl'])}
+        <div class="row user-money">
+            <input type="hidden" name="{$row['py']}" value="" class="pay_s">
+            <div>{$row['label']}</div>
+            <ul class="col-xs-12" id="phone-money">
+                {loop $payList $pay}
+                <li class="col-xs-3 m_row" data-money="{$pay}">
+                    <p class="phone-money-orig">{$pay}元</p>
+                    <p class="zh">折后{$pay}元</p>
+                </li>
+                {/loop}
+            </ul>
+        </div>
+        {/if}
+        {if $row['type']=='price'}
+            <input type="hidden" class="pay"  name="{$row['py']}" value="0">
+            <input type="hidden" class="pay"  name="page_pay" value="0">
+        {/if}
+        {/loop}
+        <div class="weui-btn disabled">充值</div>
+    </form>
+    <div class="STYLE1" style="padding-left:15px;padding-right:15px;">
+        <div align="left">1、本充值平台仅支持在【小柚加油】申领的加油IC卡副卡充值；
+        </div>
+    </div>
+    <div class="STYLE1" style="padding-left:15px;padding-right:15px;">
+        <div align="left">2、充值时间：8:30-21:00，21:00后充值的会延迟至次日8:30到账；</div>
+    </div>
+    <div class="STYLE1" style="padding-left:15px;padding-right:15px;">
+        <div align="left">3、到账时间：充值成功后1-30分钟到账，未到账请联系客服；</div>
+    </div>
+    <div class="STYLE1" style="padding-left:15px;padding-right:15px;">
+        <div align="left">4、充值查询：可通过【小柚加油】查询，也可到加油站查询。</div>
+    </div>
+    <div class="STYLE1" style="padding-left:15px;padding-right:15px;">
+        <div align="left">&nbsp;&nbsp;</div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{MODULE_URL}/static/oli/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/oli/bootstrap.min.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/layer.js"></script>
+<script src="{MODULE_URL}/static/oli/phone.js"></script>
+
+<script>
+    var discount=1;
+    $('.search_change').bind('input propertychange', function() {
+        var search = new Object();
+        search.id=$(this).attr("data-id");
+        search.val = $(this).val();
+        $.post("{php echo $this->createMobileUrl('getData1')}",search,function(response){
+            if(response.code==0){
+                $(".weui-btn").removeClass("active");
+                $(".weui-btn").addClass("disabled");
+                discount=1;
+                $(".p_data").val("");
+                setMoney(1);
+            }else{
+                $(".weui-btn").removeClass("disabled");
+                $(".weui-btn").addClass("active");
+                discount = response.discount;
+                $(".p_data").val(response.data);
+                setMoney(discount);
+            }
+        },"json");
+    });
+
+    $(".m_row").click(function(){
+        var s_money = parseFloat($(this).attr("data-money"))
+        var money = discount*s_money;
+        $(".pay_s").val(s_money);
+        $(".pay").val(money);
+    });
+
+    $(".weui-btn").click(function(){
+        if($(this).hasClass("disabled")){
+            if($("#phone").val()==""){
+                successMsg('请输入卡号');
+            }else{
+                successMsg('卡号错误');
+            }
+            return false;
+        }
+        if($(".money-click").length==0){
+            successMsg('请选择充值金额');
+            return false;
+        }
+        $(".p_data").val($(".p_data").val()+"id="+$(".search_change").attr("data-id"));
+
+        var post=$("form").serialize();
+        var url=$("#form").attr("action");
+        $.ajax({
+            url:url,
+            type:'post',
+            data:{post:post},
+            dataType:"json",
+            success:function(result){
+                if(result.code==1){
+                    successMsg(result.msg);
+                    setTimeout(function(){
+                        if(result.data!=""){
+                            location.href=result.data;
+                        }
+                    },1100);
+                }else{
+                    successMsg(result.msg);
+                }
+            }
+        });
+    });
+
+    function successMsg(msg){
+        layer.open({
+            content: msg
+            ,skin: 'msg'
+            ,time: 2
+        });
+    }
+
+    //初始化折扣金额
+    function setMoney(disc){
+        $(".m_row").each(function(){
+            var money = parseFloat($(this).attr("data-money"))*disc;
+            $(this).find(".zh").html("折后"+money+"元")
+        });
+    }
+</script>
+
+</body>
+</html>

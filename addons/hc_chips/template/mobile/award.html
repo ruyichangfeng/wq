@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>中奖名单</title>
+	<link rel="stylesheet" type="text/css" href="../addons/hc_chips/style/css/list.css">
+	<link rel="stylesheet" href="../addons/hc_chips/style/css/mobi.css"/>
+</head>
+<body>
+
+<div class="khhuodong gyStyle2">
+	<h3>中奖名单</h3>
+	<p class="shomingk">
+	</p>
+	<div class="kanjialist">
+		<div class="listMain">
+			<div class="topbiaoti clearfix">
+				<a class="col1" href="javascript:;">序号</a>
+				<a class="col2 kandiaojine1" href="javascript:;">奖品名称</a>
+				<a class="col3" href="javascript:;">手机号码</a>
+			</div>
+			<div class="bordery">
+				<div class="listx">
+					<ul class="ul1">
+					{loop $awards $key $a}
+					{php $key++}
+						<li class="clearfix">
+							<div class="lefttext">{$key}</div>
+							<div class="kanhoujia">
+								<span>{$chip[$a['chipid']]}</span>
+							</div>
+							<div class="szimgSize"><img src="../addons/hc_chips/style/images/jinbitp1.png" alt="图片">
+								<span>{php echo haha($a['mobile'])}</span>
+							</div>
+						</li>
+					{/loop}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<footer class="foot">
+	<div style="color:#fff;">@{$_W['account']['name']}</div>
+</footer>
+<nav class="nav fn-clear" style=""> 
+	<a href="{php echo $this->createMobileUrl('index')}"><i class="icon-award"></i>众筹活动</a> 
+	<a href="{php echo $this->createMobileUrl('home', array('op'=>'mychips'))}"><i class="icon-inbox"></i>我的众筹</a>
+	<a href="{php echo $this->createMobileUrl('award')}" class="active"><i class="icon-user-1"></i>中奖名单</a> 
+</nav>
+</body>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{php $signPackage=$_W['account']['jssdkconfig'];}	
+<script>
+wx.config({
+	debug: false,   
+	appId: '<?php echo $signPackage["appId"];?>',
+	timestamp: '<?php echo $signPackage["timestamp"];?>',
+	nonceStr: '<?php echo $signPackage["nonceStr"];?>',
+	signature: '<?php echo $signPackage["signature"];?>',
+	jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+});
+
+wx.ready(function () {
+	var shareData = {
+		title: "{$chip['title']}",
+		desc: "{$chip['description']}",
+		link: "{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('chip', array('op'=>'join', 'id'=>$chip['id']))}",
+		imgUrl: "{$_W['attachurl']}{$chip['picture']}",
+		trigger: function (res) {},
+		complete: function (res) {},
+		success: function (res) {},
+		cancel: function (res) {},
+		fail: function (res) {}
+	};
+	wx.onMenuShareAppMessage(shareData);
+	wx.onMenuShareQQ(shareData);
+	wx.onMenuShareWeibo(shareData);
+	wx.onMenuShareTimeline(shareData);
+});
+</script>
+</html>

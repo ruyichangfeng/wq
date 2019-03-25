@@ -1,0 +1,125 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>互动管理</cite></a>
+          <a><cite>十秒答题</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+	 	<ul class="layui-tab-title">
+	        <li class="layui-this">
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/answer_list')}">答题记录</a>
+	        </li>
+	        <li>
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/answer_sz')}">答题设置</a>
+	        </li>
+	        <li>
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/questions_list')}">题库</a>
+	        </li>
+	    </ul> 
+    </div>
+    <div class="x-body">
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Answer/answer_list')}"  method="post" style="width:95%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">答题时间</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="开始日" value="{$s_jtime}" name="s_jtime" id="s_jtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="截止日" value="{$e_jtime}"  name="e_jtime" id="e_jtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="nickname" value="{$nickname}"  placeholder="请输入用户昵称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="telephone" value="{$telephone}"  placeholder="请输入手机号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>
+     	
+      	<form id="delform" class="layui-form">
+	      	<table class="layui-table">
+	            <thead>
+	                <tr>
+	                    <th>ID</th>
+	                    <th>用户昵称 </th>  
+	                    <th>手机号</th>
+	                    <th>是否通关</th>
+	                    <th>获得奖励</th>   
+	                    <th>答题时间</th>
+	                </tr>
+	            </thead>
+	            <tbody id="formdata">
+	              	<volist name="list" id="v">	
+	                <tr>	                
+	                    <td>{$v.id}</td>
+	                    <td> <u style="cursor:pointer" onclick="member_show('{$v.nickname}','{:U('Home/MainCtr/Member/member_show',array('id'=>$v['uid']))}','10001','360','455')">{$v.nickname}</u> </td>
+	                    <td >{$v.telephone}</td>
+	                    <td>
+	                    	<?php if($v['is_tg']==1){ ?>
+	                    	<span class="layui-badge layui-bg-green">通关成功</span>
+	                    	<?php }else{?>
+	                    	<span class="layui-badge">未通关</span>
+	                    	<?php } ?>	                    	
+	                    </td>	                    
+	                    <td ><?php if($v['status']==1){echo $v['num']."虚拟币";}elseif($v['status']==2){echo $v['num']."虚拟锤";}elseif($v['status']==3){echo $v['num']."积分";}else{echo "暂无奖励";}?></td>
+	                    <td><?php echo  date('Y-m-d H:i:s', $v['createtime']); ?></td>
+	                </tr>
+	              	</volist>  
+	            </tbody>
+	        </table>
+        </form> 
+        <div id="page"></div>
+        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+    </div>
+     <include file="Public/footer.html"/>   
+     <script>
+        layui.use(['form','laydate','element','laypage','layer'], function(){
+          var laydate = layui.laydate;//日期插件
+          var laypage = layui.laypage;//分页
+          var layer = layui.layer;//弹出层
+          var form = layui.form;
+          $ = layui.jquery; 
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limits},
+		   curr : {$nowpage}, 
+		   jump: function(obj, first){
+			   if(!first){ 
+			    var $purl = "{:U('Home/MainCtr/Answer/answer_list',array('page'=>'pageval','s_jtime'=>$s_jtime,'e_jtime'=>$e_jtime,'nickname'=>$nickname,'telephone'=>$telephone))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);  			
+			   }
+			}
+		  });
+          //时间选择器
+		  laydate.render({
+		    elem: '#s_jtime'
+		    ,type: 'datetime'
+		  });
+		   laydate.render({
+		    elem: '#e_jtime'
+		    ,type: 'datetime'
+		  });
+		  
+		   
+        });
+        
+        /*用户-查看*/
+        function member_show(title,url,id,w,h){
+            x_admin_show(title,url,w,h);
+        }
+        
+ </script> 
+</body>
+</html>

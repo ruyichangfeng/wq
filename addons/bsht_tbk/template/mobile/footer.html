@@ -1,0 +1,388 @@
+
+    <div id="back_top" class="slide-box" style="display:none">
+	
+	 
+	 {if $setting['qiandaourl']!='内置' || $_GPC['do']!='index'}
+	 <a href="javascript:" onclick="gzcode();" class="bag-enter" title="扫码关注"><img src="{$res}static/jwap/images/qrcode-icon.png" alt="扫码关注" /></a>
+     {/if}
+
+
+    
+
+     <a href="javascript:scroll(0,0);" class="back-top" title="返回顶部"><img src="{$res}static/jwap/images/back-top.png" alt="返回顶部" /></a>
+    </div>
+    <div id="foot">
+     <div class="foot-nav">
+
+
+<a href="{php echo $this->createMobileUrl('list_dtk')}"><img src="{$res}static/jwap/images/phone.png" />领券直播</a>
+
+
+
+
+      <a href="{php echo $this->createMobileUrl('uc')}" class="joa_load_app"><img src="{$res}static/jwap/images/client.png" />个人中心</a>
+      <a href="{php echo $this->createMobileUrl('index')}" class="_border"><img src="{$res}static/jwap/images/home.png" />返回首页</a>
+     </div>
+     <div class="foot-copyright"></div>
+     <h2>copyright &copy; {$setting['sitecopy']}</h2>
+    </div>
+    
+    
+
+   
+   </div>
+  </div>
+ 
+  <script type="text/javascript" src="{$res}static/jwap/js/swipeSlide.min.js"></script>
+
+<script type="text/javascript" src="{$res}static/jwap/js/jp.plus.js"></script>
+<script type="text/javascript">
+$(function(){
+            function hideMenu() {
+                setTimeout("window.scrollTo(0, 0)", 1);
+            }
+
+            $('.alert_black_bg .close').on('click', function(){
+                $('.alert_black_bg').hide();
+                $('#foot').height(120);
+            });
+            });
+            $(".go-app .closed").on("click",function(){
+                $(".go-app").hide();
+                return false;
+            })
+
+</script>
+
+
+<script type="text/javascript">
+	$(function(){
+$('.layui-layer-content').css('height','auto');
+$(".nav_box").css("position","fixed");
+$(".nav_box").css("bottom","0px");
+$(".nav_box").css("z-index","9999");
+
+{if $_GPC['do']=='uc'}
+{if empty($user)}
+//layer.msg('对不起，您无权访问', {
+ // shade: [0.8, '#393D49'],
+  //closeBtn: 0
+//}, function(){window.location.href="{php echo $this->createMobileUrl('index')}";});
+{/if}
+{/if}
+
+
+{if $_GPC['do']=='show'}
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('id'=>$_GPC['id'],'act'=>'item'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if}
+
+{if $_GPC['do']=='show_dtk'}
+
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('id'=>$_GPC['id'],'act'=>'itemdtk'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+
+//判断
+var url2 = "{php echo $this->createMobileUrl('yhj_all_ajax',array('quan_link'=>$show['quan_link'],'id'=>$show['id']));}";		
+$.post(url2, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1){
+
+//
+/*layer.msg('来晚了，优惠券已被抢空！<br>喜欢本商品可以直接购买！', {
+  shade: [0.8, '#393D49'],
+  closeBtn: 0
+}, function(){
+	$('#weixin-tip').show();
+	//window.location.href="{php echo $this->createMobileUrl('index')}";
+	});
+*/
+layer.open({
+    content: '来晚了，优惠券已被抢空！<br>喜欢本商品可以直接购买！'
+    ,skin: 'msg'
+    ,time: 2 
+    , end:function(){
+	$('#weixin-tip').show();
+	//window.location.href="{php echo $this->createMobileUrl('index')}";
+	}});
+//
+
+}
+
+});
+//判断
+
+
+
+//更新
+var url3 = "{php echo $this->createMobileUrl('yhj_num_ajax',array('quan_link'=>$show['quan_link'],'id'=>$show['id']));}";		
+$.post(url3, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1){
+$('#quan_num').html(dat.quan_num);
+
+}
+
+});
+//更新
+
+//加写
+var url4 = "{php echo $this->createMobileUrl('yhj_tkl_ajax',array('id'=>$show['id']));}";		
+$.post(url4, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1 && dat.tkl!='error'){
+$('#copy_key_ios').html("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_android').val("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_ios2').html("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_android2').val("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+
+}else if(dat.tkl=='error'){
+
+$('#weixin-tt').hide();
+$('#taokouling').hide();
+$('#weixin-tip').show();
+
+}
+
+});
+//加写
+
+
+{/if}
+
+
+
+{if $_GPC['do']=='show_all'}
+
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('id'=>$_GPC['id'],'act'=>'itemall'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+
+//判断
+var url2 = "{php echo $this->createMobileUrl('yhj_all_ajax',array('quan_link'=>$show['quan_link'],'id'=>$show['id']));}";		
+$.post(url2, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1){
+
+/*
+layer.msg('来晚了，优惠券已被抢空！<br>喜欢本商品可以直接购买！', {
+  shade: [0.8, '#393D49'],
+  closeBtn: 0
+}, function(){
+	$('#weixin-tip').show();
+	//window.location.href="{php echo $this->createMobileUrl('index')}";
+	//改写
+$('#copy_key_ios').html("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_android').val("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_ios2').html("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_android2').val("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('.fq-explain span').html("友情提示");
+	//改写
+	});
+*/
+
+layer.open({
+    content: '来晚了，优惠券已被抢空！<br>喜欢本商品可以直接购买！'
+    ,skin: 'msg'
+    ,time: 2 
+    , end:function(){
+	$('#weixin-tip').show();
+	//window.location.href="{php echo $this->createMobileUrl('index')}";
+	//改写
+$('#copy_key_ios').html("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_android').val("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_ios2').html("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('#copy_key_android2').val("来晚了，优惠券已被抢空！喜欢本商品可点击右上角使用其他浏览器直接购买！");
+$('.fq-explain span').html("友情提示");
+	//改写
+	}});
+
+}
+
+});
+//判断
+
+
+
+//更新
+var url3 = "{php echo $this->createMobileUrl('yhj_num_ajax',array('quan_link'=>$show['quan_link'],'id'=>$show['id']));}";		
+$.post(url3, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1){
+$('#quan_num').html(dat.quan_num);
+
+}
+
+});
+//更新
+
+//加写
+var url4 = "{php echo $this->createMobileUrl('yhj_tkl_all_ajax',array('id'=>$show['id']));}";		
+$.post(url4, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1 && dat.tkl!='error'){
+$('#copy_key_ios').html("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_android').val("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_ios2').html("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+$('#copy_key_android2').val("复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买"+dat.tkl);
+
+}else if(dat.tkl=='error'){
+
+$('#weixin-tt').hide();
+$('#taokouling').hide();
+$('#weixin-tip').show();
+
+}
+
+});
+//加写
+
+
+{/if}
+
+
+	wx.config(jssdkconfig);
+	var $_share = {php echo json_encode($_share);};
+	if(typeof sharedata == 'undefined'){
+		sharedata = $_share;
+	} else {
+		sharedata['title'] = sharedata['title'] || $_share['title'];
+		sharedata['desc'] = sharedata['desc'] || $_share['desc'];
+		sharedata['link'] = sharedata['link'] || $_share['link'];
+		sharedata['imgUrl'] = sharedata['imgUrl'] || $_share['imgUrl'];
+	}
+	if(sharedata.imgUrl == ''){
+		var _share_img = $('body img:eq(0)').attr("src");
+		if(_share_img == ""){
+			sharedata['imgUrl'] = window.sysinfo.attachurl + 'images/global/wechat_share.png';
+		} else {
+			sharedata['imgUrl'] = util.tomedia(_share_img);
+		}
+	}
+	if(sharedata.desc == ''){
+		var _share_content = util.removeHTMLTag($('body').html());
+		if(typeof _share_content == 'string'){
+			sharedata.desc = _share_content.replace($_share['title'], '')
+		}
+	}
+	wx.ready(function () {
+
+
+
+//nb_plus
+
+//nb_plus
+
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+
+        sharedata.success = function(){
+
+{if $_GPC['do']=='show'}
+var url = "{php echo $this->createMobileUrl('share_ajax',array('id'=>$_GPC['id'],'act'=>'item'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if} 
+
+{if $_GPC['do']=='show_dtk'}
+var url = "{php echo $this->createMobileUrl('share_ajax',array('id'=>$_GPC['id'],'act'=>'itemdtk'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+
+{/if}
+
+{if $_GPC['do']=='show_all'}
+var url = "{php echo $this->createMobileUrl('share_ajax',array('id'=>$_GPC['id'],'act'=>'itemall'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+
+{/if}
+
+	    }
+
+
+	});
+
+	});
+</script>
+
+<script type="text/javascript">
+document.getElementById("back_top").style.display = "none";
+document.getElementById("search").style.display = "none";
+window.onscroll = function () {
+    
+	var allheight = window.screen.height;
+	
+
+    if (document.documentElement.scrollTop + document.body.scrollTop > 100) {
+        document.getElementById("back_top").style.display = "block";
+		//document.getElementById("search").style.display = "block";
+    }
+    else {
+        document.getElementById("back_top").style.display = "none";
+		//document.getElementById("search").style.display = "none";
+    }
+
+	if (document.documentElement.scrollTop + document.body.scrollTop > 50) {
+        //document.getElementById("back_top").style.display = "block";
+		document.getElementById("search").style.display = "block";
+    }
+    else {
+        //document.getElementById("back_top").style.display = "none";
+		document.getElementById("search").style.display = "none";
+    }
+
+	
+
+	
+}
+</script>
+
+<script>
+function gzcode(){
+
+layer.open({
+  type: 1,
+  title: '- 长按扫码关注 -',
+  skin: 'layui-layer-demo', //样式类名
+  closeBtn: 0, //不显示关闭按钮
+  anim: 2,
+  shadeClose: true, //开启遮罩关闭
+  content: '<img src="{$_W['account']['qrcode']}" style="width:300px;height:300px;">'
+});
+
+}
+</script>
+{if $setting['ishb']==1 && $_GPC['do']!='list_top'}
+{template 'hb'}
+{/if}
+{if $setting['isvolist']==1 && $_GPC['do']!='list_top'}
+{if $_GPC['do']!='uc'}
+<script src="{$res}js/volist.js"></script>
+{/if}
+{/if}
+
+{if $setting['tongji']}
+<div style="display:none">
+{$setting['tongji']}
+</div>
+{/if}
+ </body>
+
+</html>

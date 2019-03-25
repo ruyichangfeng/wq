@@ -1,0 +1,224 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content">
+                <ul class="nav nav-tabs">
+                    <li>
+                        <a style="color: #1ab394" href="{php echo $this->createWebUrl('goods', array('op' => 'list', 'storeid' => $storeid))}"><i class="fa fa-lg fa-cubes" style="color: #ed8902"></i>商品管理</a>
+                    </li>
+                    <li class="active">
+                        <a href="{php echo $this->createWebUrl('goods', array('op' => 'recyclelist', 'storeid' => $storeid))}"><i class="fa fa-lg fa-recycle" style="color: #e10c14"></i>商品回收站</a></li>
+                    <li>
+                        <a href="{php echo $this->createWebUrl('goodstype')}"><i class="fa fa-lg fa-sitemap" style="color:#0abc89"></i>商品分类</a>
+                    </li>
+                </ul>
+                <div class="panel panel-default" id="uploaddata" style="display: none;">
+                    <div class="panel-body">
+                        <form action="" method="post" class="navbar-form navbar-left" enctype="multipart/form-data">
+                            <input type="hidden" name="leadExcel" value="true">
+                            <input type="hidden" name="c" value="site" />
+                            <input type="hidden" name="a" value="entry" />
+                            <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                            <input type="hidden" name="do" value="UploadExcel" />
+                            <input type="hidden" name="ac" value="goods" />
+                            <input type="hidden" name="storeid" value="{$storeid}" />
+                            <span class="input-group">
+                    <input name="viewfile" id="viewfile" type="text" value="" class="form-control" style="width:300px;" readonly>
+			        <span class="input-group-btn">
+                        <a class="btn btn-default ms_br">
+                            <label for="unload" class="ms_mp" >选择...</label>
+                        </a>
+                        <input type="submit" style="border-radius: 0px;" class="btn btn-success" value="上传"
+                               onclick="if(document.getElementById('viewfile').value==''){alert('请先选择上传文件!');return false;}">
+                        <a class="btn btn-primary ms_mb" href="{$_W['siteroot']}addons/hl_mmsystem/example/example_goods.xls">下载导入模板
+                        </a>
+                    </span>
+                    <input type="file" name="inputExcel" id="unload" class="form-control" style="display: none;"
+                           onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
+                </span>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+
+                        <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goods', array('op' => 'recyclelist', 'storeid' => $storeid))}" >
+                            <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                    </div>
+                    <div class="panel-body">
+                        <form action="./index.php" method="get" class="form-horizontal" role="form">
+                            <input type="hidden" name="c" value="site" />
+                            <input type="hidden" name="a" value="entry" />
+                            <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                            <input type="hidden" name="do" value="goods" />
+                            <input type="hidden" name="op" value="recyclelist" />
+                            <input type="hidden" name="storeid" value="{$storeid}" />
+                            <div class="form-group">
+                                <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">商品编码</label>
+                                <div class="col-sm-2 col-lg-1">
+                                    <input class="form-control" name="codekeyword" id="" type="text" value="{$_GPC['codekeyword']}">
+                                </div>
+                                <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">商品助记码</label>
+                                <div class="col-sm-1 col-lg-1">
+                                    <input class="form-control" name="pinYinkeyword" id="" type="text" value="{$_GPC['pinYinkeyword']}">
+                                </div>
+                                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width: 100px;">商品名称</label>
+                                <div class="col-sm-2 col-lg-1">
+                                    <input class="form-control" name="keyword" id="" type="text" value="{$_GPC['keyword']}">
+                                </div>
+                                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">商品分类</label>
+                                <div class="col-sm-2 col-lg-2">
+                                    <select style="margin-right:15px;" name="goodstype_id" class="form-control">
+                                        <option value="0">请选择商品分类</option>
+                                        {loop $goodstypeitem $row}
+                                        <option value="{$row['id']}" {if $row['id'] == $_GPC['goodstype_id']} selected="selected"{/if}>{$row['gt_name']}</option>
+                                        {/loop}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2 col-lg-2">
+                                    <button class="btn btn-outline btn-primary" type="submit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <form class="form-horizontal form" method="post" >
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="2%">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"></label>
+                                    </div>
+                                </th>
+                                <th>编码</th>
+                                <th>助记码</th>
+                                <th>名称</th>
+                                <th>类别</th>
+                                <th>状态</th>
+                                <th>类型</th>
+                                <th>售价</th>
+                                <th>库存数量</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['goo_code']}</td><!--商品助记码-->
+                                <td>{$item['goo_pinYin']}</td><!--商品助记码-->
+                                <td>{$item['goo_name']}</td><!--商品名称-->
+                                <td>{php echo util::getGoodsTypeName($item['goodsTypeId'])}</td><!--商品分类-->
+                                <td>{if $item['goo_status']==1}<span class="badge badge-primary">正常</span>{else}<span class="badge badge-danger">停售</span>{/if}</td><!--商品状态-->
+                                <td>{if $item['goo_goodsOrService']==1}<span class="badge badge-warning">实物</span>{elseif $item['goo_goodsOrService']==2}<span class="badge badge-success">服务</span>{else}<span class="badge badge-danger" STYLE="font-size:16px;">套餐</span>{/if}</td><!--商品属于什么服务还是-->
+                                <td>{$item['goo_price']}元</td><!--商品售价-->
+                                <td>{$item['goo_number']}</td><!--入库库存-->
+                                <td>
+                                    <a href="{php echo $this->createWebUrl('goods', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+                                    <a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('goods',array('op'=>'recycledelete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            <tr>
+                                <td colspan="10">
+                                    <input name="token" type="hidden" value="{$_W['token']}" />
+                                    <button class="btn btn-warning " type="button" name="recycledeleteall" ><i class="fa fa-trash"></i> 批量删除</button>
+                                    <button class="btn btn-warning " type="button" name="btnupall" ><i class="fa fa-mail-reply-all"></i> 批量恢复</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div align="right">{$pager}</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $(".check_all").click(function(){
+            var checked = $(this).get(0).checked;
+            $("input[type=checkbox]").attr("checked",checked);
+        });
+
+        $("button[name=recycledeleteall]").click(function(){
+            var check = $("input[type=checkbox][class!=check_all]:checked");
+            if(check.length < 1){
+                swal("操作有误", "请选择要删除的商品！","error");
+                return false;
+            }
+            if(confirm("确认要删除选择的商品?")){
+                var id = new Array();
+                check.each(function(i){
+                    id[i] = $(this).val();
+                });
+                var url = "{php echo $this->createWebUrl('goods', array('op' => 'recycledeleteall', 'storeid' => $storeid))}";
+                $.post(
+                    url,
+                    {idArr:id},
+                    function(data){
+                        swal({
+                            title: "操作成功！",
+                            text: data.error,
+                            timer: 2000,
+                            type:"success",
+                            showConfirmButton: false
+                        },function(){
+                            location.reload();
+                        });
+                    },'json'
+                );
+            }
+        });
+
+        $("button[name=btnupall]").click(function(){
+            var check = $("input[type=checkbox][class!=check_all]:checked");
+            if(check.length < 1){
+                swal("操作有误", "请选择要恢复的商品！","error");
+                return false;
+            }
+            if(confirm("确认要恢复选择的商品?")){
+                var id = new Array();
+                check.each(function(i){
+                    id[i] = $(this).val();
+                });
+                var url = "{php echo $this->createWebUrl('goods', array('op' => 'upall', 'storeid' => $storeid))}";
+                $.post(
+                    url,
+                    {idArr:id},
+                    function(data){
+                        swal({
+                            title: "操作成功！",
+                            text: data.error,
+                            timer: 2000,
+                            type:"success",
+                            showConfirmButton: false
+                        },function(){
+                            location.reload();
+                        });
+
+                    },'json'
+                );
+            }
+        });
+
+    });
+</script>
+
+{template 'web/common/footer'}

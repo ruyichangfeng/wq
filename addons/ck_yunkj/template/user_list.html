@@ -1,0 +1,475 @@
+{template 'common/header'}
+
+{template 'user_header'}
+
+<div class="nav" style="padding-bottom:20px;">
+	<a href="{$urlt}" {if $op==''}class="btn btn-info"{else}class="btn btn-default"{/if}>客户列表</a>
+	<a href="{$urlt}&op=import" {if $op=='import'}class="btn btn-info"{else}class="btn btn-default"{/if}>批量导入CSV报表</a>
+	<a href="{$urlt}&op=parameter" {if $op=='parameter'}class="btn btn-info"{else}class="btn btn-default"{/if}>设置报表参数标题</a>
+	<a href="{php echo $this->createWebUrl('user_list_export')}" target="_blank" class="btn btn-default">导出excel表格</a>
+</div>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:35px; border: 1px solid #cccc; line-height: 35px; border-radius: 5px;}
+	.btnptspt{
+	   padding-left:8px; padding-right:8px; padding-bottom:5px; padding-top:5px;
+	   color:#fff;
+	   border-radius:5px;
+	   background-color:#EF4F4F;
+	}
+</style>
+{if $op == 'edit'}
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+	<input type="hidden" name="id" value="{$srdb['id']}" />
+	<input type="hidden" name="uid" value="{$srdb['uid']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">客户信息</div>
+            <div class="panel-body">
+			
+              <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9">
+						{php echo tpl_form_field_image('avatar', $usershow['avatar'])}
+                    </div>
+               </div>
+
+               <div class="form-group">
+					<label class="col-sm-2 control-label">昵称</label>
+					<div class="col-sm-10">
+					  <p class="form-control-static">{$usershow[nickname]}</p>
+					</div>
+				</div>
+				
+				{if $srdb['ygid']}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分配专属会计</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">头像：
+							{if $usershow1[avatar]}
+							<img src="{php echo tomedia($usershow1[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+							{else}
+							<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+							{/if}
+						</p>
+						<p class="form-control-static">姓名：{$staff_show['name']}</p>
+						<p class="form-control-static">手机号码：{$staff_show['phone']}</p>
+						<p class="form-control-static"><a href="{php echo $this->createWebUrl('service_allocation1', array('did' => $srdb[id]));}" class="btnptspt">更换</a>&nbsp;专属会计!</p>
+                    </div>
+                </div>
+				
+				{else}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分配专属会计</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">未分配专属会计，快去&nbsp;<a href="{php echo $this->createWebUrl('service_allocation1', array('did' => $srdb[id]));}"  class="btnptspt">分配</a>&nbsp;吧!</p>
+                    </div>
+                </div>
+				{/if}
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">成为正式客户</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static"><input type="checkbox" name="type" value="1" {if $srdb['type']} checked {/if}/>&nbsp;是</p>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">正式客户期限</label>
+                    <div class="col-xs-12 col-sm-9" >
+					    {if $newtimes > $srdb['deadline']}
+						<input class="form-control" name="monthadd" id="" type="text" value="" style="width:100px;" onkeyup="this.value=this.value.replace(/[^\d]/ig,'')" placeholder="单位“月”">
+						{else}
+						<p class="form-control-static">{php echo date('Y-m-d H:i', $srdb['deadline']);}</p>
+						{/if}
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">正式客户月费</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="payfees" id="" type="text" value="{$srdb['payfees']}" style="width:100px;" onkeyup="value=value.replace(/[^\d.]/g,'')" placeholder="单位“元/月”"> (默认{$cwgl_config['month_money']}元/月)
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司名称</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="compname" id="" type="text" value="{$srdb['compname']}" >
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系人姓名</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="name" id="" type="text" value="{$srdb['name']}" style="width:200px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系电话</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="phone" id="" type="text" value="{$srdb['phone']}" style="width:300px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司介绍</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_ueditor('message', $srdb['message']);}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{elseif $op == 'import'}
+
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<input type="hidden" name="token" value="{$_W['token']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">批量导入报表</div>
+            <div class="panel-body">
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属年月</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<select name="years" class="t_input">
+							{$yearhtml}
+						</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<select  name="month" class="t_input">
+							{$monthhtml}
+						</select>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">CSV文件样板</label>
+                    <div class="col-xs-12 col-sm-9" >
+						导出客户excel表格后，以此为基础制作成如下的报表，每行最多能添加10个框（A1~A10）&nbsp;<a href="{$urlt}&op=parameter">设置10个参数标题</a>&nbsp;,如下图<br/>
+						<img src="../addons/{$_GPC['m']}/template/tupiangp.jpg" style="max-width:100%;"/>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">导入</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input type="file" name="file" class="t_input">  <span style="color:#666666; padding-top:10px;">*请选择要导入的CSV文件</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="导入" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{elseif $op == 'parameter'}
+
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<input type="hidden" name="token" value="{$_W['token']}" />
+	<input type="hidden" name="type" value="{$type}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">报表参数标题设置</div>
+            <div class="panel-body">
+								
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">参数图样</label>
+                    <div class="col-xs-12 col-sm-9" >
+						参数标题（A1~A10）,如下图<br/>
+						<img src="../addons/{$_GPC['m']}/template/tupiangp.jpg" style="max-width:100%;"/><br/>
+						设置例如：营业收入、 营业利润、 库存现金、 银行存款、 其他应收款、 薪酬支出、 费用支出、 地税、 国税......
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A1</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a1" id="" type="text" value="{$srdb['a1']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A2</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a2" id="" type="text" value="{$srdb['a2']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A3</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a3" id="" type="text" value="{$srdb['a3']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A4</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a4" id="" type="text" value="{$srdb['a4']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A5</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a5" id="" type="text" value="{$srdb['a5']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A6</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a6" id="" type="text" value="{$srdb['a6']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A7</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a7" id="" type="text" value="{$srdb['a7']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A8</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a8" id="" type="text" value="{$srdb['a8']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A9</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a9" id="" type="text" value="{$srdb['a9']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A10</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a10" id="" type="text" value="{$srdb['a10']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A11</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a11" id="" type="text" value="{$srdb['a11']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A12</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a12" id="" type="text" value="{$srdb['a12']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A13</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a13" id="" type="text" value="{$srdb['a13']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A14</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a14" id="" type="text" value="{$srdb['a14']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A15</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a15" id="" type="text" value="{$srdb['a15']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A16</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a16" id="" type="text" value="{$srdb['a16']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A17</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a17" id="" type="text" value="{$srdb['a17']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A18</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a18" id="" type="text" value="{$srdb['a18']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A19</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a19" id="" type="text" value="{$srdb['a19']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A20</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a20" id="" type="text" value="{$srdb['a20']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A21</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a21" id="" type="text" value="{$srdb['a21']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A22</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a22" id="" type="text" value="{$srdb['a22']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A23</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a23" id="" type="text" value="{$srdb['a23']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A24</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a24" id="" type="text" value="{$srdb['a24']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A25</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a25" id="" type="text" value="{$srdb['a25']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A26</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a26" id="" type="text" value="{$srdb['a26']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A27</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a27" id="" type="text" value="{$srdb['a27']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A28</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a28" id="" type="text" value="{$srdb['a28']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A29</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a29" id="" type="text" value="{$srdb['a29']}">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">A30</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="a30" id="" type="text" value="{$srdb['a30']}">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="保 存" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputName2">UID</label>
+				<input type="text" class="form-control" name="uid" placeholder="会员ID">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">NICKNAME</label>
+				<input type="text" class="form-control" name="nickname" placeholder="会员昵称">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">NAME</label>
+				<input type="txt" class="form-control" name="name" placeholder="会员姓名">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">PHONE</label>
+				<input type="txt" class="form-control" name="phone" placeholder="会员手机号码">
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+   
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="100">UID</th>
+			<th >公司名称</th>
+			<th width="150">状态</th>
+			<th >操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td>{$value[uid]}</td>
+			<td>{$value[compname]}</td>
+			<td>
+				{if $value['type']}
+					{$value['status']}
+				{/if}
+			</td>
+			<td>
+				<a href="{php echo $this->createWebUrl('user_notice', array('uid' => $value[uid],'type' => 1))}">发布通知</a> &nbsp;|&nbsp;
+				<a href="{php echo $this->createWebUrl('user_paycost', array('uid' => $value[uid]))}">催费管理</a>  &nbsp;|&nbsp;
+				<a href="{php echo $this->createWebUrl('user_report', array('uid' => $value[uid]))}">账目报表管理</a>  &nbsp;|&nbsp;
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="4">{$pager}</td>
+		</tr>
+		{/if}
+	  </table>
+	</div>
+
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

@@ -1,0 +1,79 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >会员等级</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('cate.list');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" placeholder="有个搜索栏更好看">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button"  form="keyform">搜索</button>
+			        <a href="javascript:void(0);" class="btn btn-default" style="display: inline-block;" onclick="editGroup()">添加等级</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 200px;">等级名称</th> 
+					<th style="width: 150px;">订单额达成条件</th>  
+					<th style="width: 150px;">享受折扣</th>    
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $groups $index $item}
+				<tr> 
+					 
+					<td>{$item['name']}</td> 
+					<td>{$item['moneytotal']}</td>
+					<td><?php echo (floatval($item['percent'])*10)." 折 ";?> </td>   
+					<td>  
+							<a href="<?php echo $this->routeUrl('member.editgroup');?>&groupid={$item['id']}" class="linkbtn" >编辑</a>
+						 
+					 
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+				</tr>
+				 
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+		<p style="color:#ff4444;font-size:13px;">会员折扣可与优惠券叠加，不能与促销、砍价、秒杀、拼团等活动叠加</p>
+	</div>
+	
+</div> 
+	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function editGroup(id=0,name=""){ 
+	 window.location.href="<?php echo $this->routeUrl('member.editGroup');?>&groupid="+id+"&name="+name;
+	} 
+	function remove0(id,text){
+	modalDlg("是否删除"+text+"?",function(){
+		window.location.href="<?php echo $this->routeUrl('member.delGroup');?>&groupid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

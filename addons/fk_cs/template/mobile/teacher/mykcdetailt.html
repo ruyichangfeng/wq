@@ -1,0 +1,114 @@
+<html lang="zh-CN">
+<head>
+    <style type="text/css">@charset "UTF-8";
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
+        display: none !important;
+    }
+
+    ng\:form {
+        display: block;
+    }</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta content="telephone=no" name="format-detection">
+    <title>本节内容</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    {php echo register_jssdk();}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/jquery-1.11.3.min.js?v=4.6"></script>
+    <script src="{OSSURL}public/mobile/js/jquery.js"></script>
+    <script src="{OSSURL}public/mobile/js/PromptBoxUtil.js"></script>
+    <style type="text/css">@media screen {
+        .smnoscreen {
+            display: none
+        }
+    }
+
+    @media print {
+        .smnoprint {
+            display: none
+        }
+    }
+    .flow {display: table;padding: 10px 0;height: 45px;overflow:hidden;}
+    .flow .flow-item:{width: 1%;display:table-cell;text-align:center;font-size:14px;height:24px;line-height:24px;border-right:1px solid #eeeeee;}
+    </style>
+</head>
+<body>
+<div ng-view="" style="height: 100%;" class="ng-scope">
+    <div class="ddb-nav-header ng-scope" common-header="">
+        <div class="flow" style="display: inline-table;padding: 10px 0;height: 20px">
+            {if $flows}
+                {loop $flows  $flow}
+                    {if ($flow['id'] == $item['flow_id'] || ($item['flow_id'] == NULL && $flow['nodeType'] == 1)) && $item['status'] == 1 && $flow['isDone'] == false && $flow['needPic'] == 2}
+                        <div class="flow-item" style=" width:1%; height:30px; background-color:orange; border-radius:25px;display: table-cell;">
+                            <a href="{php echo $this->createMobileUrl('newchecklog',array('schoolid' => $schoolid,'kbid' => $item['id'],'flowid' => $flow['id']))}">
+                                <span style="height:30px; line-height:30px; display:block; color:#FFF; text-align:center">{$flow['name']}</span>
+                            </a>
+                        </div>
+                    {elseif ($flow['id'] == $item['flow_id'] || ($item['flow_id'] == NULL && $flow['nodeType'] == 1)) && $item['status'] == 1 && $flow['isDone'] == false && $flow['needPic'] == 1}
+                        <div class="flow-item" style=" width:1%; height:30px; background-color:orange; border-radius:25px;display: table-cell;">
+                                <span style="height:30px; line-height:30px; display:block; color:#FFF; text-align:center" onclick="checkin({$item['id']},{$flow['id']})">{$flow['name']}</span>
+                        </div>
+                    {elseif $item['status'] == 1 && $flow['isDone'] == true}
+                        <div class="flow-item" style=" width:1%; height:30px; background-color:green; border-radius:25px;display: table-cell;">
+                            <span style="height:30px; line-height:30px; display:block; color:#FFF; text-align:center">{$flow['name']}</span>
+                        </div>
+                    {elseif $item['status'] == 1 && $flow['isDone'] == false}
+                        <div class="flow-item" style=" width:1%; height:30px; background-color:red; border-radius:25px;display: table-cell;">
+                            <span style="height:30px; line-height:30px; display:block; color:#FFF; text-align:center">{$flow['name']}</span>
+                        </div>
+                    {else}
+                        <div class="flow-item" style=" width:1%; height:30px; background-color:grey; border-radius:25px;display: table-cell;">
+                            <span style="height:30px; line-height:30px; display:block; color:#FFF; text-align:center">{$flow['name']}</span>
+                        </div>
+                    {/if}
+                {/loop}
+            {/if}
+        </div>
+    </div>
+    <div class="main-view ng-binding ng-scope" common-header="" style="min-height: 0">
+        <div class="header-title ng-binding">本节内容</div>
+    </div>
+    <div id="ddb-branch-introduction" class="main-view ng-binding ng-scope">
+        {if !empty($item['content'])}{php echo htmlspecialchars_decode($item['content'])}
+        {elseif !empty($lastFlow)}
+        {php echo htmlspecialchars_decode($lastFlow['pic'])}
+        {else}本节课程内容尚未录入{/if}
+    </div>
+</div>
+{php include $this->template('footer');}
+<script type="text/javascript">
+    var PB = new PromptBox();
+    WeixinJSHideAllNonBaseMenuItem();
+    /**微信隐藏工具条**/
+    function WeixinJSHideAllNonBaseMenuItem(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+
+                wx.hideAllNonBaseMenuItem();
+            });
+        }
+    }
+    function checkin(kbid,flowid){
+        var submitData = {
+            schoolid :"{$schoolid}",
+            weid :"{$weid}",
+            kbid :kbid,
+            flowid:flowid,
+            tid:"{$item['tid']}",
+            op:'POST'
+        };
+        $.post("{php echo $this->createMobileUrl('newchecklog')}",submitData,function(data){
+            if(data.result){
+                PB.prompt(data.msg);
+                window.location.href = "{php echo $this->createMobileUrl('mykcdetailt', array('schoolid' => $schoolid), true)}"+'&id='+kbid;
+            }else{
+                PB.prompt(data.msg);
+            }
+        },'json');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品调拨管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goodsinventorytransfer')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="./index.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="goodsinventorytransfer" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-4 m-b-xs">
+                            <a href="javascript:;" id="parentIframe" class="btn btn-primary">
+                                <i class="fa fa-plus"></i>商品调拨添加</a>
+                        </div>
+                        <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">调拨单号</label>
+                        <div class="col-sm-2 col-lg-1">
+                            <input class="form-control" name="inventoryTransferCode" id="" type="text" value="{$_GPC['inventoryTransferCode']}">
+                        </div>
+                        <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width: 100px;">商品名称</label>
+                        <div class="col-sm-2 col-lg-2">
+                            <input class="form-control" name="keyword" id="" type="text" value="{$_GPC['keyword']}">
+                        </div>
+                        <div class="col-sm-2 col-lg-2">
+                            <button class="btn btn-outline btn-primary" type="submit"><i class="fa fa-search"></i> 搜索</button>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </form>
+                <div class="ibox-content">
+                    <form class="form-horizontal form" method="post" >
+
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">id</th>
+                                <th>调拨单据号</th>
+                                <th>商品名称</th>
+                                <th>调拨数量</th>
+                                <th>调拨备注</th>
+                                <th>调出店铺</th>
+                                <th>调入店铺</th>
+                                <th>调拨时间</th>
+                                <!--<th>操作</th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['git_inventoryTransferCode']}</td>
+                                <td>{$item['goo_name']}</td>
+                                <td>{$item['git_number']}</td>
+                                <td>{$item['git_note']}</td>
+                                <td>{php echo util::getStoreOne($item['git_inventoryTransferOutStore_id']);}</td>
+                                <td>{php echo util::getStoreOne($item['git_inventoryTransferInStore_id']);}</td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[git_TransferTime]);}</td>
+                                <!--<td>-->
+                       <!--<span onclick="parent.layer.open({type: 2,title: 'iframe父子操作',maxmin: true,shadeClose: true,area: ['1200px', '700px'],content: '{php echo $this->createWebUrl('goodsinventorytransfer',array('op' => 'detail','id' => $item['id']))}'});"  class="btn btn-primary btn-sm">查看记录</span>-->
+                                <!--</td>-->
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input type="submit" name="delete" class="btn btn-danger fa-times-circle" value="批量删除">
+                                    <input type="hidden" name="token" value="{$_W['token']}"/>
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#parentIframe').on('click', function(){
+        parent.layer.open({
+            type: 2,
+            title: '添加商品调拨',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['1100px' , '800px'],
+            content: '{php echo $this->createWebUrl('goodsinventorytransfer',array('op' => 'add'))}'
+        });
+    });
+</script>
+>
+
+{template 'web/common/footer'}

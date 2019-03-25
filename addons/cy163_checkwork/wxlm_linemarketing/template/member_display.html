@@ -1,0 +1,231 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('member', array('op'=>'display'));}">店员信息管理</a></li>
+    <li><a href="{php echo $this->createWebUrl('member', array('op'=>'create'));}">添加店员</a></li>
+</ul>
+
+<div class="main">
+
+    <div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">店员姓名</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[member_name]" value="{$data['search']['member_name']}" placeholder="可模糊查询"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">店员电话</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[member_tel]" value="{$data['search']['member_tel']}"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">粉丝编号</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[member_openid]" value="{$data['search']['member_openid']}"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">店员信息管理</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:4%;">序号</th>
+                                <th style="width:8%;">店员姓名</th>
+                                <th style="width:10%;">店员电话</th>
+                                <th style="width:15%;">粉丝编号</th>
+                                <th style="width:15%;">所在店面</th>
+                                <th style="width:8%;">可用积分</th>
+                                <th style="width:8%;">可用余额</th>  
+                                <th style="width:8%;">店员状态</th>  
+								<th style="width:30%;" style='text-align: center;'>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['member_name']}
+								</td>
+								<td>
+                                    {$item['member_tel']}
+								</td>
+								<td>
+                                    {$item['member_openid']}
+								</td>
+                                <td  title="{$item['member_storetitle']}">
+                                    {$item['member_storetitle']}
+								</td>
+								<td id="credit1{$item['member_id']}">
+                                    {if $item['member_credit1state']==1}{$item['member_credit1']}{else}无限制{/if}
+								</td>
+								<td id="credit2{$item['member_id']}">
+                                    {if $item['member_credit2state']==1}{$item['member_credit2']}{else}无限制{/if}
+								</td>
+                                <td>
+                                    {if $item['member_state']==2}冻结{else}正常{/if}
+								</td>
+								<td style="text-align: right;">
+									{if $item['member_credit1state']==1||$item['member_credit2state']==1}
+									<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal{$item['member_id']}"  onClick="clearformss({$item['member_id']})">
+									  可用{if $item['member_credit1state']==1&&$item['member_credit2state']==1}积分／余额{else if $item['member_credit1state']==1}积分{else if $item['member_credit2state']==1}余额{/if}充值
+									</button>
+									<!-- Modal -->
+									<div class="modal fade" id="myModal{$item['member_id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="text-align: left;">
+									  <div class="modal-dialog" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									        <h4 class="modal-title" id="myModalLabel" >充值</h4>
+									      </div>
+ 											<form action="" method="post" class="form-horizontal form" id="jifenform{$item['member_id']}">
+										      	<div class="modal-body">
+												{if $item['member_credit1state']==1&&$item['member_credit2state']==1}
+										       	<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>类型</label>
+													<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+														<label class="radio-inline">
+														  <input type="radio" name="credit_type" id="credit_type1" value="1" checked="checked"> 积分
+														</label>
+														<label class="radio-inline">
+														  <input type="radio" name="credit_type" id="credit_type2" value="2" >余额
+														</label>
+													</div>
+												</div>
+												{else if $item['member_credit1state']==1}
+												
+													<input type="hidden" name="credit_type"  value="1" >
+												
+												{else if $item['member_credit2state']==1}
+												
+													<input type="hidden" name="credit_type"  value="2" >
+												
+												{/if}
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>分值</label>
+													<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+														<input type="number" name="credit_number" class="form-control" id="jine{$item['member_id']}" value="" oninput="if(value.length>10)value=value.slice(0,10)" />
+														{if $item['member_credit1state']==1}
+														<div class="help-block">分值的说明："积分只能输入整数，输入负值则扣除分值"</div>
+														{/if}
+													</div>
+												</div>
+										      	</div>
+										      	<div class="modal-footer">
+										      		<input type="hidden" name="member_id" class="form-control" value="{$item['member_id']}" />
+										        	<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+										        	<button type="button" class="btn btn-primary" onClick="submitjifen({$item['member_id']})">提交</button>
+
+										      	</div>
+											</form>
+									    </div>
+									  </div>
+									</div>
+									{/if}
+                                    <a href="{php echo $this->createWebUrl('member', array('op'=>'create','member_id'=>$item['member_id']));}" class="btn btn-primary" >编辑</a>
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('member', array('op'=>'delete', 'member_id'=>$item['member_id']));}" class="btn btn-danger ">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#member_state_0").prop("checked",'checked')
+}
+function submitjifen(id){
+	var re = /^-?\\d+$/,
+		type=$('input:radio[name="credit_type"]:checked').val();
+	if($('#jine').val=='')
+	{
+		alert('请先填写充值分值，在进行提交');		
+	}else if (type==1&&re.test($('#jine').val)){
+		alert('积分分值必须为整数。');		
+	}else{
+		$.ajax({  
+            type:"POST",
+            url: "{php echo $this->createWebUrl('ajaxmember');}",
+            data:$('#jifenform'+id).serialize(),
+            dataType:"json",
+            // dataType:"text",
+            async:false,
+            success: function(data){
+                if(data.result=='success')
+                {
+                	$('#credit'+data.type+id).html(data.rs);
+                	$("#myModal"+id).modal('hide');
+                }else if(data.result=='error1')
+                {
+                	alert('店员账户剩余不能小于0');
+                }else{
+                	alert('充值失败');
+                }
+            }
+        });
+	}		
+}
+function clearformss(id)
+{
+	$("#credit_type1").prop("checked",'checked')
+	$('#jine'+id).val("");
+}
+</script>
+
+{template 'common/footer'}

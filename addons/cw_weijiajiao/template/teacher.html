@@ -1,0 +1,146 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op == 'display'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('teachers', array('op' => 'display'))}">教师管理</a>
+  </li>
+  <li {if $op == 'post'}class="active"{/if}>
+	  {if empty($item['id'])}<a href="{php echo $this->createWebUrl('teachers', array('op' => 'post'))}">新增教师</a>
+	  {else}<a href="{php echo $this->createWebUrl('teachers', array('op' => 'post'))}">编辑教师</a>
+	  {/if}
+	</li>
+</ul>
+{if $op == 'post'}
+<div class="panel panel-default">
+	<div class="panel-heading">
+     	教师设置
+    </div>
+	<div class="panel-body">
+		<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data" >
+			<input type="hidden" name="id" value="{$item['id']}">
+			<div class="panel panel-default">
+				<div class="panel-body">
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+				 		<div class="col-sm-5">
+				 			 <input type="text" name="tecsort" class="form-control" value="{$item['tecsort']}" />
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">教师姓名</label>
+				 		<div class="col-sm-8">
+							<input type="text" name="tecname" class="form-control" value="{$item['tecname']}" />
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">性别</label>
+				 		<div class="col-sm-8">
+							<label  class="radio-inline"><input type="radio" name="texsex" value="1" id="texsex" {if empty($item) || $item['texsex'] == 1}checked="true"{/if} /> 男</label>
+	                        &nbsp;&nbsp;&nbsp;
+	                        <label  class="radio-inline"><input type="radio" name="texsex" value="0" id="texsex"  {if !empty($item) && $item['texsex'] == 0}checked="true"{/if} /> 女</label>
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">年龄</label>
+				 		<div class="col-sm-8">
+							<input type="text" name="tecage" class="form-control" value="{$item['tecage']}" />
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">文化程度</label>
+				 		<div class="col-sm-8">
+				 			<textarea name="tecculture" class="form-control" id="reply-add-text" cols="50">{$item['tecculture']}</textarea>
+				 		</div>
+				 	</div>					
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">教授课程</label>
+				 		<div class="col-sm-8">
+				 			<textarea name="teclesson" class="form-control" id="reply-add-text" cols="50">{$item['teclesson']}</textarea>
+				 		</div>
+				 	</div>		
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">照片</label>
+				 		<div class="col-sm-8">
+							 {php echo tpl_form_field_image('tecpic', $item['tecpic'])}
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">个人说明</label>
+				 		<div class="col-sm-8">
+				 			<textarea name="teccontent" class="form-control" id="reply-add-text" cols="50">{$item['teccontent']}</textarea>
+				 		</div>
+				 	</div>	
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">所属家教机构</label>
+				 		<div class="col-sm-9">
+							<select name='department_id'>
+								<option value='-1'>请选择</option>
+								{loop $departments $dep}
+								<option value='{$dep['id']}' {if $item['department_id'] == $dep['id']}selected{/if}>{$dep['department']}</option>
+								{/loop}
+							</select>
+				 		</div>
+				 	</div>								
+		 		</div>
+			</div>
+			 <div class="form-group">
+			 <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+			 <div class="col-sm-8">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			 </div> 
+			 </div>			
+		</form>
+	</div>
+</div>	
+{elseif $op == 'display'}
+<div style="padding:15px;">
+  <table class="table table-hover">
+    <thead class="navbar-inner">
+      <tr>
+        <th>序号</th>
+        <th>显示顺序</th>
+        <th>姓名</th>
+        <th>性别</th>
+        <th>年龄</th>
+        <th>文化程度</th>
+        <th>教授课程</th>
+        <th>照片</th>
+        <th>个人说明</th>
+        <th>所属家教机构</th>
+        <th>操作</th>
+  </tr>
+</thead>
+{loop $list $item}
+<tr style="align:center;">
+  <td>{$item['id']}</td>
+  <td>{$item['tecsort']}</td>
+  <td>{$item['tecname']}</td>
+  <td>{if $item['texsex'] == 1}
+    <span class="label label-success">男</span>
+        {else}
+        <span class="label label-default">女</span>
+        {/if}</span>
+  </td>
+  <td>{$item['tecage']}</td>
+  <td>{$item['tecculture']}</td>
+  <td>{$item['teclesson']}</td>
+  <td><img style="width: 100px;" src="{php echo $_W['attachurl'].$item['tecpic']}"></td>
+  <td>{$item['teccontent']}</td>
+  <td>{$item['department']}</td>
+  <td>
+    <a href="{php echo $this->createWebUrl('teachers',array('id' => $item['id'] ,'op' => 'post'))}">编辑
+    </a>
+    <a href="{php echo $this->createWebUrl('teachers',array('id' => $item['id'],'op' => 'delete'))}">删除
+    </a>
+  </td>
+</tr>
+{/loop}
+</table>
+</div>
+
+
+
+
+{/if}
+
+{template 'common/footer'}

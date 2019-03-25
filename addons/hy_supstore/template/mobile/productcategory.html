@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrom=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>产品分类</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/category.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/product.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/public/dropload/dropload.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">产品分类</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 头部模块 -->
+        <nav class="top-nav">
+            <ul class="clearfix">
+                <li {if $categoryLevelOneId=='all' }class="active" {/if}><a href="{php echo $this->createMobileUrl('product',array('categoryLevelOneId'=>'all'))}">全部</a></li>
+                <li {if $categoryLevelOneId !='all' }class="active" {/if}>分类 <i class="fa fa-caret-down"></i>
+                    <div class="drop-down">
+                        <div class="arrow"></div>
+                        {loop $listLevelOne $key $item}
+                        <a href="{php echo $this->createMobileUrl('product',array('categoryLevelOneId'=>$item['id']))}" {if $categoryLevelOneId == $item['id']}class="on"{/if}">{$item['name']}</i></a> 
+                        {/loop}
+                    </div>
+                </li>
+                <li><a href="javascript:void(0);" class="icon-left fa fa-sitemap fa-lg" id="changeStyle"></a></li>
+            </ul>
+        </nav>
+        <div class="nav-category clearfix">
+            <ul class="category-head">
+                <li {if $categoryLevelTwoId=='all' }class="active" {/if}><a href="{php echo $this->createMobileUrl('product',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>'all'))}">全部</a></li>
+                {loop $listLevelTwo $key $item}
+                <li {if $categoryLevelTwoId==$item['id']}class="active" {/if}><a href="{php echo $this->createMobileUrl('product',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>$item['id']))}">{$item['name']}</a></li>
+                {/loop}
+            </ul>
+        </div>
+        <div class="product-list" id="productList">
+            <ul class="list clearfix">
+                {loop $listProduct $key $item}
+                <li>
+                    <a href="{php echo $this->createMobileUrl('product',array('op'=>'info','id'=>$item['id']))}">
+                        <div class="img_box"><img class="lazyload" src="../addons/hy_supstore/template/mobile/images/thumb.jpg" data-original="{$_W['attachurl']}{$item['img_url']}" alt=""></div>
+                        <div class="title">{$item['name']}</div>
+                        <div class="middle">
+                            <div class="comment">最新品</div>
+                            <div class="num">正在热卖中</div>
+                        </div>
+                        <div class="bottom">
+                            <div class="price"><span class="thick">¥{$item['price']}</span></div>
+                            <button class="buy">详情</button>
+                        </div>
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+            {if empty($listProduct) || count($listProduct)<1} 
+            <div class="no-content">无数据</div>
+            {/if}
+        </div>
+        <input type="hidden" name="minId" value="{$minId}">
+        <!-- 返回顶部 -->
+        <div id="goTop"><a href="javascript:void(0);" class="fa fa-angle-double-up fa-lg"></a></div>
+        <!-- 返回顶部 -->
+        <!-- 底部导航 -->
+        {template 'footerindex'}
+        <!-- 底部导航 -->
+    </div>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/lazyload/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/dropload/dropload.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/layer-mobile/layer.js"></script>
+    <script>
+    //懒加载
+    $(".lazyload").lazyload({
+        threshold : 200, // 设置阀值
+        effect : "fadeIn" // 设置图片渐入特效
+    });
+    $('.top-nav li').on('click', function(event) {
+        var $target = $(event.target);
+        if ($target.is("li")) {
+            if ($(this).children('.drop-down').is(':visible')) {
+                $(this).children('.drop-down').hide();
+            } else {
+                $(this).children('.drop-down').show();
+            }
+        }
+    })
+    $('#changeStyle').on('click',function(){
+        if($(this).hasClass('fa-sitemap')){
+           $(this).removeClass('fa-sitemap').addClass('fa-sliders');
+           $('#productList').removeClass('product-list').addClass('product-list-horizontal');
+        }else{
+           $(this).removeClass('fa-sliders').addClass('fa-sitemap');
+           $('#productList').removeClass('product-list-horizontal').addClass('product-list');
+        }
+    })
+    goScrollTop();
+    //返回顶部的火箭
+    function goScrollTop(){
+        if($('#goTop>a')[0]){
+            var gotop = $('#goTop>a')[0];
+            var leader = 0,target = 0,timer = 0;
+            $(window).scrollTop() > 0 ? show(gotop):hide(gotop);
+            window.onscroll = function(){
+                leader = $(window).scrollTop();
+                leader > 0 ? show(gotop):hide(gotop);
+                gotop.onclick = function(){
+                    $(window).scrollTop(0);
+                }
+            };
+            function show(obj){
+                $(obj).parent().fadeIn('100');
+            }
+            function hide(obj){
+                $(obj).parent().fadeOut('100');
+            }
+        }
+    }     
+    // // 上拉加载
+    // $('#productList').dropload({
+    //     scrollArea : window,
+    //     loadDownFn : function(me){
+    //         var result = '';
+    //         $.ajax({
+    //             type:'POST',
+    //             url:"{php echo $this->createMobileUrl('product',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>$categoryLevelTwoId))}",
+    //             dataType: 'json',
+    //             data:{minId:$('input[name="minId"]').val(),pagesize:4},
+    //             success:function(data){
+    //                 var list = data.list;
+    //                 var arrLen = list.length;
+    //                 var minId = $('input[name="minId"]').val(data.minId);
+    //                 if(arrLen > 0){
+    //                     for (var i = 0; i < arrLen; i++) {
+    //                         result += '<li>';
+    //                             result += '<a href="{php echo $this->createMobileUrl("product",array("op"=>"info","id"=>"'+Number(list[i].id)+'"))}">';
+    //                                 result += '<div class="img_box"><img class="lazyload" src="{$_W["attachurl"]}'+list[i].img_url+'" alt=""></div>';
+    //                                 result += '<div class="title">'+list[i].name+'</div>';
+    //                                 result += '<div class="middle">';
+    //                                     result += '<div class="comment">最新品</div>';
+    //                                     result += '<div class="num">正在热卖中</div>';
+    //                                 result += '</div>';
+    //                                 result += '<div class="bottom">';
+    //                                     result += '<div class="price"><span class="thick">¥'+list[i].price+'</span></div>';
+    //                                     result += '<button class="buy">详情</button>';
+    //                                 result += '</div>';
+    //                             result += '</a>';
+    //                         result += '</li>';
+    //                     };
+    //                 }else{
+    //                     me.lock();// 锁定
+    //                     me.noData();// 无数据
+    //                 }
+                    
+    //                 setTimeout(function(){
+    //                     $('#productList .list').append(result);
+    //                     me.resetload();// 每次数据插入，必须重置
+    //                 },500);
+    //             },
+    //             error: function(xhr, type){
+    //                 layer.open({
+    //                     content: '加载数据有误',
+    //                     skin: 'msg',
+    //                     time: 2
+    //                 });
+    //                 // 即使加载出错，也得重置
+    //                 me.resetload();
+    //             }
+    //         });
+    //     }
+    // });
+    </script>
+</body>
+
+</html>

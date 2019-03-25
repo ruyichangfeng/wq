@@ -1,0 +1,457 @@
+{template 'web/common/header'}
+<style>
+    .paylist{
+        display:none;
+    }
+</style>
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('quickconsume')}"></a></h5>
+                <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="quickConsumeForm" role="form" >
+                    <input type="hidden" name="c" value="site" />
+                    <input type="hidden" name="a" value="entry" />
+                    <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                    <input type="hidden" name="do" value="quickconsume" />
+                    <input type="hidden" name="op" value="saveQuickConsumeData" />
+                    <input type="hidden" name="storeid" value="{$storeid}" />
+                    <div class="col-sm-12">
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <i class="fa fa-free-code-camp" aria-hidden="true"></i> 快速消费
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">消费</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" name="consumeMoneyCount" id="consumeMoneyCount" class="form-control" style="font-size: xx-large; color: #e10c14 !important;height: 60px;"/>
+                                                <span class="input-group-addon">元</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <button type="button" class="btn btn-outline btn-info" id="span_showGivePoint" style="font-size: large; font-weight: bold">会员消费：1元={php echo util::set('cmp306',$setdata)}积分</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="div_resultMoneyCount">
+                                        <label class="col-sm-2 control-label">合计金额</label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <span class="label" id="span_resultMoneyCount" style="font-size: xx-large; color: #e10c14 !important;"> </span>
+                                                <input type="hidden" name="hidden_resultMoneyCount"  id="hidden_resultMoneyCount" />
+                                                <input type="hidden" name="hidden_resultPointsCount"  id="hidden_resultPointsCount" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-3 control-label"></label>
+                                <div class="col-sm-9">
+                                    <button type="button"  onclick="btn_showReadCard()" class="btn btn-warning btn-lg"><i class="fa fa-spin fa-spinner"></i>&nbsp;读卡</button>
+                                    <button  class="btn btn-lg btn-danger " type="button"  data-toggle="modal" data-target="#consumeOrderData" ><i class="fa fa-money"></i>&nbsp;结&nbsp;账&nbsp;</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                    <button name="referer_submitquickconsume"  onclick="btn_clearMemberInfo()"  id="referer_submitquickconsume" type="button" class="btn btn-lg btn-info"><i class="fa fa-refresh" aria-hidden="true"></i> 清空</button>
+                                </div>
+                            </div>
+                        </div>
+                        {template 'web/common/panel-member-card-info'}
+                        {template 'web/common/paycommon'}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    key('q', function(){
+        payStyle_Check(2);
+    });
+    key('a', function(){
+        payStyle_Check(1);
+    });
+    key('z', function(){
+        payStyle_Check(3);
+    });
+    $(document).ready(function(){
+        $("#consumeMoneyCount").focus();
+        $("#span_showGivePoint").hide();
+        $("#div_resultMoneyCount").hide();
+        $("#quickConsumeForm").validate({
+            rules: {
+                consumeMoneyCount: {
+                    required: true,
+                    number:true,
+                    min:0.01
+                }
+            },
+            messages: {
+                consumeMoneyCount: {
+                    required: "请输入消费金额",
+                    number: "必须输入大于0的消费金额",
+                    min: $.validator.format( "请输入大于0.01的消费金额" )
+                }
+            }
+        });
+        //取付款模态内焦点
+        $('#consumeOrderData').on('shown.bs.modal',function(e){
+            $('#hidden_TextPayCode2').focus();
+        });
+    });
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                        else {
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+                            swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                        }
+                    }
+
+                });
+            });
+
+    }
+    $("#consumeMoneyCount").on('keyup', function (){
+        var cmpdata  = "{php echo util::set('cmp306',$setdata)}";
+        var cmpstatedata  = "{php echo util::set('cmp307',$setdata)}";
+        var consumeMoneyCount = parseFloat($("#consumeMoneyCount").val());
+        var memberId = parseInt($("#memberId").val());
+        var memberMoneyCount = parseFloat($("#memberMoneyCount").val());
+        $("#hidden_realMoneyCount").attr("value",consumeMoneyCount);
+        var resultGivePointsCount = 0;
+        if(memberId > 0){
+            $("#div_resultMoneyCount").show();
+//            if(consumeMoneyCount > memberMoneyCount){
+//                swal("消费超额！", "当前会员卡的储值金额不足以支付消费金额。","error");
+//            }
+            if(cmpstatedata == 1){
+                resultGivePointsCount = (consumeMoneyCount * cmpdata).toFixed(2);
+                $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                $("#span_showGivePoint").show();
+                $("#span_resultMoneyCount").html(consumeMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+            }else{
+                $("#hidden_resultPointsCount").attr("value",0);
+                $("#span_resultMoneyCount").html(consumeMoneyCount+" 元");
+            }
+            $("#hidden_resultMoneyCount").attr("value",consumeMoneyCount.toFixed(2));
+        }
+    });
+    //清空会员信息
+    function btn_clearMemberInfo() {
+        $("#memberId").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#memberNote").attr("value","");
+        $("#txt_PayNote").val("");
+        $("#consumeMoneyCount").val("");
+        $("#consumeMoneyCount").focus();
+        $("#hidden_resultMoneyCount").val("");
+        $("#hidden_resultPointsCount").val("");
+        $("#div_resultMoneyCount").hide();
+    }
+
+    var dingshi1='';
+    var dingshi2='';
+    var imgsrc='{HLMMS_IMG}chenggong.gif';
+    var imgsrc3='{HLMMS_IMG}dengdai.gif';
+    var imgsrc1='{HLMMS_IMG}shibai.gif';
+    function  payStyle_Check(payid){
+        //alert(payid);
+        var imgsrc1='{HLMMS_IMG}dengdai.png';
+        var imgsrc2='{HLMMS_IMG}ma.gif';
+        for(var i=1; i<=3;i++){
+            $('#payStyle_Check'+i).removeClass('main-right-top-active');
+            $('#div_payResultShowOrHide'+i).hide();
+            $('#payresult'+i+'-'+i).html('结果区域');
+            if(i==1 || i==3 ){
+                $('#payresult'+i).attr('src',imgsrc2);
+            }else{
+                $('#payresult'+i).attr('src',imgsrc2);
+            }
+        }
+        $('#hidden_TextPayCode'+payid).val('');
+
+        $('#payStyle_Check'+payid).addClass('main-right-top-active');
+        $('#div_payResultShowOrHide'+payid).show();
+        $('#radio_consumePayStyle'+payid).attr('checked', true);
+        $('#hidden_TextPayCode'+payid).focus();
+
+    }
+
+    //刷卡
+    function ShuaKaPay(){
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var pay_get_TextPayCode2=$('#hidden_TextPayCode2').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "快速消费";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0,请采用现金支付方式！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(pay_get_TextPayCode2==''){
+            swal("操作异常！", "付款码不能为空！","error");
+            return false;
+        }else{
+            if(!/^\d{18}$/.test(pay_get_TextPayCode2)){
+                swal("操作异常！", "付款码格式不对,应为长度为18位数字,请检查！","error");
+                return false;
+            }
+        }
+        var wechatCodePayUrl = "{php echo $this->createWebUrl('doMemberRechargePay', array())}";
+        var wechatCodePayParams = {
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'pay_get_TextPayCode2': pay_get_TextPayCode2
+        };
+        $("#btn_SaveConsumeOrderData2").hide();
+        $.ajax({
+            url: wechatCodePayUrl,
+            data: wechatCodePayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['status'] == 0) {
+
+                    $('#payresult2').attr('src',imgsrc3);
+                    dingshi1=setTimeout("PayResultQuery('"+data['message']['out_trade_no']+"','"+data['message']['out_trade_no_type']+"')",3000);
+
+                } else {
+                    $('#payresult2').attr('src',imgsrc1);
+
+                    setTimeout('waitDoClosePayFalse()',3000);
+                }
+            }
+        });
+    }
+    function PayResultQuery(out_trade_no,out_trade_no_type){
+        if(out_trade_no_type == 'wechatpay'){
+            var PayQueryUrl = "{php echo $this->createWebUrl('doWechatPayQuery', array())}";
+        }else{
+            var PayQueryUrl = "{php echo $this->createWebUrl('doAliPayQuery', array())}";
+        }
+        var order_id=out_trade_no;
+        var order_type=out_trade_no_type;
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultMoneyCount=$('#hidden_resultMoneyCount').val();
+        var hidden_resultPointsCount=$('#hidden_resultPointsCount').val();
+        var consumeType="arsl2";
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "快速消费";
+        }
+        var PayParams = {
+            'out_trade_no': order_id,
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+            'consumeType': consumeType
+        };
+
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+                    $('#payresult2').attr('src',imgsrc);
+                    clearTimeout(dingshi1);
+                    clearTimeout(dingshi2);
+                    setTimeout('waitDoClosePayTrue()',3000);
+                }else{
+                    //alert(data['message']['msg']);
+                    dingshi2=setTimeout("PayResultQuery('"+order_id+"','"+order_type+"')",3000);
+                }
+            }
+        });
+    }
+    function moneryisnum(monery){
+        var reg = new RegExp("^[0-9]+(.[0-9]{1,2})?$");
+        if(!reg.test(monery)){
+            return true;
+        }
+        return false;
+    }
+    function PayNoteFomat(value_txt_PayNote){
+        var reg = new RegExp("^[\u4e00-\u9fa5]{0,}$");
+        if(!reg.test(value_txt_PayNote)){
+            return true;
+        }
+        return false;
+    }
+    //现金和一码付收款
+    function cashPay(){
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_radio_consumePayStyle=$('input:radio[name="radio_consumePayStyle"]:checked').val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultMoneyCount=$('#hidden_resultMoneyCount').val();
+        var hidden_resultPointsCount=$('#hidden_resultPointsCount').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "快速消费";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        var cashPayUrl = "{php echo $this->createWebUrl('quickconsume', array('op' => 'saveQuickConsumeData'))}";
+        var cashPayParams = {
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'radio_consumePayStyle': pay_radio_consumePayStyle,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+        };
+        if(pay_radio_consumePayStyle == 1){
+            $("#yiMaFuPayhidden").hide();
+        }
+        if(pay_radio_consumePayStyle == 3){
+            $("#cashPayhidden").hide();
+        }
+        //alert(JSON.stringify(cashPayParams));
+        $.ajax({
+            url: cashPayUrl,
+            data: cashPayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //alert(data['message']['code']);
+                if (data['message']['code'] == 0) {
+                    if(pay_radio_consumePayStyle == 1){
+                        $('#payresult1').attr('src',imgsrc);
+                        $('#payresult1-1').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc);
+                        $('#payresult3-3').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }
+                } else {
+                    if(pay_radio_consumePayStyle  == 1){
+                        $('#payresult1').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }
+                }
+            }
+        });
+    }
+    //延迟执行
+    function waitDoClosePayTrue(){
+        $('#consumeOrderData').modal('hide');
+        swal("结账成功！", "","success");
+        window.location.reload();
+    }
+    function waitDoClosePayFalse(){
+        $('#consumeOrderData').modal('hide');
+        swal("支付失败！", "操作异常，请重新操作结账。","error");
+        window.location.reload();
+    }
+</script>
+{template 'web/common/footer'}

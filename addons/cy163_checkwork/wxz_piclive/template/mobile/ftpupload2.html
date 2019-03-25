@@ -1,0 +1,83 @@
+﻿<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="<?php  echo $_W['siteroot'];?>app/resource/css/common.min.css" rel="stylesheet">
+                <link href="../addons/wxz_piclive/css/addImage/mui.css" rel="stylesheet" />
+		<link href="../addons/wxz_piclive/css/addImage/tempSale_css.css" rel="stylesheet" />
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/css/addImage/app.css" />
+		<link href="../addons/wxz_piclive/css/addImage/mui.picker.css" rel="stylesheet" />
+		<link href="../addons/wxz_piclive/css/addImage/mui.poppicker.css" rel="stylesheet" />
+                <script src="../addons/wxz_piclive/css/sellercentral/jquery-1.11.1.min.js"></script>
+                <script src="../addons/wxz_piclive/template/mobile/js/util.js"></script>
+                <script src="<?php  echo $_W['siteroot'];?>app/resource/js/require.js"></script>
+	<script type="text/javascript" src="<?php  echo $_W['siteroot'];?>app/resource/js/app/common.js"></script>
+        <style>
+            input[type='submit'], .mui-btn-primary, .mui-btn-blue {
+                color: #fff;
+                border: 1px solid #04be02;
+                background-color: #04be02;
+            }
+            .mui-toast-container{bottom:1000px;margin-left:0px;}
+        </style>
+        </head>
+
+	<body>
+        <link href="../addons/wxz_piclive/css/sellercentral/mui-switch.css" rel="stylesheet" type="text/css">
+		<script src="../addons/wxz_piclive/template/mobile/js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+		</script>
+		<div style="height: 10px;"></div>
+
+		<div class="present_img_sect">
+			<div class="sect_img_title">以下图片需要再次处理 <br/>总共图片<span id="ftpImageNum">{$ftpImageNum}</span>张<br/></div>
+			<ul class="mui-table-view mui-table-view-radio">
+				{loop $ftpimageRows $item}
+				<li class="mui-table-view-cell" showType="0">
+					<a class="mui-navigate-right">
+						ID: {$item['fid']}&nbsp;&nbsp;路径：{$item['picpath']}
+					</a>
+				</li>
+				{/loop}
+			</ul>
+		</div>
+
+		<input type="hidden" name="lid" value="{$lid}">
+        <div class="form-group col-sm-12" style='text-align: center;margin-top:10px;'>
+			<input type="submit" name="submit" value="一键处理" class="btn btn-primary col-lg-1">
+		</div>
+
+		<script type="text/javascript">
+ 			$(function () {
+				$("input[name=submit]").click(function(){
+					var lid = $("input[name=lid]").val();console.log('lid:'+lid);
+					//开始处理图片
+					$.ajax({
+		                url: "{php echo $this->createMobileUrl('ftpupload', array('op' => 'dealImage', 'lid' => $lid))}",
+		                type: 'POST',
+		                data: {},
+		                success:function(res){console.log(res);
+		                	var result = JSON.parse(res);
+		                    if(result.err > 0){
+								alert(result.msg);return false;
+							}
+							alert(result.msg);
+		                    location.href = "{php echo $this->createMobileUrl('ftpupload', array('lid' => $lid))}";
+		                },
+		                error:function(){
+		                    alert('ajax error');
+		                }
+		            });
+				});
+			});
+                        
+            
+		</script>
+	</body>
+
+</html>

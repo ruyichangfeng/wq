@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>会员中心</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='../addons/hy_supstore/template/mobile/style_cz.css' rel='stylesheet' type='text/css'>
+    <link href='../addons/hy_supstore/template/mobile/style_jf.css' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="tabs">
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>1,'uid'=>$_GPC['uid']))}" {if $_GPC[ 'status']==1}class="active" {/if}>使用中</a>
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>2,'uid'=>$_GPC['uid']))}" {if $_GPC[ 'status']==2}class="active" {/if}>已使用</a>
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>0,'uid'=>$_GPC['uid']))}" {if $_GPC[ 'status']==0&&$_GPC[ 'status']!==NULL}class="active" {/if}>已过期</a>
+        </div>
+        <div class="swiper">
+            <div class="oncecard">
+                <dl>
+                    <dt> </dt>
+                    <dd>
+                        <div class="oncecardlist">
+                            <ul>
+                                {loop $list $item}
+                                <li>
+                                    <div class="oncebg">
+                                        <img src="{if $settings['oncecardimg']}{$settings['oncecardimg']}{else}../addons/hy_supstore/template/mobile/images/oncecardbg.png{/if}">
+                                        <p class="p1">{$item['title']}</p>
+                                        <p class="p2">购买时间：{php echo date('Y年m月d日',$item['addtime'])}</p>
+                                        <p class="p3">过期时间：{php echo date('Y年m月d日',$item['expirytime'])}</p>
+                                        <p class="p4">
+                                            {if $item['value']==999999} 使用次数无限制，已使用
+                                            <red>{$item['amount']}</red>次 {else} 共
+                                            <red>{$item['number']}</red>次，已用
+                                            <red>{$item['amount']}</red>次，剩余
+                                            <red>{$item['value']}</red>次 {/if}
+                                        </p>
+                                        <a class="p5" href="{php echo $this->createMobileUrl('oncecardconsumlog',array('oncecardmemid' => $item['id']))}">使用记录</a>
+                                        <p class="p6">{if $item['status']==1}{elseif $item['status']==2}
+                                            <red>已使用</red>{else}
+                                            <red>已过期</red>{/if}</p>
+                                    </div>
+                                </li>
+                                {/loop} 
+                                {if empty($list)}
+                                <div style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无记录</div>
+                                {/if}
+                            </ul>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <style>
+    /*选项卡*/
+
+    .wrap {
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .tabs {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        height: 43px;
+        background: #fff;
+        max-width: 640px;
+    }
+
+    .tabs a {
+        display: block;
+        float: left;
+        width: 33.333333%;
+        color: #424242;
+        text-align: center;
+        background: #eee;
+        line-height: 43px;
+        text-decoration: none;
+        background-color: #fff;
+        font-size: .9rem;
+    }
+
+    .tabs a.active {
+        border-bottom: 2px solid #b79957;
+        color: #b79957;
+    }
+
+    .swiper {
+        width: 100%;
+        padding-top: 50px;
+        height: 100%;
+    }
+
+    .oncecard {
+        margin: 5px 5%;
+        height: 100%;
+    }
+
+    .oncecard>dl>dt {
+        line-height: 40px;
+        font-size: .9rem;
+    }
+
+    .oncecard>dl>dt>a {
+        color: #4b85d2;
+        font-size: .9em;
+        float: right;
+    }
+
+    .oncecardlist {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .oncecardlist li {
+        overflow: hidden;
+        margin: 20px 0;
+        background: #fff;
+        position: relative;
+    }
+
+    .oncebg {
+        padding-bottom: 63.157894737%;
+        position: relative;
+        background: #eee;
+        font-size: 10px;
+    }
+
+    .oncebg>img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1
+    }
+
+    .oncebg p,
+    .oncebg a {
+        position: absolute;
+        z-index: 10;
+        color: #fff;
+    }
+
+    .oncebg .p1 {
+        left: 1rem;
+        top: 1rem;
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+
+    .oncebg .p2 {
+        left: 1rem;
+        top: 2.5rem;
+    }
+
+    .oncebg .p3 {
+        left: 1rem;
+        top: 3.5rem;
+    }
+
+    .oncebg .p4 {
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .oncebg .p5 {
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .oncebg .p6 {
+        left: 1rem;
+        bottom: 1rem;
+    }
+    /*选项卡（END）*/
+    </style>
+    <!--底部导航-->
+    {template 'adminfooter'}
+</body>
+
+</html>

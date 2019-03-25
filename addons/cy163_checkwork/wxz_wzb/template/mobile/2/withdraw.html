@@ -1,0 +1,131 @@
+<html><head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+		<link href="{MODULE_URL}template/mobile/2/css/mui.min.css" rel="stylesheet">
+		
+		<link href="{MODULE_URL}template/mobile/2/css/common.css" rel="stylesheet">
+		<link href="{MODULE_URL}template/mobile/2/css/incomePage.css" rel="stylesheet">
+	</head>
+
+	<body class="mui-ios mui-ios-9 mui-ios-9-1">
+	
+		<div class="main">
+			
+		
+<div class="mui-content">
+ <div class="mui-row">
+        <div class=" mui-col-xs-12">
+            <li class="mui-table-view-cell">
+               
+                 个人历史总收益：<i class="font1">￥{php echo ($viewer['amount'])/100}</i>
+
+                
+            </li>
+        </div>
+        <div class="mui-col-xs-12">
+            <li class="mui-table-view-cell">
+               
+                    已到账金额：<i class="font1">￥{php echo ($viewer['deposit'])/100}</i>
+                
+            </li>
+        </div>
+         <div class=" mui-col-xs-12">
+            <li class="mui-table-view-cell">
+               
+                  未到账金额:<i class="font2">￥{php echo ($viewer['amount']-$viewer['deposit'])/100}</i>
+                <a class="kiting" href="javascript:;" onclick="send();">提现</a>
+            </li>
+        </div>
+        <div class="mui-col-xs-12 box01">
+        	微信限制每人每天只能收到100次赏金，并且提现金额不能小于1元。
+        </div>
+       
+    </div>
+       <div class="content"><div class="NotUesed"></div></div>
+		</div>
+	
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+<script src="{MODULE_URL}template/mobile/2/js/mui.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/dropload/dropload.min.js"></script>
+<script type="text/javascript">
+$(function(){
+   load();
+   function load(){
+     var page = 0;
+         var lock=0;
+        $('.content').dropload({
+        scrollArea : window,
+        loadDownFn : function(me){
+$.ajax({
+                type: 'POST',
+                url: "{php echo $this->createMobileUrl('getincome',array('rid'=>$rid))}",
+                data:{page:page},
+                dataType: 'json',
+                success: function(data){
+                	var str='';
+                	 $.each(data.msg,function(index,value){
+                	 	var start=new Date(value.dateline*1000);
+                	 	 var time=start.getFullYear()+'-'+(start.getMonth()+1)+'-'+start.getDate()+' '+(start.getHours()<10?'0'+start.getHours():start.getHours())+':'+(start.getMinutes()<10?'0'+start.getMinutes():start.getMinutes())+':'+(start.getSeconds()<10?'0'+start.getSeconds():start.getSeconds());          
+   str+=' <div class="mui-card"><div class="mui-card-content" style="position: relative;font-size: 15px;min-height: 60px;padding:0 0 10px 15px ;color: #666;"><div class="live-name">来自'+value.fromnickname+'的';
+   var type='打赏';
+   if(value.type=='2'){
+       type='群红包';
+   }else if(value.type=='3'){
+		type='助力';
+   }
+   	 str+=type+'</div><div>'+type+'金额：￥'+value.amount+'元</div><div>时间：'+time+'</div></div></div>';
+                });
+                    $('.NotUesed').append(str);  
+                    page++;
+     
+                    if(data.msg.length<10)
+                    {
+                      me.lock();
+                        // 无数据
+                        me.noData();
+
+                    }
+                    
+                    me.resetload();
+
+                    // 每次数据加载完，必须重置
+                    
+                },
+                error: function(xhr, type){
+                    //alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });	
+}});
+}
+
+});
+function send()
+{
+	if({php echo ($viewer['amount']-$viewer['deposit'])}==0){
+		mui.alert('您的余额已提现');return false;
+	}
+	$.ajax({
+                type: 'POST',
+                url: "{php echo $this->createMobileurl('withdrawmoney',array('rid'=>$rid))}",
+                dataType: 'json',
+                success: function(data){
+					mui.alert(data.msg,function() {
+						location.replace(document.referrer);
+					});
+                   
+                },
+                error: function(xhr, type){
+                    alert('出错了');
+                     //window.location="/Index/center";
+                }
+
+            });
+}
+</script>
+<div style="display:none;">
+<script src="https://s13.cnzz.com/z_stat.php?id=1273392991&web_id=1273392991" language="JavaScript"></script>
+</div>
+</div></body></html>

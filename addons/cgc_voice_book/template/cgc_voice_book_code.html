@@ -1,0 +1,176 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op== 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl($filename)}">邀请码管理</a></li>
+  <li {if $op== 'post' && empty($id)}class="active"{/if}><a href="{php echo $this->createWebUrl($filename,array('op'=>'post'))}">新建邀请码</a></li>
+  {if !empty($id)}<li class="active"><a>编辑邀请码</a></li> {/if}
+</ul>
+{if $op=='display'}
+<form action="./index.php" id="form1" method="get" class="form-horizontal" role="form">
+<div class="panel panel-info">
+  <div class="panel-heading">筛选</div>
+  <div class="panel-body">
+      <input type="hidden" name="c" value="site" />
+      <input type="hidden" name="a" value="entry" />
+      <input type="hidden" name="m" value="{php echo $this->modulename}" />
+      <input type="hidden" name="do" value="{$filename}" />
+      <div class="form-group">
+        <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">昵称</label>
+        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-4">
+          <input class="form-control" name="nickname" id="" type="text" value="{$_GPC['nickname']}" placeholder="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">邀请码</label>
+        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-4">
+          <input class="form-control" name="invite_code" id="" type="text" value="{$_GPC['invite_code']}" placeholder="">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-3 col-md-2 control-label">
+          <button class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+        </div>
+      </div>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">邀请码列表    (共<i style="color:red">{$total}</i>条记录)</div>
+  <div class="panel-body table-responsive" style="overflow: visible;">
+    <table class="table table-hover">
+      <thead class="navbar-inner">
+        <tr>
+          <th style="width: 5%;">选择</th>
+          <th style="width: 10%;">昵称</th>
+          <th style="width: 10%;">微信ID</th>
+          <th style="width: 10%;">头像</th>
+          <th style="width: 10%;">邀请码</th>
+          <th style="width: 10%;">是否使用</th>
+         <!--  <th style="width: 10%;">是否通过审核</th> -->
+          <th style="width: 10%;">时间</th>
+          <th style="width: 20%;">操作</th>
+        </tr>
+      <tbody id="main">
+        {loop $list $row}
+        <tr>
+          <td><input type="checkbox" name="id[]" value="{$row['id']}" class=""></td>
+          <td style="white-space: normal; word-break: break-all">{$row['nickname']}</td>
+          <td style="white-space: normal; word-break: break-all">{$row['openid']}</td>
+          <td style="white-space: normal; word-break: break-all">{if ($row['headimgurl'])}<img style="width:80px" src="{php echo tomedia($row['headimgurl'])}">{/if}</td>
+          <td style="white-space: normal; word-break: break-all">{$row['invite_code']}</td>
+          <td style="white-space: normal; word-break: break-all">{if empty($row['status'])}<span class="label label-default ">否</span>{else}<span class="label label-success">是</span>{/if}</td>
+          <!-- <td style="white-space: normal; word-break: break-all">{if empty($row['is_check'])}<span class="label label-default ">否</span>{else}<span class="label label-success">是</span>{/if}</td> -->
+          <td style="white-space: normal; word-break: break-all">{php echo date('Y-m-d H:i:s', $row['createtime'])}</td>
+          <td style="white-space: normal; word-break: break-all; overflow: visible;">
+            <a href="{php echo $this->CreateWebUrl($filename,array('op'=>'post','id'=>$row['id']))}" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-edit" ></i></a>
+            <a onclick="if(!confirm('确定删除，删除后数据不可恢复?')) return false;" href="{php echo $this->CreateWebUrl($filename,array('op'=>'delete','id'=>$row['id']))}" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+          </td>
+        </tr>
+        {/loop}
+        <tr>
+          <td>
+            <input type="checkbox" name="" onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+          </td>
+          <td colspan="8">
+            <input type="hidden" id="op" name="op"/>
+            <a href="javascript:batch_del();" class="btn btn-default 
+btn-primary" data-toggle="tooltip" data-placement="top" title="批量删除"><i class="fa fa-times"></i>批量删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {$pager}
+</div>
+</form>
+<script type="text/javascript">
+require(['bootstrap' ], function($) {
+  $('.btn').hover(function() {$(this).tooltip('show');},
+  function() {$(this).tooltip('hide');});
+});
+function displayUrl(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<p class="form-control-static" style="word-break:break-all">直达链接: <br>'+ url + '</p>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>' + '<button type="button" class="btn btn-primary">复制直达链接</button>';
+    var diaobj = u.dialog('查看URL', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.on('shown.bs.modal', function() {u.clip(diaobj.find('.btn-primary')[0], url);});
+  diaobj.modal('show');
+  });
+}
+function displayQr(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<div class="panel panel-default text-center"><img src="' + url + '" alt="二维码" class="img-rounded"></div>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>';
+    var diaobj = u.dialog('查看URL二维码', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.modal('show');
+  });
+}
+function delete_all() {
+  if (confirm('确认删除所有信息吗,删除完不可恢复?')) {
+    location.href = "{php echo $this->createWebUrl($filename, array('op' => 'delete_all'))}";
+  }
+}
+function batch_del() {
+  if (!confirm('确定批量删除吗?')){
+    return false;
+  }else {
+    $('#op').val('batch_del');
+    $('#form1').submit();
+  }
+}
+</script>
+{/if}
+{if $op=='post'}
+<div class="main">
+  <form action="" method="post" class="form-horizontal form" id="form">
+    <div class="panel panel-default">
+      <div class="panel-heading">邀请码信息</div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>昵称</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[nickname]" value="{$page_data['nickname']}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>微信ID</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[openid]" value="{$page_data['openid']}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>头像</label>
+          <div class="col-xs-12 col-sm-8">
+            {php echo tpl_form_field_image("page_data[headimgurl]", $page_data['headimgurl']);}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">邀请码</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[invite_code]" value="{$page_data['invite_code']}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">是否使用</label>
+          <div class="col-xs-12 col-sm-8">
+            <label class="radio-inline"><input type="radio" value="0" name="page_data[status]" {if empty($page_data['status'])}checked{/if}/>否</label><label class="radio-inline"><input type="radio" value="1" name="page_data[status]" {if $page_data['status']==1}checked{/if}/>是</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">是否通过审核</label>
+          <div class="col-xs-12 col-sm-8">
+            <label class="radio-inline"><input type="radio" value="0" name="page_data[is_check]" {if empty($page_data['is_check'])}checked{/if}/>否</label><label class="radio-inline"><input type="radio" value="1" name="page_data[is_check]" {if $page_data['is_check']==1}checked{/if}/>是</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+            <input type="hidden" name="id" value="{$id}" />
+            <input name="submit" type="submit" value="提交" class="btn btn-primary" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{/if}

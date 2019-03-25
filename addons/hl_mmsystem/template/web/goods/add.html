@@ -1,0 +1,421 @@
+{template 'web/common/header'}
+<script type="text/javascript" src="resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+<script src="{HLMMS_JS}scroll.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('goods', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;添加商品</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goods',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" id="goodsform" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                        <input type="hidden" name="id" value="{$item['id']}">
+                        <div class="form-group">
+                            <label for="goodsOrService1" class="col-sm-1 control-label">商品属于</label>
+                            <div class="col-xs-2">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="goodsOrService" id="goodsOrService1" value="1" {if $item['goo_goodsOrService']==1 || empty($item['goo_goodsOrService'])}checked="checked" {/if}>
+                                    <label for="goodsOrService1"> 实物商品 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="goodsOrService" id="goodsOrService2" value="2" {if $item['goo_goodsOrService']==2 }checked="checked" {/if}>
+                                    <label for="goodsOrService2"> 服务商品 </label>
+                                </div>
+                            </div>
+                            <label for="typeid" class="col-sm-1 control-label">商品类别</label>
+                            <div class="col-xs-2">
+                                <select class="form-control m-b" name="typeid" id="selectgoodstype">
+                                    <option value="0">请选择</option>
+                                    {loop $goodstypelist $goodstypeitem}
+                                    <option value="{$goodstypeitem['id']}" {if $goodstypeitem['id'] == $item['goodsTypeId']}selected ='selected'{/if}>{$goodstypeitem['gt_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                            <label for="goodsUnitId" class="col-sm-1 control-label">计量单位</label>
+                            <div class="col-xs-2">
+                                {if $item['goo_goodsOrService']==1}
+                                <select class="form-control m-b"  id="selectgoodsunitreal">
+                                    <option value="">请选择</option>
+                                    {loop $goodsunitreallist $goodsunitrealitem}
+                                    <option value="{$goodsunitrealitem['id']}" {if $goodsunitrealitem['id'] == $item['goodsUnit_id']}selected ='selected'{/if}>{$goodsunitrealitem['gu_name']}</option>
+                                    {/loop}
+                                </select>
+                                {else}
+                                <select class="form-control m-b"  id="selectgoodsunitreal">
+                                    <option value="">请选择</option>
+                                    {loop $goodsunitreallist $goodsunitrealitem}
+                                    <option value="{$goodsunitrealitem['id']}">{$goodsunitrealitem['gu_name']}</option>
+                                    {/loop}
+                                </select>
+                                {/if}
+                                {if $item['goo_goodsOrService']==2}
+                                <select class="form-control m-b" id="selectgoodsunitservice">
+                                    <option value="">请选择</option>
+                                    {loop $goodsunitservicelist $goodsunitserviceitem}
+                                    <option value="{$goodsunitserviceitem['id']}" {if $goodsunitserviceitem['id'] == $item['goodsUnit_id']}selected ='selected'{/if}>{$goodsunitserviceitem['gu_name']}</option>
+                                    {/loop}
+                                </select>
+                                {else}
+                                <select class="form-control m-b" id="selectgoodsunitservice">
+                                    <option value="">请选择</option>
+                                    {loop $goodsunitservicelist $goodsunitserviceitem}
+                                    <option value="{$goodsunitserviceitem['id']}" >{$goodsunitserviceitem['gu_name']}</option>
+                                    {/loop}
+                                </select>
+                                {/if}
+                            </div>
+                            <label for="goostatus" class="col-sm-1 control-label">状态</label>
+                            <div class="col-xs-2">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="goostatus" id="goostatus1" value="1" {if $item['goo_status']==1 || empty($item['goo_status'])}checked="checked" {/if}>
+                                    <label for="goostatus1"> 上架 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="goostatus" id="goostatus2" value="2" {if $item['goo_status']==2 }checked="checked" {/if}>
+                                    <label for="goostatus2"> 停售 </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="col-sm-1 control-label">名称</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="name1" class="form-control" value="{$item['goo_name']}" id='name1' required aria-required="true"/>
+                            </div>
+                            <label for="title" class="col-sm-1 control-label">条码编号</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="code" id="code" class="form-control" value="{$item['goo_code']}" id='code'/>
+                            </div>
+                            <label for="title" class="col-sm-1 control-label">助记码</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="pinYin" class="form-control" value="{$item['goo_pinYin']}" id='pinYin' required aria-required="true"/>
+                            </div>
+                            <label for="title" class="col-sm-1 control-label" >简称</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="nick" class="form-control" value="{$item['goo_nick']}" id='nick'required aria-required="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchasePrice" class="col-sm-1 control-label">入库价格</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="purchasePrice" class="form-control" value="{$item['goo_purchasePrice']}" id='purchasePrice' placeholder="{$item['goo_purchasePrice']}" required aria-required="true"/>
+                            </div>
+                            <label for="listPrice" class="col-sm-1 control-label">标价</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="listPrice" class="form-control" value="{$item['goo_listPrice']}" id='listPrice' placeholder="{$item['goo_listPrice']}" required aria-required="true"/>
+                            </div>
+                            <label for="price" class="col-sm-1 control-label">售价</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="price" class="form-control" value="{$item['goo_price']}" id='price' placeholder="{$item['goo_price']}" required aria-required="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group"style="display: none;">
+                            <label for="minPrice" class="col-sm-1 control-label ">最低限价</label>
+                            <div class="col-xs-3">
+                                <input type="number" name="minPrice" class="form-control" value="{$item['goo_minPrice']}" id='minPrice'required aria-required="true"/>
+                            </div>
+                            <label for="bargainPrice" class="col-sm-1 control-label">特价价格</label>
+                            <div class="col-xs-3">
+                                <input type="number" name="bargainPrice" class="form-control" value="{$item['goo_bargainPrice']}" id='bargainPrice'required aria-required="true"/>
+                            </div>
+                            <label for="number" class="col-sm-1 control-label">库存数量</label>
+                            <div class="col-xs-3">
+                                <input type="number" name="number" class="form-control" value="{$item['goo_number']}" id='number' required aria-required="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="col-sm-1 control-label">描述</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="description" class="form-control" value="{$item['goo_description']}" id='description' required aria-required="true"/>
+                            </div>
+                            <label for="supplierId" class="col-sm-1 control-label"style="display: none;">所属供应商</label>
+                            <div class="col-xs-2"style="display: none;">
+                                <select class="form-control m-b" name="supplierId" id="supplierId" value="{$parentitem['id']}">
+                                    <option value="">请选择</option>
+                                    {loop $goodssupplierlist $goodssupplieritem}
+                                    <option value="{$goodssupplieritem['id']}" {if $goodssupplieritem['id'] == $item['goodssupplier_id']}selected ='selected'{/if}>{$goodssupplieritem['gs_supplierName']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                            <label for="content" class="col-sm-1 control-label"id="pic">商品详情图</label>
+                            <div class="col-xs-5">
+                                {php echo tpl_form_field_multi_image('thumbs',$piclist)}
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="content" class="col-sm-1 control-label"id="picture">商品封面图</label>
+                            <div class="col-xs-5">
+                                {php echo tpl_form_field_image('goopicture', $item['goo_picture'])}
+                            </div>
+
+                            {if $item['id'] != null}
+                            {else}
+                            <label for="ifPublishToMall" class="col-sm-1 control-label">发布到微信商城</label>
+                            <div class="col-xs-2">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="ifPublishToMall" id="ifPublishToMall1" value="1" {if $item['goo_ifPublishToMall']==1 }checked="checked" {/if}>
+                                    <label for="ifPublishToMall1"> 是 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="ifPublishToMall" id="ifPublishToMall2" value="2" {if $item['goo_ifPublishToMall']==2 || empty($item['goo_ifPublishToMall'])}checked="checked" {/if}>
+                                    <label for="ifPublishToMall2"> 否 </label>
+                                </div>
+                            </div>
+                            {/if}
+
+                            <label for="size" class="col-sm-1 control-label">规格状态</label>
+                            <div class="col-xs-2">
+
+                                    <div class="radio radio-info radio-inline">
+                                        <input type="radio" name="specificationstatus" id="specificationstatus1" value="1" {if $item['goo_size']==1 || empty($item['goo_size'])}checked="checked" {/if}>
+                                        <label for="specificationstatus1"> 开启 </label>
+                                    </div>
+                                    <div class="radio radio-inline radio-danger">
+                                        <input type="radio" name="specificationstatus" id="specificationstatus2" value="0" {if $item['goo_size']==0 }checked="checked" {/if}>
+                                        <label for="specificationstatus2"> 关闭 </label>
+                                    </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group" id="specification_hidde">
+                            <label for="content" class="col-sm-1 control-label"id="picture">规格</label>
+                            <div class="col-xs-11">
+                                <div class="panel-body">
+                                    <div class="panel-body table-responsive" style="padding:0px;">
+                                        <table class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th style='width:50px;'></th>
+                                                <th>规格</th>
+                                                <th>价格</th>
+                                                <th>编码</th>
+                                                <th>条码</th>
+                                                <th>库存</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="option-items">
+                                            {loop $specificationjson $specificationjsonloop}
+                                            <tr>
+                                                <td>
+                                                    <a href="javascript:;" class="fa fa-move" title="拖动调整此显示顺序"><i class="fa fa-arrows"></i></a>&nbsp;
+                                                    <a href="javascript:;" onclick="deleteoption(this)" style="margin-top:10px;" title="删除"><i class='fa fa-remove'></i></a>
+                                                </td>
+                                                <td>
+                                                    <input name="specification_title[]" type="text" class="form-control option_title" value="{$specificationjsonloop['specification_title']}"/>
+                                                </td>
+                                                <td><input name="specification_price[]" type="text" class="form-control option_normalprice" value="{$specificationjsonloop['specification_price']}"/></td>
+                                                <td><input name="specification_code[]" type="text"  class="form-control  option_stock" value="{$specificationjsonloop['specification_code']}"/></td>
+                                                <td><input name="specification_barcode[]" type="text"  class="form-control  option_stock" value="{$specificationjsonloop['specification_barcode']}"/></td>
+                                                <td><input name="specification_stock[]" type="text" readonly class="form-control  option_stock" value="{$specificationjsonloop['specification_stock']}"/></td>
+                                            </tr>
+                                            {/loop}
+                                            </tbody>
+                                            <tbody>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <a href="javascript:;" id='add-option' onclick="addoption()" style="margin-top:10px;"  title="添加规格"><i class='fa fa-plus'></i>添加规格</a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="content" class="col-sm-1 control-label">详细内容</label>
+                            <div class="col-xs-6" name="content">
+                                {php echo tpl_ueditor('content',$item['goo_content']);}
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-5 control-label"></label>
+                            <div class="col-sm-2">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script language="javascript">
+    $(document).ready(function(){
+        {if $item['goo_size'] == 1}
+        $("#specification_hidde").show();
+        {else}
+        $("#specification_hidde").hide();
+        {/if}
+        $("#specificationstatus1").click(function(){
+            $("#specification_hidde").show();
+        });
+        $("#specificationstatus2").click(function(){
+            $("#specification_hidde").hide();
+        });
+    });
+
+    $(function(){
+        $("#option-items").sortable({handle:'.fa-move'});
+    })
+    function addoption() {
+        var customizespecification="         <tr>\n" +
+            "                                                <td>\n" +
+            "                                                    <a href=\"javascript:;\" class=\"fa fa-move\" title=\"拖动调整此显示顺序\"><i class=\"fa fa-arrows\"></i></a>&nbsp;\n" +
+            "                                                    <a href=\"javascript:;\" onclick=\"deleteoption(this)\" style=\"margin-top:10px;\" title=\"删除\"><i class='fa fa-remove'></i></a>\n" +
+            "                                                </td>\n" +
+            "                                                <td>\n" +
+            "                                                    <input name=\"specification_title[]\" type=\"text\" class=\"form-control option_title\" value=\"{$specificationjsonloop['specification_title']}\"/>\n" +
+            "                                                </td>\n" +
+            "                                                <td><input name=\"specification_price[]\" type=\"text\" class=\"form-control option_normalprice\" value=\"{$specificationjsonloop['specification_price']}\"/></td>\n" +
+            "                                                <td><input name=\"specification_code[]\" type=\"text\"  class=\"form-control  option_stock\" value=\"{$specificationjsonloop['specification_code']}\"/></td>\n" +
+            "                                                <td><input name=\"specification_barcode[]\" type=\"text\"  class=\"form-control  option_stock\" value=\"{$specificationjsonloop['specification_barcode']}\"/></td>\n" +
+            "                                                <td><input name=\"specification_stock[]\" type=\"text\" readonly class=\"form-control  option_stock\" value=\"{$specificationjsonloop['specification_stock']}\"/></td>\n" +
+            "                                            </tr>";
+        $('#option-items').append(customizespecification);
+        return;
+    }
+    function deleteoption(o) {
+        $(o).parent().parent().remove();
+    }
+</script>
+<script type="text/javascript">
+    {if empty($id) }
+    $("#selectgoodsunitservice").hide();
+    $("#selectgoodsunitreal").attr("name","goodsUnitId");
+    {else}
+    {if $item['goo_goodsOrService']==1}
+    $("#selectgoodsunitservice").hide();
+    $("#selectgoodsunitreal").attr("name","goodsUnitId");
+    {/if}
+        {if $item['goo_goodsOrService']==2}
+        $("#selectgoodsunitreal").hide();
+        $("#selectgoodsunitservice").attr("name","goodsUnitId");
+        {/if}
+            {/if}
+                $("#goodsOrService1").click(function(){
+                    $("#selectgoodsunitservice").hide();
+                    $("#selectgoodsunitservice").attr("name","");
+                    $("#selectgoodsunitreal").attr("name","goodsUnitId");
+                    $("#selectgoodsunitreal").show();
+
+                });
+                $("#goodsOrService2").click(function(){
+                    $("#selectgoodsunitservice").attr("name","goodsUnitId");
+                    $("#selectgoodsunitservice").show();
+                    $("#selectgoodsunitreal").attr("name","");
+                    $("#selectgoodsunitreal").hide();
+                });
+
+                $().ready(function() {
+                    $("#goodsform").validate({
+                        rules: {
+                            name1: {
+                                required: true
+                            }, nick: {
+                                required: true,
+                                isChinese:true
+                            },code: {
+                                required: true,
+                                digits:true,
+                                rangelength:[0,13],
+                                min:0
+                            }, description: {
+                                required: true
+                            },pinYin: {
+                                required: true,
+                                isEnglish:true
+                            },purchasePrice: {
+                                required: true,
+                                number:true,
+                                min:0.01
+                            },listPrice: {
+                                required: true,
+                                number:true,
+                                min:0.01
+                            },price: {
+                                required: true,
+                                number:true,
+                                min:0.01
+                            },size: {
+                                rangelength:[0,20]
+                            }, goopicture:{
+                                url:false
+                            }
+                        },
+                        messages: {
+                            name1: {
+                                required: "请填写商品名称"
+                            }, nick: {
+                                required: "请填写商品简称（必须中文）",
+                                isChinese: "请填写中文简称"
+                            }, code: {
+                                required: "请填写条码编号（13位数字整数）",
+                                digits:"请输入整数",
+                                rangelength:"请输入13位"
+                            },description: {
+                                required: "请填写商品描述"
+                            },pinYin: {
+                                required: "请填写助记码（商品大写首字母）",
+                                isEnglish: "请输入大写英文字母"
+                            },purchasePrice: {
+                                required: "请填写金额"
+                            },listPrice: {
+                                required: "请填写金额"
+                            },price: {
+                                required: "请填写金额"
+                            },size: {
+                                rangelength:"最多支持20个字符"
+                            }
+                        }
+                    });
+                    jQuery.validator.addMethod("isChinese", function(value, element) {
+                        return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+                    }, "只能包含中文字符。");
+
+                    jQuery.validator.addMethod("isPwd", function(value, element) {
+                        return this.optional(element) || /^[a-zA-Z]\\w{6,12}$/.test(value);
+                    }, "以字母开头，长度在6-12之间，只能包含字符、数字和下划线。");
+
+                    jQuery.validator.addMethod("isEnglish", function(value, element) {
+                        return this.optional(element) || /^[A-Z]+$/.test(value);
+                    }, "只能包含英文字符。");
+                });
+
+                $("#code,#pinYin").blur(function(){
+
+                    var code = $("#code").val();
+                    var pinyin = $("#pinYin").val();
+                    $.ajax({
+                        type: "post",
+                        url: "{php echo $this->createWebUrl('goods', array('op' => 'comparisoncodepinyin'))}",
+                        data: { code:code,pinyin:pinyin},
+                        dataType: 'JSON',
+                        success: function (data) {
+                            if (data['message']['sign']==1) {
+                                swal({
+                                    title: "请确认商品条码唯一性！",
+                                    type:"error",
+                                    showConfirmButton: true
+                                })
+                            }else if(data['message']['sign']==0){
+                                swal({
+                                    title: "请确认商品助记码唯一性！",
+                                    type:"error",
+                                    showConfirmButton: true
+                                })
+                            }
+                        },
+                    });
+
+                })
+
+
+</script>
+
+{template 'web/common/footer'}

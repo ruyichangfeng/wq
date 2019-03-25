@@ -1,0 +1,125 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('organization', array('op' => 'list'))}"></a> &nbsp;编辑机构信息</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('organization',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="organizAtionAdd">
+                    <input type="hidden" name="id" value="{$item['id']}">
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">机构名称</label>
+                        <div class="col-xs-3">
+                            <input type="text" name="name" class="form-control" value="{$item['org_name']}" id='name' placeholder="请输入机构名称"/>
+                        </div>
+                        <label  class="col-sm-1 control-label">上级机构</label>
+                        <div class="col-xs-3">
+                            <select class="form-control m-b" name="upHierarchy" id="upHierarchy" >
+                                <option value=""> 无</option>
+                                {loop $organizationtype $itemuphierarchy}
+                                <option value="{$itemuphierarchy['id']}" {if $itemuphierarchy['id'] == $item['org_upHierarchyId']}selected ='selected'{/if}>{$itemuphierarchy['org_name']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="contactMan" class="col-sm-3 control-label">联系人</label>
+                        <div class="col-xs-3">
+                            <input type="text" name="contactMan" class="form-control" value="{$item['org_contactMan']}" id='contactMan' placeholder="请输入联系人"/>
+                        </div>
+                        <label for="contactTel" class="col-sm-1 control-label">联系电话</label>
+                        <div class="col-xs-3">
+                            <input type="text" name="contactTel" class="form-control" value="{$item['org_contactTel']}" id='contactTel' placeholder="请输入电话号码"/>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">所属区域</label>
+                        <div class="col-xs-7">
+                            {php echo tpl_form_field_district('reside',array('province' => $item['province'],'city' => $item['city'],'district' => $item['district']));}
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">详细地址</label>
+                        <div class="col-xs-7">
+                            <input type="text" name="detailAdress" class="form-control" value="{$item['org_detailAdress']}" id='detailAdress' placeholder="请输入详细地址"/>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="note" class="col-sm-3 control-label">机构描述</label>
+                        <div class="col-xs-7">
+                            <input type="text" name="description" class="form-control input-lg m-b" value="{$item['org_description']}" id='description' placeholder="请输入描述"></input>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="note" class="col-sm-3 control-label">备注</label>
+                        <div class="col-xs-7">
+                            <input type="text" name="note" class="form-control" value="{$item['org_note']}" id='note' placeholder="请输入备注"/>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-5 control-label"></label>
+                        <div class="col-sm-7">
+                            <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </div>
+                </form>
+                </div></div></div></div></div>
+<script>
+    $("#organizAtionAdd").validate({
+        rules: {
+            name: {
+                required: true,
+                name1:true,
+                maxlength:20,
+            },
+            contactMan: {
+                required: true,
+                name1:true,
+                maxlength:7,
+                minlength:2,
+            },
+            contactTel: {
+                required: true,
+                digits:true,
+                maxlength:11,
+                minlength:11,
+            },
+            detailAdress: {
+                required: true,
+            },
+        },
+        messages: {
+            name: {
+                required: "请输入机构名称",
+                maxlength: $.validator.format( "不能大于20个字" ),
+            },
+            contactMan: {
+                required: "请输入联系人"
+            },
+            contactTel: {
+                required: "请输入联系人电话",
+                digits:"请输入正确的电话号码",
+                maxlength: $.validator.format( "请输入正确的电话号码" ),
+                minlength: $.validator.format( "请输入正确的电话号码" )
+            },
+            detailAdress: {
+                required: "请输入地址"
+            },
+        }
+    });
+    jQuery.validator.addMethod("name1", function(value, element) {
+        return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+    }, "只能包含中文字符。");
+</script>
+{template 'web/common/footer'}

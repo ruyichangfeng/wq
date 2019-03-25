@@ -1,0 +1,209 @@
+{template 'common/header'}
+{template 'user_header'}
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+	.btnptspt{
+	   padding-left:8px; padding-right:8px; padding-bottom:5px; padding-top:5px;
+	   color:#fff;
+	   border-radius:5px;
+	   background-color:#EF4F4F;
+	}
+</style>
+{if $op == 'edit'}
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+	<input type="hidden" name="id" value="{$srdb['id']}" />
+	<input type="hidden" name="uid" value="{$srdb['uid']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">待发展客户信息</div>
+            <div class="panel-body">
+			
+               <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9">
+						{php echo tpl_form_field_image('avatar', $usershow['avatar'])}
+                    </div>
+               </div>
+
+               <div class="form-group">
+					<label class="col-sm-2 control-label">昵称</label>
+					<div class="col-sm-10">
+					  <p class="form-control-static">{$usershow[nickname]}</p>
+					</div>
+				</div>
+				
+				{if $srdb['ygid']}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分配专属会计</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">头像：
+							{if $usershow1[avatar]}
+							<img src="{php echo tomedia($usershow1[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+							{else}
+							<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+							{/if}
+						</p>
+						<p class="form-control-static">姓名：{$staff_show['name']}</p>
+						<p class="form-control-static">手机号码：{$staff_show['phone']}</p>
+						<p class="form-control-static"><a href="{php echo $this->createWebUrl('service_allocation1', array('did' => $srdb[id]));}" class="btnptspt">更换</a>&nbsp;专属会计!</p>
+                    </div>
+                </div>
+				
+				{else}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分配专属会计</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">未分配专属会计，快去&nbsp;<a href="{php echo $this->createWebUrl('service_allocation1', array('did' => $srdb[id]));}"  class="btnptspt">分配</a>&nbsp;吧!</p>
+                    </div>
+                </div>
+				{/if}
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">成为正式客户</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static"><input type="checkbox" name="type" value="1" {if $srdb['type']} checked {/if}/>&nbsp;是</p>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">正式客户期限</label>
+                    <div class="col-xs-12 col-sm-9" >
+					    {if $newtimes > $srdb['deadline']}
+						<input class="form-control" name="monthadd" id="" type="text" value="" style="width:100px;" onkeyup="this.value=this.value.replace(/[^\d]/ig,'')" placeholder="单位“月”">
+						{else}
+						<p class="form-control-static">{php echo date('Y-m-d H:i', $srdb['deadline']);}</p>
+						{/if}
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">正式客户月费</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="payfees" id="" type="text" value="{$srdb['payfees']}" style="width:100px;" onkeyup="this.value=this.value.replace(/[^\d]/ig,'')" placeholder="单位“元/月”">(默认{$cwgl_config['month_money']}元/月)
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司名称</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="compname" id="" type="text" value="{$srdb['compname']}" >
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系人姓名</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="name" id="" type="text" value="{$srdb['name']}" style="width:200px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系电话</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="phone" id="" type="text" value="{$srdb['phone']}" style="width:300px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司介绍</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_ueditor('message', $srdb['message']);}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputName2">UID</label>
+				<input type="text" class="form-control" name="uid" placeholder="会员ID">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">NICKNAME</label>
+				<input type="text" class="form-control" name="nickname" placeholder="会员昵称">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">NAME</label>
+				<input type="txt" class="form-control" name="name" placeholder="会员姓名">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">PHONE</label>
+				<input type="txt" class="form-control" name="phone" placeholder="会员手机号码">
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+   
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="100">UID</th>
+			<th >公司名称</th>
+			<th >姓名</th>
+			<th >手机号码</th>
+			<th >操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td>{$value[uid]}</td>
+			<td>{$value[compname]}</td>
+			<td>{$value['name']}</td>
+			<td>{$value['phone']}</td>
+			<td>
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="5">{$pager}</td>
+		</tr>
+		{/if}
+	  </table>
+	</div>
+
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

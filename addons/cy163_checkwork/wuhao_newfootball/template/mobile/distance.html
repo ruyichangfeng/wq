@@ -1,0 +1,99 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Oi74PC4xKgTluClWpExGa7ItBoDGi5DD"></script>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.js"></script>>
+	<title>浏览器定位</title>
+</head>
+<body>
+	<div id="allmap"></div>
+	<input type="hidden" name="place" id="place" value="{$data_matches['place']}">
+	<input type="hidden" name="matchid" id="matchid" value="{$data_baoming['matchid']}">
+	<input type="hidden" name="id" id="id" value="{$data_baoming['id']}">
+</body>
+</html>
+<script type="text/javascript">
+
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	map.centerAndZoom("青岛",12);  //初始化地图,设置城市和地图级别。
+
+	// 创建地址解析器实例
+	var myGeo = new BMap.Geocoder();
+	// 将地址解析结果显示在地图上,并调整地图视野
+	var dest=document.getElementById("place").value;
+	var matchid=document.getElementById("matchid").value;
+	var id=document.getElementById("id").value;
+	console.log(dest);
+	console.log(matchid);
+	console.log(id);
+	//var pointA=new BMap.Point();
+	myGeo.getPoint(dest, function(point){
+		if (point) {
+			//map.centerAndZoom(point, 16);
+			//map.addOverlay(new BMap.Marker(point));
+			var pointA=new BMap.Point(point.lng,point.lat);
+
+			//console.log(point);
+			//console.log(pointA);
+
+
+
+			var geolocation = new BMap.Geolocation();
+	
+			geolocation.getCurrentPosition(function(r){
+				if(this.getStatus() == BMAP_STATUS_SUCCESS){
+					// var mk = new BMap.Marker(r.point);
+					// map.centerAndZoom(r.point, 16);
+					// map.addOverlay(mk);
+					// map.panTo(r.point);
+					// console.log(r.point);
+					//alert('您的位置：'+r.point.lng+','+r.point.lat);
+					var pointB=new BMap.Point(r.point.lng,r.point.lat);
+					//console.log(pointA);
+					//console.log(pointB);
+					var distance=map.getDistance(pointA,pointB).toFixed(2);
+					alert('从'+dest+'到您的位置的距离是：'+distance+' 米。');  //获取两点距离,保留小数点后两位
+					var polyline = new BMap.Polyline([pointA,pointB], {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5});  //定义折线
+					map.addOverlay(polyline);     //添加折线到地图上
+
+					if(distance>500){						
+						alert('您的位置不能签到，请到'+dest+'再签到');
+					}else{
+						var url = "{php echo $this->createMobileUrl('qiandaosuccess')}";
+						$.ajax({
+							"url":url,
+							type:'POST',
+							data:{matchid:matchid,id:id},						
+							dataType:'json',
+							async:false,
+							success:function(data){
+								console.log(data);
+								alert(data);
+								location.href="{php echo $this->createMobileUrl('qiandao')}";						
+							},
+							error: function (msg) {  
+					          	alert(msg['responseText']);  
+								console.log(msg);
+								location.href="{php echo $this->createMobileUrl('qiandao')}";
+								//alert(msg);
+					      	}
+						});
+					}					
+				}
+				else {
+					alert('failed'+this.getStatus());
+				}        
+			},{enableHighAccuracy: true})
+
+		}else{
+			alert("您选择地址没有解析到结果!");
+		}
+	}, "青岛市");
+
+
+</script>

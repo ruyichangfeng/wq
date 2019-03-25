@@ -1,0 +1,148 @@
+{template 'web/common/header'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagemobanaddmanage')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                   <li class="active"><a href="{php echo $this->createWebUrl('messagemobanaddmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                 </ul>
+                                <div class="tab-content">
+                                    <div id="tab-2" class="tab-pane active">
+                                        <div class="ibox-content">
+                                            <form action="" method="post">
+                                                <form action="./index.php" method="get" class="form-horizontal form-search" role="form">
+                                                    <input type="hidden" name="c" value="site" />
+                                                    <input type="hidden" name="a" value="entry" />
+                                                    <input type="hidden" name="m" value="hl_mmsystem" />
+                                                    <input type="hidden" name="do" value="messagemobanaddmanage" />
+                                                    <div class="page-toolbar row m-b-sm m-t-sm">
+                                                        <div class="col-sm-6">
+                                                            <div class="input-group-btn">
+                                                                <a  class="btn btn-success" href="{php echo $this->createWebUrl('messagebursts',array('op'=>'addapplication'))}"><i class="fa fa-plus"></i> 添加新模板</a>
+                                                                <button class="btn btn-warning" style="margin-right: 3px;margin-left: 3px;" type="button" onclick='refresh()'>
+                                                                    <i class='fa fa-refresh'></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 pull-right">
+                                                            <div class="input-group">
+                                                                <input type="text" class="input form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入关键词">
+                                                                <span class="input-group-btn"><button class="btn btn-primary" type="submit">搜索</button></span>&nbsp;&nbsp;
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                <div class="blank"></div>
+                                                {if count($list)>0}
+                                                <table class="table table-bordered table-responsive table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th style="width:25px;">
+                                                            <input type='checkbox' onclick="swapCheck()" />
+                                                        </th>
+                                                        <th>模板名称</th>
+                                                        <th>申请状态</th>
+                                                        <th>支付状态</th>
+                                                        <th class="text-right">操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {loop $list $row}
+                                                    <tr>
+                                                        <td>
+                                                            <input type='checkbox' value="{$row['id']}"/>
+                                                        </td>
+                                                        <td>
+                                                            {$row['mt_title']}
+                                                        </td>
+                                                        <td>
+                                                            {if $row['mt_application']==1 }<span class="badge badge-warning">申请中</span>
+                                                            {else if $row['mt_application']==2}<span class="badge badge-primary">申请通过</span>
+                                                            {else}<span class="badge badge-success">已发送</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td>
+                                                            {if $row['mt_paystatus']==1 }<span class="badge badge-danger">未支付：{$row['mt_paymoney']}</span>
+                                                            {else if $row['mt_paystatus']==2}<span class="badge badge-primary">已支付：{$row['mt_paymoney']}</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td class="text-right">
+                                                            {if $row['mt_application']==1 }
+                                                            <a class='btn btn-primary  btn-sm' href="{php echo $this->createWebUrl('messagebursts', array('op'=>'addapplication', 'tid' => $row['id']))}"><i class='fa fa-edit'></i> 编辑</a>
+                                                            {else if $row['mt_application']==2&&$row['mt_paystatus']==1 }
+                                                            <a class='btn btn-primary  btn-sm' href="{php echo $this->createWebUrl('messagebursts', array('op'=>'paymoney', 'id' => $row['id']))}"><i class='fa fa-credit-card'></i> 支付</a>
+                                                            {/if}
+                                                            <a class='btn btn-danger  btn-sm' href="JavaScript:;" onclick="delete_msgtempl('{$row['id']}')"><i class='fa fa-trash'></i> 删除</a>
+                                                            <a class='btn btn-info  btn-sm' href="JavaScript:;" onclick="check_msgtempl('{$row['id']}')" title='校验模板'><i class='fa fa-check-square-o'></i> 校验模板</a>
+                                                        </td>
+                                                    </tr>
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                                {$pager}
+                                                {else}
+                                                <div class='panel panel-default'>
+                                                    <div class='panel-body' style='text-align: center;padding:30px;'>
+                                                        暂时没有任何申请模板!
+                                                    </div>
+                                                </div>
+                                                {/if}
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script type="text/javascript">
+    function delete_msgtempl(tid){
+        new $.flavr({
+            content     : '确定删除该群发模板消息？',
+            buttons     : {
+                close   : { text: '取消', style: 'default' },
+                success : { text: '删除', style: 'danger',
+                    action: function(){
+                        window.location="{php echo $this->createWebUrl('messagebursts',array('op'=>'delete_msgtempl'))}&tid="+tid;
+                    }
+                },
+            }
+        });
+    }
+    function check_msgtempl(tid){
+        new $.flavr({
+            title   : '模板校验',
+            content : '<div id="check-form"></div>',
+            buttons : {
+                close : {text:'关闭'}
+            }
+        });
+        $.ajax({
+            url: "{php echo $this->createWebUrl('messageallmanage',array('op'=>'check_msgtempl'))}&tid="+tid,
+            cache: false,
+            data:{}
+        }).done(function (html) {
+            //console.log(html);
+            $("#check-form").append(html);
+        });
+    }
+</script>
+
+
+{template 'web/common/footer'}

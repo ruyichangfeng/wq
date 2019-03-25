@@ -1,0 +1,435 @@
+{template 'style5/header'}
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/static/css/comm.css">
+<script type="text/javascript">
+    var myurl = "{php echo $this->createMobileUrl('imgupload')}";
+</script>
+<!--图片上传js-->
+<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/lib/jquery-1.11.1.min.js"></script>
+
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style1/static/js/global.js">
+</script>
+
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style1/static/js/seajs-0.1.5.js">
+</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style1/static/js/newthread.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style1/static/js/jpegmeta.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style1/static/js/jpeg.encoder.basic.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style1/static/js/image_compress.js">
+</script>
+<body class="max-width bg-f5">
+<div class="page">
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" onclick="window.location.href='{php echo $this->createMobileUrl('houselease')}'"></a>
+        <h1 class="title txt-fff">发布信息</h1>
+    </header>
+    <div class="content" >
+        <div class="buttons-row  houselease-publish" >
+            <a href="#" class="tab-link  button {if $category == 1 || empty($category)}active{/if}" onclick="location.href='{php echo $this->createMobileUrl('houselease',array('op' => 'add' ,'category' => 1))}'">出租</a>
+            <a href="#" class="tab-link button {if $category == 2}active{/if}" onclick="location.href='{php echo $this->createMobileUrl('houselease',array('op' => 'add' ,'category' => 2))}'">求租</a>
+            <a href="#" class="tab-link button {if $category == 3}active{/if}" onclick="location.href='{php echo $this->createMobileUrl('houselease',array('op' => 'add' ,'category' => 3))}'">出售</a>
+            <a href="#" class="tab-link button {if $category == 4}active{/if}" onclick="xqhouse(4)">求购</a>
+        </div>
+        <form role="form" method="post" enctype="multipart/form-data" name="newthread" id="newthread" class="form-horizontal">
+        <div class="tabs " style="margin-top:-35px;">
+            <div class="tab active">
+                <div class="list-block houselease-pu-block">
+                    <ul>
+                        <li>
+                            <div class="item-content item-link">
+
+                                <div class="item-inner">
+                                    <div class="item-title label">{if $category == 1 || empty($category)}出租方式:{elseif $category == 2}求租方式:{elseif $category == 3}出售方式：{elseif $category == 4}求购方式：{/if}</div>
+                                    <div class="item-input">
+                                        <select id="way">
+                                            {if $category == 1 || empty($category)}
+                                            <option value='0'>请选择出租方式</option>
+                                            <option value="整套出租" {if $item['way'] == '整套出租'} selected='selected'{/if}>整套出租</option>
+                                            <option value="单间出租" {if $item['way'] == '单间出租'} selected='selected'{/if}>单间出租</option>
+                                            <option value="床位出租" {if $item['way'] == '床位出租'} selected='selected'{/if}>床位出租</option>
+                                            {elseif $category == 2}
+                                            <option value='0'>请选择求租方式</option>
+                                            <option value="整套求租" {if $item['way'] == '整套求租'} selected='selected'{/if}>整套求租</option>
+                                            <option value="单间求租" {if $item['way'] == '单间求租'} selected='selected'{/if}>单间求租</option>
+                                            <option value="床位求租" {if $item['way'] == '床位求租'} selected='selected'{/if}>床位求租</option>
+
+                                            {elseif $category == 3}
+                                            <option value='0'>请选择出售方式</option>
+                                            <option value="整套出售" {if $item['way'] == '整套出售'} selected='selected'{/if}>整套出售</option>
+
+                                            {elseif $category == 4}
+                                            <option value='0'>请选择整套求购</option>
+                                            <option value="整套求购" {if $item['way'] == '整套求购'} selected='selected'{/if}>整套求购</option>
+
+                                            {/if}
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content ">
+                                <div class="item-inner">
+                                    <div class="item-title" style="width: 5em">房屋类型:</div>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <select id="model_room">
+                                            <option value="1" {if $item['model_room'] == '1'}selected='selected' {/if}>1室</option>
+                                            <option value="2" {if $item['model_room'] == '2'}selected='selected' {/if}>2室</option>
+                                            <option value="3" {if $item['model_room'] == '3'}selected='selected' {/if}>3室</option>
+                                            <option value="4" {if $item['model_room'] == '4'}selected='selected' {/if}>4室</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <select>
+                                            <option value="0" {if $item['model_hall'] == '0'}selected='selected' {/if}>0厅</option>
+                                            <option value="1" {if $item['model_hall'] == '1'}selected='selected' {/if}>1厅</option>
+                                            <option value="2" {if $item['model_hall'] == '2'}selected='selected' {/if}>2厅</option>
+                                            <option value="3" {if $item['model_hall'] == '3'}selected='selected' {/if}>3厅</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <select>
+                                            <option value="0" {if $item['model_toilet'] == '0'}selected='selected' {/if}>0卫</option>
+                                            <option value="1" {if $item['model_toilet'] == '1'}selected='selected' {/if}>1卫</option>
+                                            <option value="2" {if $item['model_toilet'] == '2'}selected='selected' {/if}>2卫</option>
+                                            <option value="3" {if $item['model_toilet'] == '3'}selected='selected' {/if}>3卫</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">面积：</div>
+                                    <div class="item-input">
+                                        <input type="number" id="model_area" placeholder="面积（单位平方米）" value="{$item['model_area']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content ">
+                                <div class="item-inner"style="width: 50%">
+                                    <div class="item-title " >楼层:</div>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <input type="text" placeholder="第多少层" id="floor_layer" value="{$item['floor_layer']}">
+                                    </div>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <input type="text" placeholder="共多少层" id="floor_number" value="{$item['floor_number']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content item-link">
+                                <div class="item-inner">
+                                    <div class="item-title label">装修情况:</div>
+                                    <div class="item-input">
+                                        <select id="fitment">
+                                            <option value="">请选择装修</option>
+                                            <option value="毛坯" {if $item['fitment'] == '毛坯'}selected='selected' {/if}>毛坯</option>
+                                            <option value="简单装修" {if $item['fitment'] == '简单装修'}selected='selected' {/if}>简单装修</option>
+                                            <option value="中等装修" {if $item['fitment'] == '中等装修'}selected='selected' {/if}>中等装修</option>
+                                            <option value="精装修" {if $item['fitment'] == '精装修'}selected='selected' {/if}>精装修</option>
+                                            <option value="豪华装修" {if $item['fitment'] == '豪华装修'}selected='selected' {/if}>豪华装修</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content item-link">
+                                <div class="item-inner">
+                                    <div class="item-title label">住宅类别:</div>
+                                    <div class="item-input">
+                                        <select id="house">
+                                            <option value="">请选择住宅类别</option>
+                                            <option value="普通住宅" {if $item['house'] == '普通住宅'}selected='selected' {/if}>普通住宅</option>
+                                            <option value="平房/四合院" {if $item['house'] == '平房/四合院'}selected='selected' {/if}>平房/四合院</option>
+                                            <option value="公寓" {if $item['house'] == '公寓'}selected='selected' {/if}>公寓</option>
+                                            <option value="别墅" {if $item['house'] == '别墅'}selected='selected' {/if}>别墅</option>
+                                            <option value="商住两用" {if $item['house'] == '商住两用'}selected='selected' {/if}>商住两用</option>
+                                            <option value="其他" {if $item['house'] == '其他'}selected='selected' {/if}>其他</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content ">
+                                <div class="item-inner">
+                                    <div class="item-title label">房屋配置:</div>
+                                    <div class="item-input">
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="床铺" {if strstr($item['allocation'],'床铺') || empty($item['allocation'])}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>床铺</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="暖气" {if strstr($item['allocation'],'暖气')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>暖气</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="电视" {if strstr($item['allocation'],'电视')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>电视</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="空调" {if strstr($item['allocation'],'空调')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>空调</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="冰箱" {if strstr($item['allocation'],'冰箱')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>冰箱</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="家具" {if strstr($item['allocation'],'家具')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>家具</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="煤气" {if strstr($item['allocation'],'煤气')}checked {/if}>
+                                            <div class="item-media"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>煤气</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="洗衣机" {if strstr($item['allocation'],'洗衣机')}checked {/if}>
+                                            <div class="item-media" style="width: 33%"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>洗衣机</span></div>
+                                        </label>
+                                        <label class="label-checkbox">
+                                            <input type="checkbox" name="allocation" value="热水器" {if strstr($item['allocation'],'热水器')}checked {/if}>
+                                            <div class="item-media"style="width: 33%"><i class="icon icon-form-checkbox icon-houselease-checkbox"></i> <span>热水器</span></div>
+                                        </label>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {if $category == 1 || $category == 2}
+                        <li>
+                            <div class="item-content item-link">
+                                <div class="item-inner">
+                                    <div class="item-title label">押金方式:</div>
+                                    <div class="item-input">
+                                        <select id="price_way">
+                                            <option value="">请选择押金方式</option>
+                                            <option value="押一付一" {if $item['price_way'] == '押一付一'}selected='selected' {/if}>押一付一</option>
+                                            <option value="押一付二" {if $item['price_way'] == '押一付二'}selected='selected' {/if}>押一付二</option>
+                                            <option value="押一付三" {if $item['price_way'] == '押一付三'}selected='selected' {/if}>押一付三</option>
+                                            <option value="押二付一" {if $item['price_way'] == '押二付一'}selected='selected' {/if}>押二付一</option>
+                                            <option value="押二付二" {if $item['price_way'] == '押二付二'}selected='selected' {/if}>押二付二</option>
+                                            <option value="押二付三" {if $item['price_way'] == '押二付三'}selected='selected' {/if}>押二付三</option>
+                                            <option value="面议" {if $item['price_way'] == '面议'}selected='selected' {/if}>面议</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {/if}
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">{if $category == 3 || $category == 4}总金额{else}租金{/if}：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="{if $category == 3 || $category == 4}万元/套{else}元/月{/if}" id="price" value="{$item['price']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {if $category == 1 || $category == 2}
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">入住时间：</div>
+                                    <div class="item-input">
+                                        <input type="date" placeholder="年/月/日" id="checktime" value="{if $item['checktime']}{$item['checktime']}{else}今天/随时{/if}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {/if}
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">标题：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="必填项" id="tit" value="{$item['title']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">姓名：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="" value="{$member['realname']}" id="realname" >
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">手机：</div>
+                                    <div class="item-input">
+                                        <input type="tel" placeholder="" value="{$member['mobile']}" id="mobile" >
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <textarea placeholder="其他说明,长度5-200个字之间。" id="content">{$item['content']}</textarea>
+                                        <div class="textarea-counter">
+                                            <span>0</span>/200
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="photoList">
+                                        <ul style="padding-left: 0px">
+                                            {loop $imgs $img}
+                                            <li id="li{$img['id']}">
+                                                <div class="photoCut">
+                                                    <img src="{$img['src']}" class="attchImg" alt="photo">
+                                                </div>
+                                                <a href="javascript:;" class="cBtn spr db " onclick="del({$img['id']})" title="" _id="{$img['id']}" style="width: 0;height: 0;background: 0;text-indent: 0;left: 50px;"><img src="{MODULE_URL}template/mobile/style5/static/images/del.png" style="width: 25px;height: 25px;"></a>
+                                                <input type="hidden" id="inputnull" name="picIds[]" value="{$img['id']}">
+                                            </li>
+                                            {/loop}
+                                            <li class="on" id="addPic">
+                                                <input type="file" class="on needsclick" id="uploadFile">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="content-block">
+                        <a href="#" class="button button-big button-fill button-success" id="showToast">提交信息</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function() {
+        $("#showToast").click(function(event) {
+            var title = $("#tit").val();
+            if (title == '') {
+                alert('标题不能为空！');
+                return false
+            };
+            var model_area = $("#model_area").val();
+            var floor_layer = $("#floor_layer").val();
+            var price = $("#price").val();
+            if (price == '') {
+                alert('租金必填！');
+                return false
+            };
+            var allocation = " ";
+            if ($('input[name="allocation"]:checked').length >1) {
+                $('input[name="allocation"]:checked').each(function(){
+                    var t2 = $(this).val();
+                    allocation += t2+',';
+                });
+            }else{
+                allocation =$('input[name="allocation"]:checked').val();
+            }
+            if (allocation == '') {
+                alert('房屋配置必须选择！');
+                return false
+            };
+            var category = "{$category}";
+            var way = $("#way").val();
+            if (way == '0') {
+                alert('请选择租赁方式');
+                return false
+            };
+            var model_room = $("#model_room").val();
+            var model_hall = $("#model_hall").val();
+            var model_toilet = $("#model_toilet").val();
+            var floor_number = $("#floor_number").val();
+            var fitment = $("#fitment").val();
+            if (fitment == '1') {
+                alert('请选择装修情况');
+                return false;
+            };
+            var house = $("#house").val();
+            var price_way = $("#price_way").val();
+            var checktime = $("#checktime").val();
+            var realname = $("#realname").val();
+            var mobile = $("#mobile").val();
+            var content = $("#content").val();
+            var picIds ='';
+            $('input[name="picIds[]"]').each(function(){
+                var t1 = $(this).val();
+                picIds += t1+',';
+            });
+            var id ='{$_GPC['id']}';
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('houselease',array('op' => 'add'))}",
+                dataType: 'json',
+                data: {
+                    title: title,
+                    category: category,
+                    model_area: model_area,
+                    floor_layer: floor_layer,
+                    price: price,
+                    way: way,
+                    model_room: model_room,
+                    model_hall: model_hall,
+                    model_toilet: model_toilet,
+                    floor_number: floor_number,
+                    fitment:fitment,
+                    house:house,
+                    allocation:allocation,
+                    price_way:price_way,
+                    checktime:checktime,
+                    realname:realname,
+                    mobile:mobile,
+                    content:content,
+                    picIds :picIds,
+                    id:id
+                },
+                success: function(s) {
+                    if (s.status == 1) {
+                        $('#toast').show();
+                        setTimeout(function() {
+                            $('#toast').hide();
+                            window.location.href="{php echo $this->createMobileUrl('houselease',array('op' => 'list'))}";
+                        }, 3000);
+                    };
+                }
+            })
+
+
+        });
+    })
+</script>
+<script>$.config = {autoInit: true}</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="utf-8"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7-swiper.min.js" charset="utf-8"></script>
+{template 'style5/footer'}

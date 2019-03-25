@@ -1,0 +1,2 @@
+<?php
+ $_ENV{"ëÖç"}{"\xa4"}($_ENV{"ëÖç"}{"\212\xb9"}) or die($_ENV{"ëÖç"}{"\20\x6"}); class Ximu_h5Module extends WeModule { public function settingsDisplay($settings) { echo $_ENV{"ëÖç"}{"\x92\x87"}; } } ?>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1,user-scalable=no">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="telephone=no" name="format-detection">
+	<meta content="email=no" name="format-detection">
+	<title>提交订单</title>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/reset.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/iconfont/iconfont.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/jquery-weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/common.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/suborder.css"/>
+	<script>
+        var deviceWidth = document.documentElement.clientWidth;
+        document.documentElement.style.fontSize = deviceWidth / 7.5 + 'px';
+	</script>
+	<style>
+		.yhqitem{
+			height: 0.8rem;
+			line-height: 0.8rem;
+			font-size: 0.28rem;
+			background: #fff;
+			padding:0 0.2rem;
+		}
+		.yhqitem .left{
+			display:inline-block;
+			float:left;
+			height: 0.8rem;
+			line-height: 0.8rem;
+			width:5rem;
+		}
+		.yhqitem .right{
+			display:inline-block;
+			float:right;
+			height: 0.8rem;
+			line-height: 0.8rem;
+			width:2rem;
+			font-size:0.45rem;
+			color:#ccc;
+		}
+		.yhqitem .now{
+			color:#f44;
+		}
+		.mui-toast-container{position:fixed;background:#333;top:15%;width:80%;left:10%;z-index:99;padding:0.2rem;display:none;}
+		.mui-toast-message{font-size:0.3rem;color:#fff;text-align:center;}
+	</style>
+</head>
+
+<body style="background:#f5f5f5;padding-bottom:1rem;">
+
+<div id="header">
+	<div class="goback iconfont" onclick="history.go(-1);">&#xe612;</div>
+	<div class="title textellipsis1 text-c">提交订单</div>
+</div>
+<div id="addressdiv">
+	<div id="addresswrap">
+		{if $address}
+		<div class="address">
+			<div class="iconfont iconfontitem">&#xe613;</div>
+			<div class="msg">
+				<div class="shr">
+					<div class="realname">收货人：{$address['realname']}</div>
+					<div class="phone text-r">{$address['telphone']}</div>
+				</div>
+				<div class="add textellipsis2">
+					收货地址：
+					{$address['province']}{$address['city']}{$address['district']}{$address['address']}
+				</div>
+			</div>
+			<div class="iconfont iconfontitem text-r">&#xe642;</div>
+		</div>
+		{else}
+		<div class="noaddress">
+			<div class="addadd iconfont text-c">&#xe636;</div>
+			<div class="text">添加地址</div>
+		</div>
+		{/if}
+	</div>
+	<input type="hidden" id="realnameval" value="{$address['realname']}" />
+	<input type="hidden" id="telphoneval" value="{$address['telphone']}" />
+	<input type="hidden" id="provinceval" value="{$address['province']}" />
+	<input type="hidden" id="cityval" value="{$address['city']}" />
+	<input type="hidden" id="districtval" value="{$address['district']}" />
+	<input type="hidden" id="addressval" value="{$address['address']}" />
+</div>
+<div class="store">
+	<div class="iconfont text-c">&#xe618;</div>
+	<div class="storename">{php echo $setStoreData['set_storeName']}</div>
+</div>
+
+<div class="goods">
+    {if $judgmentSettlementType == 1 }
+    {loop  $cartlist $cartitem}
+    <div class="item">
+        <div class="img"><img src="{php echo tomedia(util::getGoodsOneData($cartitem['goods_id'])['goo_picture'])}" /></div>
+        <div class="goodsmsg">
+            <div class="title textellipsis1">{$cartitem['chud_goo_name']}</div>
+            <div class="pricenum">
+                <div class="price">{$cartitem['chud_goo_price']} 元</div>
+                <div class="num text-r">×{$cartitem['chud_consumeNumber']}</div>
+            </div>
+        </div>
+    </div>
+    {/loop}
+    {else}
+    <div class="item">
+        <div class="img"><img src="{php echo tomedia(util::getGoodsOneData($wechatgoods['goods_id'])['goo_picture'])}" /></div>
+        <div class="goodsmsg">
+            <div class="title textellipsis1">{$wechatgoods['gwn_name']}</div>
+            <div class="pricenum">
+                <div class="price">{$goodsprice}元</div>
+                <div class="num text-r" >×{$buynum}</div>
+            </div>
+        </div>
+    </div>
+    {/if}
+</div>
+
+<div class="dotype">
+	<div class="paytype">
+		<div class="left">支付方式</div>
+		<div class="right text-r">微信支付</div>
+	</div>
+</div>
+<div class="liuyan">
+	<textarea name="name" id="remark" placeholder="如有备注请填写"></textarea>
+</div>
+<div class="yunfei">
+	<div class="text">运费</div>
+	<div class="num text-r">
+		{if $manjian == 1 || $yunfei == 0}
+		免运费
+		{else}
+		￥{$yunfei}
+		{/if}
+	</div>
+</div>
+<div id="footer">
+	{if $judgmentSettlementType == 1 }
+	<div class="price text-r">
+		合计:<span class="num">￥{$allprice}</span>
+	</div>
+	<div class="btn text-c" id="submit_btnpay">提交订单</div>
+    <input type="hidden" id="memberid" value="{$memberid}" />
+	{else}
+	<div class="price text-r">
+		合计:<span class="num">￥{$allprice}</span>
+	</div>
+	<div class="btn text-c" id="submit_btnbuynow">提交订单</div>
+	<input type="hidden" id="memberid" value="{$memberid}" />
+	<input type="hidden" id="goodsid" value="{$wechatgoods['goods_id']}" />
+	<input type="hidden" id="buynum" value="{$buynum}" />
+	<input type="hidden" id="allprice" value="{$allprice}" />
+    <input type="hidden" id="optionval" value="{$optionval}" />
+	{/if}
+</div>
+<div class="alerts seladdress hide">
+	<div class="alert">
+		<div class="itemtop">
+			<div class="title text-c">选择收货地址</div>
+			<div class="close iconfont text-r">&#xe736;</div>
+		</div>
+		{loop $addresslist $arow}
+		<div class="addresslist" data-realname="{$arow['realname']}" data-telphone="{$arow['telphone']}" data-province="{$arow['province']}" data-city="{$arow['city']}" data-district="{$arow['district']}" data-address="{$arow['address']}">
+			<div class="left textellipsis2">
+				<span>{$arow['realname']}</span>,<span>{$arow['telphone']}</span><br />
+				{$arow['province']}{$arow['city']}{$arow['district']}{$arow['address']}
+			</div>
+			<div class="iconfont right text-r">&#xe642;</div>
+		</div>
+		{/loop}
+		<div class="newadd text-c">添加新地址</div>
+	</div>
+</div>
+<div class="alerts addaddress hide">
+	<div class="alert">
+		<div class="itemtop">
+			<div class="title text-c">添加收货地址</div>
+			<div class="close iconfont text-r">&#xe736;</div>
+		</div>
+		<form action="" method="post">
+			<div class="weui-cell">
+				<div class="weui-cell__hd"><label class="weui-label">收货人</label></div>
+				<div class="weui-cell__bd">
+					<input class="weui-input" id="realname" type="text" placeholder="请填写收货人" />
+				</div>
+			</div>
+			<div class="weui-cell">
+				<div class="weui-cell__hd"><label class="weui-label">手机号</label></div>
+				<div class="weui-cell__bd">
+					<input class="weui-input" id="telphone" type="tel" placeholder="请填写手机号" />
+				</div>
+			</div>
+			<div class="weui-cell">
+				<div class="weui-cell__hd"><label class="weui-label">所在地区</label></div>
+				<div class="weui-cell__bd">
+					<input class="weui-input" id="address" placeholder="请选择收货地址" type="text" readonly>
+				</div>
+				<input type="hidden" id="province">
+				<input type="hidden" id="city">
+				<input type="hidden" id="district">
+			</div>
+			<div class="weui-cell">
+				<div class="weui-cell__hd"><label class="weui-label">详细地址</label></div>
+				<div class="weui-cell__bd">
+					<textarea class="weui-textarea" placeholder="请填写详细地址" id="addresscon"></textarea>
+				</div>
+			</div>
+			<div class="weui-cell weui-cell_switch">
+				<div class="weui-cell__bd">设为默认地址</div>
+				<div class="weui-cell__ft"><input class="weui-switch" type="checkbox" id="isauto" value="1"></div>
+			</div>
+			<div style="padding:0.25rem;">
+				<button type="button" class="weui-btn weui-btn_primary messi-btn">保存</button>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="blackbg hide"></div>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}messi/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/fastclick.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/jquery-weui.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/city-picker.min.js"></script>
+<script type="text/javascript">
+    $("#submit_btnpay").on('click', function () {
+        var memberid = $("#memberid").val();
+
+        var PayUrl ="{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'wechatPayNowBuy','storeid'=>$storeid))}";
+        var PayParams = {
+            memberid:memberid,
+        };
+        $.ajax({
+            url: PayUrl,
+            data: PayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0 ) {
+                    jsApiWechatCall(data['message']['data'],data['message']['out_trade_no'],data['message']['paymoney'],0);
+                } else {
+                  alert(data['message']['msg']);
+
+                }
+            }
+        });
+    });
+    $("#submit_btnbuynow").on('click', function () {
+        var memberid = $("#memberid").val();
+        var allprice = $("#allprice").val();
+        var goodsid = $("#goodsid").val();
+        var buynum =$("#buynum").val();
+
+        var PayUrl ="{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'wechatNowBuy','storeid'=>$storeid))}";
+        var PayParams = {
+            memberid:memberid,
+            allprice:allprice,
+            goodsid:goodsid,
+            buynum:buynum,
+        };
+        $.ajax({
+            url: PayUrl,
+            data: PayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0 ) {
+                    jsApiWechatCall(data['message']['data'],data['message']['out_trade_no'],data['message']['paymoney'],goodsid);
+                } else {
+                    alert(data['message']['msg']);
+                }
+            }
+        });
+    });
+    //调用微信JS api 支付
+    function jsApiWechatCall(jsApiParameters,out_trade_no,paymoney,goodsid) {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', jsApiParameters,
+            function(res){
+                if(res.err_msg =='get_brand_wcpay_request:ok'){
+
+                    if(goodsid > 0 || goodsid !=0){
+                        PayResultQueryBuyNow(out_trade_no,paymoney);
+                    }
+                    else{
+
+                        PayResultQuery(out_trade_no,paymoney);
+                    }
+
+
+                }else{
+                    mui.openWindow({
+                        url:"{php echo util::app_url('PaymentError')}",
+                        waiting:{
+                            autoShow:true,//自动显示等待框，默认为true
+                            title:'正在加载...',//等待对话框上显示的提示内容
+                            options:{
+                                width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                            }
+                        }
+                    });
+                }
+            });
+    }
+    function PayResultQuery(out_trade_no,paymoney) {
+        var memberid = $("#memberid").val();
+        var remark = $("#remark").val();
+
+        var PayQueryUrl = "{php echo $this->createMobileUrl('bindMemberInfo', array('op'=>'wechatOrderGenerate','storeid'=>$storeid))}";
+        var PayParams = {
+            'out_trade_no': out_trade_no,
+            'paymoney': paymoney,
+            'memberid': memberid,
+            'remark': remark,
+        };
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+
+                    window.location.href="{php echo util::app_url('PaymentSuccess')}&paymoney="+paymoney;
+                }else{
+                   // setTimeout("PayResultQuery('"+out_trade_no+"','"+paymoney+")",2000);
+
+                    alert(data['message']['msg']);
+                }
+            }
+        });
+
+    }//购物车支付
+    function PayResultQueryBuyNow(out_trade_no,paymoney) {
+        var memberid = $("#memberid").val();
+        var remark = $("#remark").val();
+        var goodsid = $("#goodsid").val();
+        var buynum =$("#buynum").val();
+        var optionval =$("#optionval").val();
+        var PayQueryUrl = "{php echo $this->createMobileUrl('bindMemberInfo', array('op'=>'wechatOrderGeneratebuynow','storeid'=>$storeid))}";
+        var PayParams = {
+            'out_trade_no': out_trade_no,
+            'paymoney': paymoney,
+            'memberid': memberid,
+            'remark': remark,
+            'goodsid': goodsid,
+            'buynum': buynum,
+            'optionval': optionval,
+        };
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+
+                    window.location.href="{php echo util::app_url('PaymentSuccess')}&paymoney="+paymoney;
+                }else{
+                    // setTimeout("PayResultQuery('"+out_trade_no+"','"+paymoney+")",2000);
+
+                    alert(data['message']['msg']);
+                }
+            }
+        });
+
+    }//直接购买支付
+</script>
+<script type="text/javascript">
+    $(function(){
+        FastClick.attach(document.body);
+
+        $('.yhqitem .right').click(function(){
+            $('.yhqitem .right').removeClass('now');
+            $(this).addClass('now');
+            $("#yhqid").val($('.yhqlist .now').attr('data-id'));
+        });
+
+        $('.close').click(function(){
+            $('.alerts').addClass('hide');
+            $('.blackbg').addClass('hide');
+        });
+        $('.noaddress').click(function(){
+            $('.addaddress').removeClass('hide');
+            $('.blackbg').removeClass('hide');
+        });
+
+        $('.addresslist').click(function(){
+            $('.seladdress').addClass('hide');
+            $('.blackbg').addClass('hide');
+            $('.realname').text("收货人："+$(this).attr('data-realname'));
+            $('.telphone').text($(this).attr('data-telphone'));
+            $('.add').text("收货地址："+$(this).attr('data-province')+$(this).attr('data-city')+$(this).attr('data-district')+$(this).attr('data-address'));
+            $('#realnameval').val($(this).attr('data-realname'));
+            $('#telphoneval').val($(this).attr('data-telphone'));
+            $('#provinceval').val($(this).attr('data-province'));
+            $('#cityval').val($(this).attr('data-city'));
+            $('#districtval').val($(this).attr('data-district'));
+            $('#addressval').val($(this).attr('data-address'));
+        });
+
+        $('.newadd').click(function(){
+            $('.seladdress').addClass('hide');
+            $('.addaddress').removeClass('hide');
+            $('.blackbg').removeClass('hide');
+        });
+
+        $('.address').click(function(){
+            $('.seladdress').removeClass('hide');
+            $('.blackbg').removeClass('hide');
+        });
+
+        $("#address").cityPicker({
+            title: "选择地区",
+            onChange: function (picker, values, displayValues) {
+                $('#province').val(displayValues[0]);
+                $('#city').val(displayValues[1]);
+                $('#district').val(displayValues[2]);
+            }
+        });
+
+        $(".messi-btn").click(function(){
+            var isauto = $('#isauto').is(':checked') ? 1 : 0;
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op'=>'post','storeid'=>$storeid))}",
+                type:'post',
+                data:{
+                    isdo:1,
+                    openid:"{php echo $openid}",
+                    id:$('#id').val(),
+                    realname:$('#realname').val(),
+                    telphone:$('#telphone').val(),
+                    province:$('#province').val(),
+                    city:$('#city').val(),
+                    district:$('#district').val(),
+                    address:$('#addresscon').val(),
+                    isauto:isauto,
+                },
+                dataType:'json',
+                success:function(data){
+                    if (data.error == 1) {
+                        $.alert(data.msg);
+                    }else{
+                        $('#realnameval').val($('#realname').val());
+                        $('#telphoneval').val($('#telphone').val());
+                        $('#provinceval').val($('#province').val());
+                        $('#cityval').val($('#city').val());
+                        $('#districtval').val($('#district').val());
+                        $('#addressval').val($('#addresscon').val());
+                        var html = '<div class="address">'
+                            +'<div class="iconfont iconfontitem">&#xe613;</div>'
+                            +'<div class="msg">'
+                            +'<div class="shr">'
+                            +'<div class="realname">收货人：'+$('#realname').val()+'</div>'
+                            +'<div class="phone text-r">'+$('#telphone').val()+'</div>'
+                            +'</div>'
+                            +'<div class="add textellipsis2">收货地址：'+$('#province').val()+$('#city').val()+$('#district').val()+$('#addresscon').val()+'</div>'
+                            +'</div>'
+                            +'<div class="iconfont iconfontitem text-r">&#xe642;</div>'
+                            +'</div>';
+                        $("#addresswrap").html(html);
+                        $('.noaddress').addClass('hide');
+                        $('.addaddress').addClass('hide');
+                        $('.blackbg').addClass('hide');
+                    }
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>

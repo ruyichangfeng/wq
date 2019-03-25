@@ -1,0 +1,64 @@
+{template "base/child_header"}
+<form class="layui-form" >
+    <input type="hidden" name="group_id" value="{$_GPC['id']}">
+    <div class="layui-form-item">
+        {loop $accList $key $acc}
+        <div class="layui-input-block" style="margin-left: 20px;">
+            <input type="checkbox" class="{$key}" class-id="{$key}" lay-filter="top" name="in[{$key}]" title="{$acc['name']}"  {if $accLs[$key]} checked {/if}>
+        </div>
+        {loop $acc $ky $vl}
+            {if $ky!='name'}
+                <div class="layui-input-block" style="margin-left: 50px;">
+                    <input type="checkbox" class="{$key} {$ky} second" class-id="{$ky}" lay-filter="second"  name="in[{$ky}]" title="{$vl['name']}" {if $accLs[$ky]} checked {/if}>
+                    {loop $vl $k $v}
+                    {if $k!='name'}
+                    <input type="checkbox" name="in[{$ky}-{$k}]" class="{$key} {$ky} {$ky}-{$k}" title="{$v}" lay-skin="primary" {if $accLs[$ky."-".$k]} checked{/if}>
+                    {/if}
+                    {/loop}
+                </div>
+            {/if}
+        {/loop}
+        {/loop}
+        <div class="layui-input-block" style="margin-top: 30px;">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">立即提交</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','jquery'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        form.on('submit(addAdmin)', function(data){
+            $.post("{php echo $this->createWebUrl('acc')}&Ajax=",data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+        //监听一级元素
+        form.on('checkbox(top)', function(data){
+            var classId = $(this).attr("class-id");
+            if(data.elem.checked){
+                $("."+classId).attr("checked","");
+            }else{
+                $("."+classId).removeAttr("checked");
+            }
+            form.render();
+        });
+        //监听一级元素
+        form.on('checkbox(second)', function(data){
+            var classId = $(this).attr("class-id");
+            if(data.elem.checked){
+                $("."+classId).attr("checked","");
+            }else{
+                $("."+classId).removeAttr("checked");
+            }
+            form.render();
+        });
+    });
+</script>
+{template "base/child_footer"}

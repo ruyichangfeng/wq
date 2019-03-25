@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['pc_member_title']}</title>
+{template '../pc/head'}
+
+</head>
+<body class="nav-md">
+		{template '../pc/header'}
+		
+		<!-- page content -->
+        <div class="right_col con-box" role="main">
+			<div class="con">
+              <div class="col-md-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2 style="font-weight:bold;">核销</h2>
+                    <!--<ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>-->
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <form class="form-horizontal form-label-left">
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-6 col-xs-12" style="margin-top:18px;">核销类型</label>
+                        <div class="col-md-6 col-sm-10 col-xs-12">
+                          <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true" style="padding:10px 40px;"   onClick="credittype1()" >积&nbsp;&nbsp;&nbsp;分</a>
+                            </li>
+                            <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false" style="padding:10px 40px;" onClick="credittype2()" >余&nbsp;&nbsp;&nbsp;额</a>
+                            </li>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-6 col-xs-12">核销数值</label>
+                        <div class="col-md-6 col-sm-10 col-xs-12">
+                          <div id="myTabContent" class="tab-content">
+                          <input type="hidden" id="credittype" value=''>
+                            <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" style="text-align: right;" id="money" value="">
+                                    <span class="input-group-addon " id='credittypetitle'>积分</span>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-6 col-xs-12">备注</label>
+                        <div class="col-md-6 col-sm-10 col-xs-12">
+<!--                             <input class="form-control" value=""  type="text"> -->
+                            <input type="text" class="form-control" id="remark">
+                        </div>
+                      </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
+                            <a href="javascript:getqrcode();" style="display: block;width: 50%;"><img src="{RES}public/images/m_btn3.png" class="m_btn_a" style="width: 60%;"/></a>
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- /page content -->
+      </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="tanchukuang">
+	  	<div class="modal-dialog modal-sm" role="document">
+	    	<div class="modal-content" style="text-align: center;">
+		    	<div>
+		    		<img src="" alt="" id="qrcodeimg" style="margin:1em auto;">
+		    	</div>
+		    	<div id="tishi" style="height: 2em;line-height: 2em;font-size: 1.1em;margin-bottom: 2em;">
+		    		
+		    	</div>
+	    	</div>
+	  	</div>
+	</div>
+	<script src="{RES}public/pc/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{RES}public/pc/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="{RES}public/pc/js/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="{RES}public/pc/js/nprogress.js"></script>
+    <!-- FullCalendar -->
+    <script src="{RES}public/pc/js/moment.min.js"></script>
+    <script src="{RES}public/pc/js/fullcalendar.min.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="{RES}public/pc/js/custom.min.js"></script>
+		
+<script>
+$(function(){
+	credittype1();
+})
+function credittype1()
+{	
+	$('#credittype1').addClass('btn-info');
+	$('#credittype1').removeClass('btn-default');
+	$('#credittype2').addClass('btn-default');
+	$('#credittype2').removeClass('btn-info');
+	$('#credittypetitle').html('积分');
+	$('#credittype').val(1);
+	$('#money').val('');
+}
+function credittype2()
+{
+	$('#credittype1').removeClass('btn-info');
+	$('#credittype1').addClass('btn-default');
+	$('#credittype2').removeClass('btn-default');
+	$('#credittype2').addClass('btn-info');
+	$('#credittypetitle').html('元');
+	$('#credittype').val(2);
+	$('#money').val('');
+}
+/** 提交表单生成二维码 */    
+function getqrcode()
+{
+	/* 消费类型  消费金额 */
+	var type=$('#credittype').val(),
+	  	number=$('#money').val(),
+	  	remark=$('#remark').val();
+	if(type==1)
+	{
+		if(number.toString().split(".")[1]>0)
+		{
+			alert('核销类型为积分的情况下，核销数值为整数');
+			return false;
+		}
+	}
+	if(type=='')
+	{
+		alert('请填写核销类型');
+	}else if (number<=0)	
+	{
+		alert('请填写正确的核销数值');
+	}else{
+		$.ajax({  
+			type:"POST",
+			url: "{php echo $this->createMobileUrl('ajaxpcgetqrcodebyveri');}",
+			data:{type:type,number:number,remark:remark,storeid:storeid},
+			dataType:"json",
+			async:false,
+			success: function(data){
+		        if(data.result=='success')
+		        {
+		        	 $('#tanchukuang').modal('show');
+		        	 $('#qrcodeimg').addClass('show');
+		        	 $('#qrcodeimg').attr('src',data.qr);
+		 			 $('#tishi').html('扫描上方二维码核销'+data.jifen+data.type);
+		        }else{
+		        	// $('#qrcodeimg').removeClass('show');
+		        	// $('#qrcodeimg').addClass('hide');
+		        	$('#modalMSG').html(data.rs);
+		        	$('#msgModal').modal('show');  
+		        }
+		    }
+		});
+	}
+}	
+
+$('#tanchukuang').on('hidden.bs.modal', function (e) {
+		$('#money').val('');
+		$('#spending_id').val('');
+		$('#remark').val('');
+	})
+</script>
+
+</body>
+</html>

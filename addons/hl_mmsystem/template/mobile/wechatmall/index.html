@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1,user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>微信商城-{php echo $setStoreData['set_storeName']}</title>
+    {template 'wechatmall/common_pm_header'}
+    {php echo register_jssdk(false);}
+    <style>
+        body{background:#F0EFF5;padding-bottom:1rem;}
+        #header{width:100%;height:0.6rem;padding:0.15rem 0;background:#1e1d22;border-bottom:none;}
+        #header .logo{width:0.6rem;height:0.6rem;float:left;margin-left:0.2rem;}
+        #header .logo img{width:0.6rem;height:0.6rem;border-radius:0.6rem;}
+        #header .name{width:3rem;height:0.6rem;line-height:0.6rem;color:#999;font-size:0.3rem;float:left;margin-left:0.1rem;}
+        #header .my{width:2.4rem;height:0.6rem;line-height:0.6rem;color:#999;font-size:0.3rem;float:right;margin-right:0.2rem;}
+        #header .my span{font-size:0.33rem;margin-right:0.1rem;}
+
+        #list{width:100%;float:left;}
+        #list .item{background:#fff;width:47%;margin-left:2%;float:left;height:auto;margin-top:2%;}
+        #list .item .shouqing{
+            text-align:center;
+            display:block;
+            width:1.8rem;
+            height:1.8rem;
+            line-height:1.8rem;
+            font-size:1.8rem;
+            color:#999;
+            position:absolute;
+            z-index:99;
+            margin-top:-1.8rem;
+            margin-left:1.5rem;
+        }
+        #list .item .img{width:3.15rem;height:3.15rem;margin:0.15rem auto;}
+        #list .item .img img{max-width:100%;}
+        #list .item .title {
+            font-size: 0.28rem;
+            color: #333;
+            height: 0.8rem;
+            line-height: 0.4rem;
+            width:3.15rem;
+            float: left;
+            margin:0 0.15rem;
+        }
+        #list .item .price{
+            width:3.15rem;
+            height:0.6rem;
+            line-height:0.6rem;
+            margin:0.15rem;
+            clear:both;
+        }
+        #list .item .price span{
+            display:inline-block;
+            float:left;
+            height:0.6rem;
+            line-height:0.6rem;
+        }
+        #list .item .price span.jg{
+            color: #ff6600;
+            font-size: 0.30rem;
+        }
+        #list .item .price span.xl{
+            color: #999;
+            font-size:0.28rem;
+        }
+        #footer{
+            width: 100%;
+            height: 1rem;
+            position: fixed;
+            z-index: 99;
+            bottom: 0;
+            background: #fff;
+            border-top: solid 1px #f2f2f2;
+        }
+        #footer .item {
+            width: 25%;
+            height: 1rem;
+            float: left;
+        }
+        #footer .item .iconfont {
+            color: #666;
+            font-size: 0.4rem;
+            height: 0.4rem;
+            line-height: 0.4rem;
+            padding-top:0.1rem;
+            border-right: 1px #f2f2f2 solid;
+        }
+        #footer .item .text {
+            color: #666;
+            font-size: 0.22rem;
+            height: 0.4rem;
+            line-height: 0.4rem;
+            padding:0.05rem 0;
+            border-right: 1px #f2f2f2 solid;
+        }
+        #footer .now .iconfont, #footer .now .text {
+            color: #ff6600;
+        }
+        .nogoods{margin-top:1.5rem;color:#999;}
+        .nogoods .iconfont{font-size:1.2rem;}
+        .nogoods .text{font-size:0.3rem;height:0.6rem;line-height:0.6rem;}
+
+        #catsdiv{
+            position: fixed;
+            z-index: 99;
+            background: #fff;
+            width:1.875rem;
+            border: solid 1px #ccc;
+            border-bottom:none;
+            left:1.875rem;
+            bottom:1.05rem;
+        }
+        #catsdiv .cat-item{
+            text-align:center;
+            height:0.7rem;
+            line-height:0.7rem;
+            color:#666;
+            font-size:0.28rem;
+            border-bottom: solid 1px #ccc;
+        }
+        #catsdiv .cat-item a{
+            color:#666;
+            font-size:0.28rem;
+        }
+        .banquan a{color:#ff6600;}
+    </style>
+
+    <style type="text/css">
+        body {
+            margin: 0;  padding: 0;
+            font-size: 14px; font-family: "microsoft yahei",'Arial', 'Verdana','Helvetica', sans-serif;
+        }
+        .bar {
+            position: fixed; top: 0; left: 0; right: 0; /* 决定了搜索框置顶 */
+            height: 44px; padding: 0 10px;
+            background-color: #fff; opacity: 0.8; /* 搜索框半透明效果 */
+            z-index: 10;
+        }
+        .bar form {
+            display: block; padding: 0;margin: 0;
+        }
+        .search-row {
+            position: relative;
+            height: 30px; padding: 7px 0;
+        }
+        .search-row input[type=search] {
+            position: absolute; top: 7px;
+            height: 30px; line-height: 21px; width: 100%; padding: 10px 15px 10px 30px;
+            border: 0; border-radius: 6px; outline: 0; background-color: rgba(0,0,0,0.1);
+            font-size: 16px; text-align: center;
+            z-index: 100;
+        }
+        .search-row .placeholder {
+            position: absolute; top: 2px; left: 0; right: 0;
+            display: inline-block; height: 34px; line-height: 34px;
+            border: 0; border-radius: 6px;
+            font-size: 16px; text-align: center; color: #999;
+            z-index: 1;
+        }
+        .search-row .placeholder .iconfont {
+            display: inline-block; width: 19px; line-height: 24px; padding: 10px 0;
+            font-size: 21px; color: #666;
+        }
+        .search-row .placeholder .text {
+            line-height: 40px;
+            vertical-align: top;
+        }
+        .background img {
+            width: 100%;
+        }
+        .active:before {
+            position: absolute; top: 11px; left: 5px; right: auto;
+            display: block; margin-right: 0;
+            font-size: 21px;
+        }
+        .active input[type=search] {
+            text-align: left
+        }
+        .active .placeholder{
+            display: none
+        }
+    </style>
+
+</head>
+<body>
+<div id="header">
+    <div class="logo">
+        {if empty($setStoreData['set_storeLogo'])}
+        <img src="{HLMMS_MOBILE_IMG}touxiang_logo.jpg" width="60px" height="60px" />
+        {else}
+        <img src="{php echo tomedia($setStoreData['set_storeLogo']);}" width="60px" height="60px" />
+        {/if}
+    </div>
+    <div class="name textellipsis1">{php echo $setStoreData['set_storeName']}</div>
+    <a href="tel:{php echo $setStoreData['set_storeContactTel']}"><div class="my text-r"><span class="iconfont">&#xe645;</span>联系商家</div></a>
+</div>
+
+
+
+<form name="search" class="search" id="search" action="">
+    <input type="hidden" name="c" value="entry" />
+    <input type="hidden" name="a" value="site" />
+    <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+    <input type="hidden" name="do" value="wechatmall" />
+    <input type="hidden" name="i" value="{$_W['uniacid']}" />
+    <input type="hidden" name="token" value="{$_W['token']}" />
+    <input type="hidden" name="op" value="index" />
+    <div class="search-row">
+        <input type="search" name="goodsname" id="word">
+        <span class="placeholder "><span class="iconfont icon-sousuo"></span><span class="text">搜索</span></span>
+    </div>
+</form>
+<!--{if $advlist}-->
+<!--<div class="swiper-container" data-space-between='0' data-pagination='.swiper-pagination' data-autoplay="1000">-->
+<!--<div class="swiper-wrapper">-->
+<!--{loop $advlist $arow}-->
+<!--<div class="swiper-slide"><a href="{$arow['pa_adurl']}" target="_blank"> <img src="{php echo tomedia($arow['pa_adpic']);}" style="max-width:100%;" /></a></div>-->
+<!--{/loop}-->
+<!--</div>-->
+<!--<div class="swiper-pagination"></div>-->
+<!--</div>-->
+<!--{/if}-->
+<div id="list">
+    {if $goodslist}
+    {loop $goodslist $row}
+    <a href="{php echo $this->createMobileUrl('wechatmalldetail',array('wechatid'=>$row['id'],'memberid'=>$memberid,'storeid'=>$storeid))}">
+        <div class="item">
+            <div class="img"><img src="{php echo tomedia(util::getGoodsOneData($row['goods_id'])['goo_picture'])}" /></div>
+            <div class="title textellipsis2">{if util::getGoodsOneData($row['goods_id'])['goo_number'] > 0}<span class="iconfont" style="font-size:0.4rem;color:#F44;">&#xe6c8;</span>{/if}{$row['gwn_name']}</div>
+            <div class="price">
+                <span class="jg" style="width: 55%">{$row['gwm_wechatMallPrice']}元</span>
+                <span class="xl text-r" style="width: 45%">
+                    {if util::getGoodsOneData($row['goods_id'])['goo_goodsOrService'] == 1 }
+                    已售:{php echo util::getGoodsConsumeCount($row['goods_id'],$storeid);}
+                     {else}
+                    <span class="jg">无限制</span>
+                    {/if}
+                </span>
+            </div>
+            {if util::getGoodsOneData($row['goods_id'])['goo_number'] <= 0 && util::getGoodsOneData($row['goods_id'])['goo_goodsOrService'] == 1 }
+            <span class="iconfont shouqing">&#xe694;</span>
+            {/if}
+        </div>
+    </a>
+    {/loop}
+    {else}
+    <div class="nogoods text-c">
+        <div class="iconfont">&#xe67d;</div>
+        <div class="text">( ⊙ o ⊙ )啊哦，没有更多商品啦~</div>
+    </div>
+    {/if}
+</div>
+
+<div class="banquan" style="height:0.8rem;line-height:0.8rem;text-align:center;font-size:0.3rem;clear:both;color:#999;">{php echo $setStoreData['set_storeName']}</div>
+
+<div id="catsdiv" class="hide">
+    {if $cats}
+    {loop $cats $crow}
+    <div class="cat-item textellipsis1"><a href="{php echo $this->createMobileUrl('wechatmall',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'typeid'=>$crow['id'],'storeid'=>$storeid))}">{$crow['gt_name']}</a></div>
+    {/loop}
+    {else}
+    <div class="cat-item">暂无分类</div>
+    {/if}
+</div>
+
+<div id="footer">
+    <div class="item now">
+        <a href="{php echo $this->createMobileUrl('wechatmall',array('storeid'=>$storeid))}">
+            <div class="iconfont text-c">&#xe807;</div>
+            <div class="text text-c">微信商城</div>
+        </a>
+    </div>
+    <div class="item cats">
+        <div class="iconfont text-c">&#xe682;</div>
+        {if $catres}
+        <div class="text text-c">{$catres['name']}</div>
+        {else}
+        <div class="text text-c">商品分类</div>
+        {/if}
+    </div>
+    <div class="item">
+        <a href="{php echo $this->createMobileUrl('wechatmallcart',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+            <div class="iconfont text-c" style="border-right:1px #f2f2f2 solid;">&#xe677;</div>
+            <div class="text text-c" style="border-right:1px #f2f2f2 solid;">购物车</div>
+        </a>
+    </div>
+    <div class="item">
+        <a href="{php echo $this->createMobileUrl('wechatmallmine',array('op' => 'list','memberid' =>$memberid,'storeid'=>$storeid))}">
+            <div class="iconfont text-c" style="border:none;">&#xe600;</div>
+            <div class="text text-c" style="border:none;">个人中心</div>
+        </a>
+    </div>
+</div>
+{template 'wechatmall/common_pm_footer'}
+<script type="text/javascript">
+    $(".swiper-container").swiper({
+        loop: true,
+        paginationType:'bullets',
+        autoplay:5000
+    });
+    $(function(){
+        FastClick.attach(document.body);
+        $('.cats').click(function(){
+            $('#catsdiv').toggleClass('hide');
+        });
+    })
+    //滚动加载
+    var loading = false;  //状态标记
+    var count = 2;
+    $(document.body).infinite().on("infinite", function() {
+        if(loading) return;
+        loading = true;
+        if(count < {$allpage}){
+            setTimeout(function() {
+                $.ajax({
+                    url:"{php echo $this->createMobileUrl('wechatmall',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}",
+                    data:{
+                        page:count,
+                        isajax:1,
+                        id:{$memberid},
+                    },
+                    dataType:'html',
+                    type:'post',
+                    success:function(data){
+                        if(data != ''){
+                            $('#list').append(data);
+                            count++;
+                        }
+                        loading = false;
+                    },
+                });
+            }, 500);   //模拟延迟
+        }else{
+        }
+    });
+</script>
+<script type="text/javascript">
+    wx.ready(function () {
+        sharedata = {
+            title: '{$shareres["title"]}',
+            desc: '{$shareres["des"]}',
+            link: '{$shareres["url"]}',
+            imgUrl: '{$shareres["thumb"]}',
+            trigger: function (res) {
+                //alert('用户点击发送给朋友');
+            },
+            success: function (res) {
+                //alert('已分享');
+            },
+            cancel: function (res) {
+                //alert('已取消');
+            },
+            fail: function (res) {
+                alert("分享失败");
+            }
+        };
+        wx.onMenuShareAppMessage(sharedata);
+        wx.onMenuShareTimeline(sharedata);
+        wx.onMenuShareQQ(sharedata);
+        wx.onMenuShareWeibo(sharedata);
+    });
+</script>
+<script type="text/javascript">
+    /* 输入框获取到焦点 表示用户正在输入 */
+    $("#word").focusin(function() {
+        $(".search-row").addClass("active iconfont icon-sousuo");
+    });
+    /* 输入框失去焦点 表示用户输入完毕 */
+    $("#word").focusout(function() {
+        /* 判断用户是否有内容输入 */
+        if ($(this).val()=="") {
+            /* 没有内容输入 改变样式 */
+            $(".search-row").removeClass("active iconfont icon-sousuo");
+        } else {
+            /* 有内容输入 保持样式 并提交表单 */
+            $("#search").submit();
+        }
+    });
+</script>
+</body>
+</html>

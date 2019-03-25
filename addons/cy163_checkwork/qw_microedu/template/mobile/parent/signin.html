@@ -1,0 +1,103 @@
+{template 'header'}
+<div id="signin">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">打卡记录</h1>
+    </div>
+    <div class="mui-content">
+        <div class="recorder">
+            <header class="signin-header">
+                <img src="{$children['avatar']}" />
+                <h4>{$children['fullname']}</h4>
+                <div class="signin-month">
+                    <select class="signin-select" style="color:black !important;"  onchange="year()">
+                        {loop $years $i $y}
+                            <option value="{$y}" {if $time_one == $y } selected="selected" {/if}>{$y}</option>
+                        {/loop}
+                    </select>
+                    <input type="hidden" id="children_id" value="{$children_id}">
+                    <script type="text/javascript">
+                        function year()
+                        {
+                            var val = $('.signin-select option:selected').val();
+                            var children_id = $('#children_id').val();
+                            window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'signin')) ?>"+"&children_id="+children_id+"&time="+val;
+                        }
+                    </script>
+                </div>
+                <div class="signin-tongji">
+                    <ul class="mui-table-view mui-grid-view mui-grid-9">
+                        <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+                            <div class="mui-media-body">迟到</div>
+                            <span>{$chidao['count']}</span>
+                        </li>
+                        <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+                            <div class="mui-media-body">早退</div>
+                            <span>{$zaotui['count']}</span>
+                        </li>
+                        <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4">
+                            <div class="mui-media-body">请假</div>
+                            <span>{$qingjia['count']}</span>
+                        </li>
+                    </ul>
+                </div>
+            </header>
+            <div class="timeline">
+
+                {if $punch_cards}
+                    {loop $punch_cards $i $punch_card}
+                        {if $punch_card['status'] == 0}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-unsign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 课程未开始/学员旷课</p>
+                            </div>
+                        {else if $punch_card['status'] == 1}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-sign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 学员正常签到</p>
+                            </div>
+                        {else if $punch_card['status'] == 2}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-unsign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 学员迟到</p>
+                            </div>
+                        {else if $punch_card['status'] == 3}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-unsign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 学员早退</p>
+                            </div>
+                        {else if $punch_card['status'] == 4}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-unsign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 学员请假</p>
+                            </div>
+                        {else if $punch_card['status'] == 5}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-sign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 已经安排试听</p>
+                            </div>
+                        {else if $punch_card['status'] == 6}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-sign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 完成试听</p>
+                            </div>
+                        {else}
+                            <div class="recorder-content">
+                                <h4><img src="{MODULE_URL}assets/img/timeline-sign.png" /><span class="gray">{$punch_card['timeslot']}</span> </h4>
+                                <p>{$punch_card['class_name']} 准时到校上课</p>
+                            </div>
+                        {/if}
+                    {/loop}
+                {else}
+                    <div class="recorder-content">
+                        <p>暂无打卡记录</p>
+                    </div>
+                {/if}
+
+            </div>
+        </div>
+    </div>
+</div>
+{template 'footer'}

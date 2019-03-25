@@ -1,0 +1,130 @@
+{template 'common/header'}
+<SCRIPT src="{STATIC_ROOT}/js/jquery.lazyload.min.js" type=text/javascript></SCRIPT>
+<meta name="referrer" content="never">
+<style>
+    .l_tableWrap .l_table_tit .l_formBar {
+        border: 0;
+        float: left;
+        font-size: 0;
+    }
+    .y_sele {
+        display: inline-block;
+        padding: 5px 0 12px 12px;
+    }
+    .y_sele_tit {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+    }
+    .l_table_search{
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+<div class="clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            专题栏目列表
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <div class="l_table_tit clearfix">
+                <div class="btn-group l_table_search">
+                    <a href="{php echo $this->createWebUrl('topic', array('_wg' => 'edit'))}" class="btn btn-success">添加专题栏目</a>
+                </div>
+            </div>
+            <style>
+                .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+                    white-space: normal;
+                }
+            </style>
+            <table class="table table-hover">
+                <tr>
+                    <th>排序</th>
+                    <th>ID</th>
+                    <th style="width: 190px;">地址</th>
+                    <th>标题</th>
+                    <th>摘要</th>
+                    <th>图片</th>
+                    <th>创建时间</th>
+                    <th style="width: 150px; text-align: right;">操作</th>
+                </tr>
+                {loop $list $row}
+                <tr>
+
+                    <td>
+                        <p class="form-control-static">
+                            {$row['display_order']}
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="form-control-static">
+                            {$row['id']}
+                        </p>
+                    </td>
+                    <td style="width: 190px;word-break: break-all;">
+                        <p class="form-control-static">
+                            <a target="_blank" href="<?php echo $this->webmobileUrl('topic',['topic_id' => $row['id']]);?>"><?php echo $this->webmobileUrl('topic',['topic_id' => $row['id']]);?></a>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['title']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['text']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php
+                        $im = json_decode($row['image'],true);
+                        if($im) {
+                        ?>
+                            <a><img src="<?php echo $this->formatArrImage($im[0])['url'];?>" width="120px" style="max-height: 150px;"></a>
+                            <?php } ?></p>
+                    </td>
+
+                    <td>
+                        <p class="form-control-static">
+                            {php echo date('Y-m-d H:i:s',$row['create_time']);}
+                        </p>
+                    </td>
+                    <td style="width:100px;">
+                        <div class="form-control-static">
+                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('topic', array('_wg' => 'edit', 'id' => $row['id']))}" >编辑</a>
+                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('topic', array('_wg' => 'topiclist', 'id' => $row['id']))}" >文章列表</a>
+
+                        </div>
+                        <div>
+                            <a href="javascript:void(0);" data-id="{$row['id']}" class="del-topic btn btn-default btn-sm" >删除</a>
+                        </div>
+
+
+                    </td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    var url_del = "{php echo $this->createWebUrl('topic',['_wg' => 'del']);}";
+    $(function () {
+
+        $('.del-topic').click(function () {
+            if(!confirm('确认删除此专题，专题相关文章也会被删除？')) {
+                return false;
+            }
+            var id = $(this).attr('data-id');
+            $.post(url_del,{id:id},function (data) {
+                if(data.code != 0) {
+                    alert(data.msg);
+                }
+                location.reload();
+            },'JSON');
+        });
+    })
+    </script>
+{template 'common/footer'}

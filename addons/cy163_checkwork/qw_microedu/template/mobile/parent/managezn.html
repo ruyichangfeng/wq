@@ -1,0 +1,145 @@
+{template 'header'}
+<div id="managezn">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">管理子女</h1>
+    </div>
+    <div class="mui-content">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell mui-collapse mui-active">
+                <a class="mui-navigate-right" href="#">已添加子女</a>
+                <div class="mui-collapse-content mui-active editit">
+                    <ul class="mui-table-view mui-table-view-chevron">
+
+                        {if $childrens}
+                            {loop $childrens $index $children}
+                                <li class="mui-table-view-cell mui-media">
+                                    <a class="mui-navigate-right" href="<?php echo $this->createMobileUrl('parent', array('page' => 'editzn', 'children' => $children['id'])) ?>">
+                                        <img class="mui-media-object mui-pull-left evaluate-img" src="{$children['avatar']}">
+                                        <div class="mui-media-body">
+                                            {$children['fullname']}
+                                            <p class="mui-ellipsis">{$children['age']}岁</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            {/loop}
+                        {else}
+                            <tr><td colspan="5"><p class="text-center" style="margin-bottom:5% !important;">未添加子女</p></td></tr>
+                        {/if}
+
+                    </ul>
+                </div>
+            </li>
+            <li class="mui-table-view-cell mui-collapse">
+                <a class="mui-navigate-right" href="#">添加子女</a>
+                <div class="mui-collapse-content">
+                    <form class="mui-input-group">
+                        <div class="mui-input-row">
+                            <label>姓名</label>
+                            <input type="text" name="name" class="mui-input-clear" placeholder="请输入孩子真实姓名">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>年龄</label>
+                            <input type="number" name="age" class="mui-input-clear" placeholder="请输入孩子真实年龄">
+                        </div>
+                        <div class="mui-input-row head">
+                        <label>上传头像</label>
+                        <div class="mui-pull-right"><img src="" class="edit-header" /><span class="mui-icon mui-icon-plus add-header"></span><p class="uploadsrc" style="display: none;"></p></div>
+                        </div>
+                            <div class="mui-input-row mui-radio">
+                            <label>性别</label>
+                        </div>
+                        <div class="mui-input-row mui-radio">
+                            <label>男</label>
+                            <input type="radio" name="sex" value="1" checked="checked">
+                        </div>
+                        <div class="mui-input-row mui-radio">
+                            <label>女</label>
+                            <input type="radio" name="sex" value="0">
+                        </div>
+
+                        <input type="hidden" name="action" value="children_add">
+
+                        <div class="mui-text-center">
+                            <a class="btn btn-save" id="but" href="javascript:;">确认</a>&nbsp;
+                        </div>
+                    </form>
+                    <script type="application/javascript">
+                        $("#but").click(function () {
+                            var name = $("input[name='name']").val();
+                            var age = $("input[name='age']").val();
+                            var sex = $("input[name='sex']:checked").val();
+                            var loadsrc=$(".uploadsrc").text();
+                            if (name == "")
+                            {
+                                mui.alert("请输入您儿女的真实姓名"); return;
+                            }
+                            if (age == "")
+                            {
+                                mui.alert("请输入您儿女的真实年龄"); return;
+                            }
+                            if (sex == "")
+                            {
+                                mui.alert("请选择您儿女的真是性别"); return;
+                            }
+                            if($.trim(loadsrc)==''){
+                                mui.alert("请上传图片");
+                                //模拟点击
+                                $(".add-header").click();
+
+                                return false;
+                            }
+
+                            $('#but').attr("disabled",'disabled');
+                            $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'children_add')) ?>", {
+                                name: name,
+                                age: age,
+                                sex: sex,
+                                loadsrc:loadsrc
+                            }, function (response) {
+                                if (response.status == 'success')
+                                {
+                                    mui.alert('添加成功', function () {
+                                        window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'managezn')) ?>";
+                                    });
+                                }
+                                else
+                                {
+                                    mui.alert('添加失败,请重试!');
+                                    $('#but').removeAttr("disabled");
+                                }
+                            }, "json");
+                        });
+                    </script>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{template 'footer'}
+{php echo register_jssdk(false);}
+<script>
+    wx.ready(function(){
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+    });
+    $(".add-header").click(function(){
+        var ttt = $(this).parent().find(".edit-header");
+        wx.chooseImage({
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                ttt.attr('src',localIds);
+                localIds = localIds.toString();
+                wx.uploadImage({
+                    localId: localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
+                    success: function (res) {
+                        var serverId = res.serverId; // 返回图片的服务器端ID
+                        $(".uploadsrc").text(serverId);
+                    }
+                });
+            }
+        });
+    })
+</script>
+{template 'footer'}

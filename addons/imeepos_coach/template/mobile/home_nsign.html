@@ -1,0 +1,108 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}public/libs/ionic/css/ionic.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/weui/weui.min.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/jquery_weui/jquery-weui.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/iconfont.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/common.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/index.css"/>
+<style>
+    .item{min-height: 35px;}
+    .h44{height:44px;}
+</style>
+<div class="panel">
+    <div class="weui_msg">
+        <div class="weui_icon_area"><i class="weui_icon_success weui_icon_msg"></i></div>
+        <div class="weui_text_area">
+            <h2 class="weui_msg_title">恭喜您</h2>
+            <p class="weui_msg_desc">【{$member['nickname']}】扫码成功</p>
+        </div>
+    </div>
+    <div class="weui_panel_bd">
+        <div class="weui_media_box weui_media_small_appmsg">
+            <div class="weui_cells weui_cells_access" style="margin-top:44px;">
+                {if $type == 'seat'}
+                {loop $list $log}
+                {php $manage = M('seat')->getInfo($log['seat_id'])}
+                <div class="weui_cell sign" data-id="{$log['id']}">
+                    <div class="weui_cell_hd"><img src="{php echo tomedia($manage['image'])}" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p>{$manage['seat_id']}</p>
+                    </div>
+                    <div class="weui_cell_ft">
+                        {if $log['status'] == 0}
+                        <span style="color:red;" data-id="{$log['id']}" class="sign">点击签到</span>
+                        {else if $log['status'] == 1}
+                        <span style="color:red;">已签到</span>
+                        {else if $log['status'] == 2}
+                        <span style="color:red;">迟到</span>
+                        {else if $log['status'] == 3}
+                        <span style="color:red;">旷课</span>
+                        {/if}
+                    </div>
+                </div>
+                {/loop}
+                {else}
+                {loop $list['list'] $log}
+                {php $manage = M('manage')->getInfo($log['manage_id'])}
+                <div class="weui_cell sign" data-id="{$log['id']}">
+                    <div class="weui_cell_hd"><img src="{php echo tomedia($manage['image'])}" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p>{$manage['title']}</p>
+                    </div>
+                    <div class="weui_cell_ft">
+                        {if $log['status'] == 0}
+                        <span style="color:red;" data-id="{$log['id']}" class="sign">点击签到</span>
+                        {else}
+                        <span style="color:red;">已签到</span>
+                        {/if}
+                    </div>
+                </div>
+                {/loop}
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div style="height:44px;"></div>
+</div>
+{template 'common/footerbar'}
+<script>
+    require(["{MODULE_URL}public/libs/jquery_weui/jquery-weui.js"],function(){
+        wx.config(jssdkconfig);
+        $('.weui_btn_default').click(function(){
+            wx.ready(function(){
+                wx.closeWindow();
+            });
+        });
+        $('.weui_btn_primary').click(function(){
+            window.location.href = "{php echo $url}";
+        });
+        var posting = true;
+        $('.sign').click(function(){
+            var _that = $(this);
+            var _value = _that.data('id');
+            var post = {type:"{php echo $_GPC['type']}",id:_value,act:'sign'};
+            if(posting){
+                posting = false;
+                $.post("",post,function(data){
+                    if(data.status == 1){
+                        $.toast('签到成功,赠送积分:'+data.credit,2000,function(){
+                            setTimeout(function(){
+                                window.location.href = "{php echo $this->createMobileUrl('home')}";
+                            },100);
+
+                        });
+                    }else{
+                        //alert(JSON.stringify(data));
+                        $.toast(data.message,'forbidden',function(){
+                            wx.ready(function(){
+                                wx.closeWindow();
+                            });
+                        });
+                    }
+                },'json');
+            }
+
+        });
+    });
+</script>
+{template 'common/footer'}

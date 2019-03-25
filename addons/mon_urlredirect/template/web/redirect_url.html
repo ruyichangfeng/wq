@@ -1,0 +1,235 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('redirectSetting');}">跳转管理</a></li>
+        <li  class="active" ><a href="{php echo $this->createWebUrl('redirecturl', array('redid' => $redid));}">跳转链接管理</a></li>
+
+    </ul>
+
+
+    <div class="panel panel-info">
+        <div class="panel-heading">{$redirect['rname']} 跳转链接管理</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="mon_urlredirect" />
+                <input type="hidden" name="do" value="redirecturl" />
+                <input type="hidden" name="redid" value="{$redid}" />
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">关键字</label>
+                    <div class="col-sm-8 col-lg-9">
+                        <input class="form-control" name="keyword" id="" type="text" value="{$_GPC['keyword']}">
+                    </div>
+                    <div class=" col-xs-12 col-sm-2 col-lg-2">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <a class="btn btn-default" href="javascript:addRedirectUrl()" role="button"><i class="glyphicon glyphicon-plus"></i>新增跳转链接</a>
+
+        </div>
+        <div class="table-responsive panel-body">
+
+    <div style="padding:15px;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+            <tr>
+
+                <th>名称</th>
+                <th style="width: 80px">跳转链接</th>
+                <th>转发次数</th>
+                <th>是否已启用</th>
+                <th>创建时间</th>
+                <th style="width: 400px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $row}
+                <tr>
+                    <td>{$row['urlname']}</td>
+                    <td>
+                        {$row['url']}
+                    </td>
+
+                    <td>{$row['trigger_count']}</td>
+
+                    <td>{if $row['is_enable']}是{else} 否{/if}</td>
+                    <td>{php echo date("Y-m-d H:i", $row['createtime'])}</td>
+                    <td style="overflow: inherit;">
+
+                        <a href="{php echo $this->createWebUrl('redirectrecord',array('redid'=>$row['redid'], 'uid'=> $row['id']))}" class="btn  btn-default" rel="tooltip" title="跳转记录"><i class="glyphicon glyphicon-bookmark"></i>跳转记录</a>
+
+                       <a class="btn btn-default" rel="tooltip" href="javascript:editUrl({$row['id']})" title="编辑"><i class="glyphicon glyphicon-edit"></i></i></a>
+                        <a class="btn  btn-danger" rel="tooltip" href="#" onclick="drop_confirm('您确定要删除吗?', '{php echo $this->createWebUrl('redirecturl',array('op'=>delete,'uid'=>$row['id']))}');" title="删除">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </td>
+                </tr>
+            {/loop}
+
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+
+            </div>
+        </div>
+</div>
+
+
+<div class="modal fade" id="urlModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">新增跳转URL</h4>
+            </div>
+            <div class="modal-body">
+                <form id="url_form">
+                    <input type="hidden" name="redid" value="{$redid}" />
+                    <input type="hidden" name="uid" id="uid" value="" />
+                    <div class="form-group">
+                        <label for="urlname" class="control-label">跳转URL名称:</label>
+                        <input type="text" class="form-control" id="urlname" name="urlname">
+                    </div>
+                    <div class="form-group">
+                        <label for="url" class="control-label">跳转地址(http:// 或者https 完整链接地址):</label>
+                        <input type="text" class="form-control" id="url" name="url">
+
+                    </div>
+
+                    <div class="form-group">
+                        <label  class="control-label">是否启用:</label>
+
+                        <input type="radio" name="is_enable" value="1" checked="checked" >开启&nbsp;
+                        <input type="radio" name="is_enable" value="0" />关闭
+
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="btn_save_url()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function addRedirectUrl () {
+
+        $('#urlModal').modal('show')
+    }
+
+    function editUrl (uid) {
+
+        //alert(uid);
+
+        $.post("{php echo $this->createWebUrl('getDetailUrl')}",  {"uid": uid} , function(res) {
+
+            $("#uid").val(res.id);
+            $("#urlname").val(res.urlname);
+            $("#url").val(res.url);
+
+
+
+            $("input[name='is_enable']").each(function(){
+                if ($(this).val() == res.is_enable) {
+                    this.checked=true;
+                } else {
+                    this.checked=false;
+                }
+            });
+
+            $('#urlModal').modal('show')
+            //$("#url").val(res.url);
+
+
+
+        }, 'json');
+
+
+
+
+
+    }
+
+    function btn_save_url() {
+
+        $.post("{php echo $this->createWebUrl('editRecirectUrl')}",  $("#url_form").serialize() , function(res) {
+            alert(res.msg);
+            window.location.reload();
+        }, 'json');
+
+
+    }
+
+    $(function(){
+
+        $(".check_all").click(function(){
+
+            var checked = $(this).get(0).checked;
+            $("input[type=checkbox]").each(function(i){
+                $(this).get(0).checked=checked;
+            });
+
+        });
+
+
+        $("input[name=deleteall]").click(function(){
+
+
+            var check = $("input:checked");
+            if (check.length < 1){
+                 alert('请选择要删除的记录!');
+                return false;
+            }
+            if (confirm("确认要删除选择的记录?")){
+                var id = new Array();
+                check.each(function(i){
+                    id[i] = $(this).val();
+                });
+
+
+                $.post('{php echo $this->createWebUrl('DeleteZl')}', {idArr:id}, function(data){
+
+                    if(data.code==200) {
+                        alert("删除成功");
+                        location.reload();
+                    } else {
+                        alert("删除出错，稍后再试!");
+                    }
+
+                }, 'json');
+            }
+
+        });
+    });
+
+
+</script>
+<script>
+    function drop_confirm(msg, url){
+        if (confirm(msg)){
+            window.location = url;
+        }
+    }
+</script>
+
+{template 'common/footer'}

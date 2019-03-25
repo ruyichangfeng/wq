@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_member_title']}</title>
+{template 'head'}
+</head>
+</head>
+<body>
+<input type="hidden" id="store_id" value="{$store_id}" >
+<div class="mnav mcolor-a" {if $config['mobile_diy1_bcolor']!=''} style="background-color: {$config['mobile_diy1_bcolor']}"{/if}>
+    <a href="javascript:backss();" class="mbackbtn_a"><div class="mbackbtn"><img src="{RES}/public/images/m_btn_back.png"/></div></a>
+    {if $config['mobile_diy1_title']!=''}{$config['mobile_diy1_title']}{else}发放记录{/if}
+</div>
+<div class="mtablediv">
+    <table class="table table-striped mtable">
+    	<thead>
+    		<tr>
+	    		<th><img src="{RES}public/images/fans_rew_table1.png" >时间</th>
+	    		<th><img src="{RES}public/images/fans_rew_table2.png" >名称</th>
+	    		<th><img src="{RES}public/images/fans_rew_table3.png" >类型</th>
+	    		<th><img src="{RES}public/images/fans_rew_table4.png" >分值</th>
+    		</tr>
+    	</thead>
+    	<tbody id="rewardlog_list">
+    		
+    	</tbody>
+    </table>
+</div>
+{template 'foot-msg'}
+</body>
+
+<script>
+	var storeid=$('#store_id').val();
+	var lastID=999999999999;
+	//滚动条到页面底部加载更多案例 
+ 
+	$(document).ready(function() {
+            $(window).scroll(function() {
+                //$(document).scrollTop() 获取垂直滚动的距离
+                //$(document).scrollLeft() 这是获取水平滚动条的距离
+                if ($(document).scrollTop() <= 0) {
+                    // alert("滚动条已经到达顶部为0");
+                }
+                if ($(document).scrollTop() >= $(document).height() - $(window).height()) {
+                   	if(lastID!=0)
+          				 	{
+          				 		ajaxchuli();
+          				 	}
+                }
+            });
+        });
+    $(function(){
+    	ajaxchuli();
+    })
+	function ajaxchuli()
+	{
+		 $.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('memberrellog',array('op'=>'display'));}",
+          data:{store_id:storeid,"lastID":lastID,"pageSize":13},
+          dataType:"json",
+          async:false,
+          success:function(data){
+            //清空联动数据
+            if(data.result=="success")
+            {
+                for (var i = 0; i < data.rs.length; i++) {
+                 	var op="";
+                 	op+='<tr>';
+                 	op+='<td class="mtr1">'+data.rs[i]["addtime"]+'</td>';
+                 	op+='<td class="mtr2">'+data.rs[i]["fans_nickname"]+'</td>';
+      	    			op+='<td class="mtr3">'+data.rs[i]["credittype"]+'</td>'
+      	    			op+='<td class="mtr5">'+data.rs[i]["rewardlog_number"]+'</td>';
+      	    			op+='</tr>';
+                  if(data.rs.length < 12)
+                  {
+                      lastID=0; 
+                  }else{
+                    if(data.rs[i].rewardlog_id==1)
+                    {
+                      lastID=0;  
+                    }else{
+                      lastID=data.rs[i].rewardlog_id;  
+                    }
+                  }  
+                  $("#rewardlog_list").append(op);
+              	}
+            }else{
+                lastID=0;
+                $("#rewardlog_list").append("<tr><td colspan='4'><div class='memberbox common-content'  ><div style='height:100px; line-height:100px; text-align:center; font-size:18px; font-weight:bolder;'>还没有发放记录！！</div></div></td></tr>"); 
+            }
+          }
+      });
+	}
+	function backss(){
+		var url="{php echo $this->createMobileUrl('memberlogin');}";
+		window.location.href=url+"&store_id="+storeid;
+	} 
+
+</script>
+</html>

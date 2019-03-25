@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['pc_member_title']}</title>
+{template '../pc/head'}
+</head>
+
+<body  class="nav-md">
+		{template '../pc/header'}
+		 <div class="right_col con-box" role="main">
+			<div class="con">
+              <div class="col-md-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2 style="font-weight:bold;">发放奖励</h2>
+                    <div class="clearfix"></div>
+                  </div>
+		          <!-- top tiles -->
+		          <div class="row tile_count">
+		            <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count" style="text-align:center;">
+		              <span class="count_top"><i class="fa fa-heart" style="padding-right:6px;"></i>可用积分</span>
+		              <div class="count">{$jifen}</div>
+		            </div>
+		            <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count"  style="text-align:center;">
+		              <span class="count_top"><i class="fa fa-heart-o" style="padding-right:6px;"></i>已发积分</span>
+		              <div class="count">{if $credit1count['count']==''}0{else}{$credit1count['count']}{/if}</div>
+		            </div>
+		            <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count"  style="text-align:center;">
+		              <span class="count_top"><i class="fa fa-star" style="padding-right:6px;"></i>可用余额分</span>
+		              <div class="count">{$yue}</div>
+		            </div>
+		            <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count"  style="text-align:center;">
+		              <span class="count_top"><i class="fa fa-star-o" style="padding-right:6px;"></i>已发余额分</span>
+		              <div class="count">{if $credit2count['count']==''}0{else}{$credit2count['count']}{/if}元</div>
+		            </div>
+		          </div>
+		          <!-- /top tiles -->
+                  <div class="x_content">
+                    <br />
+                    <form class="form-horizontal form-label-left">
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-6 col-xs-12">消费类型</label>
+                        <div class="col-md-6 col-sm-10 col-xs-12">
+                          <select class="form-control" id="spending">
+                          	{loop $spending_list $key $item}
+                            <option value="{$item['spending_id']}" {if $item['store_id']==$store_id }selected{/if}>{$item['spending_title']}</option>
+                            {/loop}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group" style="margin-top:20px;">
+                        <label class="control-label col-md-3 col-sm-6 col-xs-12">消费金额</label>
+                        <div class="col-md-6 col-sm-10 col-xs-12">
+                          <div class="input-group">
+                            <span class="input-group-addon">￥</span>
+                            <input id="money" class="form-control" value="" maxlength="9" step="0.01" type="number">
+                            <span class="input-group-addon">元</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
+                          <!-- <button type="submit" class="btn btn-success">生成二维码</button> -->
+                          <a href="javascript:getqrcode();" style="display: inline-block;width: 40%;"><img src="{RES}public/images/m_btn2.png" class="m_btn_a" style="width: 70%;"/></a>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- /page content -->
+      </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="tanchukuang">
+		<div class="modal-dialog modal-sm" role="document">
+		    <div class="modal-content" style="text-align: center;">
+		    	<div>
+		    		<img src="" alt="" id="qrcodeimg" style="margin:1em auto 0em;">
+		    	</div>
+		    	<div id="tishi" style="font-size: 1.1em;margin: 2em 0em;">
+		    		
+		    	</div>
+		    </div>
+		</div>
+	</div>
+	<script>
+		
+
+		function getqrcode()
+  		{
+  			/* 消费类型  消费金额 */
+  			var type= $('#spending option:selected').val(),
+  				number=$('#money').val();
+  			if(storeid=='')
+  			{
+  				alert('未获取到门店信息，请重新进入!');
+  			}else if (type=='')	
+  			{
+  				alert('请填写消费类型!');
+  			}else if (number==0){
+  				alert('请填写消费金额')
+  			}else{
+  				$.ajax({  
+		        type:"POST",
+		        url: "{php echo $this->createMobileUrl('ajaxpcgetqrcode');}",
+		        data:{type:type,number:number,storeid:storeid},
+		        dataType:"json",
+		        async:false,
+		        success: function(data){
+		        	if(data.result=='success')
+		        	{
+		        		 $('#tanchukuang').modal('show');
+		        		 $('#qrcodeimg').addClass('show');
+		        		 $('#qrcodeimg').attr('src',data.qr);
+ 						 $('#tishi').html('扫描上方二维码赠送'+data.jifen+data.type);
+		        	}else if(data.result=='error'){
+		        		op=data.rs1+'<br>'+data.rs2+'<br>'+data.rs3;
+		        		$('#tanchukuang').modal('show');
+		        		$('#qrcodeimg').removeClass('show');
+		        		$('#qrcodeimg').addClass('hide');
+		        		$('#tishi').html(op);
+		        	}else{
+		        		$('#tanchukuang').modal('show');
+		        		$('#qrcodeimg').removeClass('show');
+		        		$('#qrcodeimg').addClass('hide');
+		        		$('#tishi').html(data.rs);
+		        	}
+		        }
+	        	});
+  			}	
+  		}  
+	</script>
+	<script src="{RES}/public/pc/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{RES}/public/pc/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="{RES}/public/pc/js/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="{RES}/public/pc/js/nprogress.js"></script>
+    <!-- iCheck -->
+    <script src="{RES}/public/pc/js/icheck.min.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="{RES}/public/pc/js/custom.min.js"></script>
+</body>
+</html>

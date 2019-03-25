@@ -1,0 +1,113 @@
+﻿ <include file="Public/header.html" />
+</head>
+
+<body>
+	<div class="x-nav">
+		<span class="layui-breadcrumb">
+              <a><cite>首页</cite></a>
+              <a><cite>域名切换</cite></a>
+            </span>
+		<a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+	</div>
+	<div class="x-body">
+		<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+			<ul class="layui-tab-title">
+				<li class="layui-this">参数设置</li>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<form id="form-article-add" class="layui-form layui-form-pane">
+						<div class="layui-form-item">
+							<label class="layui-form-label">
+                                <span class='x-red'>*</span>前端域名
+                            </label>
+							<div class="layui-input-block">
+								<input type="text" name="oauth_site" lay-verify="oauth_site" value="<?php $o_url = explode('/app', $system['oauth_url']); echo $o_url[0]; ?>" autocomplete="off" placeholder="微擎前端域名" class="layui-input">
+								<input  type="hidden" name="oauth_url" value="{$system['oauth_url']}"/>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">
+                                <span class='x-red'>*</span>IP白名单
+                            </label>
+							<div class="layui-input-block">
+								<input type="text" name="ip"  value="{$ip['data']}" autocomplete="off" placeholder="访问定时器ip限制" class="layui-input">
+							<span style="color: red; font-size: 12px;font-weight:bold">
+								定时器地址：<span id="span_url"></span>
+					 		</span>
+					   
+							</div>
+						</div>
+
+						<div class="layui-form-item" style="text-align: center;">
+							<button type="button" class="layui-btn" lay-submit="" lay-filter="subfrom">
+                               	 保存
+                            </button>
+                            <input type="hidden" id="sharelogo_val" value="" >
+						</div>
+						
+					</form>
+					<div style="height:100px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<include file="Public/footer.html" />
+	<script>
+	
+	
+		layui.use(['form','element', 'layedit'], function() {
+			var form = layui.form,
+			layedit = layui.layedit;
+			$ = layui.jquery;
+            
+	        $('#span_url').text("{$system['oauth_url']}".replace('getinfo','bid_time'));
+			
+			//监听提交
+			form.on('submit(subfrom)', function(datas) {
+				var tjing = layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form=document.forms[0];
+			    var formData = new FormData(form); 
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Site/site_insert')}",
+					 data :formData,
+			         dataType:"text",
+			         processData : false,         
+			         contentType : false,   
+					 success: function(data) {
+						if(data == '1') {
+							layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								location.reload();
+							});
+						} else if(data == '2') {
+							layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						} else {
+							layer.msg(data, {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+				return false;
+			});
+		});
+		
+	</script>
+	<!--/请在上方写此页面业务相关的脚本-->
+</body>
+
+</html>

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>超级门店主页</title>
+    <link rel="stylesheet" href="../addons/hy_supstore/template/layui/css/layui.css">
+    <link rel="stylesheet" href="../addons/hy_supstore/template/web/css/style.css">
+    <!--图标插件end-->
+    <script src="../addons/hy_supstore/template/layui/layui.js"></script>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script src="../addons/hy_supstore/template/web/js/index.js"></script>
+    <!--图标插件-->
+    <link href="../addons/hy_supstore/template/web/css/jquery.gritter.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/web/css/gritter.css?v=1.2" rel="stylesheet">
+    <script src="../addons/hy_supstore/template/web/js/jquery.gritter.min.js"></script>
+    <script src="../addons/hy_supstore/template/web/js/jquery.flot.js?v=2.1.4"></script>
+    <script src="../addons/hy_supstore/template/web/js/echarts-all.js?v=2.1.4"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+    <style>
+    .layui-tab-title li:first-child>i {
+        display: none;
+    }
+
+    .layui-layout-admin .layui-logo {
+        width: 180px;
+    }
+
+    .change-side {
+        position: absolute;
+        top: 0;
+        left: 180px;
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+        transition: all .5s;
+        -moz-transition: all .5s;
+        /* Firefox 4 */
+        -webkit-transition: all .5s;
+        /* Safari 和 Chrome */
+        -o-transition: all .5s;
+        /* Opera */
+    }
+
+    .change-side:hover {
+        background-color: #313540;
+    }
+
+    .change-side i {
+        font-size: 20px;
+        color: #c2c2c2;
+    }
+
+    #layuiHeaderIndex,
+    #hrakheight {
+        min-width: 640px;
+    }
+
+    .layui-side-scroll {
+        padding-bottom: 45px;
+    }
+
+    .layuiadmin-page-table {
+        text-align: center;
+    }
+
+    .user-name {
+        display: inline-block;
+        width: 80px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-bottom: -10px;
+    }
+    /*面板响应式*/
+    @media screen and (min-width:992px) and (max-width:1200px) {
+        .layuiadmin-time{display: none;}
+    }
+    /*时间切换*/
+    .change-time.active {
+        border-color: #C9C9C9;
+        color: #1890ff;
+    }
+    </style> 
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header" id="layuiHeaderIndex">
+            <div class="layui-logo" style="background: url('{if $this->settings['logo']}{php echo $this->settings['logo']}{else}../addons/hy_supstore/template/web/images/logo.png{/if}') no-repeat center; background-size: cover;"></div>
+            <a href="javascript:void(0);" class="change-side change-side-right" id="changeSide"><i class="layui-icon">&#xe668;</i></a>
+            <div id="countDown" style="line-height: 60px; color: white;width: 450px;font-size: 16px;margin-left: 260px;"></div>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img src="{$_W['account']['logo']}" class="layui-nav-img">
+                        {$_W['account']['name']} -- {$_W['user']['username']} ({if $_W['role'] == 'founder'}系统管理员{elseif $_W['role'] == 'manager'}公众号管理员{else}公众号操作员{/if})
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="./?refresh"><i class="fa fa-weixin fa-fw"></i> 返回系统</a></dd>
+                        <dd><a href="{url 'user/profile/profile'}" target="_blank"><i class="fa fa-cogs fa-fw"></i> 我的账号 </a></dd>
+                        <dd><a href="{url 'user/logout'}"><i class="fa fa-mobile"></i> 退出系统</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+        <div class="layui-side layui-bg-black" id="layuiSideIndex">
+            <div class="layui-side-scroll">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul class="layui-nav layui-nav-tree" lay-filter="left-menu">
+                    <li class="layui-nav-item">
+                        <a href="{php echo $this->createWebUrl('index')}"><i class="layui-icon">&#xe68e;</i> 首页</a>
+                    </li>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a href="javascript:;"><i class="layui-icon">&#xe600;</i> 店面</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SA01" name="{php echo $this->createWebUrl('storeCategory')}"><a href="javascript:;">店面分类</a></dd>
+                            <dd id="SA02" name="{php echo $this->createWebUrl('store')}"><a href="javascript:;">店面管理</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a href="javascript:;"><i class="layui-icon">&#xe613;</i> 会员</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SB01" name="{php echo $this->createWebUrl('center')}"><a href="javascript:;">全部会员<span class="layui-badge layui-bg-cyan">{$totalList['mem']}</span></a></dd>
+                            {loop $groupList $index $item}
+                            <dd id="SB<?php echo 30+intval($index)?>" name="{php echo $this->createWebUrl('center',array('groupid'=>$item['id']))}"><a href="javascript:;">{$item['title']}<span class="layui-badge layui-bg-cyan">{$totalList[$index]}</span></a></dd>
+                            {/loop}
+                            <dd id="SB02" name="{php echo $this->createWebUrl('group')}"><a href="javascript:;">分组设置</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe632;</i> 制卡中心</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SC01" name="{php echo $this->createWebUrl('cardnumber')}"><a href="javascript:;">全部卡号</a></dd>
+                            <dd id="SC02" name="{php echo $this->createWebUrl('cardnumber',array('isbind'=>1))}"><a href="javascript:;">已领取卡号</a></dd>
+                            <dd id="SC03" name="{php echo $this->createWebUrl('cardnumber',array('isbind'=>0))}"><a href="javascript:;">未领取卡号</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe656;</i> 模板管理</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SD01" name="{php echo $this->createWebUrl('TplTheme')}"><a href="javascript:;">主题设置</a></dd>
+                            <dd id="SD02" name="{php echo $this->createWebUrl('TplGlobal')}"><a href="javascript:;">全局设置</a></dd>
+                            <dd id="SD03" name="{php echo $this->createWebUrl('TplBanner')}"><a href="javascript:;">轮播图管理</a></dd>
+                            <dd id="SD04" name="{php echo $this->createWebUrl('TplNav')}"><a href="javascript:;">导航管理</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe66b;</i> 产品管理</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SE01" name="{php echo $this->createWebUrl('productcategory')}"><a href="javascript:;">产品分类</a></dd>
+                            <dd id="SE02" name="{php echo $this->createWebUrl('product')}"><a href="javascript:;">产品管理</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe62d;</i> 文章管理</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SF01" name="{php echo $this->createWebUrl('articlecategory')}"><a href="javascript:;">文章分类</a></dd>
+                            <dd id="SF02" name="{php echo $this->createWebUrl('article')}"><a href="javascript:;">文章管理</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe63b;</i> 规则</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SG01" name="{php echo $this->createWebUrl('rules')}"><a href="javascript:;">储值规则</a></dd>
+                            <dd id="SG02" name="{php echo $this->createWebUrl('consumrules')}"><a href="javascript:;">消费规则</a></dd>
+                            <dd id="SG03" name="{php echo $this->createWebUrl('coupon')}"><a href="javascript:;">优惠券管理</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe65e;</i> 财务</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SH01" name="{php echo $this->createWebUrl('account')}"><a href="javascript:;">总账单</a></dd>
+                            <dd id="SH02" name="{php echo $this->createWebUrl('recharge')}"><a href="javascript:;">充值记录</a></dd>
+                            <dd id="SH03" name="{php echo $this->createWebUrl('consum')}"><a href="javascript:;">消费记录</a></dd>
+                            <dd id="SH04" name="{php echo $this->createWebUrl('credit1')}"><a href="javascript:;">积分记录</a></dd>
+                            <dd id="SH05" name="{php echo $this->createWebUrl('couponlog')}"><a href="javascript:;">优惠券记录</a></dd>
+                            <dd id="SH06" name="{php echo $this->createWebUrl('couponmemlog')}"><a href="javascript:;">优惠券领取记录</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe634;</i> 次卡</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SI01" name="{php echo $this->createWebUrl('oncecardset')}"><a href="javascript:;">次卡设置</a></dd>
+                            <dd id="SI02" name="{php echo $this->createWebUrl('oncecard')}"><a href="javascript:;">次卡管理</a></dd>
+                            <dd id="SI03" name="{php echo $this->createWebUrl('oncecardmem')}"><a href="javascript:;">用户次卡记录</a></dd>
+                            <dd id="SI04" name="{php echo $this->createWebUrl('oncecardlog')}"><a href="javascript:;">次卡领取记录</a></dd>
+                            <dd id="SI05" name="{php echo $this->createWebUrl('oncecardconsumlog')}"><a href="javascript:;">次卡消费记录</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe6af;</i> 人脸识别</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SJ01" name="{php echo $this->createWebUrl('faceset')}"><a href="javascript:;">基本设置</a></dd>
+                            <dd id="SJ02" name="{php echo $this->createWebUrl('facelog')}"><a href="javascript:;">请求统计</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe611;</i> 短信</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SK01" name="{php echo $this->createWebUrl('smsset')}"><a href="javascript:;">短信设置</a></dd>
+                            <dd id="SK02" name="{php echo $this->createWebUrl('smsrecharge')}"><a href="javascript:;">短信充值</a></dd>
+                            <dd id="SK03" name="{php echo $this->createWebUrl('smsrechargelog')}"><a href="javascript:;">短信充值记录</a></dd>
+                            <dd id="SK04" name="{php echo $this->createWebUrl('smssendlog')}"><a href="javascript:;">短信发送记录</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="layui-icon">&#xe631;</i> 设置</a>
+                        <dl class="layui-nav-child">
+                            <dd id="SL01" name="{php echo $this->createWebUrl('column')}"><a href="javascript:;">会员字段设置</a></dd>
+                            <!--dd id="S019" name="{php echo $this->createWebUrl('importcredit')}"><a href="javascript:;">余额导入</a></dd-->
+                            <dd id="SL02" name="{php echo $this->createWebUrl('boss')}"><a href="javascript:;">信息设置</a></dd>
+                            <dd id="SL03" name="{php echo $this->createWebUrl('msgsend')}"><a href="javascript:;">模板消息发送</a></dd>
+                            <dd id="SL04" name="{php echo $this->createWebUrl('print')}"><a href="javascript:;">打印管理设置</a></dd>
+                            <dd id="SL05" name="{php echo $this->createWebUrl('cover')}"><a href="javascript:;">入口设置</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="layui-body" id="hrakheight">
+            <!-- 内容主体区域 -->
+            <div class="layui-tab" lay-allowClose="true" lay-filter="tab-switch">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="S000">首页</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show" style="background-color: #f5f5f5">
+                        <!-- 内容主体区域 -->
+                        <div class="layui-fluid">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-sm6 layui-col-md3">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            会员
+                                            <span class="layui-badge layui-bg-blue layuiadmin-badge">总</span>
+                                        </div>
+                                        <div class="layui-card-body layuiadmin-card-list">
+                                            <p class="layuiadmin-big-font">{if $total_num}{$total_num}{else}0{/if}</p>
+                                            <p>
+                                                会员总数
+                                                <span class="layuiadmin-span-color">所有门店 <i class="layui-inline layui-icon">&#xe770;</i></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm6 layui-col-md3">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            消费
+                                            <span class="layui-badge layui-bg-cyan layuiadmin-badge">月</span>
+                                        </div>
+                                        <div class="layui-card-body layuiadmin-card-list">
+                                            <p class="layuiadmin-big-font">{if $acc_fee}{php echo sprintf('%.2f',$acc_fee);}{else}0{/if}</p>
+                                            <p>
+                                                <span class="layuiadmin-time">最近一个月</span> 总共<red>{$acc_num}</red>笔
+                                                <span class="layuiadmin-span-color">所有门店<i class="layui-inline layui-icon">&#xe698;</i></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm6 layui-col-md3">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            充值
+                                            <span class="layui-badge layui-bg-green layuiadmin-badge">月</span>
+                                        </div>
+                                        <div class="layui-card-body layuiadmin-card-list">
+                                            <p class="layuiadmin-big-font">{if $recharge_fee}{php echo sprintf('%.2f',$recharge_fee);}{else}0{/if}</p>
+                                            <p>
+                                                <span class="layuiadmin-time">最近一个月</span> 总共<red>{$recharge_num}</red>笔
+                                                <span class="layuiadmin-span-color">所有门店<i class="layui-inline layui-icon">&#xe659;</i></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm6 layui-col-md3">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            新增会员
+                                            <span class="layui-badge layui-bg-orange layuiadmin-badge">月</span>
+                                        </div>
+                                        <div class="layui-card-body layuiadmin-card-list">
+                                            <p class="layuiadmin-big-font">{if $mem_num}{$mem_num}{else}0{/if}</p>
+                                            <p>
+                                                最近一个月
+                                                <span class="layuiadmin-span-color">所有门店 <i class="layui-inline layui-icon">&#xe770;</i></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">最新消费订单列表</div>
+                                        <div class="layui-card-body">
+                                            <table class="layui-table layuiadmin-page-table" lay-skin="line">
+                                                <thead>
+                                                    <tr>
+                                                        <th>用户名</th>
+                                                        <th>账单号</th>
+                                                        <th>消费金额</th>
+                                                        <th>创建时间</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {loop $newConsum $item}
+                                                    <tr>
+                                                        <td>
+                                                            <span class="user-name"><img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style="height:38px; border-radius:50%;">
+                                                                <br>{$item['nickname']}
+                                                            </span>
+                                                        </td>
+                                                        <td><span class="order-box">{$item['orderno']}</span></td>
+                                                        <td><red>-{$item['credit2']}元</red>{if $item['couponvalue']!=0}(优惠：{$item['couponvalue']}元){/if}</td>
+                                                        <td>{$item['createtime']}</td>
+                                                        <td><a href="javascript:void(0);" class="consum-check">查看</a></td>
+                                                    </tr>
+                                                    {/loop}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">最新充值订单列表</div>
+                                        <div class="layui-card-body">
+                                            <table class="layui-table layuiadmin-page-table" lay-skin="line">
+                                                <thead>
+                                                    <tr>
+                                                        <th>用户名</th>
+                                                        <th>账单号</th>
+                                                        <th>充值金额</th>
+                                                        <th>创建时间</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {loop $newRecharge $item}
+                                                    <tr>
+                                                        <td>
+                                                            <span class="user-name"><img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style="height:38px; border-radius:50%;">
+                                                                <br>{$item['nickname']}
+                                                            </span>
+                                                        </td>
+                                                        <td><span class="order-box">{$item['orderno']}</span></td>
+                                                        <td><green>+{$item['credit2']}元</green></td>
+                                                        <td>{$item['createtime']}</td>
+                                                        <td><a href="javascript:void(0);" class="recharge-check">查看</a></td>
+                                                    </tr>
+                                                    {/loop}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm12">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">新增会员列表</div>
+                                        <div class="layui-card-body">
+                                            <table class="layui-table layuiadmin-page-table" lay-skin="line">
+                                                <thead>
+                                                    <tr>
+                                                        <th>会员名称</th>
+                                                        <th>会员类别</th>
+                                                        <th>分组</th>
+                                                        <th>门店</th>
+                                                        <th>手机号</th>
+                                                        <th>添加时间</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {loop $newMember $item}
+                                                    <tr>
+                                                        <td>
+                                                            <span class="user-name w100"><img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" width="38" height="38" style="border-radius:50%;">
+                                                            <br /><span>{if $item['name']}<green>{$item['name']}</green>{else}<red>未绑定</red>{/if}</span>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {if $item['mobile']}<span class="layui-badge" style="background-color: #5B98F1;">手机号/APP</span>{/if}
+                                                            {if $item['openid']}<span class="layui-badge" style="background-color: #44b549;">微信</span>{/if}
+                                                            {if $item['wpopenid']}<span class="layui-badge" style="background-color: #605AB0;">小程序</span>{/if}
+                                                            {if $item['cardnumber']}<span class="layui-badge layui-bg-blue">实体卡</span>{/if}
+                                                        </td>
+                                                        <td>{$item['group']}</td>
+                                                        <td>{$item['storename']}</td>
+                                                        <td>{$item['mobile']}</td>
+                                                        <td>{$item['createtime']}</td>
+                                                        <td><a href="javascript:void(0);" class="member-check">查看</a></td>
+                                                    </tr>
+                                                    {/loop}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            消费趋势图
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="consum" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="consum" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="bar" data-type="consum" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-top: 5%; padding-bottom: 1%;" id="consumData">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            各门店消费占比
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="consum" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="consum" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="pie" data-type="consum" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-bottom: 6%;" id="consumStore">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            充值趋势图
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="recharge" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="recharge" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="bar" data-type="recharge" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-top: 5%; padding-bottom: 1%;" id="rechargeData">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            各门店充值占比
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="recharge" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="recharge" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="pie" data-type="recharge" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-bottom: 6%;" id="rechargeStore">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            新增会员趋势图
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="newmember" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="bar" data-type="newmember" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="bar" data-type="newmember" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-top: 5%; padding-bottom: 1%;" id="newMemberData">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-xs12 layui-col-sm6">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">
+                                            各门店新增会员占比
+                                            <div class="layui-btn-group layuiadmin-btn-group">
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="newmember" data-time="threeday">最近3日</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time" data-chart="pie" data-type="newmember" data-time="week">最近一周</a>
+                                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs change-time active" data-chart="pie" data-type="newmember" data-time="month">最近一个月</a>
+                                            </div>
+                                        </div>
+                                        <div class="layui-card-body">
+                                            <div class="layui-carousel layadmin-carousel layadmin-dataview" style="width: 100%; height: 280px; padding-bottom: 6%;" id="newMemberStore">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="changeChartVal">
+            <input type="hidden" id="changeTimeVal">
+            <input type="hidden" id="changeTypeVal">
+        </div>
+    </div>
+    <script>
+    $(function() {
+        //倒计时 用于测试版
+        layui.use(['layer','form','util'], function(){
+            var util = layui.util;
+            var layer = layui.layer;//弹层
+            var form = layui.form;
+          
+            //示例
+            var endTime = new Date(2018,8,30).getTime(), //假设为结束日期
+            serverTime = new Date().getTime(); //假设为当前服务器时间，这里采用的是本地时间，实际使用一般是取服务端的
+
+            util.countdown(endTime, serverTime, function(date, serverTime, timer){
+                var str = date[0] + '天' + date[1] + '时' +  date[2] + '分' + date[3] + '秒';
+                $('#countDown').html('(体验版)距离2018年9月31日还有：'+ str);
+            });
+
+            if( parseInt(endTime - serverTime) / parseInt(1000*3600*24)  > 7 ){
+                layer.open({
+                    title: '提示',
+                    content: '欢迎使用体验版！'
+                });             
+            }else{
+                layer.open({
+                    title: '提示',
+                    content: '已快到期，请使用正式版！'
+                });
+            }
+
+        });
+
+
+        //查看
+        $('.consum-check').on('click',function(){
+            $('#SH03 a').trigger("click"); 
+        });
+
+        $('.recharge-check').on('click',function(){
+            $('#SH02 a').trigger("click"); 
+        });
+
+        $('.member-check').on('click',function(){
+            $('#SB01 a').trigger("click"); 
+        });
+        
+        //全部店铺
+        var allStore = {$allStoreInfo},//所有店铺后台数据
+            consumChart = {$consumChart},//消费后台数据
+            rechargeChart = {$rechargeChart},//充值后台数据
+            memberChart = {$memberChart},//新增会员后台数据
+            allStoreName = [];//所有店铺名称
+
+        //所有店铺名称
+        for (var i = 0; i < allStore.length; i++) {
+            allStoreName[i] = allStore[i].title;
+        }
+
+        //重新组装json
+        function getJson(arr){
+            var jsonData = [];
+            //默认数据
+            for (var i = 0; i < allStoreName.length; i++) {
+                var json = {'value':arr[i],'name':allStoreName[i]};
+                jsonData.push(json);
+            }
+
+            return jsonData;
+        }
+
+        // console.log(allStoreName);
+        // console.log({$consumChart});
+        // console.log({$rechargeChart});
+        // console.log({$memberChart});
+
+        //时间参数
+        var dateMonth = ['6日','12日','18日','24日','30日'],
+            dateWeek = ['1日','2日','3日','4日','5日','6日','7日'],
+            dateThreeDay = ['1日','2日','3日'];
+
+        /*消费*/
+        var consumBarBottom = [],//柱状图消费图表底部
+            consumBarData = [],//柱状图消费图表数据
+            consumPieData = [];//饼状图消费图表数据
+
+        consumBarBottom = dateMonth;//默认月
+        consumBarData = consumChart.bar;//默认数据
+        //默认数据
+        consumPieData = getJson(consumChart.pie);
+
+        //消费趋势占比(柱状图)
+        var consumData = echarts.init(document.getElementById('consumData'));
+        var consumDataOption = {
+                title : {
+                    text: '消费趋势图',
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:['消费金额']
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : consumBarBottom
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'消费金额',
+                        type:'bar',
+                        data:consumBarData,
+                        markPoint : {
+                            data : [
+                                {type : 'max', name: '最大值'},
+                                {type : 'min', name: '最小值'}
+                            ]
+                        },
+                        markLine : {
+                            data : [
+                                {type : 'average', name: '平均值'}
+                            ]
+                        }
+                    }
+                ]
+            };
+        consumData.setOption(consumDataOption);
+
+        //各店铺消费趋势占比(饼状图)
+        var consumStore = echarts.init(document.getElementById('consumStore'));
+        var consumStoreOption = {
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient : 'vertical',
+                    x : 'left',
+                    data:allStoreName
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'消费金额',
+                        type:'pie',
+                        radius : ['46%', '70%'],
+                        center: ['50%', '60%'],
+                        label: {
+                            normal: {
+                                formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                                backgroundColor: '#eee',
+                                borderColor: '#aaa',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                rich: {
+                                    a: {
+                                        color: '#999',
+                                        lineHeight: 22,
+                                        align: 'center'
+                                    },
+                                    hr: {
+                                        borderColor: '#aaa',
+                                        width: '100%',
+                                        borderWidth: 0.5,
+                                        height: 0
+                                    },
+                                    b: {
+                                        fontSize: 16,
+                                        lineHeight: 33
+                                    },
+                                    per: {
+                                        color: '#eee',
+                                        backgroundColor: '#334455',
+                                        padding: [2, 4],
+                                        borderRadius: 2
+                                    }
+                                }
+                            }
+                        },
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show : true
+                                },
+                                labelLine : {
+                                    show : true
+                                }
+                            },
+                            emphasis : {
+                                label : {
+                                    show : true,
+                                    position : 'center',
+                                    textStyle : {
+                                        fontSize : '30',
+                                        fontWeight : 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        data:consumPieData
+                    }
+                ]
+            };
+        consumStore.setOption(consumStoreOption);
+        
+        /*充值*/
+        var rechargeBarBottom = [],//柱状图消费图表底部
+            rechargeBarData = [],//柱状图消费图表数据
+            rechargePieData = [];//饼状图消费图表数据
+
+        rechargeBarBottom = dateMonth;//默认月
+        rechargeBarData = rechargeChart.bar;//默认数据
+        //默认数据
+        rechargePieData = getJson(rechargeChart.pie);
+
+        //充值趋势占比(柱状图)
+        var rechargeData = echarts.init(document.getElementById('rechargeData'));
+        var rechargeDataOption = {
+                title : {
+                    text: '充值趋势图',
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:['充值金额']
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : rechargeBarBottom
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'充值金额',
+                        type:'bar',
+                        data:rechargeBarData,
+                        markPoint : {
+                            data : [
+                                {type : 'max', name: '最大值'},
+                                {type : 'min', name: '最小值'}
+                            ]
+                        },
+                        markLine : {
+                            data : [
+                                {type : 'average', name: '平均值'}
+                            ]
+                        }
+                    }
+                ]
+            };
+        rechargeData.setOption(rechargeDataOption);
+
+        //各店铺充值趋势占比(饼状图)
+        var rechargeStore = echarts.init(document.getElementById('rechargeStore'));
+        var rechargeStoreOption = {
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient : 'vertical',
+                    x : 'left',
+                    data:allStoreName
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'充值金额',
+                        type:'pie',
+                        radius : ['46%', '70%'],
+                        center: ['50%', '60%'],
+                        label: {
+                            normal: {
+                                formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                                backgroundColor: '#eee',
+                                borderColor: '#aaa',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                rich: {
+                                    a: {
+                                        color: '#999',
+                                        lineHeight: 22,
+                                        align: 'center'
+                                    },
+                                    hr: {
+                                        borderColor: '#aaa',
+                                        width: '100%',
+                                        borderWidth: 0.5,
+                                        height: 0
+                                    },
+                                    b: {
+                                        fontSize: 16,
+                                        lineHeight: 33
+                                    },
+                                    per: {
+                                        color: '#eee',
+                                        backgroundColor: '#334455',
+                                        padding: [2, 4],
+                                        borderRadius: 2
+                                    }
+                                }
+                            }
+                        },
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show : true
+                                },
+                                labelLine : {
+                                    show : true
+                                }
+                            },
+                            emphasis : {
+                                label : {
+                                    show : true,
+                                    position : 'center',
+                                    textStyle : {
+                                        fontSize : '30',
+                                        fontWeight : 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        data:rechargePieData
+                    }
+                ]
+            };
+        rechargeStore.setOption(rechargeStoreOption);
+
+        /*新增会员*/
+        var newMemberBarBottom = [],//柱状图消费图表底部
+            newMemberBarData = [],//柱状图消费图表数据
+            newMemberPieData = [];//饼状图消费图表数据
+
+        newMemberBarBottom = dateMonth;//默认月
+        newMemberBarData = memberChart.bar;//默认数据
+        //默认数据
+        newMemberPieData = getJson(memberChart.pie);
+
+        //新增会员趋势占比(柱状图)
+        var newMemberData = echarts.init(document.getElementById('newMemberData'));
+        var newMemberDataOption = {
+                title : {
+                    text: '新增会员趋势图',
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data:['新增会员人数']
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : newMemberBarBottom
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'新增会员人数',
+                        type:'bar',
+                        data:newMemberBarData,
+                        markPoint : {
+                            data : [
+                                {type : 'max', name: '最大值'},
+                                {type : 'min', name: '最小值'}
+                            ]
+                        },
+                        markLine : {
+                            data : [
+                                {type : 'average', name: '平均值'}
+                            ]
+                        }
+                    }
+                ]
+            };
+        newMemberData.setOption(newMemberDataOption);
+
+        //各店铺新增会员趋势占比(饼状图)
+        var newMemberStore = echarts.init(document.getElementById('newMemberStore'));
+        var newMemberStoreOption = {
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient : 'vertical',
+                    x : 'left',
+                    data:allStoreName
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'新增会员人数',
+                        type:'pie',
+                        radius : ['46%', '70%'],
+                        center: ['50%', '60%'],
+                        label: {
+                            normal: {
+                                formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                                backgroundColor: '#eee',
+                                borderColor: '#aaa',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                rich: {
+                                    a: {
+                                        color: '#999',
+                                        lineHeight: 22,
+                                        align: 'center'
+                                    },
+                                    hr: {
+                                        borderColor: '#aaa',
+                                        width: '100%',
+                                        borderWidth: 0.5,
+                                        height: 0
+                                    },
+                                    b: {
+                                        fontSize: 16,
+                                        lineHeight: 33
+                                    },
+                                    per: {
+                                        color: '#eee',
+                                        backgroundColor: '#334455',
+                                        padding: [2, 4],
+                                        borderRadius: 2
+                                    }
+                                }
+                            }
+                        },
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show : true
+                                },
+                                labelLine : {
+                                    show : true
+                                }
+                            },
+                            emphasis : {
+                                label : {
+                                    show : true,
+                                    position : 'center',
+                                    textStyle : {
+                                        fontSize : '30',
+                                        fontWeight : 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        data:newMemberPieData
+                    }
+                ]
+            };
+        newMemberStore.setOption(newMemberStoreOption);
+
+        //图表切换时间
+        $('.change-time').on('click',function(){
+            var chartVal = $(this).attr('data-chart');
+            var typeVal = $(this).attr('data-type');
+            var timeVal = $(this).attr('data-time');
+
+            $('#changeChartVal').val(chartVal);
+            $('#changeTypeVal').val(typeVal);
+            $('#changeTimeVal').val(timeVal);
+
+            $(this).siblings().removeClass('active').end().addClass('active');//切换样式
+
+            $.post('{php echo $this->createWebUrl("ChangeChart")}',{chart:chartVal,type:typeVal,time:timeVal},function(data){
+                var data= JSON.parse(data);
+                if(data && data.length >1){
+                    var type = $('#changeTypeVal').val();
+                    var time = $('#changeTimeVal').val();
+                    var chart = $('#changeChartVal').val();
+
+                    if(type == 'consum'){
+                        if(time == 'threeday'){
+                            if(chart == 'bar')consumDataOption.xAxis[0].data = dateThreeDay;
+                        }else if(time == 'week'){
+                            if(chart == 'bar')consumDataOption.xAxis[0].data = dateWeek;
+                        }else if(time == 'month'){
+                            if(chart == 'bar')consumDataOption.xAxis[0].data = dateMonth;
+                        }
+                        if(chart == 'bar'){
+                            consumDataOption.series[0].data = data;
+                            consumData.clear();
+                            consumData.setOption(consumDataOption,true);
+                        }else if(chart == 'pie'){
+                            consumStoreOption.series[0].data = getJson(data);
+                            consumStore.clear();
+                            consumStore.setOption(consumStoreOption);
+                        }
+                    }else if(type == 'recharge'){
+                        if(time == 'threeday'){
+                            if(chart == 'bar')rechargeDataOption.xAxis[0].data = dateThreeDay;
+                        }else if(time == 'week'){
+                            if(chart == 'bar')rechargeDataOption.xAxis[0].data = dateWeek;
+                        }else if(time == 'month'){
+                            if(chart == 'bar')rechargeDataOption.xAxis[0].data = dateMonth;
+                        }
+                        if(chart == 'bar'){
+                            rechargeDataOption.series[0].data = data;
+                            rechargeData.clear();
+                            rechargeData.setOption(rechargeDataOption,true);
+                        }else if(chart == 'pie'){
+                            rechargeStoreOption.series[0].data = getJson(data);
+                            rechargeStore.clear();
+                            rechargeStore.setOption(rechargeStoreOption,true);
+                        }
+                    }else if(type == 'newmember'){
+                        if(time == 'threeday'){
+                            if(chart == 'bar')newMemberDataOption.xAxis[0].data = dateThreeDay;
+                        }else if(time == 'week'){
+                            if(chart == 'bar')newMemberDataOption.xAxis[0].data = dateWeek;
+                        }else if(time == 'month'){
+                            if(chart == 'bar')newMemberDataOption.xAxis[0].data = dateMonth;
+                        }
+                        if(chart == 'bar'){
+                            newMemberDataOption.series[0].data = data;
+                            newMemberData.clear();
+                            newMemberData.setOption(newMemberDataOption,true);
+                        }else if(chart == 'pie'){
+                            newMemberStoreOption.series[0].data = getJson(data);
+                            newMemberStore.clear();
+                            newMemberStore.setOption(newMemberStoreOption,true);
+                        }
+                    }
+                }
+            })
+        })
+         
+    })
+    </script>
+</body>
+
+</html>

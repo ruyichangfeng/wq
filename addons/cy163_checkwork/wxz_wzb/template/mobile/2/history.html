@@ -1,0 +1,76 @@
+<html><head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+		
+		<link href="{MODULE_URL}template/mobile/2/css/common.css" rel="stylesheet">
+		<link href="{MODULE_URL}template/mobile/2/css/myLiveRoom.css" rel="stylesheet">
+
+	</head>
+	
+
+	<body>
+		<div class="main">
+			<ul class="mui-table-view">
+				<div class="content"><div class="NotUesed"></div></div>
+			</ul>
+
+
+
+		</div>
+
+	
+<script src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/dropload/dropload.min.js"></script>
+<script>
+			$(function() {
+				
+				load();
+			
+				function load(){
+
+     var page = 0;
+         var lock=0;
+        $('.content').dropload({
+        scrollArea : window,
+        loadDownFn : function(me){
+            $.ajax({
+                type: 'POST',
+                url: "{php echo $this->createMobileUrl('gethistory',array('type'=>$type))}",
+                data:{page:page},
+                dataType: 'json',
+             
+                success: function(data){
+                	var str='';
+                	 $.each(data.msg,function(index,value){
+                	 	str+='<li class="mui"><a class="navigate" href="./index.php?i='+value.uniacid+'&c=entry&m=wxz_wzb&do=index2&rid='+value.rid+'"><div class="left0"><img src="'+value.img+'"></div><div class="right0"><span>'+value.logo+'</span><span class="col14">'+value.title+'</span></div></a></li>';
+                	 });
+                	  $('.NotUesed').append(str);  
+                    page++;
+                     
+                   
+                    if(data.msg.length<10)
+                    {
+                        me.lock();
+                        // 无数据
+                        me.noData();
+
+                    }
+                    
+                    me.resetload();
+                	},
+                	 error: function(xhr, type){
+                    //alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                 }
+
+                });
+        }
+    });
+    }
+});
+</script>
+<div style="display:none;">
+<script src="https://s13.cnzz.com/z_stat.php?id=1273392991&web_id=1273392991" language="JavaScript"></script>
+</div>
+</body></html>

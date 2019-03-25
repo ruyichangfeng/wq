@@ -1,0 +1,201 @@
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <title>积分购买 - 积分商城</title> 
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" /> 
+  <meta content="telephone=no" name="format-detection" /> 
+  <link href="http://mimg.127.net/p/yymobile/1509301730/css/common.css" rel="stylesheet" /> 
+  <link href="http://mimg.127.net/p/yymobile/1509301730/css/cart.css" rel="stylesheet" /> 
+  
+  <script src="../addons/hc_credit_shopping/style/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../addons/ewei_shopping/images/jquery.gcjs.js"></script>
+  <style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -100px !important;
+    width: 200px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+</style> 
+ </head>
+ <body> 
+
+  <div class="m-cart" id="pro-view-5">
+
+   <div class="item" id="item_1">
+    <div class="pic">
+     <a><img src="{$_W['attachurl']}{$setting['credit_img']}" alt="积分购买" /></a>
+    </div>
+	<form action="{php echo $this->createMobileUrl('submit_credit_order')}" method="post" id='form' >
+    <div class="text">
+     <h1 class="title"><a>积分兑换</a></h1>
+     <div>
+      兑换1积分消耗
+      <em class="remain" id='stock' >{$setting['credit_rate']}</em>&nbsp 积分
+     </div>
+     <div>
+      兑换 
+      <div class="w-number" id="pro-view-7">
+	  <div style="display:none">
+	  <span class='singletotalprice' id="goodsprice_1">1</span>
+	  <span id="stock_1" style='display:none'>{$goods['total']}</span>
+	  <span id="singleprice_1">{$setting['credit_rate']}</span>
+	  </div>
+       <input class="w-number-input" data-pro="input" price="1" pricetotal="1" value="1" maxbuy="" id="goodsnum_1" pattern="[0-9]*" style="height:28px" id="total" name="total"  />
+       <a class="w-number-btn w-number-btn-plus" data-pro="plus" href="javascript:void(0);" onclick="addNum(1,0)">+</a>
+       <a class="w-number-btn w-number-btn-minus" data-pro="minus" href="javascript:void(0);" onclick="reduceNum(1)">-</a>
+      </div>
+     </div>
+    <a href="javascript:void(0);" onclick="" data-pro="del" class="del"><i class="ico ico-del"></i></a>
+    </div>
+   </div>
+   </form>
+   
+  <div class="m-simpleFooter" id="pro-view-3">
+   <div data-pro="text" class="m-simpleFooter-text">
+    <div id="pro-view-4">
+     总计：
+     <em class="txt-red" id="pricetotal">{$setting['credit_rate']}</em>积分，兑换 <em class="txt-red" id="pricetotal2">1</em>积分,当前积分：{$credit}
+    </div>
+   </div>
+   <div data-pro="ext" class="m-simpleFooter-ext">
+    <a onclick="submit()"><button class="w-button w-button-main" id="pro-view-2">提交</button></a>
+   </div>
+  </div>
+   
+   
+  </div>  
+ <!-- 
+<script>
+    var maxbuy = {php echo empty($goods['maxbuy']) ? "0" : $goods['maxbuy']};
+
+
+   function addNum() {
+        var total = $("#total");
+        if (!total.isInt()) {
+            total.val("1");
+        }
+        var stock = $("#stock").html() == '' ? -1 : parseInt($("#stock").html());
+        var mb = maxbuy;
+        if (mb > stock && stock != -1) {
+            mb = stock;
+        }
+        var num = parseInt(total.val()) + 1;
+        if (num > stock) {
+            alert("您最多可购买 " + stock + " 件!", true);
+            num--;
+        }
+        if (num > mb && mb > 0) {
+            alert("您最多可购买 " + mb + " 件!", true);
+            num = mb;
+        }
+        total.val(num);
+    }
+
+    function reduceNum() {
+        var total = $("#total");
+        if (!total.isInt()) {
+            total.val("1");
+        }
+        var num = parseInt(total.val());
+        if (num - 1 <= 0) {
+            return;
+        }
+        num--;
+        total.val(num);
+    }
+</script> 
+-->
+<script>
+	function addNum(id,maxbuy){
+		var mb = maxbuy;
+		 var stock =$("#stock_" + id).html()==''?-1:parseInt($("#stock_" + id).html());
+				if(mb>stock && stock!=-1){
+					mb = stock;
+				}
+		var num = parseInt( $("#goodsnum_" + id).val() ) + 1;
+		if(num>mb && mb>0){
+		//	alert("最多只能购买 " + mb + " 件!",true);
+		//	return;
+		}
+		$("#goodsnum_" + id).val(num);
+		var price = parseFloat( $("#singleprice_"+id).html() ) * num;
+		$("#goodsprice_" + id).html(price);console.log("#goodsprice_" + id);
+		$("#pricetotal").html(price);
+		$("#pricetotal2").html(num);
+	//	updateCart(id,num);
+	}
+	function reduceNum(id){
+		var num = parseInt( $("#goodsnum_" + id).val() );
+		if(num-1<=0){
+			return;
+		}
+		num--;
+		//alert(parseFloat( $("#singleprice_"+id).html() ));
+		$("#goodsnum_" + id).val(num);
+		var price = parseFloat( $("#singleprice_"+id).html() ) * num;
+		$("#goodsprice_" + id).html(price);
+		$("#pricetotal").html(price);
+		$("#pricetotal2").html(num);
+	//	updateCart(id,num);
+	}
+function canculate(){
+		var total = 0;
+		$(".singletotalprice").each(function(){
+			total+=parseFloat( $(this).html() );
+		});
+		$("#pricetotal").html(total);
+	}
+	function updateCart(id,num){
+		var url = "{php echo murl('entry//mycart',array('m'=>'hc_credit_shopping','op'=>'update'), true)}"+ "&id=" + id+"&num=" + num;
+		$.getJSON(url, function(s){
+
+		});
+	}
+	
+	function removeCart(id){
+		if (confirm('您确定要删除此商品吗？')) {
+			alert("正在处理数据...");
+			var url = "{php echo murl('entry//mycart',array('m'=>'hc_credit_shopping','op'=>'remove'), true)}"+ "&id=" + id;
+			$.getJSON(url, function(s){
+			console.log("#item_" + s.cartid);
+				$("#item_" + s.cartid).remove();
+				if($(".shopcart-item").length<=0){
+					$("#cartempty").show();
+					$("#cartfooter").hide();
+				}
+				//tip_close();
+				canculate();
+			});
+		}
+	}	
+	
+	function submit(){
+		$('#form').submit();
+	}
+	
+
+	
+	$("#goodsnum_1").keyup(function(){
+		var id=1;
+		var num = $("#goodsnum_" + id).val();		
+		var price = parseFloat( $("#singleprice_"+id).html() ) * num;
+		$("#pricetotal").html(price);
+		$("#pricetotal2").html(num);
+	});
+	
+</script>  
+  
+  
+  
+  
+  
+ </body>
+</html>

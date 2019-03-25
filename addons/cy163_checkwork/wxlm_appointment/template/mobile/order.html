@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+    {template 'head'}
+    <title>{php echo $this->config['system_name']}</title>
+
+</head>
+
+<body>
+<div class="box">
+	<div class="tops">
+    	<div class="col-xs-2 text01-l">
+			<a href="javascript:" onclick="history.back(); ">
+            	<img src="{RES}mobile/images/back-white.png">
+            </a>
+        </div>
+        <div class="col-xs-8 text01-c">预约信息</div>
+    </div>
+	<div class="cont">
+		<div class="five-con">
+        	<div class="five-con01">
+        		<div class="five-con01-t">
+        			<img src="{RES}mobile/images/eyes.png">
+                    <div class="five-text01">预约信息</div>
+        		</div>
+                <div class="five-con01-b">
+                    <div class="form-horizontal">
+                      <div class="form-group">
+                        <label class="col-xs-4 control-label">预约项目</label>
+                        <div class="col-xs-8 five-text02">{$project['project_name']}</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-xs-4 control-label">预约人员</label>
+                        <div class="col-xs-8 five-text02">{$staff['staff_name']}</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-xs-4 control-label">预约时间</label>
+                        <div class="col-xs-8 five-text02">{$day} {$start}-{$end}</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-xs-4 control-label">预约费用</label>
+                        <div class="col-xs-8 five-text02">{if empty($dating['dating_pay_money'])}0{else}{$dating['dating_pay_money']}{/if}元</div>
+                      </div>
+                    </div>
+       			</div>
+            </div>
+            <form class="form-horizontal" enctype="multipart/form-data" id="formorder" method="post" action="{php echo $this->createMobileUrl('order', array('op'=>'post'))}" onsubmit="">
+        	<div class="five-con01">
+        		<div class="five-con01-t">
+        			<img src="{RES}mobile/images/pen.png">
+                    <div class="five-text01">个人信息</div>
+        		</div>
+                <div class="five-con01-b">
+
+                        <div class="form-group" hidden>
+                            <label class="col-xs-4 control-label">预约日期</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_dating_day]" value="{$day}">
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <label class="col-xs-4 control-label">开始时间</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_dating_start]" value="{$start}">
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <label class="col-xs-4 control-label">结束时间</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_dating_end]" value="{$end}">
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <label class="col-xs-4 control-label">预约信息</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="dating_id" value="{$dating_id}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">预约人姓名</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_username]" value="{$fans['realname']}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">手机号码</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_userphone]" value="{$fans['mobile']}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-4 control-label">备注</label>
+                            <div class="col-xs-8 five-text02">
+                                <input class="five-text03" type="text" name="order[order_remark]">
+                            </div>
+                        </div>
+                    {if !empty($vip)}
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label">支付方式</label>
+                        <div class="col-xs-8 five-text02">
+                            <label for="pay1" >
+                                <input id="pay1" type="radio" name="pay_action" value="1" checked>在线支付
+                            </label>
+                            <label for="pay2" >
+                                <input id="pay2" type="radio" name="pay_action" value="2">会员卡
+                            </label>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="form-group">
+                        <div class="col-xs-12 five-text02">
+
+                            <input id="tong" type="checkbox" name="sync" value="2"><span style="line-height: 40px;padding-left: 5px;color: grey">同步到个人信息, 方便下次使用</span>
+
+
+                        </div>
+                    </div>
+
+       			</div>
+            </div>
+            <div class="five-con02">
+                <input type="hidden" name="token" value="{$_W['token']}">
+                <input class="five-text04" name="submit" type="submit"  value="提交">
+            </div>
+            </form>
+        </div>
+    </div>
+    {template 'foot'}
+</div>
+<script>
+$(".tc-back").click(function(){
+	$(".modal").hide();
+	$(".modal-backdrop").hide();
+	
+})
+
+$('#formorder').submit(function(){
+
+    if($('input[name="order[order_username]"]').val() == ''){
+        alert('未填写预约人姓名')
+        return false;
+    }
+    if($('input[name="order[order_userphone]"]').val() == ''){
+        alert('未填写预约人电话')
+        return false;
+    }
+
+    return true;
+});
+
+</script>
+</body>
+</html>

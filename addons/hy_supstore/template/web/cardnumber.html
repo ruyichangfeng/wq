@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    {if $op == 'list' || $op == 'detail' || $op == 'add'}
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('cardnumber')}">卡号列表</a>
+        <a class="layui-btn layui-btn-normal right " style="margin-left:10px;" href="{php echo $this->createWebUrl('cardnumber', array('op' => 'add'))}">添加卡号</a>
+    </div>
+    {/if}
+    <script>
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+    });
+    </script>
+    {if $op == 'list'}
+    <div class="layui-form-item">
+        <form action="{php echo $this->createWebUrl('cardnumber', array('op'=>'list','page'=>1))}" method="post" class="layui-form layui-form-pane">
+            <div class="layui-inline">
+                <label class="layui-form-label">卡号</label>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <input type="text" name="cardnumber" class="layui-input" value="{$_GPC['cardnumber']}" placeholder="请输入实体卡号">
+                </div>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <button class="layui-btn">搜索</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <table class="layui-table">
+        <thead class="table table-hover">
+            <tr>
+                <th>会员卡号</th>
+                <th>会员名称</th>
+                <th>会员类别</th>
+                <th>分组</th>
+                <th>门店</th>
+                <th>手机号</th>
+                <th width="100">添加时间<span style="margin-right:5px;"><a href="{php echo $this->createWebUrl('cardnumber',array('sortcolumn'=>'createtime','sorttype'=>'asc','isbind'=>$isbind))}">↑</a></span><span><a href="{php echo $this->createWebUrl('cardnumber',array('sortcolumn'=>'createtime','sorttype'=>'desc','isbind'=>$isbind))}">↓</a></span></th>
+                <th width="60">绑定情况</th>
+                <th width="100">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $item}
+            <tr>
+                <td style="width:100px;text-align:center;">
+                {$item['number']}
+                </td>
+                <td style="width:160px;text-align:center;">
+                    <img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" width="38" height="38" style="border-radius:38px; margin-bottom:2px;">
+                    <br /><span style="width:100px;text-align:center;">{php echo $item['name']?$item['name']:"未绑定"}</span>
+                </td>
+                <td style="width:160px;text-align:center;">
+                    {if $item['mobile']}<span class="layui-badge" style="background-color: #5B98F1;">手机号/APP</span>{/if}
+                    {if $item['openid']}<span class="layui-badge" style="background-color: #44b549;">微信</span>{/if}
+                    {if $item['wpopenid']}<span class="layui-badge" style="background-color: #605AB0;">小程序</span>{/if}
+                    {if $item['isbind'] == 1}<span class="layui-badge layui-bg-blue">实体卡</span>{/if}
+                </td>
+                <td style="width:100px;text-align:center;">{php echo $item['group']?$item['group']:"未绑定"}</td>
+                <td style="width:100px;text-align:center;">{php echo $item['storename']?$item['storename']:"未绑定"}</td>
+                <td style="width:100px;text-align:center;">{php echo $item['mobile']?$item['mobile']:"未绑定"}</td>
+                <td style="text-align:center;">{php echo date('Y-m-d H:i:s', $item[createtime]);}</td>
+                <td style="text-align:center;">
+                    {if $item['isbind']==1}
+                    <green>已绑定</green>
+                    {else}
+                    <red>未绑定</red>
+                    {/if}
+                </td>
+                <td style="text-align:center;">
+                    <a href="{php echo $this->createWebUrl('cardnumber', array('op' => 'delete','id' => $item['id']))}" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete {if $item['isbind']==1}layui-btn-disabled{/if}">删除</a>
+                </td>
+            </tr>
+            {/loop} {if empty($list)}
+            <tr>
+                <td colspan="10" style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+    <div class="fenye">{$pager}</div>
+    <style>
+    .layui-table .layui-btn {
+        margin: 0 0 5px 0 !important;
+    }
+    </style>
+    <script>
+    $('.item-action-delete').click(function() {
+        var href = $(this).attr('href');
+        if($(this).hasClass('layui-btn-disabled')){
+            layer.msg('已绑定的卡号不能删除');
+        }else{
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+        }
+        return false;
+    })
+
+    </script>
+    {elseif $op == 'detail'}
+    <div>详细信息</div>
+    {elseif $op == 'add'}
+    <fieldset class="layui-elem-field">
+        <legend>批量生成会员卡号</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('cardnumber', array('op'=>'add','type'=>'batch'))}" method="post" id="formBatch" class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label"> 注意事项： </label>
+                        <div class="layui-form-mid layui-word-aux oncecardtip red">
+                            卡号位数限制6到10位 按一定规则批量生成
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">起始卡号</label>
+                        <div class="layui-input-inline" style="width: 160px;">
+                            <input type="number" name="frontnum" class="layui-input" value="" step="1" maxlength="10" minlength="6" placeholder="填写6到10位 首位不为0">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">生成数量</label>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="number" class="layui-input" value="1" id="cardnum" name="cardnum" step="1" maxlength="2" lay-verify="require|number">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">必填项 1-10</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit name="submit" lay-filter="formDemo" value="提交">立即生成</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </form>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>设计生成会员卡号</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('cardnumber', array('op'=>'add','type'=>'design'))}" method="post" id="formDesign" class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 注意事项： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip red">
+                        卡号位数限制6到10位 卡号不可重复
+                    </div>
+                    <button class="layui-btn input-add">添加输入框</button>
+                </div>
+                <div id="list">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">卡号</label>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            <input type="number" class="layui-input" value="1" name="cardnumber[]" step="1" maxlength="6" minlength="10" lay-verify="require|number">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">填写6到10位</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit name="submit" lay-filter="formDemo" value="提交">立即生成</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    $('.input-add').on('click', function() {
+
+        var input = $('<div class="layui-form-item"><label class="layui-form-label">卡号</label><div class="layui-input-inline" style="width: 100px;"><input type="number" class="layui-input" value="1" name="cardnumber[]" step="1" maxlength="6" minlength="10"></div><div class="layui-form-mid layui-word-aux">填写6到10位</div></div>');
+        var del = $('<div class="layui-btn layui-btn-sm layui-btn-danger input-del" style="vertical-align:middle;">删除</div>');
+
+        del.on('click', function() {
+            $(this).parent().remove();
+        });
+
+        input.append(del);
+
+        $('#list').append(input);
+
+        return false;
+    })
+    </script>
+    {/if}
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+     <div class="ibox float-e-margins">
+         <div class="ibox-title">
+             <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('goodssupplier', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;供应商列表</h5>
+             <a class="btn btn-outline btn-default" style="float: right;margin-top: -10px;" href="{php echo $this->createWebUrl('goodssupplier',array('op' => 'goodssuppliertype'))}">
+                 <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+         </div>
+    <form action="{php echo $this->createWebUrl('goodssupplier', array('op' => 'goodssuppliertype','id' => $id))}" class="form-horizontal" method="post" enctype="multipart/form-data">
+         <div class="ibox-title">
+             <div class="form-group">
+                 <label class="col-sm-3 control-label">请输入分类名称:</label>
+                 <div class="col-sm-5">
+                     <input type="text" id="goodssuppliertype"  name="goodssuppliertypename" class="form-control" value="{$item['gst_name']}" required />
+                 </div>
+                 <div class="col-sm-4">
+                     <input type="submit" class="btn btn-primary" name="submit" value="保存"/>
+                     <input type="hidden" name="token" value="{$_W['token']}" />
+                 </div>
+                 <div class="col-sm-4">
+                 </div>
+             </div>
+         </div>
+        <div class="ibox-content" style="padding-top: 10px; padding-bottom: 10px;">
+                <table id="goodssuppliertypelist" data-mobile-responsive="true"></table>
+        </div>
+
+    </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+    $('#goodssuppliertypelist').bootstrapTable({
+        url: '{php echo $this->createWebUrl('goodssupplier', array('op' => 'goodssuppliertypelist'));}',
+        method:"post",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded",
+        //toolbar: '#toolbar',
+        showPaginationSwitch:false,//是否显示数据条数选择框
+        queryParamsType:'',
+        queryParams: queryParamspage,//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber:1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [10, 25, 50, 100],
+        pagination: true,
+        clickToSelect: true,
+        height: 360,
+        uniqueId: "id",
+        columns: [{
+            field: 'gst_name',
+            width:50,
+            title: '供货商分类名称'
+        },{
+            field: 'id',
+            title: '操作',
+            align: "center",
+            width:50,
+            valign: "middle",
+            formatter:actionFormatter
+        },  ]
+    });
+        function queryParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"EditViewByPackage('" + id + "')\" title='编辑'><span class='glyphicon glyphicon-pencil'></span></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"DeleteByPackage('" + id + "')\" title='删除'><span class='glyphicon glyphicon-remove'></span></button>";
+
+            return result;
+        }
+    });
+    function EditViewByPackage(packageid){
+        var packageid = parseInt(packageid);
+        var url = "{php echo $this->createWebUrl('goodssupplier', array('op' => 'goodssuppliertype'))}&id=" + packageid;
+        $(window).attr('location',url);
+
+    }
+    function DeleteByPackage(packageid){
+        var packageid = parseInt(packageid);
+        swal({
+                title: "确定删除吗？",
+                text: "你将无法恢复该数据信息！",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "取消删除！",
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定删除！",
+                closeOnConfirm: false
+            },
+            function(){
+                $.ajax({
+                    type: "post",
+                    url: "{php echo $this->createWebUrl('goodssupplier', array('op' => 'ajaxdeletetype', 'storeid' => $storeid))}",
+                    data: { packageid:packageid },
+                    success: function (data, status) {
+                        if (status == "success") {
+                            swal({
+                                title: "操作成功！",
+                                text: data.error,
+                                timer: 2000,
+                                type:"success",
+                                showConfirmButton: true
+                            },function(){
+                                $("#goodssuppliertypelist").bootstrapTable('refresh');
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal("操作有误", "请选择要删除的项目！","error");
+                    },
+                    complete: function () {
+                        $("#goodssuppliertypelist").bootstrapTable('refresh');
+                    }
+
+                });
+            });
+    }
+</script>
+
+
+
+
+
+{template 'web/common/footer'}

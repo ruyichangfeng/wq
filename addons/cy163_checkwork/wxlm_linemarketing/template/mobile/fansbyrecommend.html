@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_fans_title']}</title>
+{template 'head'}
+
+<script type="text/javascript">
+    var lastID=99999999999;
+    {if $config['mobile_fans_qrcodestate']==1}
+        wx.ready(function () {
+            sharedata = {
+                title: "{$config['mobile_fans_recotitle']}",
+                desc: "{$config['mobile_fans_recotitle']}",
+                link: "{$shareurl}",
+                imgUrl: "{php echo tomedia($config['mobile_fans_recoimg'])}",
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function(){
+                },
+                cancel: function(){
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata);
+            wx.onMenuShareQQ(sharedata);
+            wx.onMenuShareWeibo(sharedata);
+            wx.onMenuShareQZone(sharedata);
+        }); 
+    {/if}
+</script>
+<style>
+    .byrecommend-btn{
+        border-top-left-radius:10px; 
+        border-bottom-left-radius:10px;
+        border-top-right-radius:10px; 
+        border-bottom-right-radius:10px;
+        width: 85%;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+    .btn1{
+        border-top-left-radius:10px; 
+        border-bottom-left-radius:10px;
+        background-color: white;
+        border:2px solid  #6EE7DE;
+    }
+    .btn2{
+        border-top-right-radius:10px; 
+        border-bottom-right-radius:10px;
+        background-color: white;
+        border:2px solid  #6EE7DE;
+    }
+    .byrecommend-btn .btn-active{ background-color: #6EE7DE;color:white;}
+    .byrecommend-content>a{display:inline-block;width:100%;height: 60px;padding: 0px 5px;border-bottom:1px dashed #E0E0E0;color:black;}
+    .byrecommend-content>a.active{background-color: #bbb;}
+    .byrecommend-content>a:first-child{border-top:1px solid  #E0E0E0;}
+    .byrecommend-content>a:last-child{border-bottom:1px solid  #E0E0E0;}
+    .bcontent-desc>div{display: inline-block;float: left;}
+    .bcontent-title{width:12%;margin-top: 20px;text-align: center;}
+    .bcontent-title img {width: 12px;height: 12px;}
+    .bcontent-title2,.bcontent-title3{margin-left: 0px;text-align: left;padding: 5px 0px;}
+    .bcontent-title2{width: 50%;}
+    .bcontent-title3{width: 32%;}
+    .bcontent-title2>div,.bcontent-title3>div{height: 24px;line-height: 24px;}
+    .bcontent-title3>div:last-child{color:red;}
+    .bcontent-title4{width:6%;display: inline-block;float: left;margin-top: 20px;text-align: left;}
+    .bcontent-title4>img{width: 8px;height: 14px;}
+    #tanchukuang{opacity:0.6;}
+
+</style>
+</head>
+<body>
+<div class="mnav mcolor-d" {if $config['mobile_diy11_bcolor']!=''} style="background-color: {$config['mobile_diy11_bcolor']}"{/if}>
+    <a href="javascript:back();" class="mbackbtn_l"><div class="mbackbtn"><img src="{RES}/public/images/m_btn_back.png"/></div></a>
+    {if $config['mobile_diy11_title']!=''}{$config['mobile_diy11_title']}{else}我要推荐{/if}
+</div>
+<center>
+{if $config['mobile_fans_qrcodestate']==1}
+<div class="mqrcode">
+    <img src="{$QR}"/>
+</div>
+<div class="mh1">扫描上方二维码</div>
+{/if}  
+{if count($extension_list)>0}
+<div class="btn-group btn-group-justified byrecommend-btn" role="group" aria-label="..." style="" >
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn1 btn-active" onclick="byrecommendbtn(1)">分享任务</button>
+      </div>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn2" data-toggle="modal" data-target=".bs-example-modal-sm"  onclick="byrecommendbtn(2)">新手指导</button>
+      </div>
+</div> 
+
+<div class='byrecommend-content'>
+   
+    {loop  $extension_list $key $item}
+        <a href="javascript:extensiononc({$item['extension_id']});">
+            <div class="clearfix bcontent-desc">
+                <div class="bcontent-title" ><img src="{RES}public/images/li-logo.png" style=""></div>
+                <div class="bcontent-title2" >   
+                    <div >{$item['extension_title']} </div>
+                    <div ><p><span>已分享：{$item['extension_shareed']}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>浏览：{$item['extension_clicked']}</span></p></div>
+                </div> 
+                <div class="bcontent-title3" >   
+                    <div >奖励{if $item['extension_taskredtype']==1}积分{else}余额{/if}</div>
+                    <div >{$item['extension_shareoncered']}{if $item['extension_taskredtype']==1}积分{else}余额{/if}*{$item['extension_sharemaxtimes']}次</div>
+                   
+                </div>
+                <div class="bcontent-title4" >   
+                   <img src="{RES}public/images/content.png" >
+                </div>
+            </div>    
+        </a>
+    {/loop}
+</div> 
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="tanchukuang" >
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content" >
+        {if $config['mobile_fans_advice']==''}
+        <div style="height: 60px;line-height: 60px;font-size: 20px;font-weight: bold;">暂未设置</div>
+        {else}
+            <div style="margin: 20px 0px;">
+                {php echo htmlspecialchars_decode($config['mobile_fans_advice'])}
+            </div>
+            
+        {/if}
+    </div>
+  </div>
+</div>    
+{/if}               
+</center>
+<script type="text/javascript">
+function back(){
+	window.location.href="{php echo $this->createMobileUrl('fanslogin');}";
+}
+function byrecommendbtn(num){
+      
+    if(num==1)
+    {
+        $('.btn1').addClass('btn-active');
+        $('.btn2').removeClass('btn-active');
+    }else{
+        $('.btn2').addClass('btn-active');
+        $('.btn1').removeClass('btn-active');
+
+    }
+    
+
+}
+function extensiononc(id){
+    url="{php echo $this->createMobileUrl('fansbyrecommend');}"
+    window.location.href=url+"&extension_id="+id+"&op=create";
+}
+$('#tanchukuang').on('hidden.bs.modal', function (e) {
+        byrecommendbtn(1);
+    })
+</script>
+{template 'foot-msg'}
+</body>
+</html>

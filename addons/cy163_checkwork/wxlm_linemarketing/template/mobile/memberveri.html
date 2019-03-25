@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_member_title']}</title>
+{template 'head'}
+</head>
+<body>
+<input type="hidden" id="store_id" value="{$store_id}" >
+<div class="mnav mcolor-c" {if $config['mobile_diy3_bcolor']!=''}style="background-color:{$config['mobile_diy3_bcolor']}"{/if}>
+    <a href="javascript:backss();" class="mbackbtn_a"><div class="mbackbtn"><img src="{RES}/public/images/m_btn_back.png"/></div></a>
+    {if $config['mobile_diy3_title']!=''}{$config['mobile_diy3_title']}{else}核销{/if}
+</div>
+<div class="container-fluid">
+    <div class="row" style="margin-top:20px;">
+		<div class="col-xs-3 m_box_p1">
+			<div class="mtitle">
+				核销类型
+			</div>
+		</div>
+		<div class="col-xs-8">
+			<div class="btn-group btn-group-justified" role="group" style="width:100%;">
+				<input type="hidden" id="credittype" value=''>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-info" id="credittype1"  onClick="credittype1()">积分</button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" id="credittype2" onClick="credittype2()">余额</button>
+                </div>
+			</div>
+		</div>
+	</div>
+    
+    <div class="m_bg1" style="height:95px;">
+    <div class="row" style="margin-top:-10px;">
+		<div class="col-xs-3 m_box_p1">
+			<div class="mtitle">
+				核销数值
+			</div>
+		</div>
+		<div class="col-xs-8">
+            <div class="input-group">
+                <input type="text" class="form-control" readonly id="money" style="text-align: right;" value="0">
+                <span class="input-group-addon " id='credittypetitle'>积分</span>
+            </div>
+		</div>
+    </div>
+    
+    <div class="row" style="margin-top:10px;">
+        <div class="col-xs-3 m_box_p1">
+			<div class="mtitle">
+				备注
+			</div>
+		</div>
+		<div class="col-xs-8">
+            <input type="text" class="form-control" id="remark">
+		</div>
+	</div>
+    </div>
+    <div class="row" style="margin-top:10px; padding-left:10px; padding-right:10px;">
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(1);"><img src="{RES}/public/images/m_an_1.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(2);"><img src="{RES}/public/images/m_an_2.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(3);"><img src="{RES}/public/images/m_an_3.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(4);"><img src="{RES}/public/images/m_an_4.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(5);"><img src="{RES}/public/images/m_an_5.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(6);"><img src="{RES}/public/images/m_an_6.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(7);"><img src="{RES}/public/images/m_an_7.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(8);"><img src="{RES}/public/images/m_an_8.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(9);"><img src="{RES}/public/images/m_an_9.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(0);"><img src="{RES}/public/images/m_an_10.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(11);"><img src="{RES}/public/images/m_an_11.png"/></a>
+		</div>
+        <div class="col-xs-4 m_an">
+			<a href="javascript:number(12);"><img src="{RES}/public/images/m_an_12a.png"/></a>
+		</div>
+    </div>
+    
+    <div class="m_box_w1">
+        <a href="javascript:getqrcode();"><img src="{RES}/public/images/m_btn3.png" class="m_btn_a"/></a>
+    </div>
+	<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="tanchukuang">
+	  <div class="modal-dialog modal-sm" role="document">
+	    <div class="modal-content" style="text-align: center;">
+	    	<div>
+	    		<img src="" alt="" id="qrcodeimg" style="margin:1em auto;width:100%;">
+	    	</div>
+	    	<div id="tishi" style="height: 2em;line-height: 2em;font-size: 1.1em;margin-bottom: 2em;">
+	    		
+	    	</div>
+	    </div>
+	  </div>
+	</div>
+</div>
+
+<script>
+	var storeid=$('#store_id').val();
+	function number(num)
+  	{
+  		var va = $("#money").val();
+  		if(num<10&&va.length<9)
+  		{
+  			if(va.indexOf(".")!=-1)
+	  		{
+	  			if(va.split(".")[1].length<2)
+	  			{
+	  				if (va == 0) {  
+	                	$("#money").val(num);  
+		            }  
+		            else {  
+		                $("#money").val(va + num);  
+		            } 
+	  			}
+	  		}else{
+	  			if (va == 0) {  
+                	$("#money").val(num);  
+		            }  
+		            else {  
+		                $("#money").val(va + num);  
+		            } 
+	  			}
+  				
+  		}
+
+  		if($('#credittype').val()!=1)
+  		{
+  			if(num==11)
+	  		{
+				if(va.indexOf(".")==-1)
+				{
+					$("#money").val(va + '.');
+				}
+	  		}
+  		}
+  		if(num==12)
+  		{
+  			if (va.length>1) {  
+               	$("#money").val(va.substring(0,va.length-1));
+	           }
+	           if(va.length==1)
+	           {
+	           	$("#money").val(0);
+	           }
+  		}
+  			 
+  	}
+  	$(function(){
+  		$('#credittype').val(1);
+  	})
+  	function credittype1()
+  	{	
+  		$('#credittype1').addClass('btn-info');
+  		$('#credittype1').removeClass('btn-default');
+  		$('#credittype2').addClass('btn-default');
+  		$('#credittype2').removeClass('btn-info');
+  		$('#credittypetitle').html('积分');
+  		$('#credittype').val(1);
+  		$('#money').val(0);
+  	}
+  	function credittype2()
+  	{
+  		$('#credittype1').removeClass('btn-info');
+  		$('#credittype1').addClass('btn-default');
+  		$('#credittype2').removeClass('btn-default');
+  		$('#credittype2').addClass('btn-info');
+  		$('#credittypetitle').html('元');
+  		$('#credittype').val(2);
+  		$('#money').val(0);
+  	}
+  	/** 提交表单生成二维码 */    
+  		function getqrcode()
+  		{
+  			/* 消费类型  消费金额 */
+  			var type=$('#credittype').val(),
+  				number=$('#money').val(),
+  				remark=$('#remark').val();
+
+  			if(type=='')
+  			{
+  				alert('请填写核销类型')
+  			}else if (number==0)	
+  			{
+  				alert('请填写核销数值');
+  			}else{
+  				$.ajax({  
+		        type:"POST",
+		        url: "{php echo $this->createMobileUrl('ajaxgetqrcodebyveri');}",
+		        data:{type:type,number:number,remark:remark,storeid:storeid},
+		        dataType:"json",
+		        async:false,
+		        success: function(data){
+		        	if(data.result=='success')
+		        	{
+		        		 $('#tanchukuang').modal('show');
+		        		 $('#qrcodeimg').attr('src',data.qr);
+ 						 $('#tishi').html('扫描上方二维码核销'+data.jifen+data.type);
+		        	}else{
+		        		$('#modalMSG').html(data.rs);
+		        		$('#msgModal').modal('show');  
+		        	}
+		        }
+	        });
+  		}	
+  	} 
+  	function backss(){
+		var url="{php echo $this->createMobileUrl('memberlogin');}";
+		window.location.href=url+"&store_id="+storeid;
+	} 
+	$('#tanchukuang').on('hidden.bs.modal', function (e) {
+		$('#money').val(0);
+		$('#spending_id').val('');
+		$('#remark').val('');
+	})
+</script>
+{template 'foot-msg'}
+</body>
+</html>

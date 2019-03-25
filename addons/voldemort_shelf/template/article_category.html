@@ -1,0 +1,135 @@
+<script type="text/javascript">
+	$('.media-category').click(function(){
+		var media_id = $(this).attr('data-media');
+		$('.shelf_article_category_media').val(media_id);
+		$('#form1 p:last').empty();
+		$.ajax({
+			url:"{php echo $this->createWebUrl('article_category',array('action'=>'ajax_cats_of_media'));}",
+			type:'post',
+			data:{media_id:media_id},
+			success:function(res){
+				
+				var result = $.parseJSON(res);
+				var cats = $('.article_cats_list').find('input[type=checkbox]');
+				$.each(cats, function(index, val) {
+					if($.inArray($(val).attr('data-id'), result) != -1){
+						$(val).prop('checked', 'checked');
+					}else{
+						$(val).prop('checked', false);
+					}
+				});
+				
+				
+			},
+			error:function(res){
+				alert('AJAX FAILED');
+			}
+		});
+		$('#modal-article-category').modal();
+		
+	});
+
+
+
+require(['jquery', 'util'], function($, u){
+
+	
+	$('#btn-article_cat').click(function(){
+		
+		var url = "{php echo $this->createWebUrl('article_category',array('action'=>'post'));}";
+		var media_id = $('.shelf_article_category_media').val();
+		var cats = $('.article_cats_list').find('input[type=checkbox]:checked');
+		var cat_array = new Array();
+		$.each(cats, function(index, val) {
+			 cat_array.push($(val).val());
+		});
+		var cat_json = JSON.stringify(cat_array);
+		var params = {
+				'media_id': media_id,
+				'cats':cat_json
+			};
+		$.post(url, params, function(data){
+			if(data == 'success') {
+				$('#modal-article-category').modal('hide');
+				u.message('提交成功', '', 'success');
+				window.location=window.location.href;
+			} else {
+				data = $.parseJSON(data);
+				if(data.errno || data.type == 'error' || data.type == 'info') {
+					u.message(data.message, '', 'error');
+				}
+			}
+			try{data = $.parseJSON(data);}catch (e) {eval(data);}
+			if(data.type) {
+				u.message(data.message, '', 'error');
+				return;
+			}
+			if(data.status == 'error') {
+				u.message(data.message, '', 'error');
+				return;
+			} else if(data.status == 'success') {
+				u.message(data.message, '', 'success');
+				return;
+			}
+		});
+	})
+});
+</script>
+<style type="text/css">
+	.user {
+	    float: left;
+	    margin-right: 10px;
+	    border: 1px solid #e7e7eb;
+	    cursor: pointer;
+	    padding: 0 .5em;
+	    background-color: #e5e7ec;
+	}
+	.user .opt {
+	    font-size: 0;
+	    text-indent: -999em;
+	    background: url("{MODULE_URL}images/appmsg_new_z2ac3d8.png") 0 -530px no-repeat;
+	    width: 14px;
+	    height: 14px;
+	    vertical-align: middle;
+	    display: inline-block;
+	}
+	.user .opt:hover{
+		background:url("{MODULE_URL}images/appmsg_new_z2ac3d8.png") 0 -554px no-repeat
+	}
+
+</style>
+<input type="hidden" class="shelf_article_category_media" value=""/>
+<div id="modal-article-category" class="modal fade " style="margin-top: 10%;">
+	<div class='modal-dialog' >
+		<div class="modal-content">
+			<div class="modal-header" style="background-color: #f4f5f9;height: 52px;line-height: 52px;">
+				<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+				<h4 style="margin:0;">文章分类</h4>
+			</div>
+			<div class="modal-body" style="padding: 66px 100px 108px 100px;">
+				<!-- <div class="panel panel-default">
+				<div class="panel-body"> -->
+				<form class="form form-horizontal" id="form1" onsubmit="return false;">
+						<p>文章会在以下分类中显示</p>
+						{php $cats = cats_array_obj();}
+						<div class="article_cats_list">
+							{loop $cats $cat}
+								<label style="margin-right: 10px;"><input type="checkbox" data-id="{php echo $cat->id;}" name="article_cat[{php echo $cat->id;}]" value="{php echo $cat->id;}"/>{php echo $cat->title;}</label>
+							{/loop}
+						</div>
+						<p>
+						
+						</p>
+					
+				</form>
+				<!-- </div>
+				</div> -->
+			</div>
+			<div class="modal-footer" style="background-color: #f4f5f9;text-align: center;">
+				<input type="hidden" value="{$_W['token']}" name="token" />
+				<a href="javascript:void(0);" style="width:104px;" class="btn btn-success" id="btn-article_cat">提交</a>
+				<a href="javascript:void(0);" style="width:104px;" class="btn  btn-default" data-dismiss="modal" class="close">取消</a>
+			</div>
+		</div>
+	</div>
+</div>

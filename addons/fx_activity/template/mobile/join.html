@@ -1,0 +1,141 @@
+{template 'common/header'}
+<style type="text/css">
+.pic img{display:inline-block;width:50%;max-width:100%;height:auto;padding:4px;line-height:1.42857143;background-color:#fff;border:1px solid #ddd;border-radius:4px;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;transition:all .2s ease-in-out}
+.pic .webuploader-pick{ font-size:14px;}
+.pic .js-image-pic{ border-left:none;border-radius:0 4px 4px 0!important;padding: 3px 10px!important;}
+.mui-bar a{color: #ff9900;}
+.mui-btn{ border:none!important;}
+.mui-btn-primary{background-color: #ff9900;}
+.mui-btn-primary:enabled:active{background-color: #ec7230!important;}
+
+.mui-btn-cancel{color: #fff;background-color: #b8b8b8;}
+.mui-textarea{ height:auto!important; width:100%;}
+.area {margin: 20px auto 0px auto;}
+.mui-input-group:first-child {margin-top: 20px;}
+.mui-input-group label {width: 25%;}
+.mui-input-row label~input,
+.mui-input-row label~select,
+.mui-input-row label~textarea {width: 75%;}
+.mui-checkbox input[type=checkbox],
+.mui-radio input[type=radio] {top: 6px;}
+.mui-image-uploader .mui-upload-btn{width: 60px;height: 60px;}
+.mui-image-uploader .mui-upload-btn .webuploader-pick{width: 60px;height: 60px; font-size:60px;}
+.mui-image-uploader img{width: 60px;height: 60px; }
+</style>
+<body>
+<div class="mui-content">
+<h5 class="mui-desc-title mui-pl15">报名信息</h5>
+    <form class="mui-input-group"  action="" method="post" onSubmit="return check(this)" >
+        <div class="mui-input-row">
+            <label>姓名：</label>
+            <input type="text" name="username" id="username" placeholder="请输入姓名">
+        </div>
+        <div class="mui-input-row">
+            <label>手机：</label>
+            <input type="text" name="mobile" id="mobile" placeholder="请输入手机号" data-input-clear="3">
+            <span class="mui-icon mui-icon-clear mui-hidden"></span>
+        </div>
+        
+        <div class="mui-input-row">
+            <label>性别：</label>
+            <input class="js-user-options" name="gender" type="text" value="" readonly="" placeholder="请选择性别">
+             <script type="text/javascript">
+            $(".js-user-options").on("tap", function(){
+                var options = {data: [
+                    {"text":"保密","value":"保密"},
+                    {"text":"男","value":"男"},
+                    {"text":"女","value":"女"}
+               ]};
+                var $this = $(this);
+                util.poppicker(options, function(items){
+                    $this.val(items[0].value);
+                });
+            });
+            </script>
+        </div>
+                       
+        <div class="mui-table-view-chevron">
+            <div class="mui-image-uploader">
+            <label>照片：</label>
+                <a href="javascript:;" class="mui-upload-btn mui-pull-right js-image-pic"></a>
+                <div class="mui-image-preview js-image-preview mui-pull-right">
+                	<img src="./resource/images/nopic.jpg" data-id="" data-preview-src="" data-preview-group="__IMG_UPLOAD_pic"/>
+                    <input type="hidden" value="" id="pic" name="pic" />
+                </div>
+            </div>
+            <script>
+			
+            util.image($('.js-image-pic'), function(url){
+                //$('.js-image-pic').parent().find('.js-image-preview').append('<input type="hidden" value="'+url.attachment+'" name="pic" />');
+				util.toast('上传成功');
+				$('.js-image-pic').parent().find('#pic').val(url.attachment);
+				$('.js-image-pic').parent().find('img').attr("src",url.url);
+					$('.js-image-pic').parent().find('img').attr("data-id",url.id);
+					$('.js-image-pic').parent().find('img').attr("data-preview-src",url.url);
+				if ($('.js-image-pic').parent().find('img').length==1){
+					
+				}else{					
+					
+				}
+            }, {
+                crop : true,
+                multiple : false,
+                preview : '__IMG_UPLOAD_pic',
+            });
+			
+            </script>
+        </div>
+        <p></p>
+        <div class="mui-input-row mui-textarea">
+           <textarea id="textarea" class="mui-input-clear" name="msg" placeholder="请输入留言"></textarea>
+        </div>
+        
+        <div class="mui-content-padded">
+          <button type="submit" class="mui-btn mui-btn-block mui-btn-primary">提交报名</button>
+          <button type="button" class="mui-btn mui-btn-block mui-btn-cancel" onClick="history.go(-1);">取　消</button>&nbsp;&nbsp;&nbsp;
+          <input type="hidden" name="submit" value="提交报名"/>
+          <input type="hidden" name="activityid" value="{$activityid}" />
+          <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+	function check(form) {
+
+		if (!form['username'].value) {
+			util.alert('请输入姓名', ' ', function() {
+				$("input[name='username']").focus();
+			});
+			return false;
+		}
+		
+		if (!form['mobile'].value) {
+			util.alert('请输入手机号', ' ', function() {
+				$("input[name='mobile']").focus();
+			});
+			return false;
+		}else{
+			 var mobile = $('#mobile').val();
+			 var pattern = /^1[34578]\d{9}$/; 
+			  
+		     if (!pattern.test(mobile)) {
+					 util.alert('手机号不合法', ' ', function() {
+						$("input[name='mobile']").focus();
+					 });
+					return false;
+			 }
+		}
+		if (form['gender'].value=='') {
+			util.alert('请选择您的性别', ' ', function() {
+				$(".js-user-options").trigger('tap');
+			});
+			return false;
+		}
+		return true;
+	}
+	$(".pic input.form-control").attr('type','text');
+	$(".pic .js-image-pic").addClass('input-group-btn');
+</script>
+</body>
+</html>

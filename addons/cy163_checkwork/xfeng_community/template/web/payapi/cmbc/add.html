@@ -1,0 +1,141 @@
+{template 'web/common/header'}
+<!--<ul class="nav nav-tabs">-->
+<!--<li>-->
+<!--<a href="{php echo $this->createWebUrl('payapi', array('op' => 'list'));}">基本设置</a>-->
+<!--</li>-->
+<!--<li class="active">-->
+<!--<a href="{php echo $this->createWebUrl('payapi', array('op' => 'alipay'));}">支付宝设置</a>-->
+<!--</li>-->
+<!--<li>-->
+<!--<a href="{php echo $this->createWebUrl('payapi', array('op' => 'wechat'));}">微信支付设置</a>-->
+<!--</li>-->
+<!--</ul>-->
+<div class="main">
+    <ul class="nav nav-tabs" role="tablist">
+        <li><a href="{php echo $this->createWebUrl('payapi', array('op' => 'list'));}">基本设置</a></li>
+        <li><a href="{php echo $this->createWebUrl('payapi', array('op' => 'alipay'));}">支付宝设置</a></li>
+        <li><a href="{php echo $this->createWebUrl('payapi', array('op' => 'wechat'));}">借用微信支付</a></li>
+        <li><a href="{php echo $this->createWebUrl('payapi', array('op' => 'service'));}">微信支付(子商户版)</a></li>
+        <li role="presentation" {if $operation == 'add'}class="active"{/if}><a href="{php echo $this->createWebUrl('payapi', array('op' => 'cmbc','operation' => 'add'));}">添加民生银行</a></li>
+        <li role="presentation" {if $operation == 'list'}class="active"{/if}><a href="{php echo $this->createWebUrl('payapi', array('op' => 'cmbc','operation' => 'list'));}">管理民生银行</a></li>
+    </ul>
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" >
+        <input type="hidden" value="{$set['id']}" name="id" />
+        <div class="panel panel-default">
+            <div class='panel-body'>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="3" {if $set['type'] == 3 || empty($set['type'])}checked="checked"{/if}> 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="1" {if $set['type'] == 1}checked="checked"{/if}> 物业费
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="type" value="2" > 商家
+                        </label>
+                        <span class="help-block" style="color: red">注意：全部就是物业费、商家、超市都缴纳到当前接口。适用当前分权用户既是物业又是商家 </span>
+                    </div>
+
+                </div>
+                <div class="form-group" id="company" style="display: none">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">物业公司</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="cid" class="form-control">
+                            <option value="0">选择物业</option>
+                            {loop $companies $company}
+                            <option value="{$company['id']}" {if $company['id'] == $set['cid']}selected = 'selected'{/if}>{$company['title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="userid" style="display: none">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商家</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="userid" class="form-control">
+                            <option value="0">选择商家</option>
+                            {loop $permission $user}
+                            <option value="{$user['uid']}" {if $user['uid'] == $set['userid']}selected = 'selected'{/if}>{$member[$user['uid']]['username']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">平台号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="cmbc[platformId]" class="form-control" value="{$pay[cmbc][platformId]}" autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="cmbc[merchantNo]" class="form-control" value="{$pay[cmbc][merchantNo]}" autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户名</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="cmbc[merchantName]" class="form-control" value="{$pay[cmbc][merchantName]}" autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户私钥证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <!--<input type="hidden" name="apiclient_cert" value=""/>-->
+                        <input type="file" name="sy_cert" class="form-control" />
+                        <span class="help-block">
+                                {if !empty($pay[cmbc][sy_cert])}
+                                <span class='label label-success'>已上传</span>
+                                {else}
+                                <span class='label label-danger'>未上传</span>
+                                {/if}
+                                </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">民生公钥证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <!--<input type="hidden" name="apiclient_cert" value=""/>-->
+                        <input type="file" name="gy_cert" class="form-control" />
+                        <span class="help-block">
+                                {if !empty($pay[cmbc][gy_cert])}
+                                <span class='label label-success'>已上传</span>
+                                {else}
+                                <span class='label label-danger'>未上传</span>
+                                {/if}
+                                </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1"  />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(function () {
+        $("input[name='type']").click(function () {
+            var type = $('input[name="type"]:checked ').val();
+            if(type == 2){
+                $("#userid").show();
+                $("#company").hide();
+            }
+            if(type == 1){
+                $("#userid").hide();
+                $("#company").show();
+            }
+            if(type == 3){
+                $("#userid").hide();
+                $("#company").hide();
+            }
+        })
+    })
+</script>
+{template 'web/common/footer'}

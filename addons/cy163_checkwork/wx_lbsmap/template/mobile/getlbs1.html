@@ -1,0 +1,95 @@
+<!DOCTYPE html> 
+<html lang="zh-cn"> 
+<head> 
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<title>正在获取您的定位信息...</title> 
+
+<script src="../addons/wx_lbsmap/js/jquery-1.11.0.min.js"></script> 
+
+<!-- <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=t3FP9YY3pI7XHSODGH0NOidw"></script>  -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=CfI3KLqID3GDBgxB03GVxRi143ZTINe1"></script>
+<script>
+(function(){        //闭包
+function load_script(xyUrl, callback){
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = xyUrl;
+    //借鉴了jQuery的script跨域方法
+    script.onload = script.onreadystatechange = function(){
+        if((!this.readyState || this.readyState === "loaded" || this.readyState === "complete")){
+            callback && callback();
+            // Handle memory leak in IE
+            script.onload = script.onreadystatechange = null;
+            if ( head && script.parentNode ) {
+                head.removeChild( script );
+            }
+        }
+    };
+    // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+    head.insertBefore( script, head.firstChild );
+}
+function translate(point,type,callback){
+    var callbackName = 'cbk_' + Math.round(Math.random() * 10000);    //随机函数名
+    var xyUrl = "http://api.map.baidu.com/ag/coord/convert?from="+ type + "&to=4&x=" + point.lng + "&y=" + point.lat + "&callback=BMap.Convertor." + callbackName;
+    //动态创建script标签
+    load_script(xyUrl);
+    BMap.Convertor[callbackName] = function(xyResult){
+        delete BMap.Convertor[callbackName];    //调用完需要删除改函数
+        var point = new BMap.Point(xyResult.x, xyResult.y);
+		//alert(xyResult.x+" and "+ xyResult.y);
+		
+		url="{php echo $_W['siteroot'] . 'app/index.php?i='.$_W['uniacid'].'&c=entry&do=map&m=wx_lbsmap'}";
+		url=url+'&lat='+xyResult.y+'&lng='+xyResult.x+'&tr=1';
+		//alert(res.latitude+" and "+res.longitude);
+		alert(url);
+		<!-- window.location.href=url; -->
+						
+        callback && callback(point);
+    }
+}
+
+window.BMap = window.BMap || {};
+BMap.Convertor = {};
+BMap.Convertor.translate = translate;
+})();
+</script> 
+
+
+<script> 
+
+$(function(){ 
+navigator.geolocation.getCurrentPosition(translatePoint); //定位 
+}); 
+function translatePoint(position){ 
+var currentLat = position.coords.latitude; 
+var currentLon = position.coords.longitude; 
+var gpsPoint = new BMap.Point(currentLon, currentLat); 
+//alert(currentLon+" and lat is "+currentLat);
+BMap.Convertor.translate(gpsPoint, 0, initMap); //转换坐标 
+} 
+
+function initMap(point){ 
+//初始化地图 
+map = new BMap.Map("map"); 
+map.addControl(new BMap.NavigationControl()); 
+map.addControl(new BMap.ScaleControl()); 
+map.addControl(new BMap.OverviewMapControl()); 
+
+map.centerAndZoom(point, 15); 
+map.addOverlay(new BMap.Marker(point)) 
+} 
+</script> 
+
+</head> 
+<body> 
+<div id="bk"><img src="../addons/wx_lbsmap/images/load.gif" id="load" width="30px"><br /></div>
+<div><p id="wz" style="text-align:center;width:100%;position:absolute;top:53%;">正在获取定位信息...</p></div>
+<script>
+		 $avgwid=($(window).width()-$("#load").width())/2;
+		 $avgheig=($(window).height()-$("#load").height())/2.2;
+		 $("#bk").css({"position":"absolute","left":$avgwid,"top":$avgheig});
+		</script>
+</body> 
+</html> 

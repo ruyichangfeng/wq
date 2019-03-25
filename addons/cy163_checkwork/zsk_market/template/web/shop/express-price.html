@@ -1,0 +1,252 @@
+
+{template 'public/header'}  
+<style type="text/css">
+	.checkbox,.radio{
+		display: inline-block !important;margin-right: 20px !important;
+	}
+	.panel{
+		margin-bottom:0px;
+	}
+	.citytb{
+		width: 800px !important;
+	}
+	.citytb .lef{ width: 100px; }
+	.citytb .rig{
+		width:700px;text-align: left;
+	} 
+</style> 
+<div class="panel panel-info">
+	<div class="panel-heading"  >普通快递价格设置</div>
+	<div class="panel-body">
+		<div class="row form-row" style="margin-top: 0px;">
+		<form action="<?php echo $this->routeUrl('expressinfo.express');?>&active=express" method="post" id="keyform">	
+		<div class="row form-row" >
+		    <div class="alignR col-xs-3 col-md-2 rowLabel" >第一件默认邮费</div>
+		    <div class="alignL col-xs-9 col-md-10 "> 
+		    	<input type="text" name='express_default' style="width: 100px;" value="<?php echo ($shop['express_default']);?>" form="expForm" class="form-control" ><span class="notice">未指定的地区以默认金额为准。</span>
+		    </div>
+		</div>
+		<div class="row form-row" >
+		    <div class="alignR col-xs-3 col-md-2 rowLabel" >第N件默认邮费 </div>
+		    <div class="alignL col-xs-9 col-md-10 "> 
+		    	<input type="text" name='express_defaultn' style="width: 100px;" value="<?php echo ($shop['express_defaultn']);?>" form="expForm"  class="form-control" ><span class="notice">
+		    		邮费=第一件邮费 + 第N件邮费 * (N-1)。其中N表示购买商品数量，N>=2
+		    	</span>
+		    </div>
+		</div>
+		 <div class="row form-row" style="display: none;">
+		    <div class="alignR col-xs-3 col-md-2 rowLabel" > </div>
+		    <div class="alignL col-xs-9 col-md-10 "> 
+		    	
+		    	<input type="button"  class ="mybtn"  class="btn btn-default"   style="margin:0 auto;" onclick="addrule()" value="添加邮费规则"/> 
+		    	<input type="submit"  class ="mybtn"  class="btn btn-default"  style="margin:0 20px;" form="expForm" value="保存"/> 
+		    </div>
+		</div>
+		</form>
+		 </div>
+		<table class="table " style="display: none;">
+			<thead>
+				<tr > 
+					<th style="width: 150px;">地区</th> 
+					<th style="width: 150px;">第一件邮费</th>
+					<th style="width: 150px;">第N件邮费</th>
+					<th style="width: 100px;">状态</th>  
+					<th style="width: 120px;">操作</th>
+				</tr>
+			</thead> 
+		</table>  
+	</div>
+</div>
+<div class="panel panel-info">
+	<div class="panel-heading" >包邮设置</div>
+	<div class="panel-body">
+		<form action="<?php echo $this->routeUrl('expressinfo.saveExpressPrice');?>&sid={$shop['id']}" id="expForm"  method="post">
+	 
+		<div class="row form-row" >
+		    <div class="alignR col-xs-3 col-md-2 rowLabel" >包邮金额</div>
+		    <div class="alignL col-xs-9 col-md-10 "> 
+		    	<input type="text" name='express_limit' style="width: 100px;" value="<?php echo ($shop['express_limit']);?>"  class="form-control" form="expForm"><span class="notice">订单达到包邮金额后不计邮费，未设置地区默认全国包邮。未达到包邮金额按下方普通快递价格设置</span>
+		    </div>
+		</div>
+		<div class="row form-row" >
+		    <div class="alignR col-xs-3 col-md-2 rowLabel" >包邮地区</div>
+		    <div class="alignL col-xs-9 col-md-10 "> 
+		    	 <input type="button"  class ="mybtn"  class="btn btn-default"     style="margin:0 auto;" onclick="addBaoyou()" value="添加包邮地区"/>
+		    	 <input type="submit"  class ="mybtn"  class="btn btn-default"    style="margin:0 20px;" form="expForm"  value="保存"/>
+		    	
+		    </div>
+		</div>  
+		</form>
+		 <table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 250px;">地区</th> 
+					<th style="width: 100px;">级别</th> 
+					<th style="width: 100px;">状态</th>   
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $baoyous $index $item}
+				<tr relation="{$item['pid']}-{$item['id']}"> 
+					<td>
+						<?php if(count($item['children'])>0){ ?>
+						<span class="glyphicon glyphicon-plus" aria-hidden="true" sts="0" onclick="swithParentSts(this)" pid="{$item['id']}" style="color:#999;padding-right: 10px;"></span>
+						<?php }else{ ?> 
+						<span style="padding-right: 10px;">&nbsp;&nbsp;</span>
+						<?php } ?>{$item['province']}{$item['city']}</td> 
+					<td><?php if(intval($item['parentid'])==0){ echo "省";}else{echo "市";}?></td>  
+				 
+					<td>{$item['sts']} </td> 
+					<td>    
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0Baoyou({$item['rowid']} )">删除</a>
+						 
+					</td>
+				</tr>
+				 
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+	</div>
+</div>
+     
+
+<script type="text/javascript">
+ 	function subBase(){
+
+		modalDlg("是否继续？",function(){
+			$("#baseForm").submit();
+		});   	 
+	 
+	}
+	 
+</script> 
+
+<!-- Large modal -->
+
+<div id="baoyoudiv" style="display: none;">
+	<table class="citytb table table-bordered">
+		<tr>
+			<td class="lef">
+				选择省份
+			</td>
+			<td class="rig">
+				{loop $provinces $index $pri}
+				<div class="checkbox">
+				    <label>
+				      <input type="checkbox"  onclick="getCity(this,{$pri['id']},'{$pri['name']}')" name="provinces[]" value="{$pri['id']}" >{$pri['name']}
+				    </label>
+			  	</div>
+				{/loop}
+			</td>
+		</tr>
+		<tr>
+			<td class="lef">
+				选择城市
+			</td>
+			<td class="rig citys">
+				 <span style="color: #999;font-size: 13px;">未勾选城市时，将对所有已勾选的省份生效。勾选城市后，仅对已勾选城市生效。</span><br/>
+			</td>
+		</tr>
+		 
+	</table>
+</div>
+ 
+ 
+<div id="rulediv" style="display: none;">
+	<table class="citytb table table-bordered">
+		<tr>
+			<td class="lef">
+				选择省份
+			</td>
+			<td class="rig">
+				{loop $provinces $index $pri}
+				<div class="checkbox" onclick="getCity({$pri['id']},'{$pri['name']}')">
+				    <label>
+				      <input type="checkbox" name="city[]" value="{$pri['id']}" >{$pri['name']}
+				    </label>
+			  	</div>
+				{/loop}
+			</td>
+		</tr>
+		<tr>
+			<td class="lef">
+				选择城市
+			</td>
+			<td class="rig citys">
+				 
+			</td>
+		</tr>
+		<tr>
+			<td class="lef">
+				邮费规则
+			</td>
+			<td class="rig">
+				 <input type="text" name='express_default' style="width: 100px;"  value=" " placeholder="第一件邮费" class="form-control" >
+				 <label>+</label>
+				 <input type="text" name='express_default' style="width: 100px;"  placeholder="第N件邮费" value="0" class="form-control" >
+				  <label>x&nbsp;（N&nbsp;-1）=&nbsp;<span id="currCity">快递至&nbsp;成都市&nbsp;的邮费（N>=2）</span></label>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<script type="text/javascript">
+	function remove0Baoyou(id){
+		modalDlg("是否删除？",function(){
+			window.location.href="<?php echo $this->routeUrl('expressinfo.removeBaoyou');?>&cid="+id;
+		},"添加包邮地区");
+	}
+	function addrule(){
+		modalDlg($("#rulediv").html(),function(){
+
+		},"添加邮费规则");
+	}
+	function addBaoyou(){
+		var html="<form id='baoyouForm' action='<?php echo $this->routeUrl('expressinfo.ruleBaoyou');?>' method='post'>";
+		html+=$("#baoyoudiv").html(); 
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#baoyouForm").submit();
+		},"添加包邮地区");
+	}
+  	function getCity(dom,id,name){
+  		if($(dom).is(":checked")){
+  			$.ajax({
+	  			url:'<?php echo $this->routeUrl("expressinfo.getCityByPid");?>&pid='+id,
+	  			dataType:"json",
+	  			success:function(data){
+	  				var html=$(".citys").html();
+	  				 
+	  				$.each(data,function(i,v){
+	  					html+='<div class="checkbox citycheckbox" pid="'+id+'" > <label><input type="checkbox" name="citys[]" value="'+v.id+'" >'+v.name+'</label> </div>';
+	  				});
+	  				$(".citys").html(html);
+	  			}
+	  		})	
+  		}else{
+  			$.each($(".citycheckbox"),function(i,v){
+  				if(parseInt($(v).attr("pid"))==id){
+  					$(v).remove();
+  				}
+  			})	
+  		}
+  		
+  		
+  	}
+  	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+</script> 
+ {template 'public/footer'}

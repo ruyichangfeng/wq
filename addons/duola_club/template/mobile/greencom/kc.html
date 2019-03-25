@@ -1,0 +1,223 @@
+<!--正文导航-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta content="telephone=no" name="format-detection" /> 
+<style>
+	body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+	body{padding-bottom: 0 !important;}
+</style>
+<meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+<title>{$school['title']}</title>
+<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+<link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+<script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+<script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+</head>
+<body>
+<style>
+dd.teacher_count li {font: 13px/18px "黑体";padding: 10px 60px 10px 34px;position: relative;background: url({OSSURL}public/mobile/img/teacher_inf.jpg) no-repeat 10px 15px;background-size: 15px 15px;border-bottom: 1px solid #ddd;}
+.teacher_count div.add > div {background-image: url("{OSSURL}public/mobile/img/state_add.png");}
+.teacher_count div.hot > div {background-image: url("{OSSURL}public/mobile/img/state_hot.png");}
+.teacher_count  div.new > div{ background-image: url("{OSSURL}public/mobile/img/state_new.png")}
+.selectList{position:fixed; left:0; right:0; top:0; bottom:0;-webkit-box-sizing:border-box; box-sizing:border-box; background-color:rgba(0,0,0,.53); text-align:center; z-index:30;font-size:20px;color:#fe6700;}
+.selectList .single{ position:absolute; left:5%; right:5%; top:15%; padding: 0 20px; background-color:#fff; padding-bottom:0px; padding-top: 10px;}
+.selectList ul{width:100%;height:150px;overflow:auto;}
+.selectList ul li{height:50px;line-height:50px;border-bottom:1px solid #e9e9e9;padding:0 1px;}
+.selectList ul li.selected{border-left:5px solid #ffc74e;}
+.selectList ul li span.le{height:50px;line-height:50px;float:left;font-size:16px;}
+.selectList ul li span.ri{height:50px;line-height:50px;font-size:16px;}
+.weui-media-box__info__meta {
+	float: left;
+	padding-right: 0.2em;
+}
+</style>
+<div id="wrap" class="teacher_inf">
+	<div class="ddb-tab-bar" style="display: inline-table;padding: 10px 0;height: 20px">
+		<div class="ddb-tab-item ng-scope">
+			<a href="javascript:;" class="ng-binding" id="km">按科目</a>
+			<i class="fa fa-caret-down"></i>
+		</div>
+		<div class="ddb-tab-item ng-scope">
+			<a href="javascript:;" class="ng-binding" id="lb">按类别</a>
+			<i class="fa fa-caret-down"></i>
+		</div>
+		<div class="ddb-tab-item ng-scope" ng-repeat="pane in panes" ng-class="{active:pane.selected}"
+			 ng-click="toggle(pane)">
+			<a href="javascript:;" class="ng-binding" id="center">按分中心</a>
+			<i class="fa fa-caret-down"></i>
+		</div>
+		<div class="ddb-tab-item ng-scope" ng-repeat="pane in panes" ng-class="{active:pane.selected}"
+			 ng-click="toggle(pane)">
+			<a href="javascript:;" class="ng-binding" id="keyword">按关键字</a>
+			<i class="fa fa-caret-down"></i>
+		</div>
+	</div>
+	<dl id="main">
+		<dd class="teacher_count">
+			<h3>课程列表</h3>
+			<ul>
+			{loop $list $item}					
+			   <li class="{if $item['end'] < TIMESTAMP}closed{/if}" onclick="chakan('{$item['id']}');">
+				   <span class="weui-media-box__info" style="margin-top: 1px;margin-bottom: 1px;">
+					   <h4>
+						   <a class="weui-media-box__info__meta" style="padding-right: 1em;">{$item['name']}</a>
+						   {if !empty($category[$item['km_id']])}
+						   <a class="weui-media-box__info__meta weui-media-box__info__meta_extra">{$category[$item['km_id']]['sname']}</a>
+						   {/if}
+					   </h4>
+				   </span>
+				   {if $item['is_hot'] == 1}<p>精品课</p>{/if}
+					<span> {php echo date('Y/m/d',$item['start'])}-{php echo date('Y/m/d',$item['end'])}</span>
+					<span> {if !empty($category[$item['bj_id']])}{$category[$item['bj_id']]['sname']}{/if}</span>
+				   {if $item['is_welfare'] == 0}
+				   <span class="weui-media-box__info" style="margin-top: 1px;margin-bottom: 3px;">
+					   <a class="weui-media-box__info__meta">一人班:<strong style="color: #EF4F4F">¥{$item['cose']}</strong></a>
+					   <a class="weui-media-box__info__meta">两人班:<strong style="color: #EF4F4F">¥{$item['cose2']}</strong></a>
+					   <a class="weui-media-box__info__meta">三人班:<strong style="color: #EF4F4F">¥{$item['cose3']}</strong></a>
+				   </span>
+				   {else}
+				   <span style="color: red;font-size: 15px;">免费</span>
+				   {/if}
+				   <!--<span style="float: left;padding-right: 30px;"> {if !empty($category[$item['km_id']])}{$category[$item['km_id']]['sname']}{/if}</span>-->
+				   <!--通过hot、add和new分别设置热报、正在报名和新增 -->
+					{if $item['end']<TIMESTAMP}
+					<div class="hot">
+						<div style="font-size:12px;">已完</div>
+						<a href="{php echo $this->createMobileUrl('kcinfo', array('id' => $item['id'], 'schoolid' =>$schoolid), true)}">查看详情</a>
+					</div>
+					{else}
+					<div class="add">
+						<div style="font-size:12px;">{php echo pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_kcbiao')." WHERE kcid = '".$item['id']."'")}节</div>
+						<span>剩余{php echo pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_kcbiao')." WHERE date>'".TIMESTAMP."' And kcid = '".$item['id']."'")}节</span>
+						<a href="{php echo $this->createMobileUrl('kcinfo', array('id' => $item['id'],'schoolid' =>$schoolid), true)}">查看详情</a>
+					</div>
+					{/if}
+			   </li> 
+			{/loop}		   
+			</ul>
+		</dd>
+		<div class="selectList" id="selectList" style="z-index:100000;display:none;">
+			<div class="single" style="z-index:100000;">
+				<ul>
+					<span style="color:#444;">切换学生</span>
+				{loop $user $row}
+					<li onclick="isSelect({$row['id']},{$row['schoolid']});"><span class="le">{$row['bjname']}</span><span class="ri">{$row['s_name']}</span></li>
+				{/loop}	
+				</ul>
+			</div>
+		</div>
+	</dl>
+</div>
+<div class="all">
+	<div class="selectList" id="kmList" style="z-index:100000;display:none;">
+		<div class="single" style="z-index:100000;">
+			<ul>
+				{loop $km $row}
+				<li onclick="selectType('km',{$row['sid']},{$row['schoolid']});">{$row['sname']}</li>
+				{/loop}
+			</ul>
+			<span id="closedkm">×</span>
+		</div>
+	</div>
+	<div class="selectList" id="lbList" style="z-index:100000;display:none;">
+		<div class="single" style="z-index:100000;">
+			<ul>
+				{loop $courseCats $row}
+				<li onclick="selectType('lb',{$row['sid']},{$row['schoolid']});"><span>{$row['sname']}</span></li>
+				{/loop}
+			</ul>
+			<span id="closedlb">×</span>
+		</div>
+	</div>
+	<div class="selectList" id="centerList" style="z-index:100000;display:none;">
+		<div class="single" style="z-index:100000;">
+			<ul>
+				{loop $districtCenter $row}
+				<li onclick="selectType('center',{$row['sid']},{$row['schoolid']});"><span>{$row['sname']}</span></li>
+				{/loop}
+			</ul>
+			<span id="closedcenter">×</span>
+		</div>
+	</div>
+	<div class="selectList" id="kw" style="z-index:100000;display:none;">
+		<div class="single" style="z-index:100000;left:2%; right:2%;padding-bottom: 33px;padding-top: 10px;">
+			<input type="text" id = "kwsearch" name="keyword" placeholder="关键字" style="font-size: 20px;float:left;">
+			<button onclick="searchKw({$_GPC['schoolid']},'keyword');"><i class="fa fa-search" style="font-size: 20px;"></i> 搜索</button>
+			<span id="closedkeyword">×</span>
+		</div>
+	</div>
+</div>
+<input id="flag" value="{$flag}" type="hidden">
+<input id="cache" value="{$userss}" type="hidden">
+<script type="text/javascript">
+	$(function ($) {
+        var flag = $("#flag").val();
+		var cache = $("#cache").val();
+		
+        if (flag == 2) {
+			if (cache == "" || cache == null) {
+			   $('#selectList').show();
+			}
+		}
+	});
+	function isSelect(userid,schoolid){
+		location.href = "{php echo $this->createMobileUrl('kc')}"+ '&userid=' + userid + '&schoolid=' + schoolid;
+		location.href = reload();
+	}
+	function selectType(typeName,id,schoolid){
+		location.href = "{php echo $this->createMobileUrl('kc')}"+ '&typeId=' + id + '&schoolid=' + schoolid + '&typeName='+typeName;
+		location.href = reload();
+	}
+	function searchKw(schoolid,typeName){
+		location.href = "{php echo $this->createMobileUrl('kc')}"+ '&typeId=' + $("#kwsearch").val() + '&schoolid=' + schoolid + '&typeName='+typeName;
+		location.href = reload();
+	}
+	//科目
+	$("#km").click(function(){
+		$('#kmList').show();
+	});
+	//类别
+	$("#lb").click(function(){
+		$('#lbList').show();
+	});
+	//分中心
+	$("#center").click(function(){
+		$('#centerList').show();
+	});
+	//关键字
+	$("#keyword").click(function(){
+		$('#kw').show();
+	});
+	$("#closedkm").on('click', function () {
+		$('#kmList').hide();
+	});
+	$("#closedlb").on('click', function () {
+		$('#lbList').hide();
+	});
+	$("#closedcenter").on('click', function () {
+		$('#centerList').hide();
+	});
+	$("#closedkeyword").on('click', function () {
+		$('#kw').hide();
+	});
+</script>   
+<script>
+	$(document).ready(function(e) {
+		$("#wrap").css("min-height", $(document).height())
+	});
+    function chakan(id) {
+
+    window.location.href = "{php echo $this->createMobileUrl('kcinfo', array('schoolid' => $schoolid),true)}" + "&id=" + id;
+
+    }		
+</script>
+{php include $this->template('footer');} 
+</body>
+</html>

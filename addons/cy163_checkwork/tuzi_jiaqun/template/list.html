@@ -1,0 +1,58 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a>群管理</a></li>
+        <li><a href="{php echo $this->createWebUrl('add',array('rid'=>$rid));}">添加群</a></li>
+    </ul>	
+    <div style="padding:15px;">
+        <form action="{$_W['siteurl']}" method="post">
+            <input type="hidden" name="token" value="{$_W['token']}">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                    <tr>
+                        <th align="center" style="width:40px;text-align:center;">ID</th>						
+                        <th align="center" style="width:100px;text-align:center;">入群顺序</th>
+                        <th align="center" style="text-align:center;">群名</th>
+                        <th align="center" style="width:80px;text-align:center;">状态</th>
+                        <th align="center" style="width:60px;text-align:center;">限制</th>
+                        <th style="width:120px;text-align:center;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loop $list $row}
+                    <tr>		
+                        <td align="center" style="text-align:center;">{$row['id']}</td>
+                        <td align="center" style="text-align:center;"><input class="form-control" type='text' name="sort[{$row['id']}]" value="{$row['order_sort']}"></td>
+                        <td align="center" style="font-size:12px; color:#666;text-align:center;">{$row['title']}</td>
+                        <td align="center" style="font-size:12px; color:#666; text-align:center;">{if $row['isuse'] == 1}<label class='label label-success'>启用</label>{else}<label class='label label-default'>未启用</label>{/if}</td>
+                        <td align="center" style="font-size:12px; color:#666; text-align:center;">{$row['limitsum']}</td>
+                        <td style="text-align:center;">
+                            <button class="btn btn-default" type="button" onclick="location.href = '{php echo $this->createWebUrl('add',array('id'=>$row['id'],'rid'=>$rid));}'"><i class='fa fa-edit'></i></button>
+                            <button class="btn btn-default btn2delete" type="button" data-id="{$row['id']}"><i class='fa fa-times'></i></button>
+                        </td>
+                    </tr>
+                    {/loop}
+                    <tr><td colspan="6"><input name="submit" type="submit" value="提交排序" class="btn btn-primary" /></td></tr>
+                </tbody>
+            </table>
+            
+        </form>
+        {$pager}
+    </div>
+</div>
+<script>
+    require(['jquery', 'util'], function ($, u) {
+        $(function () {
+            $('.btn2delete').click(function () {
+                var id = $(this).data('id');
+                if(confirm('确定要删除？')){
+                    $.post("{php echo $this->createWebUrl('delete');}",{ id:id },function(data){
+                        location.reload(true);
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+{template 'common/footer'}

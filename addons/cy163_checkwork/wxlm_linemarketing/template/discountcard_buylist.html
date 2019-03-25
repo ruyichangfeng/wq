@@ -1,0 +1,158 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'display'));}">折扣卡</a></li>
+	<li class="active"><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'buylist'));}">购买记录</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'paylist'));}">核销记录</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'create'));}">添加折扣卡</a></li>
+
+</ul>
+
+<div class="main">
+	<div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[buycardlog_state]" id="store_state_0"  value="" {if $data['search']['buycardlog_state']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[buycardlog_state]"  value="1" {if $data['search']['buycardlog_state']=='1'} checked="checked"{/if} > 已购买
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[buycardlog_state]"  value="2" {if $data['search']['buycardlog_state']=='2'} checked="checked"{/if} > 未购买
+                        </label>
+					</div>
+				</div>
+				
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+						<input type="hidden" name="search[buycardlog_discardid]" value="{$discountcard_id}" />
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+						
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">核销记录</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:14%;">序号</th> 
+								<th style="width:15%;">订单编号</th>
+								<th style="width:15%;">折扣卡</th>
+                                <th style="width:26%;">购买者信息</th>
+                                <th style="width:15%;">状态</th>
+								<th style="width:15%;">购买时间</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+								<td >
+									{$item['buycardlog_ordernumber']}
+								</td>
+								<td >
+									{$item['usecardlog_cardtitle']}
+								</td>
+								<td>
+									<img src="{$item['fans_avatar']}" class="img-circle" alt="" style="height: 25px;">    {$item['fans_nickname']}
+								</td>
+                                <td >
+                                    {if $item['buycardlog_state']==1}已购买{else}未购买{/if}
+								</td>
+								<td >
+									{$item['buycardlog_updatetime']}
+								</td>
+
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#store_state_0").prop("checked",'checked')
+}
+function submitjifen(id){
+	var re = /^-?\\d+$/,
+		type=$('input:radio[name="credit_type"]:checked').val();
+	if($('#jine'+id).val=='')
+	{
+		alert('请先填写充值分值，在进行提交');		
+	}else if (type==1&&re.test($('#jine'+id).val)){
+		alert('积分分值必须为整数。');		
+	}else{
+		
+		$.ajax({  
+            type:"POST",
+            url: "{php echo $this->createWebUrl('ajaxstore');}",
+            data:$('#jifenform'+id).serialize(),
+            dataType:"json",
+            // dataType:"text",
+            async:false,
+            success: function(data){
+                if(data.result=='success')
+                {
+                	$('#credit'+data.type+id).html(data.rs);
+                	$("#myModal"+id).modal('hide');
+                }else if(data.result=='error1'){
+                	alert('充值后门店剩余不能小于0');
+                }else{
+                	alert('充值失败');
+                }
+            }
+        });
+	}		
+}
+function clearformss(id)
+{
+	$("#credit_type1").prop("checked",'checked');
+	$('#jine'+id).val('');
+}
+</script>
+
+{template 'common/footer'}

@@ -1,0 +1,214 @@
+{template 'style5/header'}
+<style>
+    #right-nav {
+        width: 90px;
+        height: 100%;
+        position: fixed;
+        top: 430px;
+        right: 0;
+        z-index: 9999;
+        border-right: 1px solid #48b54e;
+    }
+    #right-nav li {
+        position: relative;
+        left: 0;
+        top: 0;
+        height: 40px;
+        width: 90px;
+        margin-bottom: 1px;
+    }
+    #right-nav li a {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #48b54e;
+        padding: 10px;
+        box-sizing: border-box;
+        border-radius: 3px;
+        color: white;
+    }
+</style>
+<body class="max-width bg-f2">
+
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+        <a class="button button-link button-nav pull-right txt-fff "id="right-btn"></a>
+        <h1 class="title txt-fff">拼车列表</h1>
+    </header>
+    <aside class="pc_search" style="height: 568px;">
+        <form action="" method="post" id="sxForm">
+            <div class="close"><span>X</span></div>
+            <div id="tjsx">
+                <div class="sx">筛选条件</div>
+                <div class="tj">
+                    <dl class="block2">
+                        <dt>座位：</dt>
+                        <dd class="cattsel">不限
+                            <input name="category" type="radio" value="0" checked="">
+                        </dd>
+                        <dd>1人
+                            <input name="category" type="radio" value="1">
+                        </dd>
+                        <dd>2人
+                            <input name="category" type="radio" value="2">
+                        </dd>
+                        <dd>3人
+                            <input name="category" type="radio" value="3">
+                        </dd>
+                        <dd>≥4人
+                            <input name="category" type="radio" value="4">
+                        </dd>
+                    </dl>
+
+                    <dl class="block2">
+                        <dt>费用：</dt>
+                        <dd class="cattsel">不限
+                            <input name="price" type="radio" value="1000000" checked="">
+                        </dd>
+                        <dd>0-20元
+                            <input name="price" type="radio" value="1000">
+                        </dd>
+                        <dd>20-40元
+                            <input name="price" type="radio" value="2000">
+                        </dd>
+                        <dd>40-60元
+                            <input name="price" type="radio" value="4000">
+                        </dd>
+                        <dd>≥60元
+                            <input name="price" type="radio" value="6000">
+                        </dd>
+                    </dl>
+
+                    <dl class="block2">
+                        <dt>目的地：</dt>
+                        <input type="text" name="destination" placeholder="请填写关键字   选填" class="mdd">
+                    </dl>
+                </div>
+                <a href="javascript:void(0)" onclick="$('#sxForm').submit();" class="btn-tj"><span>提交信息</span></a>
+            </div>
+        </form>
+    </aside>
+    <div class="content">
+        <div class="car-btn-row">
+            <div class="switch">
+                <input type="radio" class="switch-input" name="view" value="week" id="week" checked onclick="javascript:window.location.href='{php echo $this->createMobileUrl('car',array('op' => 'list','type' => 1))}'"/>
+                <label for="week" class="switch-label {if $type == 1} switch-label-off{else}switch-label-on{/if}">车主</label>
+                <input type="radio" class="switch-input" name="view" value="month" id="month"  onclick="javascript:window.location.href='{php echo $this->createMobileUrl('car',array('op' => 'list','type' => 2))}'"/>
+                <label for="month" class="switch-label {if $type == 2} switch-label-off{else}switch-label-on{/if}">乘客</label>
+                <span class="switch-selection"></span>
+            </div>
+        </div>
+        <section>
+            <div class="ui-refresh" id="car">
+                <ul class="data-list">
+
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div id="btn_div">
+        <div id="btn_dj">
+            <span id="btn_input" class="btn_img hide_b"></span>
+        </div>
+        <div id="menu_b" class="menu_btn hide_m" style="width: 170px">
+            <a href="{php echo $this->createMobileUrl('car',array('op' => 'add'))}">发布信息</a>
+            <a href="{php echo $this->createMobileUrl('car',array('op' => 'my'))}">我的发布</a>
+        </div>
+    </div>
+    <!--<div id="right-nav">-->
+        <!--<div class="w">-->
+            <!--<ul id="right-nav-list1">-->
+                <!--<li><a href="#" onclick="location.href='{php echo $this->createMobileUrl('car',array('op' => 'add'))}'"><div>发布信息</div></a></li>-->
+                <!--<li><a href="#" onclick="location.href='{php echo $this->createMobileUrl('car',array('op' => 'my'))}'"><div>我要发布</div></a></li>-->
+            <!--</ul>-->
+        <!--</div>-->
+    <!--</div>-->
+    <script type="text/html" id="xq_list">
+        {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+        <li style="margin: 0px 0px; ">
+            <a class="" href="{{ d.list[i].url }}">
+                <h5>{{ d.list[i].title }}</h5>
+                <div class="box_div">
+                    <div class="box_l">
+                        <div class="car_header">
+                            <img src="{{# if(d.list[i].avatar){ }}{{ d.list[i].avatar }}{{# }else{ }}{MODULE_URL}template/mobile/style5/static/img/detail-personal-img.jpg{{# } }}">
+                        </div>
+                        <div class="caru_name">{{ d.list[i].contact }}</div>
+                    </div>
+                    <div class="box_m">
+                        <div class="m_content">
+                            <div class="sart">{{ d.list[i].start_position }}</div>
+                        </div>
+                        <div class="m_content">
+                            <div class="end">{{ d.list[i].end_position }}</div>
+                        </div>
+                    </div>
+                    <div class="box_r">
+                        <span class="price">{{ d.list[i].sprice }}</span>
+                        <span class="seat">{{ d.list[i].seat }}</span>
+                    </div>
+                </div>
+                <div class="bottom_box" style="background: white">
+                    <!--<div class="bottom_l">-->
+                        <!--<span class="sj_img"></span>-->
+                    <!--</div>-->
+                    <div class="bottom_m">
+                        <span>发布时间：{{ d.list[i].datetime }}</span>
+                    </div>
+                </div>
+            </a>
+        </li>
+        {{# } }}
+    </script>
+<script>
+    $(function() {
+        $("#btn_dj").click(function() {
+            var input_btn = $("#btn_input")
+            if (input_btn.attr("class") == "btn_img hide_b") {
+                input_btn.removeClass();
+                input_btn.addClass("btn_img show_b");
+            } else {
+                input_btn.removeClass();
+                input_btn.addClass("btn_img hide_b");
+            }
+            var menu_b = $("#menu_b")
+            if (menu_b.attr("class") == "menu_btn hide_m") {
+                menu_b.removeClass();
+                menu_b.addClass("menu_btn show_m");
+            } else {
+                menu_b.removeClass();
+                menu_b.addClass("menu_btn hide_m");
+            }
+        })
+    })
+</script>
+<script>
+    $(function() {
+        $(".pc_search").height($("#page").height())
+        $("#right-btn").click(function() {
+            $(".pc_search").addClass("ok_search");
+        })
+        $(".close").click(function() {
+            $(".pc_search").removeClass("ok_search");
+        })
+        $(".tj dl dd").click(function() {
+            $(this).attr("class", "cattsel");
+            $(this).siblings("dd").removeAttr("class");
+            changeAtt(this)
+        })
+
+    })
+
+    function changeAtt(t) {
+        t.lastChild.checked = 'checked';
+    }
+</script>
+<script>$.config = {autoInit: true}</script>
+<script>
+    $(document).ready(function () {
+        var type = "{$_GPC['type']}";
+        loaddata("{php echo $this->createMobileUrl('car',array('op'=>'list'))}&type=" + type, $(".data-list"), 'xq_list', true);
+    });
+</script>
+{template 'style5/footer'}

@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+    {template 'head'}
+    <title>{php echo $this->config['system_name']}</title>
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+    <link rel="stylesheet" href="{RES}mobile/css/starability-all.min.css">
+</head>
+<style>
+    #blur{
+        filter:blur(2px);
+        -webkit-filter:blur(2px);
+        -moz-filter:blur(2px);
+        -ms-filter:blur(2px);
+        -o-filter:blur(2px);
+    }
+    .this-list-tab {
+    background-color: #428dc7 !important;
+    border: 1px solid #428dc7 !important;
+    color: #fff !important;
+}
+.app-list-tab a {
+    display: block;
+    float: left;
+    padding: 4px 8px;
+    border: 1px solid #428dc7;
+    color: #428dc7;
+    margin-left: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+.wddp{
+    height: 40px;
+    border-bottom: 1px solid #ddd;
+    line-height: 40px;
+    padding-left: 10px;
+    background-color: white;
+}
+.wddp img{
+    width: 24px;
+    margin-top: -4px;
+    margin-right: 6px;
+}
+
+.appraise_imgbox img {
+           
+           position: absolute;
+           background: white;
+           padding: 4px;
+           width: 30%;
+       }
+       .appraise_imgbox{
+           position: relative;
+           overflow: hidden;
+           width: 92%;
+           margin: 0 auto;
+       }
+</style>
+<body>
+<div class="box">
+	<div class="tops">
+    	<div class="col-xs-2 text01-l">
+			<a href="javascript:" onclick="history.back(); ">
+            	<img src="{RES}mobile/images/back-white.png">
+            </a>
+        </div>
+        <div class="col-xs-8 text01-c">选择预约时间</div>
+    </div>
+    
+	<div class="cont" >
+		<div class="three-image">
+        	<img id="blur" src="{php echo tomedia($staff['staff_pic'])}">
+        </div>
+        <div class="three-con01">
+        	<div class="three-image01">
+        		<img src="{php echo tomedia($staff['staff_avatar'])}" >
+        	</div>
+            <div class="three-r">
+            	<div class="three-text01">
+                    <div> {$staff['staff_name']} 
+                            {if $fabulous1==2}
+                            <!--<span style="float: right;"> -->
+                                <!--<img class="dianzan_true {if $fabulous2==2}hide{/if}"  src="{RES}mobile/images/xin02.png"  style="width: 30px;">-->
+                                <!--<img class="dianzan_flase {if $fabulous2==1}hide{/if}"  src="{RES}mobile/images/xin03.png"  style="width: 30px;" onclick="addordelcollect({$dating_id})">-->
+                            <!--</span> -->
+                            {/if}</div>
+                   
+                    <a  class="collection_1" href="javascript:getCollection(1)" {if empty($collection)} style="display: none"{/if}><img  class="collection" src="{RES}mobile/images/xing01.png" alt=""></a>
+    <a class="collection_2" href="javascript:getCollection(2)" {if !empty($collection)}style="display: none"{/if}><img  class="collection" src="{RES}mobile/images/xing001.png" alt=""></a>
+    <li class="clear"></li>
+                </div>
+                <div class="three-text02">职称：{$staff['staff_jobname']}</div>
+                <div class="three-text03">{$staff['staff_info']}</div>
+            </div>
+        </div>
+        <div class="three-con02">
+			<table class="table">
+            	<thead>
+					<div class="three-text04">预约</div>
+				</thead>
+            	<tbody>
+
+                    <tr>
+                        <td>排班日期</td>
+                        <td>限约数</td>
+                        <td>金额</td>
+                        <td width="80px">操作</td>
+                    </tr>
+                    {loop $weeks $key $item}
+                    <tr>
+                        <td>{$item}{$week_ch[$key]}</td>
+                        <td>{$count}</td>
+                        <td>{$dating['dating_pay_money']}</td>
+                        {if $dating['dating_pay_state'] == 3}
+                        {if !empty($vip)}
+                        {if $vip_count['vip_count'] >= $store['store_card_count'] && $vip['vip_type'] == 1}
+                        <td><a class="three-text05" href="javascript:remind1()">预约</a></td>
+                        {else}
+                        <td><a class="three-text05" href="{php echo $this->createMobileUrl('time', array('time'=>$item, 'dating_id'=>$dating['dating_id']))}">预约</a></td>
+                        {/if}
+                        {else}
+                        <td><a class="three-text05" onclick="if(!confirm('本次预约需要购买会员卡, 是否立即购买?')) return false;" href="{php echo $this->createMobileUrl('card', array())}">预约</a></td>
+                        {/if}
+                        {else}
+                        <td><a class="three-text05" href="{php echo $this->createMobileUrl('time', array('time'=>$item, 'dating_id'=>$dating['dating_id']))}">预约</a></td>
+                        {/if}
+                    </tr>
+                    {/loop}
+
+                </tbody>
+  			</table>        
+          </div>
+          <div class="wddp"><img src="{RES}mobile/images/dianping-6.png">我的点评</div>
+        <div class="app-list-tab">
+            <a href="javascript:void (0)" data-level="" onclick="getScomment(this)" class="this-list-tab">全部</a>
+            <a href="javascript:void (0)" data-level="5" onclick="getScomment(this)">5星({$total_5})</a>
+            <a href="javascript:void (0)" data-level="4" onclick="getScomment(this)">4星({$total_4})</a>
+            <a href="javascript:void (0)" data-level="3" onclick="getScomment(this)">3星({$total_3})</a>
+            <a href="javascript:void (0)" data-level="2" onclick="getScomment(this)">2星({$total_2})</a>
+            <a href="javascript:void (0)" data-level="1" onclick="getScomment(this)">1星({$total_1})</a>
+            <li class="clear"></li>
+        </div>
+        <div class="dz-app-list" id="scomment-content">
+            {loop $scomments $key $item}
+            <li class="dz-app-listli">
+                <div class="dz-app-listli-left">
+                    <img src="{php echo tomedia($item['scomment_avatar'])}">
+                </div>
+                <div class="dz-app-listli-right">
+                    <p>{$item['scomment_nickname']} <span style="float:right;color:#6b6b6b;font-size:14px;">{$item['scomment_time_add']}</span></p>
+                    <fieldset class="starability-grow starability-grow2">
+                        <span style="font-size:14px;margin-top:-4px;">打分</span>
+                        <label for="rate5-3" title="Amazing" class="lable-list {if $item['scomment_level'] == 5}this-lable-list{/if}">5 stars</label>
+                        <label for="rate4-3" title="Very good" class="lable-list {if $item['scomment_level'] >= 4}this-lable-list{/if}">4 stars</label>
+                        <label for="rate3-3" title="Average" class="lable-list {if $item['scomment_level'] >= 3}this-lable-list{/if}">3 stars</label>
+                        <label for="rate2-3" title="Not good" class="lable-list {if $item['scomment_level'] >= 2}this-lable-list{/if}">2 stars</label>
+                        <label for="rate1-3" title="Terrible" class="lable-list {if $item['scomment_level'] >= 1}this-lable-list{/if}">1 star</label>
+                    </fieldset>
+                    <p>
+                        {loop $item['tag'] $row}
+                        <span style="margin-right: 10px">{$row}</span>
+                        {/loop}
+                       
+                    </p>
+                    <p>{$item['scomment_content']}</p>
+                    <div class="appraise_imgbox">
+                        <!-- 直接img标签就可以 -->
+                        <!-- <img src="" > -->
+                        {loop $item['scomment_pic'] $key $item}
+                        <img src="{php echo tomedia($item)}" alt="">
+                        {/loop}
+                    </div>
+                </div>
+                <ul class="clear"></ul>
+            </li>
+            {/loop}
+
+
+        </div>
+    </div>
+    {template 'foot'}
+</div>
+<script src="{RES}mobile/js/pinterest_grid.js"></script>
+<script>
+          $(function () {
+            $(".appraise_imgbox").pinterest_grid({
+                // no_columns: 10,
+                padding_x: 0,
+                padding_y: 0,
+                margin_bottom: 0,
+                single_column_breakpoint: 200
+            });
+        });
+
+        
+$(".tc-back").click(function(){
+	$(".modal").hide();
+	$(".modal-backdrop").hide();
+	
+})
+    function remind1() {
+
+        alert('您的预约卡使用次数已达上限, 请联系门店负责人或上门咨询');
+    }
+    function addordelcollect(datingid)
+    {
+        $.ajax({
+            type:"POST",
+            url: "{php echo $this->createMobileUrl('fabulous');}",
+            data:{dating_id:datingid},
+            dataType:"json",
+            async:false,
+            success:function(data){
+                if(data.result=='success')
+                {
+                    alert('点赞成功');
+                    $('.dianzan_flase').addClass('hide');
+                    $('.dianzan_true').removeClass('hide');
+
+                }else{
+                    alert(data.rs);
+                }
+            }
+        });
+    }
+
+    /** 收藏 */
+    function getCollection(type) {
+
+
+    var staffid = "{$dating_id}";
+
+    $.ajax({
+
+        url:"{php echo $this->createMobileUrl('ajaxCollection')}",
+        type:"post",
+        data:{staffid:staffid},
+        success:function (res) {
+
+            if (res == 1)
+            {
+                $('.collection_1').css('display', 'inline')
+                $('.collection_2').css('display', 'none')
+
+            } else if (res == 2)
+            {
+                $('.collection_1').css('display', 'none')
+                $('.collection_2').css('display', 'inline')
+            }
+
+
+        }
+    })
+}
+
+    /** 点评 */
+    function getScomment(that) {
+
+        var level = $(that).data('level');
+        var staff = "{$staff['staff_id']}";
+
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('getScomment')}",
+            type:"post",
+            data:{level:level, staff:staff},
+            success:function (res) {
+
+                $('.app-list-tab a').removeClass('this-list-tab');
+                $(that).addClass('this-list-tab');
+                $('#scomment-content').html(res);
+            }
+        })
+    }
+</script>
+</body>
+</html>

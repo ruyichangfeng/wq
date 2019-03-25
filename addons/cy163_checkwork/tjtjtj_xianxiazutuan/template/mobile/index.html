@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+	<title>首页</title>
+	<link rel="stylesheet" href="{APP_TEMP_PATH}css/weui.css"/>
+    <link rel="stylesheet" href="{APP_TEMP_PATH}css/example.css"/>
+	<script src="{APP_TEMP_PATH}js/zepto.min.js"></script>
+	<style>
+*{margin: 0; padding: 0;}
+a{text-decoration: none;}
+li{list-style: none;}
+body{background-color: #f1f1f2;font-size: 0.9em; line-height: 1.6;}
+/*幻灯片*/
+.box_swipe{ overflow:hidden;position:relative;}
+.box_swipe ul{ position: relative; -webkit-padding-start: 0px; width: 100%; height: 160px;}
+.box_swipe>ol{ height:10px; position: relative; bottom: 0px;  right: 20px; z-index:10; margin-top:-20px; text-align:right;margin-right: 20px;}
+.box_swipe>ol>li{ display:inline-block; margin:-5px 0px 11px 0px ;width:7px; height:7px;background-color:#999;border-radius: 7px;}
+.box_swipe>ol>li.on{background-color:#d5007e;}
+/*商品模块*/
+.m-goods{width: 94%; height: auto; padding: 10px 1%; margin: 0 2%; position: relative; top: 160px; color: #555;background-color: #fff; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px;
+	z-index: 2;}
+.img-goods{position: relative;} 
+.m-title{position: relative; width: 100%; height: auto; text-align: center; font-size: 17px; color: red;}
+.m-introduce {position: relative; width: 95%; height: auto; color: #666; font-size: 14px;      
+	padding-left: 10px;
+    padding-top: 30px;
+    padding-bottom: 10px; color: #7b7b7b; }
+.m-foot{position:relative; display: inline-block; width: auto; height: auto;background-color: #666;color: #fff;padding:0 20px 0 5px;margin: 10px 0; font-size: 17px;}
+.m-go{position: relative; display: inline-block; width: auto; height: auto; background-color: red; color: #fff;border-left: 0.5px solid #fff; padding: 0 10px;margin: 10px 0px 10px -10px;font-size: 17px;}
+.m-love{position: absolute;bottom: 14px; right: 15px; display: inline-block; }
+
+.selected{color: #09BB07;}
+/*低栏	*/
+</style>
+</head>
+<body>
+<!-- 幻灯片 -->
+	<script type="text/javascript" src="http://m.ixiume.com/index/js/swipe.js"></script>
+    <div style="width:100%;height:160px; position: absolute;
+	top: 0px;
+	left: 0px;" >
+	  <div id="banner_box" class="box_swipe" style="width:100%;height:100%;">
+		  <ul>
+			  {loop $sliders $slider}
+			  <li><a href="{$slider['href']}"><img src="{$_W['attachurl']}{$slider['thumb']}" border="0" style="width:100%;" height="230px" /></a></li>
+			  {/loop}
+		  </ul>
+		  <ol>
+			  {loop $sliders $key $slider}
+			  <li {if $key == 0}class="on"{/if}></li>
+			  {/loop}
+		  </ol> 
+	  </div>
+    </div>
+<script>
+	$(function(){
+		new Swipe(document.getElementById('banner_box'), {
+			speed:500,
+			auto:5000,
+			callback: function(){
+				var lis = $(this.element).next("ol").children();
+				lis.removeClass("on").eq(this.index).addClass("on");
+			}
+		});
+	});
+</script>
+
+<!-- 商品模块 -->
+{loop $curgroups $group}
+<div class="m-goods">
+	<a href="{php echo $this->createMobileUrl('groups', array('uid' => $group['groupid']))}">
+		<img class="img-goods" src="{$_W['attachurl']}{$group['logo']}" alt="" width="100%" height="160px">
+		<p class="m-title">{$group['name']}</p>
+		<div class="all_discuss" style="float:left;width:100%;height:auto;">
+			<p style="float: left;z-index:1001;padding-right:5px;background-color:#F9F9F9;border-left: 5px solid red;padding-left: 5px;font-size: 15px;color:#666;height: 22px;">商品简介</p>
+			<div style="position:realtive;width: 94%;margin-left:3%;height: 11px;border-bottom: 1px solid #aaa;"></div>
+		</div>
+		<p class="m-introduce">
+			{php echo htmlspecialchars_decode($group['details'])}
+		</p>
+		<div class="m-foot">☃ {$group['needpeople']}人团 ¥{$group['price']} </div>
+		<div class="m-go">去组团 ＞</div>
+	</a>
+	<div class="m-love" ><img class="Ilike" groupid="{$group['groupid']}" src="{APP_TEMP_PATH}images/a-xin.png" alt="" width="30px" height="28px"></div>
+</div>
+{/loop}
+
+
+
+<div class="m-goods" style=" height:45px;z-index:0;background: none; border: none;"></div>
+<!-- 低栏 -->
+<div class="weui_tabbar" style="padding-bottom:1px;position:fixed; z-index:1002;">
+    <a href="{php echo $this->createMobileUrl('index')}" class="weui_tabbar_item weui_bar_item_on" style="padding: 4px 0 0;">
+        <div class="weui_tabbar_icon" style="height:26px;">
+            <img src="{APP_TEMP_PATH}images/house.png" alt=""  height="26px ">
+        </div>
+        <p class="weui_tabbar_label" style="margin-top: 0px;">首页</p>
+    </a>
+    <a href="{php echo $this->createMobileUrl('groups', array('action' => 'back'))}" class="weui_tabbar_item" style="padding: 4px 0 0;">
+        <div class="weui_tabbar_icon">
+            <img src="{APP_TEMP_PATH}images/after-2.png" alt="">
+        </div>
+        <p class="weui_tabbar_label" style="margin-top: 0px;">往期</p>
+    </a>
+    <a href="{php echo $this->createMobileUrl('groups', array('action' => 'future'))}" class="weui_tabbar_item" style="padding: 4px 0 0;">
+        <div class="weui_tabbar_icon">
+            <img src="{APP_TEMP_PATH}images/fenlei-2.png" alt="">
+        </div>
+        <p class="weui_tabbar_label" style="margin-top: 0px;">预告</p>
+    </a>
+    <a href="{php echo $this->createMobileUrl('account')}" class="weui_tabbar_item" style="padding: 4px 0 0;">
+        <div class="weui_tabbar_icon">
+            <img src="{APP_TEMP_PATH}images/person-2.png" alt="">
+        </div>
+        <p class="weui_tabbar_label" style="margin-top: 0px;">我的</p>
+    </a>
+</div>
+
+<script>
+	$(function(){
+		$('.m-love').on('click', '.Ilike', function(){
+			var groupid = $(this).attr('groupid');
+			var geturl = '{php echo $this->createMobileUrl('groups', array('action' => 'likes'));}&uid=' + groupid;
+			var dom = this;
+			$.getJSON(geturl, function(data){
+				if (data.status == 0) {
+					//成功
+					$(dom).attr('src', '{APP_TEMP_PATH}images/a-xin1.png');
+				}
+				alert(data.msg);
+			});
+		});
+	});
+
+	$(function(){
+		$('div.weui_tabbar_item').click(function(){
+			$('div.weui_tabbar_label').addClass('selected').siblings().removeClass('sel');
+		})
+	})
+</script>
+
+</body>
+</html>

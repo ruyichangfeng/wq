@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body style="background-color: #fff; min-width: auto !important;">
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('store')}">店面管理</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('store', array('op' => 'add'))}">添加店面</a>
+    </div>
+    {if $op == 'list'}
+    <script src="../addons/hy_supstore/template/web/js/jquery.qrcode.min.js"></script>
+    <style>
+    .layui-card:last-child {
+        margin-bottom: 0px;
+    }
+
+    .layui-card {
+        margin-bottom: 15px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: rgba(0, 0, 0, 0.0470588) 0px 1px 2px 0px;
+        border-radius: 2px;
+    }
+
+    .layui-card-header {
+        position: relative;
+    }
+
+    .layui-card-header {
+        height: 40px;
+        color: rgb(51, 51, 51);
+        font-size: 14px;
+        padding: 5px 15px;
+        border-bottom: 1px solid rgb(246, 246, 246);
+        border-radius: 2px 2px 0px 0px;
+    }
+
+    .layui-card-body {
+        text-align: center;
+        height: 200px;
+        line-height: 24px;
+        padding: 10px 15px;
+    }
+
+    .layui-btn {
+        margin: 0 0 5px 0 !important;
+    }
+
+    .layui-card-header {
+        color: #666;
+    }
+
+    .layui-card-body {
+        display: block !important;
+        text-align: center;
+        height: 200px;
+        line-height: 24px;
+        padding: 10px 15px;
+        color: #666;
+    }
+
+    .layui-card .layui-card-header .item {
+        display: inline-block;
+        margin-right: 3px;
+    }
+    
+    .layui-card .layui-card-header .block{
+        display: block;
+        line-height: 22px;
+    }
+
+    .icon-right {
+        position: absolute;
+        bottom: 14px;
+        right: 15px;
+        text-align: right;
+    }
+
+    .icon-right span {
+        vertical-align: middle;
+    }
+
+    .icon-right a {
+        float: right;
+        margin-left: 10px;
+        position: relative;
+    }
+
+    .icon-right a>div {
+        border: 1px solid #ddd;
+        position: absolute;
+        top: -120px;
+        left: -60px;
+        display: none;
+        background: #fff;
+        z-index: 999;
+        line-height: 0;
+    }
+
+    .icon-right a>div canvas,
+    .icon-right a>div img {
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+    }
+
+    .icon-right a:hover>div {
+        display: block;
+    }
+
+    .icon-right a>img {
+        width: 15px;
+    }
+
+    .layui-card-body>.top {
+        width: 100%;
+        height: 114px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .layui-card-body .content-left {
+        float: left;
+        width: 30%;
+    }
+
+    .layui-card-body .content-left .img-box {
+        width: 100%;
+        height: 100px;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: cover !important;
+        background-color: #f5f5f5 !important;
+    }
+
+    .layui-card-body .bottom {
+        width: 100%;
+        padding: 6px 0;
+        text-align: left;
+        border-top: 1px solid #dcdcdc;
+    }
+
+    .layui-card-body .bottom>a {
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .layui-card-body .content-right {
+        width: 70%;
+        height: 100%;
+        float: right;
+        text-align: right;
+    }
+
+    .layui-card-body .content-right .accounts {
+        display: inline-block;
+        width: 140px;
+        padding: 0 10px;
+        text-align: left;
+        height: 110px;
+        line-height: 26px;
+    }
+
+    .layui-card-body .content-right .actives {
+        float: right;
+        width: 68px;
+        text-align: center;
+    }
+
+    .layui-card-body .content-right .users {
+        width: 100%;
+        display: inline-block;
+    }
+
+    .layui-store-user {
+        text-align: left;
+        margin: 6px 0;
+        height: 36px;
+        padding-right: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+    }
+
+    .layui-store-user img {
+        width: 34px;
+        border-radius: 50%;
+    }
+
+    .layui-store-user .title {
+        display: inline-block;
+        height: 100%;
+        padding-left: 10px;
+        vertical-align: middle;
+        line-height: 36px;
+    }
+    </style>
+    <script>
+    function createcode($id, $ermurl) {
+        $('#erm' + $id).qrcode({
+            render: "canvas",
+            width: 100,
+            height: 100,
+            text: $ermurl
+        });
+    }
+    </script>
+    <div style="width: 100%;height: 30px;background-color: #fff;"></div>
+    <div class="wrap" style="background-color: #f5f5f5;padding: 10px 0;">
+        <div class="layui-row layui-col-space10" style="margin-left: 5px;margin-right: 5px;">
+            {loop $list $tag}
+            <div class="layui-col-xs12 layui-col-sm6 layui-col-md6 layui-col-lg4">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <div class="block">                        
+                            <div class="item"><i class="layui-icon">&#xe68e;</i>&nbsp;{$tag["title"]}</div>
+                            <div class="item"><i class="layui-icon">&#xe770;</i>&nbsp;会员{$tag["usercount"]}个</div>
+                            <div class="icon-right float-right">
+                                <span>二维码</span>
+                                <a title="付款二维码" href="javascript:;"><img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                                    <div id="erm{$tag['id']}">
+                                        <script>
+                                        createcode("{$tag['id']}","{$tag['ermurl']}");
+                                        </script>
+                                    </div>
+                                </a>
+                                <a title="关注二维码" href="javascript:;">
+                                    <img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                                    <div><img src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={$tag['ticket']}"></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="block">
+                            <div class="item store"><i class="layui-icon">&#xe637;</i>&nbsp;{if $tag["category_name"]}{$tag["category_name"]}{else}门店{/if}</div>
+                            <div class="item rank"><i class="layui-icon">&#xe625;</i>&nbsp;排序{$tag["rank"]}</div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="top">
+                            <div class="content-left">
+                                <div class="img-box" style="background:url('{php echo tomedia($tag['thumb'])}')"></div>
+                            </div>
+                            <div class="content-right">
+                                <div class="accounts">
+                                    <p>实际金额：{php echo floatval($tag["rechargeamount"])}元</p>
+                                    <p>充值金额：{$tag["creditamount2"]}元</p>
+                                    <p>赠送金额：{$tag["creditamount3"]}元</p>
+                                    <p>消费总额：{php echo floatval($tag["amount"])}元</p>
+                                </div>
+                                <div class="actives">
+                                    <a class="layui-btn layui-btn-sm layui-btn-warm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'recharge','storeid' => $tag['id']))}','快速充值');" href="javascript:;">快速充值</a>
+                                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'consum','storeid' => $tag['id']))}','快速消费');" href="javascript:;">快速消费</a>
+                                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'oncecardconsum','storeid' => $tag['id']))}','次卡消费');" href="javascript:;">次卡消费</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="users layui-store-user">
+                            <div class="title">店长：</div>
+                            {loop $tag['user'] $index $user}
+                            <img src="{if !empty($user['avatar'])}{$user['avatar']}{else}resource/images/noavatar_middle.gif{/if}">&nbsp;{$user['name']}&nbsp;&nbsp;&nbsp; {/loop}
+                            <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('storemanage',array('op' => 'article','storeid' => $tag['id']))}" style="float: right;margin: 3px 0 5px 0!important; position: absolute; right: 0;z-index: 100;">店面管理</a>
+                            <div style="background-color: #fff;position: absolute; right: 0;top: 0; width: 80px;height: 36px;"></div>
+                        </div>
+                        <div class="bottom">
+                            <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('store', array('op' => 'update','id' => $tag['id']))}">修改店面</a>
+                            <a href="javascript:void(0);" data-id="{$tag['id']}" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete">删除店面</a>
+                            <div class="time float-right">
+                                创建时间：{$tag["createtime"]}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/loop} {if empty($list)}
+            <tr>
+                <div style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</div>
+            </tr>
+            {/if}
+        </div>
+    </div>
+    <div class="fenye">{$pager}</div>
+    <script>
+    layui.use(['layer', 'element'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        $('.item-action-delete').click(function() {
+            var that = this;
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                $.post('{php echo $this->createWebUrl("store", array("op"=>"delete"))}', { id: $(that).attr('data-id') }, function(data) {
+                    if(data == true){
+                        layer.msg('删除店铺成功', function() {
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg('删除店铺失败 '+data, function() {
+                            window.location.reload();
+                        });
+                    }
+                });
+            })
+            return false;
+        })
+    });
+
+    function openview(url, title) {
+        layer.open({
+            type: 2,
+            title: title,
+            closeBtn: 1,
+            maxmin: true,
+            moveOut: true,
+            scrollbar: false,
+            shade: 0,
+            shadeClose: true, //点击遮罩关闭层
+            area: ['800px', '95%'],
+            content: url,
+            zIndex: layer.zIndex, //重点1
+            success: function(layero) {
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
+    //关闭弹窗
+    function select_entry(message, jumpUrl, index) {
+        layer.close(index); //先关闭弹窗，在操作   
+        layer.msg(message, function() {
+            //关闭后的操作
+            if (jumpUrl) {
+                window.location.href = jumpUrl;
+            } else {
+                window.location.reload();
+            }
+        });
+    }
+
+    //关闭弹窗
+    function select_entrylayui(message, jumpUrl, index) {
+        layer.close(index); //先关闭弹窗，在操作   
+        layer.msg(message, function() {
+            //关闭后的操作
+            if (jumpUrl) {
+                window.location.href = jumpUrl;
+            } else {
+                window.location.reload();
+            }
+        });
+    }
+    </script>
+    {elseif $op == 'add'}
+    <link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./resource/css/common.css" rel="stylesheet">
+    <script type="text/javascript">
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+        if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+            alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+        }
+    }
+    window.sysinfo = {
+        'uniacid': '{$_W['uniacid']}',
+        'acid': '{$_W['account']['acid']}',
+        'uid': '{$_W['uid']}',
+        'isfounder': '{$_W['isfounder']}',
+        'family': 'v',
+        'siteroot': '{$_W['siteroot']}',
+        'siteurl': '{$_W['siteurl']}',
+        'attachurl': '{$_W['attachurl']}',
+        'attachurl_local': '{$_W['attachurl_local']}',
+        'attachurl_remote': '{$_W['attachurl_remote']}',
+        'module': { 'url': '', 'name': '' },
+        'cookie': { 'pre': 'mendian' },
+    };
+    </script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/util.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/common.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/require.js"></script>
+    <script type="text/javascript" src="../addons/hy_supstore/template/web/js/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/web/js/areadata.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=F51571495f717ff1194de02366bb8da9&s=1"></script>
+    <style>
+    #storeManager {
+        margin: 5px;
+        overflow: hidden;
+    }
+
+    .user-box {
+        float: left;
+        padding: 5px;
+        height: 100px;
+        width: 100px;
+        border: 1px solid #e6e6e6;
+        margin: 0 5px;
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+    }
+
+    .closex {
+        position: absolute;
+        right: 3px;
+        top: 3px;
+    }
+
+    .img-responsive {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    </style>
+    <div id="mapdiv1" style="width:100%;height:100%;display: none;">
+        <div id="r-result" style="width:100%;height:50px; margin-top:10px">
+            <input id="cityName" type="text" class="layui-input" style="width:70%; margin-left:10px; margin-right:10px;" placeholder="请在此输入地址来查找相关位置" />
+            <input type="button" value="查询" class="layui-input" style="width:15%;" onclick="theLocation()" />
+        </div>
+        <div id="maplocation" style="width:100%;height:85%;">
+        </div>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend style="margin: 0 0 0 20px; border-bottom: 0; width: auto;">店面修改</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('store',array('op'=>'add'))}" method="post" id="formAdd" class="layui-form layui-form-pane">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店面名称</label>
+                    <div class="layui-input-block" style="width: 300px;">
+                        <input type="text" name="title" id="title" required lay-verify="required" placeholder="请输入店铺名称" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类:</label>
+                    <div class="layui-input-block">
+                        <div style="width: 50%">
+                            <select name="categoryId" lay-verify="required">
+                                <option value="0" data-depth="0">基类</option>
+                                {loop $listCategory $key $value}
+                                <option value="{$value['id']}" data-depth="{$value['depth']}" {if $item['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" id="test1">上传图片</button>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">格式：200*200 大小：50KB</div>
+                        <div class="layui-upload-list">
+                            <img src="./resource/images/nopic.jpg" style="max-width:280px; max-height:210px;" class="layui-upload-img" id="demo1">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="thumb" id="thumb" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺电话</label>
+                    <div class="layui-input-block" style="width: 200px;">
+                        <input autocomplete="tel" class="layui-input" required type="text" name="mobile" id="mobile" required lay-verify="required" placeholder="请输入店铺电话">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-block" style="width: 200px;">
+                        <input autocomplete="tel" class="layui-input" type="number" name="rank" id="mobile" placeholder="请输入排序号">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">详细介绍</label>
+                    <div class="layui-input-block" style="width: 60%;">
+                        {php echo tpl_ueditor('fdesc', '', array('height'=>300,'width'=>'100%'));}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">特色标签</label>
+                    <div class="layui-input-block" style="width: 60%;">
+                        <textarea name="label" class="layui-textarea" placeholder="请输入特色标签"></textarea>
+                        <div class="layui-form-mid layui-word-aux">特色标签用,分割</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择地区</label>
+                    <div class="layui-input-inline">
+                        <select id="provid" lay-filter="provid">
+                            <option value="">请选择省</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select id="cityid" lay-filter="cityid">
+                            <option value="">请选择市</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select id="areaid" lay-filter="areaid">
+                            <option value="">请选择县/区</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="provinces">
+                    <input type="hidden" name="cities">
+                    <input type="hidden" name="areas">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">详细地址</label>
+                    <div class="layui-input-block" style="width: 500px;">
+                        <input autocomplete="off" class="layui-input" required type="text" name="address" id="address" required lay-verify="required" placeholder="请在此输入地址">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">坐标</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="lng" id="lng" value="{$item['lng']}" placeholder="地理经度" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="lat" value="{$item['lat']}" id="lat" placeholder="地理纬度" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <button id="showbaidumap" onClick="openMapBox(this);" class="layui-btn" type="button">选择坐标</button>
+                    </div>
+                    <script>
+                    var map;//百度地图实例化
+                    var localSearch; //查询记录
+                    var nowPointLng;//当前存储的经度
+                    var nowPointLat;//当前存储的纬度
+
+                    function theLocation() {
+                        var city = document.getElementById("cityName").value;
+
+                        if (city != "") {
+                            // 创建地址解析器实例
+                            var myGeo = new BMap.Geocoder();
+                            var myCity = new BMap.LocalCity();
+                            myCity.get(myFunLocal);
+                            // 将地址解析结果显示在地图上,并调整地图视野
+                            myGeo.getPoint(city, function(point) {
+                                if (point != null) {
+                                    map.clearOverlays();
+                                    map.centerAndZoom(new BMap.Point(point.lng,point.lat), 14);
+                                    var marker = new BMap.Marker(point); // 创建标注
+                                    map.addOverlay(marker); // 将标注添加到地图中
+                                    marker.enableDragging(); //可拖拽
+                                    nowPointLng = point.lng;
+                                    nowPointLat = point.lat;
+                                     //移动到坐标点
+                                    map.panTo(new BMap.Point(point.lng,point.lat));
+                                } else {
+                                    alert("您所输入的位置地图未查询到");
+                                }
+                            }, myCity);
+                        }
+                    }
+
+                    function myFunLocal(result) {
+                        var cityName = result.name;
+                        map.setCenter(cityName);
+                    }
+
+                    function openMapBox(obj) {
+                        layer.open({
+                            title: false, //标题   
+                            closeBtn: 1, //关闭按钮 0不显示 1 2
+                            type: 1,
+                            anim: 1, //0-6的动画形式，-1不开启
+                            maxmin: false, //最大化最小化
+                            shadeClose: true, //点击遮罩关闭层
+                            area: ['90%', '80%'],
+                            btn: ['确定', '关闭'],
+                            content: $('#mapdiv1'),
+                            success: function() {
+                                $('#mapdiv1').show();
+                                $('#maplocation').show();
+                                setTimeout(function(){
+                                    initBaiduMap();
+                                },200);
+                            },
+                            yes: function(index, layero){
+                                layer.closeAll();
+                                $('#lng').val(nowPointLng);
+                                $('#lat').val(nowPointLat);
+                            }
+                        });
+                    }
+
+                    function initBaiduMap(){
+                        var option_x = $("#lng").val();
+                        var option_y = $("#lat").val();
+
+                        map = new BMap.Map("maplocation"); // 创建地图实例
+
+                        var point = new BMap.Point(option_x, option_y); // 创建点坐标 
+                        map.centerAndZoom(point, 14);
+                        map.enableScrollWheelZoom(); //启用滚轮放大缩小，默认禁用
+                        map.enableDragging(); //可拖拽
+                        
+                        if(option_x == 117.194164 && option_y == 39.081541){
+                            //没有修改坐标
+                            //第一次加载 默认调用定位接口    
+                            var geolocation = new BMap.Geolocation();
+                            geolocation.getCurrentPosition(function(r){
+                                if(this.getStatus() == BMAP_STATUS_SUCCESS){
+                                    //加载定位接口成功
+                                    map.panTo(r.point);
+                                    var marker = new BMap.Marker(r.point); // 创建标注
+                                    map.addOverlay(marker); // 将标注添加到地图中
+                                    marker.enableDragging(); //可拖拽
+
+                                    marker.addEventListener("dragend", function(e) { //拖拽标注获取标注坐标
+                                        nowPointLng = e.point.lng;
+                                        nowPointLat = e.point.lat;
+                                    });
+                                }
+                                else {
+                                    //加载定位接口失败
+                                    alert('failed'+this.getStatus());
+                                    var marker = new BMap.Marker(point); // 创建标注
+                                    map.addOverlay(marker); // 将标注添加到地图中
+                                    marker.enableDragging(); //可拖拽
+
+                                    marker.addEventListener("dragend", function(e) { //拖拽标注获取标注坐标
+                                        nowPointLng = e.point.lng;
+                                        nowPointLat = e.point.lat;
+                                    });
+                                }        
+                            });
+                        }else{
+                            //已经修改坐标 不在调用定位接口
+                            var marker = new BMap.Marker(point); // 创建标注
+                            map.addOverlay(marker); // 将标注添加到地图中
+                            marker.enableDragging(); //可拖拽
+
+                            marker.addEventListener("dragend", function(e) { //拖拽标注获取标注坐标
+                                nowPointLng = e.point.lng;
+                                nowPointLat = e.point.lat;
+                            });
+                        }
+
+                        //百度地图控件
+                        var top_left_control = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});// 左上角，添加比例尺
+                        var top_left_navigation = new BMap.NavigationControl();  //左上角，添加默认缩放平移控件
+                        var top_right_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_SMALL}); 
+                        //右上角，仅包含平移和缩放按钮
+                        /*缩放控件type有四种类型:
+                        BMAP_NAVIGATION_CONTROL_SMALL：仅包含平移和缩放按钮；
+                        BMAP_NAVIGATION_CONTROL_PAN:仅包含平移按钮；
+                        BMAP_NAVIGATION_CONTROL_ZOOM：仅包含缩放按钮*/
+
+                        //添加控件和比例尺
+                        map.addControl(top_left_control);        
+                        map.addControl(top_left_navigation);     
+                        map.addControl(top_right_navigation);
+
+                    }
+                    </script>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择负责人</label>
+                    <div class="layui-input-inline" style="width:auto">
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" onClick="storemanag();">选择负责人</button>
+                        </div>
+                        <div id="storeManager" class="layui-input-block">
+                        </div>
+                    </div>
+                    <input type="hidden" name="uids" id="uids">
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="submit" class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="立即提交">
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <input type="hidden" id="provincesCode">
+                <input type="hidden" id="citiesCode">
+                <input type="hidden" id="areasCode">
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+
+        var $ = layui.jquery,
+            form = layui.form,
+            upload = layui.upload,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        var $form = $('form');
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1',
+            url: './index.php?c=utility&a=file&do=upload',
+            size: 50, //限制文件大小，单位 KB
+            done: function(res) {
+
+                $('#demo1').attr('src', res.url);
+                $('#thumb').val(res.url);
+
+            }
+        });
+
+
+        //普通图片上传
+        var uploadInst = upload.render({
+
+            elem: '#test2',
+            url: './index.php?c=utility&a=file&do=upload',
+            size: 50, //限制文件大小，单位 KB
+            before: function(obj) {
+
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result) {
+
+                    $('#demo2').attr('src', result); //图片链接（base64）
+                    $('#logo').val(result); //图片链接（base64）
+
+                });
+            },
+            done: function(res) {
+
+                $('#demo2').attr('src', res.url);
+                $('#thumb').val(res.url);
+
+            }
+        });
+
+        form.on('radio(filter1)', function(data) {
+
+            if (data.value == 1) {
+                $('#ermurl2').show();
+            } else {
+                $('#ermurl2').hide();
+            }
+
+        });
+
+        //监听提交
+
+        form.on('submit(formDemo)', function(data) {
+
+            if (data.field.title == "") {
+                layer.msg('必须输入店面名称');
+                return false;
+            }
+
+            if (data.field.address == "") {
+                layer.msg('必须输入地址');
+                return false;
+            }
+
+            if (data.field.mobile == "") {
+                layer.msg('必须输入电话');
+                return false;
+            }
+
+            $('#formAdd').submit();
+        });
+        
+        //设置初始值
+        var provincesCode = $('#provincesCode').val();
+        var citiesCode = $('#citiesCode').val();
+        var areasCode = $('#areasCode').val();
+
+        var defaults = {
+            s1: 'provid',
+            s2: 'cityid',
+            s3: 'areaid',
+            v1: provincesCode?provincesCode:null,
+            v2: citiesCode?citiesCode:null,
+            v3: areasCode?areasCode:null,
+        };
+
+        treeSelect(defaults);
+
+        function treeSelect(config) {
+            config.v1 = config.v1 ? config.v1 : 110000;
+            config.v2 = config.v2 ? config.v2 : 110100;
+            config.v3 = config.v3 ? config.v3 : 110101;
+            $.each(threeSelectData, function(k, v) {
+                appendOptionTo($form.find('#' + config.s1), k, v.val, config.v1);
+            });
+            form.render();
+            cityEvent(config);
+            areaEvent(config);
+            form.on('select(' + config.s1 + ')', function(data) {
+                setInputs();
+                cityEvent(data);
+                form.on('select(' + config.s2 + ')', function(data) {
+                    setInputs();
+                    areaEvent(data);
+                });
+            });
+
+            function cityEvent(data) {
+                $form.find('#' + config.s2).html("");
+                config.v1 = data.value ? data.value : config.v1;
+                $.each(threeSelectData, function(k, v) {
+                    if (v.val == config.v1) {
+                        if (v.items) {
+                            $.each(v.items, function(kt, vt) {
+                                appendOptionTo($form.find('#' + config.s2), kt, vt.val, config.v2);
+                            });
+                        }
+                    }
+                });
+                form.render();
+                config.v2 = $('#' + config.s2).val();
+                areaEvent(config);
+                setInputs();
+            }
+
+            function areaEvent(data) {
+                $form.find('#' + config.s3).html("");
+                config.v2 = data.value ? data.value : config.v2;
+                $.each(threeSelectData, function(k, v) {
+                    if (v.val == config.v1) {
+                        if (v.items) {
+                            $.each(v.items, function(kt, vt) {
+                                if (vt.val == config.v2) {
+                                    $.each(vt.items, function(ka, va) {
+                                        appendOptionTo($form.find('#' + config.s3), ka, va, config.v3);
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+                form.render();
+                form.on('select(' + config.s3 + ')', function(data) {
+                    setInputs();
+                });
+                setInputs();
+            }
+
+            function appendOptionTo($o, k, v, d) {
+                var $opt = $("<option>").text(k).val(v);
+                // var $opt = $("<option>").text(k).val(k);//val为中文名称
+                if (v == d) { $opt.attr("selected", "selected") }
+                $opt.appendTo($o);
+            }
+
+            //点击联动菜单给inputs赋值
+            function setInputs() {
+                var v1 = $('#' + config.s1).val() + '|' + $('#' + config.s1 + ' option:selected').html();
+                var v2 = $('#' + config.s2).val() + '|' + $('#' + config.s2 + ' option:selected').html();
+                var v3 = $('#' + config.s3).val() + '|' + $('#' + config.s3 + ' option:selected').html();
+                $('input[name="provinces"]').val(v1);
+                $('input[name="cities"]').val(v2);
+                $('input[name="areas"]').val(v3);
+            }
+        }
+
+    });
+
+    //打开粉丝列表
+    function storemanag() {
+        var url = "{php echo $this->createWebUrl('query',array('isopenid'=>1))}";
+        layer.open({
+            title: "会员列表",
+            type: 2,
+            area: ['80%', '90%'],
+            offset: '20px',
+            closeBtn: 1,
+            anim: 1,
+            maxmin: false,
+            shadeClose: true,
+            content: url,
+            zIndex: layer.zIndex, //重点1
+            success: function(layero) {
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
+    //选择一个粉丝
+    function select_entry(uid, avatar, name) {
+        var orguid = $('#uids').val();
+        var orguidarr = orguid.split(",");
+
+        if (avatar == '') {
+            avatar = "resource/images/noavatar_middle.gif";
+        }
+
+        var tioue = 1;
+
+        for (var i = 0; i < orguidarr.length; i++) {
+            if (uid == orguidarr[i]) {
+                alert('该成员已经在列表中了');
+                tioue = 2;
+                break;
+            }
+        }
+
+        if (tioue == 1) {
+            if (orguid == '') {
+                orguid = uid;
+            } else {
+                orguid = orguid + "," + uid;
+            }
+
+            $('#uids').val(orguid);
+
+            $html = '<div class="user-box"><span class="closex" onclick=javascript:nickdelete(this,"' + uid + '")>×</span><img class="img-responsive img-thumbnail" src="' + avatar + '"><p>' + name + '</p></div>';
+
+            $("#storeManager").append($html);
+            layer.closeAll();
+        }
+
+    }
+
+    //删除选择的负责人
+    function nickdelete(obj, uid) {
+        $(obj).parent().remove();
+
+        var orguid = $('#uids').val();
+        var orguidarr = orguid.split(",");
+        var str = '';
+        var j = 0;
+
+        for (var i = 0; i < orguidarr.length; i++) {
+            if (uid != orguidarr[i]) {
+                if (j == 0) {
+                    str = orguidarr[i];
+                } else { str += "," + orguidarr[i]; }
+                j++;
+            }
+        }
+
+        $('#uids').val(str);
+    }
+    </script>
+    {elseif $op == 'update'}
+    <link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./resource/css/common.css" rel="stylesheet">
+    <script type="text/javascript">
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+        if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+            alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+        }
+    }
+    window.sysinfo = {
+        'uniacid': '{$_W['uniacid']}',
+        'acid': '{$_W['account']['acid']}',
+        'uid': '{$_W['uid']}',
+        'isfounder': '{$_W['isfounder']}',
+        'family': 'v',
+        'siteroot': '{$_W['siteroot']}',
+        'siteurl': '{$_W['siteurl']}',
+        'attachurl': '{$_W['attachurl']}',
+        'attachurl_local': '{$_W['attachurl_local']}',
+        'attachurl_remote': '{$_W['attachurl_remote']}',
+        'module': { 'url': '', 'name': '' },
+        'cookie': { 'pre': 'mendian' },
+    };
+    </script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/util.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/common.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/require.js"></script>
+    <script type="text/javascript" src="../addons/hy_supstore/template/web/js/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/web/js/areadata.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=F51571495f717ff1194de02366bb8da9&s=1"></script>
+    <style>
+    #storeManager {
+        margin: 5px;
+        overflow: hidden;
+    }
+
+    .user-box {
+        float: left;
+        padding: 5px;
+        height: 100px;
+        width: 100px;
+        border: 1px solid #e6e6e6;
+        margin: 0 5px;
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+    }
+
+    .closex {
+        position: absolute;
+        right: 3px;
+        top: 3px;
+    }
+
+    .img-responsive {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    </style>
+    <div id="mapdiv1" style="width:100%;height:100%;display: none;">
+        <div id="r-result" style="width:100%;height:50px; margin-top:10px">
+            <input id="cityName" type="text" class="layui-input" style="width:70%; margin-left:10px; margin-right:10px;" placeholder="请在此输入地址来查找相关位置" />
+            <input type="button" value="查询" class="layui-input" style="width:15%;" onclick="theLocation()" />
+        </div>
+        <div id="maplocation" style="width:100%;height:85%;">
+        </div>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend style="margin: 0 0 0 20px; border-bottom: 0; width: auto;">店面修改</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('store',array('op'=>'update'))}" method="post" id="formUpdate" class="layui-form layui-form-pane" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="{$id}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店面名称</label>
+                    <div class="layui-input-block" style="width: 300px;">
+                        <input type="text" name="title" id="title" value="{$item['title']}" required lay-verify="required" placeholder="请输入店铺名称" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类:</label>
+                    <div class="layui-input-block">
+                        <div style="width: 50%">
+                            <select name="categoryId" lay-verify="required">
+                                <option value="0" data-depth="0">基类</option>
+                                {loop $listCategory $key $value}
+                                <option value="{$value['id']}" data-depth="{$value['depth']}" {if $item['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" id="test1">上传图片</button>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">格式：200*200 大小：50KB</div>
+                        <div class="layui-upload-list">
+                            <img src="{if $item['thumb']}{php echo tomedia($item['thumb'])}{else}./resource/images/nopic.jpg{/if}" style="max-width:280px; max-height:210px;" class="layui-upload-img" id="demo1">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="thumb" id="thumb" value="{$item['thumb']}" />
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺电话</label>
+                    <div class="layui-input-block" style="width: 200px;">
+                        <input autocomplete="tel" class="layui-input" required type="text" name="mobile" id="mobile" value="{$item['mobile']}" placeholder="请输入店铺电话">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-block" style="width: 200px;">
+                        <input autocomplete="tel" class="layui-input" type="number" name="rank" id="mobile" value="{$item['rank']}" placeholder="请输入排序号">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">详细介绍</label>
+                    <div class="layui-input-block" style="width: 60%;">
+                        {php echo tpl_ueditor('fdesc', $item['fdesc'], array('height'=>300,'width'=>'100%'));}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">特色标签</label>
+                    <div class="layui-input-block" style="width: 60%;">
+                        <textarea name="label" class="layui-textarea" placeholder="请输入特色标签">{$item['label']}</textarea>
+                        <div class="layui-form-mid layui-word-aux">特色标签用,分割</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择地区</label>
+                    <div class="layui-input-inline">
+                        <select id="provid" lay-filter="provid">
+                            <option value="">请选择省</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select id="cityid" lay-filter="cityid">
+                            <option value="">请选择市</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select id="areaid" lay-filter="areaid">
+                            <option value="">请选择县/区</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="provinces" value="{$item['provinces']}">
+                    <input type="hidden" name="cities" value="{$item['cities']}">
+                    <input type="hidden" name="areas" value="{$item['areas']}">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">详细地址</label>
+                    <div class="layui-input-block" style="width: 500px;">
+                        <input autocomplete="off" class="layui-input" required type="text" name="address" id="address" value="{$item['address']}" placeholder="请在此输入地址">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">坐标</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="lng" id="lng" value="{$item['lng']}" placeholder="地理经度" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="lat" value="{$item['lat']}" id="lat" placeholder="地理纬度" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <button id="showbaidumap" onClick="openMapBox(this);" class="layui-btn" type="button">选择坐标</button>
+                    </div>
+                    <script>
+                    var map;//百度地图实例化
+                    var localSearch; //查询记录
+                    var nowPointLng;//当前存储的经度
+                    var nowPointLat;//当前存储的纬度
+
+                    function theLocation() {
+                        var city = document.getElementById("cityName").value;
+
+                        if (city != "") {
+                            // 创建地址解析器实例
+                            var myGeo = new BMap.Geocoder();
+                            var myCity = new BMap.LocalCity();
+                            myCity.get(myFunLocal);
+                            // 将地址解析结果显示在地图上,并调整地图视野
+                            myGeo.getPoint(city, function(point) {
+                                if (point != null) {
+                                    map.clearOverlays();
+                                    map.centerAndZoom(new BMap.Point(point.lng,point.lat), 14);
+                                    var marker = new BMap.Marker(point); // 创建标注
+                                    map.addOverlay(marker); // 将标注添加到地图中
+                                    marker.enableDragging(); //可拖拽
+                                    nowPointLng = point.lng;
+                                    nowPointLat = point.lat;
+                                     //移动到坐标点
+                                    map.panTo(new BMap.Point(point.lng,point.lat));
+                                } else {
+                                    alert("您所输入的位置地图未查询到");
+                                }
+                            }, myCity);
+                        }
+                    }
+
+                    function myFunLocal(result) {
+                        var cityName = result.name;
+                        map.setCenter(cityName);
+                    }
+
+                    function openMapBox(obj) {
+                        layer.open({
+                            title: false, //标题   
+                            closeBtn: 1, //关闭按钮 0不显示 1 2
+                            type: 1,
+                            anim: 1, //0-6的动画形式，-1不开启
+                            maxmin: false, //最大化最小化
+                            shadeClose: true, //点击遮罩关闭层
+                            area: ['90%', '80%'],
+                            btn: ['确定', '关闭'],
+                            content: $('#mapdiv1'),
+                            success: function() {
+                                $('#mapdiv1').show();
+                                $('#maplocation').show();
+                                setTimeout(function(){
+                                    initBaiduMap();
+                                },200);
+                            },
+                            yes: function(index, layero){
+                                layer.closeAll();
+                                $('#lng').val(nowPointLng);
+                                $('#lat').val(nowPointLat);
+                            }
+                        });
+                    }
+
+                    function initBaiduMap(){
+                        var option_x = $("#lng").val();
+                        var option_y = $("#lat").val();
+
+                        map = new BMap.Map("maplocation"); // 创建地图实例
+
+                        var point = new BMap.Point(option_x, option_y); // 创建点坐标 
+                        map.centerAndZoom(point, 14);
+                        map.enableScrollWheelZoom(); //启用滚轮放大缩小，默认禁用
+                        map.enableDragging(); //可拖拽
+
+                        //百度地图控件
+                        var top_left_control = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});// 左上角，添加比例尺
+                        var top_left_navigation = new BMap.NavigationControl();  //左上角，添加默认缩放平移控件
+                        var top_right_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_SMALL}); 
+                        //右上角，仅包含平移和缩放按钮
+                        /*缩放控件type有四种类型:
+                        BMAP_NAVIGATION_CONTROL_SMALL：仅包含平移和缩放按钮；
+                        BMAP_NAVIGATION_CONTROL_PAN:仅包含平移按钮；
+                        BMAP_NAVIGATION_CONTROL_ZOOM：仅包含缩放按钮*/
+
+                        //添加控件和比例尺
+                        map.addControl(top_left_control);        
+                        map.addControl(top_left_navigation);     
+                        map.addControl(top_right_navigation);
+
+                        var marker = new BMap.Marker(point); // 创建标注
+                        map.addOverlay(marker); // 将标注添加到地图中
+                        marker.enableDragging(); //可拖拽
+
+                        marker.addEventListener("dragend", function(e) { //拖拽标注获取标注坐标
+                            nowPointLng = e.point.lng;
+                            nowPointLat = e.point.lat;
+                        });
+                    }
+                    </script>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择负责人</label>
+                    <div class="layui-input-inline" style="width:auto">
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" onClick="storemanag();">选择负责人</button>
+                        </div>
+                        <div id="storeManager" class="layui-input-block">
+                            {loop $userlist $vo}
+                            <div class="user-box">
+                                <span class="closex" onClick="javascript:nickdelete(this,'{$vo['id']}')">×</span>
+                                <img class="img-responsive img-thumbnail" src="{if $vo['avatar']}{$vo['avatar']}{else}resource/images/noavatar_middle.gif {/if}">
+                                <p>{$vo['name']}</p>
+                            </div>
+                            {/loop}
+                        </div>
+                    </div>
+                    <input type="hidden" name="uids" id="uids" value="{$item['uids']}">
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <input type="hidden" id="provincesCode" value="{$item['provincesCode']}">
+                <input type="hidden" id="citiesCode" value="{$item['citiesCode']}">
+                <input type="hidden" id="areasCode" value="{$item['areasCode']}">
+            </form>
+        </div>
+    </fieldset>
+    <script>
+        layui.use(['form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+
+            var $ = layui.jquery,
+                form = layui.form,
+                upload = layui.upload,
+                layer = layui.layer, //弹层
+                element = layui.element; //元素操作
+
+            var $form = $('form');
+
+            //普通图片上传
+            var uploadInst = upload.render({
+                elem: '#test1',
+                url: './index.php?c=utility&a=file&do=upload',
+                size: 50, //限制文件大小，单位 KB
+                done: function(res) {
+
+                    $('#demo1').attr('src', res.url);
+                    $('#thumb').val(res.url);
+
+                }
+            });
+
+            //普通图片上传
+            var uploadInst = upload.render({
+
+                elem: '#test2',
+                url: './index.php?c=utility&a=file&do=upload',
+                size: 50, //限制文件大小，单位 KB
+                before: function(obj) {
+
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result) {
+
+                        $('#demo2').attr('src', result); //图片链接（base64）
+                        $('#logo').val(result); //图片链接（base64）
+
+                    });
+                },
+                done: function(res) {
+
+                    $('#demo2').attr('src', res.url);
+                    $('#thumb').val(res.url);
+
+                }
+            });
+
+            form.on('radio(filter1)', function(data) {
+
+                if (data.value == 1) {
+                    $('#ermurl2').show();
+                } else {
+                    $('#ermurl2').hide();
+                }
+
+            });
+
+            //监听提交
+            form.on('submit(formDemo)', function(data) {
+
+                if (data.field.title == "") {
+                    layer.msg('必须输入店面名称');
+                    return false;
+                }
+
+                if (data.field.address == "") {
+                    layer.msg('必须输入地址');
+                    return false;
+                }
+
+                if (data.field.mobile == "") {
+                    layer.msg('必须输入电话');
+                    return false;
+                }
+
+                $('#formUpdate').submit();
+
+            });
+            
+            //设置初始值
+            var provincesCode = $('#provincesCode').val();
+            var citiesCode = $('#citiesCode').val();
+            var areasCode = $('#areasCode').val();
+
+            var defaults = {
+                s1: 'provid',
+                s2: 'cityid',
+                s3: 'areaid',
+                v1: provincesCode?provincesCode:null,
+                v2: citiesCode?citiesCode:null,
+                v3: areasCode?areasCode:null,
+            };
+
+            treeSelect(defaults);
+
+            function treeSelect(config) {
+                config.v1 = config.v1 ? config.v1 : 110000;
+                config.v2 = config.v2 ? config.v2 : 110100;
+                config.v3 = config.v3 ? config.v3 : 110101;
+                $.each(threeSelectData, function(k, v) {
+                    appendOptionTo($form.find('#' + config.s1), k, v.val, config.v1);
+                });
+                form.render();
+                cityEvent(config);
+                areaEvent(config);
+                form.on('select(' + config.s1 + ')', function(data) {
+                    setInputs();
+                    cityEvent(data);
+                    form.on('select(' + config.s2 + ')', function(data) {
+                        setInputs();
+                        areaEvent(data);
+                    });
+                });
+
+                function cityEvent(data) {
+                    $form.find('#' + config.s2).html("");
+                    config.v1 = data.value ? data.value : config.v1;
+                    $.each(threeSelectData, function(k, v) {
+                        if (v.val == config.v1) {
+                            if (v.items) {
+                                $.each(v.items, function(kt, vt) {
+                                    appendOptionTo($form.find('#' + config.s2), kt, vt.val, config.v2);
+                                });
+                            }
+                        }
+                    });
+                    form.render();
+                    config.v2 = $('#' + config.s2).val();
+                    areaEvent(config);
+                    setInputs();
+                }
+
+                function areaEvent(data) {
+                    $form.find('#' + config.s3).html("");
+                    config.v2 = data.value ? data.value : config.v2;
+                    $.each(threeSelectData, function(k, v) {
+                        if (v.val == config.v1) {
+                            if (v.items) {
+                                $.each(v.items, function(kt, vt) {
+                                    if (vt.val == config.v2) {
+                                        $.each(vt.items, function(ka, va) {
+                                            appendOptionTo($form.find('#' + config.s3), ka, va, config.v3);
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    form.render();
+                    form.on('select(' + config.s3 + ')', function(data) {
+                        setInputs();
+                    });
+                    setInputs();
+                }
+
+                function appendOptionTo($o, k, v, d) {
+                    var $opt = $("<option>").text(k).val(v);
+                    // var $opt = $("<option>").text(k).val(k);//val为中文名称
+                    if (v == d) { $opt.attr("selected", "selected") }
+                    $opt.appendTo($o);
+                }
+
+                //点击联动菜单给inputs赋值
+                function setInputs() {
+                    var v1 = $('#' + config.s1).val() + '|' + $('#' + config.s1 + ' option:selected').html();
+                    var v2 = $('#' + config.s2).val() + '|' + $('#' + config.s2 + ' option:selected').html();
+                    var v3 = $('#' + config.s3).val() + '|' + $('#' + config.s3 + ' option:selected').html();
+                    $('input[name="provinces"]').val(v1);
+                    $('input[name="cities"]').val(v2);
+                    $('input[name="areas"]').val(v3);
+                }
+            }
+
+        });
+
+        //打开粉丝列表
+        function storemanag() {
+            var url = "{php echo $this->createWebUrl('query',array('isopenid'=>1))}";
+
+            layer.open({
+                title: "会员列表",
+                type: 2,
+                area: ['80%', '90%'],
+                offset: '20px',
+                closeBtn: 1,
+                anim: 1,
+                maxmin: false,
+                shadeClose: true,
+                content: url,
+                zIndex: layer.zIndex, //重点1
+                success: function(layero) {
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+
+        //选择一个粉丝
+        function select_entry(uid, avatar, name) {
+            var orguid = $('#uids').val();
+            var orguidarr = orguid.split(",");
+
+            if (avatar == '') {
+                avatar = "resource/images/noavatar_middle.gif";
+            }
+
+            var tioue = 1;
+
+            for (var i = 0; i < orguidarr.length; i++) {
+                if (uid == orguidarr[i]) {
+                    alert('该成员已经在列表中了');
+                    tioue = 2;
+                    break;
+                }
+
+            }
+
+            if (tioue == 1) {
+                if (orguid == '') {
+                    orguid = uid;
+                } else {
+                    orguid = orguid + "," + uid;
+                }
+
+                $('#uids').val(orguid);
+
+                $html = '<div class="user-box"><span class="closex" onclick=javascript:nickdelete(this,"' + uid + '")>×</span><img class="img-responsive img-thumbnail" src="' + avatar + '"><p>' + name + '</p></div>';
+
+                $("#storeManager").append($html);
+
+                layer.closeAll();
+            }
+        }
+
+        //删除选择的负责人
+        function nickdelete(obj, uid) {
+            $(obj).parent().remove();
+
+            var orguid = $('#uids').val();
+            var orguidarr = orguid.split(",");
+            var str = '';
+            var j = 0;
+
+            for (var i = 0; i < orguidarr.length; i++) {
+                if (uid != orguidarr[i]) {
+                    if (j == 0) {
+                        str = orguidarr[i];
+                    } else { str += "," + orguidarr[i]; }
+                    j++;
+                }
+            }
+
+            $('#uids').val(str);
+        }
+    </script>
+    {elseif $op == 'manage'}
+    <div class="layui-tab layui-tab-card" lay-filter="docDemoTabBrief">
+        <ul class="layui-tab-title">
+            <li class="layui-this">文章</li>
+            <li>产品</li>
+            <li>账单</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <a href="javascript:;" class="layui-btn layui-btn-sm layui-btn-primary {if $oq=='list'}on{/if} layui-cate" lay-href="{php echo $this->createWebUrl('store',array('op'=>'manage'))}" >文章分类</a>
+                        <a href="javascript:;" class="layui-btn layui-btn-sm layui-btn-primary layui-cate {if $oq == 'article'}on{/if}" lay-href="{php echo $this->createWebUrl('store',array('op'=>'manage','oq'=>'article'))}">文章管理</a>
+                        {if $oq == 'list'}<a href="" class="layui-btn layui-btn-sm " style="float: right;margin: 8px 0;">添加分类</a>{elseif $oq == 'article'}<a href="" class="layui-btn layui-btn-sm" style="float: right;margin: 8px 0;">添加文章</a>{/if}
+                    </div>
+                    <div class="layui-card-body">
+                        <link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+                        <link href="./resource/css/common.css" rel="stylesheet">
+                        <script type="text/javascript" src="../addons/hy_supstore/template/web/js/lazyload.min.js"></script>
+                        {if $oq == 'list'}
+                        {template 'web/template/articlecategory/list'}
+                        {elseif $oq == 'article'}
+                        {template 'web/template/article/list'}
+                        {/if}
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-card">
+                    <div class="layui-card-header"><a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary on layui-cate" lay-href="{php echo $this->createWebUrl('productcategory')}" >产品分类</a><a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary layui-cate" lay-href="{php echo $this->createWebUrl('product')}">产品管理</a></div>
+                    <div class="layui-card-body">
+                        <iframe src="{php echo $this->createWebUrl('productcategory')}" name="layui-category" id="layui-category" frameborder="0" height="700" width="100%"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary">总帐单</a>
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary">充值记录</a>
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary">消费记录</a>
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary">积分记录</a>
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-primary">优惠券记录</a>
+            </div>           
+        </div>
+    </div> 
+    <style type="text/css">.on{color: #1e9fff;} .layui-cate:hover{color: #1e9fff !important;}</style>
+    <script>
+    //注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+    layui.use('element', function(){
+      var element = layui.element;
+    });
+    $(".layui-cate").click(function(){
+
+        var url = $(this).attr("lay-href");
+
+        $(this).siblings().removeClass('on').end().addClass('on');//切换样式
+
+        window.location.href=url;
+
+
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

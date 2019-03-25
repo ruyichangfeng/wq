@@ -1,0 +1,136 @@
+{if $active == 'list'}
+<style>
+.layui-table td {
+    text-align: center;
+}
+.select-pane .layui-inline{
+    margin: 0;
+}
+.store-box.off{
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.store-box.on{
+    max-width: 120px;
+    height: 100px;
+}
+@media screen and (max-width:1200px) {
+    .store-box.off{
+        max-width: 100px;
+    }
+    .store-box.on{
+        max-width: 100px;
+    }
+    .layui-btn.layui-btn-danger{
+        margin-left: 0!important;
+    }
+}
+</style>
+<fieldset class="layui-elem-field">
+    <legend>优惠券领取记录</legend>
+    <div class="layui-field-box">
+        <div class="layui-form-item select-pane">
+            <form action="" method="post" class="layui-form layui-form-pane">
+                <div class="layui-inline" style="margin-bottom: -10px;">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">会员名称</label>
+                        <div class="layui-input-inline mb5 w150">
+                            <input type="text" name="nickname" class="layui-input" value="{$_GPC['nickname']}" placeholder="请输入会员名称">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-inline mb5 w150">
+                            <select name="status">
+                                <option value="all"{if $_GPC['status']=="all"}selected{/if}>不限</option>
+                                <option value="1" {if $_GPC['status']==1}selected{/if}>正常</option>
+                                <option value="none" {if $_GPC['status']=="none"}selected{/if}>过期</option>
+                                <option value="2" {if $_GPC['status']==2}selected{/if}>已使用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline mb5 w120">
+                            <button class="layui-btn">搜索</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="c" value="site">
+                    <input type="hidden" name="a" value="entry">
+                    <input type="hidden" name="m" value="hy_supstore">
+                    <input type="hidden" name="do" value="storemanage" />
+                    <input type="hidden" name="op" value="coupon" />
+                    <input type="hidden" name="type" value="couponmemlog" />
+                    <input type="hidden" name="page" value="1">
+                </div>
+            </form>
+        </div>
+        <form action="" method="post" class="form">
+            <table class="layui-table">
+                <thead>
+                    <tr>
+                        <th width="50">编号</th>
+                        <th width="80">会员名称</th>
+                        <th width="50">优惠券名称</th>
+                        <th width="60">面值</th>
+                        <th width="80">启用金额</th>
+                        <th width="80">最大领取数</th>
+                        <th width="80">所属门店</th>
+                        <th width="80">获得时间</th>
+                        <th width="80">到期时间</th>
+                        <th width="60">状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loop $list $item}
+                    <tr>
+                        <td>{$item['id']}</td>
+                        <td><img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style="height:38px; border-radius:50%;">
+                            <br>
+                            <a href="{php echo $this->createWebUrl('couponlog', array('op'=> 'list','uid'=>$item['uid']))}">{$item['nickname']}</a></td>
+                        <td>{$item['title']}</td>
+                        <td>{$item['value']}</td>
+                        <td>{$item['condition']}</td>
+                        <td>{$item['limit_num']}</td>
+                        <td class="store-box off">{$item['couponstorename']}</td>
+                        <td>{$item['addtime']}</td>
+                        <td>{$item['expirytime']}</td>
+                        <td>{if $item['status']==1}正常{elseif $item['status']==0}过期{else}已使用{/if}</td>
+                    </tr>
+                    {/loop} 
+                    {if empty($list)}
+                    <tr>
+                        <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                    </tr>
+                    {/if}
+                    <tr>
+                        <td colspan="10" class="fenye">{$pager}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['laydate','form', 'layer','element'], function() {
+var $ = layui.jquery,
+    form = layui.form,
+    layer = layui.layer,
+    laydate = layui.laydate,
+    element = layui.element;
+
+    //店铺名称展开关闭
+    $('.store-box').on('click',function(){
+        var str = $(this).html();
+        if(str.length>25){
+            if($(this).hasClass('off')){
+                $(this).removeClass('off').addClass('on');
+            }else{
+                $(this).removeClass('on').addClass('off');
+            }
+        }
+    });
+});
+</script>
+{/if}

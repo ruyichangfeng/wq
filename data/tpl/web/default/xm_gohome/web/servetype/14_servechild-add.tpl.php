@@ -1,0 +1,459 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<ul class="nav nav-tabs">
+    <li><a href="<?php  echo  $this->createWebUrl('servetype', array('foo'=>'index'));?>">服务项目管理</a></li>
+    <li class="active"><a href="<?php  echo  $this->createWebUrl('servetype', array('foo'=>'add'));?>">添加服务项目</a></li>
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="<?php  echo $this->createWebUrl('servetype', array('foo'=>'addok'));?>" method="post">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                添加服务项目
+            </div>
+            <div class="panel-body">
+            
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属父类</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="parent_id" id="parent_id" class="form-control  input-s-lg">
+                            <option value="0">--做为根类别--</option>
+                            <?php  if(is_array($list1)) { foreach($list1 as $vo1) { ?>
+                            <option value="<?php  echo $vo1['id'];?>" <?php  if($id==$vo1['id']) { ?> selected <?php  } ?>><?php  echo $vo1['type_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">类别名称</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="type_name" id="type_name" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">超链接</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="chao" value="1"  onclick="check_link(1)">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="chao" value="0" checked="checked" onclick="check_link(0)">不启用
+                            </label>
+                        </div>
+						<span class="help-block">当启用超链接以后，以下设置都将失效，将直接跳转到超链接所指的地址</span>
+                    </div>
+                </div>
+                
+                <div id="link_show" style="display: none;">
+	                <div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">链接地址</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="link" id="link" class="form-control">
+	                        <span class="help-block">链接地址必须已http://开头</span>	
+	                    </div>
+	                </div>
+                </div>
+                
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">显示图标[智能设备端]</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <?php  echo tpl_form_field_image('icon','');?>
+                        <span class="help-block">推荐尺寸：60*60</span>	
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">显示图标[PC端]</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <?php  echo tpl_form_field_image('icon_pc','');?>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">显示排序</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="top" id="top" class="form-control">
+						<span class="help-block">数字越小越靠前</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">项目简述</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea name="jianshu" id="jainshu" class="form-control"></textarea>
+                        <span class="help-block">对项目的一个简单描述</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">项目说明</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <?php  echo tpl_ueditor('remark', $item['remark']);?>
+                        <span class="help-block">对项目的详细说明</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">市场价格</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="price" id="price" class="form-control">
+						<span class="help-block">服务项目的市场价格</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">优惠价格</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="price_unit" id="price_unit" class="form-control">
+						<span class="help-block">服务项目的优惠价格</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 计算单位</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="unit" id="unit" class="form-control">
+						<span class="help-block">及服务项目的计算单位，如：小时、单、次</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">模型名称</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <select name="temp_id" id="temp_id" class="form-control  input-s-lg">
+                            <option value="">选择模型</option>
+                            <?php  if(is_array($list2)) { foreach($list2 as $vo2) { ?>
+                            <option value="<?php  echo $vo2['id'];?>"><?php  echo $vo2['temp_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        <span class="help-block">在业务模型管理中添加的模型</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">订单模式</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="mode" value="1" checked="checked" onclick="check_mode(1)">抢单模式
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="mode" value="0" onclick="check_mode(0)">派单模式
+                            </label>
+                        </div>
+						<span class="help-block"></span>
+                    </div>
+                </div>
+                
+                <div id="mode_show" style="display: none;">
+                	<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                    		<label><input type="checkbox" name="temp_msg[]" value="1">消息推送</label>
+                    		&nbsp;&nbsp;&nbsp;&nbsp;[推送openid添加]<input type="text" name="mode_openid" id="mode_openid" class="form-control" >
+                        </div>
+						<span class="help-block" style="color:red;">有多个openid以半角逗号分割[openid在公司/工人列表中查看]<br/>
+						</span>
+                    </div>
+                    
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                    		<label><input type="checkbox" name="send_sms[]" value="1">发送短信</label>
+                    		&nbsp;&nbsp;&nbsp;&nbsp;[手机号码添加]<input type="text" name="mode_mobile" id="mode_mobile" class="form-control">
+                        </div>
+						<span class="help-block" style="color:red;">有多个手机号码以半角逗号分割</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">抢单报价</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="offer_state" value="1" checked="checked">必填
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="offer_state" value="0">可不填
+                            </label>
+                        </div>
+						<span class="help-block">在服务人员抢单报价时，价格是否需要填写</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">第一抢单即为选定的服务人员</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <div>
+                            <label class="radio-inline">
+                                <input type="radio" name="first" value="1">开启
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="first" value="0" checked="checked">不开启
+                            </label>
+                        </div>
+                        <span class="help-block">当订单推送后第一个抢单的服务人员即为选定服务人员</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所需证件</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="cardname" id="cardname" class="form-control">
+						<span class="help-block">此项目所需证件，可为空，多个以||分割</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">平台佣金方式</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <input type="radio" name="gettype" value="1" onclick="check(1)" checked="checked">按百分比
+                            <input type="text" name="bili_bai" id="bili_bai" value="10" >%
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="gettype" value="0" onclick="check(2)">按每单收费
+                            <input type="text" name="bili_money" id="bili_money" >元/单
+                        </div>
+                    </div>
+                </div>
+                
+				<div id="show1">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">平台佣金峰值</label>
+                    <div class="col-sm-9 col-xs-12">
+                        保底：<input type="text" name="start" id="start" value="0" >元
+                        封顶：<input type="text" name="end" id="end" value="0" >元
+                        <span class="help-block" style="color:red;">封顶为0时，表示不封顶</span>
+                    </div> 
+                </div>
+				</div>
+                
+				<div id="show2" style="display:none">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">平台佣金结算</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="times" value="1" checked="checked">在选定人员时结算
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="times" value="0">在付款是结算
+                            </label>
+                        </div>
+						<span class="help-block" style="color:red;">本选项仅对平台佣金方式为按单计算生效</span>
+                    </div>
+                </div>
+				</div>
+                
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">抢单余额下限</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="basemoney" id="basemoney" value="0" class="form-control">
+						<span class="help-block">服务人员余额低于此处设定值时不能抢单，设为0则可以一直抢单,设为负数服务人员可以欠款抢单</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">预付金金额</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="front" id="front" value="0" class="form-control">
+						<span class="help-block">用户下单时所需支付的预付金额，交预付金后才可执行后面的操作，设为0则不需要预付金，预付金在结算时会减去</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">预付金支付时间</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="payway" value="0" checked="checked">用户提交预约订单时
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="payway" value="1">用户选定服务人员时
+                            </label>
+                        </div>
+						<span class="help-block"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">订单推送模板消息[给服务人员]</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="otmpmsg_id" id="otmpmsg_id" class="form-control  input-s-lg">
+                            <option value="0">选择模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>" ><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        
+                     <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">抢单模板消息[给用户]</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="qtmpmsg_id" id="qtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="0">选择模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>"><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        
+                     <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">选定服务人员模板消息[给服务人员]</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="xtmpmsg_id" id="xtmpmsg_id" class="form-control  input-s-lg">
+                            <option value="0">选择模板消息</option>
+                            <?php  if(is_array($list)) { foreach($list as $vo) { ?>
+                            <option value="<?php  echo $vo['id'];?>"><?php  echo $vo['message_name'];?></option>
+                            <?php  } } ?>
+                        </select>
+                        
+                     <span class="help_block">当没有指定模板消息时使用指定的默认模板消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">推送范围</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="fanwei" value="5">1公里
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fanwei" value="4">5公里
+                            </label>
+                            
+                            <label class="radio-inline">
+                                <input type="radio" name="fanwei" value="3">40公里
+                            </label>
+                            
+                            <label class="radio-inline">
+                                <input type="radio" name="fanwei" value="2">100公里
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fanwei" value="0" checked="checked">不限
+                            </label>
+                        </div>
+						<span class="help-block"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否显示</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="stop" value="1" checked="checked">是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="stop" value="0">否
+                            </label>
+                        </div>
+						<span class="help-block">可以控制此类型是否在页面显示</span>
+                    </div>
+                </div>
+                
+                <div class="panel-heading">
+                	客服端个性定制【你填入的将会替换客服端相对应的文字显示】
+            	</div>
+                
+                <div class="panel-body">
+                	<div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">预约时间=</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="diytime" id="diytime" placeholder="预约时间" class="form-control">
+	                        <span class="help_block">预约页面的预约时间</span>
+	                    </div>
+	                </div>
+                </div>
+                
+                <div class="panel-body">
+                	<div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系电话=</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="diymobile" id="diymobile" placeholder="联系电话" class="form-control">
+	                        <span class="help_block">预约页面的联系电话</span>
+	                    </div>
+	                </div>
+                </div>
+                
+                <div class="panel-body">
+                	<div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">您的姓名=</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="diyname" id="diyname" placeholder="您的姓名" class="form-control">
+	                        <span class="help_block">预约页面的姓名</span>
+	                    </div>
+	                </div>
+                </div>
+                
+                <div class="panel-body">
+                	<div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">上传图片=</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="diypic" id="diypic" placeholder="上传图片" class="form-control">
+	                        <span class="help_block">预约页面的上传图片</span>
+	                    </div>
+	                </div>
+                </div>
+                
+                <div class="panel-body">
+                	<div class="form-group">
+	                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址=</label>
+	                    <div class="col-sm-9 col-xs-12">
+	                        <input type="text" name="diyaddress" id="diyaddress" placeholder="详细地址" class="form-control">
+	                        <span class="help_block">预约页面的详细地址</span>
+	                    </div>
+	                </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" type="submit" value="保存" class="btn btn-primary btn-block" />
+                        <input type="hidden" name="token" value="<?php  echo $_W['token'];?>" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function check(id){
+	if(id == 1){
+		document.getElementById('show1').style.display = 'block';
+		document.getElementById('show2').style.display = 'none';
+	}else{
+		document.getElementById('show1').style.display = 'none';
+		document.getElementById('show2').style.display = 'block';
+	}
+}
+
+function check_link(id){
+	if(id == 1){
+		document.getElementById('link_show').style.display = 'block';
+	}else{
+		document.getElementById('link_show').style.display = 'none';
+	}
+}
+
+function check_mode(id){
+	if(id == 0){
+		document.getElementById('mode_show').style.display = 'block';
+	}else{
+		document.getElementById('mode_show').style.display = 'none';
+	}
+}
+</script>
+
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

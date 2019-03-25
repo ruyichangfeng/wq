@@ -1,0 +1,481 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li class="{if $op=='display'}active{/if}" data-son=".nav_list" data-title="分类列表">
+		<a href="{php echo $this->createWebUrl('news', array('op'=>'display'));}">新闻列表</a>
+
+	</li>
+	<li class="{if $op=='add'}active{/if}" data-son=".add_nav" data-title="新增列表">
+		<a href="{php echo $this->createWebUrl('news', array('op'=>'add'));}">新增新闻</a>
+
+	</li>
+	<li class="{if $op=='addwai'}active{/if}" data-son=".add_nav" data-title="新增列表">
+		<a href="{php echo $this->createWebUrl('news', array('op'=>'addwai'));}">新增外链新闻</a>
+
+	</li>
+	<li class="{if $op=='manage_comment'}active{/if}" data-son=".add_nav" data-title="新增列表">
+		<a href="{php echo $this->createWebUrl('news', array('op'=>'manage_comment'));}">评论管理</a>
+	</li>    
+	{if $op=='update'}
+	<li class="{if $op=='update'}active{/if}" data-son=".update_nav" data-title="修改分类">
+		<a href="{php echo $this->createWebUrl('news', array('op'=>'update'));}">修改新闻</a>
+
+	</li>
+	{/if}
+</ul>
+<div class="panel panel-default ng-scope">
+	<div class="panel-heading" id="panel-heading">
+	新闻列表
+		
+	</div>
+	<div class="panel-body">
+		{if $op=="display"}
+		<div class="nav_list">
+			<table st-table="items" class="table table-striped">
+				<thead>
+					<tr>
+						<th style="width:50px;">新闻编号</th>
+						<th style="width:150px;">新闻标题</th>
+						<th style="width:100px;">新闻缩略图</th>
+						<th style="width:150px;">新闻内容</th>
+						<th style="width:150px;">新闻外链地址</th>
+						<th style="width:100px;">所属分类</th>
+						<th style="width:50px;">排序</th>
+						<th style="width:100px;">是否开启评论</th>
+						<th style="width:80px;">状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $news_list $list}
+					<tr>
+						<td class="ng-binding">
+						{$list['news_id']}
+						</td>
+						<td>
+							<a href="#" editable-text="item.title" onbeforesave="updatetitle(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['news_title']}</a>
+						</td>
+						<td>
+							<img src="{php echo tomedia($list['news_thumbnail'])}" style="height:50px;width:50px">
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['news_content']}</a>
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['news_wai_link']}</a>
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['nav_title']}</a>
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['news_sort']}</a>
+						</td>
+						<td>
+							<label for="" ng-click="status(item)" class="label label-info">{if $list['news_comment_open']==0}是{elseif $list['news_comment_open']==1}否{/if}</label>
+						</td>
+						<td>
+							<label for="" ng-click="status(item)" class="label label-info">{if $list['news_status']==0}显示{elseif $list['news_status']==1}不显示{/if}</label>
+						</td>
+						<td>
+							<a class="btn btn-default" onclick="return confirm_r();" title="删除表单" href="{php echo $this->createWebUrl('news', array('op'=>'delete', 'id'=>$list['news_id']));}">
+								<i class="fa fa-times"></i>
+							</a>
+							<a class="btn btn-default" title="修改" href="{php echo $this->createWebUrl('news', array('op'=>'update', 'id'=>$list['news_id']));}">
+								<i class="fa  fa-check-square"></i>
+							</a>
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+		</div>
+		{elseif $op=="add"}
+		<div class="add_slide">
+			<form class="form-horizontal" action="{php echo $this->createWebUrl('news', array('op'=>'add'));}" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+				    <label for="inputEmail3" class="col-sm-2 control-label">腾讯新闻连接</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" name="url" placeholder="链接地址">
+				    </div>
+			  	</div>
+			  	<div class="form-group">
+				    <label for="inputEmail3" class="col-sm-2 control-label">获取到的视频连接地址</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" value="{$news_src}" name="video" placeholder="获取到的网页视频连接">
+				    </div>
+			  	</div>
+			  	 <div class="panel-footer">
+			  		<input type="hidden" value="{$_W['token']}" name="token" />
+			  		<!-- <input type="hidden" name="id" value="<?php echo $id;?>"> -->
+					<input type="submit" name="celect" class="btn btn-sm btn-success" value="一键获取" />			
+				</div>
+			</form>
+			<form class="form-horizontal" onsubmit="return check_valid();" action="{php echo $this->createWebUrl('news', array('op'=>'add'));}" method="post" enctype="multipart/form-data">
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">标题</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="title" value="{$news_title}" placeholder="标题">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">作者</label>
+			    <div class="col-sm-10">
+			      <input type="text" name="author" value="{$news_author}" class="form-control" name="link_url" placeholder="作者">
+			    </div>
+			  </div>
+			   <div class="form-group">
+				    <label class="col-sm-2 control-label">所属新闻版块</label>
+				    <div class="col-sm-10">
+					    <select name="nav_id">
+					    	{loop $nav_list $list}
+						  		<option value="{$list['nav_id']}">{$list['nav_title']}</option>
+					    	{/loop}
+						</select>
+					</div>       
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻缩略图</label>
+			    <div class="col-sm-10">
+			      {php echo tpl_form_field_image('thumbnail')}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享标题</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="share_title" placeholder="新闻标题">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享描述</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="share_desc" placeholder="分享描述">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享缩略图</label>
+			    <div class="col-sm-10">
+			      {php echo tpl_form_field_image('share_thumbnail')}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">日期</label>
+			    <div class="col-sm-10">
+			     	{php echo tpl_form_field_date('date', '', true);}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">排序</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="news_sort" placeholder="排序">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">刷浏览量</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="screen_times" placeholder="浏览量">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">刷赞</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="zan_count" placeholder="赞的数量">
+			    </div>
+			  </div>
+			  
+			  <div class="form-group">
+			    <label for="name" class="col-sm-2 control-label">请输入新闻内容</label>
+			    <div class="col-sm-10">
+			    	{php echo tpl_ueditor('content',$news_content)}
+			    </div>
+  			  </div>
+			  <div class="form-group">
+				    <label class="col-sm-2 control-label">是否显示</label>
+				    <div class="col-sm-10">
+					    <select name="status">
+						  <option value="0">显示</option>
+						  <option value="1">不显示</option>
+						</select>
+					</div>
+			  </div>
+			  <div class="form-group">
+				    <label class="col-sm-2 control-label">是否开启评论</label>
+				    <div class="col-sm-10">
+					    <select name="comment_open">
+						  <option value="0">开启</option>
+						  <option value="1">不开启</option>
+						</select>
+					</div>
+			  </div>
+			  <div class="panel-footer">
+			  		<input type="hidden" value="{$_W['token']}" name="token" />
+			  		<!-- <input type="hidden" name="id" value="<?php echo $id;?>"> -->
+					<input type="submit" name="submit" class="btn btn-sm btn-success" value="新增" />	
+				</div>
+			</form>
+		</div>
+		{elseif $op=='addwai'}
+		<!-- <form class="form-horizontal" action="{php echo $this->createWebUrl('news', array('op'=>'addwai'));}" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">连接地址</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="" name="url" placeholder="链接地址">
+			    </div>
+		  	</div>
+		  	 <div class="panel-footer">
+		  		<input type="hidden" value="{$_W['token']}" name="token" />
+		  		<input type="hidden" name="id" value="<?php echo $id;?>">
+				<input type="submit" name="celect" class="btn btn-sm btn-success" value="一键获取" />			
+			</div>
+		</form> -->
+		<form class="form-horizontal" onsubmit="return check_submit();" action="{php echo $this->createWebUrl('news', array('op'=>'addwai'));}" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻标题</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$news_title}" name="title" placeholder="新闻标题">
+			    </div>
+		  	</div>
+		  	<div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻缩略图</label>
+			    <div class="col-sm-10">
+			      {php echo tpl_form_field_image('thumbnail',$news_image)}
+			    </div>
+		  	</div>
+		  	<div class="form-group">
+				    <label class="col-sm-2 control-label">所属新闻版块</label>
+				    <div class="col-sm-10">
+					    <select name="nav_id">
+					    	{loop $nav_list $list}
+						  		<option value="{$list['nav_id']}">{$list['nav_title']}</option>
+					    	{/loop}
+						</select>
+					</div>       
+			  </div>
+		  	<div class="form-group">
+			    <label class="col-sm-2 control-label">日期</label>
+			    <div class="col-sm-10">
+			     	{php echo tpl_form_field_date('date', '', true);}
+			    </div>
+		  	</div>
+		  	<div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">排序</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="news_sort" placeholder="排序">
+			    </div>
+			</div>
+		  	<div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻连接</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="" name="wai_link" placeholder="新闻外链地址">
+			    </div>
+		  	</div>
+		  	 <div class="form-group">
+				    <label class="col-sm-2 control-label">是否显示</label>
+				    <div class="col-sm-10">
+					    <select name="status">
+						  <option value="0">显示</option>
+						  <option value="1">不显示</option>
+						</select>
+					</div>
+			  </div>
+		  	 <div class="panel-footer">
+		  		<input type="hidden" value="{$_W['token']}" name="token" />
+		  		<!-- <input type="hidden" name="id" value="<?php echo $id;?>"> -->
+				<input type="submit" name="submit" class="btn btn-sm btn-success" value="增加" />			
+			</div>
+
+		</form>
+		{elseif $op=='update'}
+		<div class="add_slide">
+			<form class="form-horizontal" action="{php echo $this->createWebUrl('news', array('op'=>'update'));}" method="post" enctype="multipart/form-data">
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">标题</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['news_title']}" name="title" placeholder="标题">
+			    </div>
+			  </div>
+			  {if $results['news_content']}
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">作者</label>
+			    <div class="col-sm-10">
+			      <input type="text" name="author" value="{$results['news_author']}" class="form-control" name="link_url" placeholder="作者">
+			    </div>
+			  </div>
+			  {/if}
+			   <div class="form-group">
+				    <label class="col-sm-2 control-label">所属新闻版块</label>
+				    <div class="col-sm-10">
+					    <select name="nav_id">
+					    	{loop $nav_list $list}
+						  		<option '{if $results["news_nav_id"]==$list["nav_id"]} selected="selected"{/if}' value="{$list['nav_id']}">{$list['nav_title']}</option>
+					    	{/loop}
+						</select>
+					</div>       
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻缩略图</label>
+			    <div class="col-sm-10">
+			      {php echo tpl_form_field_image('thumbnail',$results['news_thumbnail'])}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享标题</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['share_title']}" name="share_title" placeholder="分享标题">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享描述</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['share_desc']}" name="share_desc" placeholder="分享描述">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">分享缩略图</label>
+			    <div class="col-sm-10">
+			      {php echo tpl_form_field_image('share_thumbnail',$results['share_thumbnail'])}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">日期</label>
+			    <div class="col-sm-10">
+			     	{php echo tpl_form_field_date('date', '', true);}
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">排序</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['news_sort']}" name="news_sort" placeholder="排序">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">刷浏览量</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['news_count']}" name="screen_times" placeholder="浏览量">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">刷赞</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['news_zan']}" name="zan_count" placeholder="赞的数量">
+			    </div>
+			  </div>
+			  {if $results['news_wai_link']}
+			  <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-2 control-label">新闻连接</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" value="{$results['news_wai_link']}" name="wai_link" placeholder="新闻外链地址">
+			    </div>
+		  	  </div>
+		  	  {/if}
+		  	  {if $results['news_content']}
+			  <div class="form-group">
+			    <label for="name" class="col-sm-2 control-label">请输入新闻内容</label>
+			    <div class="col-sm-10">
+			    	{php echo tpl_ueditor('content',$results['news_content'])}
+			    </div>
+  			  </div>
+  			  {/if}
+			  <div class="form-group">
+				    <label class="col-sm-2 control-label">是否显示</label>
+				    <div class="col-sm-10">
+					    <select name="status">
+						  <option "{if $results['news_status']==0} selected=selected{/if}"  value="0">显示</option>
+						  <option "{if $results['news_status']==1} selected=selected{/if}"  value="1">不显示</option>
+						</select>
+					</div>
+			  </div>
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">是否开启评论</label>
+			    <div class="col-sm-10">
+				    <select name="comment_open">
+					  <option "{if $results['news_comment_open']==0} selected=selected{/if}" value="0">开启</option>
+					  <option "{if $results['news_comment_open']==1} selected=selected{/if}" value="1">不开启</option>
+					</select>
+				</div>
+			  </div>
+			  <div class="panel-footer">
+			  		<input type="hidden" value="{$_W['token']}" name="token" />
+			  		<input type="hidden" name="id" value="<?php echo $id;?>">
+					<input type="submit" name="submit" class="btn btn-sm btn-success" value="修改" />			
+				</div>
+			</form>
+		</div>
+		{elseif $op=='manage_comment'}
+		<div class="nav_list">
+			<table st-table="items" class="table table-striped">
+				<thead>
+					<tr>
+						<th style="width:50px;">评论编号</th>
+						<th style="width:200px;">用户名</th>
+						<th style="width:200px;">头像</th>
+						<th style="width:200px;">评论内容</th>
+						<th style="width:200px;">所属新闻标题</th>
+						<th style="width:50px;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $comment_results $list}
+					<tr>
+						<td class="ng-binding">
+						{$list['comment_id']}
+						</td>
+						<td>
+							<a href="#" editable-text="item.title" onbeforesave="updatetitle(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['comment_username']}</a>
+						</td>
+						<td>
+							<img src="{php echo tomedia($list['comment_thumbnail'])}" style="height:50px;width:50px">
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['comment_content']}</a>
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$list['news_title']}</a>
+						</td>
+						<td>
+							<a class="btn btn-default" onclick="return confirm_r();" title="删除表单" href="{php echo $this->createWebUrl('news', array('op'=>'dele_comment', 'id'=>$list['comment_id']));}">
+								<i class="fa fa-times"></i>
+							</a>
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+		</div>
+		{/if}
+	</div>
+</div>
+<script>
+
+function check_valid(){
+	if($('input[name="title"]').val()==''){
+		util.message('标题不能为空！','','error');
+		var editor = util.editor($('#content')[0]);
+		if(editor.getContent()==''){
+			util.message('新闻内容不能为空！','','error');
+		}
+		return false;
+	}
+	return true;
+}
+function check_submit(){
+	if($('input[name="title"]').val()==''){
+		util.message('标题不能为空！','','error');
+		return false;
+	}
+	if($('input[name="wai_link"]').val()==''){
+		util.message('新闻连接不能为空！','','error');
+		return false;
+	}
+	return true;
+}
+function confirm_r(){
+		var r=confirm("确定要删除吗!");
+		if(r==true){
+			return true;
+		}else{
+			return false;
+		}
+	}
+</script>
+{template 'common/footer'}

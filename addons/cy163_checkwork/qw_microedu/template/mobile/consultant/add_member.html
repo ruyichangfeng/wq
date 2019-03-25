@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微早教-顾问端-增加试听学员</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/app.css">
+</head>
+<body>
+<div id="add-xueyuan">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">选择试听学员</h1>
+    </div>
+    <div class="mui-content">
+        <form class="mui-input-group">
+            <ul class="mui-table-view guwen-xueyuan-choose">
+                {loop $student_list $index $vo}
+                <li class="mui-input-row mui-checkbox mui-left mui-table-view-cell guwen-collapse mui-collapse mui-active">
+                    <a class="mui-navigate-right" href="#">
+                        <img class="mui-media-object mui-pull-left guwen-huiyuan-img" src="{MODULE_URL}assets/img/cbd.jpg">学生:{$vo['fullname']}（{$vo['age']}岁）
+                        <!--<p class="mui-pull-right red">未试听</p>-->
+                        <p>家长：{$vo['tutor_fullname']}   手机：{$vo['tutor_mobile']}</p>
+                    </a>
+                    <div class="mui-collapse-content mui-active editit">
+                        <input name="shiting" value="{$vo['id']}" type="checkbox" style="z-index: 500;" >
+                        <ul class="mui-table-view mui-table-view-chevron">
+                            <li class="mui-table-view-cell mui-media">
+                                <div class="mui-media-body guwen-huiyuan-content">
+                                    <!--<p class="mui-ellipsis"><span class="gray">学员来源：</span>市场部 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">学员性别：</span>男 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">学员年龄：</span>4岁 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">试听时间：</span>2016-07-14 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">试听课程：</span>机器人手工 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">试听班级：</span>初级 </p>-->
+                                    <!--<p class="mui-ellipsis"><span class="gray">跟进状态：</span>未分配 </p>-->
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                {/loop}
+            </ul>
+        </form>
+        <div class="mui-bar mui-bar-tab choose-buy-bottom">
+            <div class="mui-pull-left xueyuannum">
+                共选择0位学员
+            </div>
+            <div class="mui-pull-right bottom-btn">
+                <a class="choose-buy-bottom-btn queren">确定</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{MODULE_URL}assets/js/mui.min.js"></script>
+<script src="{MODULE_URL}assets/js/mui.view.js "></script>
+<script src="https://cdn.jsdelivr.net/jquery/2.2.4/jquery.min.js"></script>
+<script>
+    mui.init({
+        swipeBack:true //启用右滑关闭功能
+    });
+</script>
+<script>
+    $("document").ready(function(){
+        var num=0;
+        var schedule_id = "{$schedule_id}";
+         $("input[name='shiting']").change(function(){
+            if($(this).is(":checked")){
+                num+=1;
+            }else{
+                num-=1;
+            }
+            $(".xueyuannum").empty().text("共选择"+num+"位学员");
+        })
+        $(".queren").click(function(){
+            if(num<1){
+                alert("请选择学员");
+            }
+            var aaa =new Array();
+            $("input[name='shiting']:checked").each(function(){
+                alert($(this).val());
+                aaa.push($(this).val());
+            });
+            var Url = "{php echo $this->createMobileurl('consultant')}";
+            var vdata = {caozuo:'addmember',xuanze:aaa,schedule_id:schedule_id};
+            $.post(Url,vdata,function(data){
+                if(data.error==1){
+                    alert(data.message);
+                }else{
+                    alert(data.message);
+                }
+            },'json');
+            return false;
+        })
+    })
+</script>
+</body>
+</html>

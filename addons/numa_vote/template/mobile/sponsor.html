@@ -1,0 +1,103 @@
+{template 'common_header'}
+{if $operation=='display'}
+<div class="g-main">
+         {template 'common_search'}  
+        <!--m-center-->
+        <div class="m-center"> 
+            <div class="center-bt">
+                	<h2> ★赞助商★ </h2>
+            </div>
+            <div class="m-zzs"> 
+            	{loop $sponsors $sponsor}
+                <div class="list-zzs">
+                    <a href="{php echo $this->createMobileUrl('sponsor',array('op'=>'info','id'=>$activity['id'],'iid'=>$sponsor['id']))}">
+                        <div class="zzs-img">
+                           	  <img src="{php echo tomedia($sponsor['logo'])}" />
+                        </div>
+                        <div class="zzs-info">
+                            <h3>{$sponsor['name']}</h3>
+                            <div class="zzs-des">
+                                <P>{php echo alinuma_strCut($sponsor['desc'],100)}</P>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                 {/loop} 
+            </div> 
+        </div> 
+ </div>
+    <!--g-main结束-->
+{elseif $operation=='info'}
+    <link rel="stylesheet" type="text/css" href="{php echo $this->staticPath}/app/css/zy.media.min.css" />
+    <script type="text/javascript" src="{php echo $this->staticPath}/app/js/zy.media.min.js"></script>
+    <style type="text/css">
+        #modelView{z-index:0;opacity:0.7;width: 100%;;position: relative;}
+        .playvideo{padding-top: auto;z-index: 9999;position: relative;width:100%}
+        .zy_media{z-index: 999999999}
+        .zzs-where{border-top: 0px solid #ddd;  }
+    </style>
+	<div class="g-main"> 
+           {template 'common_search'}  
+        <!--m-center-->
+        <div class="m-center"> 
+                <div class="center-bt"> <h2>  {$sponsor['name']} </h2> </div>
+            {if $sponsor['video_url']!=''}
+                <div class="playvideo">
+                    <div class="zy_media">
+                        <video poster="" data-config='{"mediaTitle": ""}'>
+                            <source src="{$activity['adv_video']}" type="video/mp4">
+                            您的浏览器不支持HTML5视频
+                        </video>
+                    </div>
+                    <div id="modelView">&nbsp;</div>
+                </div>
+                <script type="text/javascript">
+                    $(function(){
+                        zymedia('video',{autoplay: true});
+                    })
+                </script>
+            {/if}
+            <p><img src="{php echo tomedia($sponsor['logo'])}" /></p>
+            <P>{php echo htmlspecialchars_decode($sponsor['content'])}</P>
+            <div class="zzs-where">
+                <p>{$sponsor['name']}</p>
+                {if $sponsor['address']!=''}<p>公司地址：{$sponsor['address']}</p>{/if}
+                {if $sponsor['mobile']!=''} <p>电话：{$sponsor['mobile']} </p> {/if}
+                {if $sponsor['contact']!=''} <p>联系人：{$sponsor['contact']} </p> {/if}
+            </div>
+            <div class="btn-link">
+	                        {if $sponsor['qrcode']!=''}
+	                        		<a href="javascript:void(0)" class="btn_viewqrcode"><button type="submit" class="btn btn-green">关注公众号</button></a>
+	                        {/if}
+	                        {if $sponsor['map_jwd']!=''}
+			                		<a href="{$map_url}"><button type="submit" class="btn btn-orange">查看导航位置</button></a>
+			                {/if}
+			                {if $sponsor['url']!=''}
+			                	<a href="{$sponsor['url']}"><button type="submit" class="btn btn-red">去他官网看看</button></a>
+			                {/if}
+			                <a href="{$index_url}"><button type="submit" class="btn btn-blue">返回首页</button></a>
+	            </div>
+            </div>
+        </div>
+    <!--g-main结束-->
+    <div id="sponsor_gzh">
+        		<div class="gzhbj"></div>
+		        <div class="gzhnr">
+		            <P><img src="{php echo tomedia($sponsor['qrcode'])}"></P> 
+		        </div>
+     </div>
+     <script type="text/javascript">
+     		$(function(){ 
+	     			 $(".btn_viewqrcode").click(function(){
+	     				 layer.open({
+	     					shadeClose :true,
+	 			    		    content: '<P><img src="{php echo tomedia($sponsor["qrcode"])}" width="100px"></P>'
+	 			    		    ,yes: function(index){ 
+	     			    		      layer.close(index);
+	 			    		    } 
+	 			    		  });
+	     			 }) 
+     		}) 
+     </script>
+{/if}
+{template 'common_footer'}

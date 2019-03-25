@@ -1,0 +1,105 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>短信购买</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'index'))}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="alert alert-danger">
+                        注意！商户只可以购买一个短信套餐服务，短信条数用尽之后，会自动解锁其他套餐购买按钮！
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'index'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信购买</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'messagelist'))}"><i class="fa fa-lg fa-tasks" style="color:purple"></i>短信记录</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-5" class="tab-pane active">
+                                        <div class="panel-body">
+                                            {loop $smspackagelist $item}
+                                            <div class="vertical-timeline-content">
+                                                <div class="vertical-timeline-icon navy-bg" style="margin-top: 13px">
+                                                    <i class="fa fa-envelope-o"></i>
+                                                </div>
+                                                <div style="margin-left: 70px">
+                                                    <h2>套餐名称&nbsp&nbsp&nbsp<span style="color: #FF7F00">'{$item['sp_title']}'</span></h2>
+                                                    <p >套餐金额&nbsp&nbsp&nbsp<span style="color: red">{$item['sp_amount']}</span></p>
+                                                    {if !empty($setStoreData['set_smsbuy'])}
+                                                    <a data-toggle="modal" data-target="#myModal3" class="btn btn-sm btn-primary">&nbsp;已购买</a>
+                                                    {else}
+                                                    <a data-toggle="modal" data-target="#myModal3" class="btn btn-sm btn-primary" onclick="smsBuy({$item['id']});">&nbsp;购买</a>
+                                                    {/if}
+                                                    <a><span class="vertical-date">包含短信条数</span>&nbsp&nbsp&nbsp<span style="color: #1AB394">{$item['sp_quantity']} 条</span></a>
+                                                </div>
+                                            </div>
+                                            {/loop}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function smsBuy(smspackagebuyid) {
+        var smspackagebuyid = smspackagebuyid;
+        swal({
+                title: "确定购买吗？",
+                text: "您将无法恢复！",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "取消",
+                confirmButtonColor: "#1AB394",
+                confirmButtonText: "购买！",
+                closeOnConfirm: false
+            },
+            function(){
+                var url =  "{php echo $this->createWebUrl('smsmarketing', array('op' => 'Ajaxsmsbuy'))}";
+                var params = {
+                    ' smspackagebuyid':smspackagebuyid
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            swal({
+                                title: "购买失败",
+                                text: "套餐不存在或已购买，请重新购买！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }else{
+                            swal({
+                                title: "购买成功",
+                                text: "您的购买已生效",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            }, function(){
+                                location.reload(true);
+                            })
+
+                        }
+                    }
+                });
+
+
+
+            });
+
+    }
+</script>
+
+{template 'web/common/footer'}

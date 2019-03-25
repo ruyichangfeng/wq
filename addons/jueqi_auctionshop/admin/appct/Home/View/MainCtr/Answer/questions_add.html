@@ -1,0 +1,106 @@
+<include file="Public/header.html" />
+</head>
+<body>
+	<div class="x-body">
+		<form class="layui-form">			
+			<div class="layui-form-item">
+				<label class="layui-form-label">题目</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="title" autocomplete="off" value="{$questions['title']}" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">正确答案</label>
+				<div class="layui-input-block">
+					<select name="is_ok" class="layui-input">
+				        <option value="A" <?php if($questions['is_ok']==A){echo 'selected="selected"';}?>>A</option>
+				        <option value="B" <?php if($questions['is_ok']==B){echo 'selected="selected"';}?>>B</option>
+				        <option value="C" <?php if($questions['is_ok']==C){echo 'selected="selected"';}?>>C</option>
+				        <option value="D" <?php if($questions['is_ok']==D){echo 'selected="selected"';}?>>D</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">答案A</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="answer1" autocomplete="off" value="{$questions['answer1']}" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">答案B</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="answer2" autocomplete="off" value="{$questions['answer2']}" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">答案C</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="answer3" autocomplete="off" value="{$questions['answer3']}" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">答案D</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="answer4" autocomplete="off" value="{$questions['answer4']}" class="layui-input">
+				</div>
+			</div>
+
+			<input type="hidden" name="id" value="{$questions['id']}" />		
+			<div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+               	<button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+           	</div>
+		</form>
+	</div>
+	<include file="Public/footer.html" />
+	<script type="text/javascript" src="__ROOT__/Public/js/tools.js"></script> 
+	<script>
+		layui.use(['form', 'layer'], function() {
+			$ = layui.jquery;
+			var form = layui.form;
+			var layer = layui.layer;
+			form.on('submit(save)', function(data) {
+				var tjing = parent.layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+				var form=document.forms[0];		        
+			    var formData = new FormData(form); 
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Answer/doquestions')}",
+					data: formData,
+					processData : false,         
+			        contentType : false,    
+					dataType: 'text',
+					success: function(data) {
+						layer.close(tjing);
+						if(data == '1') {
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								parent.location.reload();
+							})
+						} else if(data == '2') {
+							parent.layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+				return false;
+			});
+
+		});
+	</script>
+</body>
+</html>

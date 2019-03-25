@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+<meta name="format-detection" content="telephone=no">
+<title>员工代表事项列表 - {$cwgl_config['webtitle']}</title>
+<link href="{$templateurl}/css/css.css" rel="stylesheet" type="text/css">
+<link href="{$templateurl}/css/common.css" rel="stylesheet" type="text/css">
+</head>
+<body >
+<!--分页-->
+<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+<!--分页-->
+<style>
+	.form-control_pp{width:180px;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}
+	.tab_menu li a{ color:#666666; display:block;}
+	.tab_menu .selected a{ color:#FFFFFF;}
+</style>
+<div class="head">
+	<div class="content-top clearFix">
+    <a href="{php echo $this->createMobileUrl('staff_index')}">
+	 <em class="return"><</em>
+	<span class="fanhui">返回</span>
+	</a>
+	
+	<!--搜索 start-->
+	<div style="float:right;">
+	<form action="./index.php" method="get" class="form-inline" role="form">
+	<input type="hidden" name="i" value="{$_GPC['i']}">
+	<input type="hidden" name="c" value="{$_GPC['c']}">
+	<input type="hidden" name="do" value="{$_GPC['do']}">
+	<input type="hidden" name="m" value="{$_GPC['m']}">
+	<input type="hidden" name="type" value="{$_GPC['type']}">
+	<input type="txt" class="form-control_pp" name="keyword" value="{$_GPC['keyword']}" placeholder="请输入关键字">
+	<input type="submit" class="btn btn-default" value="搜索">
+	</form>
+	</div>
+	<!--搜索 end-->
+   </div>
+</div>
+	
+<div id="content" >
+  
+   <div class="tab-bd clearFix" id="tab">
+   <ul class="tab_menu clearFix">
+		<li {if $_GPC['type']==''}class="selected"{/if}><a href="{$urltk}">未处理</a></li>
+		<li {if $_GPC['type']=='1'}class="selected"{/if}><a href="{$urltk}&type=1">处理中</a></li>
+		<li {if $_GPC['type']=='2'}class="selected"{/if}><a href="{$urltk}&type=2">已完成</a></li>
+   </ul>
+   <div class="tab_box">
+      <div class="business-list">
+	  
+	     <ul>
+		   {loop $list $key $value}
+		   <li>
+				<div class="service-info">
+				  <P>{php echo date('Y-m-d', $value['dateline']);}{if $value['tosend']}【由 管理员 指派】{/if}{if $value['urgency']}<font class="red">【紧急】</font>{/if}</P>
+				  <P>客户名称：<font class="green">{$value['compname']}</font></P>
+				  {if $value['yguid']}
+				  {php $profile_t = pdo_get('cwgl_staff_list', array('weid' => $_W['uniacid'],'uid' => $value['yguid']));}
+				  <p>办理人：{$profile_t['name']}</p>
+				  {/if}
+				  <p>事项内容：{$category[$value['type']]['name']}</p>
+				</div>
+				<a href="{php echo $this->createMobileUrl('staff_ywlist', array('op' => 'view', 'id' => $value[id]))}" class="look-more">查看任务</a>
+				{if $value['yguid']}
+					{if $value['succeed']}
+						已完成，{if $value['sfpj']}已评价{else}<font color="#CC0000">未评价</font>{/if}	
+					{else}
+					<a href="{php echo $this->createMobileUrl('staff_ywlist', array('op' => 'add', 'id' => $value[id]))}" class="look-more">发布进度</a>
+					<a href="{php echo $this->createMobileUrl('staff_ywlist', array('op' => 'succeed', 'id' => $value[id]))}" class="look-more">确认完成</a>
+					{/if}
+					<a href="{php echo $this->createMobileUrl('staff_ywlist', array('op' => 'progress', 'id' => $value[id]))}" class="look-more">进度管理</a>
+				{/if}
+		   </li>
+		   {/loop}
+		 </ul>
+		 <div style="padding: 0 10px; text-align:center;">
+			<style>.pagination {margin-top: 0px;}</style>
+			{$pager}
+		 </div>
+
+	  </div>
+   </div>
+  
+</div>
+   
+</div>
+
+<!--footer star-->
+{template 'staff_footer'}
+</body>
+</html>

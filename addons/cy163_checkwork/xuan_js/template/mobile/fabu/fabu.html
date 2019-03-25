@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport">
+		<meta http-equiv="cache-control" content="max-age=0" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<link rel="stylesheet" href="{D_PATH}public/css/djkj.css" />
+		<!-- styles -->
+		<link rel="stylesheet" href="{D_PATH}public/css/fb.css">
+		<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js" charset="utf-8"></script>
+		<script src="{D_PATH}public/js/ajaxupload.js" charset="utf-8"></script>
+		<title>
+			发布
+		</title>
+		{php echo register_jssdk();}
+		<script type="text/javascript"> 
+			
+		</script>
+	</head>
+
+	<body id="scroll-wrapper">
+
+		<!-- body -->
+
+		<section id="new-item-page" class="page">
+			<header id="header">
+				<img class="icon" src="{$_W['attachurl']}{$cate['thumb']}" />
+				<span class="title">{$cate['name']}</span>
+			</header>
+			<div id="title-cell" class="cell border-bottom">
+				<div class="inner no-icon">
+					<span class="darker"><span id="title-prefix">我有</span> <b>·</b> </span>
+					<div class="cell-input-wrapper">
+						<input id="title" placeholder="{$cateinfo['nametishi']}" value="" />
+					</div>
+				</div>
+			</div>
+			{if $cateinfo['number']}
+			<div id="amount-input-cell" class="cell border-bottom">
+				<div class="inner no-icon">
+					<span class="darker">数量</span>
+					<div class="cell-input-wrapper">
+						<input id="amount" type="number" class="maingreen" placeholder="请输入出售的商品数量" value="1">
+					</div>
+				</div>
+			</div>
+			{/if}
+			{if $cateinfo['xiala1']}
+			<div id="schoolbook-college-input-cell" class="cell border-bottom">
+				<div class="inner no-icon">
+					<span class="darker">{$cateinfo['xiala1name']}</span>
+					<div class="cell-input-wrapper">
+						<input id="college" type="text" placeholder="{$cateinfo['xiala1tishi']}" value="">
+					</div>
+					<img class="arrow select-arrow" src="http://assets.quanzijishi.com/assets/imgs/select-down-arrow-f8d5475ca1.png" />
+					
+					<select class="select" onchange="$('#college').val($(this).val())">
+						<option value="">请选择</option>
+						<?php  $a=explode('@',$cateinfo['xiala1content']);  ?>
+						{loop $a $k $v}
+						<option value="{$v}">{$v}</option>
+						{/loop}
+					</select>
+				</div>
+			</div>
+			{/if}
+			{if $cateinfo['xiala2']}
+			<div id="schoolbook-grade-input-cell" class="cell border-bottom">
+				<div class="inner no-icon">
+					<span class="darker">{$cateinfo['xiala2name']}</span>
+					<div class="cell-input-wrapper">
+						<input id="grade" type="text" placeholder="{$cateinfo['xiala2tishi']}" value="">
+					</div>
+					<img class="arrow select-arrow" src="http://assets.quanzijishi.com/assets/imgs/select-down-arrow-f8d5475ca1.png" />
+					<select class="select" onchange="$('#grade').val($(this).val())">
+						<option value="">请选择</option>
+
+						<?php  $a=explode('@',$cateinfo['xiala2content']);  ?>
+						{loop $a $k $v}
+						<option value="{$v}">{$v}</option>
+						{/loop}
+
+
+					</select>
+				</div>
+			</div>
+			{/if}
+			<textarea id="description" warp="off" rows="3" class="" placeholder="{$cateinfo['texttishi']}"></textarea>
+
+			<div id="desc-cell">
+				<ul id="item-photo-list">
+					
+					<label for="img" id="up" onclick="ajaxFileUpload()">
+					<li id="add-photo-btn">
+						<img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-add-photo-835c8ec473.png" />
+						<p>添加一张新照片</p>
+					</li>
+					</label>
+					
+					
+					<!--<li id="add-voice-btn">
+						<div class="inner-empty">
+							<img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-add-voice-3ac7f2813e.png" />
+							<p>添加录音</p>
+						</div>
+						<div class="inner-filled">
+							<img class="bg" src="http://assets.quanzijishi.com/assets/imgs/bg-audio-d93b65510f.jpg" />
+							<img class="icon play" src="http://assets.quanzijishi.com/assets/imgs/icon-add-voice-3ac7f2813e.png" />
+							<p>录音已添加</p>
+						</div>
+					</li>-->
+
+				</ul>
+				</template>
+				<template id="tpl-item-photo">
+					<li class="item-photo">
+						<img class="photo" src="" />
+						<span class="has-desc"> 已添加描述 </span>
+						<span class="as-cover">封面</span>
+						<span class="edit-hint">点击图片添加描述</span>
+						<div class="loading-cover"> 上传中... </div>
+					</li>
+				</template>
+
+			</div>
+
+			<div id="price-cell" class="cell margin border-bottom">
+				<div class="inner no-icon">
+					<div id="price-type-switch">
+						<button id="classic-price-btn" class="active" data-type="classic">开个价</button>
+						<button id="special-price-btn" data-type="special">免费送</button>
+					</div>
+					<div id="classic-price-box">
+						<span class="darker">售价</span>
+						<div class="cell-input-wrapper">
+							<input id="price" type="number" class="maingreen" placeholder="请输入数字价格">
+						</div>
+					</div>
+					<div id="special-price-box" style="display:none">
+
+						<span class="special-price-tag" data-value="不要钱">不要钱</span>
+
+						<span class="special-price-tag" data-value="一杯奶茶">一杯奶茶</span>
+
+						<span class="special-price-tag" data-value="陪我吃饭">陪我吃饭</span>
+
+						<span class="special-price-tag customize">
+            <i class="icon icon-add">+</i>
+            <img class="icon icon-edit" src="http://assets.quanzijishi.com/assets/imgs/icon-special-price-edit-a6fb0529ef.png"/>
+            <span class="text">自定义</span>
+						</span>
+						<p id="special-price-preview">
+							<b>“</b>
+							<span class="text"></span>
+							<b>”</b>
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div id="original-price-cell" class="cell border-bottom">
+				<div class="inner no-icon">
+					<span class="darker">原价</span>
+					<div class="cell-input-wrapper">
+						<input id="original-price" type="number" class="green" placeholder="请输入购入时的原价，选填">
+					</div>
+				</div>
+			</div>
+
+			<div id="delivery-methods-cell" class="cell">
+				<div class="inner no-icon">
+					<p id="delivery-type" class="darker title">发货方式
+
+						<small class="select-multi-hint">（可多选）</small>
+
+					</p>
+
+					<div id="face-to-face-box" class="box">
+						<span class="darker">当面交易</span>
+
+						<div id="" class="checkbox checked">
+
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-default-17f04b0496.png" class="icon-default" />
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-checked-3aeb3a23b9.png" class="icon-checked" />
+
+						</div>
+					</div>
+
+					<div id="postage-box" class="box">
+						<span class="darker">快递</span>
+						<img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-rmb-c311e23293.png" />
+						<input id="postage" type="number" class="maingreen" value="0" />
+						<span class="tail">元</span>
+
+						<div id="" class="checkbox checked">
+
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-default-17f04b0496.png" class="icon-default" />
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-checked-3aeb3a23b9.png" class="icon-checked" />
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<div id="trade-methods-cell" class="cell">
+				<div class="inner no-icon">
+					<p id="trade-type" class="darker title">收款方式
+
+						<small class="select-multi-hint">（可多选）</small>
+
+					</p>
+
+					<div id="online-trade-box" class="box">
+						<span class="darker">买家在线支付
+            <small id="guarantee-hint">（平台担保交易）</small></span>
+
+						<div id="" class="checkbox checked">
+
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-default-17f04b0496.png" class="icon-default" />
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-checked-3aeb3a23b9.png" class="icon-checked" />
+
+						</div>
+					</div>
+
+					<div id="offline-trade-box" class="box">
+						<span class="darker">平台外支付</span>
+						<div id="wx-id-input-container" style="display:none">
+
+							<input id="wx-id" type="text" placeholder="请输入微信号" value="{$ziliao['weixin']}" />
+
+						</div>
+
+						<div id="" class="checkbox" >
+
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-default-17f04b0496.png" class="icon-default" onclick="return $('#offline-trade-notice-dialog').show();"/>
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-checked-3aeb3a23b9.png" class="icon-checked" />
+
+						</div>
+					</div>
+				</div>
+			</div>
+			{if $categorychild}
+			<div id="classes-cell" class="cell margin">
+				<p id="classes-hint" class="darker">选择分类</p>
+				{loop $categorychild $index $vo}
+					<span class="class-item" data-id="ng8szak0l72" data-type="goods" data-category="none" data-name="{$vo['id']}">
+	                {$vo['name']}
+	                </span>
+				{/loop}
+			</div>
+			{/if}
+			<div id="phone-input-cell" class="cell margin">
+				<div class="inner no-icon">
+					<span class="darker">联系方式</span>
+
+					<input type="number" id="phone" class="block-input" value="{$ziliao['phone']}" placeholder="请输入手机号" />
+				</div>
+			</div>
+
+		</section>
+
+		<section id="photo-edit-dialog" class="dialog">
+			<div class="inner">
+				<header>
+					<p>编辑照片描述</p>
+					<button class="header-close-btn">
+          <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+        </button>
+				</header>
+				<div class="body">
+					<textarea id="photo-desc" class="input" rows="1" placeholder="输入图片描述"></textarea>
+					<div class="cover-switch left-align">
+
+						<div id="" class="checkbox">
+
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-default-17f04b0496.png" class="icon-default" />
+							<img src="http://assets.quanzijishi.com/assets/imgs/checkbox-checked-3aeb3a23b9.png" class="icon-checked" />
+
+						</div> <span>设为封面</span>
+					</div>
+				</div>
+				<footer>
+					<button class="confirm-btn btn-maingreen btn-primary btn-block">编辑完成</button>
+					<button class="delete-btn btn-white btn-primary btn-block">删除图片</button>
+				</footer>
+			</div>
+		</section>
+
+		<section id="verify-dialog" class="dialog">
+			<div class="inner">
+				<header>
+					<p>验证手机号码</p>
+					<button class="header-close-btn">
+        <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+      </button>
+				</header>
+				<div class="body">
+					<div>
+						<p class="hint">接收短息手机号<span class="phone-number"></span></p>
+						<input type="text" class="verify-code input" placeholder="请输入验证码">
+						<button class="resend-btn btn btn-white btn-primary">
+          <span class="timeout">60秒后</span>重新发送</button>
+					</div>
+				</div>
+				<footer>
+					<button class="confirm-btn btn btn-block btn-maingreen">提交</button>
+				</footer>
+			</div>
+		</section>
+		<section id="voice-record-dialog" class="dialog">
+			<div class="inner">
+				<header>
+					<p>录音</p>
+					<button class="header-close-btn">
+        <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+      </button>
+				</header>
+				<div class="body">
+					<div class="progress-bar-box">
+						<div class="progress-bar-wrapper">
+							<div class="progress-bar">
+								<span class="filled"></span>
+							</div>
+						</div>
+						<span class="recorded-time">0s</span>
+					</div>
+					<div class="play-btn-box">
+						<button class="play-btn">
+          <span class="voice-ripple">
+            <b class="ripple ripple-1"></b>
+            <b class="ripple ripple-2"></b>
+            <b class="ripple ripple-3"></b>
+          </span>
+        </button>
+						<span class="recorded-time">0s</span>
+					</div>
+					<div class="record-btn-box">
+						<button class="record-btn">
+          <img src="http://assets.quanzijishi.com/assets/imgs/icon-record-start-8ecec23516.png" class="icon start-icon" />
+          <img src="http://assets.quanzijishi.com/assets/imgs/icon-record-stop-bcbc1184a5.png" class="icon stop-icon" />
+        </button>
+						<small class="hint start-hint">点击开始录音，最长可录60s</small>
+						<small class="hint stop-hint">点击停止录音</small>
+					</div>
+				</div>
+				<footer class="footer" style="display:none">
+					<button class="reset-btn">重录</button>
+					<button class="upload-btn">上传</button>
+					<button class="delete-btn">删除</button>
+				</footer>
+			</div>
+		</section>
+		<section id="offline-trade-notice-dialog" class="dialog notice-dialog">
+			<div class="inner">
+				<header>
+					<img class="logo" src="http://assets.quanzijishi.com/assets/imgs/icon-safe-notification-white-cc88684edd.png" />
+					<span class="title">平台外支付</span>
+				</header>
+				<div class="body">
+					<p>
+						若商品允许「平台外支付」，则当买家选择此支付方式时，交易流程不经平台担保， 买家确定订单后将直接获得卖家微信号，在平台外与卖家交流并进行支付。
+					</p>
+				</div>
+				<footer>
+					<button class="accept-btn btn btn-maingreen btn-block singe" onclick="return $('#offline-trade-notice-dialog').hide()">我知道了</button>
+				</footer>
+			</div>
+		</section>
+
+		<section id="alert-dialog" class="dialog">
+			<div class="inner">
+				<header class="header title"> 提示 </header>
+				<div class="body">
+					<p class="content"> 内容 </p>
+				</div>
+				<footer class="footer">
+					<button class="accept-btn btn btn-maingreen btn-block single" onclick="return $('#alert-dialog').hide();">确定</button>
+				</footer>
+			</div>
+		</section>
+
+		<section id="confirm-dialog" class="dialog confirm-dialog">
+			<div class="inner">
+				<header class="header"> <span class="title">确认</span>
+					<button class="header-close-btn">
+              <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+            </button>
+				</header>
+				<div class="body">
+					<p class="content"> 内容 </p>
+				</div>
+				<footer>
+					<button class="cancel-btn btn btn-white btn-block">取消</button>
+					<button class="accept-btn btn btn-maingreen btn-block">确定</button>
+				</footer>
+			</div>
+		</section>
+
+		<section id="prompt-dialog" class="dialog confirm-dialog">
+			<div class="inner">
+				<header class="header"> <span class="title">请输入</span>
+					<button class="header-close-btn">
+              <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+            </button>
+				</header>
+				<div class="body">
+					<p class="content"> 内容 </p>
+					<input class="input" type="text" value="" placeholder="请输入...">
+				</div>
+				<footer>
+					<button class="cancel-btn btn btn-white btn-block">取消</button>
+					<button class="accept-btn btn btn-maingreen btn-block">确定</button>
+				</footer>
+			</div>
+		</section>
+
+		<div id="loading-toast" class="weui_loading_toast" style="display: none;">
+			<div class="weui_mask_transparent"></div>
+			<div class="weui_toast">
+				<div class="weui_loading loading-mark">
+					<div class="weui_loading_leaf weui_loading_leaf_0"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_1"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_2"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_3"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_4"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_5"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_6"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_7"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_8"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_9"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_10"></div>
+					<div class="weui_loading_leaf weui_loading_leaf_11"></div>
+				</div>
+				<p class="weui_toast_content">数据加载中</p>
+			</div>
+		</div>
+
+		<div id="toast" style="display: none;">
+			<div class="weui_mask_transparent"></div>
+			<div class="weui_toast">
+				<i class="weui_icon_toast"></i>
+				<p class="content weui_toast_content">已完成</p>
+			</div>
+		</div>
+
+		<!-- footer -->
+
+		<footer id="footer">
+			<button id="submit-btn" class="btn btn-footer btn-maingreen">
+      
+        发布
+      
+    </button>
+		</footer>
+
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var type=1;
+				
+				$("#special-price-btn").click(function(){
+					type=2;
+					$("#classic-price-btn").removeClass("active");
+					$("#special-price-btn").addClass("active");
+					$("#classic-price-box").hide();
+					$("#special-price-box").show();
+				});
+				$("#classic-price-btn").click(function(){
+					type=1;
+					$("#special-price-btn").removeClass("active");
+					$("#classic-price-btn").addClass("active");
+					$("#special-price-box").hide();
+					$("#classic-price-box").show();
+				});
+				
+
+				$(".special-price-tag").click(function(){
+					$(".special-price-tag").attr("class","special-price-tag");
+					$(this).addClass("active");
+					$("#special-price-preview").children(".text").html($(this).html());
+				});
+
+				/*****对话框******/
+				$(".customize").click(function(){
+					$("#prompt-dialog").show();
+				});
+				$(".header-close-btn").click(function(){
+					$("#prompt-dialog").hide();
+				});
+				
+				$(".cancel-btn").click(function(){
+					$("#prompt-dialog").hide();
+				});
+				$(".accept-btn").click(function(){
+
+					$(".active").children(".text").html($("#prompt-dialog").find("input").val());
+					$("#special-price-preview").children(".text").html($("#prompt-dialog").find("input").val());
+					$("#prompt-dialog").hide();
+				});
+				$(".class-item").click(function(){
+					$(".class-item").attr("class","class-item");
+					$(this).addClass("active");
+					 
+					//console.log(fenlei);
+				});
+				/******checkbox*****/
+				$(".checkbox").click(function(){
+					
+					if ($(this).hasClass("checked")) {
+						$(this).removeClass("checked");
+						$(this).prev("#wx-id-input-container").hide();
+					}else{
+						$(this).addClass("checked");
+						
+						$(this).prev("#wx-id-input-container").show();
+
+					}
+					
+				});
+				/*******提交*********/
+				$("#submit-btn").click(function(){
+					/*********ajax*******/
+					
+
+					var title=$("#title").val();
+					if (title=="") {alert2("请输入标题");return;}
+					
+					{if $cateinfo['number']}
+					var amount=$("#amount").val();
+					if (amount=="") {alert2("请输入数量");return;}
+					{else}
+					var amount="-1";
+					{/if}
+
+					{if $cateinfo['xiala1']}
+					var college=$("#college").val();
+					if (college=="") {alert2("请选择课本的适用院系");return;}
+					{else}
+					var college="";
+					{/if}
+
+					{if $cateinfo['xiala2']}
+					var grade=$("#grade").val();
+					if (grade=="") {alert2("请选择课本的适用年级");return;}
+					{else}
+					var grade="";
+					{/if}
+					var description=$("#description").val();
+					if (description=="") {alert2("请输入商品描述");return;}
+					
+					if (type==1) {
+						var price=$("#price").val();
+						if (price=="") {alert2("请输入商品价格");return;}
+					}else{
+						var sprice=$("#special-price-preview").children(".text").html();
+					}
+					
+					//封面
+					var fengmian='';
+					//图册
+					var img='';
+					fengmian=$(".photo").eq(0).attr("alt");
+					$(".photo").each(function(){
+						img+=$(this).attr("alt")+"@";
+					});
+					
+					if (img=='') {alert2("至少插入一张图片");return;}
+					
+					var oprice=$("#original-price").val();
+					
+					//当面交易
+					var face = $("#face-to-face-box").children(".checkbox").hasClass("checked");
+					//快递
+					var kuaidi = $("#postage-box").children(".checkbox").hasClass("checked");
+					if (face) { face=1; }else{ face=0;}
+					if (kuaidi) { kuaidi=1;}else{ kuaidi=0;}
+					if (face || kuaidi) {
+						
+					}else{
+						alert2("至少选择一种发货方式！");return;
+					}
+					if (kuaidi) {
+						var kuaidifee=$("#postage").val();
+					}else{
+						var kuaidifee=0;
+					}
+					/****收款方式****/ 
+					var onlinepay = $("#online-trade-box").children(".checkbox").hasClass("checked");
+					var offlinepay = $("#offline-trade-box").children(".checkbox").hasClass("checked");
+					var weixin = offlinepay?$("#wx-id").val():0;
+					if (onlinepay) { onlinepay=1; }else{ onlinepay=0;}
+
+					if (offlinepay) { offlinepay=1;}else{ offlinepay=0;}
+					if (onlinepay || offlinepay) {
+						
+					}else{
+						alert2("至少选择一种支付方式！");return;
+					}
+					var fenlei = $.trim($(".class-item.active").data('name'));
+					{if !empty($categorychild)}
+						if (fenlei=="") {alert2("选择分类");return;}
+					{/if}
+					
+					var phone = $("#phone").val();
+					if (phone=="") {alert2("请输入手机号。");return;}
+					//一级分类
+					var dafen="{$cate['id']}";
+					/**ajax**/
+					$.ajax({
+						type:'POST',
+						url:"{php echo $this->createMobileUrl('ajax',array('op'=>'fabu'))}",
+						data:{'title':title,'amount':amount,'college':college,'grade':grade,'description':description,"type":type,'price':price,'sprice':sprice,'fengmian':fengmian,'img':img,'oprice':oprice,'face':face,'kuaidi':kuaidi,'kuaidifee':kuaidifee,'onlinepay':onlinepay,'offlinepay':offlinepay,'weixin':weixin,'fenlei':fenlei,'phone':phone,'dafen':dafen},
+						success:function(data){
+
+				            datas=eval('('+data+')');
+							if(datas.code==-1){
+								alert2(datas.msg);
+							}else if (datas.code==1){
+								alert("发布成功");
+								location.href="{php echo $this->createMobileUrl('index')}";
+							}else{
+								alert2("异常请重试。");
+							}
+						},
+						error:function(data){
+							alert2("失败请重试。");
+							$("#loading-toast").hide();
+						},
+				    	beforeSend: function(){
+				    	  $("#loading-toast").show();
+				    	}
+					});	
+					
+					
+					
+				});
+				/**弹出提示框***/
+				function alert2(text){
+					$("#alert-dialog").find("p").html(text);
+					$("#alert-dialog").show();
+					return 0;
+				}
+
+			});
+			var ua = window.navigator.userAgent;
+			if(ua.match(/iPhone OS 9|Mac/)) {
+				console.log("is ios");
+				var footer = document.querySelectorAll(".page-footer")[0];
+				if(footer) {
+					footer.className += " use-blur";
+				}
+			}
+			function ajaxFileUpload()
+			{	
+				 wx.chooseImage({
+                    count: 1, // 默认9
+                    //sizeType: ['compressed', 'original'], // 可以指定是原图还是压缩图，默认二者都有
+                    //sourceType: ['camera', 'album'], // 可以指定来源是相册还是相机，默认二者都有
+                    sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['camera', 'album'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                            
+                            wx.uploadImage({
+                                localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                                isShowProgressTips: 1, // 默认为1，显示进度提示
+                                success: function (res) {
+                                    var serverId = res.serverId; // 返回图片的服务器端ID
+                                   	/**ajax下载微信图片*/
+                                   	$.ajax({
+								        type:'post',
+								        url:"{php echo $this->createMobileUrl('ajax',array('op'=>'weixin'))}",
+								        data:{serverId:serverId},
+								        success:function(d) {
+								        	
+								          	$("#up").before("<li class='item-photo'><img class='photo' src={$_W['attachurl']}"+d+" alt="+d+"><span class='has-desc'> 已添加描述 </span><span class='as-cover'>封面</span><span class='edit-hint' >点击图片添加描述</span></li>");
+											$(".item-photo").click(function(){
+												$(this).remove();
+											});
+								        }
+								      })
+                                }
+                            });
+                            
+                       } 
+                });
+				/*$.ajaxFileUpload({
+				 url:"{$_W['siteroot']}web/index.php?c=utility&a=file&do=upload&type=image", //你处理上传文件的服务端
+				 secureuri:false,
+				 fileElementId:'img',
+				 dataType: 'json',
+				 success: function (data){
+				 		var json = eval(data);	
+				 		var alt =json.attachment;
+						//console.log("值为:",json.url);
+						$("#up").before("<li class='item-photo'><img class='photo' src="+json.url+" alt="+alt+"><span class='has-desc'> 已添加描述 </span><span class='as-cover'>封面</span><span class='edit-hint' >点击图片添加描述</span></li>");
+						$(".item-photo").click(function(){
+							$(this).remove();
+						});
+						$("#loading-toast").hide();
+				 		},
+				 error: function(data){
+				 	$("#loading-toast").hide();
+				 	alert("上传失败，请重试！");
+				 	}
+				})*/
+				return false;
+			  } 
+		</script>
+
+
+
+
+<style>
+.class-item.active {
+    background: #3bc89c;
+    color: white;
+}
+</style>
+	</body>
+
+</html>

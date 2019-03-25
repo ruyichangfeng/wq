@@ -1,0 +1,218 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	{template 'staff_header'}
+	<li class="active" style="margin-left:100px;"><a href="{$urlt}&op=add" >添加员工</a></li>
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+</style>
+{if $op == 'add' || $op == 'edit'}
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+		<input type="hidden" name="token" value="{$_W['token']}" />
+    	<input type="hidden" name="id" value="{$srdb['id']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">会员信息</div>
+            <div class="panel-body">
+				
+				{if $op == 'edit'}
+				{if $srdb['uid']}
+				<input type="hidden" name="uid" value="{$srdb['uid']}" />
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_form_field_image('avatar', $profile['avatar'])}
+                    </div>
+                </div>
+				{else}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+						<span style="color:#666666;">该员工账号未关注公众号，不能修改头像！</span>
+                    </div>
+                </div>
+				{/if}
+				{/if}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属职位</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<select name="type" class="form-control">
+							<option value="" >不限</option>
+							{loop $category $row1}
+							<option value="{$row1['cid']}" {if $row1['cid'] == $srdb['type']} selected="selected"{/if}>{$row1['name']}</option>
+							{/loop}
+						</select>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="name" id="" type="text" value="{$srdb['name']}" style="width:200px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">设置密码</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="password" id="" type="password" value="" style="width:200px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">性别</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">
+						<input type="radio" name="sex" value="1" {if $srdb['sex']==1}checked{/if}> &nbsp;男&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		   <input type="radio" name="sex" value="2" {if $srdb['sex']==2}checked{/if}> &nbsp;女
+		   				</p>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">手机号码</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="phone" id="" type="text" value="{$srdb['phone']}" style="width:300px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">学历</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="xueli" id="" type="text" value="{$srdb['xueli']}" style="width:300px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">从业年限</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="working_time" id="" type="text" value="{$srdb['working_time']}" style="width:300px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">联系QQ</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="qq" id="" type="text" value="{$srdb['qq']}" style="width:300px;">
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">微信账号</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="WeChath" id="" type="text" value="{$srdb['WeChath']}" style="width:300px;">
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">个人介绍</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<textarea style="height:100px;" class="form-control" name="message" cols="70" id="reply-add-text">{$srdb['message']}</textarea>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputName2">会员ID</label>
+				<input type="text" class="form-control" name="id" value="{$_GPC['id']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">会员姓名</label>
+				<input type="txt" class="form-control" name="name"  value="{$_GPC['name']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">手机号码</label>
+				<input type="txt" class="form-control" name="phone"  value="{$_GPC['phone']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">所属职位</label>
+				<select name="type" class="form-control">
+					<option value="" >不限</option>
+					{loop $category $row1}
+					<option value="{$row1['cid']}" {if $row1['cid'] == $_GPC['type']} selected="selected"{/if}>{$row1['name']}</option>
+					{/loop}
+				</select>
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+   
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="100">头像</th>
+			<th >ID/姓名</th>
+			<th>所属职位</th>
+			<th >手机号码</th>
+			<th >状态</th>
+			<th >操作</th>
+		</tr>
+		{loop $list $key $value}
+		{php $profile = pdo_get('mc_members', array('uniacid' => $_W['uniacid'],'uid' => $value['uid']));}
+		<tr >
+			<td>
+				{if $profile[avatar]}
+				<img src="{php echo tomedia($profile[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+				{else}
+				<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+				{/if}
+			</td>
+			<td>{$value[id]}/{$value[name]}</td>
+			<td>{$category[$value['type']]['name']}</td>
+			<td>{$value['phone']}</td>
+			<td>{if $value['uid']}<font color="#006600">已关注公众号</font>{else}<font color="#CC0000">未关注公众号</font>{/if}</td>
+			<td>
+				{if $value['uid']}
+				<a href="{php echo $this->createWebUrl('user_notice', array('uid' => $value[uid]))}">发布通知</a> &nbsp;|&nbsp;
+				{/if}
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="6">{$pager}</td>
+		</tr>
+		{/if}
+	  </table>
+	</div>
+
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

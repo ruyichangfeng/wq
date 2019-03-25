@@ -1,0 +1,171 @@
+{template 'common/header'}
+<script src="{HLMMS_JS}JsBarcode.all.min.js"></script>
+<style>
+    html,
+    body {
+        background-color: #fafaff;
+    }
+    .mui-bar~.mui-content .mui-fullscreen {
+        top: 44px;
+        height: auto;
+    }
+    .mui-pull-top-tips {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        margin-left: -25px;
+        width: 40px;
+        height: 40px;
+        border-radius: 100%;
+        z-index: 1;
+    }
+    .mui-bar~.mui-pull-top-tips {
+        top: 24px;
+    }
+    .mui-pull-top-wrapper {
+        width: 42px;
+        height: 42px;
+        display: block;
+        text-align: center;
+        background-color: #efeff4;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        background-clip: padding-box;
+        box-shadow: 0 4px 10px #bbb;
+        overflow: hidden;
+    }
+    .mui-pull-top-tips.mui-transitioning {
+        -webkit-transition-duration: 200ms;
+        transition-duration: 200ms;
+    }
+    .mui-pull-top-tips .mui-pull-loading {
+        /*-webkit-backface-visibility: hidden;
+        -webkit-transition-duration: 400ms;
+        transition-duration: 400ms;*/
+
+        margin: 0;
+    }
+    .mui-pull-top-wrapper .mui-icon,
+    .mui-pull-top-wrapper .mui-spinner {
+        margin-top: 7px;
+    }
+    .mui-pull-top-wrapper .mui-icon.mui-reverse {
+        /*-webkit-transform: rotate(180deg) translateZ(0);*/
+    }
+    .mui-pull-bottom-tips {
+        text-align: center;
+        background-color: #efeff4;
+        font-size: 15px;
+        line-height: 40px;
+        color: #777;
+    }
+    .mui-pull-top-canvas {
+        overflow: hidden;
+        background-color: #fafafa;
+        border-radius: 40px;
+        box-shadow: 0 4px 10px #bbb;
+        width: 40px;
+        height: 40px;
+        margin: 0 auto;
+    }
+    .mui-pull-top-canvas canvas {
+        width: 40px;
+    }
+    .mui-slider-indicator.mui-segmented-control {
+        background-color: #efeff4;
+    }
+    .table {
+        border: 1px solid #ffffff;
+        color: #666;
+    }
+
+    .table th {
+        background-repeat: repeat-x;
+        height: 30px;
+    }
+
+    .table td{
+        background-color: white;
+        padding: 0 1em 0;
+        border: 1px solid #cad9ea;
+        color: black;
+    }
+    .table th {
+        border: 1px solid #cad9ea;
+        background-color: #16a7ef;
+        padding: 0 1em 0;
+        color: white;
+    }
+
+    .table tr {
+        background-color: #16a7ef;
+    }
+</style>
+<body>
+<header id="header" class="mui-bar mui-bar-transparent" style="background-color: #16a7ef">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: white"></a>
+    <h1 class="mui-title" style="color: white">操作</h1>
+</header>
+
+<div class="mui-content">
+    <div id="slider" class="mui-slider mui-fullscreen">
+        <div id="sliderSegmentedControl" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted" style="height: 80px;background-color: #16a7ef;">
+            <div class="mui-scroll">
+
+                {loop $cactivitytimelimitlist $cactivitytimelimititem $k}
+                <a class="mui-control-item" href="#item1mobile_{$cactivitytimelimititem}">
+                    <table  class="table">
+                        <tr>
+                            <th>
+                                {php echo $weekarray[date("w",strtotime("$data + $cactivitytimelimititem day"))]}
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                {php echo date("m-d",strtotime("$data + $cactivitytimelimititem day"))}
+                            </td>
+                        </tr>
+                    </table>
+                </a>
+                {/loop}
+            </div>
+        </div>
+        <div class="mui-slider-group" style="padding-top: 10%">
+
+            {loop $cactivitytimelimitlist $cactivitytimerangeitem $v}
+            <div id="item1mobile_{$cactivitytimerangeitem}" class="mui-slider-item mui-control-content mui-active">
+                <div id="scroll1" class="mui-scroll-wrapper">
+                    <div class="mui-scroll">
+                        <ul class="mui-table-view">
+                            {loop $v $k}
+                            {if $k['limitnumberTime'] == 0}
+                                <li class="mui-table-view-cell">
+                                    <p style="float: right"><span class="mui-badge mui-badge-danger">名额&nbsp;满员</span></p>
+                                    <span class="mui-icon-extra mui-icon-extra-outline"style="float: left;padding-right: 2%"></span>
+                                    <p style="font-size: 16px;color: black;margin-top: 1%">{$k['Start']}-{$k['Eed']}</p>
+                                </li>
+                            {else}
+                            <a href="{php echo $this->createMobileUrl('bespeak',array('op' => 'project','activityid' =>$activitydetail['id'],'timeid'=>$k['timeid'],'cactivitytimerangeid'=>$cactivitytimerangeitem,'memberid'=>$memberid))}">
+                                <li class="mui-table-view-cell">
+                                    <p style="float: right"><span class="mui-badge mui-badge-success">名额&nbsp;{$k['limitnumberTime']}</span></p>
+                                    <span class="mui-icon-extra mui-icon-extra-outline"style="float: left;padding-right: 2%"></span>
+                                    <p style="font-size: 16px;color: black;margin-top: 1%">{$k['Start']}-{$k['Eed']}</p>
+                                </li>
+                            </a>
+                            {/if}
+
+                            {/loop}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {/loop}
+
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+
+</script>
+</body>

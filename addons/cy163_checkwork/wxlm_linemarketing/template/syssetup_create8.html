@@ -1,0 +1,92 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>1));}">应用基础设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>2));}">PC端内容设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>3));}">手机端内容设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>4));}">折扣卡设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>6));}">店员充值设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>5));}">手机端DIY设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>7));}">支付设置</a></li>
+    <li class="active"><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>8));}">排行榜</a></li>
+
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">排行榜设置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-md-2 control-label"><span class="xhred"></span>状态</label>
+					<div class="col-md-10">
+						<label class="radio-inline">
+						  <input type="radio" name="create[toplist_openstate]" id="toplist_openstate1" value="1" 
+						  {if $config['toplist_openstate'] == 1} checked{/if} >开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="create[toplist_openstate]" id="toplist_openstate2" value="2" 
+						  {if $config['toplist_openstate'] == 2||$config['toplist_openstate'] == ''} checked{/if}>关闭
+						</label>
+	                </div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="create[toplist_credittype]" id="toplist_credittype1" value="1" {if $config['toplist_credittype'] == 1||$config['toplist_credittype'] == ''} checked="checked"{/if} > 积分
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="create[toplist_credittype]" id="toplist_credittype2" value="2" {if $config['toplist_credittype'] == 2} checked="checked"{/if} > 余额
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"><span class="xhred"></span>包含内容</label>
+					<div class="col-md-10">
+						<label class="checkbox-inline"><input type="checkbox" class="toplist_type" name="create[toplist_type][]" value="1" {if in_array('1',$config['toplist_type'])}checked="checked"{/if}>粉丝推荐榜</label>
+	                    <label class="checkbox-inline"><input type="checkbox" class="toplist_type" name="create[toplist_type][]" value="2" {if in_array('2',$config['toplist_type'])}checked="checked"{/if}>推广任务榜</label>
+	                    <label class="checkbox-inline"><input type="checkbox" class="toplist_type" name="create[toplist_type][]" value="3" {if in_array('3',$config['toplist_type'])}checked="checked"{/if}>粉丝消费榜</label>
+	                    <label class="checkbox-inline"><input type="checkbox" class="toplist_type" name="create[toplist_type][]" value="4" {if in_array('4',$config['toplist_type'])}checked="checked"{/if}>粉丝分销榜</label>
+	                    <span class="help-block">可多选，排行榜将统计所有勾选的奖励来源</span>
+	                </div>
+				</div>
+	            <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>上榜人数</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="number" class="form-control" name="create[toplist_number]" value="{$config['toplist_number']}" step="1" />
+						<span class="help-block">上榜人数为空或为0，上榜人数无限制</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>排行榜标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="create[toplist_title]" value="{$config['toplist_title']}"  maxlength="20" />
+						<span class="help-block"></span>
+					</div>
+				</div>
+                <div class="form-group">
+                	<input name="op" type="hidden" value="create"/>
+                	<input type="hidden" name="systype" value="8" />
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="create[pc_member_title]"]').val() == ''){
+				util.message('请填写页面标题');
+				return false;
+			}	
+			return true;
+		});
+	});
+});
+</script>
+{template 'common/footer'}

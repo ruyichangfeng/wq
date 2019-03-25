@@ -1,0 +1,554 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-sm-5" style="padding-left: 5px;padding-right: 5px;">
+            <div class="ibox float-e-margins" style="margin-bottom: 0px;" >
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;padding-left: 5px;padding-right: 5px;">
+                    <div class="panel panel-info" style="margin-bottom:0px;">
+                        <div class="panel-heading">
+                            <i class="fa fa-id-card" aria-hidden="true"></i> 积分信息
+                        </div>
+                        <div class="panel-body" id="searchgoodstoolbar"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                            <form  class="form-horizontal" role="form" id="search_goods" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                                <div class="form-group"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                                    <label class="col-sm-1 control-label"  style="padding-top: 0px;width: 10%">商品分类</label>
+                                    <div class="col-sm-1"  style="width: 30%">
+                                        <div class="input-group" style="width: 100%">
+                                            <select data-placeholder="请选择类别(可搜索名称)"  class="chosen-select" name="search_goodsTypeId" id="search_goodsTypeId"  style="width: 100%" tabindex="4">
+                                                {if in_array('0', $pointsproducttypelist) }
+                                                <option value="0"   hassubinfo="true" selected>无商品分类</option>
+                                                {else}
+                                                <option value="0"   hassubinfo="true">无商品分类</option>
+                                                {/if}
+                                                {loop $pointsproducttypelist $pointsproducttypeitem}
+                                                <option value="{$pointsproducttypeitem['id']}" {if $pointsproducttypeitem['id'] == $item['pointsproducttypeid']}selected = "selected"{/if} >{$pointsproducttypeitem['ppt_title']}</option>
+                                                {/loop}
+                                            </select>
+
+
+                                        </div>
+                                    </div>
+                                    <label class="col-sm-1 control-label" style="padding-top: 0px;width: 10%">商品名称</label>
+                                    <div class="col-sm-1" style="width: 35%">
+                                        <input class="form-control" name="search_goodsKeyword"  id="search_goodsKeyword" type="text" value="{$_GPC['search_goodsKeyword']}">
+                                    </div>
+                                    <div class="col-sm-1"  style="width: 7%;">
+                                        <button class="btn btn-outline btn-primary" type="button" onclick="btnSerachGoods()" id="btn_searchgoodssubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <table id="goodstabledata" data-mobile-responsive="true"></table>
+                    </div>
+                </div>
+                <SCRIPT>
+                    var config = {
+                        '.chosen-select': {},
+                        '.chosen-select-deselect': {
+                            allow_single_deselect: true
+                        },
+                        '.chosen-select-no-single': {
+                            disable_search_threshold: 10
+                        },
+                        '.chosen-select-no-results': {
+                            no_results_text: '暂无选项！'
+                        },
+                        '.chosen-select-width': {
+                            width: "95%"
+                        }
+                    }
+                    for (var selector in config) {
+                        $(selector).chosen(config[selector]);
+                    }
+
+                </SCRIPT>
+            </div>
+        </div>
+        <div class="col-sm-7" style="padding-left: 0px;padding-right: 5px;">
+            <div class="ibox float-e-margins" style="margin-bottom: 0px;" >
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;padding-left: 5px;padding-right: 5px;">
+                    <form class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="goodsInventoryinScript">
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <!-- 会员信息 --start--->
+                        {template 'web/common/panel-member-card-info'}
+                        <!-- 会员信息 --end--->
+                        <!--购物车-->
+                        <table id="pointsordertabledata" data-mobile-responsive="true"></table>
+                        <div class="hr-line-dashed" style="margin-top: 3px; margin-bottom: 0px;"></div>
+                        <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;z-index: 10;">
+                            <ul class="todo-list m-t" style=" margin-top: 5px;">
+                                <li>
+                                    <span class="m-l-xs">总积分：</span>
+                                    <small  class="label label-info" style="font-size: large" id="inventoryInTotalprice" name="inventoryInTotalprice"><i class="fa fa-database"></i> {php echo $buffer_totalPriceCount}积分</small>
+
+                                    <input type="hidden" name="hidden_nowPointCount" id="hidden_nowPointCount" />
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="panel panel-info">
+                            <div class="form-group"  style="margin-top: 10px;margin-left:250px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                                <div class="col-sm-12" style="padding-left: 5px;padding-right: 5px;">
+                                    <div class="col-sm-9">
+                                        <button type="button"  onclick="btn_showReadCard()" class="btn btn-warning btn-lg"><i class="fa fa-spin fa-spinner"></i>&nbsp;读卡</button>
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                        <button name="referer_submitdeductconsume"  onclick="btn_clearMemberInfo()"  id="referer_submitdeductconsume" type="button" class="btn btn-lg btn-info"><i class="fa fa-refresh" aria-hidden="true"></i> 清空</button>
+                                        <input type="submit" class="btn btn-lg btn-danger" name="btn_goodsinventoryinadd"   id="btn_goodsinventoryinadd_sub" value="&nbsp;兑&nbsp;换&nbsp;"/>
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    $(document).ready(function(){
+        btn_showReadCard();//读卡
+        initializationlimit();//初始化限制
+        $("#hidden_cartinitAjaxUpdategoodsinventoryintotalprice").attr("value",{php echo $buffer_totalPriceCount});
+        //改变数量总价的按钮事件
+        /****左侧商品列表----start  **/
+        $('#goodstabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('pointsconsume', array('op' => 'getPointsProductListTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            toolbar: '#searchgoodstoolbar',
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 11,                       //每页的记录行数（*）
+            pageList: [11, 22, 44, 88],
+            pagination: true,
+            height: 700,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'pp_name',
+                title: '商品名称',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'pp_sellprice',
+                title: '商品售价',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'pp_stock',
+                title: '库存',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'pp_class',
+                title: '商品类型',
+                align: "center",
+                valign: "middle",
+                formatter:pointTypeFormatter
+            },{
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "<button type='button'  class='btn btn-outline btn-sm btn-primary' onclick=\"ViewByGoods(" + id + ")\" title='查看商品详情'><i class='fa fa-eye'></i></button>";
+            return result;
+        }
+        function pointTypeFormatter(value, row, index) {
+            var typevalue = value;
+            var result = '';
+           // var result ="{php echo util::pointsProductTypeOneName("+typevalue+")}";
+            if(typevalue == 1){
+
+                result += "<span class='label label-info' > 实物 </span>";
+            }
+            else{
+
+                result += "<span class='label label-info' > 卡券 </span>";
+            }
+
+
+            return result;
+        }
+    });
+
+    /****添加商品----start  **/
+    $('#goodstabledata').on("dbl-click-row.bs.table",function(e, row, $element) {
+        var  product_id= row.id;
+        var memberId = parseInt($("#memberId").val());
+        var url = "{php echo $this->createWebUrl('pointsconsume', array('op' => 'UpdateGoodsPointsConsumeDetail'))}";
+        var params = {
+            'productid': product_id,
+            'memberId': memberId,
+        };
+
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if(data['message']['code'] == 0){
+                    $("#pointsordertabledata").bootstrapTable('refresh');
+                    $('#inventoryInTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 积分');
+                    $("#hidden_nowPointCount").attr("value",data['message']['totalPriceCount']);
+                    $("#btn_goodsinventoryinadd_sub").attr("disabled",false);
+                }else{
+                    swal({
+                        title: "操作有误",
+                        text: data['message']['msg'],
+                        type: "error",
+                    });
+                }
+                //alert(data['message']['totalPriceCount']);
+            }
+        });
+    });
+    /****添加商品----end  **/
+
+
+    /****读卡----start  **/
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                        else {
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+                            swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                            $("#deductPointsCount").attr("disabled",false);
+                            $("#submitdeductPointsCount").attr("disabled",false);
+                            $("#referer_submitdeductconsume").attr("disabled",false);
+                            commodityDetail();
+                            InitializationSubtotal();
+                        }
+                    }
+                });
+            });
+    }
+    /****读卡----end  **/
+
+    /****右侧侧商品明细列表----start  **/
+    function  commodityDetail() {
+        var editRowUrl =''
+        editRowUrl = "{php echo $this->createWebUrl('pointsconsume', array('op' => 'ajaxUpdatePointSorder'))}";
+        $('#pointsordertabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('pointsconsume', array('op' => 'getPointSorderTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: pointsordertabledataParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            height: 420,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'pointsproduct_id',
+                title: '商品id',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'po_pointProductName',
+                title: '商品名称',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'po_orderPricePoint',
+                title: '商品消费积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'po_orderNumber',
+                title: '数量',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '商品添加数量',
+                    validate: function (v) {
+                        if (!v) return '数量不能为空';
+                    }
+                }
+            },{
+                field: 'po_priceSubtotal',
+                title: '小计',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'id',
+                title: '操作',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatterdelete
+            },
+            ],
+            onEditableSave: function (field, row, oldValue, $el) {
+                $.ajax({
+                    type: "post",
+                    url: editRowUrl,
+                    data: {row: row,memberId:$("#memberId").val()},
+                    dataType: 'JSON',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "操作有误",
+                                text: data['message']['msg'],
+                                type: "error",
+                            });
+                            $("#pointsordertabledata").bootstrapTable('refresh');
+                            return;
+                        }
+                        else {
+                            $("#pointsordertabledata").bootstrapTable('refresh');
+                            $('#inventoryInTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 积分');
+                            $("#hidden_nowPointCount").attr("value",data['message']['totalPriceCount']);
+                        }
+                    }
+                });
+            }
+        });
+        function pointsordertabledataParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,
+                pageNumber: params.pageNumber,
+                memberId: $("#memberId").val(),
+            };
+            return temp;
+        };
+
+    }
+    //删除按钮
+    function actionFormatterdelete(value, row, index) {
+        var id = value;
+        var result = "";
+        result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"DeleteByInventoryIn('" + id + "')\" title='删除'><span class='glyphicon glyphicon-remove'></span></button>";
+        return result;
+    }
+    //删除单条数据
+    function DeleteByInventoryIn(inventoryinid){
+        var inventoryinid = parseInt(inventoryinid);
+        $.ajax({
+            url: "{php echo $this->createWebUrl('pointsconsume', array('op' => 'ajaxgoodsinventoryindetaildelete', 'storeid' => $storeid))}",
+            type: "post",
+            dataType: 'json',
+            data: { inventoryinid:inventoryinid },
+            success: function (data) {
+                if (data['message']['code'] != 0) {
+                    swal("操作有误", "请选择要删除的项目！","error");
+                    return;
+                } else {
+                    swal({
+                        title: "操作成功！",
+                        text: "成功将此商品移除增次列表。",
+                        timer: 2000,
+                        type:"success",
+                    },function(){
+                        $("#pointsordertabledata").bootstrapTable('refresh');
+                        if(data['message']['totalPriceCount'] == 0 || data['message']['totalPriceCount'] == '' ||  data['message']['totalPriceCount'] == null){
+                            $('#inventoryInTotalprice').html('<i class="fa fa-rmb"></i>0 积分');
+                            $("#hidden_nowPointCount").attr("value",0);
+                        }
+                        else{
+                            $('#inventoryInTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 积分');
+                            $("#hidden_nowPointCount").attr("value",data['message']['totalPriceCount']);
+                        }
+
+
+                    });
+
+                }
+            }
+        });
+    }
+    /****右侧侧商品明细列表----start  **/
+
+    //查看商品明细
+    function ViewByGoods(pointsproductid){
+        var url = "{php echo $this->createWebUrl('pointsconsume', array('op' => 'viewpackagedetail'))}&pointsproductid=" + pointsproductid;
+        parent.layer.open({
+            type: 2,
+            title: '商品详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['800px' , '600px'],
+            content: url
+        });
+    }
+    //商品列表查询按钮事件
+
+    /****刷新表格----start  **/
+    function btnSerachGoods() {
+        $("#goodstabledata").bootstrapTable('refresh');
+    }
+    /****刷新表格----end  **/
+
+    /****清空----start  **/
+    function btn_clearMemberInfo() {
+        doSelectBtn();
+        $("#memberId").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#memberNote").attr("value","");
+        $("#deductPointsCount").val("");
+        $("#deductPointsCount").attr("disabled",true);
+        $("#submitdeductPointsCount").attr("disabled",true);
+        $("#referer_submitdeductconsume").attr("disabled",false);
+
+    }
+    function doSelectBtn() {
+        var memberid = $("#memberId").val();
+        swal({
+                title: "确定清空吗？",
+                text: "你将无法对当前消费列表进行操作！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false
+            },
+            function(){
+                var url = "{php echo $this->createWebUrl('pointsconsume', array('op' => 'DeleteAllMemberConsume'))}";
+
+
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: { memberId:memberid},
+                    dataType: 'json',
+                    success: function (data) {
+                        swal("清空完成", "","success");
+                        $("#pointsordertabledata").bootstrapTable('refresh');
+                        $('#inventoryInTotalprice').html('<i class="fa fa-rmb"></i> 0 积分');
+                        $("#hidden_nowPointCount").attr("value",data['message']['totalPriceCount']);
+                    },
+                });
+            });
+
+    }
+    /****清空----end  **/
+
+    /****初始化限制----start  **/
+    function  initializationlimit() {
+        $("#realMoneyCount").focus();
+        $("#deductPointsCount").attr("disabled",true);
+        $("#submitdeductPointsCount").attr("disabled",true);
+        $("#btn_goodsinventoryinadd_sub").attr("disabled",true);
+        $("#referer_submitdeductconsume").attr("disabled",true);
+        $("#span_showGivePoint").hide();
+        $("#deductPointsCountForm").validate({
+            rules: {
+                deductPointsCount: {
+                    required: true,
+                    number:true,
+                    min:1
+                }
+            },
+            messages: {
+                deductPointsCount: {
+                    required: "请输入扣除积分数量",
+                    number: "必须输入大于0的积分数量",
+                    min: $.validator.format( "请输入大于1的积分数量" )
+                }
+            }
+        });
+    }
+    /****初始化限制----end  **/
+
+</script>
+<!--读卡-->
+{template 'web/common/footer'}

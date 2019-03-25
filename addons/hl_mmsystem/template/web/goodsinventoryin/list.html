@@ -1,0 +1,240 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>采购管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goodsinventoryin')}"></a></h5>
+
+
+                </div>
+                <div class="ibox-content">
+                        <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                            <input type="hidden" name="c" value="site" />
+                            <input type="hidden" name="a" value="entry" />
+                            <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                            <input type="hidden" name="do" value="goodsinventoryin" />
+                            <input type="hidden" name="op" value="list" />
+                            <div class="col-sm-4">
+
+                            <a href="javascript:;" id="parentIframe" class="btn btn-primary">
+                                <i class="fa fa-plus"></i>进出库管理</a>
+                            </div>
+                                <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">单据号</label>
+                                <div class="col-sm-1 col-lg-1">
+                                    <input class="form-control" name="giiInventoryInCode" id="" type="text" value="{$_GPC['giiInventoryInCode']}">
+                                </div>
+                            <div class="col-sm-2">
+                                <select name="ifSetStore" class="form-control">
+                                    <option value="3" {if $_GPC['ifSetStore'] == 3 || empty($_GPC['ifSetStore'])}selected{/if}>请选择单据类型</option>
+                                    <option value="1" {if $_GPC['ifSetStore'] == 1}selected{/if}>采购入库</option>
+                                    <option value="2" {if $_GPC['ifSetStore'] == 2}selected{/if}>退货</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                                </div>
+                            </div>
+                        </form>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                    <input type="checkbox" id="checkids"
+                                           onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                    <label for="checkids"></label>
+                                </div></th>
+                                <th>单据号</th>
+                                <th>单据类型</th>
+                                <th>入库时间</th>
+                                <th>供应商</th>
+                                <th>入库备注</th>
+                                <th>欠款结算</th>
+                                <th>查看还款明细</th>
+                                <th>查看明细</th>
+                                <th  style="display: none">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}" value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    {$item['gii_InventoryInCode']}
+                                </td>
+                                <td>{if $item['gii_inventorytype'] == 1}<span class="badge badge-primary">采购入库</span>{else}<span class="badge badge-danger">退货</span>{/if}</td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[gii_addTime]);}</td>
+                                <td>{php echo util::getGoodsSupplier($item['goodssupplier_id']);}</td>
+                                <td>{$item['gii_note']}</td>
+                                <td>
+                                    {if $item['gii_foldClause'] == 0 || $item['gii_foldClause'] == null || $item['gii_foldClause'] == ''}
+                                    <span class="badge badge-primary">欠款已结清</span>
+
+                                    {else}
+                                    <button type="button" onclick="settleArrears({$item['id']},{$item['gii_foldClause']})"  class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top"  title="点击还款">点击还款{$item['gii_foldClause']}</button>
+
+                                    {/if}
+                                </td>
+                                <td>
+                                    <button type="button" onclick=" ArrearsDetail({$item['id']})"  class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top"  title="查看还款明细">还款明细</button>
+                                </td>
+                                <td><button type="button" onclick="Look_GoodsInventoryInDetail({$item['id']})"  class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top"  title="查看单据详情">查看</button></td>
+
+                                <td style="display: none">
+                        <span>
+							<a href="{php echo $this->createWebUrl('goodsinventoryin', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('goodsinventoryin',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input type="submit" name="delete" class="btn btn-danger fa-times-circle" value="批量删除">
+                                    <input type="hidden" name="token" value="{$_W['token']}"/>
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#parentIframe').on('click', function(){
+        var index = parent.layer.open({
+            type: 2,
+            title: '进销货管理',
+            shadeClose: true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['1200px' , '700px'],
+            content: '{php echo $this->createWebUrl('goodsinventoryin',array('op' => 'add'))}'
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+        parent.layer.full(index);
+    });
+
+
+    function Look_GoodsInventoryInDetail(id){
+        var url = "{php echo $this->createWebUrl('goodsinventoryin', array('op' => 'look'))}&id="+id;
+        var index = parent.layer.open({
+            type: 2,
+            title: '进销货单据详情',
+            shadeClose: true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['1200px' , '700px'],
+            content:url
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+        parent.layer.full(index);
+    }
+
+    function ArrearsDetail(Arrearsid){
+        var url = "{php echo $this->createWebUrl('goodsinventoryin', array('op' => 'ViewArrearsDocument'))}&Arrearsid="+Arrearsid;
+        var index = parent.layer.open({
+            type: 2,
+            title: '进销货单据详情',
+            shadeClose: true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['800px' , '700px'],
+            content:url
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+    }
+
+    function settleArrears(Documentid,ArrearsAmount){
+        var Documentid = Documentid;
+        var ArrearsAmount = ArrearsAmount;
+
+        swal({
+                title: "本次结算金额",
+                text: "输入金额：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "不能为0的金额"
+            },
+            function(SettlementAmount){
+                var SettlementAmount = SettlementAmount;
+                if (SettlementAmount === false) return false;
+                if (SettlementAmount === "") {
+                    swal.showInputError("结算金额不能为空！");
+                    return false
+                }
+                if (SettlementAmount > ArrearsAmount) {
+                    swal.showInputError("结算金额不能大于欠款金额！");
+                    return false
+                }
+
+                var url = "{php echo $this->createWebUrl('goodsinventoryin', array('op' => 'AjaxSettlementDocument'))}";
+                var params = {
+                    'Documentid': Documentid,
+                    'SettlementAmount': SettlementAmount,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "更新成功",
+                                text: "欠款已更新，请刷新之后核对！",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            });
+                            return;
+                        }
+                        else {
+                            swal({
+                                title: "失败",
+                                text: "更新欠款失败，请重新操作！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                    }
+
+                });
+            });
+
+
+    }
+
+
+</script>
+
+
+{template 'web/common/footer'}

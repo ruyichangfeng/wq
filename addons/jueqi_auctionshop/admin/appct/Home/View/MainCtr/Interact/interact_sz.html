@@ -1,0 +1,165 @@
+<include file="Public/header.html" />
+</head>
+<body>
+	<div class="x-body">
+		<form class="layui-form">			
+			<div class="layui-form-item">
+				<label class="layui-form-label">名称</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="title" autocomplete="off" value="{$interact['title']}" class="layui-input" <?php if($interact['type']==1){echo 'readonly="readonly"';}?>>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+                <label  class="layui-form-label">入口图片</label>
+                <div class="layui-input-block">
+	                <button type="button" class="layui-btn layui-btn-sm" onclick="$('#pic').click();">
+					    <i class="layui-icon">&#xe67c;</i>上传图片
+					</button>
+					<input style="display: none;" type="file" id="pic"  onchange="previewImage(this,1,'pic_val')"   multiple  class="input-file">
+	                <div>
+	                   <img id="imghead1" border="0"  style="margin-top: 5px;max-height:100px;"                   	
+	                   <?php 
+	                   	   	if( empty($interact['pic']) ){
+	                   	   	   	echo 'src="__ROOT__/Public/images/z_add.png"   onclick="$(\'#pic\').click();"';
+	                   	   	}else if(strstr($interact['pic'],'Public')){
+	                   	       	echo 'src="'.$interact['pic'].'"';
+	                   	   	}else{
+	                   	   		echo 'src="__ROOT__/Uploads/'.$interact['pic'].'"';
+	                   	   	}
+	                    ?>
+	                   >
+	                </div>
+                </div>
+            </div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">url地址</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="url" autocomplete="off" value="<?php if($interact['type']==1){echo str_replace("getinfo",$interact['url'],$system['oauth_url']);}else{echo $interact['url'];} ?>" class="layui-input" <?php if($interact['type']==1){echo 'readonly="readonly"';}?>>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">序号</label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="number" name="xh" autocomplete="off" value="{$interact['xh']}" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+			    <label class="layui-form-label">开关</label>
+			    <div class="layui-input-block">
+			      	<input type="checkbox" name="is_show" value="1" lay-skin="switch" lay-text="ON|OFF" <?php if($interact['is_show']==1){echo 'checked="checked"';}?>> 
+			    </div>
+			</div>			
+			<input type="hidden" name="id" value="{$interact['id']}" />
+			<input type="hidden" name="type" value="{$interact['type']}" />
+ 			<input type="hidden" id="pic_val" value="" >			
+			<div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+               	<button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+           </div>
+		</form>
+	</div>
+	<include file="Public/footer.html" />
+	<script type="text/javascript" src="__ROOT__/Public/js/tools.js"></script> 
+	<script>
+		layui.use(['form', 'layer'], function() {
+			$ = layui.jquery;
+			var form = layui.form;
+			var layer = layui.layer;
+
+			form.on('submit(save)', function(data) {
+				var tjing = parent.layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form=document.forms[0];
+	  		    var formData = new FormData(form);  
+	  		    
+			    if($("#pic_val").val()!=''){
+			      formData.append("pic",convertBase64UrlToBlob($("#pic_val").val()));
+				} 
+				
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Interact/dopost')}",
+					data: formData,
+					processData : false,         
+			        contentType : false,    
+					dataType: 'text',
+					success: function(data) {
+						if(data == '1') {
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								parent.location.reload();
+							})
+						} else if(data == '2') {
+							parent.layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						} else {
+							parent.layer.msg(data, {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+
+				return false;
+			});
+
+		});
+		
+		
+		function convertBase64UrlToBlob(urlData){
+		    var bytes=window.atob(urlData.split(',')[1]);    
+		    var ab = new ArrayBuffer(bytes.length);
+		    var ia = new Uint8Array(ab);
+		    for (var i = 0; i < bytes.length; i++) {
+		        ia[i] = bytes.charCodeAt(i);
+		    }
+		    return new Blob( [ab] , {type : 'image/jpg'});
+	    }
+	    
+	        
+	   function previewImage(file,flag,ob){
+	     var img =$('#imghead'+flag);
+	     var oFile = file.files[0]; 
+	    
+	     if(!new RegExp("(jpg|jpeg|png)+","gi").test(oFile.type)){  
+	          layer.msg("照片上传：文件类型必须是JPG、JPEG、PNG", {icon: 2,offset: '40%',time:2000,shade: 0.3});
+	          return;  
+	     }
+	     var reader = new FileReader();  
+	     var tjing =  parent.layer.msg('图片加载中', {icon: 16,shade: 0.3,time: 60*1000});
+	     reader.onload = function(e) {  
+	        var base64Img= e.target.result;
+	        var _ir=ImageResizer({  
+	        resizeMode:"auto"  
+	        ,dataSource:base64Img  
+	        ,dataSourceType:"base64"  
+	        ,maxWidth:1200   
+	        ,maxHeight:1200 
+	        ,onTmpImgGenerate:function(img){ }   
+	        ,success:function(resizeImgBase64,canvas){
+			parent.layer.close(tjing);
+			img.attr("src",resizeImgBase64);  
+		    $('#'+ob).val(resizeImgBase64.substr(22));
+			
+	        },debug:false});            
+	     };  
+	     reader.readAsDataURL(oFile);  
+	   }
+	</script>
+</body>
+</html>

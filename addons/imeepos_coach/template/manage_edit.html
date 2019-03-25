@@ -1,0 +1,138 @@
+{template 'common/header'}
+{template 'navs/manage'}
+<div class="panel panel-default">
+    <div class="panel-heading">
+
+    </div>
+    <div class="panel-body">
+        <form action="" method="post"  class="form-horizontal" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">课程名</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <input type="text" name="title" placeholder="" value="{$item['title']}" class="form-control"/>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">缩略图</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    {php echo tpl_form_field_image('image',$item['image'])}
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">简介</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <textarea name="desc"  class="form-control" id="" cols="30" rows="10">{$item['desc']}</textarea>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">详情</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    {php echo tpl_ueditor('content',$item['content'])}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">老师</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    {php $options = M('teacher')->getAll(1)}
+                    <select name="teacher_id" id="" class="form-control">
+                        <option value="0">请选择</option>
+                        {loop $options $option}
+                        <option value="{$option['id']}" {if $item['teacher_id']==$option['id']}selected{/if}>{$option['realname']}</option>
+                        {/loop}
+                    </select>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">状态</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <label class="radio-inline">
+                        <input type="radio" name="status" value="1" {if $item['status']==1}checked="checked"{/if}> 正常
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="status" value="0" {if $item['status']==0}checked="checked"{/if}> 禁用
+                    </label>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">周几</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <select name="week_id" id="" class="form-control">
+                        <option value="0">请选择</option>
+                        {php $options=M('manage_week')->getall();}
+                        {loop $options $option}
+                        <option value="{$option['id']}" {if $item['week_id']==$option['id']}selected{/if}>{$option['title']}</option>
+                        {/loop}
+                    </select>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">时间</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <select name="time_id" id="" class="form-control">
+                        <option value="0">请选择</option>
+                        {php $options=M('manage_time')->getall();}
+                        {loop $options $option}
+                        <option value="{$option['id']}" {if $item['time_id']==$option['id']}selected{/if}>{php echo date('H:i',$option['start_time'])}-{php echo date('H:i',$option['end_time'])}</option>
+                        {/loop}
+                    </select>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">最大人数</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <input type="text" name="max_num" placeholder="" value="{$item['max_num']}" class="form-control"/>
+                    <span class="help-block"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">单价</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <input type="text" name="one_money" placeholder="" value="{$item['one_money']}" class="form-control"/>
+                    <span class="help-block">元</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">可预约会员组</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    {php $options = M('group')->getall();}
+                    {loop $options $option}
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="group_id[]" value="{$option['id']}" {if in_array($option['id'],$item['group_id'])}checked="checked"{/if}> {$option['title']}
+                    </label>
+                    {/loop}
+                    <span class="help-block"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">推荐</label>
+                <div class="col-sm-8 col-lg-9 col-xs-12">
+                    <label class="radio-inline">
+                        <input type="radio" name="ishot" value="1" {if $item['ishot']==1}checked="checked"{/if}> 推荐
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="ishot" value="0" {if $item['ishot']==0}checked="checked"{/if}> 不推荐
+                    </label>
+                    <span class="help-block">推荐后可在首页显示</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-1 col-xs-12 col-sm-10 col-md-10 col-lg-11">
+                    <input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{template 'common/footer'}

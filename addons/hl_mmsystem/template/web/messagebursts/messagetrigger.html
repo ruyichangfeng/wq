@@ -1,0 +1,195 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagebursts')}"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-4" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <form action="" method="post" class="form-horizontal form">
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                                                    定时触发配置说明 <a class='btn btn-warning btn-sm' onclick="$('#taskHelpModal').modal('show')"><i class='fa fa-question-circle'></i> 使用帮助</a>
+                                                    <p><i class="fa  fa-lg fa-bomb" style="color: red"></i> 模板消息群发有风险，请谨慎使用，大用户量建议使用公众平台推送!</p>
+                                                    <p><i class="fa  fa-lg fa-bomb" style="color: red"></i> 定时触发功能旨在于粉丝跟公众号有互动关系的时候会在定制时间内触发消息推送服务，使用需谨慎！</p>
+                                                </div>
+                                                <!--<div class="form-group">-->
+                                                        <!--<label class="col-sm-2 control-label">触发类型</label>-->
+                                                        <!--<div class="col-sm-9 col-xs-12" >-->
+                                                            <!--<label class="radio-inline coupon-radio">-->
+                                                                <!--<input type="radio" name="tracetype" value="0" {if empty($uni_settings['trace']['type'])}checked="true"{/if} onclick="" /> 普通模式-->
+                                                            <!--</label>-->
+                                                            <!--<label class="radio-inline coupon-radio">-->
+                                                                <!--<input type="radio" name="tracetype" value="1" {if $uni_settings['trace']['type'] == 1}checked="true"{/if}  onclick=""/> 地区模式-->
+                                                            <!--</label>-->
+                                                            <!--<label class="radio-inline coupon-radio">-->
+                                                                <!--<input type="radio" name="tracetype" value="2" {if $uni_settings['trace']['type'] == 2}checked="true"{/if}  onclick=""/> 时间段模式-->
+                                                            <!--</label>-->
+                                                            <!--<span class='help-block'>-->
+                                                                <!--普通模式：访问后读取间隔时间后触发；<br />-->
+                                                                <!--地区模式：设置某个地区的粉丝才能触发；<br />-->
+                                                                <!--时间段模式：设置某个时间段推送什么内容；-->
+                                                            <!--</span>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                <div class="form-group" >
+                                                    <label class="col-sm-2 control-label must">选择任务</label>
+                                                    <div class="col-sm-9 col-xs-12">
+                                                        <input type="hidden" name="taskid" id="taskid" value="{$uni_settings['trace']['taskid']}" />
+                                                        <input type="text" name="task" id="task" class="form-control" value="{php echo util::getMassTask($uni_settings['trace']['taskid'], 'title')}" style="cursor: pointer;" onclick="select_task('taskid','task')" placeholder="点击这里选择任务" readonly="true" data-rule-required='true' />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">每次间隔时间</label>
+                                                    <div class="col-sm-9 col-xs-12">
+                                                        <div class="input-group">
+                                                            <input type="number" name="wait_time" class="form-control" value="{$uni_settings['trace']['wait_time']}" />
+                                                            <span class="input-group-addon">秒</span>
+                                                        </div>
+                                                        <span class='help-block'>
+                600->10分钟 1800->30分钟 3600->1小时 10800->3小时 21600->6小时 43200->12小时<br />
+                短时间内提醒过多次数，粉丝会产生负面情绪，建议设置一下间隔时间。
+            </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" ></label>
+                                                    <div class="col-sm-9 col-xs-12">
+                                                        <div class="help-block">
+                                                            <input type="hidden" name="token" value="{$_W['token']}" />
+                                                            <input type="submit" name="submit"  value="提交" class="btn btn-primary"  />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<div class="modal inmodal fade" id="taskHelpModal" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            		<span aria-hidden="true">
+            			&times;
+            		</span>
+                </button>
+                <h4 class="modal-title" id="gridSystemModalLabel">
+                    使用帮助
+                </h4>
+            </div>
+            <div class="modal-body" style="max-height: 400px;">
+
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">强调</h3>
+                    </div>
+                    <div class="panel-body">
+                        不支持混合消息的任务！！！<br />
+                        该功能仅支持认证服务号！！！
+                    </div>
+                </div>
+
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">支持变量</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <code>#公众号名称#</code>
+                            </div>
+                            <div class="col-sm-3">
+                                <code>#粉丝昵称#</code>
+                            </div>
+                            <div class="col-sm-3">
+                                <code>#时间#</code>上午/下午/中午等
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <code>#省份#</code>
+                            </div>
+                            <div class="col-sm-3">
+                                <code>#城市#</code>
+                            </div>
+                            <div class="col-sm-3">
+                                <code>#区县#</code>
+                            </div>
+                            <div class="col-sm-3">
+                                <code>#街道#</code>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="help-block">以上变量为 <kbd>消息触发</kbd> 功能特有，<kbd>消息群发</kbd> 功能以群发的为准</div>
+                    </div>
+                </div>
+
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">配置说明</h3>
+                    </div>
+                    <div class="panel-body">
+                        1. 进入微信公众号官方后台 <a href="https://mp.weixin.qq.com/">https://mp.weixin.qq.com/</a>；<br/>
+                        2. 点击左侧菜单【开发】- 【接口权限】；在页面中找到 <code>获取用户地理位置</code>，点击“开启”，选择任意选项后确认即可（已经开启了的，忽略1、2、3步）；<br />
+                        3. 点击 <a href="{php echo url('platform/reply/post', array('type'=>'trace','m' => 'special'))}" class="btn btn-success" target="_blank">特殊消息回复</a> ，开启+设置 “触发后回复内容”为模块，并选择当前模块。
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">常见问题</h3>
+                    </div>
+                    <div class="panel-body">
+                        遇到问题，先在下面找找哟
+                    </div>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">1. 为什么有时候用户收不到消息？</h3>
+                    </div>
+                    <div class="panel-body">
+                        微信限制，客服消息主动向用户推送20条内容的期间，用户如果没有对公众号产生互动，则会暂停对该用户的客服消息发送接口。
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">知道了</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{template 'web/common/footer'}

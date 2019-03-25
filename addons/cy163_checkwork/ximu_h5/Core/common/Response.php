@@ -1,0 +1,8 @@
+<?php
+/*   __________________________________________________
+    |  Obfuscated by YAK Pro - Php Obfuscator          |
+    |              on 2018-05-26 11:06:42              |
+    |    GitHub: https://github.com/pk-fr/yakpro-po    |
+    |__________________________________________________|
+*/
+ namespace Core\common; class Response { public static function json($data) { goto nL1BK; nL1BK: header("\143\x6f\156\x74\145\x6e\x74\55\164\171\160\145\x3a\x61\160\160\x6c\x69\143\141\x74\x69\x6f\156\57\152\163\x6f\x6e"); goto EyYY7; LuhDN: die; goto VG1bA; EyYY7: echo json_encode($data); goto LuhDN; VG1bA: } public static function img($file) { try { goto cDMLN; QEKe1: ob_clean(); goto ig6Kb; eAJk6: if ($data) { goto KTm0H; } goto sYZBv; cDMLN: if (strpos($file, "\x68\164\164\160\72\x2f\57") === 0 || strpos($file, "\x68\x74\164\160\163\72\57\x2f") === 0) { goto GAXW4; } goto ahvuA; kv6Jo: KTm0H: goto lhgJD; lhgJD: header("\143\x6f\x6e\x74\145\156\164\x2d\x74\171\x70\145\72" . $data["\155\x69\x6d\x65"]); goto QEKe1; ig6Kb: echo $imgData; goto dj2vS; sYZBv: die("\345\x9b\xbe\xe7\211\207\346\227\xa0\xe6\x95\x88"); goto kv6Jo; Edui4: $imgData = file_get_contents($file, null, $context); goto r5SBU; r5SBU: $data = getimagesizefromstring($imgData); goto eAJk6; xY4uo: $context = stream_context_create(array("\x68\x74\x74\x70" => array("\164\151\x6d\x65\157\165\x74" => 5))); goto Edui4; NKZLW: GAXW4: goto xY4uo; ahvuA: $file = IA_ROOT . $file; goto NKZLW; dj2vS: } catch (\Exception $e) { echo "\xe8\257\273\345\x8f\226\xe5\233\xbe\xe7\211\207\345\xa4\261\350\xb4\245"; } die; } }

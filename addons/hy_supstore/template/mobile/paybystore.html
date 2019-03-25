@@ -1,0 +1,324 @@
+{template 'common/header'}
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href='../addons/hy_supstore/template/mobile/css/common.css' rel='stylesheet' type='text/css'>
+<link href='../addons/hy_supstore/template/mobile/css/mypay.css' rel='stylesheet' type='text/css'>
+<script src="../addons/hy_supstore/template/layui/layui.js"></script>
+<div class="wrap">
+    <form action="" id="form1" method="post" enctype="multipart/form-data" class="edit_cash">
+        <div class="shuru">
+            <span>&yen;</span>
+            <div id="money"></div>
+        </div>
+        <div style="padding: 10px 5px; border-bottom:1px solid #CFCFCF;" onClick="javscript:openview();">
+            <span id="couponname">优惠券为空</span> <span style="float:right;">请选择 ></span>
+            <input type="hidden" name="couponid" id="couponid">
+        </div>
+        <label style="margin-top: 5px;">
+            <input type="checkbox" name="credit2" id="credit2" value="1" checked="checked" style="vertical-align:middle; margin:0;" />
+            <span style="vertical-align: middle;font-weight:normal; font-size: 13px;">使用余额支付（当前余额：<span style="color:#2dbde6;">{$member['extmem']['credit2']}元</span>）</span>
+        </label>
+        <input type="hidden" name="amount" id="amount" value="" />
+        <input type="hidden" name="storeid" id="storeid" value="{if $store}{$store['id']}{/if}" />
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="hidden" name="wxtoken" value="{$wxtoken}" />
+    </form>
+    <input type="submit" value="支付" class="submit" style="background: #5a92ff;border: 1px solid #5a92ff;"> 
+    {if empty($storeid)}
+    <div class="select_box">
+        <p>店面：</p>
+        {if $stores}
+        <dl class="select">
+            <dt onclick="javascript:storeup(0)">请选择店面</dt>
+            <dd>
+                <ul>
+                    {loop $stores $store}
+                    <li><a href="javascript:void(0);" onclick="javascript:storeup({$store['id']})">{$store['title']}</a></li>
+                    {/loop}
+                </ul>
+            </dd>
+        </dl>
+        {else}
+        <dl class="select" style="display:block;">
+            <dt style="display:block;">{$store['title']}</dt>
+        </dl>
+        {/if}
+    </div>
+    {else}
+    <div class="select_box">
+        <p>店面：</p>
+        <dl class="select" style="display:block;">
+            <dt style="display:block;">{$store['title']}</dt>
+        </dl>
+    </div>
+    {/if}
+    <div class="ruletips">
+        {template 'selrules'}
+    </div>
+    <!--底部导航-->
+    {template 'footerindex'}
+</div>
+<div class="layer-content" style="display: none;">
+    <div class="form_edit clearfix">
+        <div class="num">1</div>
+        <div class="num">2</div>
+        <div class="num">3</div>
+        <div class="num">4</div>
+        <div class="num">5</div>
+        <div class="num">6</div>
+        <div class="num">7</div>
+        <div class="num">8</div>
+        <div class="num">9</div>
+        <div class="num">.</div>
+        <div class="num">0</div>
+        <div id="remove">删除</div>
+    </div>
+</div>
+<script type="text/javascript">
+layui.use(['form', 'layer', 'table', 'element'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element;
+});
+
+function openview() {
+    var money = document.getElementById("money");
+    var asdas = money.innerHTML;
+    var storeid = $('#storeid').val();
+
+    if (asdas == '') {
+        alert('请先填写消费金额 才能匹配优惠券');
+        return false;
+    }
+
+    if(!storeid){
+        alert('请先选择店铺 才能匹配优惠券');
+        return false;
+    }
+
+    uid = <?php echo $member['id'];?>; //用户id
+
+    var uulr = "{php echo $this->createMobileUrl('selcoupon')}&amount=" + asdas + "&uid=" + uid + "&storeid=" + storeid+"&status=1&includeAll=true";
+
+    layer.open({
+        type: 2,
+        title: false,
+        closeBtn: false,
+        maxmin: false,
+        scrollbar: false,
+        shadeClose: true, //点击遮罩关闭层
+        offset: 'lt',
+        area: ['100%', '100%'],
+        content: uulr
+    });
+}
+
+function select_entry(a, b) {
+    //跳转
+    layer.closeAll(); //再执行关闭 
+    $('#couponid').attr("value", a);
+    $('#couponname').html(b);
+}
+
+$(function() {
+    var gstoreid = "{$_GPC['storeid']}";
+
+    if (typeof(gstoreid) != "undefined") {
+        if (gstoreid != null) {
+            $("#storeid").val(gstoreid);
+        }
+    }
+
+    //填写信息
+    $('.submit').click(function(e) {
+        var money = document.getElementById("money");
+        var moneyHtml = money.innerHTML;
+
+        $('#amount').val(moneyHtml);
+        $storeid = $("#storeid").val();
+
+        if ($storeid == "") {
+            alert('必须选择门店!');
+            return false;
+        }
+
+        if (Number(moneyHtml) <= 0) {
+            alert('付款金额必须合法!');
+            return false;
+        }
+
+        var numindex = parseInt(moneyHtml.toString().indexOf("."), 10);
+
+        if (numindex == 0) {
+            alert('付款金额必须合法!');
+            return false;
+        }
+
+        $('.layer').hide();
+        $('.form').hide();
+        $('.submit').addClass('active');
+        //$('.submit').attr('disabled', true);  
+        $('#form1').submit();
+        //e.preventDefault();       //阻止表单提交
+    })
+
+    // 监听#money内容变化，改变支付按钮的颜色
+    $('#money').bind('DOMNodeInserted', function() {
+
+        if ($("#money").text() != "" || $("#money").text() > '0') {
+            $('.submit').removeClass('active');
+            $('.submit').attr('disabled', false);
+        } else {
+            $('.submit').addClass('active');
+            $('.submit').attr('disabled', true);
+        }
+    })
+
+    $('#money').trigger('DOMNodeInserted');
+
+    $('.shuru').click(function(e) {
+        $('.layer-content').show();
+        $('.layer-content').animate({
+            bottom: 0
+        }, 200)
+        e.stopPropagation();
+    })
+
+    $('.wrap').click(function() {
+        $('.layer-content').animate({
+            bottom: '-241px'
+        }, function() {
+            $('.layer-content').hide();
+        })
+
+    })
+
+    //向下滑动弹框收起
+
+    //返回角度  
+    function GetSlideAngle(dx, dy) {
+        return Math.atan2(dy, dx) * 180 / Math.PI;
+    }
+
+    //根据起点和终点返回方向 1：向上，2：向下，3：向左，4：向右,0：未滑动  
+    function GetSlideDirection(startX, startY, endX, endY) {
+        var dy = startY - endY;
+        var dx = endX - startX;
+        var result = 0;
+
+        //如果滑动距离太短  
+        if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
+            return result;
+        }
+
+        var angle = GetSlideAngle(dx, dy);
+        if (angle >= -45 && angle < 45) {
+            result = 4;
+        } else if (angle >= 45 && angle < 135) {
+            result = 1;
+        } else if (angle >= -135 && angle < -45) {
+            result = 2;
+        } else if ((angle >= 135 && angle <= 180) || (angle >= -180 && angle < -135)) {
+            result = 3;
+        }
+
+        return result;
+    }
+
+    //向下滑动弹框收起
+
+    //滑动处理  
+    var startX, startY;
+    document.addEventListener('touchstart', function(ev) {
+        startX = ev.touches[0].pageX;
+        startY = ev.touches[0].pageY;
+    }, false);
+    document.addEventListener('touchend', function(ev) {
+        var endX, endY;
+        endX = ev.changedTouches[0].pageX;
+        endY = ev.changedTouches[0].pageY;
+        var direction = GetSlideDirection(startX, startY, endX, endY);
+        switch (direction) {
+            case 0:
+                // alert("没滑动");  
+                break;
+            case 1:
+                // alert("向上");
+                break;
+            case 2:
+                // alert("向下");
+                $('.layer-content').animate({
+                    bottom: '-241px'
+                },function() {
+                    $('.layer-content').hide();
+                })
+                break;
+            case 3:
+                // alert("向左");   
+                break;
+            case 4:
+                // alert("向右");  
+                break;
+            default:
+        }
+    }, false);
+
+    $('.form_edit .num').click(function() {
+        var money = document.getElementById("money");
+
+        money.innerHTML += this.innerHTML;
+        $('#couponid').attr("value", '');
+        $('#couponname').html('优惠券为空');
+    })
+
+    $('#remove').click(function() {
+        var money = document.getElementById("money");
+        var moneyHtml = money.innerHTML;
+
+        money.innerHTML = moneyHtml.substring(0, moneyHtml.length - 1);
+        $('#couponid').attr("value", '');
+        $('#couponname').html('优惠券为空');
+    })
+
+    $(".select").each(function() {
+        var s = $(this);
+        var z = parseInt(s.css("z-index"));
+        var dt = $(this).children("dt");
+        var dd = $(this).children("dd");
+        var _show = function() {
+            dd.slideDown(200);
+            dt.addClass("cur");
+            s.css("z-index", z + 1); /*dd.css("display",'block');alert(dt.html());*/
+        }; //展开效果
+        var _hide = function() {
+            dd.slideUp(200);
+            dt.removeClass("cur");
+            s.css("z-index", z);
+        }; //关闭效果
+
+        dt.click(function() { dd.is(":hidden") ? _show() : _hide(); });
+        dd.find("a").click(function() {
+            dt.html($(this).html());
+            _hide();
+        }); //选择效果（如需要传值，可自定义参数，在此处返回对应的“value”值 ）
+
+        $("body").click(function(i) {!$(i.target).parents(".select").first().is(s) ? _hide() : ""; });
+    })
+
+})
+
+function storeup(storeid) {
+    if (storeid != 0) {
+        $("#storeid").val(storeid);
+
+        //添加规则
+        var url = "{php echo $this->createMobileUrl('selrules');}";
+
+        $.get(url, { storeid: storeid }, function(tpl) {
+            $('.ruletips').html(tpl);
+        });
+    }
+}
+</script>
+</body>
+</html>

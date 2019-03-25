@@ -1,0 +1,340 @@
+{template 'public/header'}
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+			<li><a href="<?php echo $this->routeUrl('goods.index');?>">商品管理</a></li>
+			<?php if(intval($goods['id'])>0){?>
+			<li class="active">{$goods['name']}</li>
+			<?php }?>
+			<li class="active"><?php if(intval($_GPC['gid'])>0){ echo '编辑商品';}else{
+				echo '添加商品';}?></li>
+		</ol></div>
+
+	<div class="panel-body">
+		<form class="form-horizontal layui-form" method="post" id="memForm"  action="<?php echo $this->routeUrl('goods.save');?>&gid={$_GPC['gid']}">
+			<input type="hidden" name="gid" value="{$goods['id']}">
+			<div class="form-group" style="margin-top:20px;">
+				<label for="inputEmail3" class="col-sm-2 control-label">商品名称</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="name" valid="length|1|49" name="name" placeholder="名称，50字以内" value="{$goods['name']}" valid-msg="名称不正确" >
+
+				</div>
+				<label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*必填</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">原价</label>
+				<div class="col-sm-4">
+					<input type="float" class="form-control"  value="{$goods['price0']}" name="price0" placeholder="价格" valid="intval|0|999999" valid-msg="价格不正确" >
+				</div> <label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*必填</label>
+
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">现价</label>
+				<div class="col-sm-4">
+					<input type="float" class="form-control"  value="{$goods['price']}"  id="price" name="price" placeholder="价格" valid="intval|0|999999" valid-msg="价格不正确" >
+				</div> <label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*必填</label>
+
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">虚拟销量</label>
+				<div class="col-sm-4">
+					<input type="number"  class="form-control"  value="<?php echo ($goods['sellCount0']);?>" id="sellCount0" name="sellCount0" placeholder="虚拟销量，0 ~ 500之间" valid="intval|0|500" valid-msg="虚拟销量只能为0-500" >
+				</div> <label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*小程序显示销量=虚拟销量+真实销量。后台只显示真实销量</label>
+
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">库存</label>
+				<div class="col-sm-4">
+					<input type="float" class="form-control"  value="{$goods['stock']}"  name="stock" placeholder="库存"   valid-msg=" " >
+				</div> <label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*规格库存优先于商品库存</label>
+
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">商品一级分类</label>
+				<div class="col-sm-3">
+					<select id="cateid"  lay-filter="cateid"  name="cateid" title="<?php echo $goods['cateid'];?>" class="form-control" style="width:200px;" >
+						<option value="0" style="color:#999;">未设置</option>
+						{loop $cates $index $cate}
+						<option value="{$cate['id']}" <?php if($goodscate['parentid'] == $cate['id'] || $goodscate['id'] == $cate['id']){ echo "selected";}  ?> >{$cate['name']}</option>
+
+						{/loop}
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">商品二级分类</label>
+				<div class="col-sm-3">
+					<select id="cateidone"  lay-filter="cateidone"  name="cateidone" class="form-control" style="width:200px;" >
+						<option value="0" style="color:#999;">未设置</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">商品品牌</label>
+				<div class="col-sm-3">
+					<select id="brandid" name="brandid" class="form-control" title="<?php echo $goods['brandid']; ?>" style="width:200px;" >
+						<option value="0" style="color:#999;">未设置</option>
+						<!--{loop $brand $index $b}-->
+						<!--<option value="{$b['id']}"  <?php if($goods['brandid']==$b['id']){ echo "selected";}?>>{$b['name']}</option>-->
+						<!--{/loop}-->
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">货到付款</label>
+				<div class="col-sm-4">
+					<input type="radio"  lay-filter="delivery"  name="delivery" value="1" title="开启" <?php if($goods['delivery'] < 2){ echo  'checked="checked"'; }?> >
+					<input type="radio"  lay-filter="delivery" name="delivery" value="2" title="关闭" <?php if($goods['delivery'] > 1){ echo  'checked="checked"'; }?>  >
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">微信付款</label>
+				<div class="col-sm-4">
+					<input type="radio" lay-filter="wechat_payment" name="wechat_payment" value="1" title="开启"  <?php if($goods['wechat_payment'] < 2){ echo  'checked="checked"'; }?>  >
+					<input type="radio" lay-filter="wechat_payment"  name="wechat_payment" value="2" title="关闭"  <?php if($goods['wechat_payment'] > 1){ echo  'checked="checked"'; }?>  >
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">售后服务</label>
+				<div class="col-sm-4">
+					<input type="radio" name="sale" lay-filter="sale" value="1" title="开启"  <?php if($goods['sale'] < 2){ echo  'checked="checked"'; }?>  >
+					<input type="radio" name="sale" lay-filter="sale" value="2" title="关闭"  <?php if($goods['sale'] > 1){ echo  'checked="checked"'; }?>  >
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">封面图片</label>
+				<div class="col-sm-4">
+					{php echo tpl_form_field_images('picture',$goods['picture']);}
+				</div>
+				<label   class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*建议比例1:1，300*300像素</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">活动图片(宽)</label>
+				<div class="col-sm-4">
+					<?php echo tpl_form_field_images('picture_wide',$goods['picture_wide']); ?>
+				</div>
+				<label   class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*建议比例3:2，600*400像素</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">详情轮播图</label>
+				<div class="col-sm-6">
+					{php echo tpl_form_field_images('pics',$swipers,2);}
+					
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">状态</label>
+				<div class="col-sm-6">
+					<select class="form-control" name="sts" style="width: 200px;" >
+						<option value="1" <?php if($goods['status']=="1"){ echo "selected";}?> >上架</option>
+						<option value="0" <?php if($goods['status']=="0"){ echo "selected";}?>  >下架</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">小程序路径</label>
+				<div class="col-sm-6">
+					<input type="float" class="form-control"  readonly disabled value="<?php if(intval($goods['id'])){echo '/zsk_market/pages/details/index?goodsid='.$goods['id'];}?>"  placeholder="添加完成后查看"  >
+				</div>
+
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">手机端商品详情图</label>
+				<div class="col-sm-6">
+					{php echo tpl_form_field_images('goodspic',$goodspic,2);}
+					
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">商品详情</label>
+				<input type="hidden" name="after_saleitl" value='' id="afterc_saleitl" />
+				<div class="col-sm-6">
+					<textarea id="demo" style="display: none; width: 100%;" name="content">{$goods['content']}</textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">手机端售后服务</label>
+				<div class="col-sm-6">
+					{php echo tpl_form_field_images('goodsafter',$goodsafter,2);}
+					
+				</div>
+			</div>
+			<div class="form-group" id="atr">
+				<label for="inputPassword3" class="col-sm-2 control-label">售后服务</label>
+				<input type="hidden" name="after_sale" value='' id="after_sale" />
+				<div class="col-sm-6">
+					<textarea id="demo1" style="display: none; width: 100%;" value='' name="kdiel">{$goods["after_sale"]}</textarea>
+				</div>
+			</div>
+			<div class="form-group" style="text-align: center;">
+				<div class="col-sm-6" style="text-align: center;">
+					<button type="button" class="mybtn" style="margin:0 auto;" onclick="sub()">保 存
+					</button>
+				</div>
+
+			</div>
+
+		</form>
+	</div>
+</div>
+<script type="text/javascript" src="{ZSK_STATIC}layui/layui.all.js"></script>
+<!--<script type="text/javascript" src="{ZSK_STATIC}layui/layui.js"></script>-->
+<script type="text/javascript">
+		var layedit = layui.layedit;
+		layedit.set({
+			uploadImage: {
+				url: '<?php echo $this->routeUrl("upload.uploadwb1"); ?>' //接口url
+				,type: 'post' //默认post
+			}
+		});
+		var demo = layedit.build('demo', {
+			height:'200px',
+			tool: [
+				'strong' //加粗
+				,'italic' //斜体
+				,'underline' //下划线
+				,'del' //删除线
+				,'|' //分割线
+				,'left' //左对齐
+				,'center' //居中对齐
+				,'right' //右对齐
+				,'link' //超链接
+				,'unlink' //清除链接
+				// ,'face' //表情
+				,'image' //插入图片
+				// ,'help' //帮助
+			]
+		});
+		var demo1 = layedit.build('demo1', {
+			height:'200px',
+			tool: [
+				'strong' //加粗
+				,'italic' //斜体
+				,'underline' //下划线
+				,'del' //删除线
+				,'|' //分割线
+				,'left' //左对齐
+				,'center' //居中对齐
+				,'right' //右对齐
+				,'link' //超链接
+				,'unlink' //清除链接
+				// ,'face' //表情
+				,'image' //插入图片
+				// ,'help' //帮助
+			]
+		});
+
+	function html_decode1(value){
+		var s = "";
+		if (value.length == 0) return "";
+		s = value.replace(/&lt;/g, "<");
+		s = s.replace(/&gt;/g, ">");
+		s = s.replace(/&nbsp;/g, " ");
+		s = s.replace(/&nbsp;/g, '"');
+		s = s.replace(/&#39/g, '"');
+		s = s.replace(/\'/g, '"');
+		return s;
+	}
+	function sub(){
+		var demoone = layedit.getContent(demo1);
+		var siel = html_decode1(demoone);
+		$('#after_sale').val(siel);
+		var demotwo = layedit.getContent(demo);
+		console.log(demotwo);
+		$('#afterc_saleitl').val(demotwo);
+		var delivery = $('input[type=radio][name=delivery][checked=checked]').val();
+		var wechat_payment = $('input[type=radio][name=wechat_payment][checked=checked]').val();
+		if(wechat_payment < 2 || delivery < 2){
+			if(valid_easy('form-control')){
+				modalDlg("是否继续？",function(){
+					$("#memForm").submit();
+				})
+			}
+		}else{
+			layer.alert('微信付款与货到付款必须选择一种付款方式');
+			return false;
+		}
+
+	}
+
+		$(document).ready(function() {
+			var cateid = $('#cateid').attr('title');
+			var title = $('#brandid').attr('title');
+			sile(cateid,title);
+			var form = layui.form
+				,layer = layui.layer
+				,layedit = layui.layedit
+				,laydate = layui.laydate;
+			form.on('select(cateid)', function(data){
+				var category_id = data.value;
+				// replace(/(^\s*)|(\s*$)/g, "")
+				// var dile = $("#"+data.elem.name).next().find("input")[0].value;
+				// $("#"+data.elem.name).next().find("input")[0].value = dile.replace(/^\s+|\s+$/g,"");
+				var title = 0;
+				form.render('select');
+				sile(category_id,title);
+			})
+			form.on('radio', function(data,is){
+				$('input[name='+data.elem.name+'][checked=checked]').removeAttr('checked','checked');
+				$('input[value='+data.value+'][name='+data.elem.name+']').attr('checked','checked');
+			});
+			form.on('radio(sale)', function(data){
+				if(data.value < 2){
+					$('#atr').css('display','block');
+				}else{
+					$('#atr').css('display','none');
+				}
+			});
+			function sile(category_id,title){
+				if(category_id < 1){
+					$("#brandid").empty();
+					$("#cateidone").empty();
+					$('#brandid').append('<option value="0" style="color:#999;">未设置</option>');
+					$('#cateidone').append('<option value="0" style="color:#999;">未设置</option>');
+					layui.form.render('select');
+					return false;
+				}
+
+				console.log(category_id);
+				$.ajax({
+					type:"POST",                      //请求类型
+					url:"<?php echo $this->routeUrl('goods.optkdi');?>",           //URL
+					data:{category_id:category_id},   //传递的参数
+					dataType:"json",                 //返回的数据类型
+					success:function(data){
+						console.log(data);
+						$("#brandid").empty();
+						$("#cateidone").empty();
+						layui.form.render('select');
+						$('#brandid').append('<option value="0" style="color:#999;">未设置</option>');
+						$('#cateidone').append('<option value="0" style="color:#999;">未设置</option>');
+						var brand = data.brand;
+						var cateidone = data.catesone;
+						for (var i = 0; i < brand.length; i++){
+							if(title == brand[i].id){
+								$('#brandid').append('<option value="'+brand[i].id+'" selected style="color:#999;">'+brand[i].name+'</option>');
+							}else{
+								$('#brandid').append('<option value="'+brand[i].id+'"  style="color:#999;">'+brand[i].name+'</option>');
+							}
+						}
+						for (var i = 0; i < cateidone.length; i++){
+							if(category_id == cateidone[i].id){
+								$('#cateidone').append('<option value="'+cateidone[i].id+'" selected style="color:#999;">'+cateidone[i].name+'</option>');
+							}else{
+								$('#cateidone').append('<option value="'+cateidone[i].id+'"  style="color:#999;">'+cateidone[i].name+'</option>');
+							}
+						}
+
+						form.render('select');
+					},
+				});
+			}
+			$("i[layedit-event='image']").click(function(){
+			var id=$(this).parent().parent().parent().find("textarea").attr('id')
+			public_imgclick(id,2)
+		})
+		});
+
+</script>
+
+{template 'public/footer'}

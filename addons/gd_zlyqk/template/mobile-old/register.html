@@ -1,0 +1,73 @@
+{template "header"}
+<style>
+    .list2 span{margin-bottom: 10px;padding-left: 10px;padding-right: 10px;}
+    .list {padding-left: 20px !important;}
+</style>
+<div class="menu-overly"></div>
+<div class="wrap page1">
+    {if $memberConfig['mut_app']}
+    <div class="part1" style="margin-top:10px;padding-top:10px;padding-bottom: 0px;">
+        <div class="list list2" >
+            {loop $appList $app}
+            <span  data-id="{$app['id']}" {if $app['id']==$memberInfo['app_id'] } class="on" {/if} {if !$memberInfo['app_id'] && $app['is_default']}  class="on" {/if}>{$app['name']}</span>
+            {/loop}
+        </div>
+    </div>
+    {/if}
+    <div class="part2" {if !$memberConfig['mut_app']} style='margin-top:10px;' {/if}>
+        <input type="hidden" id="user_id" value="{$memberInfo['id']}">
+        <div class="title" style="padding-left:.9rem">
+            <span style="left: .2rem">姓名</span>
+            <input type="text" placeholder="填写姓名" id="name" value="{$memberInfo['name']}">
+        </div>
+        <div class="title" style="padding-left:.9rem">
+            <span style="left: .2rem">电话</span>
+            <input type="text" placeholder="填写电话" id="mobile" <?php if(!empty($memberInfo['mobile'])){?> value="{$memberInfo['mobile']}" <?php } ?>>
+        </div>
+    </div>
+    <div class="operate" style="z-index: 99">
+        <a href="javascript:" class="btn submit">保存</a>
+    </div>
+</div>
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/main.js"></script>
+{template "wx_js"}
+<script>
+
+    //提交数据
+    var post = new Object();
+    $(".submit").click(function(){
+        post.app=0;
+        post.id=$("#user_id").val();
+        post.name=$("#name").val();
+        post.mobile=$("#mobile").val();
+        post.app = $(".list2").find(".on").attr("data-id");
+        if( post.app==undefined){
+            layer.open({
+                content: "请选择归属"
+                ,skin: 'msg'
+                ,time: 1
+            });
+            return false;
+        }
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('addMember')}",
+            data:post,
+            dataType:"json",
+            success:function(result){
+                layer.open({
+                    content: result.msg
+                    ,skin: 'msg'
+                    ,time: 1
+                });
+                if(result.code==1){
+                    setTimeout(function(){
+                        location.reload();
+                    },1100);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+<?php
+ goto qqZce; J36m3: require "\146\x75\156\143\164\x69\x6f\156\137\143\153\x2e\160\150\160"; goto VLl50; VLl50: $op = $_GPC["\x6f\160"]; goto bWFXi; WT8rL: $srdb = pdo_get("\x74\x65\x73\x74\137\143\157\156\146\x69\147", array("\x77\145\x69\x64" => $_W["\165\156\151\x61\x63\151\144"])); goto J36m3; qqZce: require "\x66\165\156\143\x74\x69\157\x6e\x5f\143\160\56\x70\150\x70"; goto TsGZ5; bWFXi: $urlt = $this->createWebUrl("\143\157\x6e\146\151\147"); goto uOe9j; TsGZ5: global $_W, $_GPC; goto WT8rL; uOe9j: include $this->template("\x68\145\x6c\x70"); goto Ihd2L; Ihd2L: ?>

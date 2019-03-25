@@ -1,0 +1,127 @@
+{template "header"}
+<body ontouchstart>
+{template "thems"}
+<header class="ui-header">
+    <div class="ui-icon-left">
+        <a href="javascript:" class="ui-icon icon-back"></a>
+    </div>
+    <div class="ui-title">消息列表</div>
+    <div class="ui-icon-right">
+        <div class="ui-icon-text">{$total}:条</div>
+    </div>
+</header>
+<div class="ui-content">
+    <div class="in-search-bar">
+        <div class="selectbar">
+            <span class="text">
+                {if $_GPC['id']==0} 全部数据单 {/if}
+                {if $_GPC['id']==1} 可处理 {/if}
+                {if $_GPC['id']==2} 待处理 {/if}
+                {if $_GPC['id']==3} 流转中 {/if}
+                {if $_GPC['id']==4} 已完成 {/if}
+                {if $_GPC['id']==5} 终止记录 {/if}
+                {if $_GPC['id']==6} 撤销记录 {/if}
+            </span>
+        </div>
+        <div class="inbar-body">
+            <div class="in-search">
+                <input type="text" id="search" value="{$search}" placeholder="姓名,电话,单号 搜索" class="in-text"><button class="btnso">搜索</button>
+            </div>
+        </div>
+    </div>
+    <div class="msg-style">
+        <ul class="">
+            <li {if $_GPC['id']==0} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>0))}">全部数据单</a></li>
+            <li {if $_GPC['id']==1} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>1))}">可处理</a></li>
+            <li {if $_GPC['id']==2} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>2))}">待处理</a></li>
+            <li {if $_GPC['id']==3} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>3))}">流转中</a></li>
+            <li {if $_GPC['id']==4} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>4))}">已完成</a></li>
+            <li {if $_GPC['id']==5} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>5))}">终止记录</a></li>
+            <li {if $_GPC['id']==6} class="active" {/if}><a href="{php echo $this->createMobileUrl('msg',array('id'=>6))}">撤销记录</a></li>
+        </ul>
+    </div>
+    {loop $msgList $msg}
+    <div class="weui-panel weui-panel_msg">
+        <div class="weui-panel__bd">
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="{$msg['icon']}" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="media-sm__title">
+                        应用：{$msg['app_name']}
+                    </h4>
+                    <p class="media-sm__desc">单号：{$msg['gd_sn']} <font style="font-size: 12px;font-weight: 800;color: red">{$msg['property']}</font></p>
+                    <p class="media-sm__meta">提交人：{$msg['name']}  {$msg['mobile']}</p>
+                    <p class="media-sm__desc">提交时间：{php echo date("Y-m-d H:i:s",$msg['create_time'])}</p>
+                </div>
+                <div class="weui-media-box__end">
+                    <div class="end-date">{$msg['use_time']}</div>
+                    <div class="end-tips">普通</div>
+                    <div class="end-status"><span style="color: #f08500">{if $msg['node_name_status']} {$msg['node_name_status']}{else} 待处理{/if}</span></div>
+                </div>
+            </a>
+        </div>
+        <div class="weui-panel__footer">
+            <div class="ft-item">
+                状态：{$msg['node_name']}　{if $msg['staff_name']}处理人：{$msg['staff_name']}{/if}
+            </div>
+            <div class="ft-button">
+                {if $msg['show']==1}
+                {if  $msg['who']==1 }
+                {if  $msg['is_abort']==0}
+                {if  $msg['is_mark']==0}
+                <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_action remark" data-id="{$msg['id']}" onclick="mark({$msg['id']})">{$jd}</a>
+                {/if}
+                {/if}
+                {/if}
+                {/if}
+                <!--<a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_action">分配</a>-->
+                <!--<a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_action">删除</a>-->
+                <a href="{php echo $this->createMobileUrl('sdetail',array('id'=>$msg['recorder_id'],'app_id'=>$msg['app_id']))}" class="weui-btn weui-btn_mini weui-btn_look" >查看</a>
+            </div>
+        </div>
+    </div>
+    {/loop}
+</div>
+{template "js"}
+{if $baseConfig['pt_in']==1}
+{template "menu"}
+{/if}
+{template "notice"}
+<script>
+    $(".btnso").click(function(){
+        var url = $(".active").find("a").attr("href");
+        var word = $("#search").val();
+        if(word==""){
+            return false;
+        }
+        location.href=url+"&search="+word;
+    });
+    $('.selectbar').click(function () {
+        $(".msg-style").slideDown('fast');
+    });
+    $('.msg-style li').click(function () {
+        $(this).addClass('active').siblings('li').removeClass('active');
+        var atxt = $(this).find('a').text();
+        var mspan = $('.selectbar span')
+        mspan.text(atxt);
+        $(".msg-style").hide();
+    });
+
+    function mark(id){
+        $.post("{php echo $this->createMobileUrl('remark')}&id="+id,{},function(response){
+            if(response.code==1){
+                successMsg(response.msg);
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }else{
+                errorMsg(response.msg)
+            }
+        },"json");
+    };
+
+</script>
+</body>
+</html>

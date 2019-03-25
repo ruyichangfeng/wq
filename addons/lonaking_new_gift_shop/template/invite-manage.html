@@ -1,0 +1,105 @@
+{template 'common/header'}
+<style type="text/css">
+
+	table tbody tr{
+		line-height: 30px;
+	}
+	tr td .sub{
+		color: #959595;
+		font-size: 13px;
+		overflow:hidden;
+		white-space:nowrap;
+		text-overflow:ellipsis;
+		width: 100%;
+	}
+	tr td .sub .value,a.value{
+		color: #ce643f;
+		font-size: 13px;
+		overflow:inherit;
+		white-space:initial;
+		text-overflow:inherit;
+		width: 100%;
+	}
+	tr td .sub .value.success{
+		color: #5cb85c;
+	}
+	tr td .sub .value.primary{
+		color: #428bca;
+	}
+	tr td .sub .value.danger{
+		color: #d9534f;
+	}
+	tr td .sub .value.warning{
+		color: #f0ad4e;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+	</ul>
+	<style type="text/css">
+		table thead tr th,table tbody tr td{
+			text-align: left;
+		}
+	</style>
+	<div class="panel panel-default">
+		<div class="panel-body">
+
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+				<tr>
+					<th class="col-sm-1">#</th>
+					<th class="col-sm-3">昵称／id</th>
+					<th class="col-sm-3">邀请者／id</th>
+					<th class="col-sm-2">邀请级别</th>
+					<th class="col-sm-2">类型</th>
+					<th class="col-sm-2">积分</th>
+					<th class="col-sm-2">余额</th>
+					<th class="col-sm-4">时间</th>
+					<th class="col-sm-4">最后更新</th>
+
+				</tr>
+				</thead>
+				<tbody>
+				{loop $page['data'] $r}
+				<tr class="text-left">
+					<td data-id="{$r['id']}">
+						<p>{$r['id']}</p>
+					</td>
+					<td><p class="userinfo" href="javascript:void(0);"><span><img style="margin-right: 12px; width:40px; height:40px;" src="{$r['user']['avatar']}"/></span>{$r['nickname']}／{$r['user_id']}</p></td>
+					<td><p class="userinfo" href="javascript:void(0);"><span><img style="margin-right: 12px; width:40px; height:40px;" src="{$r['invite_user']['avatar']}"/></span>{$r['invite_nickname']}／{$r['invite_user_id']}</p></td>
+					<td data-id="{$r['id']}">
+						<p>{$r['level']}</p>
+					</td>
+					<td><p>
+						{if ($r['status'] == 1)}
+							关注
+						{elseif ($r['status'] == 2)}
+							取消关注
+						{else}
+							其它
+						{/if}
+					</p></td>
+					<td>
+						<p>{$r['score']}
+							{if ($r['invite_user_id'] > 0  && $r['score_result'] == 1 && $r['score'] > 0)}
+							<span class="label label-success">已发放</span>
+							{/if}
+							{if ($r['invite_user_id'] > 0 && $r['score_result'] == 1 && $r['score'] < 0)}
+							<span class="label label-success">已扣除</span>
+							{/if}
+						</p>
+
+					</td>
+					<td><p>{$r['money']}</p></td>
+					<td><p>{php echo date("Y-m-d H:i:s",$r['create_time'])}</p></td>
+					<td><p>{php echo date("Y-m-d H:i:s",$r['update_time'])}</p></td>
+				</tr>
+				{/loop}
+				</tbody>
+			</table>
+			{$page['pager']}
+		</div>
+	</div>
+</div>
+{template 'common/footer'}

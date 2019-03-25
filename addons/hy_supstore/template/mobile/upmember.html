@@ -1,0 +1,232 @@
+{template 'common/header'}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>会员中心</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link href="./app/resource/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./app/resource/css/common.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/style_hyk.css" rel="stylesheet" />
+    <style>
+    .header .jf_box .ling {
+        position: relative;
+    }
+
+    .recharge {
+        position: absolute;
+        right: 0px;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-right: 15px;
+    }
+    </style>
+</head>
+
+<body>
+    <style>
+    .mui-navigate-right img {
+        border-radius: 38px;
+    }
+
+    .webuploader-pick {
+        width: 100%;
+    }
+
+    .mui-navigate-right {
+        display: block;
+        width: 20%;
+        z-index: 9999;
+        text-align: left;
+        color: #000000;
+        margin-left: 15px;
+    }
+
+    .mui-navigate-right img {
+        /*margin-left: 25px;*/
+        margin-top: 15px;
+        display: block;
+    }
+
+    .mui-pull-right {}
+
+    .webuploader-pick {
+        padding: 0px;
+    }
+
+    .webuploader-pick a {
+        line-height: 65px;
+    }
+
+    .mui-table-view-chevron .mui-table-view-cell {
+        padding-right: 0px;
+    }
+
+    .mui-navigate-right:after,
+    .mui-push-right:after {
+        content: none;
+    }
+
+    .mui-table-view {
+        position: static;
+    }
+
+    .mui-table-view-cell {
+        padding: 0px;
+    }
+
+    .mejjso {
+        line-height: 40px;
+        font-size: 14px;
+        text-indent: 1em;
+        color: #999;
+    }
+    </style>
+    <div class="mejjso">会员信息</div>
+    <form method="post" enctype="multipart/form-data">
+        <div class="box">
+            <div class="miba">
+                <div class="line3">
+                    <div class="tit">会员名称</div>
+                    <div class="line2">
+                        <input type="text" class="user hei65" placeholder="请输入会员名称" name="name" value="{$member['name']}">
+                    </div>
+                </div>
+            </div>
+            <div class="miba" id="avatarShade">
+                <div class="line3">
+                    <div class="tit">头像</div>
+                    <div class="line2">
+                        
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;" id="avatarShow">
+            {php echo tpl_app_form_field_avatar('avatar', $member['avatar']);}
+            </div>
+            <div class="miba">
+                <div class="line3">
+                    <div class="tit">店面</div>
+                    <div class="line2">
+                        <select name="storeid">
+                            <option value="">请选择</option>
+                            {loop $stores $store}
+                            <option value="{$store['id']}" {if $member[ 'storeid']==$store[ 'id']} selected {/if}>
+                                {$store['title']}
+                            </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {loop $columns $key $val1} 
+            {if $val1['type']=='text'}
+            <div class="miba">
+                <div class="line3" id="{$key}str">
+                    <div class="tit">{$val1['name']}</div>
+                    <div class="line2">
+                        <input type="text" name="{$val1['inputname']}" id="{$val1['inputname']}" value="{$member[$val1['inputname']]}" class="user hei65" placeholder="请输入{$val1['name']}">
+                    </div>
+                </div>
+            </div>
+            {/if} 
+            {if $val1['type']=="radio"}
+            <div class="miba">
+                <div class="line3" id="{$key}str">
+                    <div class="tit">{$val1['name']}</div>
+                    <div class="line2">
+                        <?php
+                        $vallist = explode(",",$val1['value']);
+                        foreach ($vallist as $k => $val2){ 
+                          $arr = explode("=",$val2);
+                        ?>
+                            <input type="radio" name="{$val1['inputname']}" id="{$val1['inputname']}" value="{$arr[0]}" {if trim($member[$val1[ 'inputname']])==trim($arr[0]) }checked{/if} style="margin-left:18px;"> <span>{$arr[1]}</span>
+                            <?php } ?>
+                    </div>
+                </div>
+            </div>
+            {/if} 
+            {if $val1['type']=="checkbox"}
+            <div class="miba">
+                <div class="line3" id="{$key}str">
+                    <div class="tit">{$val1['name']}</div>
+                    <div class="line2">
+                        <?php 
+                        $vallist = explode(",",$val1['value']);
+
+                        foreach ($vallist as $k => $val2){ 
+                            $arr = explode("=",$val2);
+                            $ckboxval=explode(",",$member[$val1['inputname']]);
+                            foreach($ckboxval as $key1=>$value){
+                                $ckboxval[$key1] = trim($value);
+                            }
+                        ?>
+                        <input type="checkbox" name="{$val1['inputname']}[]" id="{$val1['inputname']}" value="{$arr[0]}" {if in_array(trim($arr[0]),$ckboxval) }checked="checked" {/if} style="margin-left:18px;"> {$arr[1]}
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+            {/if} 
+            {if $val1['type']=="select"}
+            <div class="miba">
+                <div class="line3" id="{$key}str">
+                    <div class="tit">{$val1['name']}</div>
+                    <div class="line2">
+                        <select name="{$val1['inputname']}" id="{$val1['inputname']}">
+                            <option value="">请选择</option>
+                            <?php 
+                            $vallist = explode(",",$val1['value']);
+
+                            foreach ($vallist as $k => $val2){
+                                $arr = explode("=",$val2);
+                            ?>
+                            <option value="{$arr[0]}" {if trim($member[$val1[ 'inputname']])==trim($arr[0]) }selected{/if}>{$arr[1]}</option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {/if} 
+            {if $val1['type']=='textarea'}
+            <div class="miba" style="height:100px;">
+                <div class="line3" id="{$key}str" style="height:100px;">
+                    <div class="tit">{$val1['name']}</div>
+                    <div class="line2">
+                        <textarea name="{$val1['inputname']}" id="{$val1['inputname']}" class="user" style="height:80px;border: 1px solid #ababab;  margin-left:1px;margin-top:10px;margin-bottom:10px;color:#ababab;">{$member[$val1['inputname']]}</textarea>
+                    </div>
+                </div>
+            </div>
+            {/if} 
+            {/loop}
+            <input type="hidden" name="avatar" id="avatar" value="{$member['avatar']}" />
+            <input type="hidden" name="action" value="edit" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <input type="submit" class="tijiao" id="submit" name="submit" value="提交" style="width: 90%; display: block; margin: 30px auto 0 auto;" />
+        </div>
+        <div class="mui-toast-container" style="opacity:1; display:none;">
+            <div class="mui-toast-message">
+                <div class="mui-toast-icon" id="mui-toast"><span class="fatoast fatoast-exclamation-circle"></span></div><span>处理中</span></div>
+        </div>
+    </form>
+    <script>
+    window.onload = function(){
+
+        setTimeout(function(){
+            //遮罩延迟显示
+            $('#avatarShade').hide();
+            $('#avatarShow').show();
+        },1000);
+
+
+        //提交按钮
+        $('#submit').click(function() {
+            var picurl = $(".mui-navigate-right img ").attr('src');
+
+            $('#avatar').val(picurl);
+        });
+    }
+    </script>

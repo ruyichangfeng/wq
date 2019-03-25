@@ -1,0 +1,415 @@
+
+{template 'header'}
+<script type="text/javascript">
+var pagename="orderlist";
+</script>
+<style>
+
+</style>
+</head>
+<body onLoad="init_1()">
+<div id="l-map" style="height:0; width:0"></div>
+<div id="page0" class="ub ub-ver bga">
+    <div class="ub-f1 connn">
+    	<div class="ulev2 t-red tx-c font-b" style="padding:2rem 0 0 0">{$data['type_name']}</div>
+        {if $data['temp_id'] == 0}
+        <div class="tx-c" style="margin-top:3em">
+            <i class="iconfont" style="font-size:6em;font-style:normal;line-height: 120%; color: rgba(255,0,0,.3);">&#xe601;</i>
+            <span class="block t-gra">该服务类型下暂无模板，请联系管理员添加</span>
+        </div>
+        {else}
+        <div class="tx-c ulev-1 t-gra" style="line-height:1.5rem; height:1.5rem">附近有<span class="t-gre1"> {$total} </span>位服务人员</div>
+        <div class="tx-c ulev-1 t-gre1" style="line-height:1.5rem; height:1.5rem">{$data['remark']}</div>
+        <form name="form1" action="{php echo $this->createMobileUrl('projectok',array())}" method="post" onSubmit="return checkform()">
+        <input type="hidden" name="temp_id" value="{$data['temp_id']}" >
+        <input type="hidden" name="serve_type" value="{$data['id']}" >
+        <input type="hidden" name="staff_id" value="{$staff_id}" >
+        
+        <input type="hidden" name="lat" id="lat" value="" >
+        <input type="hidden" name="lng" id="lng" value="" >
+        
+        <div class="uinn8">
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-shijian ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="ftime" placeholder="请选择服务时间" value=""  id="svctime" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-phone ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="fmobile" id="fmobile" placeholder="输入联系电话" value="{$members['mobile']}" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-nan ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub-f1 ub ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="fname" id="fname" placeholder="输入姓名" value="{$members['realname']}"  class="uinn ulev0 block ub-f1" style="" />
+                        </div>
+                    </div>
+                    <div class="kk-check t-gra" style="padding:0.5rem 0.5rem 0.1rem 0.5rem ">
+                        <input name="fsex" type="radio" id="hh1" value="1" {if $members['gender'] == 1} checked {/if}>
+                        <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="hh1">先生<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                        <input name="fsex" type="radio" id="hh2" value="2" {if $members['gender'] == 2} checked {/if}>
+                        <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="hh2">女士<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                        <div class="clear"></div>
+                    </div>
+                </li>
+            </ul>
+            
+            <!--
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-nan ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="fperson" id="fperson" value="1" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                        <div>人员数量</div>
+                    </div>
+                </li>
+            </ul>
+            -->
+            <input type="hidden" name="fperson" id="fperson" value="1" />
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-icon02 ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="pic" id="pic" onClick="upload()" placeholder="上传照片" class="uinn ulev0 ub-f1 block" readonly />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <input type="hidden" id="random" name="random" value="{$random}" >
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac" id="pic_show">
+                    
+                </li>
+            </ul>
+                 
+            <ul class="userlist c-wh uc-a15">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-shouye ulev3 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <textarea class="uinn ulev-1 ub-f1 block" name="fadr" id="fadr" placeholder="指定服务地点" value="{$members['residecity']}"></textarea>
+                        </div>
+                        
+                        <div onClick="openPe()" id="adr_1" class="uc-a1 block btnn t-gre1"><i class="iconfont icon-dingweiicon01 ulev3"></i></div>
+                        
+                    </div>
+                </li>
+                
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem"></div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="flou" id="flou" placeholder="楼栋号和房号" value="{$members['residedist']}" class="uinn ulev-1 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+        </div>
+        
+        <div class="uinn8 ub">
+                <!--
+                <button class="uinn211 c-gre3 ub ub-pc uc-a1 ub-f1 btnn" onClick="javascript:window.location.href='{php echo $this->createMobileUrl('templist',array())}" style="margin-bottom:0.5em;" type="submit"><span class="ulev0 t-wh">下一步</span></button>
+                -->
+                <input name="submit" type="submit" value="下一步" class="uinn211 c-gre3 uc-a1 ub-f1 btnn ulev0 t-wh block tx-c" />
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                
+               
+        </div>
+        </form>
+        {/if}
+        
+    </div>
+    <div class="" style="height:3.125rem"></div>
+    {template 'footer'}
+    
+	<!--map open-->
+    <div class="loginmask c-bla80">
+        <div class="ub mban ub-ver" style="width:100%; height:100%; top:1500px">
+        	<!--<div class="closealert ub-f1"></div>-->
+            <div class="" style="position:absolute; top:47px; width:100%; left:0; z-index:99">
+                <div class="ub">
+                    <div class="ulev-1 tx-c uinn c-bla50 t-wh ub-f1">请拖动地图选定您需要服务的位置</div>
+                    <div class="closealert c-gra" style="padding:0.3rem 0.5rem"><i class="iconfont icon-guanbi ulev2 t-gra"></i></div>
+                </div>
+            </div>
+            <div class="c-wh"  id="container_66" style="height:100%; ">
+            	<iframe id="mapPage" width="100%" height="100%" frameborder=0 src="http://apis.map.qq.com/tools/locpicker?search=1&zoom=16&type=1&key=DEZBZ-EQKKJ-CBFFB-K2SOD-GGNA3-N7BKM&referer=o2o"></iframe>
+            </div>
+        </div>
+	</div>
+    
+</div>
+
+<input type="hidden" id="lng_v" value="{$lng}">
+<input type="hidden" id="lat_v" value="{$lat}">
+<script type="text/javascript" src="{MODULE_URL}/template/mobile/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/template/mobile/js/main.js"></script>
+<!--<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll_all.js"></script>-->
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.core.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.widget.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.scroller.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.util.datetime.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.datetimebase.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.widget.ios.js"></script>
+<script src="{MODULE_URL}/template/mobile/js/modate/mobiscroll.i18n.zh.js"></script>
+<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll_all.css" rel="stylesheet" type="text/css" />
+<!--<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll.animation.css" rel="stylesheet" type="text/css" />
+<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll.widget.css" rel="stylesheet" type="text/css" />
+<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll.widget.ios.css" rel="stylesheet" type="text/css" />
+<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll.scroller.css" rel="stylesheet" type="text/css" />
+<link href="{MODULE_URL}/template/mobile/js/modate/mobiscroll.scroller.ios.css" rel="stylesheet" type="text/css" />-->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+
+<!--<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>-->
+
+<script type="text/javascript">
+function init_1() {
+	//平台、设备和操作系统 
+     var system = {
+		 win: false, 
+         mac: false, 
+         xll: false, 
+         ipad:false 
+     }; 
+     //检测平台 
+     var p = navigator.platform; 
+     system.win = p.indexOf("Win") == 0; 
+     system.mac = p.indexOf("Mac") == 0; 
+     system.x11 = (p == "X11") || (p.indexOf("Linux") == 0); 
+     system.ipad = (navigator.userAgent.match(/iPad/i) != null)?true:false; 
+     //跳转语句，如果是手机访问就自动跳转到wap.baidu.com页面 
+     if (system.win || system.mac || system.xll||system.ipad) { 
+		var lat_1 = document.getElementById('lat_v').value;
+		var lng_1 = document.getElementById('lng_v').value;
+     } else { 
+		var lat_1 = localStorage['lat'];
+		var lng_1 = localStorage['lng'];
+		var fadr_1 = localStorage['fadr'];
+     }
+	 
+	 document.getElementById('lat').value = lat_1;
+	 document.getElementById('lng').value = lng_1;
+	 document.getElementById('fadr').value = fadr_1;
+}
+</script>
+<script>
+    window.addEventListener('message', function(event) {
+        // 接收位置信息，用户选择确认位置点后选点组件会触发该事件，回传用户的位置信息
+        var loc = event.data;
+        //console.log('location', loc);
+		//salert('你刚选择了'+loc.poiname+',它位于'+loc.poiaddress+',它的经纬度是：'+loc.latlng.lat+','+loc.latlng.lng+',所属城市为:'+loc.cityname);
+		document.getElementById('lat').value = loc.latlng.lat;
+		document.getElementById('lng').value = loc.latlng.lng;
+		document.getElementById('fadr').value = loc.poiname + '（'+loc.poiaddress + '）';
+		closePe()
+    }, false); 
+</script>
+
+
+<script>
+
+//弹出地图层
+$(".closealert").click(function() {
+	 $(".mban").animate({top:'1500px'})
+	 $(".loginmask").fadeOut(500);
+});
+function openPe(){
+	$(".loginmask").fadeIn(500), $(".mban").animate({top:'0px'});
+};
+function closePe(){
+	$(".mban").animate({top:'1500px'})
+	 $(".loginmask").fadeOut(500);
+};
+</script>
+
+<script type="text/javascript">
+	jssdkconfig = {php echo json_encode($_W['account']['jssdkconfig']);} || {};
+	
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'openLocation',
+		'getLocation',
+	];
+	
+	wx.config(jssdkconfig);
+	
+	wx.ready(function () {
+		
+	});
+	
+	//图片上传
+	function upload(){
+		wx.chooseImage({
+			count: 1, // 默认9
+			sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+			sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+			success: function (res) {
+				var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+				wx.uploadImage({
+					localId: ''+localIds+'', // 需要上传的图片的本地ID，由chooseImage接口获得
+					isShowProgressTips: 1, // 默认为1，显示进度提示
+					success: function (res) {
+						var serverId = res.serverId; // 返回图片的服务器端ID
+						var suiji = document.getElementById('random').value; 
+						
+						$.ajax({
+							url: "{php echo $this->createMobileUrl('UploadPic', array());}",
+							type:"POST",
+							data:{"random":suiji,"serverId":serverId},
+							dataType:"json",
+							success: function(data){
+								//alert(data);
+								if(data== 0){
+									alert('上传图片失败');
+									return false;
+								}else{
+									var pic = "";
+									var getstr = eval(data);
+									for(var i=0;i<getstr.length;i++){
+										pic = pic + '<div class="ub ub-ver ub-ac block"  style="padding:0.5rem 0.5rem 0.3rem 0.5rem" onclick="delpic('+getstr[i].id+')"><div class="uc-a1 c-blu ub ub-ac ub-pc iconn ub-img1 hide" style=" width:3rem; height:3rem; background-image:url({$_W["attachurl"]}gohome/pic/'+getstr[i].pic+')"></div></div>';
+									}
+									document.getElementById("pic_show").innerHTML = pic;
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+	}
+	
+	function delpic(a){
+		if(window.confirm('确定删除该图片吗？')){
+			var suiji = document.getElementById('random').value; 
+			$.ajax({
+				url: "{php echo $this->createMobileUrl('DeletePic', array());}",
+				type:"POST",
+				data:{"random":suiji,"id":a},
+				dataType:"json",
+				success: function(data){
+					alert(data);
+					if(data== 0){
+						alert('删除图片失败');
+						return false;
+					}else if(data == 1){
+						document.getElementById("pic_show").innerHTML = '';
+					}else{
+						var pic = "";
+						var getstr = eval(data);
+						for(var i=0;i<getstr.length;i++){
+							pic = pic + '<div class="ub ub-ver ub-ac block"  style="padding:0.5rem 0.5rem 0.3rem 0.5rem" onclick="delpic('+getstr[i].id+')"><div class="uc-a1 c-blu ub ub-ac ub-pc iconn ub-img1 hide" style=" width:3rem; height:3rem; background-image:url({$_W["attachurl"]}gohome/pic/'+getstr[i].pic+')"></div></div>';
+						}
+						document.getElementById("pic_show").innerHTML = pic;
+					}
+				}
+			});
+        }else{
+			return false;
+        }
+	}
+</script>
+
+<script type="text/javascript">
+function checkform(){
+	var ftime = document.getElementById('svctime').value;
+	var fmobile = document.getElementById('fmobile').value;
+	var fname = document.getElementById('fname').value;
+	var fadr = document.getElementById('fadr').value;
+	var flou = document.getElementById('flou').value;
+	var lat = document.getElementById('lat').value;
+	
+	if(ftime == ''){
+		alert('请选择服务时间');
+		return false;
+	}
+	if(fmobile == ''){
+		alert('联系电话不能为空');
+		return false;
+	}
+	if(fname == ''){
+		alert('姓名不能为空');
+	}
+	/*
+	if(fadr == ''){
+		alert('请点击定位按钮选定您的服务地址');
+		return false;
+	}
+	if(lat == ''){
+		alert('请点击定位按钮选定您的服务地址');
+		return false;
+	}
+	*/
+}
+</script>
+
+<script type="text/javascript">
+$(function () {
+	var nowData=new Date();
+	var opt= { 
+	theme:'ios', //设置显示主题 
+	mode:'mixed', //设置日期选择方式，这里用滚动scroller、mixed
+	display:'bottom', //设置控件出现方式bottom及样式modal
+	preset : 'datetime', //日期:年 月 日 时 分
+	minDate: nowData, 
+	maxDate:new Date(nowData.getFullYear(),nowData.getMonth(),nowData.getDate()+60,22,00),
+	dateFormat: 'yy-mm-dd', // 日期格式
+	dateOrder: 'yymmdd', //面板中日期排列格式
+	stepMinute: 5, //设置分钟步长
+	yearText:'年', 
+	monthText:'月',
+	dayText:'日',
+	hourText:'时',
+	minuteText:'分',
+	lang:'zh' //设置控件语言};
+	 };
+ $('#svctime').mobiscroll(opt);
+});
+</script>
+
+</body>
+</html>

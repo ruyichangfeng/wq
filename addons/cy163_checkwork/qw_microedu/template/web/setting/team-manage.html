@@ -1,0 +1,134 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .form-inline .control-label {text-align: right}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('setting', array('page' => 'index'))}">权限管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('reporting', array('page' => 'index'))}">报表统计</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('system', array('page' => 'index'))}">系统设置</a>
+        </li>
+        <li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li>
+            <a href="{php echo $this->createWebUrl('setting', array('page' => 'index'))}">角色</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('setting', array('page' => 'team'))}">角色组</a>
+        </li>
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            角色组权限管理
+        </div>
+        <div class="panel-body">
+            <form class="form-inline" role="form">
+                <div class="form-group" style="display: block;margin:10px 0">
+                    <label class="col-sm-2 control-label">超级管理员<input type="checkbox" id="super_super" /> </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage" id="super_all" onclick="goSelect(this.id)"> 全部权限
+                    </label>
+                </div>
+                <div class="form-group" style="display: block;margin:10px 0">
+                    <label class="col-sm-2 control-label">普通管理员<input type="checkbox" id="manage_manage" /></label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage1" id="manage_num1" onclick="goSelect(this.id)"> 教务管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage1" id="manage_num2" onclick="goSelect(this.id)"> 会员管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage1" id="manage_num3" onclick="goSelect(this.id)"> 系统管理
+                    </label>
+                </div>
+
+                <div class="form-group" style="display: block;margin:10px 0">
+                    <label class="col-sm-2 control-label">排课员<input type="checkbox" id="paike_paike" /></label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage2" id="paike_guwen"checked onclick="goSelect(this.id)"> 教务管理
+                    </label>
+                </div>
+
+                <div class="form-group" style="display: block;margin:10px 0">
+                    <label class="col-sm-2 control-label">迷你排课员<input type="checkbox" id="minipaike_minipaike" /></label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="manage3" id="minipaike_paike" onclick="goSelect(this.id)"> 排课管理
+                    </label>
+                </div>
+
+                <div class="form-group" style="display: block">
+                    <a href="javascript:;" class="btn btn-primary col-lg-6 col-md-6 col-sm-12 col-xs-12">提交</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function selectAll(idStart){
+        var x = $("input[id^='"+idStart+"']");
+        x.each(function(index,domEle){
+            $(this).prop("checked",true);
+        });
+
+    }
+
+    function unSelectAllBox(idStart){
+        var x = $("input[id^='"+idStart+"']");
+        x.each(function(index,domEle){
+            $(this).removeProp("checked");
+        });
+    }
+
+    function selectFather(id){
+        $("#"+id).prop("checked", "checked");
+    }
+
+    function UnSelectFather(id){
+        $("#"+id).removeProp("checked");
+    }
+
+
+    //判断还有没被选中的checkedbox
+    function isExistSelect(idStart){
+        var flag = false;
+        var $arrayEle=$("input[id^='"+idStart+"'][id!='"+idStart+"_"+idStart+"']");
+        for (var i=0; i<$arrayEle.length; i++){
+            if ($($arrayEle[i]).prop("checked")){
+                flag=true;
+            }
+        }
+        return flag;
+    }
+
+
+    function goSelect(id){
+        var arrayVal=id.split("_");
+        if (arrayVal[0] == arrayVal[1]){//parent dom
+            if ($("#"+id).prop("checked")){
+                selectAll(arrayVal[0]);
+            }else{
+                unSelectAllBox(arrayVal[0]);
+            }
+        }else{//child dom
+
+            if ($("#" + id).prop("checked")) {
+                selectFather(arrayVal[0] + "_" + arrayVal[0]);
+            }
+            else {
+                if (!isExistSelect(arrayVal[0])){
+                    UnSelectFather(arrayVal[0] + "_" + arrayVal[0]);
+                }
+            }
+        }
+    }
+</script>
+{template 'common/footer'}

@@ -1,0 +1,113 @@
+{template 'public/header'}
+{template 'public/comhead'}
+
+<ul class="nav nav-tabs">
+    <li {if $operation == 'post'}class="active"{/if}><a href="{php echo $this->createWebUrl('ad', array('op' => 'post'))}">添加广告</a></li>
+    <li {if $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('ad', array('op' => 'display'))}">广告管理</a></li>
+</ul>
+{if $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <!--<input type="hidden" name="parentid" value="{$parent['id']}" />-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                内容编辑
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">标题</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="title" class="form-control" value="{$info['title']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">广告类型</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <select name="type">
+                                <option value="1" {if $info['type'] == 1}selected{/if}>首页幻灯片</option>
+                            </select>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">简介</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="mark" class="form-control" value="{$info['mark']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">链接</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="link" class="form-control" value="{$info['link']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">图片</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_form_field_image('image', $info['image'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="sorting" class="form-control" value="{$info['sorting']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-3" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+{elseif $operation == 'display'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i>刷新</a>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <form action="" method="post" class="form-horizontal form" >
+            <input type="hidden" name="storeid" value="{$storeid}" />
+            <div class="table-responsive panel-body">
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:80px;">id</th>
+                        <th>标题</th>
+                        <th>图片</th>
+                        <th>链接</th>
+                        <th style="width:100px;text-align:right;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $row}
+                    <tr>
+                        <td><div class="type-parent">{$row['id']}&nbsp;&nbsp;</div></td>
+                        <td>
+                            <div class="type-parent">{$row['title']}&nbsp;&nbsp;</div>
+                            <div class="type-parent label label-info">{if $row['type'] == 1}首页幻灯片{/if}</div>
+                        </td>
+                        <td><div class="type-parent"><img height="40" src="{media $row['image']}">&nbsp;&nbsp;</div></td>
+                        <td><div class="type-parent">{$row['link']}&nbsp;&nbsp;</div></td>
+                        <td style="text-align:right;"><a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('ad', array('op' => 'post', 'id' => $row['id']))}" title="编辑">改</a>&nbsp;&nbsp;<a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('ad', array('op' => 'delete', 'id' => $row['id']))}" onclick="return confirm('确认删除吗？');return false;" title="删除">删</a></td>
+                    </tr>
+                    {/loop}
+                    <tr>
+                        <td colspan="3">
+                            <!-- <input name="submit" type="submit" class="btn btn-primary" value="批量更新排序"> -->
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    {$pager}
+</div>
+{/if}
+{template 'common/footer'}

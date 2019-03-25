@@ -1,0 +1,100 @@
+{template 'common/header'}
+<div class="we7-page-title">站点设置</div>
+<ul class="we7-page-tab">
+	<li{if $do == 'copyright'} class="active"{/if}><a href="{php echo url('system/site');}">站点信息</a></li>
+</ul>
+<div class="clearfix">
+	<form action="" method="post"  class="we7-form" role="form" enctype="multipart/form-data" id="form1">
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">关闭站点</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" name="status" id="status-1" {if $settings['status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="status-1">
+					 是
+				</label>
+				<input type="radio" name="status" id="status-0" {if $settings['status'] == 0} checked="checked" {/if} value="0" /> 
+				<label class="radio-inline" for="status-0">
+					否
+				</label>
+			</div>
+		</div>
+		<div class="form-group reason" {if $settings['status'] == 0} style="display:none;" {/if}>
+			<label class="col-sm-2 control-label" style="text-align:left;">关闭原因</label>
+			<div class="col-sm-8">
+				<textarea style="height:150px;" class="form-control" cols="70" name="reason" autocomplete="off">{$settings['reason']}</textarea>
+				<input type="hidden" name="reasons" value="{$settings['reason']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">备案号</label>
+			<div class="col-sm-8">
+				<input type="text" name="icp" class="form-control" value="{$settings['icp']}">
+			</div>
+		</div>
+
+		<h5 class="page-header">调试开关</h5>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">是否开启调试模式</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" id="develop_status-1" name="develop_status" {if $settings['develop_status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="develop_status-1">
+					是
+				</label>
+				<input type="radio" id="develop_status-0" name="develop_status" {if $settings['develop_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="develop_status-0">
+					否
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">是否开启日志</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" id="log_status-1" name="log_status" {if $settings['log_status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="log_status-1">
+					是
+				</label>
+				<input type="radio" id="log_status-0" name="log_status" {if $settings['log_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="log_status-0">
+					否
+				</label>
+			</div>
+		</div>
+		
+		
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-1 col-xs-12 col-sm-10 col-md-10 col-lg-11">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</form>
+	<script type="text/javascript">
+			$("#form1").submit(function() {
+				if ($("input[name='status']:checked").val() == 1) {
+					if ($("textarea[name='reason']").val() == '') {
+						util.message('请填写站点关闭原因');
+						return false;
+					}
+				}
+			});
+			$("input[name='status']").click(function() {
+				if ($(this).val() == 1) {
+					$(".reason").show();
+					var reason = $("input[name='reasons']").val();
+					$("textarea[name='reason']").text(reason);
+				} else {
+					$(".reason").hide();
+				}
+			});
+			$("input[name='mobile_status']").click(function() {
+				if ($(this).val() == 0) {
+					$("#login_type_status-1").attr("checked", false);
+					$("#login_type_status-0").prop("checked", true);
+					$("#login_type_status-1").attr("disabled", true);
+				} else {
+					$("#login_type_status-1").attr("disabled", false);
+				}
+			});
+	</script>
+</div>
+{template 'common/footer'}

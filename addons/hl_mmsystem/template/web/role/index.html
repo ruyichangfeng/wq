@@ -1,0 +1,198 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('role')}"></a> 角色权限</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('role')}"></a></h5>
+                </div>
+                {if $op == 'role'}
+                <div class="ibox-content">
+                    <form class="form-horizontal form" method="post" >
+                        <a href="{php echo $this->createWebUrl('role', array('op' => 'add'));}" class="btn btn-primary">
+                            <i class="fa fa-plus"></i>添加职务</a>
+                        <input type="submit" name="delete" class="btn btn-danger fa-times-circle" value="批量删除">
+                        <input type="hidden" name="token" value="{$_W['token']}"/>
+
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th style="width:3%;">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids" onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"> </label>
+                                    </div>
+                                </th>
+                                <th>角色名称</th>
+                                <th>帐号数量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $roles $role}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$role['id']}" value="{$role['id']}">
+                                        <label for="ids_{$role['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$role['rol_name']}</td>
+                                <td><span class="label label-info">{php echo util::getNumberOfEmployees($role['id']);} 人</span></td>
+                                <td>
+                                    <input type="checkbox" name="status" data="{$role['rol_status']}" data-id="{$role['id']}" class="js-switch_{$role['id']}" {if $role['rol_status'] == 1 }checked="checked"{/if}></td>
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('role', array('op' => 'add', 'id'=>$role['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('role',array('op'=>'del','id'=>$role['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $roles}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+
+                </div>
+                <script>
+                    $(function () {
+                        $(':checkbox').on('change', function (e, state) {
+                            $this = $(this);
+                            var id = $this.attr('data-id');
+                            var status = this.checked ? 1 : 2;
+                            $this.val(status);
+                            $.post("{php echo $this->createWebUrl('role')}",{id:id,status:status},function () {
+                            })
+                        });
+                    });
+                </script>
+                {/if}
+                {if $op == 'add'}
+                <div class="ibox-content">
+                    <form class="form-horizontal form form-validate" id="form1" action="" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">职务名称</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="rolename" value="{$role['rol_name']}" class="form-control" required="true" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">状态</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" value="1" name="status" id="status-1" {if $role['rol_status'] == 1}checked{/if}>
+                                    <label for="status-1">启用</label>
+                                </div>
+                                <div class="radio radio-danger radio-inline">
+                                    <input type="radio" value="0" name="status" id="status-0" {if $role['rol_status'] == 0}checked{/if}>
+                                    <label for="status-0">禁用</label>
+                                </div>
+                                <div class="help-block">如果禁用，则当前角色的操作员全部会禁止使用</div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">权限</label>
+                            <div class="col-sm-9 col-xs-12 perm-container">
+
+                                {loop $parentlist $key $row}
+                                {if $row}
+                                <div class="category-perm">
+                                    <div class="heading">
+                                        <div  class="checkbox checkbox-success checkbox-inline">
+                                            <input type="checkbox" name="perms[]"  value="{$row['men_controller']}" class="perm-all-item" data-group="{$row['men_controller']}" id="{$row['men_controller']}" {if in_array($row['men_controller'], $rolelist)}checked{/if}>
+                                            <label for="{$row['men_controller']}">{$row['men_title']}</label>
+                                        </div>
+                                    </div>
+                                    {if $childrenlist[$row['id']]}
+                                    <div class="perm-list">
+
+                                        {loop $childrenlist[$row['id']] $k $item}
+                                        {if $item}
+                                        <div  class="checkbox checkbox-success checkbox-inline">
+                                            <input type="checkbox" name="perms[]" value="{$item['men_controller']}-{$item['men_do']}" class="perm-item" data-group="{$row['men_controller']}" id="{$item['men_controller']}-{$item['men_do']}" {if in_array($row['men_controller'].'-'.$item['men_do'], $rolelist)}checked{/if}>
+                                            <label for="{$item['men_controller']}-{$item['men_do']}">{$item['men_title']}</label>
+                                        </div>
+                                        {/if}
+                                        {/loop}
+                                    </div>
+                                    {/if}
+                                </div>
+
+                                {/if}
+                                <div class="hr-line-dashed"></div>
+                                {/loop}
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="hidden" name="token" value="{$_W['token']}">
+                                <input type="submit" value="提交" class="btn btn-primary">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <script>
+                    $(function() {
+                        $(document).on('click', '.perm-all-item', function() {
+                            var group = $(this).data('group');
+                            if($(this).prop('checked')) {
+                                $(".perm-item[data-group='" + group + "'],.perm-all-item[data-group='" + group + "']").prop('checked', 'checked');
+                            } else {
+                                $(".perm-item[data-group='" + group + "'],.perm-all-item[data-group='" + group + "']").removeAttr('checked');
+                            }
+                        });
+                        $(document).on('click', '.perm-item', function() {
+                            var group = $(this).data('group');
+                            var length = $(".perm-item[data-group='" + group + "']:checked").size();
+                            if(length > 0) {
+                                $(".perm-all-item[data-group='" + group + "']").prop('checked', 'checked');
+                            } else {
+                                $(".perm-all-item[data-group='" + group + "']").removeAttr('checked');
+                            }
+                        });
+                    });
+                </script>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#form1").validate({
+        rules: {
+            rolename: {
+                required: true,
+                name1:true,
+                maxlength:20,
+            }
+        },
+        messages: {
+            rolename: {
+                required: "请输入职务名称",
+                maxlength: $.validator.format( "不能大于20个字" ),
+            },
+        }
+    });
+    jQuery.validator.addMethod("name1", function(value, element) {
+        return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+    }, "只能包含中文字符。");
+</script>
+{template 'web/common/footer'}

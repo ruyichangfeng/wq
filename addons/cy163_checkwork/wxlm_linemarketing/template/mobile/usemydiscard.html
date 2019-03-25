@@ -1,0 +1,116 @@
+{template 'head2'}
+<link rel="stylesheet" type="text/css" href="{RES}public/css/bootstrap.min.css">
+<script src="{RES}public/js/bootstrap.min.js"></script>
+<title>{$title}</title>
+<script>
+         wx.ready(function () {
+            sharedata = {
+                title: "{$config['mobile_card_sharetitle']}",
+                desc: "{$config['mobile_card_sharedesc']}",
+                link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('Carddis',array('parent'=>$openid)))}",
+                imgUrl: "{php echo tomedia($config['mobile_card_shareimg'])}",
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function(){
+                },
+                cancel: function(){
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata);
+            wx.onMenuShareQQ(sharedata);
+            wx.onMenuShareWeibo(sharedata);
+            wx.onMenuShareQZone(sharedata);
+        }); 
+     </script>   
+</head>
+
+<body id="bodys">
+<div class="box">
+	<div class="bag01_show-con">
+		<img src="{php echo tomedia($discard['discountcard_thumb'])}">
+        <div class="bag01_show-text">
+        	<div class="bag01_show-text01">{$discard['discountcard_title']}</div>
+            <div class="bag01_show-text02"></div>
+<!--             <div class="bag01_show-text04">可用门店：{$storestr}</div>
+            <div class="bag01_show-text04">{$str1}</div>
+            <div class="bag01_show-text04">{$str3}</div>
+            <div class="bag01_show-text04">{$str4}</div> -->
+            <div class="bag01_show-text03">福利讲解</div>
+            <div style="width: 100%;margin: 2px 6px;padding: 2px;">
+                {php echo htmlspecialchars_decode($discard['discountcard_content'])}
+            </div>
+
+              
+        </div>
+        <div class="bag01_show-foot" >
+        	<input type="button" value="立即使用"   onClick="usecard({$discard['discountcard_id']},{$discard['buycardlog_id']})">
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade bs-example-modal-sm" id="tanchukuang" style=" position: fixed;width: 80%;height: 70%; top: 20%; left: 50%;margin-left:-40%;" >
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content" id="qrcodeimages" style="text-align: center;">
+
+    </div>
+  </div>
+</div>
+</body>
+<script>
+    var h1 = $(window).height();
+    $(document.body).css({"height": h1 -"50" });
+    $(document).css({"overflow":"hidden"});
+
+    function usecard(cid,bid)
+    {
+
+        $('#tanchukuang').modal('show');
+
+        $.ajax({
+            type:"POST",
+            url: "{php echo $this->createMobileUrl('ajaxusecard');}",
+            data:{cid:cid,bid:bid},
+            dataType:"json",
+            async:false,
+            success:function(data){
+                $('#qrcodeimages').empty();
+                if(data.result=='success')
+                {
+                    $('#qrcodeimages').append("<img src='"+data.qr+"' >");
+                }else{
+                    $('#qrcodeimages').append("<div style='height: 80px;text-align: center;margin: 6px;line-height: 40px;font-size: 16px;'>"+data.rs+"</div>");    
+                }
+            }
+        });
+        $('#bodys').height(h1);
+
+
+    }
+    // $(function(){
+    //     setInterval(runajax,3000);
+    //     settime();
+    // })
+    //ajax方法执行  
+    // function runajax(){
+    //     $.ajax({  
+    //       type:"POST",
+    //       url: "{php echo $this->createMobileUrl('pcloginchecked');}",
+    //       data:{logining_id:loginid},
+    //       dataType:"json",
+    //       async:false,
+    //       success:function(data){
+    //             if(data.result==1)
+    //             {
+    //                 var url="{php echo $this->createMobileUrl('memberindex');}";
+    //                 window.location.href=url+"&logining_id="+data.login_id;
+    //             }else{
+                    
+    //             }
+    //       }
+    //     });
+    // } 
+</script>
+</html>

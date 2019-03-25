@@ -1,0 +1,146 @@
+{template 'public/header'}   
+<style type="text/css">
+	.notice{display: block;color:orange;}
+	.jumpc{display: none; }
+</style>
+ 
+<div class="panel panel-info">
+	<div class="panel-heading"  >
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('homeadvert.index');?>">首页设置</a></li>
+		  <?php if(intval($advert['id'])>0){?>
+		   <li class="active">{$advert['title']}</li>
+		  <?php }?>
+		  <li><a href="javascript:void(0);">内容</a></li>  
+		</ol> 
+	</div>
+	<div class="panel-body"> 
+	 	
+		<form class="form-horizontal" method="post" id="memForm"  action="<?php echo $this->routeUrl('homeadvert.saveAdvert');?>">
+			<input type="hidden" value="{$advert['id']}" name="aid" id="aid" readonly="readonly" />
+			<input type="hidden" value="{$advert['parentid']}" name="pid" id="pid" readonly="readonly" />
+					<input type="hidden" name="default" value="{$advert['default']}"> 
+					<input type="hidden" name="type" value="<?php if(intval($advert['id'])>0){
+					echo $advert['type'];
+				}else{ echo $parent['type'];}?>">
+					<input type="hidden" value="<?php if(is_numeric($advert['parentid'])){
+					echo $advert['parentid'];
+				}else{ echo $_GPC['pid'];}?>" name="pid" id="pid" readonly="readonly" /> 
+		<table style="width:600px;margin:10px auto;"> 
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">名称</td>
+				<td style="width:60%;"><input type="text" class="form-control" value="{$advert['title']}" placeholder="10字以内" name="name" ></td>
+				<td style="width:30%;"></td>
+			</tr> 
+			<?php if($parent['type']=="notice"||$advert['type']=="notice"){ ?>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">内容</td>
+				<td style="width:60%;"><input type="text" class="form-control" value="{$advert['content']}" placeholder="50字以内" name="content" ></td>
+				<td style="width:30%;"></td>
+			</tr> 
+			<?php } ?>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">跳转类型</td>
+				<td style="width:60%;"> 
+					<select class="form-control" name="jumptype" id="jumptype" onchange="chgjump()">
+						<option value=""  >不跳转</option>
+						<option value="goods" <?php if($advert['jumptype']=="goods"){echo 'selected';}?>>商品</option>
+						<option value="topic"  <?php if($advert['jumptype']=="topic"){echo 'selected';}?> >专题</option>
+						<option value="cate"  <?php if($advert['jumptype']=="cate"){echo 'selected';}?> >分类商品列表</option> 
+						<option value="shoplist"  <?php if($advert['jumptype']=="shoplist"){echo 'selected';}?> >店铺列表</option> 
+						<option value="about"  <?php if($advert['jumptype']=="about"){echo 'selected';}?> >关于我们</option> 
+					</select>
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;" class='jumpc jumpc-goods' <?php if($advert['jumptype']=="goods"){echo 'style="display:block"';}?> >
+				<td style="width:20%;text-align: right;padding-right: 10px;">商品编号</td>
+				<td style="width:60%;"  >
+					<input type="text" class="form-control" name="goodsnum" placeholder="输入商品编号" value="{$advert['goodsnum']}">
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;" class='jumpc jumpc-topic'  <?php if($advert['jumptype']=="topic"){echo 'style="display:block"';}?> >
+				<td style="width:20%;text-align: right;padding-right: 10px;">跳转专题</td>
+				<td style="width:60%;">
+					<select class="form-control" name="topicid">
+						{loop $topics $index $topic}
+						<option value="{$topic['id']}" <?php if($advert['topicid']==$topic['id']){echo "selected";}?> >{$topic['title']}</option> 
+						{/loop}
+					</select>
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;" class='jumpc jumpc-cate'  <?php if($advert['jumptype']=="cate"){echo 'style="display:block"';}?>  >
+				<td style="width:20%;text-align: right;padding-right: 10px;">跳转分类</td>
+				<td style="width:60%;">
+					<select id="cateid" name="cateid" class="form-control" style="width:200px;" >
+		      		{loop $cates $index $cate}
+		      		<option value="{$cate['id']}"  <?php if($advert['cateid']==$cate['id']){ echo "selected";}?>>{$cate['advert']}{$cate['name']}</option>
+			      		{loop $cate['children'] $index $cat}
+			      		<option value="{$cat['id']}"  <?php if($advert['cateid']==$cat['id']){ echo "selected";}?>>
+			      			 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$cat['advert']}{$cat['name']} 
+			      		</option>
+			      		{/loop}
+		      		{/loop}
+				</select>
+				</td>
+				<td style="width:30%;"><span style="color: orange;font-size: 13px;">将跳转到该分类所含商品的列表页面</span></td>
+			</tr>
+			<tr style="height: 60px;" >
+				<td style="width:20%;text-align: right;padding-right: 10px;">状态</td>
+				<td style="width:60%;">
+					<select class="form-control" name="sts" >
+						<option value="1" <?php if(intval($advert['status'])>0){ echo 'selected="true"';}?>>启用</option>
+						<option value="0" <?php if(intval($advert['status'])<1&&intval($advert['id'])>0){ echo 'selected="true"';}?>>禁用</option>
+						
+					</select>
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;vertical-align: top;">图片</td>
+				<td style="width:60%;">
+					 {php echo tpl_form_field_images('picture',$advert['picture']);}
+				</td>
+				<td style="width:30%;"> <label   class="control-label" style="color:orange;text-align: left;">&nbsp;*商品图片建议比例1:1，100*100像素</label></td>
+			</tr>
+
+			 
+		   
+		  
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">排序</td>
+				<td style="width:60%;"><input type="text" value="{$advert['sort']}" class="form-control" placeholder="数字越大，排序越靠前" name="sort" ></td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;">
+				<td  colspan="3" align="center">
+					 <button type="submit" class="mybtn" >保存</button>
+				</td>
+				 
+			</tr>
+		</table> 
+		</form>
+	</div>  
+</div>    
+<script type="text/javascript">
+	function chgjump(){
+		var type=$("#jumptype").val();
+		$(".jumpc").css("display","none");
+		switch(type){
+			case "goods":
+				$(".jumpc-goods").css("display","table-row");
+			break;
+			case "topic":
+				$(".jumpc-topic").css("display","table-row");
+			break;
+			case "cate":
+				$(".jumpc-cate").css("display","table-row");
+			break;
+			default:
+			break;
+		}
+	}
+</script>
+{template 'public/footer'}

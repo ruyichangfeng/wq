@@ -1,0 +1,384 @@
+{template "header"}
+<div class="menu-overly"></div>
+<div class="wrap page2" style="padding-top:0">
+    <div class="item">
+        <div class="swiper-container">
+            {if $recorderInfo['photo']}
+            <div class="swiper-wrapper">
+                {loop $recorderInfo['photo'] $photo}
+                <div class="swiper-slide"><img src="{$setting['niu_url']}/{$photo}?imageView2/1/w/386/h/179" alt="" data-id="{$setting['niu_url']}/{$photo}"></div>
+                {/loop}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next swiper-button-white"></div>
+            <div class="swiper-button-prev swiper-button-white"></div>
+            {/if}
+        </div>
+        <!--<div class="ad"><img src="{MODULE_URL}/static/mobile/images/img31.png" alt=""></div>-->
+        <div class="tips">{$recorderInfo['name']}  {php echo date("Y,m,d",$recorderInfo['create_time'])}    </div>
+        {if $recorderInfo['title']}
+        <div class="txt">{$recorderInfo['title']}</div>
+        {/if}
+        {if $recorderInfo['desc']}
+        <div class="txt">{$recorderInfo['desc']}</div>
+        {/if}
+        <div class="tags">
+            {if $recorderInfo['scene_id']}
+            <span >{$recorderInfo['scene_name']}</span>
+            {/if}
+            {if $recorderInfo['level_id']}
+            <span>{$recorderInfo['level_name']}</span>
+            {/if}
+            <span class="on" style="padding-left:6px;padding-right: 6px;">{$recorderInfo['status_text']}</span>
+        </div>
+        <div class="btm" style="{if !$recorderInfo['lat']} style='padding-left:.9rem' {/if} ">
+            {if $recorderInfo['lat']}
+            <img  src="{MODULE_URL}/static/mobile/images/icon15.png" alt="" data-lat="{$recorderInfo['lat']}" data-lnt="{$recorderInfo['lnt']}" class="icon show_address">
+            {/if}
+            {if $recorderInfo['voice']}
+            <div class="voice-box">
+                <span class="pl" style="width:35%;" onclick="play('{$setting['niu_url']}/{$recorderInfo['voice']}')">{$recorderInfo['voice_len']}</span>
+            </div>
+            {/if}
+            {if $recorderInfo['status']==1}
+            <a href="javascript:" class="btn btn-fp" data-r="{$recorderInfo['id']}" data-t="2" data-m="0">分配</a>
+            {/if}
+            {if $recorderInfo['status']<4}
+            <a href="javascript:" class="btn btn-qx" data-r="{$recorderInfo['id']}" data-t="1" data-m="0">取消</a>
+            {/if}
+        </div>
+    </div>
+
+    <div class="step">
+        <i class="c0"></i>
+        <div class="step-item">
+            <div class="con">
+                <i class="c1"></i>
+                <i class="arrow"></i>
+                <h3>开始</h3>
+                <p>{$recorderInfo['name']}</p>
+                {if $recorderInfo['address']}
+                <p>{$recorderInfo['address']}</p>
+                {/if}
+                <p>
+                    {php echo date("Y-m-d H:i:s",$recorderInfo['create_time'])}
+                    {if $recorderInfo['uid']==$uid && $recorderInfo['status']<4}
+                    <a href="" class="btn btn-remark" data-m="0" data-r="{$recorderInfo['id']}" data-t="10">备注</a>
+                    {/if}
+                </p>
+            </div>
+        </div>
+        {php $len=count($notice)-1}
+        {loop $notice $index $nts}
+        <div class="step-item">
+            <div class="con">
+                {if $index==$len}
+                <i class="c2"></i>
+                {else}
+                <i class="c1"></i>
+                {/if}
+                <i class="arrow"></i>
+                <h3>{$nts['title']}</h3>
+                <p>{$nts['name']}</p>
+                <p>{$nts['remark']}</p>
+                <p>
+                    {$nts['time']}
+                    {if $nts['other']==0 && $recorderInfo['status']<4 }
+                        {if $nts['status']==2 && $recorderInfo['receive_admin']==$adminInfo['id']}
+                            {if $recorderInfo['status']!=3}
+                                <a href="javascript:" class="btn btn-com btn-start" style="margin-left:10px;" data-m="0" data-r="{$recorderInfo['id']}" data-t="4">开始</a>
+                            {/if}
+                        <a href="" class="btn btn-remark btn-fp" >调配</a>
+                        {else if $recorderInfo['status']==3 && $recorderInfo['receive_admin']==$adminInfo['id']}
+                            <a href="javascript:" class="btn btn-com btn-remark" style="margin-left:10px;" data-m="0" data-r="{$recorderInfo['id']}" data-t="5">完成</a>
+                        {/if}
+                    {/if}
+                </p>
+            </div>
+        </div>
+        {/loop}
+
+        <!--<div class="step-item">-->
+            <!--<div class="con">-->
+                <!--<i class="c1"></i>-->
+                <!--<i class="arrow"></i>-->
+                <!--<h3>处理</h3>-->
+                <!--<p>王五</p>-->
+                <!--<p>已经联系客户处理完成。</p>-->
+                <!--<p>2015-12-12 15:30 <a href="" class="btn btn-remark">备注</a></p>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--<div class="step-item">-->
+            <!--<div class="con">-->
+                <!--<i class="c2"></i>-->
+                <!--<i class="arrow"></i>-->
+                <!--<h3>客户评论</h3>-->
+                <!--<p>本次服务非常满意</p>-->
+                <!--<div class="star-box">-->
+                    <!--<i class="star"></i>-->
+                    <!--<i class="star"></i>-->
+                    <!--<i class="star"></i>-->
+                    <!--<i class="star"></i>-->
+                    <!--<i class="star"></i>-->
+                <!--</div>-->
+                <!--<p>2015-12-12 15:30 <a href="" class="btn btn-remark">备注</a></p>-->
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+
+<!-- 弹框：备注 -->
+<!-- 去掉样式show即可默认不显示 -->
+<!-- 去掉  js_btn-cancle   去掉消失事件 -->
+<div class="alert alert-remark ">
+    <div class="box">
+        <div class="title">阶段备注——开始</div>
+        <div class="con">
+            <textarea name="" id="remark" cols="30" rows="10" placeholder="请输入备注内容"></textarea>
+        </div>
+        <div class="operate">
+            <a href="" class="btn btn-blue js_btn-cancle btn-msg">确定</a>
+        </div>
+    </div>
+</div>
+
+<!-- 弹框：人员分配 -->
+<!-- 去掉样式show即可默认不显示 -->
+<!-- 去掉  js_btn-cancle   去掉消失事件 -->
+<div class="alert alert-allot ">
+    <div class="box">
+        <div class="title">人员分配</div>
+        <div class="search">
+            <input type="text" class="search_key" placeholder="搜索">
+            <input type="submit" value="">
+        </div>
+        <ul class="list admin_list">
+            {loop $adminList $admin}
+            <li>
+                <span class="sp1">{$admin['name']}</span>
+                <span class="sp2">{if $admin['organize']==2}员工{else}管理{/if}</span>
+                <a href="javascript:" class="btn-choose" data-id="{$admin['id']}"><em>选择</em></a>
+            </li>
+            {/loop}
+        </ul>
+        <div class="operate">
+            <a href="javascript:" class="btn btn-blue fp" data-r="{$recorderInfo['id']}" data-t="3" data-m="0">确定分配</a>
+        </div>
+    </div>
+    <audio id="audio" src="#" style="display: none"></audio>
+</div>
+
+{template "wx_js"}
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/main.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/swiper.jquery.min.js"></script>
+<script>
+    //操作数据
+    var post = new Object();
+    post.md=0;
+    post.rd=0;
+    post.td=0;
+    post.remark="";
+
+    var bg=2;
+    var timeInt;
+    var isPlay=false;
+    playBtn=$(".pl");
+    var body =$("body");
+    var audio = document.getElementById('audio');
+
+    //搜索用户
+    $('.search_key').bind('input propertychange', function() {
+        keyword =$(this).val();
+        var html="";
+        $.post('{php echo $this->createMobileUrl("search")}',{keyword:keyword},function(response){
+            var data = response.data;
+            for(var i=0;i<data.length;i++){
+                html += '<li>'+
+                        '<span class="sp1">'+data[i].name+'</span>'+
+                        '<span class="sp2">'+data[i].organize+'</span>'+
+                        '<a href="javascript:" class="btn-choose " data-id="'+data[i].id+'"><em>选择</em></a>'+
+                        '</li>';
+            }
+            $(".admin_list").html(html);
+        },"json");
+    });
+
+    //选择员工
+    body.on('click','.btn-choose',function(){
+        $(".btn-choose").removeClass("on");
+        $(this).addClass("on");
+    });
+
+    //确认分配
+    $(".fp").click(function(){
+        var id = $(".admin_list").find(".on").attr("data-id");
+        if(id==undefined){
+            layer.open({
+                content: "请选择员工"
+                ,skin: 'msg'
+                ,time: 1
+            });
+            return false;
+        }
+        //提交数据
+        var post = new Object();
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+        post.md=$(this).attr("data-m");
+        post.admin=id;
+        $.post("{php echo $this->createMobileUrl('cmd')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    //开始处理标示
+    $(".btn-start").click(function(){
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+        $.post("{php echo $this->createMobileUrl('cmd')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    //处理完成
+    $(".btn-remark").click(function(){
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+    });
+
+    // 弹出：取消
+    body.on('click', '.page2 .btn-qx', function(event) {
+        event.preventDefault();
+        var str="备注—"+$(this).text()+"";
+        $(".alert-remark .title").text(str);
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+        $(".alert-remark").fadeIn(300);
+    });
+
+    // 弹出：备注
+    body.on('click', '.page2 .btn-remark', function(event) {
+        if($(this).hasClass("btn-fp")){
+            return false;
+        }
+        event.preventDefault();
+        var str="阶段备注—"+$(this).parent().siblings('h3').text();
+        $(".alert-remark .title").text(str);
+
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+
+        $(".alert-remark").fadeIn(300);
+    });
+
+    //提交消息操作数据
+    $(".btn-msg").click(function(){
+        post.remark=$("#remark").val();
+        $.post("{php echo $this->createMobileUrl('cmd')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    // 弹出：人员分配
+    body.on('click', '.page2 .btn-fp', function(event) {
+        event.preventDefault();
+        $(".alert-allot").fadeIn(300);
+    });
+
+    //播放语音
+    function play(url){
+        audio.src=url;
+        if(isPlay){
+            audio.pause();
+            isPlay=false;
+            clearInterval(timeInt);
+            playVoice(2);
+            return false;
+        }
+        timeInt = setInterval(function(){
+            if(bg==2){
+                bg=3;
+            }else{
+                bg=2;
+            }
+            playVoice(bg);
+        },600);
+        audio.play();
+        isPlay=true;
+    }
+
+    //显示地理位置
+    $(".show_address").click(function(){
+        wx.openLocation({
+            latitude: Number($(this).attr("data-lat")),
+            longitude: Number($(this).attr("data-lnt")),
+            name: '位置',
+            address: '',
+            scale: 14
+        });
+    });
+
+    //监听播放结束
+    audio.addEventListener('ended', function () {
+        isPlay=false;
+        clearInterval(timeInt);
+        playVoice(2);
+    }, false);
+
+    //图片预览
+    $("body").on("click",".swiper-slide",function(){
+        var imgArr=new Array();
+        imgList = $(this).parent().find("img");
+        imgList.each(function () {
+            imgArr.push($(this).attr("data-id"));
+        });
+        wx.previewImage({
+            urls: imgArr
+        });
+    });
+
+    var swiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        paginationClickable: '.swiper-pagination',
+        nextButton: '.swiper-button-next',
+        prevButton: '.swiper-button-prev',
+//        slidesPerView: 3,
+        paginationClickable: true,
+        spaceBetween: 30
+    });
+</script>
+</body>
+</html>

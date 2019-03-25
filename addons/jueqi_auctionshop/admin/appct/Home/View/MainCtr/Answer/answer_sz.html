@@ -1,0 +1,205 @@
+<include file="Public/header.html" />
+<link rel="stylesheet" type="text/css" href="__ROOT__/Public/lib/froala_editor/css/font-awesome.min.css?1">
+<link rel="stylesheet" type="text/css" href="__ROOT__/Public/lib/froala_editor/css/froala_editor.min.css" >
+<link rel="stylesheet" type="text/css" href="__ROOT__/Public/lib/layui/css/modules/laydate/default/laydate.css" >
+</head>
+<body>
+	<div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>互动管理</cite></a>
+          <a><cite>答题设置</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+	 	<ul class="layui-tab-title">
+	        <li>
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/answer_list')}">答题记录</a>
+	        </li>
+	        <li class="layui-this">
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/answer_sz')}">答题设置</a>
+	        </li>
+	        <li>
+	        	<a target="_self" href="{:U('Home/MainCtr/Answer/questions_list')}">题库</a>
+	        </li>
+	    </ul> 
+    </div>
+	<div class="x-body">
+		<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<form id="form-article-add" class="layui-form layui-form-pane">
+						<div class=" layui-form-item">
+				      		<label class="layui-form-label" >答题背景图</label>
+					      	<div class="layui-input-block">
+					      	  	<button type="button" class="layui-btn" onclick="$('#answerbj').click();">
+							     	<i class="layui-icon">&#xe67c;</i>上传图片
+							 	</button>
+							  	<input style="display: none;" type="file" id="answerbj"  onchange="previewImage(this,1,'answerbj_val')"   multiple  class="input-file">
+			                </div>
+			                <div style="margin-left: 10px;color: red;">建议尺寸:500*487</div>
+		                   	<img id="imghead1" border="0"  style="margin-top: 5px;max-height:150px;"                   	
+		                   	<?php 
+		                   	   	if( empty($answer['answerbj']) ){
+		                   	   	   	echo 'src="__ROOT__/Public/images/answerbj.jpg"   onclick="$(\'#answerbj\').click();"';
+		                   	   	}else{
+		                   	       	echo 'src="__ROOT__/Uploads/'.$answer['answerbj'].'"';
+		                   	   	}
+		                    ?>
+		                   >
+				      	</div>
+						
+						<div class="layui-form-item">
+							<label class="layui-form-label">答题次数</label>
+							<div class="layui-input-inline" style="width: 7.6%;margin-right: 0px;">
+						      	<input type="text" lay-verify="number" name="cs" value="{$answer['cs']}" class="layui-input">
+						   	</div>
+						   	<label class="layui-form-label" style="width: 64px;">次/天</label>
+						</div>
+						
+						<div class="layui-form-item">							
+							<label class="layui-form-label">奖励数量</label>
+							<div class="layui-input-inline">
+								<input type="text" lay-verify="number" name="num" value="{$answer['num']}" class="layui-input">
+							</div>
+							<label class="layui-form-label">奖励类型</label>
+							<div class="layui-input-inline">
+							  <select name="status" class="layui-input">
+						        <option value="1" <?php if($answer['status']==1){echo 'selected="selected"';}?>>虚拟锤</option>
+						        <option value="2" <?php if($answer['status']==2){echo 'selected="selected"';}?>>虚拟币</option>
+						        <option value="3" <?php if($answer['status']==3){echo 'selected="selected"';}?>>积分</option>
+						      </select>
+							</div>						
+						</div>
+							
+						<div class="layui-form-item layui-form-text" style="margin-top: 15px;">
+						    <label class="layui-form-label">规则</label>
+						    <div class="layui-input-block">
+						      <textarea placeholder="请输入内容" id='rule' name="rule" class="layui-textarea"><?php if(empty($answer['rule'])){ echo '<p></p><p></p><p></p>';}else{ echo $answer['rule']; } ?></textarea>
+						    </div>
+						</div>					
+    						
+						<div class="layui-form-item">
+							<button type="button" class="layui-btn" lay-submit="" lay-filter="subfrom">保存</button>
+                            <input type="hidden" id="answerbj_val" value="" >
+						</div>						
+					</form>
+					<div style="height:100px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<include file="Public/footer.html" />
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="__ROOT__/Public/js/tools.js"></script> 
+	<script type="text/javascript" src="__ROOT__/Public/lib/froala_editor/js/froala_editor.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/lib/froala_editor/js/plugins/colors.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/lib/froala_editor/js/plugins/font_family.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/lib/froala_editor/js/plugins/font_size.min.js"></script>
+	<script type="text/javascript" src="__ROOT__/Public/lib/froala_editor/js/langs/zh_cn.js"></script>
+	<script>	
+		
+		$('#rule').editable({
+			 inlineMode: false,
+			 language: "zh_cn",
+			 alwaysBlank: true, 
+			 imageUploadURL:"{:U('Home/MainCtr/Goods/upload_img')}",
+		})
+		
+		//监听提交
+		layui.use(['form','element','layer', 'layedit'], function(){
+	        var layer = layui.layer;//弹出层
+	        var form = layui.form,
+	        	layedit = layui.layedit;
+	        $ = layui.jquery;
+	        
+			form.on('submit(subfrom)', function(datas) {
+				var tjing = layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form=document.forms[0];
+		        
+			    var formData = new FormData(form); 
+
+			   	if($("#answerbj_val").val()!=''){
+			      	formData.append("answerbj",convertBase64UrlToBlob($("#answerbj_val").val()));
+				} 
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Answer/doanswer')}",
+					 data :formData,
+			         dataType:"text",
+			         processData : false,         
+			         contentType : false,   
+					 success: function(data) {
+					 	layer.close(tjing);
+						if(data == '1') {
+							layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								location.reload();
+							});
+						} else if(data == '2') {
+							layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						} else {
+							layer.msg(data, {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+				return false;
+			});
+		});
+	
+		function previewImage(file,flag,ob){		
+		     var img =$('#imghead'+flag);
+		     var oFile = file.files[0]; 	    
+		     if(!new RegExp("(jpg|jpeg|png)+","gi").test(oFile.type)){  
+		          layer.msg("图片上传：文件类型必须是JPG、JPEG、PNG", {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		          return;  
+		     }
+		     var reader = new FileReader();  
+		     var tjing =  layer.msg('图片加载中', {icon: 16,shade: 0.3,time: 60*1000});
+		     reader.onload = function(e) {  
+		        var base64Img= e.target.result;
+		        var _ir=ImageResizer({  
+		        resizeMode:"auto"  
+		        ,dataSource:base64Img  
+		        ,dataSourceType:"base64"  
+		        ,maxWidth:1200   
+		        ,maxHeight:1200 
+		        ,onTmpImgGenerate:function(img){ }   
+		        ,success:function(resizeImgBase64,canvas){
+				layer.close(tjing);
+				img.attr("src",resizeImgBase64);  
+			    $('#'+ob).val(resizeImgBase64.substr(22));
+				
+		        },debug:false});            
+		     };  
+		     reader.readAsDataURL(oFile);  
+		}
+		
+		function convertBase64UrlToBlob(urlData){
+		    var bytes=window.atob(urlData.split(',')[1]);    
+		    var ab = new ArrayBuffer(bytes.length);
+		    var ia = new Uint8Array(ab);
+		    for (var i = 0; i < bytes.length; i++) {
+		        ia[i] = bytes.charCodeAt(i);
+		    }
+		    return new Blob( [ab] , {type : 'image/jpg'});
+		}
+	</script>
+	<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

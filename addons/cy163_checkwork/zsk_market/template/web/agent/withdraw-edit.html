@@ -1,0 +1,167 @@
+{template 'public/header'}   
+<style type="text/css">
+	.notice{display: block;color:orange;}
+	.avatar{
+		width:60px;height: 60px;
+	}
+	.layui-input-block{line-height: 36px;}
+	.avatar,.nickname{display: inline-block;vertical-align: middle}.city{font-size:13px;color:#999;}
+</style>
+ 
+<div class="panel panel-info">
+	<div class="panel-heading"  >
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('shops.applylist');?>">提现省钱</a></li>
+		  
+		   <li class="active">{$_GPC['name']}</li>
+		</ol>
+	</div>
+	<div class="panel-body"> 
+		<form class="layui-form" style="width: 500px;margin-left: 100px;" method="post" id="memForm"  action="<?php echo $this->routeUrl('applys.saveapply');?>">
+		
+		   <input type="hidden" name="sid" value="{$_GPC['sid']}">   
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">微信昵称</label>
+		    <div class="layui-input-block">
+		    	<img src="{$agent['avatar']}" class="avatar" />
+		      <div class="nickname">
+		      	<p>{$agent['nickname']}</p>
+		      	<p class="city">{$agent['openid']}</p>
+		      	<p class="city">{$agent['city']}</p>
+		      </div> 
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">可提现金额</label>
+		    <div class="layui-input-block">
+		    	<span class="label-blue">{$agent['balance']}</span>
+		    </div>
+		  </div>
+		   
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">真实姓名</label>
+		    <div class="layui-input-block">
+		        {$apply['truename']}
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">联系电话</label>
+		    <div class="layui-input-block">
+		       {$apply['mobile']}
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">提现方式</label>
+		    <div class="layui-input-block">
+	   			 <?php if($apply['type']=='bank'){ ?>
+					<span class="label-blue">银行卡</span>
+				<?php }else if($apply['type']=='wxpay') {?> 
+					<span class="label-green">微信</span>
+				<?php }else if($apply['type']=='-1'){ ?> 
+				<?php }?>
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">提现金额</label>
+		    <div class="layui-input-block">
+		      <p style="color:#ff4444">{$apply['money']}</p>
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">账号</label>
+		    <div class="layui-input-block">
+		      {$apply['account']}
+		    </div>
+		  </div>
+		   
+		   
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">补充说明</label>
+		    <div class="layui-input-block">
+	           {$apply['remark']}
+		    </div>
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">回复</label>
+		    <div class="layui-input-block">
+	           {$apply['reply']}
+		    </div>
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">状态</label>
+		    <div class="layui-input-block">
+	           <?php if($apply['status']=="1"){ ?> 
+	           	<span class="label-green">已通过</span>
+	       		<?php }?>
+	       		 <?php if($apply['status']=="0"){ ?> 
+	           	<span class="label-orange">待审核</span>
+	       		<?php }?>
+	       		 <?php if($apply['status']=="-1"){ ?> 
+	           	<span class="label-red">已拒绝</span>
+	       		<?php }?>
+		    </div>
+
+		  </div> 
+		   <?php if($apply['status']=="1"){ ?> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">提现状态</label>
+		    <div class="layui-input-block">
+		        <span style="color:#ff4444;font-size:13px;margin-right:10px;">{$apires['err_code_des']}</span>{$apires['message']}
+	       		<?php if(intval($apires['cmms_amt'])>0){ ?> 
+	       		<p style="color:#ff4444;font-size:13px;margin-right:10px;">
+	       			提现手续费：￥<?php echo floatval(intval($apires['cmms_amt'])/100); ?> 
+	       		</p>
+	       		<?php }?>
+		    </div>
+		    
+		  </div>
+		  <?php }?>
+		  <div class="layui-form-item">
+		    <div class="layui-input-block">
+		    	 <?php if($apply['status']=="0"){ ?> 
+		      <button class="layui-btn" onclick="passed()" type="button">提现处理</button>
+		      <button type="button" onclick="refuse()" class="layui-btn layui-btn-danger">拒绝</button>
+		       <?php }else{ ?>
+		       <button class="layui-btn" onclick="history.go(0)" type="button">刷新</button>
+		      <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-danger">返回</button>
+		    <?php } ?>
+		    </div>
+		  </div>
+		</form>
+	</div>  
+</div>   
+<div id="rep" style="display: none;">
+	<TABLE style="width: 300px;margin: 0 auto;">
+		<tr style="height: 60px;">
+			<td>拒绝理由</td>
+			<td>
+				<input type="text" placeholder="50字以内" name="reply" class="form-control" style="width: 240px;">
+				<input type="hidden" name="aid" value="{$apply['id']}" readonly>
+			</td>
+		</tr>
+	</TABLE>
+</div>
+ 
+<script type="text/javascript">
+	 function refuse(){
+	 	var html="<form id='sform' action='<?php echo $this->routeUrl('agents.refusewithdraw');?>' method='post'>";
+	 	html+=$("#rep").html();
+	 	html+="</form>";
+	 	modalDlg(html,function(){
+	 		$("#sform").submit();
+	 	})
+	 }
+	 function passed(){
+	 	var html="<form id='pform' action='<?php echo $this->routeUrl('agents.payout');?>&aid={$apply['id']}' method='post'>";
+	 	html+="<p>是否通过提现申请？</p>";
+	 	html+="</form>";
+	 	modalDlg(html,function(){
+	 		$("#pform").submit();
+	 	})
+	 }
+	 layui.use('form', function(){
+  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  form.render();
+}); 
+</script>
+{template 'public/footer'}

@@ -1,0 +1,64 @@
+{template 'public/header'}   
+<style type="text/css">
+	.notice{display: block;color:orange;}
+</style>
+ 
+<div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title">
+    <li class="layui-this">会员等级设置</li> 
+  </ul>
+  <div class="layui-tab-content"  >
+    <div class="layui-tab-item layui-show">
+		<form class="layui-form" method="post" id="memForm"  style="width: 500px;margin-left: 30px;padding-top:50px" action="<?php echo $this->routeUrl('member.saveGroup');?>">
+			<input type="hidden" name="groupid" value="{$group['id']}" readonly="">
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">分组名称</label>
+		    <div class="layui-input-block">
+		     <input type="text" name="name"  placeholder="6个字以内"  value="{$group['name']}"  class="layui-input"  >
+		    </div>
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">升级订单金额</label>
+		    <div class="layui-input-block">
+		       <input type="number" name="moneytotal" min="0" step="1" placeholder=""  class="layui-input"  value="<?php echo intval($group['moneytotal']);?>" >
+		    </div>
+		  </div>  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">会员折扣</label>
+		    <div class="layui-input-block">
+		     <input type="number" min="0" max="0.99" step='0.01' name="percent"  placeholder="2位小数"  value="<?php echo floatval($group['percent']);?>"  class="layui-input" lay-verify="step">
+		     <p style="color:#ff4444;font-size:13px;">0到1之间的小数，如：8折优惠，填写0.8</p>
+		    </div>
+		  </div> 
+		 
+		  <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button class="layui-btn" lay-submit lay-filter="*">保存</button> 
+		    </div>
+		  </div>
+		</form>
+	</div>  
+</div>
+</div>   
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+	layui.use(['form',"layer"], function(){
+	  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+	  var layer=layui.layer;
+	  form.render();
+		  form.on('submit(*)', function(data){ 
+		  console.log(data.field) //被执行提交的form对象，一般在存在form标签时才会返回 
+		  var tot=parseFloat(data.field.percent0)+parseFloat(data.field.percent1)+parseFloat(data.field.percent2);
+		  if(tot>=1){
+		  	layer.msg("会员提成相加不能超过100%");
+		  	return false;
+		  }
+		  if(data.field.name.length<1){
+		  	layer.msg("名称不能为空");
+		  	return false;
+		  }
+		    
+		});
+  	});
+</script>

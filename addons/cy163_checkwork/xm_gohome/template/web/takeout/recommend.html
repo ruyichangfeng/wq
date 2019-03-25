@@ -1,0 +1,80 @@
+{template 'common/header-base'}
+
+<link href="{MODULE_URL}static/js/artDialog/skins/idialog.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/plugins/iframeTools.js"></script>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="javascript:;" method="post">
+    <input type="hidden" name="merchant_id" id="merchant_id" value="{$id}" />	
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                店铺权值设置(0表示不推荐，权值越大显示位置越靠前)
+            </div>
+            <div class="panel-body">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">首页推荐权值</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="top1" id="top1" value="{$item[top1]}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">列表页推荐权值</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="top2" id="top2" value="{$item[top2]}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">搜索页推荐权值</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="top3" id="top3" value="{$item[top3]}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <div onclick="submitok()" class="btn btn-primary btn-block">保存</div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+function submitok(){
+    var merchant_id = $("#merchant_id").val();
+    var top1        = $("#top1").val();
+    var top2        = $("#top2").val();
+    var top3        = $("#top3").val();
+    
+    $.ajax({
+        url: "{php echo $this->createWebUrl('takeout', array('foo'=>'recommendok'))}",
+        type:"POST",
+        data:{"merchant_id":merchant_id, "top1":top1, "top2":top2, "top3":top3},
+        dataType:"json",
+        success: function(res){
+            if(res == 1){
+                art.dialog({
+                    title: '提示消息',
+                    content: '配置成功',
+                    ok: function () {
+                        art.dialog.close();
+                        return false;
+                    }
+                });
+            }else{
+                art.dialog({
+                    time: 1,
+                    content: '配置失败！'
+                });
+            }
+        }
+    });
+}
+</script>

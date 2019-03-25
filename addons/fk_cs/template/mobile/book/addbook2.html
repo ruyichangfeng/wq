@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+        .weui-navbar__item span{
+            display: block;
+        }
+        .tt a{display: inline-block;height:20px;padding: 0 0 0 15px;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    {php echo register_jssdk();}
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="page" id="content">
+    <div class="page__hd">
+        <h1 class="page__title">扫码入库</h1>
+    </div>
+    <div class="page__bd">
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell weui-cells_form">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">书名</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" id="name" type="text" value="{$book['title']}" placeholder="请输入书名"/>
+                </div>
+            </div>
+            <div class="weui-cell weui-cells_form">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">作者</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" id="author" type="text" value="{$book['author']}" placeholder="请输入作者"/>
+                </div>
+            </div>
+            <div class="weui-cell weui-cells_form" onclick="test()">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">价格</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" id="price" type="number" value="{$book['price']}" placeholder="请输入价格">
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">闲书类别</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <select class="weui-select" name="select2" id="cat_id">
+                        <option value="">请选择</option>
+                        {loop $book_lb $lb}
+                        {if $book['cat_id'] == $lb['sid']}
+                        <option value="{$lb['sid']}" selected>{$lb['sname']}</option>
+                        {else}
+                        <option value="{$lb['sid']}">{$lb['sname']}</option>
+                        {/if}
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">适合年龄</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <select class="weui-select" name="select2" id="age_id">
+                        <option value="">请选择</option>
+                        {loop $book_age $age}
+                        {if $book['age_id'] == $age['sid']}
+                        <option value="{$age['sid']}" selected>{$age['sname']}</option>
+                        {else}
+                        <option value="{$age['sid']}">{$age['sname']}</option>
+                        {/if}
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+
+            <!--正面图片上传-->
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <div class="weui_uploader">
+                        <div class="weui_uploader_hd weui_cell">
+                            <div class="weui_cell_bd weui_cell_primary">正面图片上传</div>
+                            <div class="weui_cell_ft"></div>
+                        </div>
+                        <div class="weui_uploader_bd">
+                            <ul class="weui_uploader_files" id='coverImg'>
+                            </ul>
+                            <div class="weui_uploader_input_wrp">
+                                <input class="weui_uploader_input" type="file" accept="image/jpg,image/jpeg,image/png,image/gif" id="uploadImg" onchange="previewImage(this,'coverImg','coverImage')"/>
+                                <input  type="hidden"  id="coverImage" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--反面图片上传-->
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <div class="weui_uploader">
+                        <div class="weui_uploader_hd weui_cell">
+                            <div class="weui_cell_bd weui_cell_primary">反面图片上传</div>
+                            <div class="weui_cell_ft"></div>
+                        </div>
+                        <div class="weui_uploader_bd">
+                            <ul class="weui_uploader_files" id='backImg'>
+                            </ul>
+                            <div class="weui_uploader_input_wrp">
+                                <input class="weui_uploader_input" type="file" accept="image/jpg,image/jpeg,image/png,image/gif" id="uploadBackImg" onchange="previewImage(this,'backImg','backImage')"/>
+                                <input  type="hidden"  id="backImage" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <a class="weui-btn weui-btn_primary" href="javascript:Tijiao()" id="showTooltips">确定</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="page">
+    <!--success-->
+    <div class="weui-msg" id="success" style="display: none;">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">入库成功</h2>
+            <!--<p class="weui-msg__desc">内容详情，可根据实际需要安排，如果换行则不超过规定长度，居中展现<a href="javascript:void(0);">文字链接</a></p>-->
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="{php echo $this->createMobileUrl('mybook', array('schoolid' => $schoolid), true)}" class="weui-btn weui-btn_primary">确定</a>
+            </p>
+        </div>
+    </div>
+    <!--fail-->
+    <div class="weui-msg" id="fail" style="display: none;">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">入库失败</h2>
+            <p class="weui-msg__desc" id="fail_desc"></p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="javascript:$('#fail').hide();$('#content').show();" class="weui-btn weui-btn_primary">确定</a>
+                <!--<a href="javascript:history.back();" class="weui-btn weui-btn_default">辅助操作</a>-->
+            </p>
+        </div>
+    </div>
+</div>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function Tijiao(){
+        if($("#cat_id").val() == null || $("#cat_id").val() == ""){
+            Weui.alert({"title":"","content":"闲书类别必选！"});
+            return;
+        }
+        if($("#age_id").val() == null || $("#age_id").val() == ""){
+            Weui.alert({"title":"","content":"闲书适合年龄必选！"});
+            return;
+        }
+        if($("#name").val() == null || $("#name").val() == ""){
+            Weui.alert({"title":"","content":"闲书名字不能为空！"});
+            return;
+        }
+        if($("#author").val() == null || $("#author").val() == ""){
+            Weui.alert({"title":"","content":"闲书作者不能为空！"});
+            return;
+        }
+        if($("#price").val() == null || $("#price").val() == ""){
+            Weui.alert({"title":"","content":"闲书价格不能为空！"});
+            return;
+        }
+        if($("#coverImage").val() == null || $("#coverImage").val() == ""){
+            Weui.alert({"title":"","content":"封面图片不能为空！"});
+            return;
+        }
+        if($("#backImage").val() == null || $("#backImage").val() == ""){
+            Weui.alert({"title":"","content":"背面图片不能为空！"});
+            return;
+        }
+        var submitData = {
+            openid :"{$openid}",
+            schoolid :"{$schoolid}",
+            weid : "{$weid}",
+            id : "{$book['id']}",
+            title : $("#name").val(),
+            author : $("#author").val(),
+            cat_id : $("#cat_id").val(),
+            age_id : $("#age_id").val(),
+            price : $("#price").val(),
+            coverImg: $("#coverImage").val(),
+            backImg:$("#backImage").val(),
+            isbn : "{$isbn}",
+            isScan : "{$isScan}"
+        };
+        Weui.confirm({"title":"确认提交?","content":'',"cancelCallback":function(e){},"sureCallback":function(e){
+            $.post("{php echo $this->createMobileUrl('addbook',array('op'=>'add'))}",submitData,function(data){
+                if(data.result){
+                    $("#content").hide();
+                    $("#success").show();
+                }else{
+                    document.getElementById("fail_desc").innerHTML = data.msg;
+                    $("#content").hide();
+                    $("#fail").show();
+                }
+            },'json');
+        }});
+    }
+</script>
+<script type="text/javascript">
+    var images = {
+        localId: [],
+        serverId: [],
+        count:1
+    };
+    function delImg(id){
+        $("#"+id).find(".weui-uploader__file").remove();
+        images.localId = [];
+    }
+    function previewImage(file,showImg,hideImg) {
+        if (file.files && file.files[0]) {
+            //wx上传图片
+            wx.chooseImage({
+                count       : 1,
+                sizeType    : ['compressed'],
+                sourceType  : ['album', 'camera'],
+                success     : function(res){
+                    wx.uploadImage({
+                        localId : res.localIds[0],
+                        isShowProgressTips:1,
+                        success: function (res1) {
+                            $("#"+hideImg).val(res1.serverId);
+                            var url = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token='+"{$token2}"+'&media_id='+res1.serverId;
+                            $('#'+showImg).html('<li class="weui_uploader_file" style="background-image:url('+url+')"></li>');
+                        },
+                        fail: function (res1) {
+                            Weui.alert({"title":"","content":JSON.stringify(res1)});
+                        }
+                    })
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="memberRechargeMoneyForm" role="form" >
+                    <input type="hidden" name="storeid" value="{$storeid}" />
+                    <div class="col-sm-12">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <i class="fa fa-line-chart" aria-hidden="true"></i> 会员充值
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">充值金额</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" name="rechargeMoneyCount" id="rechargeMoneyCount" class="form-control keyup_rechargeMoneyCount"  style="font-size: xx-large; color: #e10c14 !important;height: 60px;"/>
+                                                <span class="input-group-addon">元</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <button type="button" class="btn btn-outline btn-info" id="span_showGivePoint" style="font-size: large; font-weight: bold">会员充值：1元={php echo util::set('cmp312',$setdata)}积分</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">赠送金额</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" name="giveMoneyCount" id="giveMoneyCount" class="form-control keyup_realMoneyCount"  style="font-size:xx-large; color: #e10c14 !important;height: 60px;"/>
+                                                <span class="input-group-addon">元</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4"></div>
+                                    </div>
+                                    <div class="form-group" id="div_resultMoneyCount">
+                                        <label class="col-sm-2 control-label">合计金额</label>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <span class="label" id="span_resultMoneyCount" style="font-size: xx-large; color: #e10c14 !important;"> </span>
+                                                <input type="hidden" name="hidden_resultMoneyCount"  id="hidden_resultMoneyCount" />
+                                                <input type="hidden" name="hidden_resultPointsCount"  id="hidden_resultPointsCount" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label"></label>
+                                <div class="col-sm-9">
+                                    <button type="button"  onclick="btn_showReadCard()" class="btn btn-warning btn-lg"><i class="fa fa-spin fa-spinner"></i>&nbsp;读卡</button>
+                                    <button  class="btn btn-lg btn-danger " type="button"  data-toggle="modal" id="modelConsumeBtn"  data-target="#consumeOrderData" ><i class="fa fa-money"></i>&nbsp;充&nbsp;值&nbsp;</button>
+                                    <button name="referer_submitMemberRechargeMoney"  onclick="btn_clearMemberInfo()"  id="referer_submitMemberRechargeMoney" type="button" class="btn btn-lg btn-info"><i class="fa fa-refresh" aria-hidden="true"></i> 清空</button>
+                                    <button  class="btn btn-lg btn-success " type="button" name="checkMemberRechargePackageMoney" id="checkMemberRechargePackageMoney"  data-toggle="modal" data-target="#checkMemberRechargePackage" ><i class="fa fa-diamond" aria-hidden="true"></i>&nbsp;选择充值套餐&nbsp;</button>
+                                </div>
+                            </div>
+                        </div>
+                        {template 'web/common/panel-member-card-info'}
+                        {template 'web/common/paycommon'}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="modal inmodal fade" id="checkMemberRechargePackage" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-header" style="min-height: 40px;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title" style="float: left;">请选择充值套餐</h4>
+        </div>
+        <div class="modal-content">
+
+                <div class="ibox-content" id="searchtoolbar"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;">
+                    <form id="search_goods" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="memberrechargepackages" />
+                        <input type="hidden" name="op" value="getGoodsPackagesListTableData" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <div class="form-group" style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;">
+                            <label class="col-sm-2 control-label" style="margin: 0px;width: 20%;">套餐名称</label>
+                            <div class="col-sm-8" style="width: 60%">
+                                <input class="form-control" name="keyword" id="search_keyword" type="text" value="{$_GPC['keyword']}">
+                            </div>
+                            <div class="col-sm-2" style="width: 20%">
+                                <button class="btn btn-outline btn-primary" type="button" onclick="serachRechargePackage()" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;">
+                    <table id="GoodsPackagesListTableData" data-mobile-responsive="true"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 5px;"></table>
+                </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="btn_closeGoodsId">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_SaveGoodsPackageId">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    key('q', function(){
+        payStyle_Check(2);
+    });
+    key('a', function(){
+        payStyle_Check(1);
+    });
+    key('z', function(){
+        payStyle_Check(3);
+    });
+
+    $(document).ready(function(){
+        btn_showReadCard();
+        $("#rechargeMoneyCount").attr("disabled",true);
+        $("#giveMoneyCount").attr("disabled",true);
+        $("#submitMemberRechargeMoney").attr("disabled",true);
+        $("#referer_submitMemberRechargeMoney").attr("disabled",true);
+        $("#checkMemberRechargePackageMoney").attr("disabled",true);
+        $("#span_showGivePoint").hide();
+        $("#div_resultMoneyCount").hide();
+
+        $("#memberRechargeMoneyForm").validate({
+            rules: {
+                rechargeMoneyCount: {
+                    required: true,
+                    number:true,
+                    min:0.01
+                },giveMoneyCount: {
+                    number:true,
+                    min:0.01
+                }
+            },
+            messages: {
+                rechargeMoneyCount: {
+                    required: "请输入充值金额",
+                    number: "必须输入大于0的充值金额",
+                    min: $.validator.format( "请输入大于0.01的充值金额" )
+                },giveMoneyCount: {
+                    number: "必须输入大于0的充值金额",
+                    min: $.validator.format( "请输入大于0.01的充值金额" )
+                }
+            }
+        });
+
+        //选择充值套餐
+        $('#GoodsPackagesListTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('memberrechargepackages', array('op' => 'getGoodsPackagesListTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            toolbar: '#searchtoolbar',
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            queryParamsType:'',
+            queryParams: queryParams,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            clickToSelect: true,
+            selectItemName:"id",
+            height: 250,
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            }, {
+                field: 'mrp_packagesName',
+                title: '套餐名称'
+            }, {
+                field: 'mrp_rechargeMoney',
+                title: '充值金额(元)'
+            }, {
+                field: 'mrp_giveMoney',
+                title: '赠送金额(元)'
+            }, {
+                field: 'mrp_givePoints',
+                title: '赠送积分'
+            }, {
+                field: 'mrp_packagesEndDate',
+                title: '套餐有效期',
+                formatter:mrp_packagesEndDateFormatter
+            }, ]
+        });
+        //得到查询的参数
+        function queryParams (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchkeywordstr:$("#search_keyword").val(),
+            };
+            return temp;
+        };
+
+        function mrp_packagesEndDateFormatter(value, row, index) {
+            var value = value;
+            var result = "<span class='label label-success'>"+ FormatgetLocalTime(value) +"</span>";
+            return result;
+        }
+        //取付款模态内焦点
+        $('#consumeOrderData').on('shown.bs.modal',function(e){
+            $('#hidden_TextPayCode2').focus();
+        });
+    });
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert(data['message']['code']);
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+
+                        } else {
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+                            swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                            $("#rechargeMoneyCount").attr("disabled",false);
+                            $("#giveMoneyCount").attr("disabled",false);
+                            $("#submitMemberRechargeMoney").attr("disabled",false);
+                            $("#referer_submitMemberRechargeMoney").attr("disabled",false);
+                            $("#checkMemberRechargePackageMoney").attr("disabled",false);
+                        }
+                    }
+
+                });
+            });
+
+    }
+    $(".keyup_rechargeMoneyCount,#giveMoneyCount").on('keyup', function (){
+        $("#div_resultMoneyCount").show();
+        var cmpdata  = "{php echo util::set('cmp312',$setdata)}";
+        var cmpstatedata  = "{php echo util::set('cmp313',$setdata)}";
+        var rechargeMoneyCount = parseFloat($("#rechargeMoneyCount").val());
+        var giveMoneyCount = $("#giveMoneyCount").val();
+        var resultMoneyCount = 0;
+        var resultGivePointsCount = 0;
+        if(giveMoneyCount==''){
+            if(cmpstatedata == 1){
+                resultGivePointsCount = (rechargeMoneyCount * cmpdata).toFixed(2);
+                $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                $("#span_showGivePoint").show();
+                $("#span_resultMoneyCount").html(rechargeMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+            }else{
+                $("#hidden_resultPointsCount").attr("value",0);
+                $("#span_resultMoneyCount").html(rechargeMoneyCount+" 元");
+            }
+            $("#hidden_resultMoneyCount").attr("value",rechargeMoneyCount.toFixed(2));
+        }else {
+            resultMoneyCount = parseFloat(rechargeMoneyCount) + parseFloat(giveMoneyCount);
+            if(cmpstatedata == 1){
+                resultGivePointsCount = (resultMoneyCount * cmpdata).toFixed(2);
+                $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                $("#span_showGivePoint").show();
+                $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+            }else{
+                $("#hidden_resultPointsCount").attr("value",0);
+                $("#span_resultMoneyCount").html(resultMoneyCount+" 元");
+            }
+            $("#hidden_resultMoneyCount").attr("value",resultMoneyCount.toFixed(2));
+        }
+        $("#hidden_realMoneyCount").attr("value",rechargeMoneyCount);
+
+    });
+    //清空会员信息
+    function btn_clearMemberInfo() {
+        $("#memberId").attr("value","");
+        $("#rechargeMoneyCount").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#giveMoneyCount").attr("value","");
+        $("#rechargeMoneyCount").val("");
+        $("#giveMoneyCount").val("");
+        $("#memberNote").attr("value","");
+        $("#hidden_realMoneyCount").attr("value","");
+        $("#rechargeMoneyCount").attr("disabled",true);
+        $("#giveMoneyCount").attr("disabled",true);
+        $("#div_resultMoneyCount").hide();
+        $("#submitMemberRechargeMoney").attr("disabled",true);
+        $("#referer_submitMemberRechargeMoney").attr("disabled",true);
+        $("#checkMemberRechargePackageMoney").attr("disabled",true);
+    }
+    //搜索套餐
+    function serachRechargePackage() {
+        $("#GoodsPackagesListTableData").bootstrapTable('refresh');
+    }
+    //选择套餐
+    $("#btn_SaveGoodsPackageId").click(function () {
+        var arrselections = $("#GoodsPackagesListTableData").bootstrapTable('getSelections');
+        if (arrselections.length <= 0) {
+            swal("操作有误", "请选择要设置的项目！","error");
+            return;
+        }
+        else{
+            //alert(JSON.stringify(arrselections));
+            var packageid = arrselections[0].id;
+            $.ajax({
+                type: "post",
+                dataType: 'JSON',
+                url: "{php echo $this->createWebUrl('memberrechargemoney', array('op' => 'ajaxgetgoodspackageonedata'))}",
+                data: { packageid:packageid },
+                success: function (data) {
+                    if (data['message']['code'] != 0) {
+                        swal({
+                            title: "操作有误",
+                            text: data['message']['msg'],
+                            type: "error",
+                        });
+                        return;
+                    }else{
+                        var resultMoneyCount = 0;
+                        var resultGivePointsCount = 0;
+                        var realMoneyCount = parseFloat(data['message']['totalRechargeMoney']);
+                        var giveMoneyCount = parseFloat(data['message']['totalGiveMoney']);
+                        var givePointsCount = parseFloat(data['message']['totalGivePoint']);
+                        $("#rechargeMoneyCount").attr("value",realMoneyCount);
+                        $("#giveMoneyCount").attr("value",giveMoneyCount);
+                        if(giveMoneyCount > 0){
+                            resultMoneyCount = realMoneyCount + giveMoneyCount;
+                            resultGivePointsCount = givePointsCount;
+                            $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+                            $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                            $("#hidden_resultMoneyCount").attr("value",resultMoneyCount);
+                            $("#hidden_realMoneyCount").attr("value",realMoneyCount);
+
+                            $("#rechargeMoneyCount").val(realMoneyCount);
+                            $("#giveMoneyCount").val(giveMoneyCount);
+
+                        }else{
+                            resultMoneyCount = realMoneyCount;
+                            resultGivePointsCount = givePointsCount;
+                            $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+                            $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                            $("#hidden_resultMoneyCount").attr("value",resultMoneyCount);
+                            $("#hidden_realMoneyCount").attr("value",realMoneyCount);
+
+
+                            $("#rechargeMoneyCount").val(resultMoneyCount);
+                            $("#giveMoneyCount").val(resultGivePointsCount);
+
+                        }
+
+                        $("#div_resultMoneyCount").show();
+                        $('#checkMemberRechargePackage').modal('hide')
+                    }
+                }
+
+            });
+        }
+
+    });
+    //日期格式化函数
+    function FormatgetLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+    }
+
+    var dingshi1='';
+    var dingshi2='';
+    var imgsrc='{HLMMS_IMG}chenggong.gif';
+    var imgsrc3='{HLMMS_IMG}dengdai.gif';
+    var imgsrc1='{HLMMS_IMG}shibai.gif';
+    function  payStyle_Check(payid){
+        //alert(payid);
+        var imgsrc1='{HLMMS_IMG}dengdai.png';
+        var imgsrc2='{HLMMS_IMG}ma.gif';
+        for(var i=1; i<=3;i++){
+            $('#payStyle_Check'+i).removeClass('main-right-top-active');
+            $('#div_payResultShowOrHide'+i).hide();
+            $('#payresult'+i+'-'+i).html('结果区域');
+            if(i==1 || i==3 ){
+                $('#payresult'+i).attr('src',imgsrc2);
+            }else{
+                $('#payresult'+i).attr('src',imgsrc2);
+            }
+        }
+        $('#hidden_TextPayCode'+payid).val('');
+
+        $('#payStyle_Check'+payid).addClass('main-right-top-active');
+        $('#div_payResultShowOrHide'+payid).show();
+        $('#radio_consumePayStyle'+payid).attr('checked', true);
+        $('#hidden_TextPayCode'+payid).focus();
+
+    }
+
+    //刷卡
+    function ShuaKaPay(){
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var pay_get_TextPayCode2=$('#hidden_TextPayCode2').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "会员充值";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0,请采用现金支付方式！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(pay_get_TextPayCode2==''){
+            swal("操作异常！", "付款码不能为空！","error");
+            return false;
+        }else{
+            if(!/^\d{18}$/.test(pay_get_TextPayCode2)){
+                swal("操作异常！", "付款码格式不对,应为长度为18位数字,请检查！","error");
+                return false;
+            }
+        }
+        var wechatCodePayUrl = "{php echo $this->createWebUrl('doMemberRechargePay', array())}";
+        var wechatCodePayParams = {
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'pay_get_TextPayCode2': pay_get_TextPayCode2
+        };
+        $("#btn_SaveConsumeOrderData2").hide();
+        $.ajax({
+            url: wechatCodePayUrl,
+            data: wechatCodePayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['status'] == 0) {
+
+                    $('#payresult2').attr('src',imgsrc3);
+                    dingshi1=setTimeout("PayResultQuery('"+data['message']['out_trade_no']+"','"+data['message']['out_trade_no_type']+"')",3000);
+                } else {
+                    $('#payresult2').attr('src',imgsrc1);
+                    setTimeout('waitDoClosePayFalse()',3000);
+                }
+            }
+        });
+    }
+    function PayResultQuery(out_trade_no,out_trade_no_type){
+        if(out_trade_no_type == 'wechatpay'){
+            var PayQueryUrl = "{php echo $this->createWebUrl('doWechatPayQuery', array())}";
+        }else{
+            var PayQueryUrl = "{php echo $this->createWebUrl('doAliPayQuery', array())}";
+        }
+        var order_id=out_trade_no;
+        var order_type=out_trade_no_type;
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultMoneyCount=$('#hidden_resultMoneyCount').val();
+        var hidden_resultPointsCount=$('#hidden_resultPointsCount').val();
+        var consumeType="arsl1";
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "会员充值";
+        }
+        var PayParams = {
+            'out_trade_no': order_id,
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+            'consumeType': consumeType
+        };
+
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+                    $('#payresult2').attr('src',imgsrc);
+                    clearTimeout(dingshi1);
+                    clearTimeout(dingshi2);
+                    setTimeout('waitDoClosePayTrue()',3000);
+                }else{
+                    dingshi2=setTimeout("PayResultQuery('"+order_id+"','"+order_type+"')",3000);
+                }
+            }
+        });
+    }
+    function moneryisnum(monery){
+        var reg = new RegExp("^[0-9]+(.[0-9]{1,2})?$");
+        if(!reg.test(monery)){
+            return true;
+        }
+        return false;
+    }
+    function PayNoteFomat(value_txt_PayNote){
+        var reg = new RegExp("^[\u4e00-\u9fa5]{0,}$");
+        if(!reg.test(value_txt_PayNote)){
+            return true;
+        }
+        return false;
+    }
+    //现金和一码付收款
+    function cashPay(){
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_radio_consumePayStyle=$('input:radio[name="radio_consumePayStyle"]:checked').val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultMoneyCount=$('#hidden_resultMoneyCount').val();
+        var hidden_resultPointsCount=$('#hidden_resultPointsCount').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "会员充值";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        var cashPayUrl = "{php echo $this->createWebUrl('memberrechargemoney', array('op' => 'savememberRechargeMoneyData'))}";
+        var cashPayParams = {
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'radio_consumePayStyle': pay_radio_consumePayStyle,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+        };
+        if(pay_radio_consumePayStyle == 1){
+            $("#yiMaFuPayhidden").hide();
+        }
+        if(pay_radio_consumePayStyle == 3){
+            $("#cashPayhidden").hide();
+        }
+        //alert(JSON.stringify(cashPayParams));
+        $.ajax({
+            url: cashPayUrl,
+            data: cashPayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //alert(data['message']['code']);
+                if (data['message']['code'] == 0) {
+                    //alert(pay_radio_consumePayStyle);
+                    if(pay_radio_consumePayStyle == 1){
+                        $('#payresult1').attr('src',imgsrc);
+                        $('#payresult1-1').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc);
+                        $('#payresult3-3').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }
+                } else {
+                    if(pay_radio_consumePayStyle  == 1){
+                        $('#payresult1').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }
+                }
+            }
+        });
+    }
+    //延迟执行
+    function waitDoClosePayTrue(){
+        $('#consumeOrderData').modal('hide');
+        swal("结账成功！", "","success");
+        window.location.reload();
+    }
+    function waitDoClosePayFalse(){
+        $('#consumeOrderData').modal('hide');
+        swal("支付失败！", "操作异常，请重新操作结账。","error");
+        window.location.reload();
+    }
+
+</script>
+{template 'web/common/footer'}

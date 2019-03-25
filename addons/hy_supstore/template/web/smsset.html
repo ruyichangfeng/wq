@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+    <style>
+    @media screen and (max-width:670px) {
+        .layui-form-mid{
+            margin-left: 150px;
+        }
+    }
+    @media screen and (max-width:1430px) {
+        .hint{
+            margin-left: 150px;
+        }
+    }
+    </style>
+</head>
+
+<body>
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('smsset')}">短信设置</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>参数设置</legend>
+        <div class="layui-field-box">
+            <form action="" method="post" id="form1" class="layui-form " enctype="multipart/form-data">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 注意事项： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip red">
+                        1.使用自己的阿里云短信服务，请勾选，并填写下列内容；
+                        <br> 2.使用系统自带的短信服务，不勾选，请到短信充值页面充值；
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 阿里云短信服务 </label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="isopensms" lay-filter="isopensms" id="isopensms" value="1" {if $item[ 'isopensms']==1 }checked="checked" {/if} lay-skin="primary" title="是">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux oncecardtip red"></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">accessKeyId</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="accessKeyId" id="accessKeyId" value="{$item['accessKeyId']}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">必填项</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">accessKeySecret</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="accessKeySecret" id="accessKeySecret" value="{$item['accessKeySecret']}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">必填项</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">短信签名</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="SignName" id="SignName" value="{$item['SignName']}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">必填项</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">短信模板ID</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="TemplateCode" id="TemplateCode" value="{$item['TemplateCode']}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux hint">必填项，短信模板必须对应参数。例：您的验证码为${code}， 5 分钟内有效，请勿泄漏于他人。</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">短信模板参数(选填)</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="TemplateContent" id="TemplateContent" value="{$item['TemplateContent']}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux hint" style="display: block;">如果短信模板包含两个参数,请填写。例：验证码${code}，您正在进行${product}身份验证，打死不要告诉别人哦！。</div>
+                    <div class="layui-form-mid layui-word-aux hint" style="display: block;">如果输入0,表示这个参数存在但为空。如果传值为空,表示该参数不存在</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="submit" class="layui-btn" name="submit" value="提交">立即提交</button>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>测试发送短信</legend>
+        <div class="layui-field-box">
+            <div id="form1" class="layui-form " enctype="multipart/form-data">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div class="layui-form-mid layui-word-aux red">以上内容填好后，请在这里测试一下：</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">接收手机号码</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="mobile" id="mobile">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" id="smssendceshi">发送短信</button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div class="layui-form-mid layui-word-aux red tips"></div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer //弹层
+            ,
+            element = layui.element; //元素操作
+    });
+
+    //点击发送短信
+    $('#smssendceshi').click(function() {
+        $('#smssendceshi').attr('disabled', true);
+        $('#smssendceshi').addClass('layui-btn-disabled');
+        setTimeout('myfunction()', 3000);
+        $('.tips').html('');
+        var mobile = $('#mobile').val();
+        if (mobile == '' || mobile.length != 11) {
+            showMsg('请输入有效手机号');
+            return;
+        }
+        var url = "{php echo $this->createWebUrl('smsset',array('op'=>'test'))}";
+        $.get(url, { mobile: mobile }, function(data) {
+            data = JSON.parse(data);
+            showMsg(data.errmsg);
+        });
+    });
+
+    function showMsg(msg) {
+        $('.tips').html(msg);
+        layer.msg(msg);
+    }
+
+    function myfunction() {
+        $('#smssendceshi').attr('disabled', false);
+        $('#smssendceshi').removeClass('layui-btn-disabled');
+    }
+    </script>
+</body>
+
+</html>

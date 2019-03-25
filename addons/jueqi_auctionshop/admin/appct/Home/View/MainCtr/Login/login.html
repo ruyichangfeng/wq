@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title><?php  if(empty($system['p_name'])) echo '竞价商城后台管理系统';?>{$system['p_name']}</title>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<if  condition=" empty($system['wztb'])  ">  
+ 	<link rel="Bookmark" href="__ROOT__/Public/favicon.ico" >
+ 	<link rel="Shortcut Icon" href="__ROOT__/Public/favicon.ico" />
+<else/>
+	 <link rel="Bookmark" href="__ROOT__/Uploads/{$system['wztb']}" >
+   <link rel="Shortcut Icon" href="__ROOT__/Uploads/{$system['wztb']}" />
+</if>
+
+<link rel="stylesheet" href="__ROOT__/Public/css/xadmin.css?2017" media="all">
+</head>
+<body class="login-bg">
+    
+    <div class="login">
+        <div class="message"><?php  if(empty($system['p_name'])) echo '竞价商城后台管理系统';?>{$system['p_name']}</div>
+        <div id="darkbannerwrap"></div>
+        
+        <form method="post" class="layui-form" >
+            <input name="username" id="username"  placeholder="用户名" type="text"  lay-verify="username" class="layui-input" >
+            <hr class="hr15">
+            <input name="password"  placeholder="密码"  type="password" lay-verify="pwd" class="layui-input">
+            <hr class="hr15">
+            <input name="verify" id="verify" placeholder="验证码" type="text"  lay-verify="ranks"  class="layui-input idcode_add">
+            <img class="idcode_add_img" src="{:U('Home/MainCtr/Login/verify_c')}"  onclick="re_verify();">
+            <hr class="hr15">
+            <input value="登录" type="submit"  id="butn" lay-submit lay-filter="login" style="width:100%;" >
+            <hr class="hr20" >
+        </form>
+    </div>
+    
+    <script type="text/javascript" src="__ROOT__/Public/lib/layui/layui.js" charset="utf-8"></script>
+    
+    <script>
+    	
+		function re_verify(){  
+			var verifyimg = "{:U('Home/MainCtr/Login/verify_c')}";
+		    if( verifyimg.indexOf('?')>0 ){  
+		        $('img').attr("src", verifyimg+'&random='+Math.random());  
+		    }else{  
+		        $('img').attr("src", verifyimg.replace(/\?.*$/,'')+'?'+Math.random());  
+		    }  
+		}; 
+    	
+	    layui.use(['form'], function(){
+	       var form = layui.form;
+	       $ = layui.jquery;
+	     	
+	        form.verify({
+			    username:[/(.+){2,15}$/, '用户名必须2到15位'],
+			    pwd: [/(.+){6,20}$/, '密码必须6到20位'],
+			    ranks: function(value){
+			       if(value.length != 4){
+			         return '请输入正确验证码!';
+			      }
+			    }
+			});
+	    
+	       //监听提交
+	       form.on('submit(login)', function(datas){
+	       	    $.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Login/checkUser')}",
+					data: datas.field,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+						   layer.tips('验证码错误！', '#verify',{tips: [4, 'red'],time: 2000});
+						   $("#verify").focus();
+						}else if(data=='2'){
+							 layer.msg('正在登陆中...', {icon: 16,offset: '40%',shade: 0.3,time: 60*1000});
+							 window.location.href="{:U('Home/MainCtr/Index/index')}";
+							 //window.location.href="{:U('Home/MainCtr/File/file_list')}";
+						}else if(data=='3'){ 
+							layer.tips('用户名或密码错误！', '#username',{tips: [1, 'red'],time: 5000});
+						}
+					}
+				});	
+	        
+	          return false;
+	       });
+	     
+	    });
+	     
+
+    </script>
+
+   
+</body>
+</html>

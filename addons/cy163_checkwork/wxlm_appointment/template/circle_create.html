@@ -1,0 +1,84 @@
+{template 'common/header'}
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('circle', array('op'=>'display'));}">商圈管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('circle', array('op'=>'create'));}">添加商圈</a></li>
+    </ul>
+    <form action="{php echo $this->createWebUrl('circle', array('op'=>'create'))}" method="post" class="form-horizontal form" id="circle_form">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">{if $op == 'create'}添加商圈{else if $op == 'modify'}编辑商圈{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" hidden>
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="circle[circle_id]"  class="form-control" value="{$circle['circle_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>排序</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="circle[circle_order]"  class="form-control" value="{$circle['circle_order']}" />
+                        <div class="help-block">序号越大越靠前</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>商圈名称</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="circle[circle_name]"  class="form-control" value="{$circle['circle_name']}" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>商圈地址</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_district('circle[circle_address]', $circle['circle_address']);}
+                        <div class="help-block">商圈所在省份、市为必填.</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#circle_form').submit(function(){
+
+
+                if($('input[name="circle[circle_order]"]').val() == ''){
+                    util.message('未填写排序.');
+                    return false;
+                }
+                if($('input[name="circle[circle_name]"]').val() == ''){
+                    util.message('未填写商圈名称.');
+                    return false;
+                }
+
+                if($('select[name="circle[circle_address][province]"]').val() == ''){
+                    util.message('未选择商圈所属省份.');
+                    return false;
+                }
+                if($('select[name="circle[circle_address][city]"]').val() == ''){
+                    util.message('未选择商圈所属市.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

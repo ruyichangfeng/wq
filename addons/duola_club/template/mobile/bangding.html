@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+        .weui-navbar__item span{
+            display: block;
+        }
+        .tt a{display: inline-block;height:20px;padding: 0 0 0 15px;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/bootstrap.min.js"></script>
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
+    {php echo register_jssdk();}
+</head>
+<body>
+{if $typeName == null}
+    {php $typeName = '闲书用户信息完善!';$userType='bookUser';}
+{/if}
+<div class="page" id="content">
+    <div class="page__hd">
+        <h2 class="page__title" style="padding-left: 15px;">{$typeName}</h2>
+    </div>
+    <div class="page__bd" id="form">
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell weui-cells_form">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">姓名</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" id="s_name" placeholder="请输入名字" value="{$userData['name']}"/>
+                </div>
+            </div>
+            <div class="weui-cell weui-cells_form">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">手机</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="tel" id="mobile" placeholder="请输入手机号" value="{$userData['mobile']}">
+                </div>
+            </div>
+            <div class="weui-cell weui-cells_form" onclick="showMap();">
+                <div class="weui-cell__hd">
+                    <label class="weui-label">位置</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <input id="home_address" class="weui-input" type="text" placeholder="点击选择居住小区"  disabled value="{$userData['area_addr']}">
+                    <input id="lng" name="lng" type="hidden" value="{$userData['lng']}"/>
+                    <input id="lat" name="lat" type="hidden" value="{$userData['lat']}"/>
+                </div>
+            </div>
+            <!--<div class="weui-cell weui-cell_select weui-cell_select-after">-->
+                <!--<div class="weui-cell__hd">-->
+                    <!--<label for="" class="weui-label">用户类型</label>-->
+                <!--</div>-->
+                <!--<div class="weui-cell__bd">-->
+                    <!--<select class="weui-select" name="select2" id="user_type" onchange="showSex();">-->
+                        <!--<option value="1">家长</option>-->
+                        <!--<option value="2">老师</option>-->
+                    <!--</select>-->
+                <!--</div>-->
+            <!--</div>-->
+            {if $userType == 'teacher'}
+            <div class="weui-cell weui-cell_select weui-cell_select-after"  id="selectSex">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">选择性别</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <select class="weui-select" name="select2" id="sex">
+                        <option value="1">男</option>
+                        <option value="2">女</option>
+                    </select>
+                </div>
+            </div>
+            {/if}
+        </div>
+        <div class="weui-btn-area">
+            <a class="weui-btn weui-btn_primary" href="javascript:bangDing()" id="showTooltips">确定</a>
+        </div>
+    </div>
+    <div class="page_bd">
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body" id="map" style="display: none;">
+                        <iframe id="iframe" width="100%" frameborder="1" height="300"
+                                src="http://apis.map.qq.com/tools/locpicker?search=1&type=1&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp">
+                        </iframe>
+                        <div class="weui-btn-area">
+                            <a class="weui-btn weui-btn_primary" onclick="hideMap()">确定</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{if $userType == 'bookUser'}
+<div class="page" id="register_remark">
+    <div class="page__hd">
+        <div class="weui-panel">
+            <div class="weui-panel__bd">
+                <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">备注</h4>
+                        <p class="page__desc">①手机用于闲书交易的联络工具，请务必真实填写。</p>
+                        <p class="page__desc">②位置用于交易双方距离判断，点选常住小区即可。</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}
+{php $fans = pdo_fetch("select follow FROM ".tablename('mc_mapping_fans')." WHERE acid = '".$weid."' And openid = '".$openid."' ");}
+{php $links = $_W['siteroot'] .'app/'.$this->createMobileUrl('bangding',array('schoolid' => $schoolid,'userType' => 'bookUser','typeName' => '闲书用户信息完善'));}
+{php $imgsUrl = $_W['siteroot'].'attachment/images/9/2017/01/logo_6.png';}
+<div class="page">
+    <!--success-->
+    <div class="weui-msg" id="success" style="display: none;">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作成功</h2>
+            <!--<p class="weui-msg__desc">内容详情，可根据实际需要安排，如果换行则不超过规定长度，居中展现<a href="javascript:void(0);">文字链接</a></p>-->
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="{php echo $this->createMobileUrl('mybook', array('schoolid' => $schoolid))}" class="weui-btn weui-btn_primary">确定</a>
+            </p>
+        </div>
+    </div>
+    <!--fail-->
+    <div class="weui-msg" id="fail" style="display: none;">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作失败</h2>
+            <p class="weui-msg__desc" id="fail_desc"></p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="javascript:$('#fail').hide();$('#content').show();" class="weui-btn weui-btn_primary">确定</a>
+                <!--<a href="javascript:history.back();" class="weui-btn weui-btn_default">辅助操作</a>-->
+            </p>
+        </div>
+    </div>
+</div>
+<script>
+    //iframe页面调用方法
+    $(function(){
+        adaptHeight();//动态适配高度
+        window.onresize = function() { //横屏、QQ浏览器变全屏模式下的时候，需要重新计算高度
+//            adaptHeight();
+        }
+//        if(window.parent.document.getElementById("iframe").height >= 500){
+            window.parent.document.getElementById("iframe").height = 300;
+//        }
+        window.addEventListener('message', function(event) {
+            var loc = event.data;
+            document.getElementById("lng").value=loc.latlng.lng;
+            document.getElementById("lat").value=loc.latlng.lat;
+            document.getElementById("home_address").value=loc.poiaddress;
+        }, false);
+
+        function adaptHeight() {
+            var winH = $(window).height();
+            var bodyH = document.documentElement.clientHeight;
+            if (winH > bodyH) {
+                window.parent.document.getElementById("iframe").height=winH;
+            } else {
+                window.parent.document.getElementById("iframe").height=bodyH;
+            }
+        }
+    });
+</script>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function showSex(){
+        if($("#user_type").val() == 2 && $("#selectSex").css('display') == 'none'){
+            $("#selectSex").show();
+        }else{
+            $("#selectSex").hide();
+        }
+    }
+    function bangDing(){
+        var follow = "{$fans['follow']}";
+        var userType = "{$userType}";
+        if($("#s_name").val() == null || $("#s_name").val() == ""){
+            Weui.alert({"title":"","content":"姓名不能为空！"});
+            return;
+        }else if($("#home_address").val() == null || $("#home_address").val() == ""){
+            Weui.alert({"title":"","content":"小区住址不能为空！"});
+            return;
+        }else if($("#mobile").val() == null || $("#mobile").val() == ""){
+            Weui.alert({"title":"","content":"手机号码不能为空！"});
+            return;
+        }else if(!$("#mobile").val().match(/^(0|86|17951)?(13[0-9]|15[012356789]|17[0-9]|18[0-9]|14[57])[0-9]{8}$/)){
+            Weui.alert({"title":"","content":"手机格式不正确！"});
+            return;
+        }
+        if(userType == 'teacher'){
+            if($("#sex").val() == null || $("#sex").val() == ""){
+                Weui.alert({"title":"","content":"请选择性别！"});
+                return;
+            }
+        }
+        Weui.confirm({"title":"确认提交?","content":'',"cancelCallback":function(e){},"sureCallback":function(e){
+            if(userType == 'bookUser'){
+                $("#register_remark").hide();
+            }
+            if(userType == 'bookUser' || userType == 'parents'){
+                var submitData = {
+                    openid :"{$openid}",
+                    schoolid :"{$schoolid}",
+                    weid :"{$weid}",
+                    uid :"{$fan['uid']}",
+                    name : $("#s_name").val(),
+                    mobile : $("#mobile").val(),
+                    home_address : $("#home_address").val(),
+                    lng : $("#lng").val(),
+                    lat : $("#lat").val(),
+                    userType : userType
+                };
+                var url = "{php echo $this->createMobileUrl('indexajax',array('op'=>'bdxs'))}";
+            }else{
+                var submitData = {
+                    openid :"{$openid}",
+                    schoolid :"{$schoolid}",
+                    weid :"{$weid}",
+                    uid :"{$fan['uid']}",
+                    tname : $("#s_name").val(),
+                    sex:$("#sex").val(),
+                    mobile:$("#mobile").val(),
+                    home_address : $("#home_address").val(),
+                    lng : $("#lng").val(),
+                    lat : $("#lat").val(),
+                };
+                var url = "{php echo $this->createMobileUrl('indexajax', array('op' => 'bdls'))}";
+            }
+            $.post(url,submitData,function(data){
+                if(data.result){
+                    $("#content").hide();
+                    if(follow == 0){
+                        window.location.href = "./index.php?i={$weid}&c=entry&id=2&do=ranking&m=sdl_code";
+                    }else{
+                         $("#success").show();
+                    }
+                }else{
+                    document.getElementById("fail_desc").innerHTML = data.msg;
+                    $("#content").hide();
+                    $("#fail").show();
+                }
+            },'json');
+        }});
+    }
+    function showMap() {
+        $("#form").hide();
+        $("#map").show();
+    }
+    function hideMap() {
+        $("#form").show();
+        $("#map").hide();
+    }
+</script>
+<script type="text/javascript">
+    $(function() {
+
+        WeixinJSShowShareMenu();
+
+        WeixinJSShowProfileMenuAndShare();
+
+        wx.ready(function () {
+            sharedata = {
+                title: "闲书用户注册和信息完善",
+                desc: "将闲书流动起来，发挥更大价值吧！点击参与>",
+                link: '{$links}',
+                imgUrl: '{$imgsUrl}',
+                success: function(){
+
+                },
+                cancel: function(){
+
+                }
+            };
+            sharedata1 = {
+                title: "闲书用户注册和信息完善",
+                desc: "将闲书流动起来，发挥更大价值吧！点击参与>",
+                link: '{$links}',
+                imgUrl: '{$imgsUrl}',
+                success: function(){
+
+                },
+                cancel: function(){
+
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata1);
+        });
+
+    });
+
+    function WeixinJSShowShareMenu(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+                wx.showMenuItems({
+                    menuList: ['menuItem:share:appMessage','menuItem:share:timeline'] // 要显示的菜单项，所有menu项见附录3
+                });
+            });
+        }
+    }
+
+
+    function WeixinJSShowProfileMenuAndShare(){
+
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+                wx.showMenuItems({
+                    menuList: ['menuItem:share:appMessage','menuItem:share:timeline','menuItem:profile','menuItem:addContact','menuItem:favorite'] // 要显示的菜单项，所有menu项见附录3
+                });
+            });
+        }
+    }
+</script>
+</body>
+</html>

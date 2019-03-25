@@ -1,0 +1,95 @@
+{template "base/child_header"}
+<style>
+</style>
+<form  class="layui-form">
+<blockquote class="layui-elem-quote ">
+    <div class="layui-inline">
+        <div class="layui-input-inline">
+            <input type="text" value="{$_GPC['name']}" id="name" placeholder="部门搜索" class="layui-input search_input">
+        </div>
+        <a class="layui-btn" lay-submit lay-filter="search">搜索</a>
+    </div>
+</blockquote>
+</form>
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <colgroup>
+            <col width="80">
+            <col width="100">
+            <col width="80">
+            <col >
+        </colgroup>
+        <tbody class="news_content">
+        {loop $dpList $admin}
+        <tr>
+            <td style="text-align: center !important;">
+                <input type="checkbox" name="checked" value="{$admin['id']}" data-name="{$admin['name']}" {if isset($nDpList[$admin['id']])}checked{/if} lay-skin="primary" lay-filter="choose">
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary">
+                    <i class="layui-icon"></i>
+                </div>
+            </td>
+            <td align="left">{$admin['name']}</td>
+            <td align="left">{$admin['pay']}</td>
+            <td align="left">{$admin['notice']}</td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn save" >选取</button>
+        </div>
+    </div>
+</div>
+<div id="page"></div>
+
+<script>
+    layui.use(['form','jquery','laypage'], function(){
+
+        var name,mobile;
+        var setting =new Object();
+
+        var $ = layui.jquery;
+        var form = layui.form();
+
+        form.on('submit(search)', function(data){
+            name=$("#name").val();
+            url = "{php echo $this->createWebUrl('selectDp')}"+"&name="+name;
+            location.href=url;
+            return false;
+        });
+
+        //分页
+        setting.cont="page";
+        setting.pages="{$totalPage}";
+        setting.curr="{$page}";
+        setting.skip=true;
+        setting.hash="page";
+        setting.jump=function(obj, first){
+            name=$("#name").val();
+            mobile=$("#mobile").val();
+            if(first!=true){
+                url = "{php echo $this->createWebUrl('selectDp')}"+"&name="+name+"&page="+obj.curr;
+                window.location.href =url;
+            }
+        };
+        layui.laypage(setting);
+
+        $(".save").click(function(){
+            var $checkbox = $('.news_list tbody input[type="checkbox"][name="checked"]:checked');
+            if($checkbox.is(":checked")){
+                var id=0;
+                var str="";
+                $checkbox.each(function(){
+                    str += '<a href="javascript:" class="adm_ln"><input type="hidden" name="property['+id+']" value="'+$(this).val()+'">'+$(this).attr('data-name')+'</a>';
+                    id ++;
+                });
+                parent.setProper(str);
+            }else{
+                parent.setProper("");
+            }
+        });
+    });
+
+</script>
+{template "base/child_footer"}

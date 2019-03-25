@@ -1,0 +1,120 @@
+{template 'common/header'}
+
+<div class="main">
+    <div class="col-lg-12">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#">订单统计</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="main">
+    <div class="col-lg-12">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-lg-4 text-center" style="border-right: 1px solid #eee;">
+                    <h1 style="color: red;">今天：{$today} 元</h1>
+                </div>
+                <div class="col-lg-4 text-center" style="border-right: 1px solid #eee;">
+                    <h1 style="color: orange;">本周：{$week} 元</h1>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <h1 style="color: green;">本月：{$month} 元</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <header class="panel-heading">
+                订单统计
+            </header>
+            <div class="panel-body">
+                <div class="col-lg-12">
+                    <form id="form" action="" method="get">
+                        <div class="col-lg-12">
+                            <label>创建时间</label><br />
+                            {if isset($_GPC['section'])}
+                            {php echo tpl_form_field_daterange('section', array('start' => $_GPC['section']['start'], 'end' => $_GPC['section']['end']), true);}
+                            {else}
+                            {php echo tpl_form_field_daterange('section', null, true);}
+                            {/if}
+                        </div>
+                        <div class="col-lg-12" style="margin-top: 10px; margin-bottom: 20px; ">
+                            <input type="button" onclick="location.href = '{php echo $this->createWebUrl('charts')}&' + $('#form').serialize();" value="筛选" class="btn btn-info"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel-body">
+                <section class="panel-body" style="width: 100%; height: 400px;">
+                    <canvas id="chart" height="100%" width="400"></canvas>
+                </section>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="{MODULE_URL}template/js/Chart.min.js"></script>
+<script>
+    var lineChartData = {
+        labels : [{php echo implode(',', $chartlabel)}],
+        datasets : [
+            {
+                label: "{资金总额}",
+                fillColor : "rgba(100,220,220,0.2)",
+                strokeColor : "rgba(100,220,220,1)",
+                pointColor : "rgba(100,220,220,1)",
+                pointStrokeColor : "#fff",
+                pointHighlightFill : "#fff",
+                pointHighlightStroke : "rgba(220,220,220,1)",
+                data : [{php echo implode(',', $all)}]
+            },
+            {
+                label: "{已支付资金}",
+                fillColor : "rgba(220,100,220,0.2)",
+                strokeColor : "rgba(220,100,220,1)",
+                pointColor : "rgba(220,100,220,1)",
+                pointStrokeColor : "#fff",
+                pointHighlightFill : "#fff",
+                pointHighlightStroke : "rgba(220,220,220,1)",
+                data : [{php echo implode(',', $pay)}]
+            },
+            {
+                label: "{未支付资金}",
+                fillColor : "rgba(220,220,100,0.2)",
+                strokeColor : "rgba(220,220,100,1)",
+                pointColor : "rgba(220,220,100,1)",
+                pointStrokeColor : "#fff",
+                pointHighlightFill : "#fff",
+                pointHighlightStroke : "rgba(220,220,220,1)",
+                data : [{php echo implode(',', $nopay)}]
+            },
+            {
+                label: "{退款资金}",
+                fillColor : "rgba(100,100,100,0.2)",
+                strokeColor : "rgba(100,100,100,1)",
+                pointColor : "rgba(220,220,100,1)",
+                pointStrokeColor : "#fff",
+                pointHighlightFill : "#fff",
+                pointHighlightStroke : "rgba(220,220,220,1)",
+                data : [{php echo implode(',', $cancelpay)}]
+            }
+        ]
+
+    }
+
+    window.onload = function(){
+        var ctx = document.getElementById("chart").getContext("2d");
+        window.myLine = new Chart(ctx).Line(lineChartData, {
+            responsive: true
+        });
+    }
+
+</script>
+
+{template 'common/footer'}

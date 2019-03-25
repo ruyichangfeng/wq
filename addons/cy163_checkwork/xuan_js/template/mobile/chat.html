@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+
+  <head> 
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <link rel="stylesheet" href="{D_PATH}public/css/djkj.css" />
+    <link rel="stylesheet" href="{D_PATH}public/css/lx.css">
+    <script src="https://cdn.bootcss.com/jquery/1.8.1/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <title> {$chat['nickname']} </title>
+    {php echo register_jssdk();}
+
+  </head>
+ 
+  <body id="scroll-wrapper">
+
+    <!-- body -->
+
+    <section id="chat-page" class="page">
+    {if $goods}
+      <div id="top-float-box">
+
+        <div id="from-item-box">
+          <div class="photo-wrapper">
+            <img src="{$_W['attachurl']}{$imgk[0]}" />
+          </div>
+          <div class="center-box">
+            <p class="title">{$goods['title']}</p>
+
+            <span class="price">￥{if $goods['type']==1}{$goods['price']}{else}{$goods['sprice']}{/if}</span>
+
+          </div>
+          <button id="send-item-ref-btn" onclick="Chat.senditemmsg()" class="btn btn-maingreen btn-primary">发送链接</button>
+        </div>
+
+      </div>
+      {/if}
+      <div class="chat-content-box">
+
+        <ul id="messages-list" {if $goods}class="has-from-item"{else}class="no-from-item"{/if} style="margin-bottom: 55px;">
+          <li class="loading-mark">载入中...</li>
+          <li class="hint-li">
+          <p class="text" onclick="Chat.get_history();">我们将立刻通知对方~(点击加载历史消息)</p>
+          </li>
+
+          <li style="display: none;"></li>
+          
+        </ul>
+      </div>
+
+      <template id="tpl-text-msg">
+        <li class="message-li text">
+          <p class="msg-time-wrapper" style="display:none"><span class="msg-time"></span></p>
+          <p class="msg-hint-wrapper" style="display:none"><span class="hint"></span></p>
+          <a class="user-link"> <img class="avatar" src="" /> </a>
+          <div class="content">
+            <p class="content-text"></p>
+          </div>
+        </li>
+      </template>
+
+      <template id="tpl-img-msg">
+        <li class="message-li img">
+          <p class="msg-time-wrapper" style="display:none"><span class="msg-time"></span></p>
+          <a class="user-link"> <img class="avatar" /> </a>
+          <div class="content">
+            <img class="img img2" />
+          </div>
+        </li>
+      </template>
+
+      <template id="tpl-bargain-request-msg">
+        <li class="message-li bargain-request">
+          <p class="msg-time-wrapper" style="display:none"><span class="msg-time"></span></p>
+          <a class="user-link"> <img class="avatar" /> </a>
+          <div class="content">
+            <p class="content-text">
+              我想以<b class="price-tag"><span class="price"></span>元</b>购买你的「<span class="title"></span>」，可以吗？
+            </p>
+            <hr>
+            <footer class="footer buyer requested" style="display:none">
+              <p>已发送砍价申请，等待卖家答复</p>
+            </footer>
+            <footer class="footer buyer answered" style="display:none">
+              <p>卖家已答复申请</p>
+            </footer>
+            <footer class="footer seller requested" style="display:none">
+              <button class="accept-btn">同意</button>
+              <button class="refuse-btn">拒绝</button>
+            </footer>
+            <footer class="footer seller accepted" style="display:none">
+              <p>已同意将价格修改为<b class="price-tag"><span class="price"></span>元</b></p>
+            </footer>
+            <footer class="footer seller refused" style="display:none">
+              <p>已拒绝修改价格</p>
+            </footer>
+          </div>
+        </li>
+      </template>
+
+      <template id="tpl-shake-buy-request-msg">
+        <li class="message-li shake-buy-request">
+          <p class="msg-time-wrapper" style="display:none"><span class="msg-time"></span></p>
+          <p class="msg-hint-wrapper"><span class="hint">可能会收到多个想要的消息，可以过段时间再回复哦</span></p>
+          <a class="user-link"> <img class="avatar" /> </a>
+          <div class="content">
+            <p class="content-text">
+              我想得到你在「<span class="circle-name"></span>」赠送的小礼物<span class="title"></span>~可以吗？
+            </p>
+            <hr>
+            <footer class="footer buyer requested" style="display:none">
+              <p>已发送求送消息</p>
+            </footer>
+            <footer class="footer buyer accepted" style="display:none">
+              <p>对方已经同意把礼物送给你</p>
+            </footer>
+            <footer class="footer seller requested" style="display:none">
+              <button class="accept-btn">同意</button>
+              <button class="refuse-btn">拒绝</button>
+            </footer>
+            <footer class="footer seller accepted" style="display:none">
+              <p>已同意送给对方</p>
+            </footer>
+            <footer class="footer seller refused" style="display:none">
+              <p>已拒绝赠送</p>
+            </footer>
+          </div>
+        </li>
+      </template>
+
+      <template id="tpl-item-ref-msg">
+        <li class="message-li item-ref">
+          <p class="msg-time-wrapper" style="display:none"><span class="msg-time"></span></p>
+          <a class="user-link"> <img class="avatar" /> </a>
+          <div class="content">
+            <a class="link" href="">
+              <header> 商品链接 </header>
+              <div class="cover-wrapper">
+                <img class="cover" src="" />
+              </div>
+              <div class="center-box">
+                <small class="title"></small>
+                <p class="price"></p>
+              </div>
+            </a>
+          </div>
+        </li>
+      </template>
+
+      <template id="tpl-hint-item">
+        <li class="hint-li">
+          <p class="text"></p>
+        </li>
+      </template>
+    </section>
+
+    <section id="safe-notice-dialog" class="dialog notice-dialog">
+      <div class="inner">
+        <header>
+          <img class="logo" src="http://assets.quanzijishi.com/assets/imgs/icon-safe-notification-white-cc88684edd.png" />
+          <span class="title">安全交易提醒</span>
+        </header>
+        <div class="body">
+          <p class="info">
+            <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-seller-1f53ea711c.png" />
+            <span>请与卖家确认好交易的最终金额、交易方式、运费等。</span>
+          </p>
+          <p class="info">
+            <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-delivery-603668838f.png" />
+            <span>若选择快递，需要与卖家商议运费由谁承担。若选择当面交易，
+            需要选择人多安全的时间和地点进行交易。</span>
+          </p>
+          <p class="info">
+            <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-shield-d3f8453486.png" />
+            <span>若支付方式选择「平台担保支付」，则请不要选择微信、支付宝、银行卡转账、
+            现金等形式进行支付，否则圈子集市将无法保证你的交易安全。</span>
+          </p>
+          <p class="info">
+            <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-caution-df674ac8b4.png" />
+            <span>若支付方式选择「平台外支付」，交易流程则不经平台担保，
+            买家确定订单后将直接获得卖家微信号，在平台外与卖家交流并进行支付。</span>
+          </p>
+        </div>
+        <footer>
+          <button class="accept-btn btn btn-maingreen btn-block singe">我知道了</button>
+        </footer>
+      </div>
+    </section>
+
+    <section id="official-mp-qr-dialog" class="dialog">
+      <div class="inner">
+        <div class="body">
+          <h1>长按二维码关注</h1>
+
+          <img class="qr" src="http://open.weixin.qq.com/qr/code/?username=quanzijishi" />
+
+          <p> 关注「圈子集市」公众号后即可及时收到消息提醒 </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="alert-dialog" class="dialog">
+      <div class="inner">
+        <header class="header title"> 提示 </header>
+        <div class="body">
+          <p class="content"> 内容 </p>
+        </div>
+        <footer class="footer">
+          <button class="accept-btn btn btn-maingreen btn-block single">确定</button>
+        </footer>
+      </div>
+    </section>
+
+    <section id="confirm-dialog" class="dialog confirm-dialog">
+      <div class="inner">
+        <header class="header"> <span class="title">确认</span>
+          <button class="header-close-btn">
+              <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+            </button>
+        </header>
+        <div class="body">
+          <p class="content"> 内容 </p>
+        </div>
+        <footer>
+          <button class="cancel-btn btn btn-white btn-block">取消</button>
+          <button class="accept-btn btn btn-maingreen btn-block">确定</button>
+        </footer>
+      </div>
+    </section>
+
+    <section id="prompt-dialog" class="dialog confirm-dialog">
+      <div class="inner">
+        <header class="header"> <span class="title">请输入</span>
+          <button class="header-close-btn">
+              <img src="http://assets.quanzijishi.com/assets/imgs/icon-dialog-close-45fbbad593.png"/>
+            </button>
+        </header>
+        <div class="body">
+          <p class="content"> 内容 </p>
+          <input class="input" type="text" value="" placeholder="请输入...">
+        </div>
+        <footer>
+          <button class="cancel-btn btn btn-white btn-block">取消</button>
+          <button class="accept-btn btn btn-maingreen btn-block">确定</button>
+        </footer>
+      </div>
+    </section>
+
+    <div id="loading-toast" class="weui_loading_toast" style="display: none;">
+      <div class="weui_mask_transparent"></div>
+      <div class="weui_toast">
+        <div class="weui_loading loading-mark">
+          <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+          <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="toast" style="display: none;">
+      <div class="weui_mask_transparent"></div>
+      <div class="weui_toast">
+        <i class="weui_icon_toast"></i>
+        <p class="content weui_toast_content">已完成</p>
+      </div>
+    </div>
+
+    <!-- footer -->
+
+    <button id="safe-notification-btn">
+    <img src="http://assets.quanzijishi.com/assets/imgs/icon-safe-notification-868b386a2e.png" />
+  </button>
+    <section id="float-input-layer">
+      <div class="btn-box">
+        <button id="float-send-img-btn">
+        <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-plus-a439671494.png"/>
+        </button>
+
+        <button id="float-send-btn" class="btn btn-black btn-primary btn-big">发送</button>
+      </div>
+      <div class="input-wrapper">
+        <textarea id="float-msg-input" placeholder="请输入消息"></textarea>
+      </div>
+    </section>
+
+    <footer id="chat-footer" class="page-footer">
+      <div class="blur-mask"></div>
+      <button id="send-img-btn">
+      <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-plus-a439671494.png"/>
+    </button>
+
+      <div class="input-wrapper">
+        <input id="msg-input" class="input" type="text" placeholder="请输入消息" />
+      </div>
+      <button id="send-btn" onclick="Chat.sendtext()" class="btn btn-black btn-primary btn-big">发送</button>
+    </footer>
+<div id="chat_tools_layer" style="height:200px;background-color:rgb(249, 249, 247);z-index:100;position:fixed;bottom:47px;width:100%;display:none;">
+<ul style="width:100%;list-style:none;">
+  <li style="float:left;height:75px;width:75px;border:1px solid #c1c1c3;margin:10px;border-radius:5px;text-align:center;line-height:80px;" onclick="chooseimg()">
+  <i class="fa fa-camera" aria-hidden="true" style="color:#c1c1c3;font-size:30px;"></i>
+  </li>
+  <li style="float:left;height:75px;width:75px;border:1px solid #c1c1c3;margin:10px;border-radius:5px;text-align:center;line-height:80px;" onclick="$('#chat_tools_layer').hide();$('#chat_face_layer').show();Face.create();">
+  <i class="fa fa-smile-o" aria-hidden="true" style="color:#c1c1c3;font-size:30px;"></i>
+  </li>
+</ul>
+</div>
+<div id="chat_face_layer" style="height:200px;background-color:rgb(249, 249, 247);z-index:100;position:fixed;bottom:47px;width:100%;overflow-x:scroll;display: none;">
+
+</div>
+ 
+
+  </body>
+<script>
+/*  var msgtmp= $($("#tpl-text-msg").html());
+  msgtmp.find('.content-text').html('123');
+  console.log(msgtmp.html());
+  $("#messages-list").append(msgtmp);*/
+  var Chat=(function(){
+    var prev_logid=0;
+    var chat_id="{php echo $_GPC['uid']}";
+    var sendtext=function(){
+        var message=$('#msg-input').val();
+        if (message=='') {return false;}else{
+
+          var msgtmp= $($("#tpl-text-msg").html());
+          msgtmp.find('.content-text').html(Face.filter(message));
+          msgtmp.addClass('self');
+          msgtmp.find('.avatar').attr('src',"{$chatself['avatar']}");
+          $("#messages-list").append(msgtmp);
+
+          $('#msg-input').val('');
+          scrollbottom();
+
+          sendAjax('text',message);
+        }
+    }
+    var senditemmsg=function(){
+        var msgtmp= $($("#tpl-item-ref-msg").html());
+         
+          msgtmp.find('.title').html("{$goods['title']}");
+          msgtmp.addClass('self');
+          msgtmp.find('.avatar').attr('src',"{$chatself['avatar']}");
+          msgtmp.find('.cover').attr('src',"{$_W['attachurl']}{$imgk[0]}");
+          msgtmp.find('.link').attr('href',"{php echo $this->createMobileUrl('goods',['id'=>$goods['id']])}");
+          msgtmp.find('.price').html("{if $goods['type']==1}{$goods['price']}{else}{$goods['sprice']}{/if}");
+          $("#messages-list").append(msgtmp);
+          scrollbottom();
+          sendAjax('item',"{$goods['id']}");
+    }
+    var sendimgmsg=function(imgurl){
+          var msgtmp= $($("#tpl-img-msg").html());
+         
+          msgtmp.find('.title').html("{$goods['title']}");
+          msgtmp.addClass('self');
+          msgtmp.find('.avatar').attr('src',"{$chatself['avatar']}");
+          msgtmp.find('.img').attr('src',imgurl);
+
+          $("#messages-list").append(msgtmp);
+          scrollbottom();
+
+    }
+    var sendAjax = function(type,message) {
+      if(!message.replace(/\s*/,'')) {
+        alert('请输入内容');
+        return;
+      }
+      $.ajax({
+        type:'post',
+        url:"{php echo $this->createMobileUrl('chatsend')}",
+        data:{chat_openid:chat_id,chat_message:message,type:type},
+        success:function(d) {
+          //处理数据
+          if (d.res==100) {
+            alert('发送成功');
+          }
+        }
+      })
+      // 滚动到底部
+      scrollbottom();
+    }
+
+    var scrollbottom = function() {
+      var bot = document.getElementById('messages-list');
+      bot.scrollIntoView();
+      window.scrollTo(0,document.body.scrollHeight);
+    }
+    var get = function(){
+      $.ajax({
+        type:'post',
+        url:"{php echo $this->createMobileUrl('chat',['op'=>'chatget'])}",
+        data:{chat_openid:chat_id},
+        success:function(d) {
+          //console.log(d);
+          d=eval('('+d+')');
+            for(var i=0;i<d.length;i++){
+             
+              //console.log(d[i].send_type);
+              
+                var avatar="{$chat['avatar']}";
+                  if (d[i].type=='text') {
+                      var msgtmp= $($("#tpl-text-msg").html());
+                      msgtmp.find('.content-text').html(Face.filter(d[i].data));
+                      msgtmp.addClass('others');
+                      msgtmp.find('.avatar').attr('src',avatar);
+                      $("#messages-list").append(msgtmp);
+                  }else if (d[i].type=='album') {
+                    var msgtmp= $($("#tpl-img-msg").html());
+                    msgtmp.addClass('others');
+                    msgtmp.find('.avatar').attr('src',avatar);
+                    msgtmp.find('.img').attr('src',"{$_W['attachurl']}"+d[i].data);
+                    
+                    $("#messages-list").append(msgtmp);
+                  }else if (d[i].type=='item') {
+                    item=eval('('+d[i].data+')');
+                    var msgtmp= $($("#tpl-item-ref-msg").html());
+                    msgtmp.find('.title').html(item.title);
+                    msgtmp.addClass('others');
+                    msgtmp.find('.avatar').attr('src',avatar);
+                    msgtmp.find('.cover').attr('src',"{$_W['attachurl']}"+item.cover);
+                    msgtmp.find('.link').attr('href',"{php echo $this->createMobileUrl('goods')}"+"&id="+item.id);
+                    msgtmp.find('.price').html(item.price);
+                    $("#messages-list").append(msgtmp);
+
+                  }
+                  scrollbottom();
+                
+            }
+           
+
+        }
+      })
+    }
+    var get_history = function () {
+      $('.loading-mark').show();
+      var a=prev_logid;
+      $.ajax({
+        type:'post',
+        url:"{php echo $this->createMobileUrl('chat',['op'=>'chathistory'])}",
+        data:{chat_openid:chat_id,prev_logid:prev_logid},
+        success:function(d) {
+          //console.log(d);
+          d=eval('('+d+')');
+            for(var i=0;i<d.length;i++){
+             
+              //console.log(d[i].send_type);
+                if(d[i].send_type=='self'){ var avatar="{$chatself['avatar']}"; }else{var avatar="{$chat['avatar']}";}
+                  if (d[i].type=='text') {
+                      var msgtmp= $($("#tpl-text-msg").html());
+                      msgtmp.find('.content-text').html(Face.filter(d[i].data));
+                      msgtmp.addClass(d[i].send_type);
+                      msgtmp.find('.avatar').attr('src',avatar);
+                      $("#messages-list li").eq(2).before(msgtmp);
+                  }else if (d[i].type=='album') {
+                    var msgtmp= $($("#tpl-img-msg").html());
+                    msgtmp.addClass(d[i].send_type);
+                    msgtmp.find('.avatar').attr('src',avatar);
+                    msgtmp.find('.img').attr('src',"{$_W['attachurl']}"+d[i].data);
+                    
+                    $("#messages-list li").eq(2).before(msgtmp);
+                  }else if (d[i].type=='item') {
+                    item=eval('('+d[i].data+')');
+                    var msgtmp= $($("#tpl-item-ref-msg").html());
+                    msgtmp.find('.title').html(item.title);
+                    msgtmp.addClass(d[i].send_type);
+                    msgtmp.find('.avatar').attr('src',avatar);
+                    msgtmp.find('.cover').attr('src',"{$_W['attachurl']}"+item.cover);
+                    msgtmp.find('.link').attr('href',"{php echo $this->createMobileUrl('goods')}"+"&id="+item.id);
+                    msgtmp.find('.price').html(item.price);
+                    $("#messages-list li").eq(2).before(msgtmp);
+
+                  }
+              prev_logid=d[i].id;
+            }
+            $('.loading-mark').hide();
+            if (a==0) {scrollbottom();}
+            
+        }
+      })
+    }
+    return {
+      sendtext:sendtext,
+      scrollbottom:scrollbottom,
+      sendAjax:sendAjax,
+      senditemmsg:senditemmsg,
+      sendimgmsg:sendimgmsg,
+      get_history:get_history,
+      get:get,
+    }
+  }())
+$("#send-img-btn").click(function(){
+    if ($("#chat_tools_layer").css('display')=='none') {
+      $("#chat_tools_layer").show();
+    }else{
+      $("#chat_tools_layer").hide();
+    }
+    $('#chat_face_layer').hide();
+});
+function chooseimg(){
+  wx.chooseImage({
+                    count: 1, // 默认9
+                    //sizeType: ['compressed', 'original'], // 可以指定是原图还是压缩图，默认二者都有
+                    //sourceType: ['camera', 'album'], // 可以指定来源是相册还是相机，默认二者都有
+                    sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['camera', 'album'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                            
+                            wx.uploadImage({
+                                localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                                isShowProgressTips: 1, // 默认为1，显示进度提示
+                                success: function (res) {
+                                    var serverId = res.serverId; // 返回图片的服务器端ID
+                                    Chat.sendAjax('album',serverId);
+                                }
+                            });
+                            Chat.sendimgmsg(localIds);
+                       } 
+                });
+}
+
+$(document).ready(function(){
+
+  Chat.get_history();
+
+  setInterval("Chat.get()",1000);
+  //聊天检测
+  $('#messages-list').on("click",".img2",function(){
+     wx.previewImage({
+                current: $(this).attr('src'),
+                urls: [
+                  $(this).attr('src')
+                ]
+      });
+
+  });
+  
+  
+});
+
+
+</script>
+<script type="text/javascript">
+  var Face = (function() {
+
+    var select = function(obj,i) {
+      $(obj).css({"background-color":"rgb(200, 200, 200)"});
+      setTimeout(function() {
+        $(obj).css({"background-color":"rgb(249, 249, 249)"});
+      },50);
+
+      confirm(i);
+    }
+    var confirm = function (i) {
+      //$("#chat_voice").hide();
+      //$("#chat_message").show();
+
+      $("#msg-input").val($("#msg-input").val()+"[em_"+i+"]");
+    }
+
+    var filter = function(emoji_code) {
+      emoji_code = emoji_code.replace(/\</g,'&lt;');
+      emoji_code = emoji_code.replace(/\>/g,'&gt;');
+      emoji_code = emoji_code.replace(/\n/g,'<br/>');
+      emoji_code = emoji_code.replace(/\[em_([0-9]*)\]/g,'<img src="{$_W['siteroot']}/addons/xuan_js/public/qqface/pics/$1.gif" border="0" />');
+
+      return emoji_code;
+    }
+
+    var create = (function() {
+      var html = '<table><tr>';
+      for(var i=1;i<=75;i++) {
+        html += '<td style="padding:5px;margin:0px;" onclick="Face.select(this,'+i+')"><img src="{$_W['siteroot']}/addons/xuan_js/public/qqface/pics/'+i+'.gif"></td>';
+        if(i%15 == 0) {
+          html += "</tr><tr>";  
+        }
+      }
+      html.substr(-4,4);
+      html +='</table>';
+      $("#chat_face_layer").html(html);
+    }());
+
+    return {
+      select:select,
+      filter:filter
+    }
+
+  }())
+
+</script>
+</html>

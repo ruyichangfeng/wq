@@ -1,0 +1,78 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	{template 'nav'}
+</ul>
+<style>
+	.infol{margin-left:15px;padding:5px;max-width:60%;}
+	.infor{margin-right:15px;padding:5px;max-width:60%;}
+	.pull-left,.pull-right{position:relative;}
+	.alert{margin-bottom:5px;padding:5px}
+	.more{cursor:pointer;}
+</style>
+<div class="clearfix">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			《{$workjob['title']}》:工单号:#{$workjob['workCode']}
+		</div>
+		<div class="panel-body" id="log" style="max-height:1300px;overflow-y:scroll">
+			<div id="last" data-id="31" style="margin-bottom:30px;">
+				<div class="pull-left col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="pull-right">
+						<img src="resource/images/gw-wx.gif" width="35" style="border:2px solid #418BCA;border-radius:5px">
+						<br>
+					</div>
+					<div class="alert alert-info pull-right infor">
+						工单标题:{$workjob['title']}
+						<br>
+						工单内容:{php echo htmlspecialchars_decode($workjob['content'])}
+					</div>
+				</div>
+				{loop $workjob['all'] $re}
+				<div class="pull-left col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="{if $re['type'] == 1}pull-right{else}pull-left{/if}">
+						<img src="{if $re['type'] == 1}resource/images/gw-wx.gif{else}../addons/lonaking_workjob_client/template/image/bajie.png{/if}" width="35" style="border:2px solid #418BCA;border-radius:5px">
+						<br>
+					</div>
+					<div class="alert alert-info {if $re['type'] == 1}pull-right{else}pull-left{/if} infor">
+						{php echo htmlspecialchars_decode($re['content'])}
+						<br>
+						{php echo date("Y-m-d H:i:s",$re['createTime']/1000)}
+					</div>
+					<div style="clear:both">
+					</div>
+				</div>
+				{/loop}
+
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			继续回复
+		</div>
+		<div class="panel-body">
+			<form action="{$reUrl}" method="post" class="form-horizontal reply" role="form" id="form7">
+				<input type="hidden" name="msgtype" value="text">
+				<input type="hidden" name="acid" value="{$fans['acid']}">
+				<input type="hidden" name="openid" value="{$fans['openid']}">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 详细说明</label>
+					<div class="col-sm-8">
+						{php echo tpl_ueditor('content', htmlspecialchars_decode(''));}
+						<span class="help-block">对于该问题的详细说明，建议您配上相关的图片，如果是bug，希望您最好配上还原方式，和相关图片，比如：通过什么样的步骤，可以发现bug，以及bug的图片展示</span>
+					</div>
+				</div>
+				<input type="text" class="form-control hide" name="work_job_id" value="{$workjob['id']}" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+					<div class="col-sm-10">
+						<input type="submit" class="btn btn-primary" name="submit" value="立即发送" id="submit"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{template 'common/footer'}

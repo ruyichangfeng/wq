@@ -1,0 +1,136 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >店铺分类</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('cate.list');?>" method="post" id="keyform"> 
+			  <div class="col-xs-7 col-sm-7 paddingx" style="width:400px;">
+			    <div class="input-group">
+			     
+			      <input type="text" style="width:100%;" class="form-control" placeholder="有个搜索栏更好看">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button"  form="keyform">搜索</button>
+			        <a href="<?php echo $this->routeUrl('shops.editCate');?>" class="btn btn-default"   form="keyform">添加分类</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 250px;">分类名称</th>   
+					<th style="width: 100px;">排序</th> 
+					<th style="width: 100px;">状态</th>  
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $cates $index $item}
+				<tr> 
+					 
+					<td>{$item['name']}</td> 
+					<td>{$item['sort']}</td>  
+					<td>
+					<?php if($item['status']=='1'){ ?>
+						<span class="label-blue">正常</span>
+					<?php }else if($item['status']=='0') {?> 
+						<span class="label-gray">禁用</span>
+					<?php } ?>
+					</td>  
+					<td>  
+						<a href="<?php echo $this->routeUrl('shops.editCate');?>&cid={$item['id']}" class="linkbtn" >编辑</a> 
+						<a href="javascript:void(0);" class="linkbtn linkbtn-red" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+						 
+						
+					</td>
+				</tr>
+				 
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<div id="accountab" style="display: none;">
+	<table class="sortab">
+		<tr >
+			<td style="width: 30%;">
+				商家
+			</td>
+			<td id="sortname" style="width: 70%">
+				
+
+			</td>
+		</tr>
+		<tr>
+			<td >
+				账号
+			</td>
+			<td > 
+				<input type="text" name="username" value="0" class="form-control"> 
+			</td>
+		</tr>
+		<tr>
+			<td >
+				密码
+			</td>
+			<td > 
+				<input type="password"  name="password" value="0" class="form-control"> 
+			</td>
+		</tr>
+		<tr>
+			<td >
+				重复密码
+			</td>
+			<td > 
+				<input type="password"  name="repassword" value="0" class="form-control">  
+			</td>
+		</tr>
+		<tr>
+			<td >
+				账号备注
+			</td>
+			<td > 
+				<input type="text"  name="remark" value="0" class="form-control">
+			</td>
+		</tr>
+	</table>
+
+</div>	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function addCate(id,name){ 
+	 window.location.href="<?php echo $this->routeUrl('cate.addview');?>&pid="+id+"&name="+name;
+	}
+	function editShop(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('shops.editview');?>&sid="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除"+text+"?",function(){
+		window.location.href="<?php echo $this->routeUrl('shops.delcate');?>&cid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

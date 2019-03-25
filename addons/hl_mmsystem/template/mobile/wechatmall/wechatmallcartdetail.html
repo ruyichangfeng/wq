@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1,user-scalable=no">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="telephone=no" name="format-detection">
+	<meta content="email=no" name="format-detection">
+	<title>提交订单</title>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/reset.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/iconfont/iconfont.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/jquery-weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/common.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/suborder.css"/>
+	<script>
+        var deviceWidth = document.documentElement.clientWidth;
+        document.documentElement.style.fontSize = deviceWidth / 7.5 + 'px';
+	</script>
+	<style>
+		.yhqitem{
+			height: 0.8rem;
+			line-height: 0.8rem;
+			font-size: 0.28rem;
+			background: #fff;
+			padding:0 0.2rem;
+		}
+		.yhqitem .left{
+			display:inline-block;
+			float:left;
+			height: 0.8rem;
+			line-height: 0.8rem;
+			width:5rem;
+		}
+		.yhqitem .right{
+			display:inline-block;
+			float:right;
+			height: 0.8rem;
+			line-height: 0.8rem;
+			width:2rem;
+			font-size:0.45rem;
+			color:#ccc;
+		}
+		.yhqitem .now{
+			color:#f44;
+		}
+		.mui-toast-container{position:fixed;background:#333;top:15%;width:80%;left:10%;z-index:99;padding:0.2rem;display:none;}
+		.mui-toast-message{font-size:0.3rem;color:#fff;text-align:center;}
+	</style>
+</head>
+<body style="background:#f5f5f5;padding-bottom:1rem;">
+
+<div id="header">
+	<div class="goback iconfont" onclick="history.go(-1);">&#xe612;</div>
+	<div class="title textellipsis1 text-c">提交订单</div>
+	<div class="empty"></div>
+</div>
+
+<div class="store">
+	<div class="iconfont text-c">&#xe618;</div>
+	<div class="storename textellipsis1">{php echo $setStoreData['set_storeName']}</div>
+</div>
+{loop $cartlist $row}
+<div class="goods">
+	<div class="item">
+		<div class="img"><img src="{php echo tomedia($row['pp_coverpic']);}" /></div>
+		<div class="goodsmsg">
+			<div class="title textellipsis1">{$row['pp_name']}</div>
+			<div class="option"><span style="color:red;">到店自提</span></div>
+			<div class="pricenum">
+				<div class="price"><span>{$row['pp_sellprice']}</span> 元</div>
+				<div class="num text-r">×{$row['cat_num']}</div>
+			</div>
+		</div>
+	</div>
+</div>
+{/loop}
+<div class="dotype">
+	<div class="paytype">
+		<div class="left">支付方式</div>
+		<div class="right text-r">微信购买</div>
+	</div>
+</div>
+
+<div class="liuyan">
+	<textarea name="name" id="remark" placeholder="如有备注请填写"></textarea>
+</div>
+
+
+<div id="footer">
+	<div class="price text-r">
+		合计:<span class="num">{$allprice}元</span>
+	</div>
+	<span class="btn text-c" id="submit_btn">立即购买</span>
+</div>
+
+<div class="blackbg hide"></div>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}messi/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/fastclick.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/jquery-weui.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/city-picker.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var we7Credit1Set = "{$setStoreData['set_we7Credit1Set']}";
+        var memberPoints = parseFloat({$memberAblePoints});
+        if(parseFloat(memberPoints) <= 0){
+            memberPoints = 0.00;
+		}
+        if(we7Credit1Set == 1){
+            var we7Credit1SetData = parseFloat({$we7Credit1Count});
+            memberPoints = parseFloat(memberPoints) + parseFloat(we7Credit1SetData);
+            $("#memberAblePoints").text("可用"+ parseFloat(memberPoints) +"元");
+        }else{
+            $("#memberAblePoints").text("可用"+ parseFloat(memberPoints) +"元");
+		}
+    });
+</script>
+<script type="text/javascript">
+    $("#submit_btn").click(function(){
+        var we7Credit1Set = "{$setStoreData['set_we7Credit1Set']}";
+        var payPoints = parseFloat({$allprice});
+        var memberPoints = parseFloat({$memberAblePoints});
+        var openid = "{$openid}";
+        var memberid = "{$memberId}";
+        var remarkValue = $('#remark').val();
+        if(we7Credit1Set == 1){
+            var we7Credit1SetData = parseFloat({$we7Credit1Count});
+            memberPoints = parseFloat(memberPoints) + parseFloat(we7Credit1SetData);
+		}
+        if(parseFloat(payPoints) > parseFloat(memberPoints)){
+            $.alert("您的可用余额不足兑换当前订单！");
+		}
+        else{
+            $('#submit_btn').text('提交中...');
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'doPayPointsOrder','storeid'=>$storeid))}",
+                type:'post',
+                data:{
+                    openid:openid,
+                    memberId:memberid,
+                    remark:remarkValue,
+                },
+                dataType:'json',
+                success:function(data){
+                    if (data.error == 1) {
+                        $.alert(data.message,function(){
+                            $('#submit_btn').text("立即兑换");
+                        });
+                    } else {
+                        $.alert(data.message,function(){
+                            window.location.href = "{php echo $this->createMobileUrl('pointsmyorder',array('op' => 'list','statuss'=>2,'storeid'=>$storeid))}";
+                        });
+                    }
+                }
+            });
+        }
+    })
+</script>
+</body>
+</html>

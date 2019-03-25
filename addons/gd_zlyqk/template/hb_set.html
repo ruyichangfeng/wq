@@ -1,0 +1,91 @@
+{template "base/child_header"}
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: 150px;">apiclient_cert.pem</label>
+        <div class="layui-input-block" id="imgList">
+            <input type="hidden" id="cov" class="covs" name="in[cert]" value="{$recorder['cert']}" >
+            <input type="file" name="file" class="layui-upload-file">
+            证书文件编辑,需全部重新上传
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: 150px;">apiclient_key.pem</label>
+        <div class="layui-input-block" id="imgList1">
+            <input type="hidden" id="cov1" class="covs" name="in[key]" value="{$recorder['key']}" >
+            <input type="file" name="file" class="layui-upload-file1">
+            证书文件编辑,需全部重新上传
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','jquery','upload'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        form.on('submit(addAdmin)', function(data){
+            $.post("{php echo $this->createWebUrl('hbset')}&Ajax=",data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+
+        layui.upload({
+            elem: '.layui-upload-file',
+            url: "{php echo $this->createWebUrl('upload')}",
+            method: 'post',
+            ext:'pem',
+            type:'file',
+            title: '{if $zhList["cert"]}修改证书(已上传){else}上传证书{/if}',
+            success: function (res) {
+                layui.layer.msg(res.msg);
+                if(res.code==2){
+                    return false;
+                }
+                $("#cov").val(res.url);
+            }
+        });
+        layui.upload({
+            elem: '.layui-upload-file1',
+            url: "{php echo $this->createWebUrl('upload')}",
+            method: 'post',
+            ext:'pem',
+            type:'file',
+            title: '{if $zhList["key"]}修改证书(已上传){else}上传证书{/if}',
+            success: function (res) {
+                layui.layer.msg(res.msg);
+                if(res.code==2){
+                    return false;
+                }
+                $("#cov1").val(res.url);
+            }
+        });
+        layui.upload({
+            elem: '.layui-upload-file2',
+            url: "{php echo $this->createWebUrl('upload')}",
+            method: 'post',
+            ext:'pem',
+            type:'file',
+            title: '{if $zhList["ca"]}修改证书(已上传){else}上传证书{/if}',
+            success: function (res) {
+                layui.layer.msg(res.msg);
+                if(res.code==2){
+                    return false;
+                }
+                $("#cov2").val(res.url);
+            }
+        });
+    });
+</script>
+{template "base/child_footer"}

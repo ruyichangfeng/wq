@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+{template 'head'}
+<title>{php echo $this->config['system_name']}</title>
+
+</head>
+
+<body>
+<div class="box">
+	<div class="tops">
+    	<div class="col-xs-3">
+            <a href="{php echo $this->createMobileUrl('circle', array('log'=>$_GPC['log'], 'lat'=>$_GPC['lat']))}">
+                <div class="tops-l">
+                    <span>{if empty($circle)}全部{else}{$circle['circle_name']}{/if}</span>
+                    <img src="{RES}mobile/images/down.png">
+                </div>
+            </a>
+        </div>
+        <div class="col-xs-9">
+        	<div class="tops-r">
+            	<img src="{RES}mobile/images/big.png">
+                <input type="text" id="searchstore" onchange="searchStore()" placeholder="门店名">
+            </div>
+        </div>
+    </div>
+
+    {if !empty($ads)}
+    <div class="banner">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                {loop $ads $key $item}
+                <div class="swiper-slide">
+                    <a href="{$item['ad_url']}" style="display: block">
+                   <img src="{php echo tomedia($item['ad_pic'])}">
+                    </a>
+                </div>
+
+                {/loop}
+
+            </div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    <script src="{RES}mobile/js/swiper.min.js"></script>
+    {/if}
+
+    <!-- Initialize Swiper -->
+    <script>
+    var swiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        nextButton: '.swiper-button-next',
+        prevButton: '.swiper-button-prev',
+        paginationClickable: true,
+        spaceBetween: 30,
+        centeredSlides: true,
+        autoplay: 2500,
+        autoplayDisableOnInteraction: false
+    });
+    </script>
+	<div class="con">
+    <div class="con01">
+        {if count($store_index) >= 3}
+    	<div class="con01-t">
+        	<img src="{RES}mobile/images/img01.png">
+        </div>
+        <div class="con01-b">
+        	<div class="con01-l">
+            	<a href="{php echo $this->createMobileUrl('info', array('store_id'=>$store_index[0]['store_id']))}">
+                	<div class="con01-image01">
+                    	<img src="{php echo tomedia($store_index[0]['store_pic'])}">
+                    </div>
+                    <div class="con01-text03">{$store_index[0]['store_name']}</div>
+                    <div class="con01-text04">{$store_index[0]['store_index_reason']}</div>
+                </a>
+            </div>
+            <div class="con01-r">
+            	<div class="con01-r01">
+                    <a href="{php echo $this->createMobileUrl('info', array('store_id'=>$store_index[1]['store_id']))}">
+                        <div class="con01-image02 col-xs-6">
+                            <img src="{php echo tomedia($store_index[1]['store_pic'])}">
+                        </div>
+                        <div class="col-xs-6">
+                        	<div class="con01-text05">{$store_index[1]['store_name']}</div>
+                    		<div class="con01-text06">{$store_index[1]['store_index_reason']}</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="con01-r01">
+                    <a href="{php echo $this->createMobileUrl('info', array('store_id'=>$store_index[2]['store_id']))}">
+                        <div class="con01-image02 col-xs-6">
+                            <img src="{php echo tomedia($store_index[2]['store_pic'])}">
+                        </div>
+                        <div class="col-xs-6">
+                        	<div class="con01-text05">{$store_index[2]['store_name']}</div>
+                    		<div class="con01-text06">{$store_index[2]['store_index_reason']}</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {/if}
+    </div>
+
+	<div class="con02">
+    	<div class="con02-text01">猜你喜欢</div>
+        <ul class="con02-con" id="storelist">
+            {loop $stores $key $item}
+            <a href="{php echo $this->createMobileUrl('info', array('store_id'=>$item['store_id']))}">
+                <li>
+                    <div class="con02-image col-xs-4">
+
+                        <img src="{php echo tomedia($item['store_pic'])}">
+
+                    </div>
+                    <ul class="con02-r col-xs-7">
+                        <li>
+                            <div class="con02-text02">{$item['store_name']}</div>
+                            <!--<div class="con02-text03">-->
+                                <!--<div class="con02-text04">￥7元</div>-->
+                                <!--<img src="{RES}mobileimages/con02-bg02.jpg">-->
+                            <!--</div>-->
+                        </li>
+                        <li>
+                            <div class="con02-text05">{$item['circle_name']}</div>
+                        </li>
+                        <li>
+                            <div class="con02-text06">{$item['store_tel']}</div>
+                            {if !empty($item['distance'])}
+                            <div class="con02-text07">
+                                <div class="con02-text08">{$item['distance']}km</div>
+                                <img src="{RES}mobile/images/location.png">
+                            </div>
+                            {/if}
+                        </li>
+                    </ul>
+                </li>
+            </a>
+            {/loop}
+            {if empty($stores)}
+            <li style="padding: 10px;text-align: center">
+                <img src="{RES}mobile/images/clear.png" style="height: 50px" alt="">
+                <p>未找到相关门店</p>
+            </li>
+            {/if}
+        </ul>
+    </div>
+    </div>
+    <ul class="footer">
+    	<li class="footer01 dq">
+        	<a href="{php echo $this->createMobileUrl('index', array())}">
+        		<img src="{RES}mobile/images/icon001.png">
+                <span>首页</span>
+            </a>
+        </li>
+        <li class="footer02">
+        	<a href="{php echo $this->createMobileUrl('mine', array())}">
+                <img src="{RES}mobile/images/icon02.png">
+                <span>个人中心</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    var page = 2;
+    $(window).scroll(function(){
+
+        if ($(document).scrollTop() == $(document).height() - $(window).height()) {
+
+            if (page > 1)
+            {
+                loadStore();
+            }
+        }
+    });
+    /** 搜索门店 */
+    function searchStore() {
+
+        var content= $('#searchstore').val();
+
+        if (content == '')
+        {
+            window.location.href = "{$_W['siteurl']}";
+
+        } else
+        {
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('ajaxStore', array('log'=>$_GPC['log'], 'lat'=>$_GPC['lat'], 'circle_id'=>$_GPC['circle_id']))}"+"&content="+content,
+                type:'get',
+                success:function (data) {
+
+                    $('#storelist').html(data);
+                }
+            })
+        }
+
+    }
+
+    /** 加载更多 */
+    function loadStore() {
+
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('loadStore', array('log'=>$_GPC['log'], 'lat'=>$_GPC['lat'], 'circle_id'=>$_GPC['circle_id']))}"+"&page="+page,
+            type:'get',
+            success:function (data) {
+
+                data = eval('(' +data + ')');
+               if (data.result == 'success')
+               {
+                   $('#storelist').append(data.store);
+                   page = data.page;
+                   alert(data.page);
+               }
+            }
+        })
+    }
+</script>
+</body>
+</html>

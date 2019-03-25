@@ -1,0 +1,119 @@
+{php define('MUI', true);}
+{template 'common/header_base'}
+
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">完善会员信息</h1>
+</header>
+
+<div class="mui-content">
+    <form action="" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+        <div class="mui-content-padded" style="margin: 5px;">
+
+        <h4 class="mui-content-padded"  style="padding-top: 10px;">真实姓名：</h4>
+        <div class="mui-input-row">
+            <input type="text" class="mui-input-clear js-mobile-val" id="memberName" name="memberName" value="{$memberInfo_Data['mem_memberName']}" placeholder="请输入真实姓名">
+        </div>
+
+        <h4 class="mui-content-padded">性别：</h4>
+        <div class="mui-input-row mui-radio mui-left">
+            <label>男</label>
+            <input name="memberSex" type="radio" value="1" {if $memberInfo_Data['mem_memberSex'] == 1}checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio mui-left">
+            <label>女</label>
+            <input name="memberSex" type="radio" value="2" {if $memberInfo_Data['mem_memberSex'] == 2}checked{/if} >
+        </div>
+
+        <h4 class="mui-content-padded">身份证号：</h4>
+        <div class="mui-button-row">
+            <input type="text" class="mui-input-clear" id="memberIdentityNum" name="memberIdentityNum" value="{$memberInfo_Data['mem_memberIdentityNum']}" placeholder="请输入身份证号">
+        </div>
+        <h4 class="mui-content-padded">微信号：</h4>
+        <div class="mui-input-row">
+            <input type="text" class="mui-input-clear" id="memberWechat" name="memberWechat" value="{$memberInfo_Data['mem_memberWechat']}" placeholder="请输入微信号">
+        </div>
+    </div>
+        <div class="mui-content-padded"  style="padding-bottom: 10px;">
+            <h4 class="mui-content-padded">出生日期：</h4>
+            <div class="mui-input-row mui-radio mui-left">
+                <label>公历</label>
+                <input name="memberBirthdayType" value="1" type="radio" {if $memberInfo_Data['mem_memberBirthdayType'] == 1}checked{/if}>
+            </div>
+            <div class="mui-input-row mui-radio mui-left">
+                <label>农历</label>
+                <input name="memberBirthdayType" value="1" type="radio"  {if $memberInfo_Data['mem_memberBirthdayType'] == 2}checked{/if}>
+            </div>
+            {php echo tpl_app_fans_form('birth', array('year' => $memberInfo_Data['mem_memberBirthdayYear'], 'month' => $memberInfo_Data['mem_memberBirthdayMonth'], 'day' => $memberInfo_Data['mem_memberBirthdayDay']))}
+        </div>
+        <div class="mui-content-padded"  style="padding-bottom: 1px;">
+            <h4 class="mui-content-padded">所属城市：</h4>
+            {php echo tpl_app_form_field_district('reside', array('province' => $memberInfo_Data['province'],'city' => $memberInfo_Data['city'],'district' => $memberInfo_Data['district']));}
+            <h4 class="mui-content-padded">详细地址：</h4>
+            <textarea id="textarea" rows="3" name="memberDetailAddress" placeholder="请输入详细地址,礼品等收货地址">{$memberInfo_Data['mem_memberDetailAddress']}</textarea>
+        </div>
+
+        <div class="mui-content-padded"  style="padding-bottom: 10px;">
+            <div class="mui-button-row">
+                {if empty($memberInfo_Data['mem_memberBirthdayDay']) || empty($memberInfo_Data['district'])}
+                <input type="submit" class="mui-btn mui-btn-success mui-btn-block " name="addsubmit"  value="提交信息">
+                {else}
+                <input type="submit" class="mui-btn mui-btn-success mui-btn-block " name="editsubmit"  value="提交信息">
+                {/if}
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+<script>
+    $(function(){
+        $('form').submit(function(){
+            var msg = '请认真填写您的';
+
+            if($(this).find('radio[name="memberSex"]').val() == ''){
+                mui.alert(msg+'性别');
+                return false;
+            }
+            if(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test($(this).find('input[name="memberIdentityNum"]').val()) === false) {
+                mui.alert(msg+'身份证号');
+                return false;
+            }
+            if($(this).find('radio[name="memberBirthdayType"]').val() == ''){
+                mui.alert(msg+'出生日期类型');
+                return false;
+            }
+            if($(this).find('select[name="birth[year]"]').val() == ''){
+                mui.alert(msg+"出生年份");
+                return false;
+            }
+            if($(this).find('select[name="birth[month]"]').val() == ''){
+                mui.alert(msg+"出生月份");
+                return false;
+            }
+            if($(this).find('select[name="birth[day]"]').val() == '0'){
+                mui.alert(msg+"出生日期");
+                return false;
+            }
+            if($(this).find('select[name="reside[province]"]').val() == ''){
+                mui.alert(msg+"所在省份");
+                return false;
+            }
+            if($(this).find('select[name="reside[city]"]').val() == ''){
+                mui.alert(msg+"所在市");
+                return false;
+            }
+            if($(this).find('select[name="reside[district]"]').val() == ''){
+                mui.alert(msg+"所在县区");
+                return false;
+            }
+            if($(this).find('textarea[name="memberDetailAddress"]').val() == ''){
+                mui.alert(msg+'详细地址');
+                return false;
+            }
+
+        return true;
+       });
+    })
+</script>
+{template 'common/footer_base'}

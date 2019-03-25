@@ -1,0 +1,104 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>诱导会员完善资料</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('CompleteMemberData')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" method="post" class="form-horizontal form" id="setformdata">
+                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                            <thead>
+                            <tr>
+                                <td class="col-md-2">设置项目</td>
+                                <td class="col-md-3">说明</td>
+                                <td class="col-md-4">参数值</td>
+                                <td class="col-md-3">是否启用</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="title">诱导文案内容</td>
+                                <td>示例：通知：完善个人信息资料赠送300积分，10元储值！</td>
+                                <td>
+                                    <input type="text"   class="form-control"  name="cmd[cmd400]" value="{$set['cmd400']['value']}" />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="cmd401" class="js-switch_1" {if $set['cmd401']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">赠送积分</td>
+                                <td>赠送会员积分数量。示例：300</td>
+                                <td>
+                                    <input type="number"   class="form-control"  name="cmd[cmd402]" value="{$set['cmd402']['value']}" required />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="cmd403" class="js-switch_2" {if $set['cmd403']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">赠送储余额</td>
+                                <td>赠送会员储值金额。示例：10</td>
+                                <td>
+                                    <input type="number"   class="form-control"  name="cmd[cmd404]" value="{$set['cmd404']['value']}" required />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="cmd405" class="js-switch_3" {if $set['cmd405']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label"></label>
+                            <div class="col-sm-7">
+                                <button type="submit" class="btn btn-w-m btn-primary" name="submit" value="提交">提交</button>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            var agaxurl = "{php echo $this->createWebUrl('updatekey')}";
+            var dataparam = {
+                'hlsetkey': hlsetkey,
+                'status': status,
+            };
+            $.ajax({
+                url: agaxurl,
+                data: dataparam,
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal("更新成功！", "","success");
+                    } else {
+                        swal("新增成功！", "","success");
+                    }
+                }
+            });
+
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+
+    });
+</script>
+{template 'web/common/footer'}

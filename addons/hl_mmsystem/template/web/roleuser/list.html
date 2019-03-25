@@ -1,0 +1,84 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>员工信息管理</h5>
+
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('roleuser')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <span onclick="parent.layer.open({type: 2,title: '添加员工信息',maxmin: true,shadeClose: true,area : ['800px' , '800px'],content: '{php echo $this->createWebUrl('roleuser',array('op' => 'add'))}'});" class="btn btn-primary">
+                        <i class='glyphicon glyphicon-plus'></i>添加员工信息</a>
+                             </span>
+                    </div>
+
+
+                    <form class="form-horizontal form" method="post">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-circle-o-notch"></i> ID</th>
+                                <th>工号</th>
+                                <th>姓名</th>
+                                <th>手机号</th>
+                                <th>所属机构</th>
+                                <th>可操作店铺</th>
+                                <th>职务</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $index $item}
+                            <tr>
+                                <td>
+                                    <span class="btn btn-default btn-sm" >
+                                    <i class="fa fa-circle-o-notch"></i> {$index}</span>
+                                </td>
+                                <td>{$item['ru_userAccount']}</td>
+                                <td>{$item['ru_userName']}</td>
+                                <td>{$item['ru_userPhone']}</td>
+                                <td>{php echo util::getOrganizAtionOne($item['organization_id']);}</td><!--所属机构-->
+                                <td>{php echo util::getStoreOne($item['ru_storeIdCount']);}</td><!--操作店铺-->
+                                <td>{php echo util::getRoleName($item['role_id']);}</td>
+                                <td>{if $item['ru_userSatus']==1}<span class="badge badge-primary">激活</span>
+                                    {elseif $item['ru_userSatus']==2}<span class="badge badge-danger">冻结</span>
+                                    {elseif $item['ru_userSatus']==3}<span class="badge badge-dark">禁用</span>
+                                    {/if}
+                                </td>
+                                <td>
+                             <span onclick="parent.layer.open({type: 2,title: '查看操作记录',maxmin: true,shadeClose: true,area : ['800px' , '400px'],content: '{php echo $this->createWebUrl('roleuser',array('op' => 'detail','id' => $item['id']))}'});" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="查看操作记录">
+                        <i class="fa fa-street-view"></i>查看
+                             </span>
+                                    <a href="{php echo $this->createWebUrl('roleuser', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top">编辑</a>
+                            <a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('roleuser',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{template 'web/common/footer'}

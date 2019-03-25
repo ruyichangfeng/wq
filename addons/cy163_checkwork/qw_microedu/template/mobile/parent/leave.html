@@ -1,0 +1,106 @@
+{template 'header'}
+<div id="leave">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">请假管理</h1>
+    </div>
+    <div class="mui-content yishang">
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+
+
+            {if $classhours}
+                {loop $classhours $i $c}
+                    <li class="mui-table-view-cell">
+                        <div class="mui-table">
+                            <div class="mui-table-cell mui-col-xs-10">
+                                <h4 class="mui-ellipsis zuopin-title">{$c['class_name']}</h4>
+                                <h5 class="gray"><img src="{MODULE_URL}assets/img/icon-time.png" /> {$c['timeslot']}
+                                    <img src="{MODULE_URL}assets/img/icon-teacher.png" /> 老师：{$c['fullname']}
+                                </h5>
+                                <p class="mui-h6 mui-ellipsis gray"><img src="{MODULE_URL}assets/img/icon-position.png" />{$c['name']}{$c['classroom']}</p>
+                            </div>
+                            <input type="hidden" id="id" value="{$c['id']}">
+                            <div class="mui-table-cell mui-col-xs-2 mui-text-right">
+                                {if $c['status'] == 0}
+                                    <span class="mui-h5" onclick="qingjia({$c['id']})"><a id="confirmBtn" href="javascript:;" class="btn btn-leave"><span id="info"> 请  假</span></a> </span>
+                                {else}
+                                    <span class="mui-h5" onclick="quxiao_leave({$c['id']})"><a id="confirmBtn_two" href="javascript:;" class="btn btn-leave-ed"><span>已请假</span></a> </span>
+                                {/if}
+                            </div>
+                            <script>
+                                function qingjia(id)
+                                {
+                                    var btnArray = ['否', '是'];
+                                    mui.confirm('确定请假吗，确认？', '微早教', btnArray, function(e) {
+                                        if (e.index == 1)
+                                        {
+                                            $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'leave')) ?>", {
+                                                id: id
+                                            }, function (response) {
+                                                if (response.status == 'success')
+                                                {
+                                                    mui.alert('请假成功', function () {
+                                                        window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'leave','children_id' => $_GPC['children_id'])) ?>";
+                                                    });
+                                                }
+                                                else
+                                                {
+                                                    mui.toast('请假失败,请重试!');
+                                                }
+                                            }, "json");
+                                        }
+                                        else
+                                        {
+                                            info.innerText = '请 假';
+                                        }
+                                    });
+                                }
+
+                                function quxiao_leave(id)
+                                {
+                                    var btnArray = ['否', '是'];
+                                    mui.confirm('确定取消请假吗，确认？', '微早教', btnArray, function(e) {
+                                        if (e.index == 1)
+                                        {
+                                            $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'quxiao_leave')) ?>", {
+                                                id: id
+                                            }, function (response) {
+                                                if (response.status == 'success')
+                                                {
+                                                    mui.alert('取消请假成功', function () {
+                                                        window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'leave','children_id' => $_GPC['children_id'])) ?>";
+                                                    });
+                                                }
+                                                else
+                                                {
+                                                    mui.toast('取消请假失败,请重试!');
+                                                }
+                                            }, "json");
+                                        }
+                                        else
+                                        {
+                                            return false;
+                                        }
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </li>
+                {/loop}
+            {else}
+                <li class="mui-table-view-cell">
+                    <div class="mui-table">
+                        <div class="mui-table-cell mui-col-xs-10">
+                            <h4 class="mui-ellipsis zuopin-title" style="text-align:center;color:#cccccc;">暂无课程</h4>
+                        </div>
+                    </div>
+                </li>
+            {/if}
+
+
+        </ul>
+    </div>
+</div>
+{template 'footer'}

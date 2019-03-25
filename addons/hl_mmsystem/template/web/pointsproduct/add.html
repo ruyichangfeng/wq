@@ -1,0 +1,524 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('pointsproduct', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;添加积分商品</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('pointsproduct',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+
+            <form action="" method="post" class="form-horizontal form" id="form">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">基本信息</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">排序</label>
+                            <div class="col-xs-8">
+                                <input type="text" name="order" class="form-control" value="{$item['pp_order']}" />
+                                <div class="help-block">数字越大，排名越靠前,如果为空，默认排序方式为创建时间</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>商品名称</label>
+                            <div class="col-xs-8">
+                                <input type="text" name="name" class="form-control" value="{$item['pp_name']}" id='name' placeholder="请输入商品名称"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>商品分类</label>
+                            <div class="col-xs-8">
+                                <select  class="form-control" name="pppointsproducttype" id="pppointsproducttype">
+                                    <option value="" selected = "selected" >请选择</option>
+                                    {loop $pointsproducttype $itempptype}
+                                    <option value="{$itempptype['id']}" {if $itempptype['id'] == $item['pointsproducttypeid']}selected = "selected"{/if} >{$itempptype['ppt_title']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div><!--调用商品分类-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>商品类型</label>
+                            <div class="col-xs-8">
+                                <div class="radio radio-info radio-inline">
+                                    <input id="type-1" type="radio" name="class" value="1" {if $item['pp_class'] == 1 || $item['pp_class'] == ''}checked{/if}/>
+                                    <label for="type-1">实物商品</label>
+                                </div>
+                                <div class="radio radio-info radio-inline">
+                                    <input id="type-2" type="radio" name="class" onclick="hiddengoods();" value="2" {if $item['pp_class'] == 2}checked{/if}/>
+                                    <label for="type-2">微信卡券</label>
+                                </div>
+                                <!--<div class="radio radio-info radio-inline">-->
+                                    <!--<input id="type-3" type="radio" name="ppclass" value="3" {if $item['pp_class'] == 3}checked{/if} />-->
+                                    <!--<label for="type-3">现金红包</label>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="card-id">
+                            <label class="col-sm-2 control-label">选择卡券</label>
+                            <div class="col-xs-1">
+                                <button type="button" class="btn btn-default"  name="rechargeGoodsName_Id"  id="rechargeGoodsName_Id" data-toggle="modal" data-target="#rechargeGoodsId">选择卡券</button>
+                            </div>
+                            <label class="col-sm-1 control-label">卡券类型</label>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" id="rechargeGoodsName_type" value=" {php echo util::getCouponType($itemcoupon['cou_type']);}" name="rechargeGoodsName_type" readonly/>
+                            </div>
+                            <label class="col-sm-12 control-label"></label>
+                            <label class="col-sm-12 control-label"></label>
+                            <label class="col-sm-12 control-label"></label>
+                                <label class="col-sm-2 control-label">每张限制人数</label>
+                                <div class="col-xs-1">
+                                    <input type="text" class="form-control" name="rechargeGoodsName_number" value="{$itemcoupon['cou_get_limit']}" id="rechargeGoodsName_number" readonly/>
+                                </div>
+                                <label class="col-sm-1 control-label">卡券标题</label>
+                                <div class="col-xs-2">
+                                    <input type="text" class="form-control" name="rechargeGoodsName_name" value="{$itemcoupon['cou_title']}"  id="rechargeGoodsName_name" readonly/>
+                                    <input type="hidden" class="form-control" value="{$itemcoupon['id']}" name="card_id" id="card_id" />
+                                </div>
+                                <label class="col-sm-1 control-label">卡券有效期</label>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control" value="{$coupondatainfo['time_limit_start']}~{$coupondatainfo['time_limit_end']}" name="rechargeGoodsName_time" id="rechargeGoodsName_time" readonly/>
+                                </div>
+                            <label class="col-sm-12 control-label"></label>
+                            <label class="col-sm-12 control-label"></label>
+                        </div>
+
+                        <!--<div class="form-group" id="overdue">-->
+                            <!--<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>使用时间</label>-->
+                            <!--<div class="col-xs-8">-->
+                                <!--<div class="input-group">-->
+                                    <!--<span class="input-group-addon">购买后</span>-->
+                                    <!--<input name="overdue" value="{$item['product_overdue']}" type="number" class="form-control" aria-label="Amount (to the nearest dollar)" min="0">-->
+                                    <!--<span class="input-group-addon">小时</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group" id="red-money">-->
+                            <!--<label class="col-sm-2 control-label">红包金额</label>-->
+                            <!--<div class="col-xs-8">-->
+                                <!--<input type="number" name="ppredmoney" class="form-control" value="{$item['pp_redmoney']}" max="200" min="0" step="0.01" oninput="if(value.length>6)value=value.slice(0,6)"/>-->
+                                <!--<div class="help-block">红包金额必须大于等于1元, 小于200元.<br>发送红包需要在参数设置里填写好对应参数, 否则将会导致发送失败!</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+
+
+
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">商品属性</label>-->
+                        <!--<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">-->
+                        <!--<div class="checkbox-inline"> <span><input name="product[product_attr_rec]" type="checkbox" id="rec" value="2" {if $item['product_attr_rec']}checked{/if} /><label-->
+                        <!--for="rec">推荐</label> </span></div>-->
+                        <!--<div class="checkbox-inline"> <span><input name="product[product_attr_new]" type="checkbox" id="new" value="2" {if $item['product_attr_new'] == 2}checked{/if}/><label-->
+                        <!--for="new">新品</label> </span></div>-->
+                        <!--<div class="checkbox-inline"> <span><input name="product[product_attr_hot]" type="checkbox" id="hot" value="2" {if $item['product_attr_hot'] == 2}checked{/if}/><label-->
+                        <!--for="hot">热卖</label> </span></div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>封面图</label>
+                            <div class="col-xs-8">
+                                {php echo tpl_form_field_image('coverpic', $item['pp_coverpic'])}
+                                <div class="help-block">用于商品列表页面展示的图片，建议为正方形图片</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>商品图片</label>
+                            <div class="col-xs-8">
+                                <div class="mui-input-cell">
+                                    {php echo tpl_form_field_multi_image('thumbs',$piclist)}
+                                </div>
+                                <div class="help-block">商品页面中显示的商品图片，尺寸建议宽度为640，并保持图片大小一致</div>
+                            </div>
+                        </div>
+
+                        <!--<div class="form-group" >-->
+                        <!--<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"></label>-->
+                        <!--<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">-->
+                        <!--<div class="checkbox-inline"> <span><input name="product[product_show_thum]" id="show_thum" type="checkbox" value="2" {if $item['product_show_thum'] == 2}checked{/if} <label for="show_thum">商品页面中商品图片第一位置显示为缩略图 </label></span></div>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>兑换积分</label>
+                            <div class="col-xs-8">
+                                <div class="col-xs-6 column" style="padding-left: 0"><div class="input-group">
+                                    <span class="input-group-addon">售价</span>
+                                    <input name="sellprice" value="{$item['pp_sellprice']}" type="number" class="form-control" aria-label="Amount (to the nearest dollar)" value=value.slice(0,6)">
+                                    <span class="input-group-addon">积分</span>
+                                </div>
+                                </div>
+                                <div class="col-xs-6 column" style="padding-right: 0"><div class="input-group">
+                                    <span class="input-group-addon">原价</span>
+                                    <input name="originalprice" value="{$item['pp_originalprice']}" type="number" class="form-control" aria-label="Amount (to the nearest dollar)" min="0" step="0.01" oninput="if(value.length>6)value=value.slice(0,6)">
+                                    <span class="input-group-addon">元</span>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">限购次数</label>
+                            <div class="col-xs-8">
+                                <div class="col-xs-6 column" style="padding-left: 0"><div class="input-group">
+                                    <span class="input-group-addon">一共</span>
+                                    <input name="maxbuy" value="{$item['pp_maxbuy']}" type="number" class="form-control" aria-label="Amount (to the nearest dollar)" min="0">
+                                    <span class="input-group-addon">个</span>
+                                </div>
+                                </div>
+                                <div class="col-xs-6 column" style="padding-right: 0"><div class="input-group">
+                                    <span class="input-group-addon">单人</span>
+                                    <input name="oneuser" value="{$item['pp_maxbuy_oneuser']}" type="number" class="form-control" aria-label="Amount (to the nearest dollar)" min="0">
+                                    <span class="input-group-addon">个</span>
+                                </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                            <!--<label class="col-sm-2 control-label">参与记录显示数量</label>-->
+                            <!--<div class="col-xs-8">-->
+                                <!--<input type="number" name="joinlimit" class="form-control" value="{$item['pp_joinlimit']}" />-->
+                                <!--<div class="help-block">默认为10条</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">上架状态</label>
+                            <div class="col-xs-8">
+                                <div class="radio radio-info radio-inline">
+                                    <input id="state-1" name="status" {if $item['pp_status'] == 1 || $state['store_state'] == '' }checked{/if}   type="radio" value="1" />
+                                    <label for="state-1">上架</label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input id="state-2" name="status" {if $item['pp_status'] == 2}checked{/if} type="radio" value="2" />
+                                    <label for="state-2">下架</label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">购买信息</label>
+                            <div class="col-xs-8">
+                                <div class="radio radio-info radio-inline">
+                                    <input id="member-state-1" name="memberstatus" {if $item['pp_memberstatus'] == 1 || $state['store_state'] == '' }checked{/if}   type="radio" value="1" />
+                                    <label for="member-state-1">开启</label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input id="member-state-2" name="memberstatus" {if $item['pp_memberstatus'] == 2}checked{/if} type="radio" value="2" />
+                                    <label for="member-state-2">关闭</label>
+                                </div>
+                                <div class="help-block">开启后会自动查找微擎内设置的姓名电话, 如存在则直接购买, 如不存在则仍需要填写购买信息</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-heading">商品数量</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">已出售</label>
+                            <div class="col-xs-8">
+                                <div class="input-group">
+                                    <input type="number" name="selled" class="form-control" value="{$item['pp_selled']}" aria-describedby="basic-addon2">
+                                    <span class="input-group-addon" id="basic-addon2">件</span>
+                                </div>
+                                <div class="help-block">物品虚拟出售数，下单此数据就增加, 无论是否支付</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color: red;">*</span>库存数量</label>
+                            <div class="col-xs-8">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="stock" value="{$item['pp_stock']}" aria-describedby="basic-addon2">
+                                    <span class="input-group-addon">件</span>
+                                </div>
+                                <div class="help-block">商品的剩余数量</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-heading">商品详情</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-xs-2  control-label"></label>
+                            <div class="col-xs-8">
+                                {php echo tpl_ueditor('info',$item['pp_info']);}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-5 control-label"></label>
+                            <div class="col-sm-7">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal fade" id="rechargeGoodsId" tabindex="-1" role="dialog"  aria-hidden="true" style="height: 600px; margin-top: 7%;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="ibox-title">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-content">
+                <div class="ibox-content">
+                    <table id="pointsproducttabledata" data-mobile-responsive="true"></table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="btn_closeGoodsId">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_SaveGoodsId">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var type = $('input[name="class"]:checked').val();
+        if (type == 2)
+        {
+            $('#card-id').show();
+            $('#red-money').hide();
+            $('#card-cc').hide();
+        }else if(type == 3){
+            $('#card-name').hide();
+            $('#red-money').show();
+            $('#card-id').hide();
+            $('#card-number').hide();
+
+        }else if(type == 1){
+            $('#overdue').show();
+            $('#card-id').hide();
+            $('#red-money').hide();
+            $('#card-name').hide();
+            $('#card-number').hide();
+
+        }
+
+    });
+    $('input[name="class"]').change(function () {
+
+
+        if ($(this).val() == 2)
+        {
+            $('#card-id').show();
+            $('#red-money').hide();
+            $('#overdue').hide();
+
+        } else if ($(this).val() == 3)
+        {
+            $('#red-money').show();
+            $('#card-id').hide();
+            $('#overdue').hide();
+
+        } else if ($(this).val() == 1)
+        {
+            $('#overdue').show();
+            $('#red-money').hide();
+            $('#card-id').hide();
+        }
+        else
+        {
+            $('#overdue').show();
+            $('#red-money').hide();
+            $('#card-id').hide();
+        }
+    });
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#form').submit(function(){
+                if($('input[name="product[pp_name]"]').val() == ''){
+                    util.message('未填写商品名称.');
+                    return false;
+                }
+                var type = $('input[name="class"]:checked').val();
+                if(type == 2){
+
+                    if($('input[name="ppcardid"]').val() == ''){
+                        util.message('未填卡券ID.');
+                        return false;
+                    }
+                } else if(type == 3){
+
+                    if($('input[name="ppredmoney"]').val() < 1){
+                        util.message('红包金额必须大于等于1.');
+                        return false;
+                    }
+                }
+                if($('select[name="pppointsproducttype').val() == ''){
+                    util.message('未填商品分类.');
+                    return false;
+                }
+                if($('input[name="coverpic').val() == ''){
+                    util.message('未选择封面图.');
+                    return false;
+                }
+                if($('input[name="pic').val() == ''){
+                    util.message('未选择商品图.');
+                    return false;
+                }
+                if($('input[name="sellprice').val() == ''){
+                    util.message('未填写商品出售价.');
+                    return false;
+                }
+                if($('input[name="originalprice').val() == ''){
+                    util.message('未填写商品原价.');
+                    return false;
+                }
+                if($('input[name="maxbuy').val() == ''){
+                    util.message('未填写限购次数.');
+                    return false;
+                }
+                if($('input[name="oneuser').val() == ''){
+                    util.message('未填写单人限购次数.');
+                    return false;
+                }
+                if($('input[name="stock').val() == ''){
+                    util.message('未填写商品库存.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    });
+
+
+        $('#pointsproducttabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('pointsproduct', array('op' => 'pointsproductdata'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            queryParamsType:'',
+            queryParams: queryParams,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            clickToSelect: true,
+            selectItemName:"id",
+            height: 260,
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            }, {
+                field: 'id',
+                title: '卡券id'
+            }, {
+                field: 'cou_title',
+                title: '名称',
+            },{
+                field: 'cou_type',
+                title: '类型',
+                formatter:coutypeFormatter
+            },
+            ]
+        } );
+
+        //得到查询的参数
+    function queryParams (params) {
+        var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            pageSize: params.pageSize,  //页面大小
+            pageNumber: params.pageNumber, //页码
+            searchcodekeywordstr: $("#search_codekeyword").val(),//后台请求传的查询参数
+            searchpinYinkeywordstr:$("#search_pinYinkeyword").val(),
+            searchkeywordstr:$("#search_keyword").val(),
+
+        };
+        return temp;
+    };
+    function coutypeFormatter(value, row, index) {
+        var typeid = value;
+        var result = "";
+        if(typeid == 1){
+            result += "{php echo util::getCouponType("+1+")}";
+        }
+          else if(typeid == 2){
+
+            result += "{php echo util::getCouponType("+2+")}";
+        }
+        else if(typeid == 3){
+
+            result += "{php echo util::getCouponType("+3+")}";
+        }
+        else if(typeid == 4){
+
+            result += "{php echo util::getCouponType("+4+")}";
+        }
+        else if(typeid == 5){
+
+            result += "{php echo util::getCouponType("+5+")}";
+        }
+        return result;
+    }
+    $("#btn_SaveGoodsId").click(function () {
+        var arrselections = $("#pointsproducttabledata").bootstrapTable('getSelections');
+        var ids="";
+        for(var i=0;i<arrselections.length;i++){
+            if(i==0 || i=="0"){
+                ids+=arrselections[i].id;
+            }else{
+                ids+=","+arrselections[i].id;
+            }
+        }
+        var idArrdata=ids.split(",")
+        if (arrselections.length <= 0) {
+            swal("操作有误", "请选择要设置的项目！","error");
+            return;
+        }
+        else{
+            $.ajax({
+                type: "post",
+                dataType: 'jsonp',
+                url: "{php echo $this->createWebUrl('pointsproduct', array('op' => 'ajaxgetpointsproductonedata'))}",
+                data: { idArr:idArrdata },
+                success: function (data) {
+                    $('#rechargeGoodsId').modal('hide')
+                    var cardtime = data.cou_date_info;
+                    var cardtimedata =  JSON.parse(cardtime);
+                    var start= cardtimedata["time_limit_start"];
+                    var end= cardtimedata["time_limit_end"];
+                    $("#card_id").attr("value",idArrdata);
+                    var cardtype = data.cou_type;
+                    if( cardtype == 1){
+                        var cardtypename = "{php echo util::getCouponType("+1+")}";
+                    }else if(cardtype == 2){
+                        var cardtypename = "{php echo util::getCouponType("+2+")}";
+                    }
+                    else if(cardtype == 3){
+                        var cardtypename = "{php echo util::getCouponType("+3+")}";
+                    }
+                    else if(cardtype == 4){
+                        var cardtypename = "{php echo util::getCouponType("+4+")}";
+                    }
+                    else if(cardtype == 5){
+                        var cardtypename = "{php echo util::getCouponType("+5+")}";
+                    }
+                    $('#card-name').show();
+                    $('#card-number').show();
+                    $('#card-time').show();
+                    $("#rechargeGoodsName_time").attr("value",start +'~'+end);
+                    $("#rechargeGoodsName_name").attr("value",data.cou_title);
+                    $("#rechargeGoodsName_number").attr("value",data.cou_get_limit);
+                    $("#rechargeGoodsName_type").attr("value", cardtypename);
+                },
+                error: function () {
+                    swal("操作有误", "请关闭重新操作！","error");
+                },
+                complete: function () {
+
+                }
+
+            });
+        }
+
+    });
+    function serachGoods() {
+        $("#pointsproducttabledata").bootstrapTable('refresh');
+    }
+</script>
+{template 'web/common/footer'}

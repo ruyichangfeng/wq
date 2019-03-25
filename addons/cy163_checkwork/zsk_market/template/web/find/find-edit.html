@@ -1,0 +1,247 @@
+{template 'public/header'}  
+<style type="text/css">
+	.pics{width:80px;height: 80px;display: inline-block;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+ 
+		  
+		  <li class="active">编辑</li>
+		</ol>
+	</div>
+	<div class="panel-body">
+		<form class="layui-form" style="width: 500px;margin-left: 100px;" method="post" id="memForm"  action="<?php echo $this->routeUrl('find.save');?>">
+		  <input type="hidden" name="fid" value="{$_GPC['fid']}">   
+		  <input type="hidden" name="type" value="{$_GPC['type']}">   
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">摘要</label>
+		    <div class="layui-input-block">
+		    	<textarea class="layui-input" name="content" style="resize: none;height: 100px;" <?php if($_GPC['type']=="3"){echo "disabled";}?> placeholder="显示在发现列表，500字以内">{$find['content']}</textarea> 
+		    	<p style="font-size:12px;color:orange;">买家秀不允许修改内容和图片和商品</p>
+
+		    </div>
+		  </div>  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">发布时间</label>
+		    <div class="layui-input-block">
+		    	 <input type="textd" name="createtime"   value="{$find['createtime']}"  class="layui-input" id="time"  >
+		    	  <p style="font-size:12px;color:orange;"></p>
+		    </div>
+		  </div>  
+		  <?php if($_GPC['type']=="1"){ ?>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">图片</label>
+		    <div class="layui-input-block">
+		      <?php if($_GPC['type']=="3"){ ?>
+		      {loop $find['pictures'] $index $item}
+		      	<img src="{$_W['attachurl']}{$item}" class="pics">
+		      {/loop}
+		      <?php }else{ ?>
+		      {php echo tpl_form_field_images('pictures',$find['pictures'],2);}
+		  		<?php }?>
+	          <p style="font-size:12px;color:orange;">推荐尺寸：300*300</p>
+		    </div> 
+		  </div>
+		  <?php } ?>
+		  <?php if($_GPC['type']=="2"){ ?>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">封面图片</label>
+		    <div class="layui-input-block">
+	          {php echo tpl_form_field_images('picture',$find['picture']);}
+	          <p style="font-size:12px;color:orange;">推荐尺寸：600*300</p>
+		    </div> 
+		  </div> 
+		  <?php } ?>
+
+		   
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">初始阅读量</label>
+		    <div class="layui-input-block">
+	           <input type="number" name="count_read0"  placeholder="0-999" min="0" max="999"  value="{$find['count_read0']}"  class="layui-input"  >
+		    </div> 
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">初始点赞量</label>
+		    <div class="layui-input-block">
+	           <input type="number" name="count_good0"  placeholder="0-999"  value="{$find['count_good0']}"  class="layui-input"  >
+		    </div> 
+		  </div> 
+		   <?php if($_GPC['type']!="2"){ ?>
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">关联商品</label>
+		    <div class="layui-input-block">
+
+		    	<div class="input-group" style="width:100%;">
+		    	  <?php if(intval($_GPC['type'])!=3){ ?>
+	             <input type="text" name="goodsnum"  value="{$goods['number']}" placeholder="输入商品编号"   class="form-control" style="display: inline-block;" />
+	            	<?php }?>
+			     </div>
+		     	<img src="{$_W['attachurl']}{$goods['picture']}" class="pics">
+		     	<div style="height:40px;line-height: 20px;display: inline-block;">{$goods['name']}</div>
+			    
+		    	<br/>
+		    
+		    </div>
+		    <?php } ?>
+		  <?php if($_GPC['type']=="2"){ ?>
+			   
+
+
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">商品代码</label>
+		    <div class="layui-input-block">
+		    	<div class="input-group" style="width:100%;">
+	             <input type="text" name="goodsnumber" id="goodsnumber" placeholder="输入商品编号，点击生成代码"   class="form-control" style="display: inline-block;" />
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button" onclick="getwxappcode()">生成</button> 
+			      </span>
+			    </div>  
+		    	<br/>
+		      <textarea  class="form-control" style="resize: none;word-break: break-all;" rows="4" readonly disabled id="codearea"> </textarea>
+		      <label for="inputEmail3" class="control-label" style="color:orange;text-align: left;">&nbsp;*如果要在专题文章中插入商品链接，需要转换成小程序标签，复制代码粘贴到指定位置即可，可插入多个商品。</label>
+		  		</div>
+		    </div>
+		   {php echo tpl_form_field_images1('article','');}
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">文章内容</label>
+		     <input type="hidden" name="after_sale" value='' id="after_sale" />
+		    <div class="layui-input-block">
+		    	<textarea id="article" style="display: none; width: 100%;" name="article">{$find['article']}</textarea>
+		    </div>
+		  </div> 
+		  <?php } ?>
+
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">状态</label>
+		    <div class="layui-input-block">
+	            <input type="radio" name="status" value="1" title="显示" <?php if($find['status']=="1"){echo 'checked';}?> >
+      			<input type="radio" name="status" value="0" title="隐藏" <?php if($find['status']=="0"){echo 'checked';}?>>
+		    </div>
+		  </div> 
+		  <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button type="button" class="layui-btn layui-btn-default" style="margin:0 auto;" onclick="sub()">保存</button> 
+		       <button class="layui-btn layui-btn-default" type="button" onclick="history.go(-1);">返回</button> 
+		    </div>
+		  </div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript" src="{ZSK_STATIC}layui/layui.all.js"></script>
+<script type="text/javascript">
+	 var layedit
+	 var index
+		layui.use('layedit', function(){
+		  layedit = layui.layedit
+		  layedit.set({
+			uploadImage: {
+				url: '<?php echo $this->routeUrl("upload.uploadwb1"); ?>' //接口url
+				,type: 'post' //默认post
+			}
+		});
+        index = layedit.build('article', {
+			height:'200px',
+			tool: [
+				'strong' //加粗
+				,'italic' //斜体
+				,'underline' //下划线
+				,'del' //删除线
+				,'|' //分割线
+				,'left' //左对齐
+				,'center' //居中对齐
+				,'right' //右对齐
+				,'link' //超链接
+				,'unlink' //清除链接
+				// ,'face' //表情
+				,'image' //插入图片
+				// ,'help' //帮助
+			]
+		});
+		$("i[layedit-event='image']").click(function(){
+			var id=$(this).parent().parent().parent().find("textarea").attr('id')
+			public_imgclick(id,2)
+		})
+	});
+		function html_decode1(value){
+		var s = "";
+		if (value.length == 0) return "";
+		s = value.replace(/&lt;/g, "<");
+		s = s.replace(/&gt;/g, ">");
+		s = s.replace(/&nbsp;/g, " ");
+		s = s.replace(/&nbsp;/g, '"');
+		s = s.replace(/&#39/g, '"');
+		s = s.replace(/\'/g, '"');
+		return s;
+	}
+	function sub(){
+		 var demoone = layedit.getContent(index);
+		 var type = $('input[name=type]').val();
+		 if(type > 1 ){
+			 var demoone = html_decode1(demoone);
+		 }
+		$('#after_sale').val(demoone);
+		$("#memForm").submit();
+	}
+	function showOpt(id){
+		$(id).css("display","block");
+	}
+	function getwxappcode(){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('topic.getGoodsInfo');?>",
+			type:"post",
+			dataType:"json",
+			data:{number:$("#goodsnumber").val()},
+			success:function(goods){
+				var code="未找到商品";
+				console.log(goods)
+				if(parseInt(goods.id)>0){
+					code="<goods number='"+goods.number+"' style='color:red;font-weight:800;' src='"+goods.src+"'  name='"+goods.name+"'>【商品链接："+goods.name+"】</goods>";
+				
+				} 
+				$("#codearea").val(code);
+			}
+		});
+	}
+	function getOpt1(that,domid){
+		$(domid).html("");
+		$.ajax({
+			url:"<?php echo $this->routeUrl('find.getOptByPid');?>&pid="+parseInt($(that).val()),
+			type:"post",
+			dataType:"json",
+			success:function(d){
+				var html="";
+				$.each(d,function(i,v){
+					html+="<option value='"+v.id+"'>"+v.name+"</option>";
+				});
+				$(domid).html(html);
+			}
+		});
+	}
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+		 layui.use('laydate', function(){
+	  var laydate = layui.laydate;
+	  //执行一个laydate实例
+	  laydate.render({
+	  	value:"{$find['createtime']}",
+	  	type:"datetime",
+	    elem: '#time' //指定元素
+	  }); 
+	});
+	 layui.use('form', function(){
+  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  form.render();
+  form.on("submit(*)",function(data){ 
+  })
+  form.on('switch(switchTest)', function(data){
+  
+  	  $(data.othis).siblings('input').remove();
+    $(data.othis).after('<input type="hidden" name='+ $(data.elem).attr('name') +' value='+ (data.elem.checked ? 'on' : 'off') +'>');
+    console.log($(this).val());
+  });
+}); 
+	
+</script>

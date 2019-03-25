@@ -1,0 +1,439 @@
+
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/template/mobile/css/per.css">
+<link rel="stylesheet" type="text/css" href="../addons/wxz_store/template/mobile/css/weui.css" />
+<link rel="stylesheet" type="text/css" href="..../addons/wxz_store/template/mobile/css/jquery-weui.css" />
+<link rel="stylesheet" type="text/css" href="../addons/wxz_store/template/mobile/css/extend.css" />
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/template/mobile/css/foods-all.css">
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/template/mobile/css/index.css">
+<link rel="stylesheet" type="text/css" href="../addons/wxz_store/template/mobile/css/dropload.min.css" />
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/template/mobile/css/demos.css">
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/template/mobile/css/ecsmart.css">
+<style>
+    #tab1 .tabcon1{min-height:360px!important;}
+</style>
+
+<div class="content" style="left:0px;background: #eee;width:100%;overflow:auto;">
+            {loop $goodslist $index $goods}
+            <div class="weui_panel_bd active" style="background:#fff;">
+                <div class="j-fooditem fooditem food222768613 clearfix" id="goods_{$goods['goods_id']}">
+                    <div class="food-pic-wrap"> 
+                        <a href="javascript:;"><img class="j-food-pic food-pic" src="{php echo tomedia($goods['goods_img'])}" data-src-retina="{php echo tomedia($goods['goods_img'])}" visibility="hidden" style="width: 82.6667px; height: 62px; margin-left: -10.3333px; margin-top: 0px; visibility: visible;"></a>  
+                    </div> 
+                    <div class="food-cont-wrap"> 
+                        <div class="food-cont"> 
+                            <div class="j-foodname foodname"><a href="{php echo murl('entry//goods',array('m'=>'wxz_store', 'id' => $goods['goods_id'], 'mfrom' => 'wzb', 'wrid' => $rid),true)}">{$goods['goods_name']}</a></div>   
+                                <div class="food-content-sub">  <span>销量&nbsp;{$goods['sales']}</span>   <!--<span class="food-good">赞1</span>--></div>  
+                                <div class="food-price-region">  <span class="food-price">¥{$goods['goods_price']}</span> </div>
+                                {if $goods['is_spec'] == 1}
+                                <span data-id="{$goods['goods_id']}" class="muti-btn j-muti-btn">选规格<em class="j-muti-num muti-num" {if $goods['book_num'] > 0}style="display:inline-block;"{/if}>{if $goods['book_num'] > 0}{$goods['book_num']}{else}0{/if}</em></span>
+                                {else}
+                                <div data-id="{$goods['goods_id']}" class="j-item-console foodop clearfix">
+                                        <a class="j-add-item add-food" href="javascript:;">
+                                                <i class="icon i-add-food"></i>
+                                        </a>
+                                        <span class="j-item-num foodop-num" {if $goods['book_num'] == 0}style="display:none"{/if}>{if $goods['book_num'] > 0}{$goods['book_num']}{else}1{/if}</span> 
+                                        <a class="j-remove-item remove-food" rec_id="{$goods['rec_id']}" {if $goods['book_num'] == 0}style="display:none"{/if} href="javascript:;"><i class="icon i-remove-food"></i></a> 
+                                </div>
+                                {/if}
+                        </div>  
+                    </div> 
+                </div>
+            </div>
+            {/loop}
+            <div class="weui_panel_bd" id="innercontext" style="padding:0px;background:#fff;display:none;">
+                <div class="j-fooditem clearfix"></div>
+            </div>
+        </div>
+        <div id="cart-wrap">
+            <div id="cart" class="cart">
+                <div class="cart-tip">
+                    {if $cart_total['number'] > 0}
+                    <div class="j-cart-icon cart-icon">
+                        <i class="j-ico-cart ico-cart ico-cart-active"></i>
+                        <div class="j-cart-num cart-num">{$cart_total['number']}</div>
+                    </div>
+                    <div class="j-cart-noempty cart-noempty">
+                        <span class="j-cart-price cart-price">¥{$cart_total['amount']}</span>
+                        <br>
+                        <span class="cart-shipping">配送费以订单为准</span>
+                    </div>
+                    {else}
+                    <div class="j-cart-icon cart-icon">
+                        <i class="j-ico-cart ico-cart"></i>
+                    </div>
+                    <div class="j-cart-empty cart-empty">购物车空空如也～</div>
+                    {/if}
+                </div>
+                <div class="cart-btns" style="{if $cart_total['number'] == 0}display:none;{/if}">
+                    <a class="cart-btn-confirm j-cart-btn-confirm" href="{php echo murl('entry//checkout',array('m'=>'wxz_store', 'mfrom' => 'wzb', 'wrid' => $rid),true)}" data-resource="1"><span class="inner">去结算</span></a>
+                    <!--<a class="cart-btn-unavail"><span class="inner">¥20起送</span></a>-->
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+<script>
+    //var tabHeight = $(window).innerHeight() - $('#tab').offset().top;
+	//$('#tab').height( tabHeight);
+/**
+ * 获得选定的商品属性
+ */
+function getSelectedAttributes(formBuy)
+{
+  var spec_arr = new Array();
+  var j = 0;
+
+  for (i = 0; i < formBuy.elements.length; i ++ )
+  {
+    var prefix = formBuy.elements[i].name.substr(0, 5);
+
+    if (prefix == 'spec_' && (
+      ((formBuy.elements[i].type == 'radio' || formBuy.elements[i].type == 'checkbox') && formBuy.elements[i].checked) ||
+      formBuy.elements[i].tagName == 'SELECT'))
+    {
+      spec_arr[j] = formBuy.elements[i].value;
+      j++ ;
+    }
+  }
+  spec_arr = spec_arr.join(',');
+  return spec_arr;
+}
+$(document).ready(function(){
+    $(".j-muti-btn").click(function(){
+            var gid = $(this).data('id');
+            $(".mask").show();
+            $("#muti-dialog").show();
+            $.ajax({
+               url:"{php echo $this->createMobileUrl('storeold',array('act' => 'getSpec'))}",
+                    type:'post',
+                    data:{gid:gid},
+                    dataType:'json',
+                    success:function(data){
+                            if(data.err == 0) {
+                                    var _html='<form id="purchase_form" name="ECS_FORMBUY">';
+                                    if(data.specification != "") {
+                                            $.each(data.specification,function(key,val){
+                                                    _html += '<p class="muti-sec-title">'+ val.name +'：</p>';
+                                            });
+                                            $.each(data.specification,function(key,val){
+                                                    if(val.attr_type == 1) {
+                                                            _html += '<div class="muti-choice">';
+                                                            $.each(val['values'],function(kk,vv){
+                                                                var selected = '';var checked = '';
+                                                                if(kk == 0){selected = 'selected'; checked = 'checked';}
+                                                                _html += 	'<span class="'+ selected +'" onclick="changeAtt(this, '+ gid +');" for="spec_value_'+ vv.id +'" data-attrname="'+ vv.label +'">'+ vv.label ;
+                                                                _html +=    '<input style="display:none" id="spec_value_'+ vv.id +'" type="radio" name="spec_'+ vv.id +'" value="'+ vv.id +'" '+ checked +' />';
+                                                                _html +=    '</span>';
+                                                            });
+                                                            _html += '	</div>';
+                                                    }
+                                            });
+                                    }
+                                    _html += '</form>';
+                                    //规格是否已加入购物车
+                                    var _hh = '';
+                                    if(data.cartRow.goods_number > 0) {
+                                        var rec_id = (data.cartRow.rec_id > 0) ? data.cartRow.rec_id : 0;
+                                        _hh += '<div class="j-item-console muti-cart-oprt clearfix">';
+                                        _hh += '<a class="j-add-item add-food" onclick="addToCart('+ gid +');"><i class="icon i-add-food"></i></a>';
+                                        _hh += '<span class="j-item-num foodop-num">'+ data.cartRow.goods_number +'</span>';
+                                        _hh += '<a class="j-remove-item remove-food" rec_id="'+ data.cartRow.rec_id +'" onclick="addToCart('+ gid +', '+ rec_id +',1);"><i class="icon i-remove-food"></i></a>';
+                                        _hh += '</div>';
+                                        $(".muti-oprt").html(_hh);
+                                    }
+
+                                    $("#muti-dialog .muti-food-title").html(data.goods.goods_name);
+                                    $("#muti-dialog .muti-sec").html(_html);
+                                    $("#muti-dialog .muti-oprt").attr('data-id', gid);
+                                    changePrice(gid);
+                            }
+                    }
+            });
+    });
+    //关闭弹框
+    $("#muti-close").click(function(){
+            $(".mask").hide();
+            $("#muti-dialog").hide();
+    });
+    //遮罩消失
+    $(".mask").click(function(){
+        $(this).hide();
+        $("#muti-dialog").hide();
+        $("#pref-dialog").hide();
+    });
+});
+function changePrice(gid)
+{
+    var attr = getSelectedAttributes(document.forms['ECS_FORMBUY']);
+    var number = 1;
+    $.ajax({
+           url:"{php echo $this->createMobileUrl('storeold',array('act'=>'change_price'))}",
+            type:'post',
+            data:{id:gid, attr:attr, number:number},
+            dataType:'json',
+            success:function(data){
+                if (data.err_msg != '')
+                {
+                  alert(data.err_msg);
+                }
+                else
+                {	
+                    $("#muti-dialog .muti-price").html(data.totalprice);
+                    if(data.cartRow.goods_number > 0){
+                            var _hh = '';
+                            _hh += '<div class="j-item-console muti-cart-oprt clearfix">';
+                            _hh += '<a class="j-add-item add-food" onclick="addToCart('+ gid +');"><i class="icon i-add-food"></i></a>';
+                            _hh += '<span class="j-item-num foodop-num">'+ data.cartRow.goods_number +'</span>';
+                            _hh += '<a class="j-remove-item remove-food" rec_id="'+ data.cartRow.rec_id +'" onclick="addToCart('+ gid +', '+ data.cartRow.rec_id +',1);"><i class="icon i-remove-food"></i></a>';
+                            _hh += '</div>';
+                            $(".muti-oprt").html(_hh);
+                    }else{
+                        var _hh = '';
+                        _hh += '<div class="muti-cart-btn" onclick="muti_cart_btn('+ gid +',1)">加入购物车</div>';
+                        $(".muti-oprt").html(_hh);
+                    }
+                }
+            }
+        });
+}
+function muti_cart_btn(gid){
+    var spec_str     = '';
+  var formBuy      = document.forms['ECS_FORMBUY'];
+  var is_spec	 = 0;
+  // 检查是否有商品规格 
+  if (formBuy)
+  {
+        spec_str = getSelectedAttributes(formBuy);
+        is_spec = 1;
+  }
+  var numBtn = $('.muti-oprt .foodop-num');
+    var new_num = numBtn.html();
+    var Num = 0;
+    if(new_num != null){
+        Num = parseInt(new_num);
+    }
+    Num=Num+1; 
+    numBtn.html(Num);
+    var url = "{php echo $this->createMobileUrl('storeold',array('act' => 'cart', 'op'=>'add', 'is_direct'=>1))}";
+
+    $.ajax({
+        url: url,
+             type:'post',
+             data:{gid:gid, number:Num, is_spec:is_spec, spec_str:spec_str},
+             dataType:'json',
+             success:function(data){
+                    if(data.result == 1) {
+                        var _html = '';
+                        _html += '<div class="j-item-console muti-cart-oprt clearfix">';
+                        _html += '<a class="j-add-item add-food" onclick="addToCart('+ gid +');"><i class="icon i-add-food"></i></a>';
+                        _html += '<span class="j-item-num foodop-num" data-num="1">1</span>';
+                        _html += '<a class="j-remove-item remove-food" onclick="addToCart('+ gid +', '+ data.rec_id +',1);"><i class="icon i-remove-food"></i></a>';
+                        _html += '</div>';
+                        $(".muti-oprt").html(_html);
+                        $("#goods_"+gid+" .j-muti-num").html(data.cartgoods_num).show();
+                        $("#cart .j-cart-num").html(data.total);
+                        $("#cart .j-cart-price").html(data.totalprice);
+                                                    //判断底部购物车是否有商品
+                                                    if($(".j-cart-noempty").length == 0) {
+                                                            var _hh='';
+                                                            _hh += '<div class="j-cart-icon cart-icon">';
+                                                            _hh	+= '<i class="j-ico-cart ico-cart ico-cart-active"></i>';
+                                                            _hh +='<div class="j-cart-num cart-num">'+ data.total +'</div>';
+                                                            _hh +='</div>';
+                                                            _hh +='<div class="j-cart-noempty cart-noempty">';
+                                                            _hh +='    <span class="j-cart-price cart-price">'+ data.totalprice +'</span>';
+                                                            _hh +='    <br>';
+                                                            _hh += '    <span class="cart-shipping">配送费以订单为准</span>';
+                                                            _hh +='</div>';
+                                                            $("#cart .cart-tip").html(_hh);
+                                                            $("#cart .cart-btns").show();
+                                                    }
+                    }else{
+                        alert(data.message.message);
+                    }
+             }
+     });
+}
+
+</script>
+<script language="javascript" type="text/javascript"> 
+	$(".pref-dialog-close").click(function(){
+		$("#pref-dialog").hide();
+		$(".mask").hide();
+	});
+	//加购物车
+	$(".add-food").click(function(){
+		var gid = $(this).parent().data('id');
+		var removeBtn = $(this).siblings(".remove-food");
+		var numBtn = $(this).siblings(".foodop-num");
+		var new_num=numBtn.html();  
+		var Num = parseInt(new_num);
+                var old_num = Num;
+		if(numBtn.is(":visible")) {
+			Num=Num+1;  
+			numBtn.html(Num);
+			
+		} else {
+			numBtn.show();
+			removeBtn.show();
+		}
+		$.ajax({
+		   url:"{php echo $this->createMobileUrl('storeold',array('act' => 'cart','op'=>'add', 'is_direct'=>1))}",
+			type:'post',
+			data:{gid:gid, number:Num},
+			dataType:'json',
+			success:function(data){
+                            if(data.result == 1) {
+                                $("#goods_"+gid+" .remove-food").attr('rec_id', data.rec_id);
+                                $("#cart .j-cart-num").html(data.total);
+                                $("#cart .j-cart-price").html(data.totalprice);
+                                //判断底部购物车是否有商品
+                                if($(".j-cart-noempty").length == 0) {
+                                        var _html='';
+                                        _html += '<div class="j-cart-icon cart-icon">';
+                                        _html	+= '<i class="j-ico-cart ico-cart ico-cart-active"></i>';
+                                        _html +='<div class="j-cart-num cart-num">'+ data.total +'</div>';
+                                        _html +='</div>';
+                                        _html +='<div class="j-cart-noempty cart-noempty">';
+                                        _html +='    <span class="j-cart-price cart-price">'+ data.totalprice +'</span>';
+                                        _html +='    <br>';
+                                        _html += '    <span class="cart-shipping">配送费以订单为准</span>';
+                                        _html +='</div>';
+                                        $("#cart .cart-tip").html(_html);
+                                        $("#cart .cart-btns").show();
+                                }
+                            }else{
+                                $("#goods_"+gid+" .foodop-num").hide();
+                                $("#goods_"+gid+" .remove-food").hide();
+                                $("#goods_"+gid+" .foodop-num").html(old_num);
+                                alert(data.message.message);
+                            }
+			}
+		});
+	});
+	$(".remove-food").click(function(){
+		var gid = $(this).parent().data('id');
+                var rec_id = $(this).attr('rec_id');
+                var is_delete = 0;
+		var num_val = $(this).siblings(".foodop-num");
+		var new_num=num_val.html(); 
+		var Num = parseInt(new_num);  
+		if(Num>1) {
+                    Num=Num-1;  num_val.html(Num);
+                }else{
+                    is_delete = 1;
+                }
+		$.ajax({
+		   url:"{php echo $this->createMobileUrl('storeold',array('act' => 'cart', 'op'=>'update'))}",
+			type:'post',
+			data:{gid:gid, number:Num, rec_id:rec_id, is_delete:is_delete},
+			dataType:'json',
+			success:function(data){
+				if(data.result == 1) {
+					if(data.is_delete == 1) {
+						$("#goods_"+gid+" .remove-food").hide();
+						$("#goods_"+gid+" .foodop-num").hide();
+						if(data.total == 0){
+							_html = '';
+							_html += '<div class="j-cart-icon cart-icon">';
+							_html += '<i class="j-ico-cart ico-cart"></i>';
+							_html += '</div>';
+							_html += '<div class="j-cart-empty cart-empty">购物车空空如也～</div>';
+							$("#cart .cart-tip").html(_html);
+							$("#cart .cart-btns").hide();
+						}
+					}
+					$("#cart .j-cart-num").html(data.total);
+                                        $("#cart .j-cart-price").html(data.totalprice);
+				}else{
+					alert(data.message.message);
+				}
+			}
+		});
+	});
+    
+    //加入购物车
+    function addToCart(goodsId, rec_id, minus)
+    {
+      var spec_str     = '';
+      var formBuy      = document.forms['ECS_FORMBUY'];
+      var is_spec	 = 0;
+      var is_delete	 = 0;
+      var rec_id = rec_id || '0';  
+      var minus = minus || 0; 
+      var old_num = 1;
+      // 检查是否有商品规格 
+      if (formBuy)
+      {
+            spec_str = getSelectedAttributes(formBuy);
+            is_spec = 1;
+      }
+      var numBtn = $('.muti-oprt .foodop-num');
+        var new_num = numBtn.html();
+        var Num = 0;
+        if(new_num != null){
+            Num = parseInt(new_num);
+            old_num = Num;
+        }
+        if(minus == 1) {
+            if(Num>1){
+                Num=Num-1;  numBtn.html(Num)
+            }else{
+                is_delete = 1;
+            }
+            var url = "{php echo $this->createMobileUrl('storeold',array('act' => 'cart', 'op'=>'update'))}";
+        }else{
+            Num=Num+1; 
+            numBtn.html(Num);
+            var url = "{php echo $this->createMobileUrl('storeold',array('act' => 'cart', 'op'=>'add', 'is_direct'=>1))}";
+        }
+        
+        $.ajax({
+            url: url,
+                 type:'post',
+                 data:{gid:goodsId, number:Num, is_spec:is_spec, spec_str:spec_str, rec_id:rec_id, is_delete:is_delete},
+                 dataType:'json',
+                 success:function(data){
+                        if(data.result == 1) {
+                            if(data.is_delete == 1) {
+                                $(".muti-oprt").html('<div class="muti-cart-btn" onclick="muti_cart_btn('+ goodsId +')">加入购物车</div>');
+								$("#goods_"+goodsId+" .j-muti-num").hide();
+							}
+							if(data.cartgoods_num > 0){
+								$("#goods_"+goodsId+" .j-muti-num").html(data.cartgoods_num);
+							}
+							$("#cart .j-cart-num").html(data.total);
+                                                        $("#cart .j-cart-price").html(data.totalprice);
+							if(data.total == 0){
+								_html = '';
+								_html += '<div class="j-cart-icon cart-icon">';
+								_html += '<i class="j-ico-cart ico-cart"></i>';
+								_html += '</div>';
+								_html += '<div class="j-cart-empty cart-empty">购物车空空如也～</div>';
+								$("#cart .cart-tip").html(_html);
+								$("#cart .cart-btns").hide();
+							}
+                        }else{
+                            $("#muti-dialog .foodop-num").html(old_num);
+                            alert(data.message.message);
+                        }
+                 }
+         });
+    }
+
+    function changeAtt(t, gid) {
+        $(t).siblings().removeClass('selected ');
+        $(t).addClass('selected ');
+        $(t).children("input").prop("checked", true);
+        $(t).siblings().children("input").prop("checked", false);
+        changePrice(gid);
+    }
+    //确认订单
+    $(".j-cart-btn-confirm").click(function(){
+        location.href = "{php echo murl('entry//checkout',array('m'=>'wxz_store'),true)}";
+    });
+</script>

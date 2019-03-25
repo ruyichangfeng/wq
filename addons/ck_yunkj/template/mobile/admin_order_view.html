@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+<meta name="format-detection" content="telephone=no">
+<title>服务订单详情 - {$cwgl_config['webtitle']}</title>
+<link href="{$templateurl}/css/css.css" rel="stylesheet" type="text/css">
+<link href="{$templateurl}/css/common.css" rel="stylesheet" type="text/css">
+</head>
+<body >
+<div class="head">
+	<div class="content-top clearFix">
+    <a href="{$urltk}">
+	<em class="return"><</em>
+	<span class="fanhui">返回</span>
+	</a>
+   </div>
+</div>
+	
+<div id="content" >
+   
+   <div class="contbox">
+     <div class="titbox">
+	   <i class="kuaiji"></i>
+	   <span>订单详情</span>
+	 </div>
+	 <div class="kuaiji-list">
+	   <ul>
+	   	<li>
+		  <em>订单编号：</em>
+		  <span>{$srdb['orderid']}</span>
+		</li>
+	    <li>
+		  <em>服务名称：</em>
+		  <span>{$service_show['titlename']}</span>
+		</li>
+		<li>
+		  <em>单价：</em>
+		  <span>￥{$srdb['price']}</span>
+		</li>
+		<li>
+		  <em>购买数量：</em>
+		  <span>{$srdb['number']}</span>
+		</li>
+		<li>
+		  <em>支付金额：</em>
+		  <span>￥{$srdb['paymoney']}</span>
+		</li>
+		<li>
+		  <em>公司名称：</em>
+		  <span>
+		    {if $kehu_show}
+			  {loop $kehu_show $value}
+			  {$value['compname']}
+			  {/loop}
+			{else}
+			  <font color="#CC0000">不存在或者已删除</font>
+			{/if}
+		  </span>
+		</li>
+		<li>
+		  <em>联系人：</em>
+		  <span>{$usershow['name']}</span>
+		</li>
+		<li>
+		  <em>联系电话：</em>
+		  <span>{$usershow['phone']}</span>
+		</li>
+		<li>
+		  <em>简介：</em>
+		  <span>{php echo html_entity_decode($usershow['message']);}</span>
+		</li>
+		<li>
+			<em>办理人：</em>
+			<span>{if $profile_t['name']}{$profile_t['name']}{else}<font color="#CC0000">未受理</font>{/if}</span>
+		</li>
+		<li>
+			<em>状态：</em>
+			<span>
+				{if $srdb['paystatus']}
+					已付款，
+					{if $srdb['ygcomplete']}
+						已完成，
+						{if $srdb['pjstate']}已评价
+						{else}<font color="#CC0000">未评价</font>
+						{/if}
+					{else}
+						{if $srdb['yguid']}<font color="#006600">处理中...</font>{else}<font color="#CC0000">未受理</font>{/if}
+					{/if}
+				{else}
+					<font color="#CC0000">未付款</font>
+				{/if}
+			</span>
+		</li>
+	   </ul>
+	 </div>
+	 
+	 <div class="daiban-box">
+		 <div class="box3">
+		   <h3>办理进度</h3>
+		   <div class="txt">
+		   	 {loop $list_progress $value}
+		     <p>
+			  <span>{php echo date('Y-m-d H:i', $value['dateline']);}</span>
+			  <span class="cl">{$value['content']}</span>
+			 </p>
+             {/loop}
+		   </div>
+		 </div>
+	 </div>
+	 
+	 {if $srdb['yguid'] == 0}
+	  <a href="{php echo $this->createMobileUrl('admin_order_fp', array('did' => $srdb[id]));}" class="pagebtn">分配员工办理</a>
+	 {/if}
+   </div>
+  
+</div>
+
+<!--footer star-->
+{template 'admin_footer'}
+</body>
+</html>

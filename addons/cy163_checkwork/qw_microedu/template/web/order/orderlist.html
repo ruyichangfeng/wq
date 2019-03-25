@@ -1,0 +1,307 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .daterange-date { width:40%;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'orderlist'))}">排课表</a>
+        </li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            查询
+            <!--
+            <label class="radio-inline">
+                <input type="radio" name="condition" class="condition-radio" id="Radio1" value="1" checked> 校区
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="condition" class="condition-radio" id="Radio2" value="2"> 教师
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="condition" class="condition-radio" id="Radio3" value="3"> 学员
+            </label>
+            -->
+        </div>
+        <div class="panel-body">
+            <form action="" method="post" class="form-horizontal" role="form">
+                <!--
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <label class="col-lg-1 col-md-1 col-sm-2 col-xs-2 control-label">条件</label>
+                    <input class="form-control" name="condition-input" placeholder="请选择查询条件" value="" style="width:40%;display: inline-block" data-toggle="modal" data-target=".condition1" />
+                </div>
+                -->
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <label class="col-lg-1 col-md-1 col-sm-2 col-xs-2 control-label">条件</label>
+                    <input class="form-control" name="search-condition" value="" style="width:40%;display: inline-block"  />
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <label class="col-lg-1 col-md-1 col-sm-2 col-xs-2 control-label">时间范围</label>
+                    {php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $starttime),'endtime'=>date('Y-m-d', $endtime)));}
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <button class="btn btn-block btn-primary">查看</button>
+                </div>
+                <input type="hidden" name="page" value="orderlist" />
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">排课表</div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:10%;">校区</th>
+                    <th class="text-center" style="width:5%;">教室</th>
+                    <th class="text-center" style="width:5%;">教师</th>
+                    <th class="text-center" style="width:15%;">合同课程名</th>
+                    <th class="text-center" style="width:10%;">开课时间</th>
+                    <th class="text-center" style="width:5%;">时长</th>
+                    <th class="text-center" style="width:10%;">课时类型</th>
+                    <td class="text-center" style="width:10%;">学员数量</th>
+                </tr>
+                </thead>
+                <tbody>
+                {if $schedules}
+                    {loop $schedules $index $schedule}
+                    <tr>
+                        <td class="text-center">{$index}</td>
+                        <td class="text-center">{$schedule['campus_name']}</td>
+                        <td class="text-center">{$schedule['classroom']}</td>
+                        <td class="text-center">{$schedule['tutor_fullname']}</td>
+                        <td class="text-center">{$schedule['contract_name']} - {$schedule['class_name']}</td>
+                        <td class="text-center">{$schedule['timeslot']}</td>
+                        <td class="text-center">{$schedule['duration']}</td>
+                        <td class="text-center">{$schedule['classhour_name']}</td>
+                        <td class="text-center">{$schedule['pupils_count']}</td>
+                    </tr>
+                    {/loop}
+                {else}
+                    <tr><td colspan="9" class="text-center">未找到任何记录</td></tr>
+                {/if}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+<div class="modal fade condition3" tabindex="-1" role="dialog" aria-labelledby="condition1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">筛选学员</h4>
+            </div>
+            <div class="modal-body class-content">
+
+                <form class="form-inline" role="form" style="margin:20px">
+                    <div class="form-group">
+                        <label>学员姓名</label>
+                        <input class="form-control" type="text" />
+                        <label>家长姓名</label>
+                        <input class="form-control" type="text" />
+                        <button class="btn btn-sm btn-primary">查询</button>
+                    </div>
+                </form>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        学员列表
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th class="text-center" style="width:10%;">选择</th>
+                                <th class="text-center" style="width:20%;">学员姓名</th>
+                                <th class="text-center" style="width:20%;">家长姓名</th>
+                                <th class="text-center" style="width:50%;">家长手机号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center"><input name="xy" type="radio" /> </td>
+                                <td class="text-center">李小明</td>
+                                <td class="text-center">李大明</td>
+                                <td class="text-center">13822137768</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"><input name="xy" type="radio" /> </td>
+                                <td class="text-center">李小明</td>
+                                <td class="text-center">李大明</td>
+                                <td class="text-center">13822137768</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-block btn-primary">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade condition2" tabindex="-1" role="dialog" aria-labelledby="condition1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">筛选教师</h4>
+            </div>
+            <div class="modal-body class-content">
+
+                <form class="form-inline" role="form" style="margin:20px">
+                    <div class="form-group">
+                        <label>教师姓名</label>
+                        <input class="form-control" type="text" />
+                        <button class="btn btn-sm btn-primary">查询</button>
+                    </div>
+                </form>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        教师列表
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th class="text-center" style="width:10%;">选择</th>
+                                <th class="text-center" style="width:40%;">教师姓名</th>
+                                <th class="text-center" style="width:50%;">手机号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center"><input name="js" type="radio" /> </td>
+                                <td class="text-center">李小明</td>
+                                <td class="text-center">13822137768</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"><input name="js" type="radio" /> </td>
+                                <td class="text-center">李大明</td>
+                                <td class="text-center">13822137768</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-block btn-primary">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade condition1" tabindex="-1" role="dialog" aria-labelledby="condition2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">筛选校区</h4>
+            </div>
+            <div class="modal-body class-content">
+
+                <form class="form-inline" role="form" style="margin:20px">
+                    <div class="form-group">
+                        <label>校区名称</label>
+                        <input class="form-control" type="text" />
+                        <button class="btn btn-sm btn-primary">查询</button>
+                    </div>
+                </form>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        校区列表
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th class="text-center" style="width:10%;">选择</th>
+                                <th class="text-center" style="width:40%;">校区名称</th>
+                                <th class="text-center" style="width:50%;">校区地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center"><input name="xq" type="radio" /> </td>
+                                <td class="text-center">舜泰广场校区</td>
+                                <td class="text-center">济南市高新区舜泰广场10号楼</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"><input name="xq" type="radio" /> </td>
+                                <td class="text-center">舜泰广场校区1</td>
+                                <td class="text-center">济南市高新区舜泰广场10号楼</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-block btn-primary">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $(".condition-radio").change(
+                function() {
+                    var $selectedvalue = $("input[name='condition']:checked").val();
+                    //alert($selectedvalue);
+                    if ($selectedvalue == 1) {
+                        $("input[name='condition-input']").attr("data-target","condition1");
+                        $("input[name='condition-input']").click(function () {
+                            $('.condition1').modal('show');
+                            $('.condition2').modal('hide');
+                            $('.condition3').modal('hide');
+                        })
+                    }
+                    else if($selectedvalue == 2) {
+                        $("input[name='condition-input']").attr("data-target","condition2");
+                        $("input[name='condition-input']").click(function () {
+                            $('.condition2').modal('show');
+                            $('.condition1').modal('hide');
+                            $('.condition3').modal('hide');
+                        })
+                    }
+                    else {
+                        $("input[name='condition-input']").attr("data-target","condition3");
+                        $("input[name='condition-input']").click(function () {
+                            $('.condition3').modal('show');
+                            $('.condition2').modal('hide');
+                            $('.condition1').modal('hide');
+                        })
+                    }
+                });});
+</script>
+<script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+{template 'common/footer'}

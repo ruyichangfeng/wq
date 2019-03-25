@@ -1,0 +1,115 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+
+
+                <div class="ibox-title">
+                    <h5>计量单位管理</h5>
+
+                </div>
+                <div class="ibox-content">
+
+                    <div class="form-group">
+
+                        <div class="col-sm-3">
+                    <a href="{php echo $this->createWebUrl('goodsunit', array('op' => 'add'));}" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>添加计量单位</a>
+                        </div>
+                        <div class="col-sm-9">
+                    <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="goodsunit" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-4">
+                            <select name="ifIsPackage" class="form-control">
+                                <option value="3" {if $_GPC['ifIsPackage'] == 3 || empty($_GPC['ifSetStore'])}selected{/if}>请选择商品类型</option>
+                                <option value="1" {if $_GPC['ifIsPackage'] == 1}selected{/if}>实物商品</option>
+                                <option value="2" {if $_GPC['ifIsPackage'] == 2}selected{/if}>服务商品</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="keyword" placeholder="输入关键字"/>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                            <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goodsunit')}" >
+                                <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                        </div>
+                    </div>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"> </label>
+                                    </div>
+
+                                </th>
+                                <th>商品计量单位名称</th>
+                                <th>商品计量单位分类</th>
+                                <th>商品计量单位添加时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['gu_name']}</td><!--商品供应商名称-->
+                                <td>{if $item['gu_goodsOrService']==1}<span class="badge badge-primary">实物商品</span>{else}<span class="badge badge-danger">服务商品</span>{/if}</td><!--商品状态-->
+                                <td>{php echo date('Y-m-d H:i:s', $item[gu_addTime]);}</td>   <!--计量单位添加时间-->
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('goodsunit', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('goodsunit',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input name="token" type="hidden" value="{$_W['token']}"/>
+                                    <input type="submit" class="btn btn-danger btn-sm" name="pldelete" value="批量删除"/> &nbsp;
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{template 'web/common/footer'}

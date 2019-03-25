@@ -1,0 +1,90 @@
+{template "base/child_header"}
+<style>
+</style>
+<div class="link">
+    <a href="">请选择:</a>
+</div>
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <tbody class="news_content">
+        {loop $dataList $data}
+        <tr class="tr" data-id="{$data['id']}" data-name="{$data['name']}">
+            <td align="left">{$data['name']}</td>
+            <td align="left">{php echo date("Y-m-d",$data['create_time'])}</td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn save" >选取</button>
+        </div>
+    </div>
+</div>
+<div id="page"></div>
+<script>
+    layui.use(['form','jquery','laypage'], function(){
+
+        var name,mobile;
+        var setting =new Object();
+        var parents = "{$parent}";
+
+        var $ = layui.jquery;
+        var form = layui.form();
+
+        form.on('submit(search)', function(data){
+            name=$("#name").val();
+            url = "{php echo $this->createWebUrl('selectLd')}"+"&name="+name;
+            location.href=url;
+            return false;
+        });
+
+        $("body").on('click','.tr',function(){
+            var id =$(this).attr("data-id");
+            if($(".parent_"+parents).length>0){
+                $(".parent_"+parents).remove();
+            }
+            var ele = "<a href='javascript:'  style='margin-left: 10px;' class='select_"+id+" parent_"+parents+" cats' data-id='"+id+"'>"+$(this).attr("data-name")+"</a>"
+            if($(".select_"+id).length==0){
+                $(".link").append(ele)
+            }
+            //获取下级内容如果存在
+            $.post("{php echo $this->createWebUrl('getHtml')}",{id:id},function(response){
+                if(response.code==0){
+                    return false;
+                }
+                parents = response.parent;
+                $(".news_content").html(response.html);
+            },"json")
+        });
+
+        //分页
+        setting.cont="page";
+        setting.pages="{$totalPage}";
+        setting.curr="{$page}";
+        setting.skip=true;
+        setting.hash="page";
+        setting.jump=function(obj, first){
+            name=$("#name").val();
+            mobile=$("#mobile").val();
+            if(first!=true){
+                url = "{php echo $this->createWebUrl('selectLd')}"+"&name="+name+"&page="+obj.curr;
+                window.location.href =url;
+            }
+        };
+        layui.laypage(setting);
+
+        $(".save").click(function(){
+            var str="";
+            $(".cats").each(function(){
+               str += (str=="")?$(this).text():","+$(this).text();
+            });
+            parent.setS(str);
+        });
+    });
+
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+</script>
+{template "base/child_footer"}

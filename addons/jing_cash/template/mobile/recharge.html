@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>余额</title>
+    <link rel="stylesheet" href="{CSS_PATH}weui.css"/>
+    {php echo register_jssdk()}
+</head>
+<body>
+<style type="text/css">
+    body,html{height:100%;-webkit-tap-highlight-color:transparent}.page,body{background-color:#fbf9fe}.page{overflow-y:auto;-webkit-overflow-scrolling:touch}.hd{padding:2em 0}.page_title{text-align:center;font-size:34px;color:#3cc51f;font-weight:400;margin:0 15%}
+</style>
+<div class="page">
+    <div class="hd">
+        <h1 class="page_title">余额充值</h1>
+    </div>
+    <div class="weui_cells">
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                充值方式
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select class="weui_select" name="select2">
+                    <option value="1">微信支付</option>
+                </select>
+            </div>
+        </div>
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                定额充值
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select class="weui_select" id="rule">
+                    <option value="0">请选择</option>
+                    {loop $rule $row}
+                    <option value="{$row['cz']}">充{$row['cz']}元赠{$row['zs']}元{if $row['fh'] > 1}(分{$row['fh']}个月返还){/if}</option>
+                    {/loop}
+                </select>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">金额</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" placeholder="请输入充值金额" name="money" id="money">
+                <input type="hidden" id="logid">
+            </div>
+        </div>
+    </div>
+    <div class="weui_btn_area">
+        <button class="weui_btn weui_btn_primary weui_btn_disabled" id="btn">立即充值</button>
+    </div>
+</div>
+<script src="{JS_PATH}jquery-1.8.3.min.js"></script>
+<script src="{JS_PATH}weui.js"></script>
+<script type="text/javascript">
+    var flag = 0;
+    $('#money').bind('input propertychange', function() {
+        $('#rule').val($('#money').val());
+        if($(this).val().length > 0){
+            $("#btn").removeClass("weui_btn_disabled");
+            flag = 1;
+        }else{
+            $("#btn").addClass("weui_btn_disabled");
+            flag = 0;
+        }
+    });
+    $('#rule').change(function(event) {
+        $('#money').val($('#rule').val());
+        $("#btn").removeClass("weui_btn_disabled");
+        flag = 1;
+    });
+    $('#btn').click(function() {
+        if (flag == 1) {
+            var money = $("#money").val();
+            var logid = $("#logid").val();
+            $("#btn").addClass("weui_btn_disabled");
+            flag = 0;
+            $.ajax({
+                url: '{php echo $this->createMobileUrl('pay',array('type'=>'wechat','payopenid'=>$payopenid))}',
+                type: 'post',
+                dataType: 'json',
+                data: {money: money,logid:logid},
+                success:function(data){
+                    if (data.status == 1) {
+                        $("#logid").val(data.logid);
+                        WeixinJSBridge.invoke('getBrandWCPayRequest', {
+                            'appId': data.wechat.appid ? data.wechat.appid : data.wechat.appId,
+                            'timeStamp': data.wechat.timeStamp,
+                            'nonceStr': data.wechat.nonceStr,
+                            'package': data.wechat.package,
+                            'signType': data.wechat.signType,
+                            'paySign': data.wechat.paySign,
+                        }, function (res) {
+                            if (res.err_msg == 'get_brand_wcpay_request:ok') {
+                                //支付成功回调
+                                window.location.href = '{php echo $this->createMobileUrl('index')}';
+                            } else if(res.err_msg=='get_brand_wcpay_request:cancel') {
+                                $("#btn").removeClass("weui_btn_disabled");
+                                flag = 1;
+                                Weui.alert({"title":"","content":"取消支付"});
+                            } else {
+                                $("#btn").removeClass("weui_btn_disabled");
+                                Weui.alert({"title":"","content":res.err_msg});
+                                flag = 1;
+                            }
+                        });
+                    }else{
+                        Weui.alert({"title":"","content":data.msg});
+                    }
+                }
+            });            
+        }
+    });
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+        });
+</script>
+</body>
+</html>

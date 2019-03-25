@@ -1,0 +1,98 @@
+{template 'header'}
+<div id="message">
+    <div class="mui-bar mui-bar-tab dialog-input">
+        <div class="mui-col-sm-2 mui-col-xs-2" style="display: inline-table;">
+            <img src="{MODULE_URL}assets/img/dialog-keyboard.png" class="dialog-input-img" />
+        </div>
+        <div class="mui-col-sm-7 mui-col-xs-7" style="display: inline-table;">
+            <input type="text" class="mui-input-row" id="val" placeholder="说点什么吧" />
+            <input type="hidden" id="id" value="{$from_user}" />
+        </div>
+        <div class="mui-col-sm- mui-col-xs-2 mui-text-center" style="display: inline-table;">
+            <a href="javascript:sub();" class="btn-save" style="width:100%;">发送</a>
+        </div>
+        <div class="mui-clearfix"></div>
+    </div>
+    <script type="text/javascript">
+        function sub()
+        {
+            var val = $('#val').val();
+            var id = $('#id').val();
+            if(val)
+            {
+                $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'send_message')) ?>", {
+                    id : id,
+                    val : val
+                }, function (response)
+                {
+                    if(response.status == 'success')
+                    {
+                        mui.alert('发送成功', function () {
+                            window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'message','id' => $from_user)); ?>";
+                        });
+                    }
+                    else
+                    {
+                        mui.alert('发送失败，请重试！');
+                    }
+                }, "json");
+            }
+            else
+            {
+                mui.alert('不能发送空消息');
+            }
+        }
+    </script>
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">在线咨询</h1>
+    </div>
+    <div class="mui-content">
+        <div class="jiazhang-dialog">
+
+            {if count($message_list)}
+                {loop $message_list $i $m}
+                    {if $m['to_user'] == $user_id}
+                        <div class="jiazhang-dialog-title">{$m['sendtime']}</div>
+                        <div class="mui-pull-left">
+
+                            {if $m['avatar']}
+                                <img src="{$m['avatar']}" class="kehu-img" /></div>
+                            {else}
+                                <img src="https://v.wx-oa.com/addons/qw_microedu/assets/img/icon-wzj.png" class="kehu-img" /></div>
+                            {/if}
+                        <div class="dialog dialog-zixun">
+                            <img src="{MODULE_URL}assets/img/jiazhang-dialogbg.png" class="dialog-img" />
+                            <div class="dialog-header dialog-left"></div>
+                            <div class="dialog-content dialog-left">
+                                <span>{$m['content']}</span>
+                            </div>
+                            <div class="dialog-footer dialog-left"></div>
+                        </div>
+                        <div class="mui-clearfix"></div>
+                    {else}
+                        <div class="jiazhang-dialog-title">{$m['sendtime']}</div>
+                        <div class="mui-pull-left mui-text-right dialog-reply">
+                            <img src="{MODULE_URL}assets/img/jiazhang-dialogbg-right.png" class="dialog-img-right" />
+                            <div class="dialog-header dialog-right"></div>
+                            <div class="dialog-content dialog-right">
+                                <span>{$m['content']}</span>
+                            </div>
+                            <div class="dialog-footer dialog-right"></div>
+                        </div>
+                        <div class="dialog dialog-zixun-right">
+                            <img src="{$_W['fans']['tag']['avatar']}" class="kehu-img" />
+                        </div>
+                        <div class="mui-clearfix"></div>
+                    {/if}
+                {/loop}
+            {else}
+                <div class="jiazhang-dialog-title">暂无消息</div>
+            {/if}
+
+        </div>
+    </div>
+</div>
+{template 'footer'}

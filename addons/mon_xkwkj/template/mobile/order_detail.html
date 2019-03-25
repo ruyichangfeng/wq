@@ -1,0 +1,180 @@
+<!DOCTYPE html><html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>订单详情</title>
+    <link rel="stylesheet" type="text/css" href="{MON_XKWKJ_RES}css/newActivity.53.min.css?v=20170605" />
+    <script src="{MON_XKWKJ_RES}js/jquery_min.js" type="text/javascript"></script>
+    {template 'message'}
+</head>
+<body class="save"><link href="{MON_XKWKJ_RES}css/shop_header.css?v=20170605" rel="stylesheet" type="text/css">
+<section class="shop_header clearfix">
+    <a href="javascript:history.back(-1);"><span id="shop_header_back">&nbsp;</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <!--<span id="shop_header_more"><a></a><a></a><a></a></span>-->
+</section>
+<div id="shop_header_list" style="display:none">
+    <!--<ul>-->
+        <!--<li><a href="plugin.php?id=tom_shop&amp;mod=index">首 页</a></li>-->
+        <!--<li><a href="plugin.php?id=tom_pintuan&amp;mod=index">拼团商城</a></li>-->
+        <!--<li><a href="plugin.php?id=tom_weikanjia&amp;mod=index">砍价商城</a></li>-->
+        <!--<li><a href="plugin.php?id=tom_coupon&amp;mod=index">优惠券</a></li>-->
+    <!--</ul>-->
+</div>
+<script language="javascript">
+    var show_list_tab = 0;
+    $("#shop_header_more").click( function (){
+        if(show_list_tab == 1){
+            show_list_tab = 0;
+            $("#shop_header_list").hide();
+        }else{
+            show_list_tab = 1;
+            $("#shop_header_list").show();
+        }
+    });
+</script>
+<div class="payment gyPageSHow">
+
+    <div class="buy_take_type_choose" style="display: block;">
+        <a href="javascript:void(0)">{if $lq_type == $this::LQ_TYPE_KD}快递送货{/if}{if $lq_type == $this::LQ_TYPE_ZT}到店取货{/if}</a>
+    </div>
+
+    <div class="payDetail">
+        <p class="shangPinInfo">商品信息：</p>
+        <div class="goodsInfo clearfix">
+            <div class="leftImg">
+                <a href="{php echo $this->createMobileUrl ( 'auth',array('kid'=>$xkwkj['id'],'au'=>Value::$REDIRECT_USER_INDEX))}">
+                    <img class="img-responsive" src="{php echo MonUtil::getpicurl($goods['p_preview_pic'])}" /></a>
+            </div>
+            <div class="rightText">
+                <strong>{$goods['p_name']}</strong>
+                <p style="color: #908E8E;font-size: 12px;">
+                    {$xkwkj['title']}
+                </p>
+            </div>
+        </div>
+
+        <div class="truePayment">
+            <p class="shifukuan clearfix"><span class="leftK">配送方式：</span><span class="rightK"> {if $lq_type == self::LQ_TYPE_KD}快递送货{/if}{if $lq_type == self::LQ_TYPE_ZT}到店提货{/if}</span></p>
+            <p class="shifukuan clearfix"><span class="leftK">砍后价：</span><span class="rightK">￥{$orderInfo['kh_price']}</span></p>
+            <p class="shifukuan clearfix"><span class="leftK">快递费：</span><span class="rightK">￥{$orderInfo['yf_price']}</span></p>
+        </div>
+        <p class="shiFuKuan">实付款：<span class="Jiage" id="payPrice">￥{$orderInfo['total_price']}</span></p>
+
+
+
+        <div id="addressK" class="addressK" >
+            <div class="leftK">收货方式</div>
+            <p class="shuxian"></p>
+            <div class="rightK gyDizhiK" id="addressMain">
+                <p><span class="wkj_name">{$orderInfo['uname']}</span><a href="javascript:;" class="wkj_cellphone">{$orderInfo['tel']}</a></p>
+                {if  $lq_type == self::LQ_TYPE_KD}
+                    <p class="wkj_address">地址：{$orderInfo['address']}</p>
+                {/if}
+
+
+                <p class="wkj_address">备注:{$orderInfo['remark']}</p>
+
+                {if  $lq_type == self::LQ_TYPE_ZT}
+                   <span style="color: #999">自提地址：{$xkwkj['zt_address']}</span>
+                {/if}
+            </div>
+        </div>
+
+        <div class="dibuwenlu">
+            <img class="img-responsive" src="{MON_XKWKJ_RES}images/dibuwenlu.jpg" />
+        </div>
+    </div>
+    <div class="payConfirm">
+        <div class="zhiFuButton fail" id="zhiFuButtonYi">
+            <div class="styleButtonYi">
+                <div>
+
+                    {if $xkwkj['pay_type'] == 2  && $orderInfo['status']== $this::$KJ_STATUS_XD}
+                       <a href="javascript:void;" class="id_pay_btn"><span>下单成功</span></a>
+                    {/if}
+
+                    {if $orderInfo['status'] == $this::$KJ_STATUS_XD &&  $xkwkj['pay_type'] == 1 }
+                        <a href="javascript:callpay();" class="id_pay_btn"><img src="{MON_XKWKJ_RES}images/weixinLog.png"/><span>微信支付</span></a>
+                    {/if}
+
+                    {if $orderInfo['status']!= $this::$KJ_STATUS_XD}
+                         <a href="javascript:;" ><span>{php echo $this->getOrderStatus($orderInfo['status'],  $xkwkj['pay_type'])}</span></a>
+                    {/if}
+
+                </div>
+
+
+                {if $xkwkj['hx_enabled']}
+                    <div class="styleButtonYi" style="margin-top: 20px">
+                        <a href="{php echo $this->createMobileUrl('Qrcode',array('oid'=>$orderInfo['id']))}" ><span>核销二维码</span></a>
+                   </div>
+                {/if}
+
+
+            </div>
+        </div>
+
+    </div>
+    <div id="zhegaik" class="zhegaik"></div>
+</div>
+
+
+</body>
+
+<script type="text/javascript">
+
+
+
+
+    //调用微信JS api 支付
+    function jsApiCall() {
+
+
+
+        WeixinJSBridge.invoke(
+                'getBrandWCPayRequest',
+        <?php echo $jsApiParameters; ?>,
+        function (res) {
+            if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+
+                layer.open({
+                    content: '恭喜您支付成！'
+                    ,btn: ['确定']
+                    ,yes: function(index){
+                        layer.close(index);
+                        pay = true;
+                        $(".id_pay_btn").html("支付成功！");
+                    }
+                });
+                return ;
+
+            } else{
+                //alert(res.err_code+res.err_desc+res.err_msg);
+            }
+
+
+        });
+    }
+
+    var pay = false;
+    function callpay() {
+        if (pay) return ;
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+            }
+        } else {
+            jsApiCall();
+        }
+    }
+
+
+</script>
+
+
+</html>

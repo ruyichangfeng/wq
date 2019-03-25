@@ -1,0 +1,105 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>会员优惠券管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('couponmarket', array('op' => 'list'))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;">
+                                筛选条件 ↓
+                            </a>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                <input type="hidden" name="c" value="site" />
+                                <input type="hidden" name="a" value="entry" />
+                                <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                                <input type="hidden" name="do" value="couponmarket" />
+                                <input type="hidden" name="op" value="list" />
+                                <div class="form-group">
+                                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">活动名称</label>
+                                    <div class="col-sm-7 col-lg-8 col-xs-12">
+                                        <input class="form-control" name="titlselect" type="text" value="{$_GPC['title']}">
+                                    </div>
+                                    <div class="pull-right col-lg-2">
+                                        <input type="submit" name="submit" class="btn btn-default" value="搜索">
+                                        <input type="hidden" name="token" value="{$_W['token']}">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+                    <a href="{php echo $this->createWebUrl('couponmarket', array('op' => 'add'));}" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>添加活动</a>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th>缩略图</th>
+                                <th>活动名</th>
+                                <th>发放用户</th>
+                                <th>活动状态</th>
+                                <th style="width:300px;">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td><img src="{php echo tomedia($item['act_thumb'])}" width="40"></td>
+                                <td>{$item['act_title']}</td>
+                                {if $item['act_issuetype'] == 1}
+                                <td> <span class="badge badge-primary">新用户</span></td>
+                                {elseif $item['act_issuetype'] == 2}
+                                <td> <span class="badge badge-primary">老用户</span></td>
+                                {elseif $item['act_issuetype'] == 3}
+                                <td> <span class="badge badge-primary">活跃用户</span></td>
+                                {elseif $item['act_issuetype'] == 4}
+                                <td> <span class="badge badge-primary">沉寂用户</span></td>
+                                {elseif $item['act_issuetype'] == 5}
+                                <td> <span class="badge badge-primary">会员组</span></td>
+                                {elseif $item['act_issuetype'] == 6}
+                                <td> <span class="badge badge-primary">消费时间</span></td>
+                                {elseif $item['act_issuetype'] == 7}
+                                <td> <span class="badge badge-primary">指定的粉丝</span></td>
+                                {else}
+                                <td> <span class="badge badge-success">粉丝自领</span></td>
+                                {/if}
+                                <td>{if time() > $item['act_endtime']}
+                                    <span class="label label-danger">过期</span>
+                                    {else}
+                                    <span class="label label-warning">正常</span>
+                                    {/if}</td>
+                                <td>
+                                    <a href="{php echo $this->createWeburl('couponmarket', array('op' => 'add', 'id' => $item['id']))}" class="btn btn-outline btn-primary">查看详情</a>
+                                    <a class="btn btn-danger" href="{php echo $this->createWeburl('couponmarket', array('op' => 'delete', 'id' => $item['id']))}" onclick="return confirm('确定删除活动吗？');return false;">删除</a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{template 'web/common/footer'}

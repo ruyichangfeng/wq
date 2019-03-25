@@ -1,0 +1,65 @@
+{template 'public/header'}
+
+<body data-spy="scroll" data-target="#myScrollspy">
+<div class="ub ub-ver page"><!--添加收货地址-->
+  <a class="ubb b-bla01 c-wh uinn212 umar-b1 ub-f1 ub ub-ac ub-pc" href="{php echo $this->createMobileUrl('address', array('foo'=>'add'))}">
+    <div class="ub-f1"><i class="iconfont icon-jia umar-r"></i> 添加收货地址</div>
+    <div class="ub"><i class="iconfont icon-xiangyou t-dgra"></i></div>
+  </a>
+  
+  {if $list[0]['id'] == ''}
+    <div class="weui_msg">
+      <div class="weui_icon_area">
+        <i class="weui_icon_msg weui_icon_warn"></i>
+      </div>
+      <div class="weui_text_area">
+        <h2 class="weui_msg_title">你还没有地址，请添加地址</h2>
+      </div>
+    </div>
+  {else} 
+  <div class="ub ub-ver ubt b-bla01 c-wh"><!--收货地址列表-->
+    {loop $list $vo}
+    <div class="ub-f1 ub ub-ac ub-pc uinn11 ubb b-bla01">
+     <div class="ub-f1 t-line18 ubr b-bla01 umar-l">
+      <p>{$vo[realname]} {if $vo[sex] == 1}先生{else}女士{/if} {$vo[mobile]}</p> 
+      <p>{$vo[adr_city]}{$vo[adr_room]}</p>
+      {if $vo[type] == 1}
+      <p class="ulev-2 t-org"><i class="iconfont icon-gantanhao"></i> 默认地址</p>
+      {/if}
+     </div>
+     <div class="ub ub-ac uinn12">
+      <a href="{php echo $this->createMobileUrl('address', array('foo'=>'add', 'id'=>$vo['id']))}"><i class="iconfont icon-xiugai t-blu ulev1"></i></a><br>
+      <a onclick="del({$vo['id']})"><i class="iconfont icon-delete t-org ulev1"></i></a>
+     </div>
+    </div>
+    {/loop}
+  </div>
+  {/if}
+
+</div>   
+
+{template 'public/footerjs'}
+<script type="text/javascript">
+function del(id){
+  if(window.confirm('你确定要删除该地址吗？')){
+    $.ajax({
+      url: "{php echo $this->createMobileUrl('address', array('foo'=>'delete'));}",
+      type:"POST",
+      data:{"id":id},
+      dataType:"json",
+      success: function(res){
+        if(res == "1"){
+          window.location.reload();
+        }else{
+          alert('删除失败！');
+          return false;
+        }
+      }
+    });
+  }else{
+    return false;
+  }
+}
+</script>
+</body>
+</html>

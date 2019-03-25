@@ -1,0 +1,161 @@
+{template 'public/header'}
+{template 'public/comhead'}
+
+{if $operation == 'display'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-heading">筛选</div>
+        <div class="table-responsive panel-body">
+            <form action="./index.php" method="get" class="navbar-form navbar-left" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="dh_task" />
+                <input type="hidden" name="do" value="points_record" />
+                <input type="hidden" name="op" value="display" />
+                <input type="hidden" name="storeid" value="{$storeid}" />
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="用户名称" name="username">
+                </div>
+                <button class="btn btn-success"><i class="fa fa-search"></i> 搜索</button>
+            </form>
+        </div>
+    </div>
+    <form action="" method="post" class="form-horizontal form" >
+        <div class="panel panel-default">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover" style="">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:12%;">记录id</th>
+                        <th style="width:12%;">用户</th>
+                        <th style="width:12%;">{php echo $this->getSetting('points_name');}</th>
+                        <th style="width:22%;">描述</th>
+                        <th style="width:22%;">时间</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $item}
+                    <tr>
+                        <td style="white-space:normal;">{$item['id']}</td>
+                        <td>{if $item['username']}{$item['username']}{else}{$item['nickname']}{/if}</td>
+                        <td>
+                            {if $item['points_income'] >= 0}
+                                <span class="label label-info">+{$item['points_income']}</span>
+                            {elseif $item['points_income'] < 0}
+                                <span class="label label-danger">{$item['points_income']}</span>
+                            {/if}
+                        </td>
+                        <td>{$item['points_desc']}</td>
+                        <td>
+                            {php echo date('Y-m-d H:i:s', $item['points_time'])}
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {$pager}
+</div>
+{elseif $operation == 'post'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-warning" href="{php echo $this->createWebUrl('fans', array('op' => 'display', 'storeid' => $storeid))}">返回会员管理
+            </a>
+        </div>
+    </div>
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="invitative">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                任务审核信息
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务领取ID</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            {$item['id']}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务领取人</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            {$item['user_id']}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务名称</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            {$item['task_id']}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务类型</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            {$item['task_type']}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务领取时间</label>
+                    <div class="col-sm-9">
+                        <div style="margin-top: 6px;">{php echo date('Y-m-d H:i:s', $item['receive_time'])}</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务凭证</label>
+                    <div class="col-sm-9">
+                        <?php echo tpl_ueditor("prove",htmlspecialchars_decode($item['prove'])) ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务评语</label>
+                    <div class="col-sm-9">
+                        <textarea  class="form-control" name="evaluate"  id="task_desc">{$item['evaluate']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">任务额外{php echo $this->getSetting('points_name');}</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="points" value="{$item['points']}" id="points" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">审核状态</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="0" {if $item['status']==0 || empty($item['status'])}checked{/if} />未审核
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="1" {if $item['status']==1}checked{/if} />审核通过
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="status" value="2" {if $item['status']==2}checked{/if} />审核失败
+                        </label>
+                    </div>
+                </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="保存设置" class="btn btn-primary col-lg-3"/>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function check() {
+        if($.trim($('#username').val()) == '') {
+            message('没有输入姓名.', '', 'error');
+            return false;
+        }s
+        return true;
+    }
+</script>
+{/if}
+{template 'common/footer'}

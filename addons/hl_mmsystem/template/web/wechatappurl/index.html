@@ -1,0 +1,128 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>微信端入口设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('WechatAppUrl')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-lg fa-chain" style="color: #ed8902"></i>入口链接</a>
+                                    </li>
+                                    <!--<li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"><i class="fa fa-lg fa-gg-circle" style="color: #e10c14"></i>关键词入口</a>-->
+                                    <!--</li>-->
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <form>
+                                                <div class="form-group">
+                                                    <div class="col-sm-6"style="text-align:center">
+                                                    <label >会员入口专属二维码</label>
+                                                    </div>
+                                                        <div class="col-sm-6"style="text-align:center">
+                                                    <label >商户入口专属二维码</label>
+                                                        </div>
+                                                    </div>
+                                                <div class="form-group">
+                                                    <div class="col-sm-6"style="text-align:center">
+                                                            <img src="{$_W['siteroot']}addons/hl_mmsystem/data/substoreqrcode/substore-{php echo $_W['substoreid']}.png" style="height: 249px;width: 249px"/>
+                                                    </div>
+                                                    <div class="col-sm-6"style="text-align:center">
+                                                            <img src="{$_W['siteroot']}addons/hl_mmsystem/data/substoreqrcode/Sellerhome-{php echo $_W['substoreid']}.png" style="height: 249px;width: 249px"/>
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+
+                                                    <div class="col-sm-6"style="text-align:center">
+                                                           <a class="btn btn-info btn-sm" href="{$_W['siteroot']}addons/hl_mmsystem/data/substoreqrcode/substore-{php echo $_W['substoreid']}.png"  target="_blank" download="{$setStoreData['set_storeName']}" ><i class="fa fa-pencil"></i> 下载会员入口专属二维码 </a>
+                                                    </div>
+                                                    <div class="col-sm-6"style="text-align:center">
+                                                           <a class="btn btn-info btn-sm" href="{$_W['siteroot']}addons/hl_mmsystem/data/substoreqrcode/Sellerhome-{php echo $_W['substoreid']}.png"  target="_blank" download="（商户）{$setStoreData['set_storeName']}"><i class="fa fa-pencil"></i> 下载商户入口专属二维码 </a>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function btn_showReadCard() {
+        swal({
+                title: "粉丝openid",
+                text: "请输入：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入openid"
+            },
+            function(inputOpenIdValue){
+                if (inputOpenIdValue === false) return false;
+
+                if (inputOpenIdValue === "") {
+                    swal.showInputError("openid不能为空！");
+                    return false
+                }
+                var setadministratoropenid = inputOpenIdValue;
+                var url = "{php echo $this->createWebUrl('member', array('op' => 'setadministratoropenidtesting'))}";
+                var params = {
+                    'setadministratoropenid': setadministratoropenid,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "查找失败",
+                                text: "openid不存在或有误！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                        else {
+                            swal({
+                                title: "修改成功",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            });
+                            $("#openidlist").attr("value",data['message']['openid']);
+                            $("#memmemberName").attr('value',data['message']['mem_memberName']);
+
+                        }
+                    },error: function (data){
+                        alert(JSON.stringify(data));
+                        swal({
+                            title: "失败",
+                            text: "openid不存在或有误！",
+                            confirmButtonText: "确定",
+                            type: "error",
+                        });
+                    }
+
+                });
+            });
+
+    }
+</script>
+{template 'web/common/footer'}

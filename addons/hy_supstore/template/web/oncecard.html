@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('oncecard')}">次卡管理</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('oncecard', array('op'=>'add'))}">增加次卡</a>
+    </div>
+    {if $op == 'list'}
+    <style>
+    .layui-table td {
+        text-align: center
+    }
+    .store-box.off{
+        max-width: 156px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .store-box.on{
+        max-width: 156px;
+        height: 100px;
+    }
+    @media screen and (max-width:1200px) {
+        .store-box.off{
+            max-width: 100px;
+        }
+        .store-box.on{
+            max-width: 100px;
+        }
+        .layui-btn.layui-btn-danger{
+            margin-left: 0!important;
+        }
+    }
+    </style>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>名称</th>
+                <th>所属门店</th>
+                <th>使用次数</th>
+                <th>启用时间</th>
+                <th>启用类型</th>
+                <th>有效期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $tag}
+            <tr>
+                <td>{$tag['id']}</td>
+                <td>{$tag['title']}</td>
+                <td class="store-box off">{$tag['storename']}</td>
+                <td>{if $tag['number']==0}无限制{else}{$tag['number']}次{/if}</td>
+                <td>{php echo date('Y-m-d H:i:s', $tag['addtime'])}</td>
+                <td>{if $tag['expire_type']==1}相对有效期{else}固定有效期{/if}</td>
+                <td>{$tag['expire_time']}{if $tag['daytype']==1}天{else}月{/if}</td>
+                <td>{if $tag['status']==1}
+                    <green>启用</green>{else}
+                    <red>停用</red>{/if}</td>
+                <td>
+                    <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('oncecard', array('op' => 'update','id' =>$tag['id']))}">编辑</a> {if $tag['isdefault']==0}
+                    <a class="layui-btn layui-btn-sm layui-btn-danger item-action-delete" href="{php echo $this->createWebUrl('oncecard', array('op'=>'delete','id'=>$tag['id']))}">删除</a> {/if}
+                </td>
+            </tr>
+            {/loop}
+            {if empty($list)}
+            <tr>
+                <td colspan="9" style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+    <script>
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+            var $ = layui.jquery;
+
+        $('.item-action-delete').click(function() {
+            var href = $(this).attr('href');
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+            return false;
+        });
+        //店铺名称展开关闭
+        $('.store-box').on('click',function(){
+            var str = $(this).html();
+            if(str.length>25){
+                if($(this).hasClass('off')){
+                    $(this).removeClass('off').addClass('on');
+                }else{
+                    $(this).removeClass('on').addClass('off');
+                }
+            }
+        });
+    });
+    </script>
+    {elseif $op == 'add'}
+    <form action="" method="post" id="formAdd" class="layui-form" enctype="multipart/form-data">
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 名称：</label>
+            <div class="layui-input-inline" style="width: 400px;">
+                <input class="layui-input" type="text" name="title" required lay-verify="required" id="title" placeholder="请在此输入名称">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 适用门店：</label>
+            <div class="layui-input-block">
+                <input name="storeid[]" class="selectStore" lay-filter="allStore" lay-skin="primary" title="全部门店" type="checkbox" value="all" id="allStore">
+                <br>
+                {loop $storelists $item}
+                <input name="storeid[]" class="selectStore" lay-skin="primary" lay-filter="store" title="{$item['title']}" type="checkbox" value="{$item['id']}"> 
+                {/loop}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 次数：</label>
+            <div class="layui-input-inline" style="width: 200px;">
+                <input class="layui-input" type="number" name="number" id="number" placeholder="请在此输入可用次数">
+            </div>
+            <div class="layui-form-mid layui-word-aux">留空或填0则无限制</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> 启用时间：</label>
+            <div class="layui-input-inline" style="width: 200px;">
+                <input class="layui-input" type="text" required lay-verify="required" name="addtime" id="addtime">
+            </div>
+            <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-block">
+                <label class="layui-form-label">有效期：</label>
+                <div class="layui-input-inline" style="width: 120px;">
+                    <select name="expire_type" lay-filter="selecttype">
+                        <option value="1">相对有效期</option>
+                        <option value="2">固定有效期</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline widthauto" id="expire1">
+                    <span class="inlineblock">领取</span>
+                    <input name="expire_time1" class="layui-input width100" type="text">
+                    <div class="layui-input-inline" style="width: 60px; display:inline-block; float:none">
+                        <select name="daytype1">
+                            <option value="1">天</option>
+                            <option value="2">月</option>
+                        </select>
+                    </div>
+                    <span class="inlineblock">后过期</span>
+                </div>
+                <div class="layui-input-inline widthauto" id="expire2" style="display: none;">
+                    <span class="inlineblock">从启用之日算起</span>
+                    <input name="expire_time2" class="layui-input width100" type="text" required lay-verify="required">
+                    <div class="layui-input-inline" style="width: 60px; display:inline-block; float:none">
+                        <select name="daytype2">
+                            <option value="1">天</option>
+                            <option value="2">月</option>
+                        </select>
+                    </div>
+                    <span class="inlineblock">内有效</span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">说明：</label>
+            <div class="layui-input-inline" style="width:400px;">
+                <textarea name="content" placeholder="请输入内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+                <input name="status" value="1" title="启用" type="radio" checked>
+                <input name="status" value="0" title="停用" type="radio">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+    <script>
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element','laydate'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, 
+            laydate = layui.laydate,
+            element = layui.element;
+
+        form.on('select(selecttype)', function(data) {
+            if (data.value == 2) {
+                $('#expire1').hide();
+                $('#expire2').show();
+            } else {
+                $('#expire1').show();
+                $('#expire2').hide();
+            }
+        });
+
+        //全选
+        //委托人费用全选
+        form.on('checkbox(allStore)', function(data) {
+            var a = data.elem.checked;
+            if (a == true) {
+                $(".selectStore").prop("checked", true);
+                form.render('checkbox');
+            } else {
+                $(".selectStore").prop("checked", false);
+                form.render('checkbox');
+            }
+
+        });
+        //委托人费用有一个未选中全选取消选中
+        form.on('checkbox(store)', function(data) {
+            var item = $(".selectStore");
+            for (var i = 0; i < item.length; i++) {
+                if (item[i].checked == false) {
+                    $("#allStore").prop("checked", false);
+                    form.render('checkbox');
+                }
+            }
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#addtime',
+            format: 'yyyy-MM-dd HH:mm:ss'
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function(data) {
+            $('#formAdd').submit();
+        });
+    });
+    </script>    
+    {elseif $op == 'update'}
+    <form action="" method="post" id="formUpdate" class="layui-form" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}">
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 名称：</label>
+            <div class="layui-input-inline" style="width: 400px;">
+                <input class="layui-input" type="text" name="title" id="title" value="{$item['title']}" placeholder="请在此输入名称">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 适用门店：</label>
+            <div class="layui-input-block">
+                <input name="storeid[]" class="selectStore" lay-filter="allStore" lay-skin="primary" title="全部门店" type="checkbox" value="all" id="allStore" {if $item['storeid']=='all'}checked{/if}>
+                <br>
+                {loop $storelists $itemstore}
+                <input name="storeid[]" class="selectStore" lay-skin="primary" lay-filter="store" title="{$itemstore['title']}" type="checkbox" value="{$itemstore['id']}" {if $storeids}{if in_array($itemstore['id'],$storeids) }checked="checked"{/if}{/if}{if $item['storeid']=='all'}checked="checked"{/if}>
+                {/loop}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 次数：</label>
+            <div class="layui-input-inline" style="width: 200px;">
+                <input class="layui-input" type="text" name="number" id="number" value="{$item['number']}" placeholder="请在此输入可用次数">
+            </div>
+            <div class="layui-form-mid layui-word-aux">留空或填0则无限制</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> 启用时间：</label>
+            <div class="layui-input-inline" style="width: 200px;">
+                <input class="layui-input" type="text" name="addtime" id="addtime" value="{php echo date('Y-m-d H:i:s', $item['addtime'])}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-block">
+                <label class="layui-form-label">有效期：</label>
+                <div class="layui-input-inline" style="width: 120px;">
+                    <select name="expire_type" lay-filter="selecttype">
+                        <option value="1" {if $item[ 'expire_type']==1} selected{/if}>相对有效期</option>
+                        <option value="2" {if $item[ 'expire_type']==2} selected{/if}>固定有效期</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline widthauto" id="expire1">
+                    <span class="inlineblock">领取</span>
+                    <input name="expire_time1" class="layui-input width100" type="text" value="{$item['expire_time']}">
+                    <div class="layui-input-inline" style="width: 60px; display:inline-block; float:none">
+                        <select name="daytype1">
+                            <option value="1" {if $item[ 'daytype']==1} selected{/if}>天</option>
+                            <option value="2" {if $item[ 'daytype']==2} selected{/if}>月</option>
+                        </select>
+                    </div>
+                    <span class="inlineblock">后过期</span>
+                </div>
+                <div class="layui-input-inline widthauto" id="expire2">
+                    <span class="inlineblock">从启用之日算起</span>
+                    <input name="expire_time2" class="layui-input width100" type="text" value="{$item['expire_time']}">
+                    <div class="layui-input-inline" style="width: 60px; display:inline-block; float:none">
+                        <select name="daytype2">
+                            <option value="1" {if $item[ 'daytype']==1} selected{/if}>天</option>
+                            <option value="2" {if $item[ 'daytype']==2} selected{/if}>月</option>
+                        </select>
+                    </div>
+                    <span class="inlineblock">内有效</span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">说明：</label>
+            <div class="layui-input-inline" style="width:400px;">
+                <textarea name="content" placeholder="请输入内容" class="layui-textarea">{$item['content']}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+                <input name="status" value="1" title="启用" {if $item[ 'status']==1}checked="" {/if} type="radio">
+                <input name="status" value="0" title="停用" {if $item[ 'status']==0}checked="" {/if} type="radio">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+    <script>
+    var $selecttype = '{$item["expire_type"]}';
+    if ($selecttype == 2) {
+        $("#expire1").hide();
+        $("#expire2").show();
+    } else {
+        $("#expire1").show();
+        $("#expire2").hide();
+    }
+
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate,
+            element = layui.element;
+
+        form.on('select(selecttype)', function(data) {
+            if (data.value == 2) {
+                $('#expire1').hide();
+                $('#expire2').show();
+            } else {
+                $('#expire1').show();
+                $('#expire2').hide();
+            }
+        });
+
+        //全选
+        //委托人费用全选
+        form.on('checkbox(allStore)', function(data) {
+            var a = data.elem.checked;
+            if (a == true) {
+                $(".selectStore").prop("checked", true);
+                form.render('checkbox');
+            } else {
+                $(".selectStore").prop("checked", false);
+                form.render('checkbox');
+            }
+
+        });
+        //委托人费用有一个未选中全选取消选中
+        form.on('checkbox(store)', function(data) {
+            var item = $(".selectStore");
+            for (var i = 0; i < item.length; i++) {
+                if (item[i].checked == false) {
+                    $("#allStore").prop("checked", false);
+                    form.render('checkbox');
+                }
+            }
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#addtime',
+            format: 'yyyy-MM-dd HH:mm:ss'
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function(data) {
+
+            if (data.field.title == "") {
+                layer.msg('必须填写名称');
+                return false;
+            }
+            $('#formUpdate').submit();
+        });
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

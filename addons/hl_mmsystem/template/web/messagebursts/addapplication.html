@@ -1,0 +1,405 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="col-sm-8" style="margin-top: 10px;">
+                                        <form action="" method="post" class="form-horizontal form" >
+                                            <input type="hidden" name="tp_id" value="{$list['id']}" />
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label must">
+                                                    模板名称
+                                                </label>
+                                                <div class="col-sm-11 col-xs-12">
+                                                    <input type="text" id="tp_title" name="tp_title" class="form-control" value="{$list['mt_title']}" placeholder="模版名称，示例：会员充值满100送100群发（自定义）" data-rule-required='true' />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label must">
+                                                    模板消息ID
+                                                </label>
+                                                <div class="col-sm-11 col-xs-12">
+                                                    <input type="text" id="tp_template_id" name="tp_template_id" class="form-control" value="{$list['mt_template_id']}" placeholder="模版消息ID，示例：Zs0fjQeatSa5ZwKlzRE4zztuS9ngRFkN8jYD151CNwc" data-rule-required='true'/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label must">
+                                                    头部标题
+                                                </label>
+                                                <div class="col-sm-10 title" style='padding-right:0'>
+                                                    <textarea name="tp_first" class="form-control" value="" data-rule-required='true' placeholder="{{first.DATA}}">{$list['mt_first']}</textarea>
+                                                    <span class='help-block'>
+						对填充模板 {{first.DATA}} 的值
+					</span>
+                                                </div>
+                                                <div class="col-sm-1" style='padding-left:0;'>
+                                                    <input type="color" name="firstcolor" value="{$list['mt_firstcolor']}" style="width:32px;height:32px;" />
+                                                </div>
+                                            </div>
+                                            {loop $data $list2}
+                                            {template 'web/messagebursts/template-tpl'}
+                                            {/loop}
+                                            <div id="type-items"></div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label"></label>
+                                                <div class="col-sm-11 col-xs-12">
+                                                    <a class="btn btn-default btn-add-type" href="javascript:;" onclick="addType();"><i class="fa fa-plus" title=""></i> 增加一条键</a>
+                                                    <span class='help-block'></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">
+                                                    尾部描述
+                                                </label>
+                                                <div class="col-sm-10 title" style='padding-right:0'>
+                                                    <textarea name="tp_remark" class="form-control" placeholder="{{remark.DATA}}">{$list['mt_remark']}</textarea>
+                                                    <span class='help-block'>
+						填充模板 {{remark.DATA}} 的值
+					</span>
+                                                </div>
+                                                <div class="col-sm-1" style='padding-left:0;'>
+                                                    <input type="color" name="remarkcolor" value="{$list['mt_remarkColor']}" style="width:32px;height:32px;" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">
+                                                    消息链接
+                                                </label>
+                                                <div class="col-sm-11 col-xs-12">
+                                                    <!--input type="text" name="tp_url" class="form-control" value="{$list['url']}" placeholder="" id="tpl_url" /-->
+                                                    {php echo my_tpl_form_field_link("tp_url", $list['mt_url'])}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">
+                                                </label>
+                                                <div class="col-sm-11 col-xs-12">
+                                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                                    <input type="submit" name="submit" value="提交" class="btn btn-primary" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-sm-4" style="margin-top: 10px;">
+                                        <div class="col-sm-12">
+                                            <span class='pull-left'>
+        <a class="btn btn-info" href="{php echo $this->createWebUrl('messagemobanaddmanage')}"><i class='fa fa-mail-reply-all'></i> 返回模板列表</a>
+		<a class='btn btn-warning' href="javascript:;" onclick="help()"><i class='fa fa-question-circle'></i> 简易帮助</a>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="panel panel-primary">
+                                                <div class="panel-heading">
+                                                    <span style="font-size: 15px"></span>
+                                                    快速添加模板
+                                                </div>
+                                                <div class="panel-body">
+                                                    <input type="text" id="tempcode" class="form-control" placeholder="模板编号,例:TM00015" style="margin-bottom: 5px;" value="" />
+                                                    <a class="btn btn-default" href="javascript:;" onclick="add_templmsg(this);"> 快速添加模板</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="panel panel-primary">
+                                                <div class="panel-heading">
+                                                    <span style="font-size: 15px"></span>
+                                                    选择已有模板
+                                                </div>
+                                                <div class="panel-body">
+                                                    <select id="selecttemplate" class=" form-control" style="margin-bottom: 5px;">
+                                                    </select>
+                                                    <a class="btn btn-default" href="javascript:;" onclick="selecttemp();"> 选择模板</a>
+                                                    <a class="btn btn-default" href="javascript:;" onclick="delete_templmsg(this);"> 删除模板</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 shilidiv" style="display: none;">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    模板展示:
+                                                </div>
+                                                <div class="panel-body">
+                                                    <pre id="shili" style="background-color: white; border:0;"></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <select class="form-control" onclick="$('.tm').hide();$('.tm-' + $(this).val()).show()">
+                                                        <option value="">选择模板变量类型</option>
+                                                        <option value="mass">群发消息变量</option>
+                                                        <option value="trace">触发消息变量</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="panel-body  tm tm-mass" style="display:none">
+                                                    <a href='JavaScript:;' class="btn btn-default btn-sm">粉丝昵称</a>
+                                                </div>
+
+                                                <div class="panel-body  tm tm-trace" style="display:none">
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">粉丝昵称</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">公众号名称</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">时间</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">年</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">月</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">日</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">时</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">分</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">秒</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">省份</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">城市</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">区县</a>
+                                                    <a href="JavaScript:;" class="btn btn-default btn-sm">街道</a>
+                                                </div>
+
+                                                <div class="panel-body">
+                                                    点击变量后会自动插入选择的文本框的焦点位置，在发送给粉丝时系统会自动替换对应变量值
+                                                    <div class="text text-danger">群发消息变量仅支持群发时使用，触发消息变量仅支持触发消息时使用。</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script language='javascript'>
+    var kw = 1;
+    var temps;
+    var contents;
+    restemplmsg();
+
+    function selecttemp(){
+        var tid = $("#selecttemplate").val();
+        var temp;
+        for(var i=0;i<temps.length;i++){
+            if(temps[i].template_id==tid)
+            {
+                temp =temps[i];
+                break;
+            }
+        }
+        if(temp==null){
+            return;
+        }else{
+            contents = temp.contents;
+            if(contents[0]!='first'||contents[contents.length-1]!='remark'){
+                swal("操作有误", "此模板不可用","error");
+                return;
+            }
+            $("#shili").html(temp.content);
+            $(".shilidiv").show();
+            $("#tp_title").val(temp.title);
+            $("#tp_template_id").val(temp.template_id);
+            $('.key_item').remove();
+            setcontents(0);
+        }
+    }
+
+    function setcontents(i){
+        if(contents.length==i){
+            return;
+        }
+        if(contents[i]!='first'&&contents[i]!='remark'){
+            var data = {
+                tpkw: contents[i]
+            };
+            $.ajax({
+                url: "{php echo $this->createWebUrl('messagebursts',array('op'=>'tpl'))}",
+                cache: false,
+                data:data
+            }).done(function (html) {
+                $(".btn-add-type").button("reset");
+                $("#type-items").append(html);
+                i++
+                setcontents(i);
+            });
+        }else{
+            i++
+            setcontents(i);
+        }
+    }
+
+    function add_templmsg(obj) {
+        $(obj).html($(obj).html() + "...");
+        var tempcode = $("#tempcode").val();
+        var data = {
+            key:tempcode
+        };
+        $.ajax({
+            url: "{php echo $this->createWebUrl('messagecommon',array('op'=>'add_templmsg'))}",
+            data: data,
+            cache: false
+        }).done(function (result) {
+            var  data= jQuery.parseJSON(result);
+            $(obj).html($(obj).html().replace("...",""));
+            restemplmsg()
+            if(data.result==1) {
+                swal({
+                    title: "操作成功！",
+                    text: data.errmsg,
+                    timer: 2000,
+                    type:"success",
+                },function(){
+                    location.reload();
+                });
+            }else{
+                swal({
+                    title: "操作有误！",
+                    text: data.errmsg,
+                    timer: 2000,
+                    type:"warning",
+                },function(){
+                    location.reload();
+                });
+            }
+
+        });
+    }
+
+    function delete_templmsg(obj) {
+        swal({
+                title: "确定删除吗？",
+                text: "此删除将同步删除微信公众号内模板消息！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定删除！",
+                cancelButtonText: "取消删除！",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function(isConfirm){
+                if (isConfirm) {
+                    $(obj).html($(obj).html() + "...");
+                    var tempcode = $("#selecttemplate").val();
+                    var data = {
+                        key:tempcode
+                    };
+                    $.ajax({
+                        url: "{php echo $this->createWebUrl('messagecommon',array('op'=>'delete_templmsg'))}",
+                        data: data,
+                        cache: false,
+                        type: "post",
+                        dataType: 'json',
+                        success: function (result) {
+                            var  data= jQuery.parseJSON(result);
+                            $(obj).html($(obj).html().replace("...",""));
+
+                        },
+                        complete :function(){
+                            swal({
+                                title: "操作成功！",
+                                text: data.errmsg,
+                                timer: 2000,
+                                type:"success",
+                            },function(){
+                                restemplmsg();
+                                location.reload();
+                            });
+                        }
+                    });
+                } else {
+                    swal("取消！", "模板数据恢复安全。", "error");
+                }
+            });
+
+    }
+
+    function restemplmsg() {
+        $.ajax({
+            url: "{php echo $this->createWebUrl('messagecommon',array('op'=>'get_templmsg_list'))}",
+            cache: false
+        }).done(function (result) {
+            var  data= jQuery.parseJSON(result);
+            if(data.status==1){
+                $("#selecttemplate option").remove();
+                temps =data.result;
+                for(var i=0;i<temps.length;i++){
+                    $("#selecttemplate").append("<option value='"+temps[i].template_id+"'>"+temps[i].title+"</option>");
+                }
+            }
+        });
+    }
+
+    function help() {
+        swal({
+            title: "操作帮助",
+            text: "<p style='text-align: left;'>如模板详情为: <br/><br/> {{first.DATA}}<br/>" +
+            "订单金额：{{keyword1.DATA}}<br/>" +
+            "商品详情：{{keyword2.DATA}}<br/>" +
+            "收货信息：{{keyword3.DATA}}<br/>" +
+            "{{remark.DATA}}<p><br/>" +
+            "<p style='text-align: left;'>头部标题：{{first.DATA}}<br/>" +
+            "键名：keyword1/keyword2 <br/>" +
+            "键值： 您要设置的模板项的值<br/>" +
+            "尾部描述：{{remark.DATA}}<p><br/>",
+            html: true
+        });
+    }
+
+    function addType() {
+        $(".btn-add-type").button("loading");
+        $.ajax({
+            url: "{php echo $this->createWebUrl('messagebursts',array('op'=>'tpl'))}&kw="+kw,
+            cache: false
+        }).done(function (html) {
+            $(".btn-add-type").button("reset");
+            $("#type-items").append(html);
+        });
+        kw++;
+    }
+
+    $(function () {
+        require(['jquery.caret'],function(){
+            var jiaodian;
+            $(document).on('focus', 'input,textarea',function () {
+                jiaodian = this;
+            });
+
+            $("a[href='JavaScript:;']").click(function () {
+                if (jiaodian) {
+                    $(jiaodian).insertAtCaret("#"+this.innerText+"#" );
+                }
+            })
+
+        })
+    })
+
+    function emojiBrowser(obj){
+        util.emojiBrowser(function(emoji){
+            var text = '[U+'+emoji[0].text+']';
+            var box = $(obj).parents('.tvd').find('.tv');
+            var content = box.val()+text;
+            box.val(content);
+        });
+    }
+
+</script>
+<style type="text/css">
+    #icon-container .modal-dialog.we7-modal-dialog .modal-content .modal-body {
+        max-height: 400px;
+    }
+</style>
+{template 'web/common/footer'}

@@ -1,0 +1,173 @@
+﻿@model Senparc.Weixin.MP.Helpers.JsSdkUiPackage
+@{
+    ViewBag.Title = "微信图片接口Demo";
+}
+ 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>微信图片接口Demo</title>
+    <!--jQuery非JS-SDK必须-->
+	<script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+                <script src="../addons/wxz_piclive/css/sellercentral/jquery-1.11.1.min.js"></script>
+                <script src="<?php  echo $_W['siteroot'];?>app/resource/js/require.js"></script>
+    <style type="text/css">
+        button {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button onclick="chooseImage();">选择图片</button>
+        <button onclick="uploadImage();">图片上传</button>
+        <button onclick="previewImage();">图片预览</button>
+        选择的图片<div id="img"></div>
+        上传的图片<div id="img2"></div>
+    </div>
+ 
+    <script type="text/javascript">
+        wx.config({
+        debug: true,
+        appId: "{$_W['account']['jssdkconfig']['appId']}",
+        timestamp: "{$_W['account']['jssdkconfig']['timestamp']}",
+        nonceStr: "{$_W['account']['jssdkconfig']['nonceStr']}",
+        signature: "{$_W['account']['jssdkconfig']['signature']}",
+            jsApiList: [
+                    'chooseImage',
+                    'previewImage',
+                    'uploadImage'
+            ]
+        });
+        // 全局变量存储
+        var images = {
+            localIds: [],
+            serverIds: []
+        };
+        //1.拍照、本地选图
+        function chooseImage() {
+            if (images.localIds.length == 9) {
+                alert('最多允许选中9张图片');
+                return;
+            }
+            else {
+                wx.chooseImage({
+                    count: 9 - images.localIds.length, // 默认9
+                    sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                    sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                    success: function (res) {
+                        $(function () {
+                            $.each(res.localIds, function (i, n) {
+                                images.localIds.push(n);alert(n);
+                                $("#img").append('<img src="' + n + '" style="width:70px; height:70px;margin-right:5px;"/>');
+                            });
+                        });
+						//在选择图片后，采用setTimeout(function(){wx.uploadImage()},100);可以解决android设备下的问题。
+						setTimeout(function(){
+							//上传图片接口
+							wx.uploadImage({
+								//这块比较坑， localIds.toString()，必须转字符串，或者 '' + localIds
+								localId: images.localIds.toString(),       //需要上传的图片的本地ID，由chooseImage接口获得
+								isShowProgressTips: 1,           // 默认为1，显示进度提示
+								success: function(res) {
+									var serverId = res.serverId; // 返回图片的服务器端ID, 上传图片有效期3天，可用微信多媒体接口下载图片到自己的服务器，此处获得的 serverId 即 media_id。
+		//                            alert('serverId：' + serverId);
+		//                            调用ajax，走素材解口，保存图片到服务器
+									var url = '/weixin/mobile/ajax.inc.php?action=getwechatmedia';
+									var data = {
+										mediaId: serverId
+									};
+									$.post(url, data, function (result) {
+										if (result.success) {
+											$('#'+fileid).val('/uploadfile/'+result.msg);
+											$("#" + imgid).attr("src" , '/uploadfile/'+result.msg);
+										} else {
+											show_warn_pop(result.msg);
+										}
+									}, 'json');
+								},
+								fail: function (res) {
+									alert('上传失败，请重新上传！');
+								}
+							});
+						});
+
+                },100);
+                    },
+                    cancel: function () {
+                        alert("已取消选择");
+                    }
+                });
+            }
+        }
+        //2.上传图片
+        var i = 0, length = 0;
+        function uploadImage() {
+            i = 0;
+            length = 0;
+            if (images.localIds.length == 0) {
+                alert('请先使用选择图片按钮');
+                return;
+            }
+            length = images.localIds.length;
+            upload();
+        }
+        //递归调用的方法
+        function upload() {
+            wx.uploadImage({
+                localId: images.localIds[i].toString(),
+                success: function (res) {
+                    images.serverIds.push(res.serverId.toString());
+                },
+                fail: function (res) {
+                    alert(JSON.stringify(res));
+                },
+                complete: function (res) {
+                    i++;
+                    if (i < length) {
+                        upload();
+                    }
+                    if (i == length) {
+                        downloadImage(images.serverIds);
+                    }
+                }
+            });
+        }
+        //下载图片的方法
+        function downloadImage(serverIds) {
+            $.get('@Url.Action("DownloadImageAsync")', { mediaArray: JSON.stringify(serverIds) }, function (data) {
+                $.each(data, function (i, n) {
+                    $("#img2").append('<img src="' + n + '" style="width:70px; height:70px;margin-right:5px;"/>');
+                });
+                //清空images
+                images = {
+                    localIds: [],
+                    serverIds: []
+                };
+            }, "json");
+        }
+ 
+        //3.图片预览
+        function previewImage() {
+            var imgList = [
+                  'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516438929475&di=b957eeb994395ff6b99ad5a2aa0330f3&imgtype=0&src=http%3A%2F%2Fimg1.3lian.com%2Fimg013%2Fv4%2F11%2Fd%2F64.jpg',
+                  'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516438929477&di=ca86274989d88b420edf367a3f5c4ff3&imgtype=0&src=http%3A%2F%2Fimg2.3lian.com%2F2014%2Ff4%2F209%2Fd%2F23.jpg',
+                  'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516438929476&di=bb23036f8232b23f11d7f7226d91ca22&imgtype=0&src=http%3A%2F%2Fnews.shangqiuw.com%2Fupload%2FNews%2F2016-10-14%2F20161014111158277f960f.jpg'
+            ];
+            wx.previewImage({
+                current: imgList[0],
+                urls: imgList
+            });
+        }
+        wx.error(function (res) {
+            alert(res.errMsg);
+        });
+    </script>
+</body>
+</html>

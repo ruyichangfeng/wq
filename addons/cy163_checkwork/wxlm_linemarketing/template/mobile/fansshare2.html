@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_fans_title']}</title>
+{template 'head'}
+<script type="text/javascript">
+window.onload = function() { 
+	wx.ready(function () {
+		sharedata = {
+			title: "{$extension_one['extension_sharetitle']}",
+			desc: "{$extension_one['extension_sharedesc']}",
+			link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('fansbyrecommend', array('op'=>'create','extension_id'=>$extension_one['extension_id'],'parentid'=>$line_fans_list['fans_id'])))}",
+			imgUrl: "{php echo tomedia($extension_one['extension_shareimg'])}",
+			type: '', // 分享类型,music、video或link，不填默认为link
+			dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+			success: function(){
+				getsharered();
+			},
+			cancel: function(){
+			}
+		};
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+		wx.onMenuShareQZone(sharedata);
+	});	
+}
+</script>
+<style>
+	
+</style>
+</head>
+<body>
+	<div class="top" style="{if $config['mobile_fans_topbg']!=""} background-image:url(../attachment/{$config['mobile_fans_topbg']});{/if}">
+		<div style="height: 45px;padding-top: 20px;">
+			<div class="share-icon" style="border-top-right-radius:4px;border:1px solid white;
+	   	border-top-left-radius:4px; 
+		border-bottom-left-radius:4px;text-align: center;
+		border-bottom-right-radius:4px;display: inline-block; color:white;margin-left: 10px;height: 24px;line-height: 22px;width: 80px;font-size: 16px;">分享任务</div>
+			<div style="display: inline-block;color:white;font-size: 18px;padding-left: 16px;">{$extension_one['extension_title']}</div>
+		</div>
+		<div style="height: 45px;padding-top: 4px;">
+			<div style="text-align: right;">
+				<div style="display: inline-block;float: right;color:white;margin-right: 10px;">
+					<p style="font-size: 16px;">{$extension_one['extension_clickoncered']}</p>
+					<p style="font-size: 16px;">点击可获积分</p>
+				</div>
+				<div style="display: inline-block;float: right;color:white;margin-right: 8px;">
+					<p style="font-size: 16px;">{$extension_one['extension_shareoncered']}</p>
+					<p style="font-size: 16px;">分享可获积分</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="content" style="padding:10px 16px 0px;">
+		<p style="font-size: 15px;">任务详情</p>
+		<div>
+			<div style="font-size: 16px;height: 50px;line-height: 50px;border-bottom: 1px solid #ccc;font-weight: bold;">分享可获积分：<span style="font-weight: normal;">{$extension_one['extension_shareoncered']}</span></div>
+		</div>
+		<div>
+			<div style="font-size: 16px;height: 50px;line-height: 50px;border-bottom: 1px solid #ccc;font-weight: bold;">已分享次数：<span style="font-weight: normal;">{$count1['count']}</span></div>
+		</div>
+		<div>
+			<div style="font-size: 16px;height: 50px;line-height: 50px;font-weight: bold;">本任务剩余积分：<span style="font-weight: normal;">{$shengyu}</span ></div>
+		</div>
+	</div>
+	<div class="button" style="width: 100%;text-align: center;padding: 15px 0px;">
+		<button type="button" class="btn btn-primary" style="background-color: #6EE7DE;width: 80%;height: 40px;font-size: 18px;border:1px solid #6EE7DE;" onClick="extensiononc({$extension_one['extension_id']});">查看该任务</button>
+	</div>
+	<div style="margin: 10px 20px;">
+		{php echo htmlspecialchars_decode($config['mobile_fans_taskadvice'])}
+	</div>
+
+
+
+</body>
+<script type="text/javascript">
+	function getsharered(){
+		var extension_id={$extension_one['extension_id']};
+		$.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('fansbyrecommend',array('op'=>'sharesuccess'));}",
+          data:{extension_id:extension_id},
+          dataType:"json",
+          async:false,
+          success:function(data){
+
+            //清空联动数据
+            alert(data);
+        }
+      });
+	}
+	var parentid="{$parentid}";
+	function extensiononc(id){
+	    url="{php echo $this->createMobileUrl('fansbyrecommend');}";
+
+		 	window.location.href=url+"&extension_id="+id+"&op=create&extension_type=1";
+		  
+	   
+	}
+	
+</script>
+</html>

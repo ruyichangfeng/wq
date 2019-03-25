@@ -1,0 +1,47 @@
+{template 'common/header'}
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<h3>报名记录</h3>
+		</div>
+	</div>
+	<div class="panel-body table-responsive">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>报名id</th>
+					<th>姓名</th>
+					<th>性别</th>
+					<th>电话</th>
+					<th>照片</th>
+					<th>留言</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $res $key $item}
+					<tr>
+						<td>{php echo $item['id'];}</td>
+						<td>{$item['name']}</td>
+						<td>{php echo $item['gender']==1 ? '男' : '女';}
+						</td>
+						<td>{$item['mobile']}</td>
+						<td><img style="width: 50px;height: 50px" src="{php echo tomedia($item['pic']);}" ></td>
+						<td>{$item['msg']}</td>
+					</tr>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div><?php 
+    global $_GPC;
+	$page = $_GPC['page'];
+	
+	$result = pdo_fetchall("SELECT * FROM " .tablename('activity_signup_recording')." WHERE `uniacid`=:uniacid",array(':uniacid'=>$_W['uniacid']));
+	
+	$total = count($result);
+	echo $pagination = pagination($total ,$page, 5);
+	?>
+</div>
+{template 'common/footer'}

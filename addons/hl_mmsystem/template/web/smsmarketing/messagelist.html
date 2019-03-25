@@ -1,0 +1,141 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>短信购买</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'messagelist'))}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'index'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信购买</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'messagelist'))}"><i class="fa fa-lg fa-tasks" style="color:purple"></i>短信记录</a></li>
+                                </ul>
+                                {loop $recording $item}
+                                <div class="row text-center">
+                                    <div class="col-sm-1 h-10 p-lg">
+                                        <button class="btn btn-primary btn-sm demo1">共发条数  <span style="color: red"></span>{$item['ssr_outId']}&nbsp条</button>
+                                    </div>
+                                    <div class="col-sm-2 h-10 p-lg">
+                                        <button class="btn btn-success btn-sm demo2">套餐剩余条数  <span style="color: red"></span>{$item['ssr_outId']}&nbsp条</button>
+                                    </div>
+                                    <div class="col-sm-1 h-10 p-lg">
+                                        <button class="btn btn-warning btn-sm demo3">套餐总共条数  <span style="color: red"></span>{$item['ssr_outId']}&nbsp条</button>
+                                    </div>
+                                    <div class="col-sm-1 h-10 p-lg">
+                                    </div>
+                                    {/loop}
+                                </div>
+                                <div class="tab-content">
+                                    <form class="form-horizontal form" method="post" >
+                                        <div class="table-responsive panel-body"><!--头部样式-->
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th>单据号</th>
+                                                    <th>模板名称</th>
+                                                    <th>内容</th>
+                                                    <th>接收手机号</th>
+                                                    <th>发送状态</th>
+                                                    <th>发送时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {loop $messagelist $item}
+                                                <tr>
+                                                    <td>{$item['ssr_outId']}</td><!--单据号-->
+                                                    <td>{$item['ssr_templateName']}</td><!--模板名称-->
+                                                    <td>{$item['ssr_sendContent']}</td><!--内容-->
+                                                    <td>{$item['ssr_sendPhoneNumber']}</td><!--手机号-->
+                                                    <td>
+                                                        <p>{if $item['ssr_sendStatus'] == 1}<span class="label label-primary">已发送</span>{else}<span class="label label-default">未发送</span>{/if}</p><!--状态-->
+                                                    </td>
+                                                    <td>{php echo date('Y-m-d H:i:s', $item[ssr_addTime]);}</td>
+                                                    <td>
+                                                        <a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('smsmarketing',array('op'=>'smssendrecorddelete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                                                    </td>
+                                                </tr>
+                                                {/loop}
+                                                </tbody>
+                                            </table>
+                                            <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                                                <thead>
+                                                {if $recording}
+                                                <tr>
+                                                    <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                                                </tr>
+                                                {else}
+                                                <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                                                {/if}
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function smsBuy(smspackagebuyid) {
+        var smspackagebuyid = smspackagebuyid;
+        swal({
+                title: "确定购买吗？",
+                text: "您将无法恢复！",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "取消",
+                confirmButtonColor: "#1AB394",
+                confirmButtonText: "购买！",
+                closeOnConfirm: false
+            },
+            function(){
+                var url =  "{php echo $this->createWebUrl('smsmarketing', array('op' => 'Ajaxsmsbuy'))}";
+                var params = {
+                    ' smspackagebuyid':smspackagebuyid
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            swal({
+                                title: "购买失败",
+                                text: "套餐不存在或已购买，请重新购买！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }else{
+                            swal({
+                                title: "购买成功",
+                                text: "您的购买已生效",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            }, function(){
+                                location.reload(true);
+                            })
+
+                        }
+                    }
+                });
+
+
+
+            });
+
+    }
+</script>
+
+{template 'web/common/footer'}

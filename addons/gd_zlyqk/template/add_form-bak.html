@@ -1,0 +1,76 @@
+{template "base/child_header"}
+<form class="layui-form">
+    <input type="hidden" name="app_id" value="{$appId}">
+    {loop $formList $key $form}
+    {if isset($formArr[$key])}
+    <div class="layui-form-item" style="margin-left:20px;">
+        <div class="layui-input-inline">
+            <input type="hidden" name="py[{$key}]"  value="{$formArr[$key]['py']}" >
+            <input type="text" name="label[{$key}]"  value="{$formArr[$key]['label']}" placeholder="字段名称" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <select name="form[{$key}]" lay-verify="required">
+                <option value="0">表单类型</option>
+                {loop $eleList $ele}
+                <option value="{$ele['name']}" {if $formArr[$key]['type']==$ele['name']}selected{/if} >{$ele['el_name']}</option>
+                {/loop}
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" style="width: 200px;" name="pl[{$key}]"  value="{$formArr[$key]['pl']}"  placeholder="默认值,需要多个值的','隔开"  class="layui-input">
+        </div>
+        <div class="layui-input-inline" style="margin-left:10px;">
+        <input type="checkbox" name="rq[{$key}]" lay-skin="primary" title="必填项" {if $formArr[$key]['rq']==1}checked{/if}>
+        </div>
+    </div>
+    {else}
+    <div class="layui-form-item" style="margin-left:20px;">
+        <div class="layui-input-inline">
+            <input type="text" name="label[{$key}]"  placeholder="字段名称" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <select name="form[{$key}]" lay-verify="required">
+                <option value="0">表单类型</option>
+                {loop $eleList $ele}
+                <option value="{$ele['name']}">{$ele['el_name']}</option>
+                {/loop}
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" name="pl[{$key}]" style="width: 200px;"   placeholder="默认值,需要多个值的','隔开"  class="layui-input">
+        </div>
+        <div class="layui-input-inline" style="margin-left:10px;">
+        <input type="checkbox" name="rq[$key]" lay-skin="primary" title="必填项" >
+        </div>
+    </div>
+    {/if}
+    {/loop}
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">保存</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','jquery'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        {if $de=='add'}
+            var url="{php echo $this->createWebUrl('createFm')}";
+        {else}
+            var url="{php echo $this->createWebUrl('editFm')}";
+        {/if}
+        form.on('submit(addAdmin)', function(data){
+            $.post(url,data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+    });
+</script>
+{template "base/child_footer"}

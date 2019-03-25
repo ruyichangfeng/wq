@@ -1,0 +1,101 @@
+{template 'common/header'}
+<style>
+.sub-search input,.sub-search select{margin-bottom:0;}
+</style>
+<ul class="nav nav-tabs">
+	<li class="active">
+	<a href="">报名统计</a>
+	</li>
+</ul>
+
+    <div class="main">
+		<div class="panel panel-info">
+			<div class="panel-heading">筛选</div>
+			<div class="panel-body">
+				<form action="" class="form-horizontal" method="post">
+					<input type="hidden" name="id" value="{$id}">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">姓名</label>
+						<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+							<input class="form-control" name="name" id="" type="text" value="{$_GPC['name']}" placeholder="填写签到人姓名">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">电话</label>
+						<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+							<input class="form-control" name="mobile" id="" type="text" value="{$_GPC['mobile']}" placeholder="填写签到人电话">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">时间</label>
+						<div class="col-sm-4 col-xs-12">
+							{php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $starttime),'endtime'=>date('Y-m-d', $endtime)));}
+						</div>
+						<div class="col-xs-12 col-sm-2 col-md-1 col-lg-1">
+							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i> 搜索</button>
+						</div>
+						<div class="col-xs-12 col-sm-2 col-md-1 col-lg-1">
+							<a class="btn btn-default" href="{php echo $this->createWebUrl('download', array('id' => $id , 'op' => 'record'))}"><i class="fa fa-search"></i> 导出</a>
+						</div>						
+					</div>					
+				</form>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive">
+				<h4 class="sub-title">详细数据  |  报名人数:{$membertotal} </h4>
+				<form action="" method="post" onsubmit="">
+					<div class="sub-content">
+						<table class="table table-hover">
+							<tbody>
+								<tr>
+									<td style="width:10%;text-align:center;" >编号</td>	
+									<td style="width:20%;text-align:center;" >姓名</br>公司</td>
+									<td style="width:10%;text-align:center;" >联系电话</td>
+									<td style="width:20%;text-align:center;" >报名时间</br>支付时间</td>
+									<td style="width:10%;text-align:center;" >会费</td>
+									<td style="width:10%;text-align:center;" >报名状态</br>支付状态</td>
+									<td style="width:10%;text-align:center;" >操作</td>
+								</tr>
+								{loop $list $row}
+								<tr>
+									<td style="text-align:center;" >{$row['id']}</td>	
+									<td style="text-align:center;" >{$row['name']}&nbsp;</br>{$row['comp']}&nbsp;</td>
+									<td style="text-align:center;" >{$row['mobile']}</td>
+									<td style="text-align:center;" >{php echo date("Y-m-d H:i:s" , $row['sign_time'] );}</br>{if !strexists('1970',$row['pay_time'])}{php echo date("Y-m-d H:i:s" , $row['pay_time'] );}{else}----------{/if}</td>
+									<td style="text-align:center;" >{$row['price']}</td>
+									<td style="text-align:center;" >
+										{if $row['status']=='1'}
+										<span class="label label-success">已通过</span>
+										{else}
+										<span class="label label-warning">未通过</span>
+										{/if}
+										</br>
+										{if $row['pay_status']=='1'}
+										<span class="label label-success">已支付</span>
+										{else}
+										<span class="label label-warning">未支付</span>
+										{/if}
+									</td>
+									<td style="text-align:center;" >
+										<a href="{php echo $this->createWebUrl('record',array('id' => $id , 'mid' => $row['id'] , 'op' => 'set' , 'status' => 1))}">通过</a>
+										<a href="{php echo $this->createWebUrl('record',array('id' => $id , 'mid' => $row['id'] , 'op' => 'set' , 'status' => 0))}">拒绝</a>
+									</td>
+								</tr>
+								{/loop}
+							</tbody>
+						</table>
+						<table class="table" style="display:none;">
+							<tr>
+								<td>
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+						</table>
+					</div>
+				</form>
+				{$pager}
+			</div>
+		</div>
+    </div>
+{template 'common/footer'}

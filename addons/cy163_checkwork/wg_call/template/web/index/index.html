@@ -1,0 +1,62 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li  class="active"><a href="{php echo $this->createWebUrl('index',array('op' =>'index'))}">活动列表</a></li>
+	<li><a href="{php echo $this->createWebUrl('index',array('op' =>'post'))}">添加活动</a></li>
+</ul>
+
+<div class="main panel panel-default">
+
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:30px;">ID</th>
+					<th>名称</th>
+					<th>开始时间</th>
+					<th>结束时间</th>
+					<th>投放地址</th>
+					<th>点赞记录</th>
+					<th>奖品设置</th>
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $adv}
+				<tr>
+					<td>{$adv['id']}</td>
+					<td>{$adv['name']}</td>
+					<td>{php echo date('Y-m-d H:i:s',$adv['start']);}</td>
+					<td>{php echo date('Y-m-d H:i:s',$adv['end']);}</td>
+					<td>
+						<a class="js-clip" href="javascript:void(0);" data-url="{php echo $this->webmobileUrl('index', array('id' => $adv['id']))}">复制链接</a>
+					</td>
+					<td><a href="{php echo $this->createWebUrl('log', array('activity_id' => $adv['id']))}">查看</a></td>
+					<td><a href="{php echo $this->createWebUrl('prize', array('op' => 'lists', 'activity_id' => $adv['id']))}">编辑奖品</a></td>
+					<td style="text-align:left;">
+						<a href="{php echo $this->createWebUrl('index', array('op' => 'post', 'id' => $adv['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="修改"><i class="fa fa-edit"></i></a>
+						<a href="{php echo $this->createWebUrl('index', array('op' => 'delete', 'id' => $adv['id']))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+        $('#type').change(function () {
+            location = "<?php echo $this->createWebUrl('adv',array('op' =>'index'));?>"+'&type='+$(this).val();
+        });
+
+        $('.js-clip').each(function(){
+            util.clip(this, $(this).data('url'));
+        });
+	});
+</script>
+{template 'common/footer'}

@@ -1,0 +1,285 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>消费绩效</h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1"><i  class="fa fa-circle-o-notch" style="color:dodgerblue"></i>帐号销售明细</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2"><i class="fa fa-gear" style="color:#06c28b"></i>绩效设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <form action="" method="get" class="form-horizontal" role="form">
+                                                <input type="hidden" name="c" value="site" />
+                                                <input type="hidden" name="a" value="entry" />
+                                                <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                                                <input type="hidden" name="do" value="saleperformance" />
+                                                <input type="hidden" name="op" value="index" />
+                                                <input type="hidden" name="storeid" value="{$storeid}" />
+                                                <div class="row m-b-sm m-t-sm">
+                                                    <div class="col-md-1">
+                                                        <a href="{php echo $this->createWebUrl('saleperformance')}" id="loading-example-btn" class="btn btn-white btn-sm"><i class="fa fa-refresh"></i> 刷新</a>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group m-b">
+                                                            <span class="input-group-addon">当月总金额</span> <input type="text" disabled="disabled" name="newschedule" class="form-control" value="{php echo util::getMemberAimsSchedule(9,'total','total')}" />
+                                                            <span class="input-group-addon">元</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group m-b">
+                                                            <span class="input-group-addon">当月总人数</span> <input type="text" disabled="disabled" name="newschedule" class="form-control" value="{php echo util::getMemberAimsSchedule(8,'total','total')}"/>
+                                                            <span class="input-group-addon">人</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group m-b">
+                                                            <span class="input-group-addon">累计总金额</span> <input type="text" disabled="disabled" name="newschedule" class="form-control" value="{php echo util::getMemberAimsSchedule(11,'total','total')}" />
+                                                            <span class="input-group-addon">元</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group m-b">
+                                                            <span class="input-group-addon">累计总人数</span> <input type="text" disabled="disabled" name="newschedule" class="form-control" value="{php echo util::getMemberAimsSchedule(10,'total','total')}" />
+                                                            <span class="input-group-addon">人</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group">
+                                                            <input type="text" placeholder="请输入操作员姓名" class="input-sm form-control" id="operatorname" name="operatorname"> <span class="input-group-btn">
+                                                        <input type="submit" class="btn btn-sm btn-primary" value="搜索" /> </span>
+                                                            <input type="hidden" name="token" value="{$_W['token']}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <div class="project-list">
+
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th style="width: 10%;">权限名称</th>
+                                                        <th style="width: 10%;">操作员信息</th>
+                                                        <th style="width: 10%;">当月当前总金额</th>
+                                                        <th style="width: 15%;">目标进度</th>
+                                                        <th style="width: 10%;">介绍客户</th>
+                                                        <th style="width: 30%;">操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {loop $PcRoleManageInfo $PcRoleManageInfoitem}
+                                                    <tr>
+                                                        <td class="project-status">
+                                                            <span class="label label-primary">{if $PcRoleManageInfoitem['headstore'] == 1}主管理员{else}{php echo util::getRoleName($PcRoleManageInfoitem['role'])}{/if}</span>
+                                                        </td>
+                                                        <td class="project-title">
+                                                            <span>{$PcRoleManageInfoitem['username']}</span>
+                                                            <br/>
+                                                            <small>{$PcRoleManageInfoitem['from_user']}</small>
+                                                        </td>
+                                                        <td class="project-title">
+                                                            {if util::getMemberAimsSchedule(3,$PcRoleManageInfoitem['role'],$PcRoleManageInfoitem['uid']) == 1}
+                                                            <span class="badge badge-success">{php echo util::getMemberAimsSchedule(1,$PcRoleManageInfoitem['role'],$PcRoleManageInfoitem['uid'])}&nbsp;元</span>
+                                                            {else}
+                                                            <span class="badge badge-danger">未开启</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td class="project-completion">
+                                                            {if util::getMemberAimsSchedule(4,$PcRoleManageInfoitem['role'],$PcRoleManageInfoitem['uid']) == 1}
+                                                            <small>当前进度： {php echo util::getMemberAimsSchedule(2,$PcRoleManageInfoitem['role'],$PcRoleManageInfoitem['uid'])}</small>
+                                                            <div class="progress progress-mini">
+                                                                <div style="width: {php echo util::getMemberAimsSchedule(2,$PcRoleManageInfoitem['role'],$PcRoleManageInfoitem['uid'])};" class="progress-bar"></div>
+                                                            </div>
+                                                            {else}
+                                                            <span class="badge badge-danger">未开启</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td class="project-people">
+                                                            {loop util::getMemberPictureFives($PcRoleManageInfoitem['uid']) $MemberPicture}
+                                                            <img alt="image" style="float: left;" class="img-circle" src="{$MemberPicture['mem_memberPicture']}">
+                                                            {/loop}
+                                                        </td>
+                                                        <td class="project-actions">
+                                                            {php echo file_exists($_W['siteroot']."addons/hl_mmsystem/data/operatorqrcode/operator-".$PcRoleManageInfoitem['uid'].".png")}
+                                                            <button type="button" class="btn btn-white btn-sm" onclick="modifyoperator({$PcRoleManageInfoitem['role']},{$PcRoleManageInfoitem['uid']});"><i class="fa fa-pencil"></i> 绩效记录 </button>
+                                                             <button type="button" class="btn btn-white btn-sm" onclick="generateQRcode({$PcRoleManageInfoitem['uid']});"><i class="fa fa-pencil"></i> 生成专属二维码 </button>
+                                                            <a class="btn btn-info btn-sm" href="{$_W['siteroot']}addons/hl_mmsystem/data/operatorqrcode/operator-{$PcRoleManageInfoitem['uid']}.png"  target="_blank" download="{$PcRoleManageInfoitem['username']}" ><i class="fa fa-pencil"></i> 下载专属二维码 </a>
+                                                        </td>
+                                                    </tr>
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                                <div align="right">{$pager}</div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="tab-2" class="tab-pane ">
+                                        <div class="panel-body">
+                                            <form id="theform" class="form form-horizontal" action="{php echo $this->createWebUrl('saleperformance', array('op'=>'index'));}"  method="post">
+                                                <input type="hidden" name="id" value="{$item['id']}"/>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                       各等级权限邀请会员数量目标设置
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                                                            <thead>
+                                                            <tr>
+                                                                <td class="col-md-2">权限名称</td>
+                                                                <td class="col-md-3">说明</td>
+                                                                <td class="col-md-4">参数值</td>
+                                                                <td class="col-md-3">是否启用</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $roleInfoAll $roleInfoAllitem}
+                                                            <tr>
+                                                                <input type="hidden"   value="{php echo $checkedstatuspuk = puk.$roleInfoAllitem['id']}"/>
+                                                                <input type="hidden"   value="{php echo $checkedstatuspuv = puv.$roleInfoAllitem['id']}"/>
+                                                                <td class="title">{$roleInfoAllitem['rol_name']}</td>
+                                                                <td class="title">该等级权限<span style="color: red;">*每月</span>目标数量(例：1个月 = 10 人)</td>
+                                                                <td>
+                                                                    <input type="text"   class="form-control"  name="puv[puv{$roleInfoAllitem['id']}]" value="{$set[$checkedstatuspuv]['value']}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="checkbox" id="puk{$roleInfoAllitem['id']}" class="js-switch_{$roleInfoAllitem['id']}" {if $set[$checkedstatuspuk]['value']}checked='checked'{/if} />
+                                                                </td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        各等级权限邀请会员数量提成设置
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                                                            <thead>
+                                                            <tr>
+                                                                <td class="col-md-2">权限名称</td>
+                                                                <td class="col-md-3">说明</td>
+                                                                <td class="col-md-4">参数值</td>
+                                                                <td class="col-md-3">是否启用</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $roleInfoAll $key  $roleInfoAllitem}
+                                                            <tr>
+                                                                <input type="hidden"   value="{php echo $checkedstatuspmk = pmk.$roleInfoAllitem['id']}"/>
+                                                                <input type="hidden"   value="{php echo $checkedstatuspmv = pmv.$roleInfoAllitem['id']}"/>
+                                                                <td class="title">{$roleInfoAllitem['rol_name']}</td>
+                                                                <td class="title">该等级权限<span style="color: red;">*每人</span>应得倍率(例：1个人 = 10 元)</td>
+                                                                <td>
+                                                                    <input type="text"   class="form-control"  name="pmv[pmv{$roleInfoAllitem['id']}]" value="{$set[$checkedstatuspmv]['value']}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="checkbox" id="pmk{$roleInfoAllitem['id']}" class="js-switch_{php echo $key + 1}" {if $set[$checkedstatuspmk]['value']}checked='checked'{/if} />
+                                                                </td>
+                                                            </tr>
+                                                            {/loop}
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                    <div class="col-md-2 col-lg-1">
+                                                        <input name="settingsubmit" type="submit" value="保存" class="btn btn-primary btn-block" onclick="return savefenxiao()"/>
+                                                        <input type="hidden" name="token" value="{$_W['token']}"/>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            var agaxurl = "{php echo $this->createWebUrl('saleperformance', array('op' => 'Permissionupdatekey'))}";
+            var dataparam = {
+                'hlsetkey': hlsetkey,
+                'status': status,
+            };
+            $.ajax({
+                url: agaxurl,
+                data: dataparam,
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal("更新成功！", "","success");
+                    } else {
+                        swal("新增成功！", "","success");
+                    }
+                }
+            });
+
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+
+    function generateQRcode(operatoruid) {
+
+
+        var operatoruid  = operatoruid;
+
+        var getQrUrl = "{php echo $this->createWebUrl('saleperformance', array('op' => 'generateQRcode'))}";
+        var dataParams = {
+            'operatoruid': operatoruid,
+        };
+        $.ajax({
+            url: getQrUrl,
+            data: dataParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 1) {
+                    swal("生成成功！", "确认自动下载。","success");
+                } else {
+                    swal("生成失败！", "请刷新页面重新生成。","error");
+                }
+            }
+        });
+    }
+    function modifyoperator(roleid,operatoruid) {
+        var operatoruid = operatoruid;
+        var roleid = roleid;
+        var index = parent.layer.open({
+            type: 2,
+            title: '查看详情',
+            area : ['900px' , '700px'],
+            content: '{php echo $this->createWebUrl('saleperformance')}&op=modifyoperator&operatoruid='+operatoruid+"&roleid="+roleid
+        });
+        parent.layer.full(index);
+    }
+
+</script>
+{template 'web/common/footer'}

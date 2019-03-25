@@ -1,0 +1,107 @@
+{template 'inc/header'}
+    <style>
+        html,body{margin: 0;padding: 0;width: 100%;background: #ffffff;height: 100%;}
+        #bodybox {position: relative;margin: 0 auto;max-width: 480px;width: 100%;background-color: #ffffff;min-height: 80%;}
+    </style>
+    
+<div class="weui_tab tabSty" style="max-width: 480px;margin: 0 auto;">
+    
+
+    <div class="point" >
+            {loop $mlist $sto}
+            <div class="point-div" >
+                <div class="con" >
+                    
+                    <div class="detail" style="background-color:#F5F4F4;border:none;">
+                        <div class="pic" style="margin-top:20px;margin-left:15px;margin-bottom:15px;">
+                            {if $sto['logo']}
+                            <img src="{php echo tomedia($sto['logo']);}" width="120px" height="80px">
+                            {elseif $setting['avar']}
+                            <img src="{php echo tomedia($setting['avar']);}" width="120px" height="80px">
+                            {else}
+                            <img src="{ONLINEMV_IMAGE}123.png" width="120px" height="80px">
+                            {/if}
+                        </div>
+                        <div class="title" style="margin-top:30px;">
+                            {php $name =  mb_substr($sto['videoname'],0,10,'utf-8');}
+                            <h3 class="font-color">{$name}</h3>
+                            {loop $sto['lable'] $row}
+                                <span style="background-color: {$setting['color']};color:#ffffff;padding:1px 3px;border-radius:3px;margin-left:3px;">{$row['name']}</span>
+                            {/loop}
+                            {php $remark =  mb_substr($sto['remark'],0,20,'utf-8');}
+
+                            <p class="font-color">
+                                {php echo date("Y年m月d日",$sto['createtime']);}
+                                
+                            </p>
+                        </div>
+                       
+                    </div>
+                    <div style="border-bottom:1px solid #F9F8F8;padding-bottom:10px;">  
+                        <span style="font-size:14px;color:{$setting['color']}">我的评论：</span><span style="color:#E1E0E0;">{$sto['content']}</span>
+                    </div> 
+                </div>
+            </div>
+            {/loop}
+        </div>
+
+    <div class="upload" style="display:none;" data-page="{$page}">
+        <div class="showindex" style="width:20%;margin:0 auto;">
+            <img src="{ONLINEMV_IMAGE}123.gif" width="20px;">
+            <div style="float:left;">加载中</div>
+        </div>
+    </div>
+    <input id="page" type="hidden" name="page" value="{if $pindex} {$pindex} {else}1{/if}">
+    <input id="isscroll" type="hidden" name="page" value="1">
+
+    <div class="copyright" style="padding:0;margin-bottom:0px;background-color:#ffffff;">
+        <a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a>
+    </div> 
+    <div style="width:100%;height:60px;"></div> 
+    </div>
+
+    {template 'menu'}
+
+
+<script type="text/javascript">
+$(function(){
+    $("#page").val(1);
+    $("#isscroll").val(1);
+})
+$(window).scroll(function(){
+    
+    var page = parseInt($("#page").val())+1;
+    var isscroll = $("#isscroll").val();
+    var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('ajaxmymessage'),2)}"+"&rad="+Math.random();
+    if(isscroll==1){
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            $(".upload").show();
+            $("#isscroll").val(2);
+            setTimeout(function(){
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: {doajax:1,page:page},
+                        success:function(datas){
+                            if(datas.statue==1){
+                                $(".point").append(datas.data);
+                                $("#page").val(datas.page);
+                                $("#isscroll").val(1);
+                                $(".upload").hide();
+                            }else{
+                                $("#isscroll").val(2);
+
+                                $(".showindex").html('已加载全部');
+                            }
+                        },
+                        error:function(datas){
+
+                        },
+                        dataType:'json',
+                    })
+                },1000);
+        }
+    }
+})
+</script>
+{template 'inc/footer'}

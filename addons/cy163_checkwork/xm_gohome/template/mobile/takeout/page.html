@@ -1,0 +1,489 @@
+{template 'public/header'}
+
+<body>
+  <!--加载进度开始-->
+  <div id="pageLoader" class="weui_loading_toast" style="display:none">
+    <div class="weui_mask_transparent"></div>
+    <div class="weui_toast">
+      <div class="weui_loading"> 
+        <!-- :) -->
+        <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+      </div>
+      <p class="weui_toast_content">初始化设备</p>
+    </div>
+  </div>
+  <!--加载进度结束-->
+  <div class="ub ub-ver page" id="page0"> 
+    <!--头部 star-->
+    <header class="ub ub-ac ub-pc fixed ub-fh pro_header" style="top:0; left:0; z-index:999">
+      <div class="ub uinn"><i onClick="history.go(-1)" class="iconfont icon-xiangzuo ulev1"></i></div>
+      <div class="ub-f1 uinn uc-a1"><span class="shop_name">{$item['merchant_name']}</span> </div>
+      <div class="ub uinn"><a href="{php echo $this->createMobileUrl('search',array('foo'=>'index'))}"><i class="icon-sousuo iconfont ulev1"></i></a></div>
+      <div class="ub uinn">
+      {if $this->getKeep($item['id'], $openid) == 1}
+        <i onClick="keep({$item['id']})" class="icon-wujiaoxing iconfont ulev1 "></i>
+      {else}
+        <i onClick="away({$item['id']})" class="icon-wujiaoxing iconfont ulev1 t-blu"></i>
+      {/if}</div>
+    </header>
+    <!--头部 end--> 
+    
+    <div class="ub ub-ver" >
+    <!--顶部区域-->
+      <div class="ub ub-ac ub-ver ub-img1" style=" background-image:url({MODULE_URL}static/takeout/images/pro_bg/1.jpg); padding:2rem 0">
+        <div class="logo_box">
+          {if $item['coverpic'] == ''}
+            <img src="{MODULE_URL}static/takeout/images/nopic.jpg" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+          {else}
+            {if strstr($item['coverpic'],'images')}
+                <img src="{$_W['attachurl']}{$item['coverpic']}" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+            {else}
+                <img src="{$_W['attachurl']}gohome/coverpic/{$item['coverpic']}" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+            {/if}
+          {/if}
+        </div>
+       <div class="ulev1 t-wh umar-t">{$item['merchant_name']}</div>
+       <div class="ulev-2 umar-t">
+           {if $xing == ''}
+             {php echo $this->getXing(5)}
+             <font class="ulev0 t-wh">5分</font>
+           {else}
+             {php echo $this->getXing($xing)}
+             <font class="ulev0 t-wh">{$xing}分</font>
+           {/if}
+           
+       </div>
+       <div class="ulev-2 umar-t ub ub-ac">
+           {if $item['new_disc'] == 1}
+            <span class="ub youhui c-org t-wh ub-ac ub-pc uc-a15 umar-l">首</span>
+           {/if}
+           {if $item['man1_disc'] == 1 || $item['man2_disc'] == 1 || $item['man3_disc'] == 1}
+            <span class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15 umar-l">减</span>
+           {/if}
+           {if $item['disc'] == 1}
+            <span class="ub youhui c-blu t-wh ub-ac ub-pc uc-a15 umar-l">折</span>
+           {/if}
+           <span class="ub youhui c-wh uc-a50 ub-ac ub-pc umar-l" data-toggle="modal" 
+     data-target="#myModal"><i class="iconfont icon-xiala1 ulev-4"></i></span>
+       </div>
+      </div>
+    </div>
+  <form action="{php echo $this->createMobileUrl('takeout', array('foo'=>'setorder'))}" method="post">
+    <!--主体部分 star-->
+    <div class="ub ub-ver">
+      <!--选项卡-->
+      <div class="uinn11 ubb ub tx-c top-tab b-bla01 tab_xuanka">
+    	  <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'page', 'id'=>$id))}" class="ubr b-bla01 ub-f1 uinn t-gra block active">商品</a>
+        <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'rate', 'id'=>$id))}" class=" ub-f1 uinn t-gra block ubr b-bla01">评价</a>
+        <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'info', 'id'=>$id))}" class=" ub-f1 uinn t-gra block">详情</a>
+      </div>
+      
+      
+      <!--订餐类目-->
+      <div class="ub">
+        <div class="ub c-gre3 order_left">
+          <ul id="nav">
+              {if $menuarr[0]['id'] == ''}
+                <span class="tx-c">暂无数据</span>
+              {else}
+                {php $n=0;}
+                {loop $menuarr $vo}
+                {php $n+=1;}
+                <li class="{if $n=1} active {/if}">
+                 <a href="#section-{$vo['id']}">{$vo[menu_name]}</a>
+                </li>
+                {/loop}
+              {/if}
+          </ul>
+        </div>
+
+        <div class="ub-f1 c-wh order_right">
+          {php $i=-1;}
+
+          {php $m=0;}
+          {loop $menuarr $val}
+          {php $m+=1;}
+          <div class="section" id="section-{$val['id']}">
+          <div class="uinn c-gra1" >{$val['menu_name']}</div>
+          <!--餐,商品列表-->
+          <ul>
+            <!--循环开始-->
+            
+            {loop $this->getCurryList($id,$val['id']) $value}
+            {php $i+=1;}
+            <li class="ub-f1 ub ub-ac uinn ubb b-bla01">
+               <a href="{php echo $this->createMobileUrl('page', array('foo'=>'index', 'id'=>$value['id']))}">
+                 {if $value['pic'] == ''} 
+                   <div class="ub picbox ub-img1 ub uba b-bla01" style="background-image:url({MODULE_URL}static/takeout/images/nopic.jpg)"></div>
+                 {else}
+                  {if strstr($value['pic'],'images')}
+                    <div class="ub picbox ub-img1 ub uba b-bla01" style="background-image:url({$_W['attachurl']}{$value['pic']})"></div>
+                  {else}
+                    <div class="ub picbox ub-img1 ub uba b-bla01" style="background-image:url({$_W['attachurl']}gohome/currypic/{$value['pic']})"></div>
+                  {/if}
+                 {/if}
+                </a>
+              <div class="ub-f1 ub ub-ver t-line15 umar-l ulev-1">
+                <a class="ub-f1 ub ub-ac" href="{php echo $this->createMobileUrl('page', array('foo'=>'index', 'id'=>$value['id']))}">
+                  <div class="ub-f1">{$value['curry_name']}</div>
+                  <div class="t-gra ulev-4 ub"></div>
+                </a>
+                <a class="ub-f1 ulev-4" href="{php echo $this->createMobileUrl('page', array('foo'=>'index', 'id'=>$value['id']))}">
+                {if $value['zhe'] == 1 && $disc == 1}
+                    折:￥<span class="ulev0 t-red font-b">{php echo number_format($value['price']*$disc_zhe, 2, '.', '')}</span>&nbsp;&nbsp;<span class="ulev-2">原:￥{$value['price']}</span>
+                  {else}
+                    ￥<span class="ulev0 t-red font-b">{$value['price']}</span>
+                  {/if}
+                </a>
+                <div class="ub-f1 ub ub-ac">
+                 <a class="ub-f1 block ulev-4">
+                   总售 <span class="t-org font-b">{$value['allsum']}</span>
+                  <span class="umar-l t-red" onClick="zan({$value['id']})"><i class="iconfont icon-haoping"></i><span id="zan{$value['id']}">{$value['zan']}</span></span>
+                      <input type="hidden" name="zan_v{$value['id']}" id="zan_v{$value['id']}" value="{$value['zan']}">
+                 </a>
+                 <div class="ub ub-ac">
+                 <a href="javascript:void(0)" onClick="minus({$i},{$value[id]})" class="ub block"><i class="iconfont icon-jian ulev2 t-blu"></i></a>
+                 <div class="ub ulev0 umar-l" style="width:2rem">
+                 <span id="sum_show{$i}" class="ulev0 ub-f1 block tx-c"  style="line-height:1.5rem">0</span>
+                       </div>
+                 <a href="javascript:void(0)" onClick="add({$i},{$value[id]})" class="ub block m-tip"><i class="iconfont icon-jikediancanicon09 ulev2 t-blu"></i></a>
+                  <input type="hidden" name="sum{$i}" id="sum{$i}" value="0">
+                    <input type="hidden" name="price{$i}" id="price{$i}" value="{if $value['zhe'] == 1 && $disc == 1}
+                    {php echo number_format($value['price']*$disc_zhe, 2, '.', '')}{else}{$value['price']}{/if}" />
+
+                    <div style="display: none;">
+                      <input type="checkbox" name="curry_id[]" value="{$value[id]}" />
+                      <input type="checkbox" name="curry_sum[]" value="0" />
+                    </div>
+                 </div>
+                </div>
+              </div>
+              
+           </li>
+
+            {/loop}
+
+            <!--循环结束-->
+          </ul>
+          </div>
+          <!--餐,商品列表-->
+          {/loop}
+        </div>
+      </div>
+      <!--订餐类目-->
+    </div>
+    <!--主体部分 end-->
+  </div>
+  
+  <div style="height:3.5rem"></div>
+  <!--浮动顶部 star-->
+  <footer class="fixed ub-fh c-wh ubt b-bla01 ub ub-f1 ub-ac" style="bottom:0; left:0; z-index:999;">
+    <!--去结算状态-->
+    
+      <div id="car" class="absolute order_cirle uc-a50 c-gra ub ub-ac ub-pc t-wh">
+        <i class="iconfont icon-wodedingdan03 ulev1"></i>
+      </div>
+
+      <div id="suminfo" style="display:none;" class="absolute">
+        <span class="small_cirle c-org t-wh uc-a50 ub ub-ac ub-pc ulev-4" id="buysum_show">0</span>
+      </div>
+      <input type="hidden" name="buysum" id="buysum" value="0">
+      
+      <div class="ub-f1 t-line15" style="padding-left:4rem">
+        <div id="buyinfo" style="display:none;">
+          <p class="ulev1 t-blu">￥<span id="pricesum_show"></span>元<span class="ulev-2 t-gra">
+          <!--门店价：￥<span id="pricesum_show">34元</span></span>--></p>
+          <p class="ulev-2 t-gra">另需配送费{$item[merchant_song]}元</p>
+        </div>
+        <div id="noinfo">
+          购物车是空的
+        </div>
+        <input type="hidden" name="pricesum" id="pricesum" value="0">
+      </div>
+
+      <input type="hidden" name="merchant_price" id="merchant_price" value="{$item['merchant_price']}">
+      
+      <div id="cha_show" style="display:block;">
+        <a class="ub uinn212 c-gra ub-ac ub-pc ulev0 t-wh">还差<span id="cha_sum">{$item['merchant_price']}</span>元</a>
+      </div>
+
+      <div id="sub_show" style="display:none;">
+        <input type="submit" name="submit" class="ub uinn212 c-red ub-ac ub-pc ulev0 t-wh" value="去结算">
+      </div>
+
+      <input type="hidden" name="merchant_id" id="merchant_id" value="{$id}">
+      <input type="hidden" name="merchant_song" id="merchant_song" value="{$item['merchant_song']}">
+
+  </footer>
+  </form>
+  <!--弹出框--> 
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true" style="top:30%">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        {if $item['new_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15">首</div>
+           <div class="ub-f1 umar-l t-gra">新用户立减{php echo $this->getDiscInfo($item['id'], 'new_disc')}元</div>
+        </div >
+        {/if}
+        {if $item['man1_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_1')}减{php echo $this->getDiscInfo($item['id'], 'jian_1')}</div>
+        </div >
+        {/if}
+
+        {if $item['man2_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_2')}减{php echo $this->getDiscInfo($item['id'], 'jian_2')}</div>
+        </div >
+        {/if}
+
+        {if $item['man3_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_3')}减{php echo $this->getDiscInfo($item['id'], 'jian_3')}</div>
+        </div >
+        {/if}
+
+        {if $item['disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">折</div>
+           <div class="ub-f1 umar-l t-gra">折扣商品打{php echo $this->getDiscInfo($item['id'], 'disc')}折</div>
+        </div >
+        {/if}
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal -->
+   </div>
+   
+</div>
+<input type="hidden" name="all" id="all" value="{$all}" >
+
+{template 'public/footerjs'}
+<script src="{MODULE_URL}static/takeout/js/jquery.nav.js"></script>  
+<script>
+$(function(){
+  var all = $("#all").val();
+  for(var i=0; i<all; i++){
+    document.getElementById('sum'+i).value = 0;
+  }
+
+	$('#nav').onePageNav({
+		'offsetTop':95	
+	});
+});
+</script>
+<script language="javascript">
+function minus(id,name_id){
+  var buysum = document.getElementById('buysum').value;
+  var pricesum = document.getElementById('pricesum').value;
+
+  var price = document.getElementById('price'+id).value;
+  var sum = document.getElementById('sum'+id).value;
+  var merchant_price = document.getElementById('merchant_price').value;
+  var new_sum = parseInt(sum)-1;
+
+  var new_buysum = parseInt(buysum)-1;
+  var new_pricesum = ((parseInt(pricesum*100)-parseInt(price*100)))/100;
+  
+  var cha = 0;
+  if(merchant_price > new_pricesum){
+    cha = parseInt(merchant_price) - parseInt(new_pricesum);  
+  }
+
+  if(new_sum < 0){
+    $('#car').removeClass("c-red").addClass("c-gra");
+    
+    alert('不能再减了！');
+    document.getElementById('sum'+id).value = 0;
+    document.getElementById('sum_show'+id).innerHTML = 0;
+    document.getElementById('cha_sum').innerHTML = $merchant_price;
+  }else{
+    document.getElementById('sum'+id).value = new_sum;
+    document.getElementById('sum_show'+id).innerHTML = new_sum;
+    if(new_sum == 0){
+      document.getElementsByName("curry_id[]").item(id).checked=false;
+      document.getElementsByName("curry_sum[]").item(id).checked = false;
+    }
+    document.getElementsByName("curry_sum[]").item(id).value = new_sum;
+    
+    if(new_buysum <= 0){
+      $('#car').removeClass("c-red").addClass("c-gra");
+
+      document.getElementById("noinfo").style.display = 'block';
+      document.getElementById("buyinfo").style.display = 'none';
+      document.getElementById('cha_sum').innerHTML = merchant_price;
+      document.getElementById('cha_show').style.display = 'block';
+      document.getElementById('sub_show').style.display = 'none';
+      document.getElementById('suminfo').style.display = 'none';
+
+      document.getElementById('buysum').value = new_buysum;
+      document.getElementById('buysum_show').innerHTML = new_buysum;
+      document.getElementById('pricesum').value = new_pricesum;
+      document.getElementById('pricesum_show').innerHTML = new_pricesum;
+    }else{
+      document.getElementById("noinfo").style.display = 'none';
+      document.getElementById("buyinfo").style.display = 'block';
+      if(merchant_price > new_pricesum){
+        $('#car').removeClass("c-red").addClass("c-gra");
+        document.getElementById('cha_sum').innerHTML = cha;
+        document.getElementById('cha_show').style.display = 'block';
+        document.getElementById('sub_show').style.display = 'none';
+      }else{
+        $('#car').removeClass("c-gra").addClass("c-red");
+        document.getElementById('cha_sum').innerHTML = cha;
+        document.getElementById('cha_show').style.display = 'none';
+        document.getElementById('sub_show').style.display = 'block';
+      }
+      
+      document.getElementById('buysum').value = new_buysum;
+      document.getElementById('buysum_show').innerHTML = new_buysum;
+      document.getElementById('pricesum').value = new_pricesum;
+      document.getElementById('pricesum_show').innerHTML = new_pricesum;
+    }
+  }
+}
+
+function add(id,name_id){
+  var offset = $('#car').offset(), flyer = $('<i class="iconfont icon-jikediancanicon09 ulev2 t-blu"></i>');
+  var scrollTop = document.body.scrollTop;
+
+  flyer.fly({
+      start: {
+          left: event.pageX,
+          top: event.pageY-scrollTop
+      },
+      end: {
+          left: offset.left,
+          top: offset.top-scrollTop,
+          width: 20,
+          height: 20
+      }
+  });
+
+  var buysum = document.getElementById('buysum').value;
+  var pricesum = document.getElementById('pricesum').value;
+  var price = document.getElementById('price'+id).value;
+  var sum = document.getElementById('sum'+id).value;
+  var merchant_price = document.getElementById('merchant_price').value;
+
+  var new_sum = parseInt(sum)+1;
+  if(new_sum>0){
+    $('#car').removeClass("c-gra").addClass("c-red");
+
+    document.getElementById('sum'+id).value = new_sum;
+    document.getElementById('sum_show'+id).innerHTML = new_sum;
+    if(document.getElementsByName("curry_id[]").item(id).value == name_id){
+          document.getElementsByName("curry_id[]").item(id).checked=true;
+      }
+    document.getElementsByName("curry_sum[]").item(id).value = new_sum;
+    document.getElementsByName("curry_sum[]").item(id).checked=true;
+    
+    document.getElementById("noinfo").style.display = 'none';
+    document.getElementById("buyinfo").style.display = 'block';
+    document.getElementById("suminfo").style.display = 'block';
+
+    var new_buysum = parseInt(buysum)+1;
+    var new_pricesum = ((parseInt(pricesum*100)+parseInt(price*100))/100);
+    if(new_pricesum < merchant_price){
+      var cha = parseInt(merchant_price) - parseInt(new_pricesum);
+      document.getElementById('cha_sum').innerHTML = cha;
+      document.getElementById('cha_show').style.display = 'block';
+      document.getElementById('sub_show').style.display = 'none';
+    }else{
+      document.getElementById('cha_show').style.display = 'none';
+      document.getElementById('sub_show').style.display = 'block';
+    }
+    document.getElementById('buysum').value = new_buysum;
+    document.getElementById('buysum_show').innerHTML = new_buysum;
+    document.getElementById('pricesum').value = new_pricesum;
+    document.getElementById('pricesum_show').innerHTML = new_pricesum;
+  }else{
+    alert('请选择份数');
+    document.getElementById('sum'+id).value = 0;
+    document.getElementById('sum_show'+id).innerHTML = 0;
+  }
+}
+
+function keep(id){
+  $.ajax({
+      url:"{php echo $this->createMobileUrl('takeout', array('foo'=>'keep'))}",
+      type:"POST",
+      data: {"id":id},
+      dataType:"json",
+      success: function(res){
+        if(res == 1){
+          alert('收藏成功');
+          return false;
+        }else if(res == 2){
+          alert('已收藏');
+          return false;
+        }else{
+          alert('收藏失败');
+          return false;
+        }
+      }
+  });
+}
+
+function away(id){
+  if(window.confirm('你确定要取消收藏吗？')){
+    $.ajax({
+        url:"{php echo $this->createMobileUrl('takeout', array('foo'=>'away'))}",
+        type:"POST",
+        data: {"id":id},
+        dataType:"json",
+        success: function(res){
+          if(res == 1){
+            alert('取消收藏成功');
+            return false;
+          }else if(res == 2){
+            alert('已取消收藏');
+            return false;
+          }else{
+            alert('取消收藏失败');
+            return false;
+          }
+        }
+    });
+  }else{
+    return false;
+  }
+}
+
+function zan(id){
+  var zan_v = document.getElementById('zan_v'+id).value;
+  $.ajax({
+        url:"{php echo $this->createMobileUrl('takeout', array('foo'=>'zan'))}",
+        type:"POST",
+        data: {"id":id},
+        dataType:"json",
+        success: function(res){
+          if(res == 1){
+            document.getElementById('zan'+id).innerHTML = parseInt(zan_v)+parseInt(1);
+          }else if(res == 0){
+            alert('点赞失败！');
+            return false;
+          }else{
+            alert('已点赞');
+            return false;
+          }
+        }
+    });
+}
+</script>
+</body>
+</html>

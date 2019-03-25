@@ -1,0 +1,2075 @@
+{template 'web/common/header'}
+{if $rfid1statedata == 1}
+<script language="javascript" src="http://127.0.0.1:8008/YOWOCloudRFIDReader.js"></script>
+<script src="{HLMMS_JS}YOWOReaderBase.js"></script>
+<script language="javascript" type="text/javascript">
+    rfidreader.onResult(function(resultdata) {
+            key('1', function(){
+                ReadBlock();
+            });
+            switch(resultdata.FunctionID)
+            {
+                case 14:
+                    document.getElementById("CloudReaderVer").value = resultdata.strData;
+                    break;
+                case 7:
+                    if(resultdata.Result>0)
+                    {
+                        document.getElementById("memberCardNum").value = resultdata.strData;
+                        $(".sweet-alert.show-input.showSweetAlert ").find('input').val(resultdata.strData);
+                    }
+                    else
+                    {
+                        alert("读卡失败，错误：" + GetErrStr(resultdata.Result));
+                    }
+                    break;
+                case 8:
+                    if(resultdata.Result>0)
+                    {
+                        document.getElementById("RfidCardDoMsg").innerText = "写入成功！";
+                        //alert("写入制卡成功");
+                        //ReadBlock();
+                        //alert("写入成功，写入16进制数据：" + resultdata.strData);
+                    }
+                    else
+                    {
+                        document.getElementById("RfidCardDoMsg").innerText = "写入失败，错误：" + GetErrStr(resultdata.Result);
+                        //alert("写入失败，错误：" + GetErrStr(resultdata.Result));
+                    }
+                    break;
+            }
+        }
+    );
+    function ReadBlock() {
+        var SectorID;
+        var Key;
+
+        SectorID = {php echo $rfid2statedata};
+        Key =document.getElementById("KeyCard").value;
+        rfidreader.KeyMode=0;
+        rfidreader.KeyStringMode=0;
+        rfidreader.KeyString=Key;
+        rfidreader.Repeat=0
+        rfidreader.M1ReadSector(SectorID, 1);
+    }
+    function WriteBlock(){
+        var SectorID;
+        var Key;
+        var Data;
+
+        SectorID = {php echo $rfid2statedata};
+        Key =document.getElementById("KeyCard").value;
+        Data =document.getElementById("member_RfidCardNum").value;
+        rfidreader.KeyMode=0;
+        rfidreader.KeyStringMode=0;
+        rfidreader.KeyString=Key;
+        rfidreader.Repeat=0
+        rfidreader.M1WriteSector(SectorID, Data,1);
+    }
+
+</script>
+{/if}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('member', array('op' => 'list'))}"></a>会员信息</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('memberinfo')}"></a></h5>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-user"></i>基本信息</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"><i class="fa fa-shopping-cart"></i>消费记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false"><i class="fa fa-institution"></i>储值记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false"><i class="fa fa-credit-card"></i>积分记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-5" aria-expanded="false"><i class="fa fa-gift"></i>积分兑换记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-6" aria-expanded="false"><i class="fa fa-edit"></i>记次信息</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-7" aria-expanded="false"><i class="fa fa-list-alt"></i>充次记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-8" aria-expanded="false"><i class="fa fa-list-alt"></i>扣次记录</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-9" aria-expanded="false"><i class="fa fa-institution"></i>优惠券核销</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-10" aria-expanded="false"><i class="fa fa-book"></i>跟踪记录</a></li>
+                                </ul>
+                                <div class="tab-content"  id="memberInfoList">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="ibox-content">
+                                            <form action="" method="post" class="form-horizontal" role="form">
+                                                <p>
+                                                    <button data-toggle="modal" class="btn btn-warning" onclick=" btn_showReadCard();"><i class="fa fa-spin fa-spinner"></i>&nbsp;读卡</button>
+                                                    <a name="saveSubmit" type="button" class="btn btn-primary " onclick="saveSubmit();">保存</a>
+                                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                                    <a data-toggle="modal" data-target="#myModal" class="btn btn-success"><i class="fa fa-upload"></i>&nbsp;升级</a>
+                                                    <a data-toggle="modal" data-target="#ModalWriteRfidCard" class="btn btn-danger" id="Write_RfidCard" style="display:none" ><i class="fa fa-chain"></i>绑定实体卡</a>
+                                                    <a data-toggle="modal" data-target="#ModalWriteRfidCard" class="btn btn-info" id="Write_ChangeRfidCard" style="display:none"><i class="fa fa-paste"></i>更换/补卡</a>
+                                                    <a data-toggle="modal" data-target="#myModal2" class="btn btn-primary"><i class="fa fa-plus-square"></i>&nbsp;延期</a>
+                                                    <a onclick="Addtrackrecording()" class="btn btn-success"><i class="fa fa-user-secret"></i>&nbsp;客户跟踪</a>
+                                                    <a data-toggle="modal"  class="btn btn-warning" onclick="newPassword();"><i class="fa fa-unlock-alt"></i>&nbsp;修改密码</a>
+                                                    <a data-toggle="modal"  class="btn btn-danger" onclick="deletelCard();"><i class="fa fa-unlock-alt"></i>&nbsp;退卡</a>
+                                                </p>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="title" class="col-sm-1 control-label">卡号</label>
+
+                                                    <div class="col-xs-2">
+                                                        <input type="text" disabled="disabled" name="memberCardNum" class="form-control"  id='memberCardNum' />
+                                                        <input type="hidden" disabled="disabled" name="memberId" class="form-control"   id='memberId' />
+                                                        <input type="hidden"   name="is_RfidCardNum" class="form-control"   id='is_RfidCardNum' />
+                                                    </div>
+                                                    <label for="title" class="col-sm-1 control-label">姓名</label>
+                                                    <div class="col-xs-2">
+                                                        <input type="text" name="memberName" class="form-control"  id='memberName' />
+                                                    </div>
+                                                    <label for="title" class="col-sm-1 control-label">身份证号</label>
+                                                    <div class="col-xs-2">
+                                                        <input type="text" name="memberIdentityNum" class="form-control" id='memberIdentityNum' />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="title" class="col-sm-1 control-label">手机号 </label>
+                                                    <div class="col-xs-2">
+                                                        <input type="text" name="memberMobile" class="form-control"  id='memberMobile' />
+                                                    </div>
+                                                    <label for="title" class="col-sm-1 control-label">性别</label>
+                                                    <div class="col-xs-2">
+                                                        <div class="radio radio-info radio-inline">
+                                                            <input type="radio" name="memberSex" id="memberSex1" value="1">
+                                                            <label for="memberSex1"> 男 </label>
+                                                        </div>
+                                                        <div class="radio radio-inline radio-danger">
+                                                            <input type="radio" name="memberSex" id="memberSex2" value="2">
+                                                            <label for="memberSex2"> 女 </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">绑定微信号</label>
+                                                    <div class="col-xs-2">
+                                                        <input type="text" name="memberWechat" class="form-control" id='memberWechat' placeholder="会员微信号"/>
+                                                    </div>
+                                                    <label for="title" class="col-sm-1 control-label">出生日期 </label>
+                                                    <div class="col-xs-1">
+                                                        <select  class="form-control m-b" name="memberBirthdayType" >
+                                                            <option id="memberBirthdayType1"  value="1">公历</option>
+                                                            <option id="memberBirthdayType2"  value="2">农历</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-xs-3" id="memberbirthday">
+                                                        {php echo tpl_form_field_calendar(memberbirthday, array('year' => 2018,'month' => 4,'day' => 24));}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">会员卡级别</label>
+                                                    <div class="col-xs-2">
+                                                        <input type="hidden" name="membercardlevelids" id="membercardlevelids" value="{$item['membercardlevel_id']}"/>
+                                                        <input type="text" name="membercardlevel" id="membercardlevel" class="form-control" readonly>
+                                                    </div>
+                                                    <label class="col-sm-1 control-label">会员卡到期时间</label>
+                                                    <div class="col-xs-2">
+                                                        <input type="hidden" name="membercardlevelids" value="{$item['membercardlevel_id']}"/>
+                                                        <input type="text" name="membercardlevel" id="specifiedEndTime" class="btn btn-info btn-rounded" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">会员总次数</label>
+                                                    <div class="col-xs-2">
+                                                        <div class="input-group m-b">
+                                                            <input type="text" disabled="disabled" name="memberNumberCount" class="form-control" value="{$item['mem_memberNumberCount']}" id='memberNumberCount'/>
+                                                            <span class="input-group-addon">次</span>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-sm-1 control-label">会员总积分</label>
+                                                    <div class="col-xs-2">
+                                                        <div class="input-group m-b">
+                                                            <input type="text" disabled="disabled" name="memberPointsCount" class="form-control" value="{$item['mem_memberPointsCount']}" id='memberPointsCount'/>
+                                                            <span class="input-group-addon">积分</span>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-sm-1 control-label">会员储值总金额</label>
+                                                    <div class="col-xs-2">
+                                                        <div class="input-group m-b">
+                                                            <input type="text"  disabled="disabled" name="memberMoneyCount" class="form-control" value="{$item['mem_memberMoneyCount']}" id='memberMoneyCount'/>
+                                                            <span class="input-group-addon">元</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">联系地址</label>
+                                                    <div class="col-xs-4" id="contactaddress">
+                                                        {php echo tpl_form_field_district('reside',array('province' => $item['province'],'city' => $item['city'],'district' => $item['district']));}
+                                                    </div>
+                                                    <label for="" class="col-sm-1 control-label">详细地址</label>
+                                                    <div class="col-xs-3">
+                                                        <input name="memberDetailAddress" id="memberDetailAddress" class="form-control"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">会员微信头像</label>
+                                                    <div class="col-xs-3" id="memberpicture">
+                                                        {php echo tpl_form_field_image('memberPicture', $item['mem_memberPicture'])}
+                                                    </div>
+                                                    <span class="help-block">建议比例:100像素 * 100像素<span style="color: red"></span></span>
+                                                </div>
+                                                <div class="panel-group" id="accordion">
+                                                    <div class="col-sm-12">
+                                                        <div class="panel panel-success">
+                                                            <div class="panel-heading">
+                                                                会员自定义字段信息
+                                                            </div>
+                                                            <div class="panel-body">
+                                                                {loop $membercustomizealllist $membercustomizeallitem}
+                                                                {if $membercustomizeallitem['mc_type'] == number || $membercustomizeallitem['mc_type'] == text}
+                                                                <div class="form-group">
+                                                                    <label  class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                                                    <div class="col-xs-8">
+                                                                        <input name="array[]" type="{$membercustomizeallitem['mc_type']}" id="{$membercustomizeallitem['mc_fields']}" class="form-control" value="{$membercustomizedetailed[$membercustomizeallitem['mc_fields']]}" {if $membercustomizeallitem['mc_required'] == 1}{else}required{/if} />
+                                                                        <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+
+                                                                    </div>
+                                                                </div>
+                                                                {else if $membercustomizeallitem['mc_type'] == image}
+                                                                <div class="form-group">
+                                                                    <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+
+                                                                    <label class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                                                    <div class="col-xs-8" id="{$membercustomizeallitem['mc_fields']}">
+                                                                    </div>
+                                                                </div>
+                                                                {else if $membercustomizeallitem['mc_type'] == textarea}
+                                                                <div class="form-group">
+
+                                                                    <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                                                        <div class="col-sm-8">
+                                                                            <textarea name="array[]" id="{$membercustomizeallitem['mc_fields']}" class="form-control" {if $membercustomizeallitem['mc_required'] == 1}{else}required{/if} >{$membercustomizedetailed[$membercustomizeallitem['mc_fields']]}</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {/if}
+                                                                {/loop}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div id="tab-2" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="membercashRegistertabledata" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-3" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="memberdeductionTableData" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-4" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="integralRecord" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-5" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="mrccCountConsumptionTableData" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-6" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="memberrechargecount" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-7" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="memberincreaseCountTableData" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-8" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="membercountConsumptionTableData" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-9" class="tab-pane">
+                                        <div class="panel-body">
+                                            <table id="membercountCouponTableData" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                    <div id="tab-10" class="tab-pane">
+                                        <div class="panel-body">
+                                            <label for="title" class="col-sm-10 control-label"></label>
+                                            <div class="col-xs-2">
+                                                <a onclick="Refreshtable();" class="btn btn-w-m btn-success"><i class="fa fa-refresh"></i> 刷新记录</a>
+                                            </div>
+                                            <table id="membertrackrecordingdata" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal " id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content animated fadeInDownBig">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title">升级</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label  class="col-sm-2 control-label">会员级别</label>
+                                        <div class="col-xs-8">
+                                            <select class="form-control" name="membercardlevelid" id="membercardlevelid">
+                                                <option>请选择会员等级</option>
+                                                {loop $membersql $itemmember}
+                                                <option value="{$itemmember['id']}" {if $itemmember['id'] == $item['membercardlevel_id']}selected ='selected'{/if}>{$itemmember['mcl_levelName']}</option>
+                                                {/loop}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                                    <button type="submit" class="btn btn-primary"  name="membercardLevelSubmit" onclick="membercardLeve();">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal " id="myModal2" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content animated fadeInDownBig">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title">延期</h4>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div class="form-group">
+
+                                        <label class="col-sm-3 control-label">请选择延长日期:</label>
+                                        <div class="col-sm-8" id="validityperiodnew">
+                                            <input placeholder="开始日期" class="form-control layer-date" id="MemberSpecified" name="MemberSpecified">
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                                    <button type="submit" class="btn btn-primary"  name="setdatesubmit" onclick="but_setdatesubmit();"/>保存</button>
+                                </div>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal " id="myModal4" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content animated fadeInDownBig">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title">更换店面</h4>
+
+                                </div>
+                                <form action="" class="form-horizontal form" method="post" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">请选择店面:</label>
+                                            <div class="col-xs-8">
+                                                <select class="form-control" name="storeid" id="storeid" >
+                                                    {loop $storelist $itemstore}
+                                                    <option value="{$itemstore['id']}" {if $itemstore['id'] == $item['store_id']}selected ='selected'{/if}>{$itemstore['sto_name']}</option>
+                                                    {/loop}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                                        <input type="submit" class="btn btn-primary"  name="changeStoreSubmit" value="保存">
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal " id="myModal5" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content animated fadeInDownBig">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title">新增跟踪记录</h4>
+                                </div>
+                                <form action="" class="form-horizontal form" method="post" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">跟踪内容</label>
+                                            <div class="col-xs-8">
+                                                <textarea name="mtrcontent" id="mtrcontent" class="form-control">{$item['mtr_content']}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">上传图片</label>
+                                            <div class="col-xs-8">
+                                                {php echo tpl_form_field_image('mtrpicture', $item['mtr_picture'])}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                                        <button type="button" class="btn btn-primary"  name="changeStoreSubmit" onclick="membertrackrecording()">保存</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal " id="ModalWriteRfidCard" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content animated fadeInDownBig">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title" id="rfidDo_modal_title"></h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label  class="col-sm-2 control-label">会员卡号</label>
+                                        <div class="col-xs-8">
+                                            <div class="input-group">
+                                                <input name="CloudReaderVer" type="hidden" id="CloudReaderVer" maxlength="10" readonly="readonly" />
+                                                <input name="KeyCard" type="hidden" id="KeyCard" value="FFFFFFFFFFFF" size="15" maxlength="12">
+                                                <input name="member_RfidCardNum" id='member_RfidCardNum' class="form-control" />
+                                                <span class="input-group-btn">
+                                                    {if $rfid3statedata == 1}
+                                                    <button type="button" class="btn btn-primary" style="margin-right: 5px;" onclick="WriteBlock()">写入制卡</button>
+                                                    <button type="button" class="btn btn-danger" onclick="loadNewRfidCard()">生成新卡号</button>
+                                                    {/if}
+                                                </span>
+                                            </div>
+                                            <span class="label label-danger" id="RfidCardDoMsg"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn btn-primary"  onclick="saveNewRfidCard()">提交保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    //会员卡延期
+    var end = {
+        elem: '#MemberSpecified',
+        format: 'YYYY-MM-DD',
+        min: laydate.now(),
+        max: '2099-06-16 23:59:59',
+        istime: true,
+        istoday: true,
+        choose: function (datas) {
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+        }
+    };
+    laydate(end);
+    $("#MemberSpecified").attr("value",laydate.now());
+
+    $("#memberCardNumstr").focus();
+    $(document).ready(function(){
+        var memberCardNumValue = "{php echo $memberCardNumLocation}";
+        if(memberCardNumValue.length > 0){
+            btn_showReadCardLocation(memberCardNumValue);
+        }else{
+            btn_showReadCard();
+        }
+    });
+    //会员登记完跳转过来读卡
+    function btn_showReadCardLocation(memberCardNumValue) {
+        var memberCardNum = memberCardNumValue;
+        var url = "{php echo $this->createWebUrl('memberinfo', array('op' => 'ajaxGetMemberIfo'))}";
+        var params = {
+            'memberCardNum': memberCardNum,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] != 0) {
+                    swal({
+                        title: "读卡失败",
+                        text: "卡号错误或不存在卡号，请重新读卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }
+                else {
+                    // alert(data['message']);
+                    var memberIdstr = data['message']['back_MemberId'];
+                    var memberCardNumstr = data['message']['back_MemberCardNum'];
+                    var memberNamestr = data['message']['back_MemberName'];
+                    var membercardlevelstr = data['message']['back_Membercardlevel'];
+                    var membercardlevelstr_id = data['message']['back_Membercardlevel_id'];
+                    var memberMobilestr = data['message']['back_MemberMobile'];
+                    var memberNumberCountstr = data['message']['back_MemberNumberCount'];
+                    var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                    var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                    var memberSpecifiedStartTimestr = data['message']['back_MemberSpecifiedStartTime'];
+                    var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                    var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                    var memberIdentityNum = data['message']['back_MemberIdentityNum'];
+
+
+                    var membercustomizealllist = data['message']['membercustomizealllist'];//字段信息
+                    var membercustomizedetailed = data['message']['membercustomizedetailed'];//字段数据
+                    //RFID操作
+                    var rfid1statedata = "{php echo $rfid1statedata}";
+                    var isBindRfidCard = data['message']['isRfidCard'];
+                    $("#is_RfidCardNum").attr("value",isBindRfidCard);
+                    if((isBindRfidCard ==0 || isBindRfidCard == null || isBindRfidCard == '') && rfid1statedata == 1){
+                        $("#Write_RfidCard").css('display','');
+                        $("#member_RfidCardNum").attr("value",memberCardNumstr);
+                        $("#rfidDo_modal_title").text("绑定实体卡");
+                    }else{
+                        $("#Write_ChangeRfidCard").css('display','');
+                        $("#rfidDo_modal_title").text("更换/补卡");
+                    }
+
+                    if(membercustomizedetailed){
+
+                        $.each(membercustomizealllist,function(keys,vals){
+
+                            $.each(membercustomizedetailed,function(key,val){
+
+                                //alert(val)
+                                if(vals.mc_fields == key){
+
+                                    if(vals.mc_type == 'image') {
+                                        var sss = val;
+                                        //    $("#"+vals.mc_fields).data(val);
+                                        // $("#"+vals.mc_fields).attr("","images/1/2018/05/EJfSKRC3XP9CNRkMqVkznPnx8XFM85.png");
+                                        $("#"+vals.mc_fields).html("<img  height=150 src={$_W['siteroot']}attachment/"+val+">");
+                                    }
+                                    else{
+                                        $("#"+vals.mc_fields).val(val);
+                                    }
+
+                                }
+                            });
+
+                        });
+                    }
+
+                    var memberSex = data['message']['back_MemberSex'];
+                    if(memberSex == 1){
+                        $("#memberSex1").attr("checked","checked");
+                    }else if(memberSex == 2){
+                        $("#memberSex2").attr("checked","checked");
+                    }
+                    var memberWechatstr = data['message']['back_MemberWechat'];
+
+                    var memberBirthdayTypestr = data['message']['back_MemberBirthdayType'];
+
+                    if(memberBirthdayTypestr == 1){
+                        $("#memberBirthdayType1").attr("selected",memberBirthdayTypestr);
+                    }else{
+                        $("#memberBirthdayType2").attr("selected",memberBirthdayTypestr);
+                    }
+
+                    var memberBirthdayYearstr = data['message']['back_MemberBirthdayYear'];
+
+
+                    var memberBirthdayMonthstr= data['message']['back_MemberBirthdayMonth'];
+                    var memberBirthdayDaystr = data['message']['back_MemberBirthdayDay'];
+                    var provincestr = data['message']['back_province'];
+                    var citystr = data['message']['back_city'];
+                    var districtstr = data['message']['back_district'];
+                    var memberDetailAddressstr = data['message']['back_MemberDetailAddress'];
+
+
+                    var contactaddress = data['message']['contactaddress'];
+                    var MemberBirthday = data['message']['MemberBirthday'];
+                    var memberpicture = data['message']['memberpicture'];
+
+                    $("#memberId").attr("value",memberIdstr);
+                    $("#memberCardNum").attr("value",memberCardNumstr);
+                    $("#memberName").attr("value",memberNamestr);
+                    $("#membercardlevel").attr("value",membercardlevelstr);
+                    $("#membercardlevelids").attr("value",membercardlevelstr_id);
+                    $("#memberMobile").attr("value",memberMobilestr);
+                    $("#memberNumberCount").attr("value",memberNumberCountstr);
+                    $("#memberPointsCount").attr("value",memberPointsCountstr);
+                    $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                    $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                    $("#memberIdentityNum").attr("value",memberIdentityNum);
+
+                    $("#memberWechat").attr("value",memberWechatstr);
+                    $("#memberBirthdayType").attr("value",memberBirthdayTypestr);
+
+                    $("#memberbirthday").html(MemberBirthday);//生日
+                    $("#contactaddress").html(contactaddress);//联系地址
+                    $("#memberpicture").html(memberpicture);//有图片
+
+                    $("#province").attr("value",provincestr);
+                    $("#city").attr("value",citystr);
+                    $("#district").attr("value",districtstr);
+                    $("#memberDetailAddress").attr("value",memberDetailAddressstr);
+
+                    cashRegister(memberIdstr);//消费记录
+                    deduction(memberIdstr);//储值记录
+                    countConsumption(memberIdstr);//扣次记录
+                    increaseCount(memberIdstr);//增加计次
+                    countinformation(memberIdstr);//计次记录
+                    mrcCountConsumption(memberIdstr);//积分兑换记录
+                    cashExchange(memberIdstr);//积分记录
+                    membercountCouponTableData(memberIdstr);//优惠券记录
+                    membertrackrecordingdata(memberIdstr);
+                }
+            }
+
+        });
+    }
+    //读卡
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定(1)",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberinfo', array('op' => 'ajaxGetMemberIfo'))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                        else {
+                            // alert(data['message']);
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var membercardlevelstr_id = data['message']['back_Membercardlevel_id'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberNumberCountstr = data['message']['back_MemberNumberCount'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedStartTimestr = data['message']['back_MemberSpecifiedStartTime'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            var memberIdentityNum = data['message']['back_MemberIdentityNum'];
+                            var membercustomizealllist = data['message']['membercustomizealllist'];//字段信息
+                            var membercustomizedetailed = data['message']['membercustomizedetailed'];//字段数据
+                            //RFID操作
+                            var rfid1statedata = "{php echo $rfid1statedata}";
+                            var isBindRfidCard = data['message']['isRfidCard'];
+                            $("#is_RfidCardNum").attr("value",isBindRfidCard);
+                            if((isBindRfidCard ==0 || isBindRfidCard == null || isBindRfidCard == '') && rfid1statedata == 1){
+                                $("#Write_RfidCard").css('display','');
+                                $("#member_RfidCardNum").attr("value",memberCardNumstr);
+                                $("#rfidDo_modal_title").text("绑定实体卡");
+                            }else{
+                                $("#Write_ChangeRfidCard").css('display','');
+                                $("#rfidDo_modal_title").text("更换/补卡");
+                            }
+
+                            if(membercustomizedetailed){
+
+                                $.each(membercustomizealllist,function(keys,vals){
+
+                                    $.each(membercustomizedetailed,function(key,val){
+
+                                        //alert(val)
+                                        if(vals.mc_fields == key){
+
+                                            if(vals.mc_type == 'image') {
+                                                var sss = val;
+                                                //    $("#"+vals.mc_fields).data(val);
+                                                // $("#"+vals.mc_fields).attr("","images/1/2018/05/EJfSKRC3XP9CNRkMqVkznPnx8XFM85.png");
+                                                $("#"+vals.mc_fields).html("<img  height=150 src={$_W['siteroot']}attachment/"+val+">");
+                                            }
+                                            else{
+                                                $("#"+vals.mc_fields).val(val);
+                                            }
+
+                                        }
+                                    });
+
+                                });
+                            }
+
+                            var memberSex = data['message']['back_MemberSex'];
+                            if(memberSex == 1){
+                                $("#memberSex1").attr("checked","checked");
+                            }else if(memberSex == 2){
+                                $("#memberSex2").attr("checked","checked");
+                            }
+                            var memberWechatstr = data['message']['back_MemberWechat'];
+
+                            var memberBirthdayTypestr = data['message']['back_MemberBirthdayType'];
+
+                            if(memberBirthdayTypestr == 1){
+                                $("#memberBirthdayType1").attr("selected",memberBirthdayTypestr);
+                            }else{
+                                $("#memberBirthdayType2").attr("selected",memberBirthdayTypestr);
+                            }
+
+                            var memberBirthdayYearstr = data['message']['back_MemberBirthdayYear'];
+
+                            var memberBirthdayMonthstr= data['message']['back_MemberBirthdayMonth'];
+                            var memberBirthdayDaystr = data['message']['back_MemberBirthdayDay'];
+                            var provincestr = data['message']['back_province'];
+                            var citystr = data['message']['back_city'];
+                            var districtstr = data['message']['back_district'];
+                            var memberDetailAddressstr = data['message']['back_MemberDetailAddress'];
+
+
+                            var contactaddress = data['message']['contactaddress'];
+                            var MemberBirthday = data['message']['MemberBirthday'];
+                            var memberpicture = data['message']['memberpicture'];
+
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#membercardlevelids").attr("value",membercardlevelstr_id);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberNumberCount").attr("value",memberNumberCountstr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberIdentityNum").attr("value",memberIdentityNum);
+
+                            $("#memberWechat").attr("value",memberWechatstr);
+                            $("#memberBirthdayType").attr("value",memberBirthdayTypestr);
+                            $("#memberbirthday").html(MemberBirthday);//生日
+                            $("#contactaddress").html(contactaddress);//联系地址
+                            $("#memberpicture").html(memberpicture);//有图片
+
+                            $("#province").attr("value",provincestr);
+                            $("#city").attr("value",citystr);
+                            $("#district").attr("value",districtstr);
+                            $("#memberDetailAddress").attr("value",memberDetailAddressstr);
+
+
+                            //  alert(sss);
+                            swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                            cashRegister(memberIdstr);//消费记录
+                            deduction(memberIdstr);//储值记录
+                            countConsumption(memberIdstr);//扣次记录
+                            increaseCount(memberIdstr);//增加计次
+                            countinformation(memberIdstr);//计次记录
+                            mrcCountConsumption(memberIdstr);//积分兑换记录
+                            cashExchange(memberIdstr);//积分记录
+                            membercountCouponTableData(memberIdstr);//优惠券记录
+                            membertrackrecordingdata(memberIdstr);
+                        }
+                    }
+
+                });
+            });
+
+    }
+    //修改密码
+    function newPassword() {
+
+
+        swal({
+                title: "更换密码",
+                text: "请输入密码：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入新密码"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("密码不能为空！");
+                    return false
+                }
+                var memberPassword = inputCardValue;
+                var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'membercardLevelSubmit'))}";
+                var memberid = $("#memberId").val();//获取会员ID
+                var params = {
+                    'memberPassword': memberPassword,
+                    ' memberid':memberid
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            swal({
+                                title: "修改失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }else{
+                            swal({
+                                title: "修改成功",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            });
+
+                        }
+                    }
+
+                });
+            });
+
+
+    }
+    //实体卡
+    function saveNewRfidCard() {
+        var newMemberCardNum = $("#member_RfidCardNum").val();
+        var isRfidCardNum = $("#is_RfidCardNum").val();
+        var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'changeCardSubmit'))}";
+        var memberid = $("#memberId").val();//获取会员ID
+        var params = {
+            'newMemberCardNum': newMemberCardNum,
+            'memberid':memberid,
+            'isRfidCardNum':isRfidCardNum
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "操作失败",
+                        text: "卡号错误或不存在卡号，请重新读卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }
+                else if(data['message']['code'] == 2){
+                    swal({
+                        title: "操作失败",
+                        text: "已存在该卡号，请重新换卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }
+                else{
+                    swal({
+                            title: "操作成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            $('#ModalWriteRfidCard').modal('hide');
+                            $("#memberCardNum").attr("value",data['message']['memberCardNum']);
+                            if(isRfidCardNum != 1){
+                                $("#Write_RfidCard").css('display','none');
+                                $("#Write_ChangeRfidCard").css('display','');
+                                $("#rfidDo_modal_title").text("更换/补卡");
+                                $("#member_RfidCardNum").val();
+                                document.getElementById("RfidCardDoMsg").innerText = "";
+                            }
+
+                        });
+
+                }
+            }
+
+        });
+    }
+    //退卡
+    function deletelCard() {
+        swal({
+                title: "确定删除吗？",
+                text: "你将无法该会员信息！",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定删除！",
+                closeOnConfirm: false
+            },
+            function(){
+                var memberid = $("#memberId").val();//获取会员ID
+                var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'deletelCard'))}";
+                var params = {
+                    ' memberid':memberid
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            swal({
+                                title: "退卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }else{
+                            swal({
+                                title: "退卡成功",
+                                text: "您的会员卡已失效",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            }, function(){
+                                location.reload(true);
+                            })
+
+
+                        }
+                    }
+                });
+
+
+
+            });
+
+    }
+    //会员升级
+    function membercardLeve() {
+        var memberid = $("#memberId").val();//获取会员ID
+        var membercardlevelid = $("#membercardlevelid").val();//获取会员新级别ID
+        var membercardlevelids = $("#membercardlevelids").val();//获取会员旧级别ID
+        var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'membercardLeve'))}";
+        var params = {
+            'memberid':memberid,
+            'membercardlevelid':membercardlevelid,
+            'membercardlevelids':membercardlevelids
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "升级失败",
+                        text: "卡号错误或不存在卡号，请重新读卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }else{
+                    //alert(data['message']['msg']);
+                    swal({
+                            title: "升级成功",
+                            text: "您的会员卡升级成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            var specifiedEndTime = data['message']['specifiedEndTime'];
+                            $("#specifiedEndTime").attr("value",specifiedEndTime);
+                            var membercardlevel = data['message']['memberlevelName'];
+                            $("#membercardlevel").attr("value",membercardlevel);
+                            $("#membercardlevelids").attr("value",data['message']['new_memberlevelid']);
+                            $('#myModal').modal('hide');
+                        });
+                }
+            }
+        });
+
+
+    }
+
+    function but_setdatesubmit() {
+        var memberid = $("#memberId").val();//获取会员ID
+        var MemberSpecified = $("#MemberSpecified").val();//获取会员ID
+        var params = {
+            'memberid':memberid,
+            'end':MemberSpecified
+        };
+        var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'setdatesubmit'))}";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "延期失败",
+                        text: "会员卡延期异常，请重新读卡操作！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }else{
+                    swal({
+                            title: "提交成功",
+                            text: "您的会员卡延期成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            var specifiedEndTime = data['message']['specifiedEndTime'];
+                            $("#specifiedEndTime").attr("value",specifiedEndTime);
+                            $('#myModal2').modal('hide');
+                        });
+
+
+                }
+            }
+        });
+
+    }
+    //保存
+    function saveSubmit() {
+        var memberid = $("#memberId").val();
+        var memberName = $("#memberName").val();
+        var memberIdentityNum = $("#memberIdentityNum").val();
+        var memberMobile = $("#memberMobile").val();
+        var memberSex = $("input[name='memberSex']:checked").val();
+        var memberWechat = $("#memberWechat").val();
+        var memberbirthdayyear = $("select[name='memberbirthday[year]']").val();
+        var memberBirthdayType = $("select[name='memberBirthdayType']").val();
+        var memberbirthdaymonth = $("select[name='memberbirthday[month]']").val();
+        var memberbirthdayday = $("select[name='memberbirthday[day]']").val();
+        var memberDetailAddress = $("#memberDetailAddress").val();
+        var province = $("select[name='reside[province]']").val();
+        var city = $("select[name='reside[city]").val();
+        var district = $("select[name='reside[district]']").val();
+        var memberPicture = $("input[name='memberPicture']").val();
+
+
+        var arraydata = $("*[name='array[]']").map(function(){return $(this).val()}).get();
+
+        var customizefield = $("*[name='customizefield[]']").map(function(){return $(this).val()}).get();
+
+
+
+
+        var params = {
+            'memberid':memberid,
+            'memberName':memberName,
+            'memberMobile':memberMobile,
+            'memberIdentityNum':memberIdentityNum,
+            'memberSex':memberSex,
+            'memberWechat':memberWechat,
+            'memberBirthdayType':memberBirthdayType,
+            'memberbirthdayyear':memberbirthdayyear,
+            'memberbirthdaymonth':memberbirthdaymonth,
+            'memberbirthdayday':memberbirthdayday,
+            'memberDetailAddress':memberDetailAddress,
+            'province':province,
+            'city':city,
+            'district':district,
+            'memberPicture':memberPicture,
+            'arraydata':arraydata,
+            'customizefield':customizefield,
+        };
+        var url =  "{php echo $this->createWebUrl('memberinfo', array('op' => 'updatemember'))}";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                //alert(data['message']['cosssssssssde']);
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "保存失败",
+                        text: "卡号错误或不存在卡号，请重新读卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }else{
+                    swal({
+                            title: "保存成功",
+                            text: "信息保存成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            location.reload(true);
+                        });
+
+
+                }
+            }
+        });
+
+    }
+
+
+    //消费记录
+    function cashRegister(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'getMemberCashRegisteridTableData'))}&memberid=" + memberIdstr ;
+        $('#membercashRegistertabledata').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle",
+                width : '200'
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_handleMoneyCount',
+                title: '应付总金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_realMoneyCount',
+                title: '实收金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_addTime',
+                title: '生成时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, {
+                field: 'sc_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                //searchcodekeywordstr: $("#goocode").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        }
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+
+    /****消费收银详细----start  **/
+    function ViewCashRegister(cashRegisterid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewcashregister'))}&id=" + cashRegisterid;
+        parent.layer.open({
+            type: 2,
+            title: '详细',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****消费收银详细----end  **/
+
+    /****消费收银打印----start  **/
+    function ViewCashRegisterPrint(cashRegisterprintid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewcashregisterprint'))}&cashRegisterprintid=" + cashRegisterprintid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****消费收银打印----end  **/
+
+    //储值记录
+    function deduction(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'getMemberDeductionTableData'))}&memberid=" + memberIdstr ;
+        $('#memberdeductionTableData').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'sc_invoiceCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle",
+                width : '200'
+
+            },{
+                field: 'sc_consumeType',
+                title: '类型',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_realMoneyCount',
+                title: '充值/扣除金额',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_nowMoneyCount',
+                title: '之前余额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_addTime',
+                title: '生成时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, {
+                field: 'sc_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+    }
+
+    //充次记录
+    function increaseCount(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'getMemberIncreaseCountTableData'))}&memberid=" + memberIdstr ;
+        $('#memberincreaseCountTableData').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'mrci_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle",
+                width : '200'
+            },{
+                field: 'mrci_doStyle',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doCount',
+                title: '次数',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_addTime',
+                title: '生成时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },  {
+                field: 'mrci_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewIncreaseCount(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewIncreaseCountPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+    }
+
+    /****增加计次详细----start  **/
+    function  ViewIncreaseCount(increasecountid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewincreasecountdatails'))}&increasecountid=" + increasecountid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****增加计次详细----end  **/
+
+
+    /****增加计次打印----start  **/
+    function  ViewIncreaseCountPrint(increasecountprintid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewincreasecountdatailsprint'))}&increasecountprintid=" + increasecountprintid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****增加计次打印----end  **/
+
+
+
+    //扣次记录
+    function countConsumption(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'getMemberCountConsumptionTableData'))}&memberid=" + memberIdstr ;
+        $('#membercountConsumptionTableData').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [
+                {
+                    field: 'mrci_invoiceCode',
+                    title: '消费单据号',
+                    align: "center",
+                    valign: "middle",
+                    width : '200'
+                },{
+                    field: 'mrci_doStyle',
+                    title: '消费方式',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrci_memberName',
+                    title: '会员姓名',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrci_memberCardNum',
+                    title: '会员卡号',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrci_doCount',
+                    title: '次数',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrci_addTime',
+                    title: '生成时间',
+                    align: "center",
+                    valign: "middle",
+                    formatter:consumeinvoiceaddTime
+                }, {
+                    field: 'mrci_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                //searchcodekeywordstr: $("#goocode").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewMemberCountConsume(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewMemberMemberCountConsumePrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+    }
+    /****计次消费详细----start  **/
+    function ViewMemberCountConsume(invoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewmemberCountConsume'))}&invoiceid=" + invoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '400px'],
+            content: url
+        });
+    }
+    /****计次消费详细----end  **/
+
+    /****计次消费打印----start  **/
+    function ViewMemberMemberCountConsumePrint(invoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewmembercountdetailprint'))}&invoiceid=" + invoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '550px'],
+            content: url
+        });
+    }
+    /****计次消费打印----end  **/
+
+    //计次记录
+    function countinformation(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'getMemberRechareCount'))}&memberid=" + memberIdstr ;
+        $('#memberrechargecount').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [
+                {
+                    field: 'mrc_goodsName',
+                    title: '项目名称',
+                    align: "center",
+                    valign: "middle",
+                    width : '200'
+                },{
+                    field: 'mrc_deductcount',
+                    title: '扣除次数',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrc_count',
+                    title: '可用次数',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'mrc_specifiedEndTime',
+                    title: '有效期至',
+                    align: "center",
+                    valign: "middle",
+                    formatter:consumeinvoiceaddTime
+                },{
+                    field: 'mrc_addTime',
+                    title: '生成时间',
+                    align: "center",
+                    valign: "middle",
+                    formatter:consumeinvoiceaddTime
+                }]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                //searchcodekeywordstr: $("#goocode").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+    }
+
+    //积分对换记录
+    function mrcCountConsumption(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'mrccCountConsumptionTableData'));}&memberid=" + memberIdstr ;
+        $('#mrccCountConsumptionTableData').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'sc_invoiceCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle",
+                width : '200'
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_nowPointCount',
+                title: '兑换积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_addTime',
+                title: '生成时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, {
+                field: 'sc_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                //searchcodekeywordstr: $("#goocode").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+    }
+
+
+    //积分记录
+    function cashExchange(memberIdstr){
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'integralRecord'))}&memberid=" + memberIdstr;
+        $('#integralRecord').bootstrapTable({
+            url: url,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'sc_invoiceCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle",
+                width : '200'
+            },{
+                field: 'sc_consumeType',
+                title: '单据类型',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_addTime',
+                title: '生成时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                //searchcodekeywordstr: $("#goocode").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        }
+    }
+    //优惠券记录
+    function membercountCouponTableData(memberIdstr){
+        var editRowUrl = "{php echo $this->createWebUrl('member', array('op' => 'membercountCouponTableData'))}&memberid=" + memberIdstr ;
+        $('#membercountCouponTableData').bootstrapTable({
+            url: editRowUrl,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'cmd_Verificationcode',
+                title: '核销码',
+                align: "center",
+                valign: "middle",
+                width : '200'
+
+            },{
+                field: 'act_title',
+                title: '活动',
+                align: "center",
+                valign: "middle",
+            },{
+                field: 'cmd_activityaddtime',
+                title: '派发时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberreceivetime',
+                title: '领取时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberusetime',
+                title: '使用时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_status',
+                title: '状态',
+                align: "center",
+                valign: "middle",
+                formatter:formatterstatus
+            },  ]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function formatterstatus(value){
+
+            if(value==1){
+                var result = "<span><i class='badge badge-primary'>未领取</i></span>";
+            }else if(value==2){
+                var result = "<span><i class='badge badge-warning'>已领取</i></span>";
+            }else{
+                var result = "<span><i class='badge badge-danger'>已使用</i></span>";
+            }
+            return result;
+
+        }
+    }
+    //时间转换
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+
+    //跟踪记录
+    function membertrackrecordingdata(memberIdstr){
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'membertrackrecordingdata'))}&memberid=" + memberIdstr;
+        $('#membertrackrecordingdata').bootstrapTable({
+            url: url,
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'mtr_content',
+                title: '内容',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mtr_addTime',
+                title: '添加时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'mtr_updateTime',
+                title: '修改时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'id',
+                title: '操作',
+                align: "center",
+                valign: "middle",
+                formatter:formatteroperating
+            },]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        }
+        function formatteroperating(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"Updatetrackrecording(" + id + ")\" title='修改'><span class='glyphicon glyphicon-pencil'></span></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-success' onclick=\"Viewtrackrecording(" + id + ")\" title='查看'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"Deletetrackrecording('" + id + "')\" title='删除'><span class='fa fa-trash'></span></button>";
+            return result;
+        }
+    }
+    //删除记录
+    function Deletetrackrecording(Deleteid){
+
+        var deleteid = Deleteid;
+        var url =  "{php echo $this->createWebUrl('member', array('op' => 'deletetrackrecording'))}";
+
+        var params = {
+            'deleteid': deleteid,
+        };
+
+
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "删除失败",
+                        text: "记录删除失败，请重新操作",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }else{
+                    swal({
+                            title: "删除成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            $("#membertrackrecordingdata").bootstrapTable('refresh');
+                        });
+
+
+                }
+            }
+        });
+
+
+    }
+    //查看记录
+    function Viewtrackrecording(Viewid){
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'viewtrackrecording'))}&Viewid=" + Viewid;
+
+        var index = parent.layer.open({
+            type: 2,
+            title: '查看详情',
+            area : ['900px' , '700px'],
+            content: url
+        });
+
+    }
+    //编辑记录
+    function Updatetrackrecording(Updateid){
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'viewtrackrecording'))}&Updateid=" + Updateid;
+
+        var index = parent.layer.open({
+            type: 2,
+            title: '修改记录',
+            area : ['1200px' , '700px'],
+            content: url
+        });
+
+    }
+    //添加记录
+    function Addtrackrecording(){
+        var memberid = $("#memberId").val();
+        var url = "{php echo $this->createWebUrl('member', array('op' => 'viewtrackrecording'))}&memberid="+memberid;
+
+        var index = parent.layer.open({
+            type: 2,
+            title: '添加记录',
+            area : ['1200px' , '700px'],
+            content: url
+        });
+
+    }
+    //刷新表格
+    function Refreshtable(){
+        $("#membertrackrecordingdata").bootstrapTable('refresh');
+    }
+    //生成自定义新卡号
+    function loadNewRfidCard(){
+        var newRfidCardNum = "{php echo $weid.$storeid.$randCardNum}"+ Math.round(new Date().getTime()/1000);
+        $("#member_RfidCardNum").attr('value',newRfidCardNum);
+    }
+</script>
+
+
+{template 'web/common/footer'}

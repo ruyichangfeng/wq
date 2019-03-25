@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$data['school']['title']}</title>
+    {php echo register_jssdk();}
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<style>
+    body > a:first-child,body > a:first-child img{width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+    body{padding-bottom: 0 !important;}
+    #wrap.user_list .user{font-size:12px; color:#666;}
+    #wrap.user_list .user > a::before{ content: ""; display: inline-block; float: left; height: 29px;width:29px; margin:5px 10px 10px 10px; vertical-align: middle; background-image: url({OSSURL}public/mobile/img/user_icon.png); background-size:  auto 35px;}
+    #wrap.user_list .my_order::before{ background-color:#fe6c27;background-position: 0 0;}
+    #wrap.user_list .my_inf::before{   background-color:#ffba00;background-position: -13px -3px;}
+    #wrap.user_list .my_count::before{ background-color:#47ace9;background-position: -50px -3px;}
+    #wrap.user_list .my_score::before{ background-color:#ed4f2b;background-position: -85px -3px;}
+    #wrap.user_list .my_lianxi::before{ background-color:#53ccb9;background-position: -124px -3px;}
+    #wrap.user_list .jiankong::before{ background-color:#0d43bf;background-position: -159px -3px;}
+    #wrap.user_list .bjphoto::before{ background-color:#9853cc;background-position: -194px -3px;}
+    #wrap.user_list .liuyan::before{ background-color:#e31a47;background-position: -230px -3px;}
+    #wrap.user_list .qingjia::before{ background-color:#cf5f0e;background-position: -263px -3px;}
+    #wrap.user_list .checklog::before{ background-color:#fb793a;background-position: -300px -3px;}
+    #wrap.user_list .check::before{ background-color:#0da43c;background-position: -338px -3px;}
+    #wrap.user_list .yijian::before{ background-color:#0e7ecf;background-position: -372px -3px;}
+    #wrap.user_order{ padding-top: 46px;counter-reset:item; padding-bottom:75px;}
+    .user_order #header{ position: fixed; left: 0;top: 0;right: 0; z-index: 99;}
+    #order_list > section{ display: block;}
+    #order_list > section.select{ display: block;}
+    #order_list > section.order_payed{ padding-top: 25px;}
+
+    .order_cnt{ min-height: 86px; border-top:1px solid #bec3cf; border-bottom:1px solid #bec3cf; margin-top: 10px; position: relative; padding:10px 68px 10px 10px; background-color: #fff; color: #828282;width: 95%;}
+    .order_cnt > dt,
+    .unpay_li > dt{ font-size: 12px; text-align: center; float: left; width: 50px; color: #666;}
+    .order_cnt > dt > div,
+    .unpay_li > dt > div{ width: 50px; height:50px;-webkit-border-radius: 50%; border-radius: 50%; background: no-repeat center top; background-size: cover; margin-bottom: 8px;}
+    .order_cnt > dd,
+    .unpay_li > dd{ margin-left: 5px;}
+    .order_cnt > dd:first-of-type,
+    .unpay_li > dd:first-of-type{ color:#333; font-size: 14px;}
+
+    .order_null{ position: fixed; top: 46px; left: 0; right: 0;bottom: 0;z-index: 999; text-align: center; padding-top: 40%;background-color:white;}
+    .order_null p{ padding-top: 100px; background: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/user-uc.png/img/mask_bg2.png) no-repeat center top; background-size: 98px 98px;}
+    #order_list a + section.order_null,#order_list div + section.order_null{ display:none;}
+
+    .order_tips{ position: fixed;left: 0;right:0; top: 46px; text-align: center; z-index: 999; height:35px;background-color: #3e3e3e; font-size: 14px; line-height: 35px; color: #fff;}
+    .order_tips::before{ content: ""; display: inline-block; width: 20px; height: 20px; margin-right:10px;background: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/order_tips.png) no-repeat center; background-size: contain; vertical-align: middle;}
+
+    .order_unpay{ padding-bottom: 111px; position: relative;}
+
+    .order_unpay .order_sum{ display: none;}
+    .order_unpay div ~ .order_sum{ display: block;}
+
+    .order_unpay > div{ position: relative;}
+    .order_unpay .mask{ position: absolute; left: 0;top: 0;right: 0;bottom: 0; background-color: rgba(0,0,0,.3); display: none}
+    .order_unpay .delete .mask{ display: block;}
+
+    .unpay_li{ position: relative; padding: 10px 23px 10px 39px; margin-top: 10px; background-color: #fff; border-top:1px solid #ccc;border-bottom:1px solid #ccc; background:#fff url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/user-uc.png) no-repeat 10px center; background-size: 19px; color: #828282;}
+    .unpay_li.click{counter-increment:item;background-image: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/user-c.png);counter-increment:item;}
+    .unpay_li dd:nth-of-type(2){ color:#f94c44; font-size: 16px;}
+    .unpay_li dd:nth-of-type(2)::before{ content: "￥";font-size: 11px;}
+    .unpay_li dd[value]::after{ display: inline-block; content: "剩"attr(value); color: #fff; background-color:#ffb658; font-size: 12px; padding: 0 8px; margin-left: 20px; line-height: 16px; vertical-align: text-bottom; -webkit-border-radius: 8px;-radius: 8px;}
+    .order_time{ position: relative; z-index: 1; padding: 10px; display: block; border-bottom:1px solid #ccc; color: #888;}
+
+    .delete .order_time{ color: #fff;}
+    .unpay_li .order_close{ position: absolute; right: 0; top: 0; width: 23px; height: 23px; background: rgba(0,0,0,.3) url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/mask_close.png) no-repeat center; background-size: 10px 10px; z-index: 20;}
+
+    .order_sum .btn{height:44px; display: block; background-color:#2f9ecf;font:16px/44px "黑体"; text-align:center; color:#fff; cursor:pointer;}
+    .order_sum .btn:hover{ background-color:#2f9ecf;}
+    .order_sum b::after{content:counter(item)}
+
+    .order_sum{ position: absolute; bottom: 5px; left: 0; right: 0; border-bottom: 1px solid #ccc; background-color: #f6f6f6;}
+    .order_sum li{ padding: 10px; font-size: 12px; color: #666; border-top:1px solid #ccc; min-height: 24px; line-height: 24px;}
+    .order_sum li:first-of-type{ text-align:right}
+    .order_sum li > span{ float:left; padding-left: 24px; background: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/user-uc.png) no-repeat center left; background-size: 19px;}
+    .order_sum li > span.click{ background-image: url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/user-c.png);}
+    .order_sum li:first-of-type{ text-align:right}
+    .order_li{ float: left;height: 45px; text-align: center; line-height: 45px; background-color: #fbfbfb; width: 50%;-webkit-box-sizing:border-box; box-sizing:border-box;}
+    .order_cnt .order_static{position:absolute; width:120px; right: 0; bottom: 0;top: 0; border-left: 1px dashed #bec3cf;}
+    /*入库*/
+    .top1::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "入库"; background-color: #F70708;}
+    .top2::after {display: inline-block;padding: 0 10% 0 10%;; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "入库"; background-color: #b6b6b6;}
+    /*出库*/
+    .top3::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "出库"; background-color: #F70708;}
+    .top4::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "出库"; background-color: #b6b6b6;}
+    /*联系对方*/
+    .top5::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "联系对方"; background-color: #3cbe52;}
+    .top6::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "联系对方"; background-color: #b6b6b6;}
+    /*取消*/
+    .top7::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "取消"; background-color: #F70708;}
+    .top8::after {display: inline-block;padding: 0 10% 0 10%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "取消"; background-color: #b6b6b6;}
+
+    /*接受订单*/
+    .top9::after {display: inline-block;padding: 0 8% 0 8%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "是否接受"; background-color: #F70708;}
+    /*对方书库*/
+    .top10::after {display: inline-block;padding: 0 8% 0 8%; margin:-10px 0 0 -25px;width: 50px;height: 20px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "对方书库"; background-color: #3cbe52;}
+    .order_cnt a dd{padding-left: 70px;}
+    .opration{height: 20px;}
+    .opration a{
+        display: inline-block;
+        height:20px;
+        padding: 0 1% 0 10%
+    }
+</style>
+<div id="wrap" class="user_list" style="padding-bottom:55px;">
+    <div id="bg"></div>
+    <!-- 修改开始 -->
+    <div style="position: fixed;width: 100%;z-index: 10000">
+        <div class="head">
+            <div class="head-nav">
+                <a class="head-nav-list">我的闲书库<span>{$data['userAccount']['onSaleAmount']}</span></a>
+                <a class="head-nav-list">我的闲书币<span>{$data['balance']}</span></a>
+            </div>
+        </div>
+        <section class="user" style="margin-top:0px;">
+            <ul class="order" style="padding-top:0px;">
+                <!--<li class="order_li" {if $data['orderType'] == 'transfer'} style="color:#FE6700"{/if}><a href="{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $data['schoolid'], 'op' => 'transfer','orderType' => 'transfer'), true)}">易书互换{if $data['transferCount'] > 0}<span class="weui-badge">{$data['transferCount']}</span>{/if}</a></li>-->
+                <li class="order_li" {if $data['orderType'] == 'borrow' && $data['action'] == 'in'} style="color:#FE6700"{/if}><a href="{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $data['schoolid'], 'op' => 'borrow_in','orderType' => 'borrow'), true)}">闲书待入库{if $data['borrowInCount'] > 0}<span class="weui-badge">{$data['borrowInCount']}</span>{/if}</a></li>
+                <li class="order_li" {if $data['orderType'] == 'borrow' && $data['action'] == 'out'} style="color:#FE6700"{/if}><a href="{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $data['schoolid'], 'op' => 'borrow_out','orderType' => 'borrow'), true)}"> 闲书待出库{if $data['borrowOutCount'] > 0}<span class="weui-badge">{$data['borrowOutCount']}</span>{/if}</a></li>
+                <!--<li class="order_li" {if $data['orderType'] == 'transfer' && $data['action'] == 'out'} style="color:#FE6700"{/if}><a href="{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $data['schoolid'], 'op' => 'transfer_out'), true)}">易书待出库{if $transferOutCount > 0}<span class="weui-badge">{$transferOutCount}</span>{/if}</a></li>-->
+            </ul>
+        </section>
+    </div>
+    <input type="hidden" id="orderType" value="{$data['orderType']}">
+    <section id="order_list" style="padding-top: 30%;">
+        <!-- 全部 -->
+        <section class="order_all all_g">
+            {if !empty($data['order'])}
+            {loop $data['order'] $item}
+                <dl class="order_cnt">
+                    <dt><div style="background-image:url({php echo tomedia($item['userImg']);})"></div>{$item['nickname']}</dt>
+                    <dt style="float: right;padding-left: 20px;"><div style="background-image:url({php echo tomedia($item['userImg1']);})"></div>{$item['nickname1']}</dt>
+                    <a href="{php echo $this->createMobileUrl('orderbooklist',array('schoolid' => $data['schoolid'],'orderId' => $item['id'],'orderType' => $data['orderType'],'action' => $data['action']))}">
+                    <dd>金额:{$item['price']}元</dd>
+                    <dd>下单时间:{$item['createDate']}</dd>
+                    <dd>订单状态:<strong style="color: #f77b23">{$item['orderStatusName']}</strong>
+                    <dd>双方距离:{$item['distance']}</dd>
+                    <dd>点击查看详情</dd>
+                    </dd>
+                    </a>
+                    <div class="opration" style="padding-top: 20px;width: 100%">
+                        {if $data['action'] == 'in'}
+                            <!--入库操作-->
+                                {if $item['orderStatus'] == 3  && $data['openid'] == $item['openid']}
+                                     <a  class="top1" onclick="ruku({$item['orderStatus']},{$item['id']},'{$data['action']}');"></a>
+                                {else}
+                                    <a  class="top2"></a>
+                                {/if}
+                                {if  !in_array($item['orderStatus'],array(1,5))  && $data['openid'] == $item['openid']}
+                                    <a  class="top5" onclick="tel({$item['orderStatus']},{$item['userinfo1']['mobile']})"></a>
+                                {else}
+                                     <a  class="top6"></a>
+                                {/if}
+                                {if $item['orderStatus'] == 1  && $data['openid'] == $item['openid']}
+                                     <a  class="top7" onclick="showPanel({$item['id']});"></a>
+                                {else}
+                                    <a  class="top8"></a>
+                                {/if}
+                            {elseif $data['action'] == 'out'}
+                            <!--出库操作-->
+                                {if $item['orderStatus'] == 2 && $data['openid'] == $item['bookownerid']}
+                                <a  class="top3" onclick="chuku({$item['orderStatus']},{$item['id']},'{$data['action']}');"></a>
+                                {else}
+                                <a  class="top4"></a>
+                                {/if}
+                                {if $item['orderStatus'] != 5}
+                                <a  class="top5" onclick="tel({$item['orderStatus']},{$item['userinfo']['mobile']})"></a>
+                                {/if}
+                                {if in_array($item['orderStatus'],array(2,3)) && $data['openid'] == $item['bookownerid']}
+                                    <a  class="top7" onclick="updateOrder({$item['orderStatus']},{$item['id']},'{$data['action']}');"></a>
+                                {else}
+                                <a  class="top8"></a>
+                                 {/if}
+                                {if in_array($item['orderStatus'],array(1)) && $data['openid'] == $item['bookownerid']}
+                                    <a  class="top9" onclick="confirmOrder({$item['orderStatus']},{$item['id']},'{$data['action']}');"></a>
+                                {/if}
+                        {/if}
+                        <a  class="top10" onclick="showList('{$item['partybid']}','{$data['orderType']}',{$item['id']});"></a>
+                    </div>
+                    <div class="js_dialog" id="{$item['id']}" style="display: none;">
+                    <div class="weui-mask"></div>
+                    <div class="weui-dialog">
+                        <div class="weui-dialog__hd"><strong class="weui-dialog__title">请选择取消原因</strong></div>
+                        <div class="weui-dialog__bd">
+                            <div class="weui-cells weui-cells_radio">
+                                {loop $data['cancelReason'] $reason}
+                                {if $reason['classify'] == 0}
+                                <label class="weui-cell weui-check__label" for="{$reason['id']}_x11">
+                                    <div class="weui-cell__bd">
+                                        <p style="font-size: 14px;">{$reason['remark']}</p>
+                                    </div>
+                                    <div class="weui-cell__ft">
+                                        <input type="radio" class="weui-check" name="cancelReason" id="{$reason['id']}_x11" value="{$reason['id']}">
+                                        <span class="weui-icon-checked"></span>
+                                    </div>
+                                </label>
+                                {/if}
+                                {/loop}
+                            </div>
+                        </div>
+                        <div class="weui-dialog__ft">
+                            {if $item['orderStatus'] == 1 && $item['openid'] != $data['openid']}
+                                <a onclick="updateOrder({$item['orderStatus']},{$item['id']},'{$data['action']}');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">确定</a>
+                            {else}
+                                <a onclick="cancelOrder({$item['orderStatus']},{$item['id']},'{$data['action']}');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">确定</a>
+                            {/if}
+                            <a onclick="hidePanel({$item['id']})" class="weui-dialog__btn weui-dialog__btn_primary" style="color:#0BB20C;">取消</a>
+                        </div>
+                    </div>
+                </div>
+                </dl>
+            {/loop}
+            {else}
+            <section class="order_all all_g" style="z-index:999;padding-top: 5%;">
+                <p>您还没任何订单哦~</p>
+            </section>
+            {/if}
+        </section>
+    </section>
+</div>
+{php include $this->template('footer');}
+</body>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    /**微信隐藏工具条**/
+    function WeixinJSHideAllNonBaseMenuItem(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+
+                wx.hideAllNonBaseMenuItem();
+            });
+        }
+    }
+    $(function ($) {
+        WeixinJSHideAllNonBaseMenuItem();
+        $('.all_g').remove('select');
+        $('.no_g').remove('select');
+        $('.yes_g').remove('select');
+        $('.cancel_g').remove('select');
+        var select_div = '{$_GPC['op']}';
+        if (select_div == '') {
+            select_div = 'no_g';
+        }
+        $("." + select_div).addClass('select');
+
+        if ($('.unpay_li').length == '0') {
+            $('.order_sum').hide();
+        }
+        //弹出
+        $("#scroll").on('click', function () {
+            $('#user_info').show();
+        });
+        $("#close").on('click', function () {
+            $('#user_info').hide();
+        });
+        $("#feedback").on('click', function () {
+            $('#suggestion').show();
+        });
+        $("#closed").on('click', function () {
+            $('#suggestion').hide();
+        });
+        $("#bangding").on('click', function () {
+            $('#user_info1').show();
+        });
+        $("#clos").on('click', function () {
+            $('#user_info1').hide();
+        });
+        $("#Changesf").on('click', function () {
+            $('#selectList').show();
+        });
+        $("#closeChild").on('click', function () {
+            $('#selectList').hide();
+        });
+    });
+
+    var orderType = $("#orderType").val();
+    //入库操作
+    function ruku(orderStatus,orderid,action){
+        if(orderType == 'borrow'){
+            if(orderStatus != 3){
+                Weui.alert('订单当前状态不能入库！');
+                return false;
+            }
+        }else{
+            if(orderStatus != 4){
+                Weui.alert('订单当前状态不能入库! ');
+                return false;
+            }
+        }
+        var subdata = {
+            orderId   : orderid,
+            orderType : orderType
+        };
+        Weui.confirm({"title":"确定入库吗?","content":'',"cancelCallback":function(e){
+        },"sureCallback":function(e){
+            var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'ruku','schoolid' => $data['schoolid']))}";
+            $.post(url,subdata,function(data){
+                if(data.result){
+//                    Weui.alert(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'borrow_in','schoolid' => $data['schoolid']))}"+"&orderType="+orderType;
+                }else{
+                    Weui.alert(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    //出库操作
+    function chuku(orderStatus,orderid,action){
+        if(orderType == 'borrow'){
+            if(orderStatus == 3 || orderStatus == 4){
+                Weui.alert('订单当前状态不能出库！');
+                return false;
+            }
+        }else{
+            if(orderStatus == 5 || orderStatus == 6){
+                Weui.alert('订单当前状态不能出库! ');
+                return false;
+            }
+        }
+        var subdata = {
+            orderId   : orderid,
+            orderType : orderType
+        };
+        Weui.confirm({"title":"确定出库吗?","content":'',"cancelCallback":function(e){
+        },"sureCallback":function(e){
+            var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'chuku','schoolid' => $data['schoolid']))}";
+            $.post(url,subdata,function(data){
+                if(data.result){
+//                    Weui.alert(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'borrow_out','schoolid' => $data['schoolid']))}"+"&orderType="+orderType;
+                }else{
+                    Weui.alert(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    //确定订单
+    function confirmOrder(orderStatus,orderid,action){
+        if(orderType == 'borrow'){
+            if(orderStatus != 1){
+                Weui.alert('订单当前状态不可确认！');
+                return false;
+            }
+        }else{
+            if(orderStatus != 1 && orderStatus != 3){
+                Weui.alert('订单当前状态不可确认!');
+                return false;
+            }
+        }
+        var subdata = {
+            orderId    : orderid,
+            orderType  : orderType,
+            orderStatus : orderStatus
+        };
+        Weui.confirm({"title":"确定接受订单吗?","content":'',"cancelCallback":function(e){
+                showPanel(orderid);
+            //            var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'updateStatus','schoolid' => $data['schoolid']))}";
+//            $.post(url,subdata,function(data){
+//                if(data.result){
+//                    Weui.alert(data.msg);
+//                    window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('schoolid' => $data['schoolid']))}"+"&op="+orderType+'_'+action+'&orderType='+orderType;
+//                }else{
+//                    Weui.alert(data.msg);
+//                }
+//            },'json');
+        },"sureCallback":function(e){
+            var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'confirmOrder','schoolid' => $data['schoolid']))}";
+            $.post(url,subdata,function(data){
+                if(data.result){
+//                    Weui.alert(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('schoolid' => $data['schoolid']))}"+"&op="+orderType+'_'+action+'&orderType='+orderType;
+                }else{
+                    Weui.alert(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    //联系对方
+    function tel(orderStatus,mobile){
+        if(orderStatus == 1){
+            Weui.alert('订单当前状态不能联系对方! ');
+            return false;
+        }
+        window.location.href = "tel:"+mobile;
+    }
+    //取消订单
+    function cancelOrder(orderStatus,orderid,action){
+        hidePanel(orderid);
+        var cancelReason = $("input[name='cancelReason']:checked").val();
+        if(typeof cancelReason == "undefined" || cancelReason == ''){
+            Weui.alert('请选择取消原因!');
+            return false;
+        }
+        if(orderType == 'borrow'){
+            if(orderStatus == 3){
+                Weui.alert('订单当前状态不能取消!');
+                return false;
+            }
+        }else{
+            if(orderStatus == 5){
+                Weui.alert('订单当前状态不能取消!');
+                return false;
+            }
+        }
+        var subdata = {
+            orderId   : orderid,
+            orderType : orderType,
+            cancelId  : cancelReason
+        };
+        //订单取消
+        var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'cancel','schoolid' => $data['schoolid']))}";
+        $.post(url,subdata,function(data){
+            if(data.result){
+//                Weui.alert(data.msg);
+                window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('schoolid' => $data['schoolid']))}"+"&op="+orderType+'_'+action+'&orderType='+orderType;
+            }else{
+                Weui.alert(data.msg);
+            }
+        },'json');
+    }
+    var images = {
+        localId: [],
+        serverId: []
+    };
+
+    function uploadImg(){
+
+        wxChooseImage();
+    }
+
+    /**
+     * 微信选择图片
+     */
+    function wxChooseImage(){
+        wx.chooseImage({
+            success: function (res) {
+                images.localId = res.localIds;
+                var obj=new Image();
+                obj.src=res.localIds[0];
+                imagesUploadWx();
+            }
+        });
+    };
+
+    function imagesUploadWx() {
+        wx.uploadImage({
+            localId: images.localId[0],
+            isShowProgressTips:1,//// 默认为1，显示进度提示
+            success: function (res) {
+                $("#bigImage").val(res.serverId);
+                saveImage();
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+    };
+
+    function saveImage() {
+        PB.prompt("头像上传中，请稍等~","forever");
+        var url = "{php echo $this->createMobileUrl('indexajax',array('op'=>'changeimg'))}";
+        var submitData = {
+            bigImage:$("#bigImage").val(),
+            sid:"{$it['sid']}",
+        };
+        $.post(url, submitData, function(data) {
+            if (data.result) {
+                PB.prompt(data.msg);
+                location.reload();
+            } else {
+                PB.prompt(data.msg);
+            }
+        },'json');
+    }
+    function showList(openid,orderType,orderId) {
+        window.location.href = "{php echo $this->createMobileUrl('bookCenter',array('schoolid' => $data['schoolid']))}"+'&ownerOpenId='+openid+'&orderType='+orderType+'&orderId='+orderId;
+    }
+    //订单状态还原
+    function updateOrder(orderStatus,orderid,action){
+        //判断订单状态是否需要填写取消理由
+        if(orderStatus == 1){
+            hidePanel(orderid);
+            var cancelReason = $("input[name='cancelReason']:checked").val();
+            if(typeof cancelReason == "undefined" || cancelReason == ''){
+                Weui.alert('请选择取消原因!');
+                return false;
+            }
+        }
+        var subdata = {
+            orderId   : orderid,
+            orderType : orderType,
+            orderStatus : orderStatus
+        };
+        Weui.confirm({"title":"确定取消?","content":'',"cancelCallback":function(e){
+        },"sureCallback":function(e){
+            var url = "{php echo $this->createMobileUrl('mybookorder',array('op'=>'updateStatus','schoolid' => $data['schoolid']))}";
+            $.post(url,subdata,function(data){
+                if(data.result){
+//                    Weui.alert(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('mybookorder',array('schoolid' => $data['schoolid']))}"+"&op="+orderType+'_'+action+"&orderType="+orderType;
+                }else{
+                    Weui.alert(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    function hidePanel(id){
+        $("#"+id).hide();
+    }
+
+    function showPanel(orderid) {
+        $("#"+orderid).show();
+    }
+</script>
+<script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script>
+</html>

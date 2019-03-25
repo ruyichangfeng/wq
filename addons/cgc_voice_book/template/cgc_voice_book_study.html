@@ -1,0 +1,125 @@
+{template 'common/header'}
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+<ul class="nav nav-tabs">
+	<li  class="{if $op== 'display'}active{/if}">
+	    <a href="{php echo $this->createWebUrl('cgc_voice_book_member',array('op'=>'display'));}">会员管理</a>
+	</li>	
+	
+</ul>
+
+
+
+<div class="main">
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+			<input type="hidden" name="c" value="site" />
+			<input type="hidden" name="a" value="entry" />
+			<input type="hidden" name="m" value="cgc_voice_book" />
+			<input type="hidden" name="do" value="cgc_voice_book_member" />
+			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">id</label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<input class="form-control" placeholder="" 
+					name="id"  type="text" value="{$_GPC['id']}">
+				</div>
+			</div>
+			              
+             <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">会员状态</label>
+                    <div class="col-xs-12 col-sm-8 col-lg-5">
+                        <select name="vip_status" class="form-control">
+                            <option value="">会员状态</option>
+                            <option value="0" {if $_GPC['status']==='0'}selected{/if}>否</option>
+                            <option value="1" {if $_GPC['status']==1}selected{/if}>是</option>
+              
+                        </select>
+                    </div>
+               </div>	
+                
+              <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">昵称</label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<input class="form-control" placeholder="" 
+					name="nickname"  type="text" value="{$_GPC['nickname']}">
+				</div>
+			</div>
+			
+		
+			
+	       <div class="form-group">
+				<div class=" col-xs-12 col-sm-2 col-lg-2" style="width:9%">
+					<button class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+				</div>					
+			</div>			
+		</form>
+	</div>
+</div>
+
+
+
+<div class="panel panel-info">
+
+  <button  type="button" class="btn btn-default" onclick="delete_all()">删除所有记录</button>
+  <label><strong>全部记录:{$total}</strong></label>
+</div>
+ 
+
+<div class="panel panel-default">
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+		<thead class="navbar-inner">
+	   <tr>
+	   	<th style="width:5%;">id</th>
+	    <th style="width:15%;">头像</th>	
+		<th style="width:15%;">微信id</th>			
+		<th style="width:15%;">昵称</th>				  
+        <th style="width:10%;">书名</th>     
+        <th style="width:18%;">创建时间</th>
+        <th style="width:20%;">操作</th>
+		</tr>
+		</thead>
+			<tbody>
+		{loop $list $item}
+		<tr>
+		  <td>{$item['id']}</td> 
+		  <td><img alt="" src='{php echo tomedia($item["headimgurl"]);}' width="30px" ></td> 		  
+	      <td>{$item['openid']}</td> 
+          <td>{$item['nickname']}</td>        
+          <td title="">{$item['title']}</td>
+          <td title="{php echo date('Y-m-d H:i:s', $item['createtime'])}">
+		    {php echo date('Y-m-d H:i:s', $item['createtime'])}</td>	
+		   <td>
+				<div style="padding: 6px 12px;">
+				
+			        <a class="btn btn-default" href="{php echo $this->createWebUrl($filename, array('op' => 'delete', 'id' => $item['id']))}"
+				     onclick="return confirm('确认删除信息吗？');return false;">删除</a>
+				</div>				
+				</td>				
+				</tr>
+				{/loop}
+			</tbody>		
+		</table>
+		{$pager}
+	</div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+function delete_all(){
+  if (confirm('确认删除所有信息吗,删除完不可恢复?')){
+	  location.href ="{php echo $this->createWebUrl($filename, array('op' => 'delete_all','openid' => $openid))}";	
+  }
+}
+
+
+
+
+
+</script>
+{template 'common/footer'}

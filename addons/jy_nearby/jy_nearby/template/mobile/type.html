@@ -1,0 +1,128 @@
+{template 'inc/header'}
+<script type="text/javascript">
+{if $_SESSION['posi']==''}
+$(function(){
+	if({WEIXIN}==1){
+		wx.ready(function() {
+		   wx.getLocation({
+		        type: 'wgs84',// 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		        success: function (res) {
+		            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+
+		            if(latitude&&longitude){
+			            $.ajax({
+			            	type: 'POST',
+				    		url: "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('getlalo'),2)}"+"&rad="+Math.random(),
+					    	data: {latitude:latitude,longitude:longitude},
+					    	success:function(datas){
+					    		if(datas.statue==1){
+					    			window.location.href="{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl($do,array('pid'=>$id)),2)}";
+					    		}
+					    	},
+					    	error:function(datas){
+
+						    },
+					    	dataType:'json',
+			            })
+			        }
+		    	},
+		    	error: function(res){
+		    	}
+	    });
+
+	 });
+	}
+})
+{/if}
+</script>
+<body>
+	<div class="head" style="{if $setting['color']} border-bottom-color:{$setting['color']} {/if}">
+		{if $setting['color']}
+		<a href="{php echo $this->createMobileUrl('list',array('pid'=>$id));}"><div class="new" style="{if $act=='dis'} color:{$setting['color']};{/if} border-right-color:{$setting['color']}" >距离</div></a>
+		<a href="{php echo $this->createMobileUrl('Tlist',array('pid'=>$id));}"><div class="discont" style="{if $act=='new'} color:{$setting['color']};{/if}" >最新</div></a>
+		{else}
+		<a href="{php echo $this->createMobileUrl('list',array('pid'=>$id));}"><div class="new" style="{if $act=='dis'} color:#6BA74F;{/if} border-right-color:#6BA74F;">距离</div></a>
+		<a href="{php echo $this->createMobileUrl('Tlist',array('pid'=>$id));}"><div class="discont" style="{if $act=='new'} color:#6BA74F;{/if}">最新</div></a>
+		{/if}
+	</div>
+	<section>
+		{loop $stores $sto}
+		<a href="{php echo $this->createMobileUrl('showDetail',array('id'=>$sto['id']));}">
+		<div class="point-div">
+			<div class="con">
+				<div class="detail">
+					<div class="pic">
+						{if $sto['storelogo']}
+						<img src="{php echo tomedia($sto['storelogo']);}" width="100%">
+						{elseif $setting['avar']}
+						<img src="{php echo tomedia($setting['avar']);}" width="100%">
+						{else}
+						<img src="{NEARBY_IMAGE}123.png" width="100%">
+						{/if}
+						<!-- <img src="{NEARBY_IMAGE}123.png" width="100%" height="50px"> -->
+					</div>
+					<div class="title">
+						{php $name =  mb_substr($sto['storename'],0,12,'utf-8');}
+						<h3>{$name}...</h3>
+						{php $address=mb_substr($sto['province'].$sto['city'].$sto['address'],0,18,'utf-8')}
+						<p>{$address}...</p>
+					</div>
+					{if $sto['disc']}
+					<div class="disc">
+						<span style="{if $setting['color']} background-color:{$setting['color']}; {/if}">{$sto['disc']}km</span>
+					</div>
+					{/if}
+				</div>
+				<div class="contact">
+					<div class="tel">
+						<a data="{$sto['tel']}">
+							<div class="mid">
+								<img src="{NEARBY_IMAGE}tel.png" width="30%" height="100%"><span>一键拨号</span>
+							</div>
+						</a>
+					</div>
+					<div class="nav">
+						<?php 
+								$sto['remark']= htmlspecialchars_decode($sto['remark']);
+								$sto['remark']= preg_replace("/<(.*?)>/","",$sto['remark']); 
+						?>
+						{if $sto['lat']&&$sto['lng']}
+						<a href="http://api.map.baidu.com/marker?location={$sto['lat']},{$sto['lng']}&title={$sto['storename']}&name={$sto['storename']}&content={$sto['remark']}&output=html&src=weiba|weiweb">
+							<div class="mid">
+								<img src="{NEARBY_IMAGE}dw.png" width="30%" height="100%"><span>一键导航</span>
+							</div>
+						</a>
+						{else}
+							<div class="mid nodh">
+								<img src="{NEARBY_IMAGE}dw.png" width="25%" height="100%"><span style="{if $setting['color']} color:#000; {/if}">一键导航</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+		</div>
+		</a>
+		{/loop}
+	</section>
+	<div class="copyright"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+</body>
+<!-- <script src="js/swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container');
+</script> -->
+<script type="text/javascript">
+	$(".tel a").click(function(){
+    	var a = $(this).attr("data");
+    	if(a){
+    		window.location.href = "tel:"+a;
+    	}else{
+    		swal('商家很懒，未标明电话号码!');
+    	}
+    })
+
+    $(".nav .nodh").click(function(){
+    	swal('商家很懒，未标明地址!');
+    })
+</script>
+</html>

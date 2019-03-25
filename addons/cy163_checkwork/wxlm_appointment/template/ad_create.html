@@ -1,0 +1,89 @@
+
+{template 'common/header'}
+<style>
+   .stress_red
+   {
+       color: red;
+   }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('ad', array('op'=>'manage'));}">广告管理</a></li>
+        <li class="active"><a href="">{if $ad['ad_id']!=''}修改广告{else}添加广告{/if}</a></li>
+    </ul>
+    <form action="{php echo $this->createWebUrl('ad', array('op'=>'create'));}" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-primary">
+            <div class="panel-heading"> {if $ad['ad_id']!=''}修改广告{else}添加广告{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" style="display:none;">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" style="font-weight:bold;">ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="ad[ad_id]" class="form-control" value="{$ad['ad_id']}" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" style="font-weight:bold;"><span class="stress_red">*</span>广告图片</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_image('ad[ad_pic]', $ad['ad_pic'])}
+                        <div class="help-block">建议上传图片大小640*320</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" style="font-weight:bold;"><span class="stress_red">*</span>广告链接</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="ad[ad_url]" class="form-control" value="{$ad['ad_url']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" style="font-weight:bold;"><span class="stress_red">*</span>排序</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="number" name="ad[ad_order]" class="form-control" value="{$ad['ad_order']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" style="font-weight:bold;"><span class="stress_red">*</span>状态</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select class="form-control" name="ad[ad_state]">
+                            <option value="2" {if $ad['ad_state']==2}selected="selected" {/if}>显示</option>
+                            <option value="1" {if $ad['ad_state']==1}selected="selected" {/if}>隐藏</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#form').submit(function(){
+               
+                if($('input[name="ad[ad_pic]"]').val() == ''){
+                    util.message('未选择广告图片.');
+                    return false;
+                }
+                if($('input[name="ad[ad_url]"]').val() == ''){
+                    util.message('未填写广告链接.');
+                    return false;
+                }
+                if($('input[name="ad[ad_order]"]').val() == ''){
+                    util.message('未填写排序.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    });
+</script>
+
+
+{template 'common/footer'}

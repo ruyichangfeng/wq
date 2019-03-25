@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>{$cfg['title']} -- 设备列表</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta http-equiv="refresh" content="60">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
+		
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/css/app.css"/>
+		<style>
+			.title {
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			body{background:#fff;}
+		</style>
+	</head>
+
+	<body>
+		<header id="header" class="mui-bar mui-bar-nav">
+				<a href="{php echo $this->createMobileurl('index',array('op'=>'index','aid'=>$cfg['aid']))}" class="mui-icon mui-icon-left-nav mui-pull-left" ></a>
+				<h1 class="mui-title">设备列表</h1>
+			</header>
+		<div class="mui-content">
+			 
+			
+			<ul class="mui-table-view mui-table-view-chevron"  style="margin-top:0px;font-size:14px;"> 
+				{loop $list $index $item}
+				<li class="mui-table-view-cell mui-media">
+					<a class="mui-navigate-right btn_set"  alt="{$item['id']}" title="{$item['device_code']}">
+						<img class="mui-media-object mui-pull-left" src="{MODULE_URL}template/mobile/images/glogo.jpg">
+						<div class="mui-media-body">
+							<span class="mui-badge mui-badge-primary mui-badge-inverted">{php echo ($index+1); }、</span> {$item['device_code']} 
+							 {if $item['status'] == 1}
+								<span class="mui-badge mui-badge-success mui-badge-inverted">[设备在线]</span>
+							  {else}
+							    <span class="mui-badge mui-badge-inverted">[设备离线]</span>
+							  {/if}	
+							
+							<p class='mui-ellipsis'>位置：{$item['address']}</p>
+						</div>
+					</a>
+				</li>
+				{/loop}
+			</ul>
+			
+			</div>
+			
+		<div class="mui-content-padded" style="width:100%;margin-left:0px;bottom:0px;position:absolute;margin-bottom:0px;">
+				<ul class="mui-pager">
+					<li class="mui-previous">
+						<a href="{php if($page==1) echo $pages[0]['url']; else echo $pages[$page-2]['url']}" style="width:50%;height:45px;line-height:35px;border-radius:0px;border-left:0px;">
+							上一页
+						</a>
+					</li>
+					<li class="mui-next">
+						<a href="{php if($page==count($pages)) echo $pages[count($pages)-1]['url']; else echo $pages[$page]['url']}" style="width:50%;height:45px;line-height:35px;border-radius:0px;border-left:0px;border-right:0px;">
+							下一页
+						</a>
+					</li>
+				</ul>
+			</div>
+		
+
+	</body>
+	<script src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+	<script src="{MODULE_URL}template/mobile/js/jquery-3.2.1.min.js"></script>
+	<script src="{MODULE_URL}template/mobile/js/layer.js"></script>
+	<script>
+		mui.init({
+			swipeBack:true //启用右滑关闭功能
+		});
+		
+		$(function(){ 
+			pushHistory(); 
+			window.addEventListener("popstate", function(e) {
+				window.location.href="{php echo $this->createMobileurl('index',array('op'=>'index','aid'=>$cfg['aid']))}";
+				
+			}, false); 
+			function pushHistory() { 
+				var state = { 
+				title: "title", 
+				url: "#"
+				}; 
+				window.history.pushState(state, "title", "#"); 
+			} 
+		});
+		
+		$(function(){
+			$(".btn_set").click(function(){
+				var id = $(this).attr('alt');
+				var device_code = $(this).attr('title');
+					$.post("{php echo $this->createMobileurl('ajax')}",{ac:"getdv",id:id,device_code:device_code},
+						function(response,status,xhr){				
+							if(status == 'success'){
+								if(response == 0){
+									mui.alert('该设备离线状态！不可操作！', '系统提示', function() {});
+								}else{
+									var str='<form action="" method="post">';
+									str += '<div style="width:90%;border:1px #ccc solid;margin:0 auto;overflow:hideen;border-radius:3px;padding-left:5px;height:30px;line-height:30px;">';
+									str += '<select style="width:98%;margin:0px;padding:0px;" name="aid">';
+									for(var i=0;i<response[1].length;i++){	
+										if(response[0]['aid'] == response[1][i]['id']){
+											str += '<option value="'+response[1][i]['id']+'" selected >'+response[1][i]['aname']+'</option>';
+										}else{
+											str += '<option value="'+response[1][i]['id']+'">'+response[1][i]['aname']+'</option>';
+										}
+									}
+									str +=  '</select>';							
+									str +=  '</div><br>';			
+									str += '<input type="number" placeholder="输入1元对应脉冲信号数量……" style="width:90%;height:30px;margin-top:10px;padding:0px;padding-left:5px;line-height:30px;" name="bill" required value="'+response[0]['bill']+'">';									
+									str +=  '<input type="hidden" name="device_code" value="'+response[0]['device_code']+'" />';
+									str += '<input type="hidden" name="id" value="'+response[0]['id']+'" />';
+									str +=  '<input type="hidden" name="appid" value="'+response[0]['appid']+'" />';
+									str +=  '<input type="hidden" name="token" value="'+response[2]+'" />';
+									str += '<input  type="submit" name="sub" style="width:80%;height:25px;pading:0px;" value="提交表单"></form>';
+								layer.open({
+									title: [
+									  '设置设备 '+response[0]['device_code']+' <span class="mui-icon mui-icon-closeempty" onclick="layer.closeAll()" style="float:right;padding-right:5px;"></span>',
+									  'border-bottom:1px solid #E8E8E8; color:#666;margin-top:0px;margin-bottom:10px;padding:0px'
+									]
+									,content: str
+									});
+								}
+							
+						}
+
+						
+					},'json');		
+			});
+		});
+		
+		//mui.alert('操作成功！', '系统提醒', function() {});
+		
+		
+		
+		
+		
+	</script>
+</html>

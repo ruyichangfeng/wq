@@ -1,0 +1,508 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>预约设置</h5>
+                    <!--<h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('memberinfo')}"></a></h5>-->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                <div class="tabs-container">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-cogs"></i>基本设置</a></li>
+                                        <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"><i class="fa fa-hand-spock-o"></i>自定义字段</a></li>
+                                        <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false"><i class="fa fa-clock-o"></i>时间设置</a></li>
+                                    </ul>
+                                    <div class="tab-content"  id="memberInfoList">
+                                        <div id="tab-1" class="tab-pane active">
+                                            <div class="ibox-content">
+
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label for="title" class="col-sm-2 control-label">预约标题</label>
+                                                        <div class="col-xs-4">
+                                                            <input type="text" name="activity" class="form-control"  value="{$getreservationactivity['ra_title']}" id='activity' />
+                                                        </div>
+                                                        <label for="title" class="col-sm-1 control-label">选择分类</label>
+                                                        <div class="col-xs-3">
+                                                            <select  class="form-control m-b" name="typeid" >
+
+                                                                <option>请选择分类</option>
+                                                                {loop $reservationtypelist $reservationtypeitme}
+                                                                <option value="{$reservationtypeitme['id']}">{$reservationtypeitme['rt_name']}</option>
+                                                                {/loop}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">预约封面</label>
+                                                        <div class="col-xs-12 col-sm-9">
+                                                            {php echo tpl_form_field_image('thumb',$getreservationactivity['ra_picture']);}
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">预约说明</label>
+                                                        <div class="col-xs-12 col-sm-9">
+                                                            <textarea name="content" id="content" class="form-control">{$getreservationactivity['ra_interpretation']}</textarea>
+                                                            <span class="help-block">显示于提交页使用说明</span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <div id="tab-2" class="tab-pane">
+                                            <div class="panel-body">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-1 control-label">服务项目数量</label>
+                                                        <div class="col-sm-11">
+                                                            <div class="radio radio-info radio-inline">
+                                                                <input type="radio" id="inlineRadio1" value="1"  onclick="$('#is_num').show();" name="is_num" {if $activity['is_num'] == 1} checked="checked"{/if} >
+                                                                <label for="inlineRadio1"> 开启 </label>
+                                                            </div>
+                                                            <div class="radio radio-danger radio-inline">
+                                                                <input type="radio" id="inlineRadio2" value="0" onclick="$('#is_num').hide();"  name="is_num" {if $activity['is_num'] == 0} checked="checked"{/if}>
+                                                                <label for="inlineRadio2"> 关闭 </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-12">
+                                                    <div class="alert-new">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th style="width:45%;">自定义字段</th>
+                                                                <th style="width:15%;text-align:center;">排序</th>
+                                                                <th style="width:8%;text-align:center;">是否必填</th>
+                                                                <th style="width:12%;">类型</th>
+                                                                <th style="width:10%;color:red">操作</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <input type="text" name="xmname" class="form-control" value="{$par['xmname']}" /><span class="input-group-addon">例：服务项目</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td><input type="text" class="form-control" value="顶端" readonly /></td>
+                                                                <td style="text-align:center;"><input type="checkbox" title="必填项" checked="checked" disabled="true" /></td>
+                                                                <td>
+                                                                    <select class="form-control" readonly>
+                                                                        <option>选择(select)</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                </td>
+                                                            </tr>
+                                                            <tr id="is_num"{if $activity['is_num'] == 0} style="display:none"{/if}>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <input type="text" name="numname" class="form-control" value="{$par['numname']}" ><span class="input-group-addon">服务项目 × 数量</span>
+                                                                </div>
+                                                            </td>
+                                                            <td><input type="text" class="form-control" value="顶端" readonly /></td>
+                                                            <td style="text-align:center;"><input type="checkbox" title="必填项" checked="checked" disabled="true" /></td>
+                                                            <td>
+                                                                <select class="form-control" readonly>
+                                                                    <option>数字(number)</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                            </td>
+                                                            </tr>
+                                                            <tr id="time"{if $activity['is_time'] == 1} style="display:none"{/if}>
+                                                            <td>
+                                                                <div class="input-group"><input type="text" name="yuyuename" class="form-control" value="{$par['yuyuename']}" /><span class="input-group-addon">例：预约时间</span>
+                                                                </div>
+                                                            </td>
+                                                            <td><input type="text" class="form-control" value="顶端" readonly /></td>
+                                                            <td style="text-align:center;"><input type="checkbox" title="必填项" checked="checked" disabled="true" /></td>
+                                                            <td>
+                                                                <select class="form-control" readonly>
+                                                                    <option>时间(range)</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                            </td>
+                                                            </tr>
+                                                            <tbody id="re-items">
+                                                            {loop $ds $r}
+                                                            <tr>
+                                                                <td><input name="fieldstitle[]" type="text" class="form-control" value=""/></td>
+                                                                <td><input type="text" name="fielddisplayorder[]" class="form-control" value="" /></td>
+                                                                <td style="text-align:center;"><input name="fieldessential[]" type="checkbox" title="必填项" checked/></td>
+                                                                <td>
+                                                                    <select name="fieldstype[]" class="form-control">
+                                                                        {loop $types $k $v}
+                                                                        <option value="{$k}"{if $k == $r['type']} selected="selected"{/if}>{$v}</option>
+                                                                        {/loop}
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    {if !$hasData}
+                                                                   <a href="javascript:;" onclick="deleteItem(this)" data-toggle="tooltip" data-placement="bottom" title="删除此条目" class="btn btn-default btn-sm"><i class="fa fa-times"></i></a>
+                                                                    {/if}
+                                                                </td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="help-block">
+                                                        {if $hasData}
+                                                        <a href="{php echo $this->createWebUrl('manage', array('id' => $reid));}" target="_blank">已经存在预约数据, 不能修改预约条目信息</a>
+                                                        {else}
+                                                        <a href="javascript:;" class="btn btn-success" onclick="addItem();"><i class="fa fa-plus" title="添加自定义字段"></i> 添加自定义字段</a>
+                                                        {/if}
+                                                    </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div id="tab-3" class="tab-pane">
+                                            <div class="ibox-content">
+                                                <div class="col-sm-12">
+                                                    <div class="panel panel-info">
+                                                        <div class="panel-heading">
+                                                            时间设置
+                                                        </div>
+                                                        <div class="panel-body">
+
+                                                            <div class="form-group">
+                                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="color:#ff0000;">预约时间设置</label>
+                                                                <div class="col-xs-12 col-sm-9">
+                                                                    <div class="input-group">
+                                                                        <label class="radio-inline"><input type="radio" name="is_time" value="1" id="is_time1"  {if $getreservationactivity['ra_timesettingtype'] == 1}checked{/if}/> 普通时间</label>
+                                                                        <label class="radio-inline"><input type="radio" name="is_time" value="2" id="is_time2" {if $getreservationactivity['ra_timesettingtype'] == 2}checked{/if}/> 时间段预约人数限制</label>
+                                                                        <label class="radio-inline"><input type="radio" name="is_time" value="3" id="is_time3" {if $getreservationactivity['ra_timesettingtype'] == 3}checked{/if}/> 关闭(我要自己设置)</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                                <div class="form-group">
+                                                                    <div  id="ordinarytimes">
+                                                                        <div class="form-group">
+                                                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">开始时间</label>
+                                                                            <div class="col-xs-12 col-sm-9">
+                                                                                {php echo tpl_form_field_date('starttime', $item['ra_starttime'], true)}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">结束时间</label>
+                                                                            <div class="col-xs-12 col-sm-9">
+                                                                                {php echo tpl_form_field_date('endtime', $item['ra_endtime'], true)}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                            </div>
+                                                            <div id="times">
+
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">预约时间段</label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox1" name="timerange[]" value="1" checked>
+                                                                            <label for="inlineCheckbox1"> 星期一 </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox2"  name="timerange[]" value="2" checked>
+                                                                            <label for="inlineCheckbox2"> 星期二  </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox3"  name="timerange[]" value="3" checked>
+                                                                            <label for="inlineCheckbox3"> 星期三  </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox4"  name="timerange[]" value="4" checked>
+                                                                            <label for="inlineCheckbox4"> 星期四  </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox5"  name="timerange[]" value="5" checked>
+                                                                            <label for="inlineCheckbox5"> 星期五  </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox6"  name="timerange[]" value="6">
+                                                                            <label for="inlineCheckbox6"> 星期六  </label>
+                                                                        </div>
+                                                                        <div class="checkbox checkbox-inline">
+                                                                            <input type="checkbox" id="inlineCheckbox7"  name="timerange[]" value="7">
+                                                                            <label for="inlineCheckbox7"> 星期日  </label>
+                                                                        </div>
+                                                                        <button type="button" id="addtimeperiod" class="btn btn-outline btn-primary" onclick="addTimeItem()">添加时间段</button>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                    <label class="col-xs-2"></label>
+                                                                    <div class="col-xs-8">
+                                                                        <ul id="ullist">
+
+                                                                            {loop $newtimelimitlist $timelimititem}
+                                                                            <li class="input-group m-b" id="lilist">
+                                                <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary">时段</button>
+                                                </span>
+                                                                                <input class="form-control input-group"  id='timesss' type="text" value="{$timelimititem['Start']}">
+                                                                                <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary">-</button>
+                                                </span>
+                                                                                <input class="form-control" type="text"  id='timesssv' value="{$timelimititem['Eed']}">
+                                                                                <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary">标题</button>
+                                                </span>
+                                                                                <input class="form-control" type="text" value="{$timelimititem['titleTime']}">
+                                                                                <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary">可预约</button>
+                                                </span>
+                                                                                <input class="form-control" type="text" value="{$timelimititem['limitnumberTime']}">
+                                                                                <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary">人</button>
+                                                </span>
+
+                                                                            </li>
+                                                                            {/loop}
+                                                                        </ul>
+                                                                    </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">启用状态{$par['today']}</label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="radio radio-info radio-inline">
+                                                                            <input type="radio" id="reservationstatus_radio1" value="1" checked  name="reservationstatus" >
+                                                                            <label for="reservationstatus_radio1"> 可预约当天 </label>
+                                                                        </div>
+                                                                        <div class="radio radio-info radio-inline">
+                                                                            <input type="radio" id="reservationstatus_radio2" value="2"  name="reservationstatus" >
+                                                                            <label for="reservationstatus_radio2"> 不可预约当天 </label>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">可预约天数范围</label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <input type="text" class="form-control" name="reservationdays" value="" />
+                                                                            <span class="input-group-addon">/天</span>
+                                                                        </div>
+                                                                        <div class="help-block">如果设置6天并周六周日不选中，那么1、2、3、4、5、8日可预约，6、7日是周六周日自动排除</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div style="display: none">
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">排除时间段</label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周一</span><input type="text" class="form-control" name="out1" value="{$activity['out1']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周二</span><input type="text" class="form-control" name="out2" value="{$activity['out2']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周三</span><input type="text" class="form-control" name="out3" value="{$activity['out3']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周四</span><input type="text" class="form-control" name="out4" value="{$activity['out4']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周五</span><input type="text" class="form-control" name="out5" value="{$activity['out5']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周六</span><input type="text" class="form-control" name="out6" value="{$activity['out6']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                                                    <div class="col-xs-12 col-sm-9">
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-addon">周日</span><input type="text" class="form-control" name="out7" value="{$activity['out7']}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12" style="margin-top: 10px;">
+                                    <input type="submit" name="submitdata" value="提交" id="submitdata" class="btn btn-primary col-lg-1" />
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function addItem() {
+        var html = '' +
+            '<tr>' +
+            '<td><input name="fieldstitle[]" type="text"   class="form-control" /></td>' +
+            '<td><input type="text" name="fieldsdisplayorder[]" class="form-control" /></td>' +
+            '<td style="text-align:center;"><input name="fieldsessential[]" type="checkbox" title="必填项"  /></td>' +
+            '<td>' +
+            '<select name="fieldstype[]" class="form-control">' +
+            {loop $types $k $v}'<option value="{$k}">{$v}</option>' + {/loop}
+        '</select>' +
+        '</td>' +
+        '<td>' +
+        '<a href="javascript:;" data-toggle="tooltip" data-placement="bottom" class="btn btn-default btn-sm" onclick="deleteItem(this)"  title="删除此条目"><i class="fa fa-times"></i></a>' +
+        '</td>' +
+        '</tr>';
+        $('#re-items').append(html);
+    }
+        function deleteItem(o) {
+            $(o).parent().parent().remove();
+        }
+
+</script>
+<script>
+
+    $(document).ready(function(){
+
+
+        $("#times").hide();
+        $("#ordinarytimes").show();
+
+
+        $("#is_time1").click(function () {
+            $("#times").hide();
+            $("#ordinarytimes").show();
+        });
+        $("#is_time2").click(function () {
+            $("#ordinarytimes").hide();
+            $("#times").show();
+        });
+        $("#is_time3").click(function () {
+            $("#times").hide();
+            $("#ordinarytimes").hide();
+        });
+
+    });
+
+
+    $("#submitdata").click(function(){
+
+        var fieldstitle = $("input[name='fieldstitle[]']").val();
+        var thumb = $("input[name='thumb']").val();
+       // var content = $("input[name='content']").val();
+        var activity = $("#activity").val();
+        var content = $("#content").val();
+
+        if(activity == null || activity == 0 || activity==""){
+            swal({
+                title: "请填写标题",
+                confirmButtonText: "确定",
+                type: "error",
+            });
+            return false;
+        }
+        if(thumb == null || thumb == 0 || thumb == ""){
+            swal({
+                title: "请添加主题封面",
+                confirmButtonText: "确定",
+                type: "error",
+            });
+            return false;
+        }
+        if(content == null){
+            swal({
+                title: "请填写预约说明",
+                confirmButtonText: "确定",
+                type: "error",
+            });
+            return false;
+        }
+        if(fieldstitle == null || fieldstitle == 0 || fieldstitle ==""){
+            swal({
+                title: "请添加自定义字段",
+                confirmButtonText: "确定",
+                type: "error",
+            });
+            return false;
+        }
+
+
+    });
+
+    $("input[name='timeStart[]']").clockTimePicker({autoclose: true});
+    $("input[name='timeEnd[]']").clockTimePicker({autoclose: true});
+
+    function addTimeItem() {
+
+
+        var html =" <li class=\"input-group m-b\" id=\"lilist\">\n" +
+            "                                                <span class=\"input-group-btn\">\n" +
+            "                                            <button type=\"button\" class=\"btn btn-primary\">时段</button>\n" +
+            "                                                </span>\n" +
+            "                                                                                <input class=\"form-control input-group timeStart\" name=\"timeStart[]\"  id='timeStart' type=\"text\" value=\"13:14\">\n" +
+            "                                                                                <span class=\"input-group-btn\">\n" +
+            "                                            <button type=\"button\" class=\"btn btn-primary\">-</button>\n" +
+            "                                                </span>\n" +
+            "                                                                                <input class=\"form-control timeEnd\" type=\"text \" name=\"timeEnd[]\"  id='timeEnd' value=\"13:14\">\n" +
+            "                                                                                <span class=\"input-group-btn\">\n" +
+            "                                            <button type=\"button\" class=\"btn btn-primary\">标题</button>\n" +
+            "                                                </span>\n" +
+            "                                                                                <input class=\"form-control\"  name=\"titleTime[]\"  type=\"text\">\n" +
+            "                                                                                <span class=\"input-group-btn\">\n" +
+            "                                            <button type=\"button\" class=\"btn btn-primary\">可预约</button>\n" +
+            "                                                </span>\n" +
+            "                                                                                <input class=\"form-control\" name=\"limitnumberTime[]\" type=\"text\">\n" +
+            "                                                                                <span class=\"input-group-btn\">\n" +
+            "                                            <button type=\"button\" class=\"btn btn-primary\">人</button>\n" +
+            "                                                </span>\n" +
+            "                                                                                <span class=\"input-group-btn\"><a href=\"javascript:;\" onclick=\"deleteItem(this)\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"删除此条目\" class=\"btn btn-default btn-sm\"><i class=\"fa fa-times\"></i></a> </span>\n" +
+            "\n" +
+            "\n" +
+            "                                                                            </li>";
+        $('#ullist').append(html);
+
+        require(['angular.sanitize','clockpicker'], function(angular, $, _){
+            $("input[name='timeStart[]']").clockTimePicker({autoclose: true});
+            $("input[name='timeEnd[]']").clockTimePicker({autoclose: true});
+        });
+    }
+    function deleteTimeItem(o) {
+        $(o).parent().parent().remove();
+    }
+</script>
+{template 'web/common/footer'}

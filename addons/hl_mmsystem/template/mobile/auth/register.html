@@ -1,0 +1,123 @@
+{template 'common/header'}
+<style>
+    .area {
+        margin: 20px auto 0px auto;
+    }
+    .mui-input-group:first-child {
+        margin-top: 20px;
+    }
+    .mui-input-group label {
+        width: 22%;
+    }
+    .mui-input-row label~input,
+    .mui-input-row label~select,
+    .mui-input-row label~textarea {
+        width: 78%;
+    }
+    .mui-checkbox input[type=checkbox],
+    .mui-radio input[type=radio] {
+        top: 6px;
+    }
+    .mui-content-padded {
+        margin-top: 25px;
+    }
+    .mui-btn {
+        padding: 10px;
+    }
+
+</style>
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">注册</h1>
+</header>
+<div class="mui-content">
+    <div class="avatar mui-text-center" style="margin-top: 10px;margin-bottom: 10px;">
+        <img src="{HLMMS_MOBILE_IMG}hl_logo.png" width="120px"/>
+    </div>
+    <div class="mui-input-group" id="register-basic">
+        <div class="mui-input-row">
+            <label>手机号</label>
+            <input name="username" type="text" placeholder="请填写手机号" class="js-mobile-val" id='mobile' value="{$_W['member']['mobile']}"/>
+        </div>
+        <div class="mui-input-row">
+            <label>密码</label>
+            <input name="password" type="password" placeholder="请输入密码" class="mui-input-clear mui-input"/>
+        </div>
+        <div class="mui-input-row">
+            <label>确认密码</label>
+            <input name="repassword" type="password" placeholder="请确认密码" class="mui-input-clear mui-input"/>
+        </div>
+    </div>
+    <div class="mui-content-padded">
+        <button type="submit" class="mui-btn mui-btn-block mui-btn-primary register-basic" >注册</button>
+    </div>
+    <div class="mui-content-padded mui-text-center">
+        <p>注册完成，默认手机号就是会员卡号。</p>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $(document).on('input propertychange', '.js-mobile-val', function(){
+            var mobile_value = $(this).val();
+            if(!mobile_value) {
+                util.toast('请输入手机号', '', 'error');
+                return;
+            }
+            if(!/^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(mobile_value)) {
+                util.toast('手机号格式错误', '', 'error');
+                return;
+            }
+            if (mobile_value.length == '11') {
+                $.post("{php echo url('auth/login/mobile_exist')}", {'mobile' : mobile_value}, function(data) {
+                    data = $.parseJSON(data);
+                    if (data.message.errno == '1') {
+                        util.toast('手机号已注册', '', 'error');
+                        return;
+                    } else if (data.message.errno == '2'){
+                        $('#register-basic input[name="password"]').focus();
+                    }
+                });
+            } else {
+                $("#mobile").focus();
+            }
+        });
+
+        $(document).on('click', '.register-basic', function() {
+            var username = $('#register-basic input[name="username"]').val();
+            var password = $('#register-basic input[name="password"]').val();
+            var repassword = $('#register-basic input[name="repassword"]').val();
+            if (!username || !password || !repassword) {
+                util.toast('用户名或密码为空', '', 'error');
+                return;
+            }
+            if(password.length < 6) {
+                util.toast('密码不能小于六位数', '', 'error');
+                return;
+            }
+            if (password !== repassword) {
+                util.toast('两次密码输入不一致', '', 'error');
+                return;
+            }
+            var params = {};
+            params.username = username;
+            params.password = password;
+            params.repassword = repassword;
+            var href = "{php echo url('auth/register', array('code' => '0'))}";
+            $.post(href, params, function(data) {
+                data = $.parseJSON(data);
+                if (data.type == 'success') {
+                    location.reload();
+                } else {
+                    util.toast(data.message, '', 'error');
+                }
+            })
+        });
+
+    });
+</script>
+</body>
+
+</html>
+

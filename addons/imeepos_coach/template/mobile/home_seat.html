@@ -1,0 +1,124 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}public/libs/ionic/css/ionic.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/weui/weui.min.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/jquery_weui/jquery-weui.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/iconfont.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/common.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/index.css"/>
+<style>
+    .item{min-height: 35px;}
+    .h44{height:44px;}
+</style>
+<div class="panel">
+    <div class="bar bar-header bar-light">
+        <button class="button button-clear" onclick="window.history.go(-1);">
+            <i class="icon ion-ios-arrow-back"></i>返回
+        </button>
+        <h2 class="title">预约单车</h2>
+    </div>
+    <div id="about" class="weui-popup-container popup-bottom">
+        <div class="weui-popup-modal">
+            <div class="weui_grids">
+                <a href="javascript:;" class="weui_grid js_grid scanqrcode" data-id="dialog">
+                    <div class="weui_grid_icon">
+                        <img src="{MODULE_URL}template/mobile/home/img/qrcode.png" alt="">
+                    </div>
+                    <p class="weui_grid_label">
+                        扫码签到
+                    </p>
+                </a>
+                <a href="javascript:;" class="weui_grid js_grid cancelseat" data-id="progress">
+                    <div class="weui_grid_icon">
+                        <img src="{MODULE_URL}template/mobile/home/img/resizeApi.png" alt="">
+                    </div>
+                    <p class="weui_grid_label">
+                        取消预约
+                    </p>
+                </a>
+                <a href="javascript:;" onclick="$.closePopup();" class="weui_grid js_grid" data-id="progress">
+                    <div class="weui_grid_icon">
+                        <img src="{MODULE_URL}template/mobile/home/img/close.png" alt="">
+                    </div>
+                    <p class="weui_grid_label">
+                        关闭
+                    </p>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="weui_cells weui_cells_access">
+        <div style="height:44px;"></div>
+        {php $seat_limit = M('seat_limit')->getall();}
+        {loop $seat_limit $limit}
+        {php $my = M('seat_log')->checkmy($limit['id'])}
+        <a class="weui_cell" href="{if !empty($my)}javascript:;{else}{php echo $this->createMobileUrl('seat')}{/if}">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>{php echo date('H:i',$limit['start_time'])}-{php echo date('H:i',$limit['end_time'])}</p>
+                {if !empty($my)}
+                <p style="color:green;">预约单车：{loop $my $m}[{php echo $m['seat_id']}]{/loop}</p>
+                {/if}
+            </div>
+            <div class="weui_cell_ft popup" data-id="{php echo $my['id']}">
+                {if !empty($my)}
+                    {if $my['status'] == 0}
+                    <span style="color:red;">
+                        点击签到
+                    </span>
+                    {else if $my['status'] == 1}
+                    <span style="color:red;">已签到</span>
+                    {else if $my['status']==2}
+                    <span style="color:red;">完成</span>
+                    {else}
+                    <span style="color:darkgreen;">迟到</span>
+                    {/if}
+                {else}
+                未预约
+                {/if}
+            </div>
+        </a>
+        {/loop}
+    </div>
+    <div style="height:44px;"></div>
+</div>
+<script>
+    require(["{MODULE_URL}public/libs/jquery_weui/jquery-weui.js"],function(){
+        var id = 0;
+        $('.scanqrcode').click(function(){
+            var type = $(this).data('type');
+            console.log('scanqrcode');
+            scanqrcode(type);
+        });
+        $('.popup').click(function(){
+            id = $(this).data('id');
+            $("#about").popup();
+        });
+        $('.cancelseat').click(function(){
+            $.post("",{log_id:id,act:'delete'},function(data){
+                if(data.status == 1){
+                    $.toast(data.message,2000,function(){
+                        window.location.href = "{php echo $_W['siteurl']}";
+                    });
+                }else{
+                    $.toast(data.message,'forbidden',function(){
+                        window.location.href = "{php echo $_W['siteurl']}";
+                    });
+                }
+            },'json');
+        });
+        function scanqrcode(type){
+            wx.config(jssdkconfig);
+
+            wx.ready(function(){
+                wx.scanQRCode({
+                    needResult: 0,
+                    scanType: ["qrCode","barCode"],
+                    success: function (res) {
+                        window.location.href = "{php echo $_W['siteurl']}";
+                    }
+                });
+            });
+        }
+    });
+</script>
+{template 'common/footerbar'}
+{template 'common/footer'}

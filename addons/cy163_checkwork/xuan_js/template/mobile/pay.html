@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <link rel="stylesheet" href="{D_PATH}public/css/global-ea79113a2f.css?v=0.3" />
+    <!-- styles -->
+   {template 'common/header'}
+
+    <link rel="stylesheet" href="{D_PATH}public/css/pay-order-page-338a5647b0.css">
+    <script src="//cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+
+    <title> 支付 </title>
+  </head>
+  <body id="scroll-wrapper">
+
+    <!-- body -->
+    
+  <div id="pay-order-page" class="page">
+    <section id="content-wrapper">
+      <div id="img-box">
+        <img src="http://assets.quanzijishi.com/assets/imgs/buy-success-img-fdee84341c.png" />
+      </div>
+      <h2 id="title">下单成功!</h2>
+      <p id="hint-text">请在30分钟内支付哦！</p>
+    </section>
+    <button id="pay-btn" class="btn btn-block btn-green footer-btn">
+      <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-wx-7a50890758.png"/>
+      立即支付
+    </button>
+
+    <p id="guarantee-line">
+      <img class="icon" src="http://assets.quanzijishi.com/assets/imgs/icon-safe-3b65da007a.png"/>
+      采用“微信担保交易”来保障交易安全
+    </p>
+
+  </div>
+    <script>
+      document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+          $('#pay-btn').click(function(){
+              
+              $.getJSON("{php echo $this->createMobileUrl('ajax',['op'=>'pay','tid'=>$_GPC['tid']])}", function(data, status){
+                  if(status == 'success'){
+                      util.pay({
+                          orderFee : data.fee,
+                          payMethod : 'wechat',
+                          orderTitle : '充值' + data.fee + '元',
+                          orderTid : data.ordertid,
+                          module : 'xuan_js',
+                          success : function(result) {
+                              alert('支付成功');
+                              window.location.href="{php echo $this->createMobileUrl('person',['op'=>'buyorder'])}";
+                          },
+                          fail : function(result) {
+                              alert(result.message);
+                          },
+                          complete : function(result) {
+                              location.reload();
+                          }
+                      });
+                  }
+              });
+          });
+          
+      });
+    </script>
+  </body>
+</html>

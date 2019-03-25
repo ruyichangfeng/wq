@@ -1,0 +1,118 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'index'));?>">服务模型管理</a></li>
+    <li><a href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'add'));?>">添加服务模型</a></li>
+    <li><a href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'center'));?>">模型市场</a></li>
+</ul>
+
+<div class="clearfix">    
+    <div class="panel panel-default">
+    	<div class="panel-heading">
+            服务模型列表
+        </div>
+        <?php  if($list[0]['id'] == '') { ?>
+        <div>暂无模型</div>
+        <?php  } else { ?>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <table class="table table-hover">
+            	<thead>
+                	<tr class="active">
+                    	<td width="100">序号</td>
+                        <td width="200">类别名称</td>
+                        <td width="300">标识</td>
+						<td>操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                	<?php  $n=0;?>
+                	<?php  if(is_array($list)) { foreach($list as $val) { ?>
+                    <?php  $n+=1;?>
+                	<tr>
+                    	<td><?php  echo $n;?></td>
+                        <td><?php  echo $val['temp_name'];?></td>
+						<td><?php  echo $val['temp_token'];?></td>
+						<td style="overflow:visible;">
+                        	<div class="btn-group btn-group-sm">
+								<a class="btn btn-default" href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'edit', 'id'=>$val['id']))?>"><i class="fa fa-edit"></i>编辑</a>
+                                
+                                <div class="btn btn-default" onclick="deltemp(<?php  echo $val['id'];?>)"><i class="fa fa-remove"></i> 删除</div>
+                                
+                                <!--
+                                <a class="btn btn-default" href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'setModel','temp_id'=>$val['id'],'temp_token'=>$val['temp_token']))?>"><i class="fa fa-edit"></i>生成</a>
+                                -->
+                                
+                                <a class="btn btn-default" href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'tempvalue', 'temp_id'=>$val['id'], 'temp_token'=>$val['temp_token']))?>"><i class="fa fa-tasks"></i>字段管理</a>
+                                <div class="btn btn-default" onclick="getTempOk(<?php  echo $val['id'];?>,'<?php  echo $val['temp_token'];?>')"><i class="fa fa-inbox"></i>生成模型</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php  } } ?>
+                    
+                </tbody>
+            </table>
+        </div>
+        <?php  } ?>
+        
+        <div class="panel-body text-center">
+            <?php  echo $pager;?>
+        </div>
+        
+        <div class="panel-footer">
+        	<a class="btn btn-default" href="<?php  echo $this->createWebUrl('servetemp', array('foo'=>'add'))?>">新增服务模板</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function getTempOk(temp_id,temp_token){
+	$.ajax({
+		url: "<?php  echo $this->createWebUrl('servetemp', array('foo'=>'setModel'));?>",
+		type:"POST",
+		data:{"temp_token":temp_token, "temp_id":temp_id},
+		dataType:"json",
+		success: function(res){
+			if(res == 1){
+				alert('模型生成成功！');
+			}else{
+				alert('模型生成失败，请重试！');
+			}				
+		}
+	});
+}
+
+function deltemp(id){
+	$.ajax({
+		url: "<?php  echo $this->createWebUrl('servetemp', array('foo'=>'getOrderCount'));?>",
+		type:"POST",
+		data:{"id":id},
+		dataType:"json",
+		success: function(json){
+			if(json>0){
+				alert('该服务模型下已有'+json+'笔订单数据，不能删除！');
+				return false;
+			}else{
+				if(window.confirm('删除该服务模型后，该服务模型将不可用，确认删除该服务模型吗？')){
+					$.ajax({
+						url: "<?php  echo $this->createWebUrl('servetemp', array('foo'=>'delete'));?>",
+						type:"POST",
+						data:{"id":id},
+						dataType:"json",
+						success: function(res){
+							//alert(res);
+							if(res==1){
+								window.location.href = "<?php  echo $this->createWebUrl('servetemp', array('foo'=>'index'))?>";
+							}else{
+								alert("删除失败！请重试");
+							}
+						}
+					})
+				}else{
+					return false;
+				}
+			}
+		}
+	})
+}
+</script>
+
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

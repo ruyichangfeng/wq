@@ -1,0 +1,59 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}public/libs/ionic/css/ionic.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/weui/weui.min.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/jquery_weui/jquery-weui.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/iconfont.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/common.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/index.css"/>
+<style>
+    .item{min-height: 35px;}
+    .h44{height:44px;}
+</style>
+<div class="panel">
+    <div class="bar bar-header bar-light">
+        <button class="button button-clear" onclick="window.history.go(-1);">
+            <i class="icon ion-ios-arrow-back"></i>返回
+        </button>
+        <h2 class="title">个人中心</h2>
+    </div>
+    <div class="h44"></div>
+    <div class="weui_cells weui_cells_form" style="margin-top: 0px;">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">姓名</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" name="realname" value="{$member['realname']}" placeholder="请输入姓名">
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" name="mobile" value="{$member['mobile']}" placeholder="请输入手机号">
+            </div>
+        </div>
+    </div>
+    <div class="weui_btn_area">
+        <a class="weui_btn weui_btn_primary" href="javascript:" id="sure">保存</a>
+    </div>
+    <div style="height:44px;"></div>
+</div>
+{template 'common/footerbar'}
+<script>
+    require(["{MODULE_URL}public/libs/jquery_weui/jquery-weui.js"],function(){
+        $('#sure').click(function(){
+            var post = {};
+            post.mobile = $('input[name="mobile"]').val();
+            post.realname = $('input[name="realname"]').val();
+            $.post("{php echo $_W['siteurl']}",post,function(data){
+                if(data.status == 1){
+                    $.toptip(data.message,2000,'success');
+                    setTimeout(function(){
+                        window.location.href = "{php echo $this->createMobileUrl('home')}";
+                    },1000)
+                }else{
+                    $.toptip(data.message,2000,'error');
+                }
+            },'json');
+        });
+    });
+</script>
+{template 'common/footer'}

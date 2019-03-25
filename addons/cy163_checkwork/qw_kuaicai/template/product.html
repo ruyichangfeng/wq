@@ -1,0 +1,219 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li  {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('product', array('op'=>'display'));}">菜品列表</a></li>
+    <li {if empty($id)&&$op=='edit'}class="active"{/if}><a href="{php echo $this->createWebUrl('product', array('op'=>'edit'));}">添加菜品</a></li>
+    {if !empty($id)}
+    <li class="active"><a href="{php echo $this->createWebUrl('product', array('op'=>'edit', 'id'=>$id));}">编辑菜品</a></li>
+    {/if}
+</ul>
+
+{if $op=="display"}
+<div class="panel panel-default">
+    <div class="panel-heading">菜品列表</div>
+    <div class="panel-body">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover" style="min-width: 300px;">
+                <thead class="navbar-inner">
+                <tr>
+                    <!--<th class="col-sm-1">排序</th>-->
+                    <th class="col-sm-1" style="display:none;">ID</th>
+                    <th class="col-sm-2">菜名</th>
+                    <th class="col-sm-2">图片</th>
+                    <th class="col-sm-2">数量</th>
+                    <!--<th class="col-sm-1">状态</th>-->
+                    <th class="col-sm-2" >优先</th>
+                    <th class="col-sm-1">操作</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {loop $prolist $goodsid $goods}
+                <tr class="yxtable">
+                    <!--<td><input type="text" name="sort" value="{$goods['sort']}"> </td>-->
+                    <td style="display: none;">{$goods['id']}</td>
+                    <td>{$goods['title']}</td>
+                    <td><image src="{php echo tomedia($goods['pic']);}" style="max-width: 48px; max-height: 48px; border: 1px dotted gray"></td>
+
+                    <td>{$goods['num']}</td>
+                    <td value="{$goods['yxstatus']}">{if $goods['yxstatus']==1}<button class="btn btn-success">开启</button> {else}<button class="btn btn-default">关闭</button> {/if}</td>
+                    <td><a href="{php echo $this->createWebUrl('product', array('op'=>'edit', 'id'=>$goods['id']));}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑"><i class="fa fa-pencil"></i></a>
+
+                        <a href="{php echo $this->createWebUrl('product', array('op'=>'del', 'idd'=>$goods['id']));}" onclick="return confirm('确定要删除吗？');" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="" data-original-title="删除"><i class="fa fa-times"></i></a>
+
+                    </td>
+
+                </tr>
+                {/loop}
+                {if empty($prolist)}
+                <tr>
+                    <td colspan="8">
+                        尚未添加菜品
+                    </td>
+                </tr>
+                {/if}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+{elseif $op=='edit'}
+
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-default">
+            <div class="panel-heading">菜品</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">名称</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <input type="text" name="title" class="form-control" value="{$pro['title']}" />
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">图片</label>
+                    <div class="col-xs-12 col-sm-8">
+                        {php echo tpl_form_field_image('pic', $pro['pic']);}
+                    </div>
+                    <span class="help-block">图片建议为180*180</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">描述</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="input-group">
+                            <input type="text" name="des" class="form-control" value="{$pro['des']}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">数量</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="input-group">
+                            <input type="number" name="num" class="form-control" value="{$pro['num']}" min="1" max="10000" />
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!--<div class="form-group">-->
+                    <!--<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">状态</label>-->
+                    <!--<div class="col-xs-12 col-sm-8">-->
+                        <!--<label class="radio radio-inline">-->
+                            <!--<input type="radio" name="status" value="1" {if intval($pro['status']) != 2}checked="checked"{/if}> 显示-->
+                        <!--</label>-->
+                        <!--<label class="radio radio-inline">-->
+                            <!--<input type="radio" name="status" value="2" {if intval($pro['status']) == 2}checked="checked"{/if}> 隐藏-->
+                        <!--</label>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" id="send" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+{/if}
+
+<script>
+    $(document).ready(function(){
+
+
+
+
+        //提交
+        $("#send").click(function(){
+
+            var title = $("input[name='title']").val().trim();
+
+            var des = $("input[name='des']").val().trim();
+
+            var num = $("input[name='num']").val().trim();
+
+            if(title==''){
+
+
+
+                alert('请添加菜品标题');
+                return false;
+            }
+
+            if(des==''){
+
+
+
+                alert('请添加菜品描述');
+                return false;
+            }
+
+
+
+
+ // return false;
+
+        })
+
+
+        //修改菜品优先级
+
+
+
+        $(".yxtable").each(function(){
+
+
+          $(this).find("td").eq(4).on('click',function(){
+
+              var ttt = $(this).parent().find("td");
+
+              var idd = $(this).parent().find("td").eq(0).text();//当前id
+              var Url = "{php echo $this->createWeburl('product')}";
+
+              $.post(Url,{idd:idd},function(data){
+
+
+                  var data = $.parseJSON(data);
+
+                  if(data.error==1){
+
+                      if(data.yxstatus==1){
+
+                 ttt.eq(4).html("<button class='btn btn-success'>开启</button>");
+
+                      }else{
+
+
+                          ttt.eq(4).html("<button class='btn btn-default'>关闭</button>");
+                      }
+
+
+
+
+                   //   alert(data.message);
+                  }else{
+
+                      alert(data.message);
+                  }
+              })
+
+
+
+          })
+        })
+    })
+
+
+</script>

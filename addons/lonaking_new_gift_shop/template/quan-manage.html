@@ -1,0 +1,102 @@
+{template 'common/header'}
+<style type="text/css">
+	table thead tr th,table tbody tr td{
+		text-align: center;
+	}
+	table tbody tr{
+		line-height: 30px;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+		<a href="{php echo $this->createWebUrl('QuanBatchEdit');}" class="btn btn-success btn-sm pull-right"><i class="glyphicon glyphicon-plus"></i> 批量添加 </a>
+	</ul>
+	<div class="panel panel-default">
+		<div class="table-responsive panel-body">
+			<form action="" method="post">
+				<table class="table table-hover">
+					<thead class="navbar-inner">
+						<tr>
+							<th width="5%">#</th>
+							<th>礼品</th>
+							<th width="25%">卡号</th>
+							<th>状态</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $page['data'] $o}
+							<tr class="">
+								<td data-id="{$o['id']}">{$o['id']}</td>
+								<td>
+									<p>{$o['gift']['title']}</p>
+								</td>
+								<td>
+									<p>{$o['hao']}</p>
+
+									<p>
+										<span class="label label-danger">
+										{if $o['type'] == 1}
+										一券多用(限{$o['time']}次)
+										{/if}
+										{if $o['type'] == 2}
+											一券一用
+										{/if}
+										</span>
+									</p>
+
+								</td>
+								<td>
+									<p>{$o['nickname']}</p>
+									<p>
+									{if $o['status'] == 0}
+										<span class="label label-success">未领取</span>
+									{/if}
+									{if $o['status'] == 1}
+										<span class="label label-danger">已领取</span>
+									{/if}
+									</p>
+									<p>
+										{if $o['get_time']}
+										{php echo date("Y-m-d H:i:s",$o['get_time'])}
+										{/if}
+									</p>
+								</td>
+								<td>
+									{php echo date("Y-m-d H:i:s",$o['create_time'])}
+								</td>
+								<td>
+									<a href="javascript:void(0);" data-url="{php echo $this->createWebUrl('HardRemove',array('opt'=>'quan','id'=>$o['id']));}"  class="btn btn-danger btn-sm del-button"><i class="glyphicon glyphicon-trash"> 删除</i></a>
+								</td>
+							</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</form>
+		{$page['pager']}
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		$(".del-button").on("click",function(){
+			var btn = $(this);
+			var url = btn.data('url')
+			var tr = btn.parent().parent();
+			$.post(url,function(result){
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					util.message(json.message);
+					return false;
+				}else{
+					//移除dom
+					tr.remove();
+				}
+			});
+
+		});
+	});
+</script>
+{template 'common/footer'}

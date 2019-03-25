@@ -1,0 +1,329 @@
+{template 'style5/header'}
+<body class="max-width">
+<div class="content page">
+    <div class="register-hd">
+        <div class="register-img">
+            <img src="{MODULE_URL}template/mobile/style5/static/images/registe/register-1.png">
+        </div>
+        成为认证业主，获得更多实用功能
+    </div>
+    <div class="content-block-title">申请业主认证</div>
+    <div class="list-block">
+        <ul>
+
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-phone"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="tel" placeholder="手机号码" id='mobile'>
+                        </div>
+                        {if $sms['code'] || $xqsms['code']}
+                        <div class="item-after"><button class="register-code" onclick="sendVerifyCode();" id="verifyCodeBtn">获取验证码</button></div>
+                        {/if}
+                    </div>
+
+                </div>
+            </li>
+            {if $sms['code'] || $xqsms['code']}
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-gift"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="number" placeholder="验证码" id="verifycode">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {/if}
+            {if $xqset['code']&&$xqset['room']}
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-star"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="text" placeholder="注册码" id="code">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {/if}
+            {if $xqset['room']}
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-home"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <select id="address">
+                                <option value="0">选择房号</option>
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {else}
+            {if $field['area'] || $field['build'] || $field['unit'] || $field['room']}
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-settings"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            {if $field['area']}
+                            <div class=" register-form " style="width: 25%">
+                                <input id='area'/><label>区</label>
+                            </div>
+                            {/if}
+                            {if $field['build']}
+                            <div class=" register-form " style="width: 25%">
+                                <input id='build'/><label>栋</label>
+                            </div>
+                            {/if}
+                            {if $field['unit']}
+                            <div class=" register-form " style="width: 20%">
+                                <input id='unit' style="width: 40%"/><label style="min-width: 30px">单元</label>
+                            </div>
+                            {/if}
+                            {if $field['room']}
+                            <div class=" register-form " style="width: 29%">
+                                <input id='room'/><label>室</label>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {/if}
+            {/if}
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-me"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="text" placeholder="姓名" id='realname'>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="content-block">
+        <a href="#" class="button button-big button-fill button-success" id="showToast">确认注册</a>
+    </div>
+</div>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="UTF-8"></script>
+<script type="text/javascript">
+    $(function() {
+        $("#showToast").click(function(event) {
+            var realname = $("#realname").val();
+            if (realname == '') {
+                alert('请填写真实姓名');
+                return false
+            };
+            var mobile = $("#mobile").val();
+            if (mobile == '') {
+                alert('请填写真实手机号码');
+                return false
+            };
+            if (!(/^1[3|5|7|4|5|8|][0-9]\d{4,8}$/.test(mobile))) {
+                alert("不是完整的11位手机号或者正确的手机号前七位");
+                return false;
+            }
+            var code = $("#code").val();
+            if (code == '') {
+                alert('注册码必填');
+                return false
+            };
+
+            var address = $("#address").val();
+            if(!address){
+                var build = $("#build").val();
+                {if $field['build']}
+                if (build == '') {
+                    alert('请填写正确的楼栋号');
+                    return false
+                };
+                {/if}
+                var room = $("#room").val();
+                {if $field['room']}
+                if (room == '') {
+                    alert('请填写正确的房间号');
+                    return false
+                };
+                {/if}
+            }
+            var unit = $("#unit").val();
+            var verifycode = $("#verifycode").val();
+            var regionid = "{$_GPC['regionid']}";
+            var type = $("#type").val();
+            var remark = $("#remark").val();
+            var area = $("#area").val();
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('register',array('op' => 'ajax'))}",
+                dataType: 'json',
+                data: {
+                    realname: realname,
+                    mobile: mobile,
+                    build: build,
+                    room: room,
+                    unit:unit,
+                    remark: remark,
+                    regionid: regionid,
+                    verifycode: verifycode,
+                    type: type,
+                    code: code,
+                    address:address,
+                    area:area
+                },
+                success: function(s) {
+                    if (s.status == 1) {
+                        $.toast('注册成功');
+                        setTimeout(function() {
+                            window.location.href = "{php echo $this->createMobileUrl('home')}";
+                        }, 2000);
+                    }
+                    if (s.status == 2) {
+                        $.toast('注册失败,该手机号码已经注册');
+                    }
+                    if (s.status == 3) {
+                        $.toast('验证码错误或未填写');
+
+                    }
+                    if (s.status == 4) {
+                        $.toast('注册码不对,请联系物业重新获取');
+
+                    }
+                    if (s.status == 5) {
+                        $.toast('与物业预留的手机号码不一致,请重新输入');
+                    }
+                    if (s.status == 6) {
+                        $.toast('正在审核，请耐心等待');
+                        setTimeout(function() {
+                            window.location.href = "{php echo $this->createMobileUrl('home')}";
+                        }, 2000);
+                    }
+                    if (s.status == 7) {
+                        $.toast('请选择房号');
+                    }
+                    if (s.status == 8) {
+                        $.toast('请输入正确的楼栋号和房间号');
+                    }
+
+                }
+            })
+
+
+        });
+        var code_status ="{$xqset['code']}";
+        if (code_status) {
+            $("#code").keyup(function() {
+                var code = $("#code").val();
+                var regionid = "{$_GPC['regionid']}";
+                if (code) {
+                    $.ajax({
+                        url: "{php echo $this->createMobileUrl('register',array('op' => 'room'))}",
+                        dataType: 'json',
+                        data: {
+                            code: code,
+                            regionid: regionid
+                        },
+                        success: function(s) {
+                            var data = JSON.parse(s.content);
+
+                            if (s.status == 1) {
+                                $.each(data, function(index, value) {
+                                    var content = "<option value=\"" + value.room + "\" >" + value.room + "</option>";
+                                    $("#address").html(content);
+                                });
+
+
+                            };
+                            if (s.status == 2) {
+                                $.toast('与物业提供的注册码不一致,请联系物业修改。');
+                            };
+
+                        }
+                    })
+                };
+
+            });
+
+
+        }
+
+        if (code_status == 0) {
+            $("#mobile").keyup(function() {
+                var mobile = $("#mobile").val();
+                var regionid = "{$_GPC['regionid']}";
+                if (mobile) {
+                    $.ajax({
+                        url: "{php echo $this->createMobileUrl('register',array('op' => 'room'))}",
+                        dataType: 'json',
+                        data: {
+                            mobile: mobile,
+                            regionid: regionid
+                        },
+                        success: function(s) {
+                            var data = JSON.parse(s.content);
+
+                            if (s.status == 1) {
+                                $.each(data, function(index, value) {
+                                    var content = "<option value=\"" + value.room + "\" >" + value.room + "</option>";
+                                    $("#address").html(content);
+                                });
+
+
+                            };
+                            if (s.status == 2) {
+                                $.toast('与物业预留的手机号码不一致,请联系物业修改。');
+                            };
+
+                        }
+                    })
+                };
+
+            });
+
+        };
+
+
+
+
+    })
+</script>
+<script type="text/javascript">
+    function sendVerifyCode() {
+        var mobile = $('#mobile').val();
+        if (!mobile) {
+            alert('请输入您的手机号码！');
+            return false;
+        }
+        if (mobile.search(/^1[3|5|7|4|5|8|][0-9]\d{4,8}$/) == -1) {
+            alert('请输入正确的手机号码！');
+            return false;
+        }
+        $('#verifyCodeBtn').addClass('active');
+        $('#verifyCodeBtn').attr('disabled', true);
+        var countdown = 60;
+        timer = setInterval(function() {
+            $('#verifyCodeBtn').html(countdown--);
+            if (countdown == 0) {
+                $('#verifyCodeBtn').removeClass('active');
+                $('#verifyCodeBtn').html('重新发送');
+                clearInterval(timer);
+                $('#verifyCodeBtn').attr('disabled', false);
+            }
+        }, 1000);
+        var regionid = "{$_GPC['regionid']}";
+        $.getJSON("{php echo $this->createMobileUrl('verifycode','',true)}&mobile=" + mobile +"&regionid="+regionid,
+            function(s) {
+                if (s.status == 2) {
+                    $.toast('号码已经注册,请更新号码');
+
+                };
+            });
+    }
+</script>
+</body>
+</html>

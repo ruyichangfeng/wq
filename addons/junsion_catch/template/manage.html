@@ -1,0 +1,145 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li><a href="./index.php?c=platform&a=reply&do=post&m={php echo $this->modulename}">新建活动</a></li>
+    <li {if $op == 'list'} class="active" {/if}><a href="{php echo $this->createWebUrl('manage',array('op' =>'list'))}">活动列表</a></li>
+    {if $op == 'award'}<li class="active" ><a>中奖信息</a></li>{/if}
+    {if $op == 'player'}<li class="active" ><a>参与者信息</a></li>{/if}
+    {if $op == 'friend'}<li class="active" ><a>助力者信息</a></li>{/if}
+</ul>
+<style>
+th{
+	text-align: center !important;
+}
+
+td{
+	text-align: center !important;
+	white-space: normal !important;
+	word-break: break-all !important;
+}
+</style>
+{if $op == 'list'}
+<div class="main" style="background: white;">
+    <div style="padding:15px;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr>
+                    <th>规则名称</th>					
+                    <th>活动名称</th>
+                    <th>活动时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $l}
+                <tr>
+                    <td><a href="./index.php?c=platform&a=reply&do=post&m={php echo $this->modulename}&rid={$l['rid']}">{$l['name']}</a></td>
+                    <td><a href="./index.php?c=platform&a=reply&do=post&m={php echo $this->modulename}&rid={$l['rid']}">{$l['title']}</a></td>
+                    <td>开始时间：{php echo date('Y-m-d H:i:s',$l['starttime'])}<br>结束时间：{php echo date('Y-m-d H:i:s',$l['endtime'])}</td>
+                    <td>
+                    	<a href='{php echo $this->createWebUrl("manage",array("op"=>"player","rid"=>$l["rid"]))}' class="btn btn-warning btn-sm">参与会员({$l['attend']})</a>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+    </div>
+</div>
+{elseif $op == 'player'}
+<div class="main" style="background: white;">
+    <div style="padding:15px;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr>
+                    <th>参与者</th>
+                    {if $rule['ismobile']}<th>手机号码</th>{/if}
+                    {if $rule['isqq']}<th>QQ</th>{/if}
+                    {if $rule['isemail']}<th>邮箱</th>{/if}
+                    {if $rule['isaddress']}<th>地址</th>{/if}
+					<th>剩余游戏次数</th>
+                    <th>游戏分数</th>
+                    {if $rule['endtime'] <= time()}<th>状态</th>{/if}
+                    <th>参与时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $k $l}
+                <tr>
+                    <td><img src="{$l['avatar']}" style="width: 50px;height: 50px;"><br>{if $l['realname']}{$l['realname']}{else}{$l['nickname']}{/if}</td>
+                    {if $rule['ismobile']}<td>{$l['mobile']}</td>{/if}
+                    {if $rule['isqq']}<td>{$l['qq']}</td>{/if}
+                    {if $rule['isemail']}<td>{$l['email']}</td>{/if}
+                    {if $rule['isaddress']}<td>{$l['address']}</td>{/if}
+                    <td>{if $rule['endtime'] > time()}<input style="width: 100px;display: inline-block;" class="form-control" type="number" min="0" name="times" value="{if empty($l['times'])}0{else}{$l['times']}{/if}">{else}{$l['times']}{/if}</td>
+                    <td>{if $rule['endtime'] > time()}<input style="width: 150px;display: inline-block;" class="form-control" type="number" min="0" name="score" value="{if empty($l['score'])}0{else}{$l['score']}{/if}">{else}{$l['score']}{/if}</td>
+                    {if $rule['endtime'] <= time()}
+                    	<td>{if $k < $ptotal}{if !$l['status']}<label class="label label-danger">已中奖</label>{else}<label class="label label-success">已发奖</label>{/if}<p style="margin: 0;margin-top: 5px;color: blue;font-weight: bold;}">({$plist[$k]})</p>{/if}</td>
+                    {/if}
+                    <td>{php echo date('Y-m-d H:i:s',$l['createtime'])}</td>
+                    <td>
+                    {if $rule['endtime'] > time()}
+                    <a class="btn btn-primary btn-sm" onclick="onSave(this,{$l['id']})">保存</a>
+                    {elseif !$l['status'] && $k < $ptotal}
+                    <a class="btn btn-primary btn-sm" onclick="return confirm('修改后将不能恢复，确定修改吗？')" href="{php echo $this->createWebUrl('manage',array('op'=>'take','pid'=>$l['id'],'rid'=>$rid))}">发奖</a>
+                    {/if}
+                    <a href='{php echo $this->createWebUrl("manage",array("op"=>"friend","pid"=>$l["id"]))}' class="btn btn-default btn-sm">助力者({if $l['bnum']}{$l['bnum']}{else}0{/if})</a>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</div>
+<script>
+function onSave(obj,pid){
+	var tr = $(obj).parent().parent();
+	var times = tr.find('input[name="times"]').val();
+	var score = tr.find('input[name="score"]').val();
+	$.ajax({
+		url:'{php echo $this->createWebUrl("cheat")}',
+		type:'post',
+		data:{pid:pid,score:score,times:times},
+		success: function(msg){
+			if(msg == '1'){
+				alert('保存成功！');
+			}else{
+				alert('保存失败!');
+				location.reload();
+			}
+		},
+		error: function(){
+			alert('发送请求失败，请重试!');
+			location.reload();
+		}
+	});
+}
+</script>
+{elseif $op == 'friend'}
+<div class="main" style="background: white;">
+    <div style="padding:15px;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr>
+                    <th>姓名</th>		
+                    <th>头像</th>
+                    <th>助力游戏次数</th>
+                    <th>助力时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $l}
+                <tr>
+                    <td>{$l['nickname']}</td>
+                    <td><img src="{$l['avatar']}" style="width: 50px;height: 50px;"></td>
+                    <td>{$l['blessing_num']}</td>
+                    <td>{php echo date('Y-m-d H:i:s',$l['createtime'])}</td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</div>
+{/if}
+{template 'common/footer'}

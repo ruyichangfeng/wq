@@ -1,0 +1,539 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="../addons/{$module['name']}/resource/css/style.css" />
+<link rel="stylesheet" type="text/css" href="../addons/{$module['name']}/resource/css/colpick.css" />
+<link rel="stylesheet" type="text/css" href="../addons/{$module['name']}/resource/layer/theme/default/layer.css" />
+<style>
+   .nav-form .panel{border: 0;}
+    .colpick{z-index: 999999999;}
+    .uploader-modal{z-index: 999999999;}
+    .ps{
+        margin-left: 50px;
+        position: relative;
+        top: 5px;
+        color: #a94442;
+    }
+    .color-span{
+        padding: 4px 8px;
+        display: inline-block;
+        border: 2px solid;
+    }
+</style>
+    <div class="bs-callout bs-callout-info" id="callout-alerts-dismiss-plugin">
+        <h2>{$xtitle}</h2>
+    </div>
+    <!-- 小程序底部导航栏 -->
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                底部菜单栏
+            </h3>
+        </div>
+        <div class="panel-body">
+            <form id="sign-form" class="form-horizontal" role="form" method="post" action="{$url}" name="submit" style="padding: 20px 0;">
+                <div class="form-group">
+                    <label for="nav_fontcolor" class="col-sm-2 control-label">默认字体颜色</label>
+                    <div class="col-sm-8 col-md-8">
+                        #<input type="text" class="form-control w-100 color-box js-colpick" id="nav_fontcolor" name="nav_fontcolor" style="border-color:{php echo '#'. $list['nav_fontcolor']}" value="{$list['nav_fontcolor']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_active_fontcolor" class="col-sm-2 control-label">选中状态字体颜色</label>
+                    <div class="col-sm-8 col-md-8">
+                        #<input type="text" class="form-control w-100 color-box js-colpick" id="nav_active_fontcolor" name="nav_active_fontcolor" style="border-color:{php echo '#'. $list['nav_active_fontcolor']}" value="{$list['nav_active_fontcolor']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_bgcolor" class="col-sm-2 control-label">背景颜色</label>
+                    <div class="col-sm-8 col-md-8">
+                        #<input type="text" class="form-control w-100 color-box js-colpick" id="nav_bgcolor" name="nav_bgcolor" style="border-color:{php echo '#'. $list['nav_bgcolor']}" value="{$list['nav_bgcolor']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_bordercolor" class="col-sm-2 control-label">边框颜色</label>
+                    <div class="col-sm-8 col-md-8">
+                        #<input type="text" class="form-control w-100 color-box js-colpick" id="nav_bordercolor" name="nav_bordercolor" style="border-color:{php echo '#'. $list['nav_bordercolor']}" value="{$list['nav_bordercolor']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="submit" name="submit" class="btn btn-success btn-default" value="保存">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 小程序顶部导航栏 -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                顶部导航栏
+                <span class="btn btn-info js-add">增加</span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                    <th>页面</th>
+                    <th>标题</th>
+                    <th>字体颜色</th>
+                    <th>背景颜色</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </thead>
+                <tbody>
+                {loop $navData $index $row}
+                    <tr>
+                        <td>{$row['nav_name_cn']}</td>
+                        <td>{$row['nav_title']}</td>
+                        <td><span class="color-span" style="border-color:{php echo '#'.$row['nav_font_color']; php}">#{$row['nav_font_color']}</span></td>
+                        <td><span class="color-span" style="border-color:{php echo '#'.$row['nav_bg_color']; php}">#{$row['nav_bg_color']}</span></td>
+                        <td>
+                            {if $row['m_status'] == 1}
+                            <span class="btn btn-success change_status" data-id="{$row['id']}" data-status="{$row['m_status']}">使用中</span>
+                            {else}
+                            <span class="btn btn-danger change_status" data-id="{$row['id']}" data-status="{$row['m_status']}">已禁止</span>
+                            {/if}
+                        </td>
+                        <td>
+                            <span class="btn btn-info js-edit" data-id="{$row['id']}" data-nva_name="{$row['nav_name']}"
+                                  data-title="{$row['nav_title']}" data-font_color="{$row['nav_font_color']}"
+                                  data-bg_color="{$row['nav_bg_color']}">编辑</span>
+                            <span class="btn btn-warning js-del" data-id="{$row['id']}">删除</span>
+                        </td>
+                    </tr>
+                {/loop}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script type="text/html" id="nva-from">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="form-horizontal" method="post" role="form" style="padding-top: 20px">
+                <div class="form-group">
+                    <label for="nav_name" class="col-sm-2 control-label">小程序页面</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" name="nav_name" id="nav_name">
+                            {loop $pagesData $row}
+                                <option value="{$row['name']}">{$row['title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_title" class="col-sm-2 control-label">导航标题</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control"  name="nav_title" id="nav_title" value="{$list['nav_title']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_bg_color" class="col-sm-2 control-label">导航背景颜色</label>
+                    <div class="col-sm-1 col-md-1">
+                        <input type="text" class="form-control w-100 color-box js-colpick"  name="nav_bg_color" id="nav_bg_color" value="{$list['nav_bg_color']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nav_font_color" class="col-sm-2 control-label">导航字体颜色</label>
+                    <div class="col-sm-1 col-md-1">
+                        <input type="text" class="form-control w-100 color-box js-colpick"  name="nav_font_color" id="nav_font_color" value="{$list['nav_font_color']}">
+                    </div>
+                    <div class="col-sm-7 col-md-7"><span class="ps">仅支持 ffffff 和 000000</span></div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="hidden" name="nav_id" id="nav_id" value="">
+                        <input type="submit" name="submit" class="btn btn-success btn-default" value="保存">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+<script>
+    require(["/addons/{$module['name']}/resource/js/colpick.js"],function(){
+        $(function () {
+            $('body').find('.js-colpick').colpick({
+                layout:'hex',
+                submit:0,
+                colorScheme:'dark',
+                onChange:function(hsb,hex,rgb,el,bySetColor) {
+                    $(el).css('border-color','#'+hex);
+                    if(!bySetColor) $(el).val(hex);
+                }
+            }).keyup(function(){
+                $(this).colpickSetColor(this.value);
+            });
+        })
+    });
+    require(["/addons/{$module['name']}/resource/layer/layer.js"],function(){
+        $(function () {
+            //添加
+            $('.js-add').click(function () {
+                var html = $('#nva-from').html();
+                layer.open({
+                    type: 1,
+                    skin: 'nav-form', //加上边框
+                    area: ['800px', '460px'], //宽高
+                    title:'顶部导航栏',
+                    content: html
+                });
+                var url = "{$nvaSaveUrl}";
+                $('body').find('.nav-form').find('form').eq(0).attr('action',url);
+                $('body').find('.js-colpick').colpick({
+                    layout:'hex',
+                    submit:0,
+                    colorScheme:'dark',
+                    onChange:function(hsb,hex,rgb,el,bySetColor) {
+                        $(el).css('border-color','#'+hex);
+                        if(!bySetColor) $(el).val(hex);
+                    }
+                }).keyup(function(){
+                    $(this).colpickSetColor(this.value);
+                });
+            })
+
+            //编辑
+            $('.js-edit').click(function () {
+                var html = $('#nva-from').html();
+                layer.open({
+                    type: 1,
+                    skin: 'nav-form', //加上边框
+                    area: ['800px', '460px'], //宽高
+                    title:'顶部导航栏',
+                    content: html
+                });
+                var url = "{$nvaSaveUrl}";
+                var id = $(this).attr('data-id');
+                $('body').find('.nav-form').find('form').eq(0).attr('action',url);
+                $('body').find('.nav-form').find('#nav_id').val(id);
+                $('body').find('.nav-form').find('#nav_name').val($(this).attr('data-nva_name'));
+                $('body').find('.nav-form').find('#nav_title').val($(this).attr('data-title'));
+                $('body').find('.nav-form').find('#nav_bg_color').val($(this).attr('data-bg_color')).css({'border-color':'#'+ $(this).attr('data-bg_color')});
+                $('body').find('.nav-form').find('#nav_font_color').val($(this).attr('data-font_color')).css({'border-color':'#'+ $(this).attr('data-font_color')});
+
+                $('body').find('.js-colpick').colpick({
+                    layout:'hex',
+                    submit:0,
+                    colorScheme:'dark',
+                    onChange:function(hsb,hex,rgb,el,bySetColor) {
+                        $(el).css('border-color','#'+hex);
+                        if(!bySetColor) $(el).val(hex);
+                    }
+                }).keyup(function(){
+                    $(this).colpickSetColor(this.value);
+                });
+            })
+
+            //删除
+            $('.js-del').click(function () {
+                var $this = $(this);
+                var id = $(this).attr('data-id');
+                layer.confirm('您确认要删除该数据吗？', {
+                    btn: ['是的','手误'] //按钮
+                }, function(){
+                    $.ajax({
+                        url:"{$delUrl}",
+                        data:{id:id},
+                        type:'post',
+                        dataType:'json',
+                        success:function (res) {
+                            if(res.status == 1){
+                                layer.alert('删除成功');
+                                $this.parents('tr').remove();
+                            }
+                        }
+                    })
+                }, function(){
+
+                });
+
+            })
+
+            //改变状态
+            $('.change_status').click(function () {
+                var $this = $(this);
+                var id = $(this).attr('data-id');
+                var m_status = $(this).attr('data-status');
+                layer.confirm('您确认更改状态？', {
+                    btn: ['是的','手误'] //按钮
+                }, function(){
+                    $.ajax({
+                        url:"{$changeStatusUrl}",
+                        data:{id:id,m_status:m_status},
+                        type:'post',
+                        dataType:'json',
+                        success:function (res) {
+                            if(res.status == 1){
+                                layer.alert('操作成功');
+                                window.location.reload();
+                            }
+                        }
+                    })
+                }, function(){
+
+                });
+
+            })
+
+        })
+    })
+
+</script>
+
+    <!-- 小程序底部菜单 -->
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            底部导航栏
+            <span class="btn btn-info js-menu-add">增加</span>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-hover">
+            <thead>
+            <th>名称</th>
+            <th>路径</th>
+            <th>排序</th>
+            <th>默认图标</th>
+            <th>选中图标</th>
+            <th>状态</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+            {loop $menuData $index $row}
+            <tr>
+                <td>{$row['name']}</td>
+                <td>{$row['page_path']}</td>
+                <td>{$row['m_sort']}</td>
+                <td>
+                    {if $row['icon_path']!=''}
+                      <img src="{media $row['icon_path']}" width="30" height="30">
+                    {/if}
+                </td>
+                <td>
+                    {if $row['selected_icon_path']!=''}
+                    <img src="{media $row['selected_icon_path']}" width="30" height="30">
+                    {/if}
+                </td>
+                <td>
+                    {if $row['m_status'] == 1}
+                    <span class="btn btn-success change_status-menu" data-id="{$row['id']}" data-status="{$row['m_status']}">使用中</span>
+                    {else}
+                    <span class="btn btn-danger change_status-menu" data-id="{$row['id']}" data-status="{$row['m_status']}">已禁止</span>
+                    {/if}
+                </td>
+                <td>
+                            <span class="btn btn-info js-menu-edit" data-id="{$row['id']}" data-menu-name="{$row['name']}"
+                                  data-path="{$row['page_path']}" data-icon_path="{$row['icon_path']}"
+                                  data-selected_icon_path="{$row['selected_icon_path']}"
+                                  data-select-img="{media $row['selected_icon_path']}"
+                                data-img="{media $row['icon_path']}" data-sort="{$row['m_sort']}">编辑</span>
+                    <span class="btn btn-warning js-menu-del" data-id="{$row['id']}">删除</span>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function showImageDialog(elm, opts, options) {
+        require(["util"], function(util){
+            var btn = $(elm);
+            var ipt = btn.parent().prev();
+            var val = ipt.val();
+            var img = ipt.parent().next().children();
+            options = {'global':false,'class_extra':'','direct':true,'multiple':false,'fileSizeLimit':5120000};
+            util.image(val, function(url){
+                if(url.url){
+                    if(img.length > 0){
+                        img.get(0).src = url.url;
+                    }
+                    ipt.val(url.attachment);
+                    ipt.attr("filename",url.filename);
+                    ipt.attr("url",url.url);
+                }
+                if(url.media_id){
+                    if(img.length > 0){
+                        img.get(0).src = "";
+                    }
+                    ipt.val(url.media_id);
+                }
+            }, options);
+        });
+    }
+    function deleteImage(elm){
+        $(elm).prev().attr("src", "./resource/images/nopic.jpg");
+        $(elm).parent().prev().find("input").val("");
+    }
+</script>
+<script type="text/html" id="menu-from">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="form-horizontal" method="post" role="form" style="padding-top: 20px">
+                <div class="form-group">
+                    <label for="page_path" class="col-sm-2 control-label">链接到页面</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" name="page_path" id="page_path">
+                            {loop $pagesData $row}
+                            <option value="{$row['path']}">{$row['title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="menu-name" class="col-sm-2 control-label">菜单名称</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control"  name="name" id="menu-name" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="m_sort" class="col-sm-2 control-label">排序</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control"  name="m_sort" id="m_sort" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">默认图标</label>
+                    <div class="col-sm-8 col-md-8">
+                        <div class="input-group ">
+                            <input type="text" name="icon_path" id="icon_path" value="" class="form-control" autocomplete="off">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>
+                            </span>
+                        </div>
+                        <div class="input-group " style="margin-top:.5em;">
+                            <img src="./resource/images/nopic.jpg" id="icon_path_img" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail" width="150">
+                            <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">选中状态图标</label>
+                    <div class="col-sm-8 col-md-8">
+                        <div class="input-group ">
+                            <input type="text" name="selected_icon_path" id="selected_icon_path" value="" class="form-control" autocomplete="off">
+			                <span class="input-group-btn">
+				                <button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>
+			                </span>
+                        </div>
+                        <div class="input-group " style="margin-top:.5em;">
+                            <img src="./resource/images/nopic.jpg" id="selected_icon_path_img"
+                                 onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'"
+                                 class="img-responsive img-thumbnail" width="150">
+                            <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片"
+                                onclick="deleteImage(this)">×</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="hidden" name="menu_id" id="menu_id" value="">
+                        <input type="submit" name="submit" class="btn btn-success btn-default" value="保存">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+<script>
+    $(function () {
+        require(["/addons/{$module['name']}/resource/layer/layer.js"],function(){
+            $(function () {
+                //添加
+                $('.js-menu-add').click(function () {
+                    var html = $('#menu-from').html();
+                    layer.open({
+                        type: 1,
+                        skin: 'menu-form', //加上边框
+                        area: ['800px', '600px'], //宽高
+                        title:'底部菜单',
+                        content: html
+                    });
+                    var url = "{$menuSaveUrl}";
+                    $('body').find('.menu-form').find('form').eq(0).attr('action',url);
+                })
+
+                //编辑
+                $('.js-menu-edit').click(function () {
+                    var html = $('#menu-from').html();
+                    console.log(html)
+                    layer.open({
+                        type: 1,
+                        skin: 'menu-form', //加上边框
+                        area: ['800px', '600px'], //宽高
+                        title:'底部菜单',
+                        content: html
+                    });
+                    var url = "{$menuSaveUrl}";
+                    var id = $(this).attr('data-id');
+                    $('body').find('.menu-form').find('form').eq(0).attr('action',url);
+                    $('body').find('.menu-form').find('#menu_id').val(id);
+                    $('body').find('.menu-form').find('#menu-name').val($(this).attr('data-menu-name'));
+                    $('body').find('.menu-form').find('#page_path').val($(this).attr('data-path'));
+                    $('body').find('.menu-form').find('#m_sort').val($(this).attr('data-sort'));
+                    $('body').find('.menu-form').find('#icon_path').val($(this).attr('data-icon_path'));
+                    $('body').find('.menu-form').find('#icon_path_img').attr('src',$(this).attr('data-img'));
+                    $('body').find('.menu-form').find('#selected_icon_path').val($(this).attr('data-selected_icon_path'));
+                    $('body').find('.menu-form').find('#selected_icon_path_img').attr('src',$(this).attr('data-select-img'));
+
+                })
+
+                //删除
+                $('.js-menu-del').click(function () {
+                    var $this = $(this);
+                    var id = $(this).attr('data-id');
+                    layer.confirm('您确认要删除该数据吗？', {
+                        btn: ['是的','手误'] //按钮
+                    }, function(){
+                        $.ajax({
+                            url:"{$delMenuUrl}",
+                            data:{id:id},
+                            type:'post',
+                            dataType:'json',
+                            success:function (res) {
+                                if(res.status == 1){
+                                    layer.alert('删除成功');
+                                    $this.parents('tr').remove();
+                                }
+                            }
+                        })
+                    }, function(){
+
+                    });
+
+                })
+
+                //改变状态
+                $('.change_status-menu').click(function () {
+                    var $this = $(this);
+                    var id = $(this).attr('data-id');
+                    var m_status = $(this).attr('data-status');
+                    layer.confirm('您确认更改状态？', {
+                        btn: ['是的','手误'] //按钮
+                    }, function(){
+                        $.ajax({
+                            url:"{$changeMenuStatusUrl}",
+                            data:{id:id,m_status:m_status},
+                            type:'post',
+                            dataType:'json',
+                            success:function (res) {
+                                if(res.status == 1){
+                                    layer.alert('操作成功');
+                                    window.location.reload();
+                                }
+                            }
+                        })
+                    }, function(){
+
+                    });
+
+                })
+
+            })
+        })
+    })
+</script>
+{template 'common/footer'}

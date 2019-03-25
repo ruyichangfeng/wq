@@ -1,0 +1,110 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li><a href="{php echo $this->createWebUrl('company', array('foo'=>'index'));}">公司管理</a></li>
+    <li><a href="{php echo $this->createWebUrl('company', array('foo'=>'chonglog','id'=>$id));}">充值流水</a></li>
+    <li><a href="{php echo $this->createWebUrl('company', array('foo'=>'xiaolog','id'=>$id));}">消费流水</a></li>
+    <li class="active"><a href="{php echo $this->createWebUrl('company', array('foo'=>'grablog','id'=>$id));}">抢单统计</a></li>
+</ul>
+
+<div class="clearfix">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="do" value="company" />
+                <input type="hidden" name="foo" value="grablog" />
+                <input type="hidden" name="id" value="{$id}" />
+                <input type="hidden" name="m" value="xm_gohome" />
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">抢单状态</label>
+                    <div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+                        <select class="form-control" name="selected" id="selected">
+                            <option value="">选择抢单状态</option>
+                            <option value="1">成功单</option>
+                            <option value="2">失败单</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">时间段</label>
+                    <div class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+                        {php echo tpl_form_field_daterange('addtime', $addtime);}
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-1 col-lg-1">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            抢单列表 [{php echo $this->getStaffInfo($id, 'company_name')}]
+        </div>
+        {if $list[0]['id'] == ''}
+        <div>暂无数据</div>
+        {else}
+            <div class="panel panel-info">
+                <div class="panel-heading">抢单：{$all}次 成功单：{$success}次 失败单：{$faill}次</div>
+                <div class="panel-heading">确认金额：{$sure}元</div>
+            </div>
+
+            <div class="table-responsive panel-body" style="overflow:visible;">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="active">
+                            
+                            <td>抢单项目</td>
+                            <td>员工姓名</td>
+                            <td>报价</td>
+                            <td>抢单时间</td>
+                            <td>是否成功</td>
+                            <td>确认价格</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loop $list $val}
+                        <tr>
+                            
+                            <td>{php echo $this->getServeInfo($val[serve_type], 'type_name')}</td>
+                            <td>{php echo $this->getStaffInfo($val[staff_id], 'staff_name')}</td>
+                            <td>￥{$val['offer']}</td>
+                            <td>{$val[addtime]}</td>
+                            <td>
+                            {if $val['selected'] == 1}
+                            成功
+                            {else}
+                            失败
+                            {/if}
+                            </td>
+                            <td>
+                            {if $val['selected'] == 1}
+                                {if $val['suremoney'] == ''}
+                                未确认
+                                {else}
+                                    ￥{$val['suremoney']}
+                                {/if}
+                            {/if}    
+                            </td>
+                        </tr>
+                        {/loop}
+                        
+                    </tbody>
+                </table>
+            </div>
+        {/if}    
+      
+        <div class="panel-body text-center">
+            {$pager}
+        </div>
+        
+    </div>
+</div>
+
+
+{template 'common/footer'}

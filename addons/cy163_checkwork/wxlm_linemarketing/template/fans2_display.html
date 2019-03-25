@@ -1,0 +1,117 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li ><a href="{php echo $this->createWebUrl('fans', array('op'=>'display'));}">粉丝信息管理</a></li>
+	{if $config['distribution_scale']!=0}
+	<li class="active"><a href="{php echo $this->createWebUrl('fans', array('op'=>'display2'));}">上下级关系表</a></li>
+	{/if}
+</ul>
+
+<div class="main">
+		<div class="panel panel-primary">
+			<div class="panel-heading">上下级关系表</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:6%;">粉丝</th>
+								<th style="width:20%;">上级</th>
+                                <th style="width:12%;">=》上级</th>
+                                <th style="width:17%;">=》上级</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+								<td>
+                                    {$item['fans_openid']}
+								</td>
+                                <td>
+                                    {$item['fans_nickname']}
+								</td>
+								<td>
+                                    {if $item['fans_name']==''}未编辑{else}{$item['fans_name']}{/if}
+								</td>
+								<td>
+								 	{if $item['fans_mobile']==''}未编辑{else}{$item['fans_mobile']}{/if}
+								</td>
+								<td>
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('fans', array('op'=>'delete', 'fans_id'=>$item['fans_id']));}" class="btn btn-danger">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#member_state_0").prop("checked",'checked')
+}
+function submitjifen(id){
+	var re = /^-?\\d+$/,
+		type=$('input:radio[name="credit_type"]:checked').val();
+	if($('#jine').val=='')
+	{
+		alert('请先填写充值分值，在进行提交');		
+	}else if (type==1&&re.test($('#jine').val)){
+		alert('积分分值必须为整数。');		
+	}else{
+		$.ajax({  
+            type:"POST",
+            url: "{php echo $this->createWebUrl('ajaxmember');}",
+            data:$('#jifenform'+id).serialize(),
+            dataType:"json",
+            // dataType:"text",
+            async:false,
+            success: function(data){
+                if(data.result=='success')
+                {
+                	$('#credit'+data.type+id).html(data.rs);
+                	$("#myModal"+id).modal('hide');
+                }else{
+                	alert('充值失败');
+                }
+            }
+        });
+	}		
+}
+function clearformss()
+{
+	$('#jine').val("");
+}
+</script>
+
+{template 'common/footer'}

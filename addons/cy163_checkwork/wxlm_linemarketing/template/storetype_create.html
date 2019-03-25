@@ -1,0 +1,88 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('store', array('op'=>'display'));}">门店信息管理</a></li>
+	<li ><a href="{php echo $this->createWebUrl('storetype', array('op'=>'display'));}">门店分类</a></li>
+	<li ><a href="{php echo $this->createWebUrl('storecircle', array('op'=>'display'));}">商圈信息</a></li>
+    <li class="active">{if isset($store_list[store_id])}<a href="javascript:;">编辑门店分类</a>{else}<a href="{php echo $this->createWebUrl('store', array('op'=>'create'));}">添加门店分类{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">{if isset($store[store_id])}编辑门店{else}添加门店{/if}</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="storetype[storetype_id]" class="form-control" value="{$storetype_list['storetype_id']}" />
+					</div>
+				</div>
+
+                 <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>类型名称</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="storetype[storetype_name]" class="form-control" value="{$storetype_list['storetype_name']}" maxlength="25" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>类型图片</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_form_field_image('storetype[storetype_pic]', $storetype_list['storetype_pic'])}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="storetype[storetype_order]" class="form-control" value="{$storetype_list['storetype_order']}" maxlength="20" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>开启状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="storetype[storetype_state]" id="storetype_state1" value="1" {if $storetype_list['storetype_state'] == 1 ||$storetype_list['storetype_state'] == ''} checked="checked"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="storetype[storetype_state]" id="storetype_state2" value="2" {if $storetype_list['storetype_state'] == 2} checked="checked"{/if}> 关闭
+						</label>
+						<span class="help-block"></span>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="backstore()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="storetype[storetype_name]"]').val() == ''){
+				util.message('请填写类型名称');
+				return false;
+			}	
+			if($('input[name="storetype[storetype_order]"]').val() == ''){
+				util.message('请填写排序');
+				return false;
+			}
+			if($('input:radio[name="storetype[storetype_state]"]:checked').val()==undefined){
+				util.message('请选择开启状态');
+				return false;
+			}
+			return true;
+		});
+	});
+});
+function backstore(){
+	window.location.href="{php echo $this->createWebUrl('storetype', array('op'=>'display'));}";
+}
+</script>
+{template 'common/footer'}

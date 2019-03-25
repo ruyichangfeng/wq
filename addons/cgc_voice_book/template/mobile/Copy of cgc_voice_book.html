@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" style="font-size: 44.4444px;">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta content="telephone=no" name="format-detection">
+    <link href="{MODULE_URL}template/style/css/audioplayer.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/flex.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/app.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/style/css/weike.css">
+    <script src="{MODULE_URL}template/style/js/mui.min.js"></script>
+    <script src="{MODULE_URL}template/style/js/mui.pullToRefresh.js"></script>
+    <script src="{MODULE_URL}template/style/js/mui.pullToRefresh.material.js"></script>
+    <script src="{MODULE_URL}template/style/js/jquery-2.1.1.min.js"></script>
+    <script src="{MODULE_URL}template/style/js/base.js"></script>
+    <script src="{MODULE_URL}template/style/js/utils.js"></script>
+    <script src="{MODULE_URL}template/style/js/jquery.lazyload.min.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}template/style/js/layer/layer.js"></script>
+    <link rel="stylesheet" href="{MODULE_URL}template/style/js/layer/skin/layer.css" id="layui_layer_skinlayercss">
+    <script src="{MODULE_URL}template/style/js/audioplayer.js"></script>
+    <script>
+    SC.BASE_URL = "{$_W['siteroot']}";
+    SC.THEME_URL = "{MODULE_URL}template/style/";
+    SC.COMMT_URL = "{php echo 'app/' . substr($this->createMobileUrl('commt', array()), 2);}";
+    </script>
+	<title>{$voice_book['title']}</title>
+	<script>
+	    document.documentElement.style.fontSize = document.documentElement.clientWidth/7.2 + 'px';
+	</script>
+</head>
+
+<body id="page-wrap" class="course-play course-bg mui-ios mui-ios-7 mui-ios-7-0" data-imgurl="{php echo tomedia($voice_book['cover']);}" data-name="{$voice_book['title']}" data-courseid="{$voice_book['id']}">
+    <!--播放页-->
+    <div class="module player" style="display: none;">
+        <div class="course-play-slider">
+            <div class="audio-rotating none"></div>
+            <div class="mui-slider" >
+                <div class="mui-slider-group" ></div>
+            </div>
+        </div>
+        <div class="course-play-text">
+            <p class="imgCountTip none" style="display: block;">
+            	<span style="font-size: 22px" id="currentPicIndex">1</span> / <span id="totalPicCount"></span>
+            </p>
+            <div id="textIntro" class="textIntro">&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;{$voice_book['intro']}&nbsp;&nbsp;&nbsp;&nbsp;<br></div>
+        </div>
+        <div class="course-play-audio">
+            <div class="audioplayer">
+            	<audio id="audio" src="{$voice_book['voice']}" preload="auto" controls></audio>
+            </div>
+            <div class="btn-group">
+                <a href="javascript:showDetail();">
+                    <img class="detail-btn" src="{MODULE_URL}template/style/images/detail-btn.png">
+                </a>
+                <a href="javascript:showMessage();">
+                    <img class="commt-btn" src="{MODULE_URL}template/style/images/commt-btn.png">
+                </a>
+            </div>   
+        </div>
+    </div>
+    <!--播放页-->
+    
+    <!--播放控制盒子-->
+    <div class="module player-box none" style="display: none;">   
+        <a href="#">
+            <div class="cover-container">
+                <div class="audio-cover">
+                    <div class="audio-rotating none"></div>                    
+                    <img id="cover" src="{php echo tomedia($voice_book['cover']);}" alt="">
+                </div>
+            </div>
+            <div class="audio-info">
+                <p class="audio-title">{$voice_book['title']}</p>
+                <p>
+                    <span class="audio-play-times">&nbsp;{$voice_book['pv']}</span>
+                    <span class="audio-comment-times">&nbsp;{$voice_book['commt']}</span>
+                    <span class="audio-create-times">&nbsp;{php echo date('Y-m-d',$voice_book['createtime'])}</span>
+                </p>  
+                <div id="audio-control">
+                </div>
+            </div>
+        </a>
+    </div>
+    <!--播放控制盒子-->
+
+    <!--详情页-->
+    <div class="module course-play-detail none" style="display: none;">
+        <div id="outline" class="course-detail-outline">
+        <p><span style="font-size: 14px;"><strong>内容简介：</strong></span></p>
+        <p><span style="font-size: 14px;">{$voice_book['intro']}</span></p>
+        <p><span style="font-size: 14px;"><strong><br></strong></span></p>
+        <p><span style="font-size: 14px;"></span></p>
+        <p style="text-align: center;">
+        	<span style="font-size: 14px;">----------以下是本期插图---------</span>
+        </p>
+        {if $voice_book['content_desc'] && 1!=1}
+        <p>
+        {php echo htmlspecialchars_decode($voice_book['content_desc']);}
+        </p>
+          <p><br></p>
+   
+        {else}
+         <div style="display:">       
+        {loop $voice_book['content'] $item}
+        <p>       
+        <span style="font-size: 14px;"><br></span></p>
+        <p><img style="width:100%;height:100%;background-size:100% 100%" src="{php echo tomedia($item['img']);}" title="{$item['img']}" alt="blob.png"></p>
+        <p><br></p>
+        <p><span style="font-size: 14px;">{$item['text']}</span></p>
+        {/loop}
+         
+        
+        <p><br></p>
+       </div> 
+        {/if}       
+    </div>
+    <!--详情页-->
+
+    <!--留言板-->
+    <div class="module course-play-message none" style="display: none;">
+        <div id="message" class="course-message">
+            <ul class="cou-wenda" id="wenda-list">
+    
+            </ul>
+        </div>
+        <div class="bottom-input" flex="cross:center dir:left box:last">
+            <div class="left mui-input-row">
+                <input type="text" placeholder="说点什么吧" id="inp-huida">
+            </div>
+            <div class="btn-wenda" id="btn-huida" data-type="1">评论</div>
+        </div>
+    </div>
+    <!--留言板-->
+    <div class="course-play-welcome none">
+        <div class="detail"> 
+            <img src="{MODULE_URL}template/style/images/shake_hand.png" alt="">
+        </div>
+    </div>
+
+<script>
+
+   function showDetail() {
+        //UTIL.changeTitle(name);
+        location.hash = "#/detail";
+        showModule(['course-play-detail', 'player-box']);
+        movePlayer();
+    }
+
+    /**
+     * 展示留言板
+     * 
+     */
+    function showMessage() {
+        //UTIL.changeTitle('讨论区');
+        location.hash = "#/message";
+        showModule(['course-play-message', 'player-box']);
+        movePlayer();
+    }
+
+    /**
+     * 展示播放页
+     * 
+     */
+    function showPlayer() {
+       // UTIL.changeTitle(name);
+        showModule(['player']);
+        movePlayer();
+    }
+	
+	  function movePlayer() {
+        var $audioplayer = $('.audioplayer').find('audio').get(0),
+            isPlaying1 = !audio.paused;
+        
+        if (location.hash === '#/detail' || location.hash === '#/message') {
+            if ($('.course-play-audio').children('.audioplayer').length != 0) {
+                $('.audioplayer').addClass('detail-audioplayer');
+                $('.audioplayer-playpause').addClass('detail-playpause');
+                $('.audioplayer-time').addClass('none');
+                $('.audioplayer-bar').addClass('detail-playbar');
+                $('#audio-control').append($('.audioplayer'));
+            }
+        } else if (location.hash === '') {
+            if ($('.course-play-audio').children('.audioplayer').length == 0) {
+                $('.audioplayer').removeClass('detail-audioplayer');
+                $('.audioplayer-playpause').removeClass('detail-playpause');
+                $('.audioplayer-time').removeClass('none');
+                $('.audioplayer-bar').removeClass('detail-playbar');
+                $('.course-play-audio').prepend($('.audioplayer'));
+            }
+        }
+
+        var isPlaying2 = !audio.paused;
+        if (isPlaying1 && !isPlaying2) {
+            audio.play();
+        }
+
+    }
+    
+    /**
+     * 显示图片左右滑动提示指导语
+     * @returns
+     */
+    function showImgTips(){
+    	$('.course-play-welcome')
+        .show()
+        .click(function () {
+            $(this).hide();
+        });
+    }
+	
+    
+    function showModule(moduleName) {
+        $('.module').hide();
+        for (var i = 0; i < moduleName.length; i++) {
+            $('.' + moduleName[i]).show();
+        }
+    }
+	
+	
+    /**
+     * 获取图片数量
+     * @returns
+     */
+    function getImgNumber(){
+    	$img = outlineConvertToObject($outline);
+        return $img.length;
+    }
+
+    /**
+     * outline dom 结构转为Object
+     *    
+     * @returns 
+     */
+    function outlineConvertToObject($obj) {
+        var outlineImgIndex = [],
+            outline = [],
+            paragraph = $obj.children('p'),
+            paragraphLength = paragraph.length;
+
+        for (var i = 0; i < paragraphLength; i++) {
+            if ($(paragraph[i]).find('img').length > 0) {
+                var outlineObject = {
+                    img: null,
+                    text: ''
+                };
+                outlineImgIndex.push(i);
+                outlineObject.img = $($(paragraph[i]).find('img')).clone();
+                for (var j = i + 1; j < paragraphLength; j++) {
+                    if ($(paragraph[j]).find('img').length > 0) {
+                        break;
+                    } else {
+                        outlineObject.text += '&nbsp;&nbsp;&nbsp;&nbsp;' + $(paragraph[j]).text() + '</br>';
+                    }
+                }
+                outline.push(outlineObject);
+            }
+        }
+        return outline;
+    }
+
+</script>
+<script src="{MODULE_URL}template/style/js/page-course-play.js"></script>
+<script src="{MODULE_URL}template/style/js/img_placeholder.js"></script>
+</body>
+</html>

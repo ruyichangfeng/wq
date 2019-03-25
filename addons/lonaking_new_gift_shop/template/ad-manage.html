@@ -1,0 +1,73 @@
+{template 'common/header'}
+<style type="text/css">
+	table thead tr th,table tbody tr td{
+		text-align: center;
+	}
+	table tbody tr{
+		line-height: 30px;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+		<a href="{php echo $this->createWebUrl('AdEdit');}" class="btn btn-success btn-sm pull-right"><i class="glyphicon glyphicon-plus"></i> 添加 </a>
+	</ul>
+	<div class="panel panel-default">
+		<div class="table-responsive panel-body">
+			<div class="" style="padding 15px">
+				<form action="" method="post">
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead class="navbar-inner">
+								<tr>
+									<th width="5%">编号</th>
+									<th width="8%">标题</th>
+									<th width="7%">首页展示</th>
+									<th width="10%">创建时间</th>
+									<th width="15%">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								{loop $page['data'] $data}
+									<tr>
+										<td data-id="{$data['id']}">{$data['id']}</td>
+										<td>{$data['title']}</td>
+										<td>{if $data['type'] == 1}是{else}否{/if}</td>
+										<td>{php echo date("Y-m-d h:i:s",$data['create_time'])}</td>
+										<td>
+											<a href="{php echo $this->createWebUrl('AdEdit',array('id'=>$data['id']));}" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-edit"> 修改</i></a>
+											<a href="javascript:void(0);" class="btn btn-danger btn-sm del-ad" data-id="{$data['id']}" url="{php echo $this->createWebUrl('HardRemove',array('opt'=>'ad','id'=>$data['id']));}"><i class="glyphicon glyphicon-remove"> 删除 </i></a>
+										</td>
+									</tr>
+								{/loop}
+							</tbody>
+						</table>
+					</div>
+				</form>
+				{$page['pager']}
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		$(".del-ad").on("click",function(){
+			var btn = $(this);
+			var url = btn.attr('url')
+			var tr = btn.parent().parent();
+			$.post(url,function(result){
+				$id = $(this).attr('data-id');
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					util.message(json.message);
+					return false;
+				}else{
+					//移除dom
+					tr.remove();
+				}
+			});
+
+		});
+	});
+</script>
+{template 'common/footer'}

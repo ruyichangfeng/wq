@@ -1,0 +1,77 @@
+{template 'common/header'}  
+{template 'common_header'}     
+{if $operation == 'display'}
+<ul class="nav nav-tabs">
+	   <li class="active"><a href="{php echo $this->createWebUrl('log')}">投票日志</a></li> 
+</ul>  
+<div class="main">
+	<div class="panel panel-info">
+				<div class="panel-heading">筛选</div>
+				<div class="panel-body">
+					<form action="./index.php" method="get" class="form-inline" role="form">
+						<input type="hidden" name="c" value="site" />
+						<input type="hidden" name="a" value="entry" />
+						<input type="hidden" name="m" value="numa_vote" />
+						<input type="hidden" name="do" value="log" /> 
+						<input type="hidden" name="op" value="display" />  
+						<div class="form-group">
+								 <div class="col-xs-12 col-sm-12 col-lg-12">
+											<select name="opt_type" class='form-control' style="width:100px">
+														<option value="">请选择</option> 
+														<option value="activity_id" {if $_GPC['opt_type']=='activity_id'}selected{/if} >活动ID</option> 
+														<option value="activity_title" {if $_GPC['opt_type']=='activity_title'}selected{/if} >活动标题</option> 
+														<option value="itemid" {if $_GPC['opt_type']=='itemid'}selected{/if} >选手ID</option> 
+														<option value="item_name" {if $_GPC['opt_type']=='item_name'}selected{/if} >选手名称</option>
+														<option value="username" {if $_GPC['opt_type']=='username'}selected{/if} >用户昵称</option> 
+														<option value="openid" {if $_GPC['opt_type']=='openid'}selected{/if} >OPENID</option> 
+														<option value="ip_str" {if $_GPC['opt_type']=='ip_str'}selected{/if} >IP</option> 
+														<option value="province" {if $_GPC['opt_type']=='province'}selected{/if} >省份</option> 
+											</select>  
+											<input class="form-control" name="keywords" id="" type="text" value="{$_GPC['keywords']}"> 
+											<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+											<span  class="btn btn-warning" onclick="$('#export_form').submit()"  ><i class="fa fa-sign-out">导出</i></span>
+									</div>
+						</div>   
+					</form>
+					  <form id="export_form" action="{php echo $this->createWebUrl('log',array('op'=>'export'))}" method="post">
+					  			<input type="hidden" name="opt_type" value="{$opt_type}" />
+					  			<input type="hidden" name="keywords" value="{$keywords}" />
+					  </form>
+				</div>
+       </div>
+       <div class="panel panel-default">
+				<div class="panel-body table-responsive">
+					<table class="table table-hover">
+						<thead class="navbar-inner">
+							<tr class="text-c">
+								<th style="width:5%;">ID</th>
+								<th style="width:13%">投票时间</th>
+								<th style="width:13%">活动</th> 
+								<th style="">投票给</th> 
+								<th style="width:10%;">OpenID/用户昵称</th>  
+								<th style="width:10%;">IP地址</th> 
+								<th style="width:8%">省份</th>  
+								<th style="width:8%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $data_list $item}
+							<tr class="text-c">
+									<td>{$item['id']}</td>
+									<td>{$item['logtime']}</td>
+									<td>[{$item['activity_id']}]{$item['activity_title']}</td>  
+									<td>[{$item['itemid']}]{$item['item_name']}</td>  
+									<td>{$item['openid']}<br/>{$item['username']}</td> 
+									 <td>{$item['ip_str']}</td>
+									<td>{$item['province']}</td>   
+									<td>{$item['city']}</td>
+							 </tr>
+							{/loop}
+						</tbody>
+					</table>
+					{$pager}
+			 </div>
+	</div>
+</div> 
+{/if}
+{template 'common/footer'}

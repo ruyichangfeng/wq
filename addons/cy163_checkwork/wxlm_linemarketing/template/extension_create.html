@@ -1,0 +1,276 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('extension', array('op'=>'display'));}">推广任务管理</a></li>
+    <li class="active"><a href="{php echo $this->createWebUrl('extension', array('op'=>'create'));}">{if isset($extension_list[extension_id])}编辑任务{else}添加任务{/if}</a></li>
+</ul>
+<div class="main">
+	<div class="panel panel-success">
+		<div class="panel-heading" >友情提示</div>
+		<div class="panel-body">
+			<p>营销类插件，均有被举报封域名或封号的风险，请自行查看微信官方相关规定。</p>
+			<p>诱导分享类说明 <a href="http://kf.qq.com/faq/120911VrYVrA150916imqaa6.html" target="_blank">http://kf.qq.com/faq/120911VrYVrA150916imqaa6.html</a></p>
+			<p>诱导关注类说明 <a href="http://kf.qq.com/faq/120911VrYVrA150916bYvUJR.html" target="_blank"> http://kf.qq.com/faq/120911VrYVrA150916bYvUJR.html</a></p>
+		</div>
+	</div>
+
+   <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-danger" style="border-color: #BBE1E2;">
+			<div class="panel-heading" >基础参数</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_id]" class="form-control" value="{$extension_list['extension_id']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>任务名称</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_title]" class="form-control" value="{$extension_list['extension_title']}" maxlength="25"  />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>活动起始时间</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						 {php echo tpl_form_field_daterange('extension[extension_date]', array('start'=>$extension_list['extension_statetime'],'end'=>$extension_list['extension_endtime']), true)}
+						<span class="help-block"></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="xhred">*</span>展示模式</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="radio-inline">
+							<input  name="extension[extension_openmode]" {if $extension_list['extension_openmode'] == 1 || $extension_list['extension_openmode'] == ''}checked{/if}   type="radio" id='extension_openmode1' value="1" /><label for="extension_openmode1">常规模式</label>
+						</div>
+						<div class="radio-inline">
+							<input  name="extension[extension_openmode]" {if $extension_list['extension_openmode'] == 2 }checked{/if} id='extension_openmode2' type="radio" value="2" /> <label for="extension_openmode2">边缘模式</label>
+						</div>
+						<span class="help-block">
+						<p>常规模式：点击任务将直接打开任务页面;</p>
+						<p>边缘模式：点击任务进入任务描述的一个独立页面，推广人分享此页面url实际为任务对应的url。</p>
+						<p>注意：微信文章请选择[边缘模式]</p></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="xhred">*</span>奖励类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="radio-inline">
+							<input  name="extension[extension_taskredtype]" {if $extension_list['extension_taskredtype'] == 1 || $extension_list['extension_taskredtype'] == ''}checked{/if}   type="radio" id='extension_taskredtype1' value="1" /><label for="extension_taskredtype1">积分</label>
+						</div>
+						<div class="radio-inline">
+							<input  name="extension[extension_taskredtype]" {if $extension_list['extension_taskredtype'] == 2 }checked{/if} id='extension_taskredtype2' type="radio" value="2" /> <label for="extension_taskredtype2">余额</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>任务链接</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="url" name="extension[extension_taskredurl]" class="form-control" value="{$extension_list['extension_taskredurl']}" maxlength="100"  />
+						<span class="help-block">任务链接格式：http://***</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>每人分享奖励次数上限</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="number" name="extension[extension_sharemaxtimes]" class="form-control" value="{$extension_list['extension_sharemaxtimes']}" maxlength="25"  />
+						<div class="help-block">分享超出上限，将无奖励值。</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="xhred">*</span>分享奖励模式</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="radio-inline">
+							<input  name="extension[extension_sharestate]" id="extension_state1"  {if $extension_list['extension_sharestate'] == 1 || $extension_list['extension_sharestate'] == ''}checked{/if}  type="radio" value="1" onClick="checke(1)" /> <label for="extension_state1">分享即可获得奖励</label>
+						</div>
+						<div class="radio-inline">
+							<input  name="extension[extension_sharestate]" id="extension_state2" {if $extension_list['extension_sharestate'] == 2 }checked{/if} type="radio" value="2" onClick="checke(2)" /> <label for="extension_state2">分享后他人点击可获得奖励</label>
+						</div>
+					</div>
+				</div>
+				<link rel="stylesheet" href="{RES}public/css/multiple-select.css" />
+<!-- 				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>任务门店</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					<input type="hidden" name="member[member_storeid]" class="form-control" value="{$member_list['member_openid']}" />
+ 						<select id="ms" multiple="multiple">
+	                            {loop $store_list $key $item}
+							    <option value="{$item['store_id']}" {if in_array($item['store_id'],$member_list['member_storeid'])}selected="selected"{/if} class="opt">{$item['store_title']}</option>
+	                            {/loop}
+                        </select>
+                       <div class="help-block">生成的任务只有任务门店设置的门店内才能完成进行</div>
+					</div>
+				</div> -->
+				<script src="{RES}public/js/jquery.min.js"></script>
+				<script src="{RES}public/js/multiple-select.js"></script>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="xhred">*</span>任务开启状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="radio-inline">
+							<input  name="extension[extension_state]" id="extension_state1"  {if $extension_list['extension_state'] == 1 || $extension_list['extension_state'] == ''}checked{/if}  type="radio" value="1" /> <label for="extension_state1">开启</label>
+						</div>
+						<div class="radio-inline">
+							<input  name="extension[extension_state]" id="extension_state2" {if $extension_list['extension_state'] == 2 }checked{/if} type="radio" value="2" /> <label for="extension_state2">关闭</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-warning" style="border-color: #BBE1E2;">
+			<div class="panel-heading" >奖励分配</div>
+			<div class="panel-body">
+				<div class="form-group" id="shareoncered">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>单次分享奖励</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_shareoncered]" class="form-control" value="{$extension_list['extension_shareoncered']}" maxlength="25"  />
+						<div class="help-block">分享后，推广人获得的奖励值。</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>单次点击奖励</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_clickoncered]" class="form-control" value="{$extension_list['extension_clickoncered']}" maxlength="25"  />
+						<div class="help-block">好友通过分享点击进入，推广人获得的奖励值。</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>任务总奖励值</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_maxred]" class="form-control" value="{$extension_list['extension_maxred']}" maxlength="25"  />
+						<div class="help-block">当前任务总奖励值超出后，推广人将不再获得奖励。</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-info" >
+			<div class="panel-heading">分享参数</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>分享页标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="extension[extension_sharetitle]" class="form-control" value="{$extension_list['extension_sharetitle']}" maxlength="25"  />
+						<div class="help-block">此项为网页标题title，微信分享也是用此项。</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>分享描述</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						 <textarea name="extension[extension_sharedesc]"  class="form-control richtext" cols="2" rows="2">{$extension_list['extension_sharedesc']}</textarea>				
+                        <div class="help-block">对应描述信息，分享内容使用这里的描述内容，建议字符为20-40</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>分享Logo</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_form_field_image('extension[extension_shareimg]', $extension_list['extension_shareimg'])}
+					    <div class="help-block">这个logo是用户分享到朋友圈显示的logo，请务必设置的好看一点</div>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="back()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="extension[extension_title]"]').val() == ''){
+				util.message('请填写任务名称');
+				return false;
+			}	
+			if($('input[name="extension[extension_date][start]"]').val()=='')
+			{
+				util.message('请填写活动开始时间');
+				return false;
+			}
+			if($('input:radio[name="extension[extension_taskredtype]"]:checked').val()==undefined){
+				util.message('请选择奖励类型');
+				return false;
+			}
+
+			if($('input[name="extension[extension_taskredurl]"]').val() == ''){
+				util.message('请填写任务链接');
+				return false;
+			}
+			if($('input[name="extension[extension_sharemaxtimes]"]').val() == ''){
+				util.message('请填写分享领取奖励次数上限');
+				return false;
+			}
+			if($('input:radio[name="extension[extension_state]"]:checked').val()==undefined){
+				util.message('请选择任务开启状态');
+				return false;
+			}
+			if($('input:radio[name="extension[extension_sharestate]"]:checked').val()==1)
+			{
+				if($('input[name="extension[extension_shareoncered]"]').val() == ''){
+					util.message('请填写单次分享奖励');
+					return false;
+				}
+			}
+			if($('input:radio[name="extension[extension_sharestate]"]:checked').val()==1)
+			{
+				if($('input[name="extension[extension_clickoncered]"]').val() == ''){
+					util.message('请填写单次点击奖励');
+					return false;
+				}
+			}
+
+			if($('input[name="extension[extension_maxred]"]').val() == ''){
+				util.message('请填写任务消耗总奖励数量');
+				return false;
+			}
+			if($('input[name="extension[extension_sharetitle]"]').val() == ''){
+				util.message('请填写分享页标题');
+				return false;
+			}
+			if($('input[name="extension[extension_maxred]"]').val() == ''){
+				util.message('请填写任务消耗总奖励数量');
+				return false;
+			}
+			if($('input[name="extension[extension_sharedesc]"]').val() == ''){
+				util.message('请填写分享描述');
+				return false;
+			}
+			if($('input[name="extension[extension_shareimg]"]').val() == ''){
+				util.message('请填写分享Logo');
+				return false;
+			}
+			return true;
+		});
+		checke($('input:radio[name="extension[extension_sharestate]"]:checked').val())
+		
+	});
+});
+// $(function() {
+//     $('#ms').change(function() {
+//         	$('input[name="member[member_storeid]"]').val($(this).val());
+//         }).multipleSelect({
+//             width: '100%'
+//         });
+//     });
+function checke(type)
+{
+	if(type==2)
+	{
+		$('#shareoncered').addClass('hide');
+		$('#shareoncered').removeClass('show');
+	}else{
+		$('#shareoncered').addClass('show');
+		$('#shareoncered').removeClass('hide');
+	}
+}
+function back()
+{
+	window.location.href="{php echo $this->createWebUrl('extension', array('op'=>'display'));}";
+}
+</script>
+{template 'common/footer'}

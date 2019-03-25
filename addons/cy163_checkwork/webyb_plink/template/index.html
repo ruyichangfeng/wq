@@ -1,0 +1,77 @@
+{template "common/header"}
+<style>
+.red{color:#F00;font-weight:bold;}
+.blue{color:#00F;font-weight:bold;}
+input{width:95%;padding:2px;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('index')}">链接管理</a></li>
+        <li><a href="{php echo $this->createWebUrl('link_post')}">添加链接</a></li>
+    </ul>
+    <div class="panel panel-default">
+		<div class="panel-heading">链接列表</div>
+		<div class="panel-body">
+			<div class="table-responsive panel-body">
+				<table class="table table-hover">
+					<thead class="navbar-inner">
+						<tr>
+                  			<th class="col-sm-1">ID</th>
+							<th class="col-sm-1">链接名称</th>
+                            <th class="col-sm-4">链接URL</th>
+                            <th class="col-sm-1">赠送方式</th>
+                            <th class="col-sm-1">赠送类型</th>
+							<th class="col-sm-1">赠送模式</th>
+                            <th class="col-sm-1">金额范围</th>
+                            <th class="col-sm-1">限制-时间</th>
+                            <th class="col-sm-1">限制-总额</th>
+                            <th class="col-sm-1">限制-次数</th>
+                            <th class="col-sm-1">已发送金额</th>
+                            <th class="col-sm-1">已参与次数</th>
+                            <th class="col-sm-2">添加时间</th>
+                            <th class="col-sm-2">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $list $index $item}
+						<tr>
+                            <td>{$item['id']}</td>
+                            <td>{$item['title']}</td>
+                            <td><input type="text" name="url{$item['id']}" value="{$item['url']}" title="全选复制" /></td>
+                            <td>{php echo $this->tps[$item['tp']]}</td>
+                            <td title="{php echo $this->types[$item['type']]}">{php echo $this->types[$item['type']]}</td>
+                            <td title="{php echo $this->modes[$item['mode']]}">{php echo $this->modes[$item['mode']]}</td>
+                            <td>{$item['rang']['min']} ～ {$item['rang']['max']}</td>                      
+                            <td>{$item['sxtime']}</td>
+                            <td>{$item['sum']}</td>
+							<td>{$item['num']}</td>
+                            <td>{$item['send_sum']}</td>
+                            <td>{$item['send_num']}</td>
+                            <td>{php echo date('Y-m-d H:i', $item['addtime'])}</td>
+                            <td><a href="{php echo $this->createWebUrl('link_post',array('id'=>$item['id']))}">编辑</a> | <a href="javascript:del({$item['id']},'{$item[title]}');">删除</a></td>
+                         </tr>
+						{/loop}
+						{if empty($list)}
+						<tr>
+							<td colspan="19">暂无数据</td>
+						</tr>
+						{/if}
+					</tbody>
+				</table>
+				{$pager}
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+/*$('.fz').each(function(){
+	util.clip(this, $(this).attr('title'));
+});*/
+
+function del(id, title){
+	if(confirm('你确认将【'+title+'】删除？')){
+		location.href = "{php echo $this->createWebUrl('link_proc')}"+'&op=del&id='+id;	
+	}
+}
+</script>
+{template "common/footer"}

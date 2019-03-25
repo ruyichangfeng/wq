@@ -1,0 +1,83 @@
+{template 'common/header'}
+<style type='text/css'>
+.red { float:left;color:red}
+.white {float:left;color:white}
+.tooltipbox {
+	background:#fef8dd;border:1px solid #c40808; position:absolute; left:0;top:0; text-align:center;height:20px;
+	color:#c40808;padding:2px 5px 1px 5px; border-radius:3px;z-index:1000;
+}
+</style>
+<ul class="nav nav-tabs">
+  <li {if $op == 'display'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('operator', array('op' => 'display'))}">店员管理</a>
+  </li>
+  <li {if $op == 'post'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('operator', array('op' => 'post'))}">新增店员</a>
+  </li>
+</ul>
+{if $op == 'post'}
+<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return formcheck()">
+	<input type="hidden" name="id" value="{$item['id']}">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			店员设置
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">店员名称</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" name="name" id="name"  class="form-control" value="{$item['name']}">
+				</div>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">OpenID</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" name="from_user" id="from_user"  class="form-control" value="{$item['from_user']}">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group col-sm-12">
+		<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+		<input type="hidden" name="token" value="{$_W['token']}" />
+	</div>
+</form>
+
+<script type="text/javascript">
+    require(['jquery', 'util'], function($, u){
+		$(function(){
+            u.editor($('#spotinfo')[0]);
+		});
+    });   
+</script>
+{elseif $op == 'display'}
+<div style="padding:15px;">
+  <table class="table table-hover">
+    <thead class="navbar-inner">
+      <tr>
+        <th style="width:20%;text-align:center;" >序号</th>
+        <th style="width:30%;text-align:center;" >店员名称</th>
+        <th style="width:30%;text-align:center;" >OpenID</th>
+        <th style="width:20%;text-align:center;" >操作</th>
+  </tr>
+</thead>
+{loop $list $item}
+<tr>
+  <td style="width:20%;text-align:center;" >{$item['id']}</td>
+  <td style="width:30%;text-align:center;" >{$item['name']}</td>
+  <td style="width:30%;text-align:center;" >{$item['from_user']}</td>
+  <td style="width:20%;text-align:center;" >
+    <a href="{php echo $this->createWebUrl('operator',array('id' => $item['id'] ,'op' => 'post'))}">编辑
+    </a>
+    <a href="{php echo $this->createWebUrl('operator',array('id' => $item['id'],'op' => 'delete'))}">删除
+    </a>
+  </td>
+</tr>
+{/loop}
+</table>
+</div>
+{/if}
+
+{template 'common/footer'}

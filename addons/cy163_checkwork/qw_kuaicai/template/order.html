@@ -1,0 +1,287 @@
+{template 'common/header'}
+
+
+<ul class="nav nav-tabs">
+    <li  {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('order', array('op'=>'display'));}">订单列表</a></li>
+
+</ul>
+
+
+
+<div class="panel panel-info">
+    <div class="panel-heading">筛选</div>
+    <div class="panel-body">
+        <form action="" method="get" class="form-horizontal" role="form">
+
+            <input type="hidden" name="c" value="site" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="qw_kuaicai" />
+            <input type="hidden" name="do" value="order" />
+            <input type="hidden" name="op" value="display" />
+
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label">时间范围</label>
+                <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+                      <?php  if(empty($date)){
+
+
+                        $date['start']=date('Y-m-d',time()-86400*20);
+                        $date['end']=date('Y-m-d',time()+86400*19+86399);
+                      }
+
+                      ?>
+
+                            {php echo tpl_form_field_daterange('date', $date);}
+
+                </div>
+
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label">订单号</label>
+                <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+
+
+                    <input type="text" class="form-control" name="ordersn" value="{$ordersn}" >
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label">姓名</label>
+                <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+
+
+                    <input type="text" class="form-control" name="xingming" value="{$xingming}">
+                </div>
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label">状态</label>
+                <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+
+
+                    <select name="status" class="form-control">
+
+                        <option value="">请选择</option>
+                        <option value="1" {if $status==1}selected{/if} >发货中</option>
+                        <option value="2" {if $status==2}selected{/if}>已完成</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-sm-12 ">
+                <button type="submit" class="btn btn-primary  col-lg-offset-6" name="submit" value="提交">查询</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">订单列表</div>
+    <div class="panel-body">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover" style="min-width: 300px;">
+                <thead class="navbar-inner">
+                <tr>
+
+                    <th class="col-md-2">订单号</th>
+
+                    <!--<th class="col-md-1">姓名</th>-->
+                    <th class="col-md-1">昵称</th>
+
+                    <th class="col-md-1">时间</th>
+                    <th class="col-md-2">备注</th>
+
+                    <th class="col-md-1">状态</th>
+
+                    <th class="col-md-2">点击完成</th>
+                    <th class="col-md-2">操作</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {loop $orderlist $oid $item}
+                <tr>
+                  <td>{$item['ordersn']}</td>
+                  <!--<td>{$item['name']}</td>-->
+                    <td>{$item['nicheng']}</td>
+                    <td>{php echo date('Y-m-d',$item['addtime'])}</td>
+                    <td>{$item['mark']}</td>
+                    <td>{if $item['status']==1}发货中{else}已完成{/if}</td>
+
+
+
+                    <td>{if $item['status']==1}<input type="number" min="1" max="10000" class="form-control jici" style="width:50%;display: inline-block;margin-right:5px;" placeholder="输入计次"><button class="btn btn-danger">完成订单</button> {else}{/if}</td>
+                    <td>
+                    <a href="{php echo $this->createWebUrl('order', array('op' => 'detail', 'id' => $item['id']))}" class="btn btn-success">查看订单</a>
+
+                        <a href="{php echo $this->createWebUrl('order', array('op'=>'del', 'idd'=>$item['id']));}" onclick="return confirm('确定要删除吗？');"  class="btn btn-default pull-right" data-toggle="tooltip" data-placement="top" title="" data-original-title="删除"><i class="fa fa-times"></i></a>
+
+
+                    </td>
+
+                </tr>
+
+                <?php
+
+
+
+                $xuanze = explode(',',$item['xuanze']);
+
+
+                array_pop($xuanze);
+
+                 $arr = array();
+
+                 foreach($cailist as $v)
+                 {
+
+
+                   if(in_array($v['id'],$xuanze)){
+
+                   $arr[]=$v;
+
+
+                   }
+
+                 }
+
+
+               ?>
+                <tr class="xq">
+                    <td colspan="7">
+                        <div class="pull-left">
+                            {loop $arr $v}
+                            <kbd>{$v['title']}--{$v['num']}</kbd>
+
+                            {/loop}
+
+                        </div>
+                    </td>
+                </tr>
+
+                {/loop}
+
+
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">菜品统计</div>
+    <div class="panel-body">
+        <div class="panel-body">
+
+            <ul class="list-group">
+
+
+                {loop $tongji['title'] $index $v}
+                <li class="list-group-item">
+                    <span class="badge">{$tongji['num'][$index]}</span>
+                   {$v}
+                </li>
+                {/loop}
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+{template 'common/footer'}
+
+
+<script>
+
+
+
+    $(document).ready(function(){
+
+
+        $(".xq").hide();
+
+        $(".btn-success").each(function () {
+
+            $(this).on("click",function(){
+
+
+
+
+                var rr=$(this).parent().parent().next(".xq");
+
+
+
+
+            if(rr.is(':hidden')){
+
+
+
+               rr.show(100);
+                return false;
+            }else{
+
+                rr.hide(100);
+                return false;
+
+            }
+
+
+
+
+
+
+        })
+        })
+
+        $(".btn-danger").each(function(){
+
+
+            $(this).on("click",function(){
+
+                var countjici = $(this).parent().find(".jici").val();
+
+                var ordersn = $(this).parent().parent().find("td").eq(0).text();
+
+                var ttt = $(this).parent().parent();
+
+              if(countjici<=0){
+
+
+                    alert("请输入大于0的数值");
+                    return false;
+                }
+
+                var Url = "{php echo $this->createWeburl('order')}";
+
+                $.post(Url,{ordersn:ordersn,countjici:countjici},function(data){
+
+
+
+                    var data = $.parseJSON(data);
+                    if(data.error==1){
+
+
+                        //成功完成订单，并减次数
+
+                      ttt.find("td").eq(4).html("已完成");
+                        ttt.find("td").eq(5,6).html("");
+
+
+
+
+                        alert(data.message);
+                    }else{
+
+                        alert(data.message);
+                    }
+                })
+
+
+            })
+
+
+
+        })
+
+
+
+    })
+</script>

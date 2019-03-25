@@ -1,0 +1,120 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('archive', array('op'=>'display'));}">档案管理</a></li>
+    <li ><a href="{php echo $this->createWebUrl('archive', array('op'=>'create'));}">添加档案</a></li>
+    <li style="float: right"><a class="btn btn-info" href="{php echo $this->createWebUrl('warning', array('op'=>'one'));}">预警档案</a></li>
+</ul>
+<div class="main">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="display:block;color:#FFF;">
+                搜索条件 ↓  （点击可展开）
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >姓名</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[archive_name]" value="{$search['archive_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">电话</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[archive_tel]" value="{$search['archive_tel']}"  class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >本月生日</label>
+                            <div class="col-sm-3">
+                                <select name="search[archive_birthday]" class="form-control">
+                                    <option value="" >全部</option>
+                                    <option value="1" {if $search['archive_birthday'] == 1}selected{/if}>一月</option>
+                                    <option value="2" {if $search['archive_birthday'] == 2}selected{/if}>二月</option>
+                                    <option value="3" {if $search['archive_birthday'] == 3}selected{/if}>三月</option>
+                                    <option value="4" {if $search['archive_birthday'] == 4}selected{/if}>四月</option>
+                                    <option value="5" {if $search['archive_birthday'] == 5}selected{/if}>五月</option>
+                                    <option value="6" {if $search['archive_birthday'] == 6}selected{/if}>六月</option>
+                                    <option value="7" {if $search['archive_birthday'] == 7}selected{/if}>七月</option>
+                                    <option value="8" {if $search['archive_birthday'] == 8}selected{/if}>八月</option>
+                                    <option value="9" {if $search['archive_birthday'] == 9}selected{/if}>九月</option>
+                                    <option value="10" {if $search['archive_birthday'] == 10}selected{/if}>十月</option>
+                                    <option value="11" {if $search['archive_birthday'] == 11}selected{/if}>十一月</option>
+                                    <option value="12" {if $search['archive_birthday'] == 12}selected{/if}>十二月</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                            <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">档案列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:5%;">编号</th>
+                        <th style="width:20%;">姓名</th>
+                        <th style="width:10%;">手机</th>
+                        <th style="width:20%;">生日</th>
+                        <th style="width:20%;">爱好</th>
+                        <th style="width:20%;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {php $i = ($pindex - 1) * $psize + 1}
+                    {loop $archives $key $item}
+
+                    <tr>
+                        <td>{$i}</td>
+                        <td><img src="{php echo tomedia($item['archive_avatar'])}" alt="" width="30"> {$item['archive_name']}</td>
+                        <td>{$item['archive_tel']}</td>
+                        <td>{$item['archive_birthday']}</td>
+                        <td>{$item['archive_hobby']}</td>
+                        <td>
+                         	<a href="{php echo $this->createWebUrl('consume', array('op'=>'display', 'archive_id'=>$item['archive_id']));}" class="btn btn-info">消费明细</a>
+                            <a href="{php echo $this->createWebUrl('archive', array('op'=>'create', 'archive_id'=>$item['archive_id']));}" class="btn btn-primary">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" href="{php echo $this->createWebUrl('archive', array('op'=>'delete', 'id'=>$item['archive_id']));}" class="btn btn-default btn-danger">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if empty($archives)}
+                    <tr>
+                        <td colspan="7">
+                            暂无档案
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+</script>
+{template 'common/footer'}

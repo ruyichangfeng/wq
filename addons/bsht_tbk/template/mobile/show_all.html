@@ -1,0 +1,633 @@
+{template 'header'}
+
+
+{php $isweixin=$this->iswexin();}
+<!--script src="{$res}js/jquery.masonry.min.js"></script-->
+<!--script src="{$res}js/jquery.masonry.pkgd.min.js"></script-->
+<script src="../addons/bsht_tbk/res/js/main.js"></script>
+<script type="text/javascript" src="{$plus}dan/amazeui/js/amazeui.min.js"></script>
+<script type="text/javascript" src="{$res}js/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="{$res}js/layer-m/layer.js"></script>
+<link href="{$res}css/sharepic.css" rel="stylesheet" type="text/css" />
+<style type="text/css">*{margin:0; padding:0;} a{text-decoration: none;} img{max-width: 100%; height: auto;} #weixin-tip{display: none; position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); height: 100%; width: 100%; z-index: 10000000;} #weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;} #weixin-tip .close{color:#fff;padding:5px;font:bold 20px/24px simsun;text-shadow:0 1px 0 #ddd;position:absolute;top:0;left:5%;} 
+#weixin-tip2{display: none; position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); height: 100%; width: 100%; z-index: 10000000;} #weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;} #weixin-tip .close{color:#fff;padding:5px;font:bold 20px/24px simsun;text-shadow:0 1px 0 #ddd;position:absolute;top:0;left:5%;} 
+#weixin-tt.quanpost {position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); height: 100%; width: 100%; z-index: 10000000;} #weixin-tt .close{color:#fff;padding:5px;font:bold 20px/24px simsun;text-shadow:0 1px 0 #ddd;position:absolute;top:0;right:5%;}</style>
+    
+	<div id="weixin-tip" {if $isweixin==1 && $_GPC['op']=='yindao' || $setting['isyindao']==0 && $_GPC['op']=='yhj'}style="display:block"{/if} onclick="$('#weixin-tip').hide();">
+      <p>
+        <img src="{$res}static/jwap/images/live_weixin.png" alt="微信打开" />
+        <span id="close" title="关闭" class="close" onclick="$('#weixin-tip').hide();">×</span></p>
+    </div>
+    
+
+<link type="text/css" rel="stylesheet" href="{$res}static/jwap/css/global.css" />
+
+
+<div class="shareplus2" style="position: fixed;right:20px;top:80px;width:25px;height:25px;text-align: center;line-height: 25px;border-radius:50px;font-zise:25px;z-index:9999">
+<img src="{$res}images/cardqr.png" onclick="javascript:sharepic();" style="width:20px;height:20px;padding-top:2px"/>
+</div>
+
+<div id="item">
+            <div class="item-good">
+              <div class="img_show am-inline-block am-gallery am-gallery-default fq-background-white" data-am-widget="gallery" data-am-gallery="{ pureview: true }">
+                <ul id="target" class="clear">
+                  <li><img src="{php echo tomedia($show['itempic'])}"></li>
+                </ul>
+              </div>
+
+
+<!--倒计时js-->	
+
+<script type="text/javascript">
+var intDiff = parseInt({php echo strtotime($show['itemyhj_etime'])-time();});//倒计时总秒数量
+
+function timer(intDiff){
+	window.setInterval(function(){
+	var day=0,
+		hour=0,
+		minute=0,
+		second=0;//时间默认值		
+	if(intDiff > 0){
+		day = Math.floor(intDiff / (60 * 60 * 24));
+		hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+		minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+		second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+$('#daytit').fadeIn(200);
+$('#day_show').fadeIn(50);
+$('#hour_show').fadeIn(100);
+$('#minute_show').fadeIn(150);
+$('#second_show').fadeIn(200);
+	}
+	if (intDiff < 0){ 
+	$('#daytit').fadeIn(200);
+	//$('#daytit').html("您手慢啦，优惠券已失效！");
+	$('#day_show').fadeOut(200);
+	$('#hour_show').fadeOut(200);
+	$('#minute_show').fadeOut(200);
+	$('#second_show').fadeOut(200);
+    }
+	if (minute <= 9) minute = '0' + minute;
+	if (second <= 9) second = '0' + second;
+	$('#day_show').html(day+"天");
+	$('#hour_show').html('<s id="h"></s>'+hour+'时');
+	$('#minute_show').html('<s></s>'+minute+'分');
+	$('#second_show').html('<s></s>'+second+'秒');
+	intDiff--;
+	}, 1000);
+} 
+
+
+$(function(){
+	timer(intDiff);
+});	
+
+</script>
+
+<!--倒计时js-->
+<h1>{if $show['wenan']}推荐理由：{$show['wenan']}{else}{$show['title']}{/if}</h1>
+
+              <div class="list-price buy" id="buy">			
+				
+				<span class="price-new">
+
+				  <i>￥{php echo $jiagenew;}</i>
+				  <i class="del f14 ml2">￥{$show['itemfee']}</i>
+                  
+				  <em class="icon-gai ml2">{php echo $q_jiage}元券</em>
+				  
+				  
+				</span>
+                
+                </div>
+
+
+<div class="time-item">
+    <div class="day" id="daytit" style="display:block">优惠券说明（{$show['itemyhj_tit']}）<br>当前剩余量：<span id="quan_num">{$show['itemyhj_yl']}</span> 张，手慢无！</div>
+	<strong id="day_show" style="display:none">0天</strong>
+	<strong id="hour_show" style="display:none">0时</strong>
+	<strong id="minute_show" style="display:none">0分</strong>
+	<strong id="second_show" style="display:none">0秒</strong>
+</div>
+
+
+
+              
+              
+              <div id="weixin-tt">
+               <div class="am-margin-top am-text-center" style="width:auto;padding-left:10px;padding-right:10px">
+				  <div class="fq-explain  am-center am-text-center" >
+                  <span class="am-padding-horizontal-xs fq-nowrap" style="background: white;">长按框内 &gt; 全选 &gt; 复制</span>
+			      </div>
+                  <div id="taokouling" class="fq-goods am-text-center am-margin-top-sm" style="padding-top:20px;padding-bottom:20px">
+                    
+					{if $show['itemyhj_url']!=''}
+					<span id="copy_key_ios">复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买{$show['itemyhj_tkl']}</span>
+					<textarea style="display: none;ime-mode: disabled" id="copy_key_android" type="text" class="am-form-field am-text-center am-text-mss pt10" oninput="regain();">复制框内整段文字，打开「手机淘宝」即可「领取优惠券」并购买{$show['itemyhj_tkl']}</textarea>
+
+					{else}
+
+					<span id="copy_key_ios">复制框内整段文字，打开「手机淘宝」即可购买{$show['itemtkl']}</span>
+					<textarea style="display: none;ime-mode: disabled" id="copy_key_android" type="text" class="am-form-field am-text-center am-text-mss pt10" oninput="regain();">复制框内整段文字，打开「手机淘宝」即可购买{$show['itemtkl']}</textarea>
+
+					{/if}
+
+
+			      </div>
+				  <div style="height:0px;width:5px" id="tkltips"></div>
+<script>
+function taokouling(){
+
+mScroll();
+
+}
+</script>
+
+
+<script>
+function taokouling2(){
+
+{if $setting['isyindao']==0}
+
+$('#weixin-tip').show();
+
+{else}
+
+
+$('#weixin-tt2').show();
+$('#weixin-tt2').addClass("quanpost");
+$('#xywxobg').show();
+$('#closed2').show();
+var tkli = $('#copy_key_ios').html();
+$('#copy_key_ios2').html(tkli);
+var tkla = $('#copy_key_android').val();
+$('#copy_key_android2').val(tkla);
+
+{/if}
+
+}
+</script>
+
+<!--script>
+$(function () {
+
+        document.addEventListener("selectionchange", function (e) {
+            if (window.getSelection().anchorNode.parentNode.id == 'copy_key_ios' && document.getElementById('copy_key_ios').innerText != window.getSelection()) {
+                var key = document.getElementById('copy_key_ios');
+                window.getSelection().selectAllChildren(key);
+            }
+            if (window.getSelection().anchorNode.parentNode.id == 'copy_key_ios' && document.getElementById('copy_key_ios').innerText != window.getSelection()) {
+                var key = document.getElementById('copy_key_ios');
+                window.getSelection().selectAllChildren(key);
+            }
+        }, false);
+
+
+    });
+</script-->
+
+                </div>
+                <span id="closed" title="关闭" class="close" style="display:none">×</span>
+			  </div>
+
+<!--弹窗-->
+<style type="text/css">
+#xywxobg{display:none;position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9998;} #weixin-tt2.quanpost {position:fixed;left:50%;top:20%;bottom:auto;width:80%;height:auto;margin:0 0 0 -40%;background:#fff;border-radius:12px;z-index:9999;}
+.xywxti{text-align:center;font-size:18px;}
+#weixin-tt2.quanpost .fq-goods{border:1px #ddd solid !important;border-width:1px 0 !important;background:#F4F4F4;padding:20px;font-size:12px;line-height:30px;}
+#weixin-tt2 .close{display:none;width:100%;margin-top:10px;color:#fff;text-align:center;padding:15px 0;font:bold 20px/24px simsun;background:#f30;border-radius:6px;}
+</style>
+<div id="xywxobg"></div>
+<div id="weixin-tt2" style="display:none">
+                <div class="am-margin-top am-text-left">
+                  <div class="xywxti">长按框内 &gt; 全选 &gt; 复制</div>
+                  <div class="fq-goods am-text-center am-margin-top-sm">
+                    <div class="fq-explain  am-center am-text-center"></div>
+                    <span id="copy_key_ios2"></span>
+                    <textarea style="display: none;ime-mode: disabled" id="copy_key_android2" type="text" class="am-form-field am-text-center am-text-mss pt10" oninput="regain2();"></textarea></div>
+                </div>
+ <button type="button" id="closed2" class="close" onclick="$('#weixin-tt2').hide();$('#xywxobg').hide()">我知道了</button>
+</div>
+<!--弹窗-->
+
+              
+{if $isweixin==1}
+
+			<a>&nbsp;</a>
+            
+{else}      
+  
+			<a>&nbsp;</a>
+{/if}
+			
+			<div class="bady-part" style="display:none">
+              <div id="bady-tab" class="bady-tab clear">
+                <ul>
+                  <li style="width:50%;">
+                    <a href="javascript:;">图文详情</a></li>
+                  <li style="width:50%;"><a>商品评论</a></li>
+                </ul>
+              </div>
+              <div class="tab1">
+                <img class="lazy" src=></br>
+                <img class="lazy" src=></br>
+              </div>
+              <div class="com-big tab2" style="display:none">
+                <div class="com-list">
+                  <ul>
+                    <div class="ds-thread" data-thread-key="537166660913" data-title="{$show['title']}" data-url=""></div>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+ 
+<!--详情-->
+<!--商品图文详情-->
+        <div class="am-panel-group am-margin-vertical-sm" id="accordion">
+            <div class="am-panel am-padding-horizontal-sm">
+                <div class="am-panel-hd am-padding-left-0 am-padding-right-0">
+                    <h4 class="am-panel-title" data-am-collapse="{parent: '#accordion', target: '#product-details'}" data-itemid="{$show['itemid']}">
+                        商品图文详情<span class="am-text-primary am-text-xs" style="font-size:14px">（点击展开）</span>
+                        <i class="am-icon-angle-right am-fr am-icon-sm" id="change_icon"></i>
+                    </h4>
+
+                </div>
+                <div id="product-details" class="am-panel-collapse am-collapse">
+                    <div class="am-panel-bd am-padding-0" style="border-top: 0">
+                        <div class="am-tab-panel am-fade am-in am-active" id="tab1">
+                                                            <div class="am-padding-top-sm" style="width:100%;overflow:auto;"></div>                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--商品图文详情-->
+<!--详情-->
+
+
+          <div class="normal item-recommend clear">
+            <h3>
+              <span>猜你还喜欢:</span></h3>
+            <section class="goods" id="pageCon">
+      <ul class="goods-list list_box clear" id="list_box">
+      </ul>
+     </section>
+	 <div id="list_more" class="loading" style="margin-top:10px">
+	 <span onclick="get_list(0);">查看更多</span>
+	 </div>
+     <!--div class="loading" id="loading" style="display: none;">
+      <span>正在加载中，请稍后...</span>
+     </div-->
+          </div>
+          
+          <div class="buy_btn clear">
+            <a href="{php echo $this->createMobileUrl('index')}" class="go_home">
+              <img src="{$res}static/jwap/images/home.png">返回首页</a>
+            <div class="buy_info">
+  
+{if $isweixin==1}		 
+			  {if $show['itemyhj_url']=='' || $daoqi==1}
+			  <!--a id="J_weixin" href="javascript:" onclick="$('#weixin-tip').show();" class="go_tmall" rel="nofollow"-->
+			  <a id="J_itemweixin" href="javascript:" onclick="{if $setting['isyindao']==0}$('#weixin-tip').show();{else}taokouling2();{/if}" class="go_tmall" rel="nofollow">
+                <span>立即去抢购</span>
+                <i class="gtbuy"></i>
+              </a>
+			  {else}
+			  <!--a id="J_weixin" href="javascript:" onclick="$('#weixin-tip').show();" class="go_tmall" rel="nofollow"-->
+			  <a id="J_itemweixin" href="javascript:" onclick="{if $setting['isyindao']==0}$('#weixin-tip').show();{else}taokouling2();{/if}" class="go_tmall" rel="nofollow">
+                <span>立即领券购买</span>
+                <i class="gtbuy"></i>
+              </a>
+			  {/if}
+
+              <!--a class="app_load joa_load_app addfav" href="{php echo $this->createMobileUrl('list_dtk')}">点此返回<br>领券直播目录</a-->
+			  <a class="app_load joa_load_app addfav" href="javascript:;">{if $fav==0}点这里<br>放入收藏夹{else}点这里<br>取消收藏{/if}</a>
+{else}
+
+             {if $show['itemyhj_url']=='' || $daoqi==1}
+			  <a id="J_itemweixin" href="{$show['itemyhj_url']}" target="_blank" class="go_tmall" rel="nofollow">
+                <span>立即去抢购</span>
+                <i class="gtbuy"></i>
+              </a>
+			  {else}
+			  <a id="J_itemweixin" href="{$show['itemyhj_url']}" target="_blank" class="go_tmall" rel="nofollow">
+                <span>立即领券购买</span>
+                <i class="gtbuy"></i>
+              </a>
+			  {/if}
+
+              <a class="app_load joa_load_app addfav" href="javascript:;">{if $fav==0}点这里<br>放入收藏夹{else}点这里<br>取消收藏{/if}</a>
+			
+{/if}	
+			</div>
+          </div>
+    
+    <script type="text/javascript">
+var limit = 1;
+function get_list(ty){
+    
+    if(ty==1){
+	   $("#pageCon .list_box").html('');
+	}else{
+	   $("#list_more").html('<div class="loading"><span>卖命加载中...</span> </div>');
+	   
+	}
+	
+	$.ajax({
+	    type : "post",
+	    url : "{php echo $this->createMobileUrl('show_all_ajax',array('op'=>'list','cate_id'=>$show['cate_id']))}",
+	    data : {
+	    	limit:limit,
+	    },
+        dataType : "json",		
+	    success : function(data) {
+	    	if(data.status==200){
+
+				        	
+						var list = data.content;
+						var content = '';
+						for(var i=0; i<list.length; i++){
+
+                            
+
+        content += '<li class="picCon"><a class="goods-a" href="'+list[i]['url']+'" target="_self">'
+		 +'<img class="loazd lazy-bk" src="../addons/bsht_tbk/res/images/load.gif" data-bk="'+list[i]['pic']+'{$setting['maxpic']}.jpg" /></a>'
+		 +'<a href="'+list[i]['url']+'" target="_self">'
+		 +'<h3>'+list[i]['title']+'</h3>'
+         +'<div class="list-price buy">'
+         +'<span class="price-new"><i>券后 ￥</i>'+list[i]['itemfee2']+'</span>'
+         +'<!--span class="qhj" style="margin-left:5px">'+list[i]['tag']+'</span-->'
+         +'<a id="J_weixin" href="'+list[i]['url']+'" target="_blank" class="coupon"><span class="good-btn" style="color:#999">销量'+list[i]['itemmsell']+'</span></a>'
+         +'</div></a>'
+         +'<div class="lingquan">'
+         +'<a id="J_weixin" href="'+list[i]['yhjurl']+'" target="_self" class="coupon"><span>'+list[i]['jiage2']+'元券</span></a>'
+         +'</div></li>';
+
+
+						}
+                        $("#pageCon .list_box").html(content);
+						var aa = $(".goods-list li").innerWidth();
+                        $(".goods-list li img").css('height',aa);
+
+						if(list.length==4){
+							$("#list_more").html('<span onclick="get_list(0);" style="color:#5e5e5e">换一组商品挑选</span>');
+						}else{
+							$("#list_more").html('<span></span>');
+							$("#list_more").fadeOut(500);
+						}		
+	                    limit++;
+
+						
+
+//waterfall();
+lazy_img();
+		    }else if(data.status==-103){
+	    		$("#list_more").html('<span>没有更多记录！</span>');
+				//dialog("没有更多记录！");
+				$("#list_more").fadeOut(500);
+
+	    	}else{
+			    $("#list_more").html('<span>没有更多记录！</span>');
+				//dialog("没有更多记录！！");
+				$("#list_more").fadeOut(500);
+			}    	
+	    },
+	    error : function(xhr, type) {
+
+	    }
+	});
+	    
+
+}
+
+get_list(0);
+
+function waterfall(limit){
+$container = $('#list_box');
+$container.masonry('reload');
+	$container.imagesLoaded(function() {
+		lazy_img();
+		$container.masonry({
+			itemSelector: '.picCon',
+			isFitWidth: false,//是否根据浏览器窗口大小自动适应默认false
+			//gutter: 20,
+			isAnimated: false,//是否采用jquery动画进行重拍版
+			isRTL:false,//设置布局的排列方式，即：定位砖块时，是从左向右排列还是从右向左排列。默认值为false，即从左向右
+            isResizable: true,//是否自动布局默认true
+			});
+		});
+}
+
+        
+</script>
+	<script type="text/javascript">
+	   $("#bady-tab li").eq(0).addClass("active");
+        $('#bady-tab li').on('click',
+        function() {
+          $("#bady-tab li").removeClass("active");
+          $(this).addClass("active");
+          $(".tab1,.tab2").hide();
+          $(".tab" + ($(this).index() + 1)).show();
+        });
+	</script>
+
+	<script type="text/javascript" src="{$res}static/jwap/js/mjp.min.js"></script>
+
+
+<script>
+function reload(){
+window.location.href='{php echo $this->createMobileUrl('show_all',array('id'=>$_GPC['id']));}'
+}
+
+function mScroll(){
+	$("html,body").animate({scrollTop:$("#buy").offset().top},500);
+	}
+
+
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.match(/iphone/i) == "iphone" || ua.match(/ipad/i) == "ipad") {
+
+        $('.fq-explain span').html("长按框内 > 拷贝");
+        $('.fq-explain span').css('background', 'white');
+
+        $('input').focus(function () {
+            window.setTimeout('scrollBottom()', 300);
+        });
+
+    } else {
+        $("#copy_key_ios").hide();
+        $("#copy_key_android").show();
+		$("#copy_key_ios2").hide();
+        $("#copy_key_android2").show();
+    }
+
+
+</script>
+
+<script>
+    var taokouling_value = document.getElementById("copy_key_android").value;
+    function regain() {
+        document.getElementById('copy_key_android').value = taokouling_value;
+    }
+
+    var taokouling_value_2 = document.getElementById("copy_key_android2").value;
+    function regain2() {
+        document.getElementById('copy_key_android2').value = taokouling_value_2;
+    }
+</script>
+
+
+
+<script type="text/javascript">
+	$(function(){
+
+		{if $_GPC['op']=='yhj'}taokouling();mScroll();{/if}
+
+
+{if $_GPC['do']=='show_all'}
+
+{if empty($show)}
+
+
+layer.open({
+    content: '没有找到商品信息<br>或该商品已下架！'
+    ,skin: 'msg'
+    ,time: 2 //2秒后自动关闭
+	,shadeClose:false
+	,shade: 'background-color: rgba(57,61,73,.8)'
+	,end:function(){
+	window.location.href="{php echo $this->createMobileUrl('index')}";
+	}
+  });
+
+
+{/if}
+
+
+{/if}
+
+
+	});
+</script>
+
+
+<script>
+
+    $(function() {
+          //事件监听
+          //------------------------------------------	
+          document.addEventListener("selectionchange",
+          function(e) {
+            if (window.getSelection().anchorNode.parentNode.id == 'copy_key_ios' && document.getElementById('copy_key_ios').innerText != window.getSelection()) {
+              var key = document.getElementById('copy_key_ios');
+              window.getSelection().selectAllChildren(key);
+            }
+            if (window.getSelection().anchorNode.parentNode.id == 'copy_key_ios2' && document.getElementById('copy_key_ios2').innerText != window.getSelection()) {
+              var key = document.getElementById('copy_key_ios2');
+              window.getSelection().selectAllChildren(key);
+            }
+          },
+          false);
+
+    });
+
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.match(/iphone/i) == "iphone" || ua.match(/ipad/i) == "ipad") {
+
+        $('.fq-explain span').html("长按框内 > 拷贝");
+		$('.xywxti').html("长按框内 > 拷贝");
+
+    } else {
+        $("#copy_key_ios").hide();
+        $("#copy_key_ios2").hide();
+        $("#copy_key_android").show();
+        $("#copy_key_android2").show();
+    }
+
+    //获取pics
+    $('.am-panel-title').click(function () {
+        //详情显影
+        if ($("#product-details").is(":hidden")) {
+            $("#change_icon").removeClass('am-icon-angle-right').addClass('am-icon-angle-down');
+            $('.am-tab-panel').html('<span class="am-center am-text-center am-margin-vertical-xs">图片努力加载中<i class="am-icon-spinner am-icon-pulse am-margin-left-xs"></i></span>');
+        } else {
+            $("#change_icon").removeClass('am-icon-angle-down').addClass('am-icon-angle-right');
+        }
+        var itemid = $(this).attr('data-itemid');
+        getiteminfo(itemid);
+    });
+
+    //采集pics
+    function getiteminfo(itemid) {
+        $.ajax({
+            url: "https://hws.m.taobao.com/cache/mtop.wdetail.getItemDescx/4.1/?data=%7Bitem_num_id%3A" + itemid + "%7D&type=jsonp&dataType=jsonp",
+            dataType: 'jsonp',
+            jsonp: 'callback',
+            success: function (result) {
+                if (result.ret[0] == "SUCCESS::接口调用成功") {
+                    var len = result.data.images.length;
+                    var image = new Array();
+                    for (var i = 0; i < len; i++) {
+                        image[i] = '<img src="' + result.data.images[i] + '">';
+                    }
+                    $('.am-tab-panel').html(image);
+                } else {
+                    $("#qf_alert_info").html("宝贝数据调用失败，原因：" + result.ret[0]);
+                    $('#qf_alert').modal();
+                }
+            }
+        });
+    }
+
+</script>
+
+<script>
+var sharepicmain="<div id='allsharepic' class='sharepicw100' onclick='javascript:layer.closeAll();'><div class='sharepicw100 sharepictitle'>@ {$_W['account']['name']}</div><div class='sharepicw100'><img id='startpic' src='{php echo tomedia($show['itempic'])}' class='sharepicw100'></div><div class='sharepicw35 sharepicfl qrcodediv' id='qrcodediv'></div><div class='sharepicw60 sharepicfl sharepicpd6'><span class='sharepicw100 sharepicspan1'><b>{$show['title']}</b></span><span class='sharepicw100 sharepicspan2' style='text-decoration:line-through;color:#666'><small>原价：{$show['itemfee']}</small></span><span class='sharepicw100 sharepicspan2'><b>券后价：{php echo $jiagenew}</b></span></div></div><div class='sharepicw100 sharepicfl sharepicdivbot'>截屏保存后推荐给朋友</div>";
+function sharepic(){
+
+layer.open({
+	
+	type: 2,
+	time:0.4,
+	end:function(){
+//tips
+layer.open({	
+content: sharepicmain,
+btn: '关闭'
+});
+jQuery('#qrcodediv').qrcode({
+    render    : "canvas",//也可以替换为table
+    width   : 80,
+    height  : 80,
+    text    : "{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&id={$_GPC['id']}&do={$_GPC['do']}&m=bsht_tbk",
+	correctLevel    : 1,
+	typeNumber  : -1,
+});
+//tips	
+	}
+
+
+});
+}
+
+
+window.onscroll = function () {
+if (document.documentElement.scrollTop + document.body.scrollTop > 50) {
+		$('#fixtop').css('position','fixed');
+    }
+    else {
+		$('#fixtop').css('position','absolute');
+}
+
+if (document.documentElement.scrollTop + document.body.scrollTop > 100) {
+        $('#back_top').show();
+    }
+    else {
+        $('#back_top').hide();
+    }
+
+
+}
+</script>
+
+    {template 'foot'}
+	{template 'footer'}

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+    {template 'head'}
+    <title>{php echo $this->config['system_name']}</title>
+    <style>
+        .lw-tab-title{
+            width: 100%;
+            text-align: center;
+            color: #3f97f1;
+            border-bottom: 1px solid #3f97f1;
+            line-height: 40px;
+        }
+        .lw-swiper{
+            text-align: center;
+            line-height: 40px;
+        }
+        .swiper-slide-add a{
+            color: #3f97f1;
+            text-decoration: none;
+        }
+        .swiper-slide-add{
+            border-bottom: 1px solid #3f97f1 !important;
+        }
+
+    </style>
+</head>
+
+<body style="background-color: #F8F8F8">
+<div class="box">
+	<div class="tops">
+    	<div class="col-xs-2 text01-l">
+			<a href="javascript:" onclick="history.back(); ">
+            	<img src="{RES}mobile/images/back-white.png" width="20">
+            </a>
+        </div>
+        <div class="col-xs-8 text01-c">选择预约项目</div>
+    </div>
+	<div class="cont">
+        <div>
+            <div class="one-text-1">{$store['store_name']}</div>
+            <!--<div class="project_type">-->
+                <!--<select id="ptype" >-->
+                    <!--<option value="0">全部</option>-->
+                    <!--{loop $ptypes $key $item}-->
+                    <!--<option value="{$item['ptype_id']}">{$item['ptype_title']}</option>-->
+                    <!--{/loop}-->
+                <!--</select>-->
+            <!--</div>-->
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div id="ptype_all" class="swiper-slide lw-swiper swiper-slide-add"><a href="javascript:getProjectByType('')">全部</a></div>
+                {loop $ptypes $key $item}
+                <div id="ptype_{$item['ptype_id']}" class="swiper-slide lw-swiper "><a href="javascript:getProjectByType({$item['ptype_id']})">{$item['ptype_title']}</a></div>
+                {/loop}
+
+            </div>
+        </div>
+
+
+        <ul class="one-b" id="project_list">
+            {loop $projects $key $item}
+            {if empty($item['project_pic'])}
+        	<li class="col-xs-6">
+
+                {if $item['project_info_state'] == 2}
+            	<a href="{php echo $this->createMobileUrl('projectInfo', array('project_id'=>$item['project_id'], 'store_id'=>$store_id))}">{$item['project_name']}</a>
+                {else}
+                <a href="{php echo $this->createMobileUrl('staff', array('project_id'=>$item['project_id'], 'store_id'=>$store_id))}">{$item['project_name']}</a>
+                {/if}
+            </li>
+            {else}
+            <li class="col-xs-12" style="">
+                {if $item['project_info_state'] == 2}
+                <a href="{php echo $this->createMobileUrl('projectInfo', array('project_id'=>$item['project_id'], 'store_id'=>$store_id))}">
+                    <img src="{php echo tomedia($item['project_pic'])}">
+                </a>
+                {else}
+                <a href="{php echo $this->createMobileUrl('staff', array('project_id'=>$item['project_id'], 'store_id'=>$store_id))}">
+                    <img src="{php echo tomedia($item['project_pic'])}">
+                </a>
+                {/if}
+            </li>
+            {/if}
+            {/loop}
+
+        </ul>
+
+
+    </div>
+    {template 'foot'}
+</div>
+<script>
+
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 5,
+        paginationClickable: true,
+        spaceBetween: 0,
+        freeMode: true
+    });
+
+$(".tc-back").click(function(){
+	$(".modal").hide();
+	$(".modal-backdrop").hide();
+	
+})
+    function getProjectByType(id) {
+
+        var value = id;
+
+        var storeid = "{$store_id}"
+        var businessid = "{$store['store_businessid']}";
+
+        $.ajax({
+
+            url:"{php echo $this->createMobileUrl('Ptype')}" + "&type=" + value,
+            type:"post",
+            data:{type:value, store:storeid, business:businessid},
+            success:function (res) {
+
+                $('.swiper-slide').removeClass('swiper-slide-add');
+
+                if (value == '')
+                {
+                    $('#ptype_all').addClass('swiper-slide-add');
+
+                } else
+                {
+                    $('#ptype_' + value).addClass('swiper-slide-add');
+                }
+
+                $('#project_list').html(res);
+
+            }
+
+        })
+
+    }
+    $('#ptype').change(function () {
+
+        var value = $(this).val();
+
+        var storeid = "{$store_id}"
+        var businessid = "{$store['store_businessid']}";
+
+        $.ajax({
+
+            url:"{php echo $this->createMobileUrl('Ptype')}" + "&type=" + value,
+            type:"post",
+            data:{type:value, store:storeid, business:businessid},
+            success:function (res) {
+
+                $('#project_list').html(res);
+
+            }
+
+        })
+    })
+</script>
+</body>
+</html>

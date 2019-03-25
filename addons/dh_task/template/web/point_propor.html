@@ -1,0 +1,83 @@
+{template 'public/header'}
+{template 'public/comhead'}
+
+{if $operation == 'display'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-heading">筛选</div>
+        <div class="table-responsive panel-body">
+            <form action="./index.php" method="get" class="navbar-form navbar-left" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="dh_task" />
+                <input type="hidden" name="do" value="point_propor" />
+                <input type="hidden" name="op" value="display" />
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="用户名称" name="username">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="备注搜索" name="mark">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="status" autocomplete="off">
+                        <option value="">全部</option>
+                        <option value="0">待审核</option>
+                        <option value="1">通过</option>
+                        <option value="2">未通过</option>
+                    </select>
+                </div>
+                <button class="btn btn-success"><i class="fa fa-search"></i> 搜索</button>
+            </form>
+        </div>
+    </div>
+    <form action="" method="post" class="form-horizontal form" >
+        <div class="panel panel-default">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover" style="">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:50px;">id</th>
+                        <th style="width:80px;">用户</th>
+                        <th style="width:80px;">金额</th>
+                        <th style="width:160px;">提现账户</th>
+                        <th style="width:220px;">备注</th>
+                        <th>时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $item}
+                    <tr>
+                        <td style="white-space:normal;">{$item['id']}</td>
+                        <td>{if $item['username']}{$item['username']}{else}{$item['nickname']}{/if}<br>
+                            {if $item['status'] == 0}<span class="label label-info">待提现</span>
+                        {elseif $item['status'] == 1}<span class="label label-success">通过</span>
+                        {elseif $item['status'] == 2}<span class="label label-danger">未通过</span>{/if}
+                        </td>
+                        <td>
+                            <div class="type-parent label label-info">￥{$item['price']}</div>
+                            <div class="type-parent">{$item['points']}{php echo $this->getSetting('points_name');}</div>
+                        </td>
+                        <td>
+                            <div class="type-parent label label-info">{$item['account_type']}</div>
+                            <div class="type-parent">{$item['account']}</div>
+                        </td>
+                        <td>{$item['mark']}</td>
+                        <td>{php echo date('Y-m-d H:i:s', $item['time'])}</td>
+                        <td>
+                            {if $item['status'] == 0}
+                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('point_propor', array('op' => 'status','id' => $item['id'],'status' => 1))}">通过</a>
+                            <a class="btn btn-danger btn-sm" onclick="return confirm('确定不通过吗？');return false;" href="{php echo $this->createWebUrl('point_propor', array('op' => 'status','id' => $item['id'],'status' => 2))}">不通过</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {$pager}
+</div>
+{/if}
+{template 'common/footer'}

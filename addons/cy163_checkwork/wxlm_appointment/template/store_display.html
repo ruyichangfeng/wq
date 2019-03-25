@@ -1,0 +1,127 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op'=>'display'));}">门店管理</a></li>
+    <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op'=>'create'));}">添加门店</a></li>
+</ul>
+<div class="main">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="display:block;color:#FFF;">
+                搜索条件 ↓  （点击可展开）
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >门店名称</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[store_name]" value="{$search['store_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">负责人</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[store_admin_name]" value="{$search['store_admin_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">所属商圈</label>
+                            <div class="col-sm-3">
+                                <select name="search[store_circleid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $circles $key $item}
+                                    <option value="{$item['circle_id']}" {if $search['store_circleid'] == $item['circle_id']}selected{/if}>{$item['circle_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">所属商家</label>
+                            <div class="col-sm-3">
+                                <select name="search[store_businessid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $business $key $item}
+                                    <option value="{$item['business_id']}" {if $search['store_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                            <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">门店列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:50px;">编号</th>
+                        <th style="width:80px;">门店名称</th>
+                        <th style="width:80px;">门店类型</th>
+                        <th style="width:100px;">所属商圈</th>
+                        <th style="width:100px;">所属商家</th>
+                        <th style="width:160px;">负责人</th>
+                        <th style="">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {php $i = 1;}
+                    {loop $stores $key $item}
+
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['store_name']}</td>
+                        <td>
+                            {loop $storetype $key2 $item2}
+                            {if $item2['storetype_id'] == $item['store_typeid']}
+                            {$item2['storetype_title']}
+                            {/if}
+                            {/loop}
+                        </td>
+                        <td>{$item['circle_name']}</td>
+                        <td>{$item['business_name']}</td>
+                        <td>{$item['store_admin_name']}</td>
+                        <td>
+                            <a href="{php echo $this->createWebUrl('comment', array('op'=>'display', 'store_id'=>$item['store_id']));}" class="btn btn-info">门店评论({$item['comment']})</a>
+                            <a href="{php echo $this->createWebUrl('store', array('op'=>'modify', 'id'=>$item['store_id']));}" class="btn btn-primary">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" href="{php echo $this->createWebUrl('store', array('op'=>'delete', 'id'=>$item['store_id']));}" class="btn btn-default btn-danger">删除</a>
+                        </td>
+                    </tr>
+                    {/loop}
+                    {if empty($stores)}
+                    <tr>
+                        <td colspan="8">
+                            尚未添加门店
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+</script>
+{template 'common/footer'}

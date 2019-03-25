@@ -1,0 +1,106 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>云支付设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('YunPay')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li  class="active"><a href="#tab-1" aria-expanded="true"><img width="20" src="{HLMMS_IMG}yunpay_ico.png"> 云支付</a>
+                                    </li>
+                                    <li class=""><a  href="{php echo $this->createWebUrl('wechatsetting')}" ><i class="fa fa-weixin" style="color:#0abc89"></i>微信支付</a>
+                                    </li>
+                                    <li class=""><a  href="{php echo $this->createWebUrl('alipaysetting')}" ><img width="20" src="{HLMMS_IMG}alipay_ico.png">支付宝支付</a>
+                                    </li>
+
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">云支付入口</label>
+                                            <div class="col-sm-11">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" value="{php echo util::app_url('payment')}" readonly>
+                                                    <span class="input-group-btn">
+                                    <a href="javascript:;" data-url="{php echo util::app_url('payment')}" style="margin-right:0px;" class="color-default js-clip btn btn-white "><i class="fa fa-paste"></i> 复制链接</a>
+                                </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">一码付：L</label>
+                                            <div class="col-sm-11">
+                                                <div class="input-group">
+                                                    <button class="btn btn-primary " type="button" onclick="getpayqrcode('L',4);" ><i class="fa fa-lg fa-qrcode" style="color: orange" ></i>&nbsp;生成L（最小）级一码付图片</button>
+                                                    <a class="btn btn-info "  href="{$_W['siteroot']}addons/hl_mmsystem/data/yunpayqrcode/hlyunpay-L-4.png" target="_blank"><i class="fa fa-download" ></i> 下载一码付 L 二维码图片</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">一码付：M</label>
+                                            <div class="col-sm-11">
+                                                <div class="input-group">
+                                                    <button class="btn btn-primary " type="button" onclick="getpayqrcode('M',6);" ><i class="fa fa-lg fa-qrcode" style="color:magenta"></i>&nbsp;生成M（适中较小）级一码付图片</button>
+                                                    <a class="btn btn-info " href="{$_W['siteroot']}addons/hl_mmsystem/data/yunpayqrcode/hlyunpay-M-6.png"  target="_blank"><i class="fa fa-download" ></i> 下载一码付 M 二维码图片</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">一码付：Q</label>
+                                            <div class="col-sm-11">
+                                                <div class="input-group">
+                                                    <button class="btn btn-primary " type="button" onclick="getpayqrcode('Q',8);" ><i class="fa fa-lg fa-qrcode" style="color: orangered"></i>&nbsp;生成Q（适中）级一码付图片</button>
+                                                    <a class="btn btn-info " href="{$_W['siteroot']}addons/hl_mmsystem/data/yunpayqrcode/hlyunpay-Q-8.png"  target="_blank"><i class="fa fa-download" ></i> 下载一码付 Q 二维码图片</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">一码付：H</label>
+                                            <div class="col-sm-11">
+                                                <div class="input-group">
+                                                    <button class="btn btn-primary " type="button" onclick="getpayqrcode('H',10);" ><i class="fa fa-lg fa-qrcode" style="color: black" ></i>&nbsp;生成H（最佳推荐）级一码付图片</button>
+                                                    <a class="btn btn-info "  href="{$_W['siteroot']}addons/hl_mmsystem/data/yunpayqrcode/hlyunpay-H-10.png"  target="_blank"><i class="fa fa-download" ></i> 下载一码付 H 二维码图片</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function getpayqrcode(level,pointsiz) {
+        var leveldata = level;
+        var pointsizedata = pointsiz;
+        var getQrUrl = "{php echo $this->createWebUrl('WechatAppUrl', array('op' => 'yunqr'))}";
+        var dataParams = {
+            'leveldata': leveldata,
+            'pointsizedata': pointsizedata
+        };
+        $.ajax({
+            url: getQrUrl,
+            data: dataParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    swal("生成成功！", "请下载查看一码付。","success");
+                } else {
+                    swal("生成失败！", "请刷新页面重新生成。","error");
+                }
+            }
+        });
+    }
+</script>
+{template 'web/common/footer'}

@@ -1,0 +1,60 @@
+{template 'header'}
+<div id="pingjia">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">学员评价</h1>
+    </div>
+    <div class="mui-page-content">
+        <div class="mui-input-row">
+            <textarea id="textarea-pingjia" rows="5" style="margin-top:14%;" placeholder="说点什么吧"></textarea>
+        </div>
+        <input type="hidden" id="tutor_id" value="{$tutor_id}">
+        <input type="hidden" id="attendance_id" value="{$attendance_id}">
+        <div class="upload-submit-btn">
+            <a href="javascript:sub(this);" class="mui-btn mui-btn-success mui-btn-block btn-save">提交</a>
+        </div>
+        <script type="text/javascript">
+            function sub(obj)
+            {
+                $(obj).attr('href', '#');
+                var val = $('#textarea-pingjia').val();
+                var tutor_id = $('#tutor_id').val();
+                var attendance_id = $('#attendance_id').val();
+
+                if(val)
+                {
+                    if(tutor_id && attendance_id)
+                    {
+                        $.post("<?php echo $this->createMobileUrl('tutor', array('action' => 'pingjian')) ?>", {
+                            val : val,
+                            tutor_id : tutor_id,
+                            attendance_id : attendance_id
+                        }, function (response)
+                        {
+                            if (response.status == 'success')
+                            {
+                                mui.alert('评价成功', function ()
+                                {
+                                    history.back();
+                                });
+                            }
+                            else
+                            {
+                                mui.alert('评价失败，请重试！');
+                                $(obj).attr('href', 'javascript:sub(this);');
+                            }
+                        }, "json");
+                    }
+                }
+                else
+                {
+                    mui.alert('请输入评价内容');
+                    $(obj).attr('href', 'javascript:sub(this);');
+                }
+            }
+        </script>
+    </div>
+</div>
+{template 'footer'}

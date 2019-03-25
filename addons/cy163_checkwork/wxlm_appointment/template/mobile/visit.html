@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>顾客回访</title>
+    {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+    <script src="https://www.fndroid.cn/static/js/clipboard.min.js"></script>
+
+</head>
+<body>
+<form action="{php echo $this->createMobileUrl('visitLog', array('op' => 'create'))}" method="post" id="fa-form">
+        <div class="dz-filehead">
+                <a href="{php echo $this->createMobileUrl('archiveInfo', array('archive_id' => $archive_id))}"><img src="{RES}mobile/images/left-new.png" class="goback"></a>
+                <input type="submit" name="submit" id="copyCode"  data-clipboard-target="#taokouling" data-clipboard-action="copy"  class="fabu" value="发布" style="background-color: transparent; border: none;">
+            顾客回访
+        </div>
+        <input type="hidden" name="visit[visitlog_archiveid]" value="{$archive_id}">
+        <input type="hidden" name="visit[visitlog_staffid]" value="{$staff['staff_id']}">
+        <input type="hidden" name="token" value="{$_W['token']}">
+        <div class="dz-visit2-head">
+            <div class="dz-visit2-left">
+                    <img src="{php echo tomedia($archive['archive_avatar'])}">
+            </div>
+            <div class="dz-visit2-right">
+                    <span>{$archive['archive_name']}</span>
+                    <div style="margin-top: 15px">
+                        <a style="float: left;display: inline-block;font-size: 13px;color: #56B1FC" href="{php echo $this->createMobileUrl('visitlog', array('archive_id' => $archive_id))}">回访记录</a>
+                        <p  style="margin-left: 20px;display: inline-block;font-size: 13px;color: #56B1FC" href="">最后回访时间:
+                            <br>
+                           {$lasttime}
+                        </p>
+                    </div>
+            </div>
+        </div>
+        <div class="visit2-textarea">
+            <textarea name="visit[visitlog_content]" id="taokouling" cols="30" rows="6" placeholder="写一些访问内容吧~">{$tpl['visittpl_content']}</textarea>
+            <a  onclick="sx()"> <div class="visit2-save"><img src="{RES}mobile/images/save.png">保存模版</div></a>
+
+        </div>
+        <div class="visit2-class-title">
+            选择模板分类
+        </div>
+        <div class="dz-client-box dz-visit-box">
+            {loop $tpltypes $key $item}
+                <a href="{php echo $this->createMobileUrl('visit', array('op' => 'tpl', 'archive_id' => $archive_id, 'type_id' => $item['visittype_id']))}">
+                    <li>
+                        <div class="dz-client-left">{$item['visittype_title']}</div>
+                        <div class="dz-client-right">{$item['count']}<img src="{RES}mobile/images/right.png"></div>
+                    </li>
+                </a>
+            {/loop}
+
+        </div>
+</form>
+        <!-- 弹出框 -->
+        <div class="tc-box" id="menu-box">  
+                <div class="tc-box-info" style="background:#f6f6f6;height:220px;">
+                    <div class="tc-box-title" style="border-bottom:none;">
+                        <div class="tc-box-title1-visit2">
+                            <h3>请选模板分类</h3>
+                        </div>
+                        <div class="tc-box-title3">
+                            <img src="{RES}/mobile/images/close.png" alt="" onclick="yc_sx()">
+                        </div>
+                        <div class="clear"></div>
+                    </div> 
+                    <div class="tc-box-select">
+                        <select  id="tpl_typeid">
+                            {loop $tpltypes $key $item}
+                            <option value="{$item['visittype_id']}">{$item['visittype_title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+              
+                        <a href="javascript:savaTpl()" class="visit-alignbtn">保存</a>
+                </div>
+            </div>
+
+        <!--提示框-->
+
+<div class="dz-fixed" id="message">
+
+</div>
+
+    <script>
+
+
+    function sx()
+    {
+
+
+        if($('textarea[name="visit[visitlog_content]"]').val() == ''){
+            message('请填写保存内容.');
+            return false;
+        }
+
+        $('html,body').addClass('ovfHiden'); //使网页不可滚动
+
+        
+        document.getElementById("menu-box").style.top= parseInt(500)+"px";// window.outerHeight+
+        $("#menu-box").show();
+        $("#menu-box").animate({top:"0px"},500)
+        $("#menu-box").animate();
+
+    }
+
+    function yc_sx()
+    {
+        $('html,body').removeClass('ovfHiden'); //使网页不可滚动
+        
+        $("#menu-box").animate({top:parseInt(500)+"px"},500)
+        $("#menu-box").animate()
+        $("#menu-box").fadeOut()
+    }
+
+    /** 保存模板 */
+    function savaTpl() {
+
+
+        var content = $('textarea[name="visit[visitlog_content]"]').val();
+        if (content == '')
+        {
+            alert('请填写保存内容');
+        }
+        var type = $('#tpl_typeid').val();
+        if (type == '')
+        {
+            alert('请选择模板分类');
+        }
+        yc_sx();
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('visit', array('op' => 'save'))}",
+            type:"post",
+            data:{typeid:type, content:content},
+            success:function (res) {
+
+                if (res == 1)
+                {
+                    message('保存模板成功!')
+
+                } else
+                {
+                    message('保存模板失败!')
+                }
+            }
+        })
+
+    }
+
+
+    function message(text) {
+
+        $('#message').html(text);
+        $('#message').show();
+
+        var timerid = setInterval(function () {
+
+            $('#message').hide();
+            clearInterval(timerid);
+
+        }, 2000);
+    }
+    /** 发布 */
+    $('#fa-form').submit(function () {
+
+        if($('input[name="visit[vistlog_archiveid]"]').val() == ''){
+            message('未获取到用户信息, 请刷新页面重试!');
+            return false;
+        }
+        if($('input[name="visit[vistlog_staffid]"]').val() == ''){
+            message('未获取到员工信息, 请刷新页面重试!');
+            return false;
+        }
+        if($('textarea[name="visit[visitlog_content]"]').val() == ''){
+            message('请填写或选择发布内容!');
+            return false;
+        }
+
+        return true;
+    })
+
+
+    var clipboard = new Clipboard('#copyCode');
+    clipboard.on('success', function(e){
+
+
+
+    });
+    clipboard.on('error', function(e){
+        document.getElementById('copyCode').innerHTML = '复制失败，请长按复制';
+    });
+    </script>
+</body>
+</html>

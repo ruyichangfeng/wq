@@ -1,0 +1,248 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>生日关怀</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsbirthdaycare'))}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'list'))}"><i class="fa fa-lg fa-telegram" style="color: #ed8902"></i>短信群发</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsbirthdaycare'))}"><i class="fa fa-lg fa-calendar-check-o" style="color: #e10c14"></i>生日关怀</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smstemplate'))}"><i class="fa fa-lg fa-ticket" style="color:#0abc89"></i>短信模板</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smssendrecord'))}"><i class="fa fa-lg fa-industry" style="color:dodgerblue"></i>短信记录</a></li>
+                                    <!--<li class=""><a href="{php echo $this->createWebUrl('smssign')}"><i class="fa fa-lg fa-magic" style="color:deeppink; display: none;"></i>短信签名</a></li>-->
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsinterface'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信接口</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smspackage'))}"><i class="fa fa-lg fa-tasks" style="color:purple"></i>短信套餐</a></li>
+
+                                </ul>
+                                <div class="tab-content">
+                                        <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                            <input type="hidden" name="c" value="site" />
+                                            <input type="hidden" name="a" value="entry" />
+                                            <input type="hidden" name="m" value="hl_mmsystem" />
+                                            <input type="hidden" name="do" value="web" />
+                                            <input type="hidden" name="r"  value="message" />
+                                            <div class="page-toolbar row m-b-sm m-t-sm">
+                                                <div class="col-sm-6">
+                                                    <div class="input-btn">
+                                                        <a class="btn btn-primary" href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'openbirthdaycare'))}" ><i class="fa fa-level-up"></i> 一键关怀</a>
+                                                        <button class="btn btn-success" type="button" name="hide_button" id="hide_button"><i class="fa fa-level-up"></i> 查看当前日期往后一周内过生日的会员</button>
+                                                        <button class="btn btn-warning" type="button" name="show_button" id="show_button"><i class="fa fa-level-up"></i> 返回</button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    <form class="form-horizontal form" method="post"  id="todaybirthday">
+                                        <div class="table-responsive panel-body"><!--头部样式-->
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th>卡号</th>
+                                                    <th>级别</th>
+                                                    <th>手机号</th>
+                                                    <th>姓名</th>
+                                                    <th>性别</th>
+                                                    <th>生日</th>
+                                                    <th>储值总金额</th>
+                                                    <th>总次数</th>
+                                                    <th>总积分</th>
+                                                    <th>关怀</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {loop $memberdatalist $memberdataitem}
+                                                <tr> <td>{$memberdataitem['mem_memberCardNum']}</td>
+                                                    <td>{if $memberdataitem['membercardlevel_id'] == 0}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($memberdataitem['membercardlevel_id'])}</span>{/if}</td>
+                                                    <td>{$memberdataitem['mem_memberMobile']}</td>
+                                                    <td>{$memberdataitem['mem_memberName']}</td>
+                                                    <td>{if $memberdataitem['mem_memberSex'] == 0}
+                                                        <span class="badge badge-primary">未知</span>
+                                                        {elseif $memberdataitem['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                        {elseif $memberdataitem['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>{$memberdataitem['mem_memberBirthdayYear']}年{$memberdataitem['mem_memberBirthdayMonth']}月{$memberdataitem['mem_memberBirthdayDay']}日</td>
+                                                    <td>
+                                                        {if $item['mem_memberMoneyCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+                                                        {if $memberdataitem['mem_memberNumberCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $memberdataitem['mem_memberNumberCount'] == !NULL} <span>{$memberdataitem['mem_memberNumberCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $memberdataitem['mem_memberPointsCount'] == !NULL} <span>{$memberdataitem['mem_memberPointsCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+
+                                                        {if util::getDirthdayphone($memberdataitem['mem_memberMobile']) == 2}<span class="badge badge-primary">已关怀</span>
+
+
+                                                        {else}
+                                                        <span class="badge badge-danger">未关怀</span>
+
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" type="button" name="btnMemberCareAjax" onclick="MemberCareAjax({$memberdataitem['id']},{$memberdataitem['mem_memberMobile']});" ><i class="fa fa-paper-plane-o" ></i> 关怀</button>
+                                                        </td>
+                                                </tr>
+                                                {/loop}
+                                                </tbody>
+                                            </table>
+                                            <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                                                <thead>
+                                                {if $memberdatalist}
+                                                <tr>
+                                                    <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                                                </tr>
+                                                {else}
+                                                <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                                                {/if}
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </form>
+                                    <form class="form-horizontal form" method="post"  id="weekbirthday">
+                                        <div class="table-responsive panel-body"><!--头部样式-->
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th>卡号</th>
+                                                    <th>级别</th>
+                                                    <th>手机号</th>
+                                                    <th>姓名</th>
+                                                    <th>性别</th>
+                                                    <th>生日</th>
+                                                    <th>储值总金额</th>
+                                                    <th>总次数</th>
+                                                    <th>总积分</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {loop $newmemberdatalist $newmemberdataitem}
+                                                <tr> <td>{$newmemberdataitem['mem_memberCardNum']}</td>
+                                                    <td>{if $newmemberdataitem['membercardlevel_id'] == 0}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($newmemberdataitem['membercardlevel_id'])}</span>{/if}</td>
+                                                    <td>{$newmemberdataitem['mem_memberMobile']}</td>
+                                                    <td>{$newmemberdataitem['mem_memberName']}</td>
+                                                    <td>{if $newmemberdataitem['mem_memberSex'] == 0}
+                                                        <span class="badge badge-primary">未知</span>
+                                                        {elseif $newmemberdataitem['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                        {elseif $newmemberdataitem['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>{$newmemberdataitem['mem_memberBirthdayYear']}年{$newmemberdataitem['mem_memberBirthdayMonth']}月{$newmemberdataitem['mem_memberBirthdayDay']}日</td>
+                                                    <td>
+                                                        {if $item['mem_memberMoneyCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+                                                        {if $newmemberdataitem['mem_memberNumberCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $newmemberdataitem['mem_memberNumberCount'] == !NULL} <span>{$newmemberdataitem['mem_memberNumberCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                    <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                        <span >0</span>
+                                                        {elseif $newmemberdataitem['mem_memberPointsCount'] == !NULL} <span>{$newmemberdataitem['mem_memberPointsCount']}</span>
+                                                        {/if}
+                                                    </td>
+                                                </tr>
+                                                {/loop}
+                                                </tbody>
+                                            </table>
+                                            <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                                                <thead>
+                                                {if $newmemberdatalist}
+                                                <tr>
+                                                    <td class="footable-visible"><ul class="pagination pull-right">{$newpager}</ul></td>
+                                                </tr>
+                                                {else}
+                                                <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                                                {/if}
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+        $("#todaybirthday").show();
+        $("#weekbirthday").hide();
+        $("#show_button").hide();
+    });
+
+
+    $("#hide_button").click(function(){
+        $("#weekbirthday").show();
+        $("#todaybirthday").hide();
+        $("#show_button").show();
+    });
+    $("#show_button").click(function(){
+        $("#weekbirthday").hide();
+        $("#todaybirthday").show();
+        $("#show_button").hide();
+    });
+
+
+
+
+    function MemberCareAjax(memberid,memberMobile) {
+
+        var memberid = memberid;
+        var memberMobile = memberMobile;
+        var params = {
+            memberid: memberid,
+           memberMobile : memberMobile
+
+        };
+        $.ajax({
+            type: "post",
+            data: params,
+            dataType: 'json',
+            url: "{php echo $this->createWebUrl('memberinfo', array('op' => 'AjaxMemberCare'))}",
+            success: function (data) {
+               if(data['message']['code'] == 0){
+                   swal("错误 66666", "请关闭重新操作！","error");
+               }
+               else{
+                   swal("关怀成功", "会员生日祝福短信已经成功发送！","success");
+               }
+
+
+            }
+        });
+
+
+    }
+</script>
+
+{template 'web/common/footer'}

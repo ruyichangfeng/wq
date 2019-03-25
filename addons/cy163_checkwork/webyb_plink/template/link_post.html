@@ -1,0 +1,152 @@
+{template "common/header"}
+<style type="text/css">
+.mytxt1, .mytxt2{width:20%;display:inline;}
+.mytit{width:100px;display:inline-block;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li><a href="{php echo $this->createWebUrl('index')}">链接管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('pck_post',array('id'=>$id))}">{php echo $id>0?'编辑':'添加'}链接</a></li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">链接设置</div>
+        <div class="panel-body">
+        <form action="" method="post" class="form-horizontal" role="form" id="form1" onSubmit="return check();">             
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">链接名称</label>
+				<div class="col-sm-8">
+					<input class="form-control" name="title" value="{$data['title']}">
+				</div>
+                <div class="help-block">链接名称，便于日志查看</div>	
+			</div>
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">赠送方式</label>
+				<div class="col-sm-8">
+					<input name="tp" type="radio" value="1"{if empty($id)||$data['tp']==1} checked="checked"{/if}><label>积分</label>&nbsp;&nbsp;
+                    <input name="tp" type="radio" value="2"{if $data['tp']==2} checked="checked"{/if}><label>余额</label>
+				</div>
+                <div class="help-block">赠送方式</div>	
+			</div> 
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">赠送类型</label>
+				<div class="col-sm-8">
+					<input name="type" type="radio" value="1"{if empty($id)||$data['type']==1} checked="checked"{/if} onClick="ctype(1);"><label>所有粉丝相同</label>&nbsp;&nbsp;
+                    <input name="type" type="radio" value="2"{if $data['type']==2} checked="checked"{/if} onClick="ctype(2);"><label>按会员分组设置</label>
+				</div>
+                <div class="help-block">赠送类型</div>	
+			</div>  
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">赠送模式</label>
+				<div class="col-sm-8">
+					<input name="mode" type="radio" value="1"{if empty($id)||$data['mode']==1} checked="checked"{/if} onClick="cmode(1);"><label>固定值</label>&nbsp;&nbsp;
+                    <input name="mode" type="radio" value="2"{if $data['mode']==2} checked="checked"{/if} onClick="cmode(2);"><label>随机数</label>
+				</div>
+                <div class="help-block">积分模式</div>	
+			</div>
+            <div class="form-group jf1" style="display:{if $data['type']==1}{else}none;{/if}">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">积分/余额设置</label>
+				<div class="col-sm-8">
+					<input class="form-control mytxt1" name="point1[0]" value="{$data['point'][0]}"> ～ <input class="form-control mytxt2" name="point1[1]" value="{$data['point'][1]}"{if $data['mode']==1} readonly="readonly"{/if}>
+				</div>
+                <div class="help-block">积分/余额设置，可设置范围</div>	
+			</div>
+            <div class="form-group jf2" style="display:{if $data['type']==2}{else}none;{/if}">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">积分/余额设置</label>
+				<div class="col-sm-8">
+                {loop $glist $index $item}
+                {php $gid=$item['groupid'];$point=$data['point'][$gid];}
+					<strong class="mytit">{$item['title']} : </strong><input class="form-control mytxt1" name="point2[{$gid}][0]" value="{$point[0]}"> ～ <input class="form-control mytxt2" name="point2[{$gid}][1]" value="{$point[1]}"{if $data['mode']==1} readonly="readonly"{/if}><br><br>
+                {/loop}
+				</div>
+                <div class="help-block">积分/余额设置，可设置范围</div>	
+			</div>            
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">限制 - 时间</label>
+				<div class="col-sm-8">
+					{php echo tpl_form_field_date('sxtime', $data['sxtime'], true);}
+				</div>
+                <div class="help-block"><a href="javascript:sx();" style="color:#f00;">时间归零</a></div>	
+			</div>
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">限制 - 总额</label>
+				<div class="col-sm-8">
+					<input class="form-control" name="sum" value="{$data['sum']}">
+				</div>
+                <div class="help-block">该链接发送的积分限制，达到总额自动失效，0为不限制</div>	
+			</div>
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">限制 - 次数</label>
+				<div class="col-sm-8">
+					<input class="form-control" name="num" value="{$data['num']}">
+				</div>
+                <div class="help-block">该链接参与次数限制，达到总次数自动失效，0为不限制</div>	
+			</div> 
+            <div class="form-group">
+				<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label">失效跳转</label>
+				<div class="col-sm-8">
+					<input class="form-control" name="go_url" value="{$data['go_url']}">
+				</div>
+                <div class="help-block">链接失效后跳转的URL</div>	
+			</div>                 
+			<div class="form-group">
+            	<label class="col-xs-13 col-sm-2 col-md-2 col-lg-2 control-label"></label>
+				<div class="col-sm-8">
+					<input type="submit" name="submit" value="保 存" class="btn btn-primary">
+					<input type="hidden" name="token" value="{$_W['token']}" />
+				</div>		
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+{if empty($id)}
+$(function(){
+	ctype(1);
+	cmode(1);
+	$('input[name="sxtime"]').val(0);
+	$('input[name="sum"]').val(0);	
+	$('input[name="num"]').val(0);
+});
+{/if}
+
+{if empty($data['sxtime'])}
+$(function(){
+	$('input[name="sxtime"]').val(0);
+});
+{/if}
+
+function check(){
+	var tit = $('input[name="title"]').val();
+	if(tit==''){
+		alert('请输入链接标题！');	
+		$('input[name="title"]').focus();
+		return false;
+	}
+	return true;
+}
+
+function ctype(n){
+	for(var i=1;i<=2;i++){
+		if(i==n){
+			$('.jf'+i).show();
+		}else{
+			$('.jf'+i).hide();	
+		}
+	}
+}
+
+function cmode(n){
+	a = 'readonly';
+	if(n==1){
+		$('.mytxt2').attr(a, a);
+	}else{
+		$('.mytxt2').removeAttr(a);	
+	}
+}
+
+function sx(){
+	$('input[name="sxtime"]').val(0);	
+}
+</script>
+{template "common/footer"}

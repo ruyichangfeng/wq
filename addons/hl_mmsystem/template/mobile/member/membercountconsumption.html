@@ -1,0 +1,162 @@
+{template 'common/header'}
+<head>
+    <style>
+        html,
+        body,
+        .mui-content {
+            height: 0px;
+            margin: 0px;
+            background-color: #f5fafe;
+        }
+        h5.mui-content-padded {
+            margin-left: 3px;
+            margin-top: 20px !important;
+        }
+        h5.mui-content-padded:first-child {
+            margin-top: 12px !important;
+        }
+        .mui-btn {
+            font-size: 16px;
+            padding: 8px;
+            margin: 3px;
+        }
+        .ui-alert {
+            text-align: center;
+            padding: 10px  1px;
+            font-size: 16px;
+        }
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+        }
+        .table {
+            border: 1px solid #cad9ea;
+            color: #666;
+        }
+
+        .table th {
+            background-repeat: repeat-x;
+            height: 20px;
+        }
+
+        .table td,
+        .table th {
+            border: 1px solid #cad9ea;
+            padding: 0 1em 0;
+            text-align: center;
+        }
+
+        .table tr.alter {
+            background-color: #f5fafe;
+        }
+    </style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">计次消费</h1>
+</header>
+<div class="mui-content">
+    <div class="mui-card">
+        <ul class="mui-table-view">
+
+            {loop $list $key $item}
+            <li class="mui-table-view-cell mui-collapse" style="background-color: #0BB20C">
+                <a class="mui-navigate-right" style="color: white" href="#">{$item['mrc_goodsName']}</a>
+                <div class="mui-collapse-content">
+                    <form class="mui-input-group">
+                        <ul class="mui-table-view">
+                            <div class="mui-collapse-content">
+                                <table width="100%" class="table" id="tablevalue1">
+                                    <tr>
+                                        <th width=15%>可用次数</th>
+                                        <th width=15%>扣除次数</th>
+                                        <th width=30%>有效期</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{$item['mrc_count']}</td>
+                                        <td>{$item['mrc_deductcount']}</td>
+                                        <td>{php echo date('Y-m-d H:i:s', $item[mrc_specifiedEndTime]);}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="mui-collapse-content">
+                            <table width="100%" class="table" id="tablevalue2"  style="margin-top: 0px;">
+                                <tr>
+                                    <th width=20%>当前使用次数</th>
+                                    <th width=20%>操作</th>
+                                </tr>
+                                <tr>
+                                    <td><input type="number" id="{$key}" name="{$key}" placeholder="输入扣除次数" style="border: solid 1px #06c28b;margin-left: 5px;"></td>
+                                    <td>
+                                     <button type="button" onclick="deductionnumberdata({$item['id']},{$item['member_id']},{$key})"   class="mui-btn mui-btn-success">
+                                      提交扣除
+                                    </button>
+                                    </td>
+                                </tr>
+                            </table>
+                            </div>
+                        </ul>
+                    </form>
+                </div>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+
+<script>
+
+    function deductionnumberdata(goodsid,memberid,key) {
+
+        var goodsid = goodsid;
+        var memberid = memberid;
+        var deductionnumber = mui("#"+key)[0].value;
+        var url ="{php echo $this->createMobileUrl('member',array('op' => 'check_deductionnumber'))}";
+        mui.ajax(url,{
+            data:{
+                deductionnumber:deductionnumber,
+                goodsid:goodsid,
+                memberid:memberid
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+                if(data['message']['code'] == 0){
+
+                    mui.alert('扣除', '扣次成功', function() {
+
+                        var activeUrl = "{php echo $this->createMobileUrl('member',array('op' => 'membercountconsumption'))}&memberid="+data['message']['memberid'];
+                        mui.openWindow({
+                            url:activeUrl,
+                            waiting:{
+                                autoShow:true,//自动显示等待框，默认为true
+                                title:'正在加载...',//等待对话框上显示的提示内容
+                                options:{
+                                    width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                    height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                                }
+                            }
+                        });
+                    });
+
+                }
+                else if(data['message']['code'] == 1){
+                    mui.alert('扣次失败');
+                }
+                else if(data['message']['code'] == 3){
+                    mui.alert('次数不足');
+                }
+                else if(data['message']['code'] == 4){
+                    mui.alert('库存不足');
+                }
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('连接失败');
+            }
+        });
+
+    }
+
+
+</script>

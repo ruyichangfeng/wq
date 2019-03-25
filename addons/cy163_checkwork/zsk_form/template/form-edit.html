@@ -1,0 +1,76 @@
+{template 'common/header'}  
+<style type="text/css">
+	.mytable1{width:80%;height: 100px;margin:0 auto;}
+	 
+	.mytable1 td{vertical-align: middle; padding: 10px 10px;}
+	.mytable1 .left{width: 35%;text-align: right;}
+	.mytable1 .right{width: 64%;text-align: left;}
+</style>
+<script type="text/javascript" src="{PUB}util.js"></script>
+<link rel="stylesheet" type="text/css" href="{PUB}main.css"/>
+<div class="panel panel-info">
+	<div class="panel-heading" style="text-align: center;">编辑表单</div>
+	<div class="panel-body" style="font-size: 16px;">
+		<form class="form-horizontal" method="post" id="serForm"  action="<?php echo $this->createWebUrl('saveform');?>">
+		  <div class="form-group">
+		    <label for="inputEmail3" class="col-sm-4 control-label">名称</label>
+		    <div class="col-sm-5">
+		    <input type="hidden" value="{$form['id']}" name="fid">
+		      <input type="text" class="form-control" id="title" name="name" placeholder="20字以内"   value="{$form['name']}" >
+		    </div>
+		   <label for="inputEmail3" class="col-sm-1 control-label" style="color:red;text-align: left;">&nbsp;*必填</label>
+		  </div>   
+		  
+		  
+		  <div class="form-group">
+		    <label for="" class="col-sm-4 control-label">首图</label>
+		    <div class="col-sm-5">
+		      {php echo tpl_form_field_image('picture',$form['picture']);}
+		    </div>  
+		    <label for="inputEmail3" class="col-sm-1 control-label" style="color:orange;text-align: left;">&nbsp;*选填，建议3:1至2:1，没有时不显示</label>
+		  </div> 
+		  <div class="form-group">
+		    <label for="inputEmail3" class="col-sm-4 control-label">一人一次</label>
+		    <div class="col-sm-3">
+		    	<select class="form-control" name="once">
+		       		<option value="0" <?php if($form['once']=="0"){echo "selected=true";}?> >不限制</option> 
+		       		<option value="1" <?php if($form['once']=="1"){echo "selected=true";}?> >限制</option> 
+		       </select>
+		      
+		    </div> <label for="inputEmail3" class="col-sm-5 control-label" style="color:orange;text-align: left;">&nbsp;*限制后，每个微信号只能填一次</label>
+		  </div>  
+		  <?php if(intval($form['id'])>0){?>
+		    <div class="form-group">
+			    <label for="inputEmail3" class="col-sm-4 control-label">微信端链接</label>
+			    <div class="col-sm-5">
+			   	
+			      <input  type="text" disabled="disabled" class="form-control" style="resize: none;width: 100%;" value="<?php $url0=$_W['siteroot'].'app/index.php?i='.$_W['uniacid'].'&c=entry&do=app&m=zsk_form&fid='.$form['id'];
+					echo $url0; 
+					?>"> 
+					<?php
+			   	load()->classs('cloudapi');
+				$cloud_api = new CloudApi();
+
+				$url = $cloud_api->url('We7Util', 'qrcode', array('content' =>$url0 ));
+				echo '<img style="width: 200px;height: 200px;" src="'.$url.'">';
+			   	?>
+			    </div>
+			   <label for="inputEmail3" class="col-sm-1 control-label" style="color:red;text-align: left;">&nbsp;</label>
+		   </div>   
+		  <?php }?>
+		  <div class="form-group">
+		    <label for="" class="col-sm-4 control-label"></label> 
+		    <div class="col-sm-5"> 
+		      <input type="submit"    class="mybtn" value="保存表单">
+		      <input type="button"  onclick="history.go(-1)"   class="mybtn" value="返回">
+		    </div> 
+
+		  </div>
+		   
+		  
+		</form>
+	</div>
+</div>
+ 
+ 
+{template 'common/footer'}

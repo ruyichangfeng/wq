@@ -1,0 +1,121 @@
+{template 'common/header'}
+{php echo $this -> set_tabbar($action);}
+{if $operation == 'display'}
+<div class="main">
+    <style>
+        .form-control-excel {
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+        .account-basicinformation span{font-weight:700;}
+        .account-stat-num > div{width:49%; float:left; font-size:16px; text-align:center;}
+        .account-stat-num > div span{display:block; font-size:30px; font-weight:bold;}
+    </style>
+    
+    <div class="panel panel-default" style="margin-top: 15px;">
+        <div class="panel-heading">快速查找</div>
+        <div class="table-responsive panel-body">
+            <form action="./index.php" method="get" class="navbar-form navbar-left" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="truein_jiandu" />
+                <input type="hidden" name="do" value="staffs" />
+                <input type="hidden" name="op" value="display" />
+               
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="请输入用户昵称或者uid" name="keyword">
+                </div>
+                <button class="btn btn-success"><i class="fa fa-search"></i> 搜索</button>
+            </form>
+        </div>
+    </div>
+    <form action="" method="post" class="form-horizontal form" >
+        <div class="panel panel-default">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:20%;">昵称</th>
+						<th style="width:10%;">图像</th>
+                        <th style="width:12%;text-align:center;">文章数量</th>
+                        <th style="width:12%;text-align:center;">总访问量</th>
+                        <th style="width:12%;text-align:center;">总分享量</th>
+						<th style="width:12%;text-align:center;">广告点击量</th>
+                        <th style="width:12%;text-align:center;">状态</th>
+                        <th style="width:10%;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $item}
+                    <tr>
+                        <td style="white-space:normal;">
+                            <span class="label label-warning">{$item['nickname']}</span>
+                        </td>
+						<td style="white-space:normal;">
+							{if $item['headimgurl']}
+								<img width="50" style="border-radius: 3px;" src="{php echo tomedia($item['headimgurl']);}"/>
+							{/if}
+                        </td>
+                        <td style="text-align:center;">
+							{if empty($item['articalcount'])}0{else}{$item['articalcount']}{/if}
+                        </td>
+                        <td style="text-align:center;">
+							{if empty($item['readcount'])}0{else}{$item['readcount']}{/if}
+                        </td>
+                        <td style="text-align:center;">
+							{if empty($item['sharecount'])}0{else}{$item['sharecount']}{/if}
+                        </td>
+						<td style="text-align:center;">
+							{if empty($item['clickcount'])}0{else}{$item['clickcount']}{/if}
+                        </td>
+                        <td style="text-align:center;">
+                            {if $item['status'] == 0}
+                            <span class="label label-danger">禁用</span>
+                            {else}
+                            <span class="label label-success">正常</span>
+                            {/if}
+                        </td>
+                        <td>
+                            {if $item['status'] == 1}
+                            <a class="btn btn-danger btn-sm" onclick="return confirm('您确定要禁用此用户吗？');return false;"
+                               href="{php echo $this->createWebUrl('staffs', array('id' => $item['id'], 'status' => $item['status'], 'op' => 'setstatus', 'storeid' => $storeid))}"
+ title="禁用"><i class="fa fa-lock"></i>禁用</a>
+                            {else}
+                            <a class="btn btn-success btn-sm" onclick="return confirm('您确定要将此用户置为启用状态吗？');return false;"
+                               href="{php echo $this->createWebUrl('staffs', array('id' => $item['id'], 'status' => $item['status'], 'op' => 'setstatus', 'storeid' => $storeid))}"
+                                title="启用"><i class="fa fa-unlock"></i>启用</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {$pager}
+</div>
+
+<script type="text/javascript">
+    function check() {
+        if($.trim($('#username').val()) == '') {
+            message('没有输入姓名.', '', 'error');
+            return false;
+        }s
+        return true;
+    }
+</script>
+{/if}
+{template 'common/footer'}

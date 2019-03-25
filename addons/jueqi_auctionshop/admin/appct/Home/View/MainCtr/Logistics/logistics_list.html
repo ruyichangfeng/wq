@@ -1,0 +1,199 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>物流管理</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Logistics/logistics_list')}"  method="post"  style="width:95%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="开始日" value="{$s_createtime}" name="s_createtime" id="s_createtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="截止日" value="{$e_createtime}"  name="e_createtime" id="e_createtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="orderno" value="{$orderno}"  placeholder="请输入订单号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="wuliunum" value="{$wuliunum}"  placeholder="请输入物流号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="nickname" value="{$nickname}"  placeholder="请输入用户昵称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>
+        <xblock>
+        	<button class="layui-btn layui-btn-danger" onclick="logistics_del('0')"><i class="layui-icon">&#xe640;</i>删除</button>
+        	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+       </xblock>
+       <form id="delform" class="layui-form">
+	      <table class="layui-table">
+	            <thead>
+	                <tr>
+	                    <th id="checkbox-reverse"><input  type="checkbox"  lay-filter="allChoose" id="allChoose"  lay-skin="primary" value=""></th>
+	                   	<th>用户昵称</th>
+	                   	<th>物流号</th>
+	                    <th>订单号</th>
+	                    <th>物流公司</th>
+	                    <th>创建时间</th>
+	                    <th>修改时间</th>
+	                    <th>操作</th>
+	                </tr>
+	            </thead>
+	            <tbody id="formdata">
+	              <volist name="list" id="v">	
+	                <tr>
+	                    <td><input type="checkbox"  value="{$v['id']}"  filter="choose" lay-skin="primary"  name="delete[]" ></td>
+	                    <td> <u style="cursor:pointer" onclick="member_show('{$v.nickname}','{:U('Home/MainCtr/Member/member_show',array('id'=>$v['uid']))}','10001','360','455')">{$v.nickname}</u> </td>
+	                    <td>{$v.wuliunum}</td>
+	                    <td><u style="cursor:pointer" onclick="location.href='{:U('Home/MainCtr/Order/order_list',array('orderno'=>$v['orderno']))}'">{$v.orderno}</u></td>
+	                    <td >{$v.wuliugs}</td>
+	                    <td><?php echo  date('Y-m-d H:i:s', $v['createtime']); ?></td>
+	                    <td><?php echo  date('Y-m-d H:i:s', $v['updatetime']); ?></td>
+	                    <td class="td-manage">
+	                        <a title="编辑" href="javascript:;" onclick="logistics_edit('编辑','{:U('Home/MainCtr/Logistics/logistics_edit',array('id'=>$v['id'],'orderno'=>$v['orderno']))}','600','500')"  class="ml-5" style="text-decoration:none">
+	                        	<i class="layui-icon">&#xe642;</i>
+	                        </a>
+	                        <a title ="删除" href="javascript:;" onclick="logistics_del({$v.id})"  style="text-decoration:none">
+	                            <i class="layui-icon">&#xe640;</i>
+	                        </a>
+	                        <a title ="查询" href="javascript:;" onclick="logistics_query('{$v.id}','{$v.wuliugs}')"  style="text-decoration:none">
+	                            <i class="layui-icon">&#xe615;</i>
+	                        </a>
+	                    </td>
+	                </tr>
+	              </volist>  
+	            </tbody>
+	        </table>
+		</form>
+        <div id="page"></div>
+    </div>
+     <include file="Public/footer.html"/>
+     
+     <script>
+        layui.use(['form','laydate','element','laypage','layer'], function(){
+          laydate = layui.laydate;//日期插件
+          laypage = layui.laypage;//分页
+          layer = layui.layer;//弹出层
+          form = layui.form;
+          $ = layui.jquery;
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page},
+		   jump: function(obj, first){
+			   if(!first){
+			    var $purl = "{:U('Home/MainCtr/Logistics/logistics_list',array('page'=>'pageval','s_createtime'=>$s_createtime,'e_createtime'=>$e_createtime,'orderno'=>$orderno,'wuliunum'=>$wuliunum,'nickname'=>$nickname))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);
+			   }
+			}
+		  });
+          //时间选择器
+		  laydate.render({
+		    elem: '#s_createtime'
+		    ,type: 'datetime'
+		  });
+		   laydate.render({
+		    elem: '#e_createtime'
+		    ,type: 'datetime'
+		  });
+		  
+		    form.on('checkbox(allChoose)', function(data){
+				var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"])');
+				child.each(function(index, item){
+					item.checked = data.elem.checked;
+				});
+				form.render('checkbox');
+			});
+          
+        });
+        
+        /*用户-查看*/
+        function logistics_show(title,url,w,h){
+            x_admin_show(title,url,w,h);
+        }
+        /*用户-查看*/
+        function member_show(title,url,id,w,h){
+            x_admin_show(title,url,w,h);
+        }
+        // 用户-编辑
+        function logistics_edit (title,url,w,h) {
+            x_admin_edit(title,url,w,h); 
+        }
+
+        /*用户-删除*/
+        function logistics_del(id){
+           var par = {"id":id};
+		   if( id=='0' ){
+			  if($(":checkbox[name='delete[]']:checked").size() == 0){
+		           layer.msg('请选择要删除的用户', {icon: 2,offset: '40%',time:1500,shade: 0.3});
+		           return false;
+		        }
+			  par = $("#delform").serialize();
+			}
+			layer.confirm('确认要删除吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Logistics/logistics_del')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('删除成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('删除失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+              
+      	/*物流-查询*/
+        function logistics_query(id,wuliugs){
+			$.ajax({
+				type: 'POST',
+				url: "{:U('Home/MainCtr/Logistics/logistics_query')}",
+				data: {'id':id},
+				dataType: 'json',
+				success: function(data){
+					if(data.deliverystatus=='1'){						
+					    var states = '已发货';
+					}else if(data.deliverystatus=='2'){
+						var states = '派件中';
+					}else if(data.deliverystatus=='3'){
+						var states = '已签收';
+					}else if(data.deliverystatus=='4'){
+						var states = '派件异常';
+					}
+					var content = "<p style='margin:0px 3%;padding:4px 0;'>物流状态："+states+"</p><p style='margin:0px 3%;padding:4px 0;'>承运来源："+wuliugs+"</p><p style='margin:0px 3%;padding:4px 0 10px;border-bottom:1px solid #eee;'>运单编号："+data.number+"</p>";
+					$.each(data.list,function(index,val){
+						content += "<div style='padding:4px 0;border-bottom:1px solid #eee;'><p style='padding:4px 3% 4px;'>"+val.status+"</p><p style='padding:4px 3% 4px;color:#999;'>"+val.time+"</p></div>";					
+					});
+					layer.open({
+					  	type: 1, 
+					  	content: content,
+					  	shadeClose:true,
+					  	id:'wuliu' 
+					});
+				}
+			});
+        }
+ 
+ </script>
+</body>
+</html>

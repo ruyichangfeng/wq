@@ -1,0 +1,121 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <input type="hidden" id="smspackageid" name="smspackageid" value="{$smspackageid}"/>
+                        <div class="form-group has-success">
+                            <label for="title" class="col-sm-2 control-label">标题</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="name1" class="form-control" value="{$smspackageadd['sp_title']}" id='sms_title'  aria-required="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group has-success">
+                            <label for="title" class="col-sm-2 control-label">金额</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="name1" class="form-control" onkeyup= "if( ! /^(([1-9]{1}\d*)|(0{1}))(\.\d{0,2})?$/.test(this.value)){alert('只能输入数字，小数点后只能保留两位');this.value='';}" value="{$smspackageadd['sp_amount']}" id='sms_amount'  aria-required="true"/>
+                            </div>
+                        </div>
+                        <div class="form-group has-success">
+                            <label for="title" class="col-sm-2 control-label">数量</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="name1" class="form-control" value="{$smspackageadd['sp_quantity']}" id='sms_quantity'  aria-required="true"/>
+                            </div>
+                        </div>
+                    <button type="button" class="btn btn-primary btn-rounded btn-block" name="form_package"  id="form_package"/>提交</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("form :input.required").each(function () {
+        //通过jquery api：$("HTML字符串") 创建jquery对象
+        var $required = $("<strong class='high'>*</strong>");
+        //添加到this对象的父级对象下
+        $(this).parent().append($required);
+    });
+    $("form :input").blur(function(){
+        var $parent = $(this).parent();
+        //验证姓名
+        if($(this).is("#sms_title")){
+            var nameVal = $.trim(this.value); //原生js去空格方式：this.replace(/(^\s*)|(\s*$)/g, "")
+            var regName = /[~#^$@%&!*()<>:;'"{}【】  ]/;
+            if(nameVal == "" || nameVal.length < 6 || regName.test(nameVal)){
+                var errorMsg = " 姓名非空，长度6位以上，不包含特殊字符！";
+                //class='msg onError' 中间的空格是层叠样式的格式
+                $parent.append("<span class='msg onError'>" + errorMsg + "</span>");
+            }
+            else{
+                var okMsg=" 输入正确";
+                $parent.find(".high").remove();
+                $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+            }
+        }
+        //验证邮箱
+        if($(this).is("#sms_amount")){
+            var emailVal = $.trim(this.value);
+            var regEmail = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+            if(emailVal== "" || (emailVal != "" && !regEmail.test(emailVal))){
+                var errorMsg = " 请输入正确的金额！";
+                $parent.append("<span class='msg onError'>" + errorMsg + "</span>");
+            }
+            else{
+                var okMsg=" 输入正确";
+                $parent.find(".high").remove();
+                $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+            }
+        }
+    });
+
+    $("#form_package").click(function(){
+        var url =  "{php echo $this->createWebUrl('smsmarketing', array('op' => 'Ajaxsmspackageadd'))}";
+        var sms_title = $("#sms_title").val();
+        var sms_amount = $("#sms_amount").val();
+        var sms_quantity = $("#sms_quantity").val();
+        var smspackageid = $("#smspackageid").val();
+
+        var params = {
+            'sms_title' : sms_title,
+            'sms_amount' : sms_amount,
+            'sms_quantity' : sms_quantity,
+            'smspackageid' : smspackageid,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 1) {
+                    swal({
+                        title: data['message']['msg'],
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }
+                else{
+                    swal({
+                            title: data['message']['msg'],
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+                }
+            },error:function () {
+                alert('错误');
+            }
+        });
+    });
+
+
+</script>
+{template 'web/common/footer'}

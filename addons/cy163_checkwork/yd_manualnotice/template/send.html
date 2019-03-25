@@ -1,0 +1,124 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('sendnotice', array('op'=>'display'));}">选择模板</a></li>
+	{if $tid > 0}
+    <li class="active"><a href="javascript:">发送消息</a></li>
+    {/if}
+</ul>
+
+{if $op == 'display'}
+<div class="main">
+	<div class="panel panel-info">
+        <div class="panel-heading">选择模板</div>
+        <div class="panel-body">
+        {if $tid > 0}
+        	已选择：<strong>{$dataRow['tpl_name']}</strong>
+        {else}
+            {loop $displayListRs $key $item}
+            <a href="{php echo $this->createWebUrl('sendnotice', array('op'=>'display', 'id'=>$key));}" class="btn btn-default btn-sm">{$item['tpl_name']}</a>
+            {/loop}
+            {if count($displayListRs)==0}
+            <a href="{php echo $this->createWebUrl('tplsetup', array('op'=>'creat'));}" class="btn btn-default btn-sm">请先添加模板</a>
+            {/if}
+        {/if}
+		</div>
+	</div>
+    {if $tid > 0}
+    <div class="panel panel-default">
+        <div class="panel-heading">发送信息</div>
+        <div class="panel-body">
+            <form method="post" class="form-horizontal form" id="sendForm">
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">搜索用户</label>
+                <div class="col-xs-12 col-sm-3">
+                    <input type="text" id="so_keywords" class="form-control" placeholder="用户昵称" />
+                </div>
+                <div class="col-xs-12 col-sm-3">
+                	<input onclick="ydSearch()" type="button" value="搜索" class="btn btn-primary" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">搜索结果</label>
+                <div class="col-xs-12 col-sm-4" id="yd_Html">
+                    
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">接收用户</label>
+                <div class="col-xs-12 col-sm-4">
+                    <input type="text" name="formdata[openid]" class="form-control" placeholder="用户的openid" id="yd_openid" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">发送内容</label>
+                <div class="col-sm-9 col-xs-12">
+                {loop $dataRow['field_arr'] $key $item}
+                <div class="col-sm-12 col-xs-12" style="padding-left:0;">
+                    <div class="col-sm-6 col-xs-6" style="padding-left:0;">
+                        <div class="input-group form-group">
+                            <span class="input-group-addon">{$item[3]}</span>
+                            <input type="text" name="formdata[{$item[0]}]" class="form-control" value="{php echo $this->sendValue($item[1])}" />
+                        </div>
+                    </div>
+                </div>
+                {/loop}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-1">
+                    <input type="hidden" name="id" value="{$tid}" />
+                    <input type="button" onclick="ydSendSubmit()" value="确认发送" class="btn btn-primary" id="yd_sendBtn" />
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+    {/if}
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+
+});
+function ydSendSubmit(){
+	$("#yd_sendBtn").val("发送中...");
+	$("#yd_sendBtn").attr("disabled","disabled");
+	$.ajax({
+	    url:"{php echo $this->createWebUrl('sendnotice',array('op'=>'send'));}",
+		type:'post',
+		data:$("#sendForm").serialize(),
+		dataType:'json',
+		success:function(data){
+			if(data.success){
+				alert("发送成功");
+			}else{
+				alert(data.msg);
+			}
+			$("#yd_sendBtn").val("确认发送");
+			$("#yd_sendBtn").attr("disabled",false);
+		}
+	});
+}
+
+function ydSearch(){
+	var key=$("#so_keywords").val();
+	$("#yd_Html").html("搜索中...");
+	$.ajax({
+	    url:"{php echo $this->createWebUrl('sendnotice',array('op'=>'search'));}",
+		type:'post',
+		data:"keywords="+key,
+		dataType:'html',
+		success:function(data){
+			$("#yd_Html").html(data);
+		}
+	});
+}
+function ydSelectUser(openid){
+	$("#yd_openid").val(openid);
+}
+
+</script>
+{/if} <!-- end of display -->
+
+{template 'common/footer'}

@@ -1,0 +1,186 @@
+<script type="text/javascript" src="{MODULE_URL}images/jquery.1.10.js"></script>
+<style type="text/css">
+
+	ul.media_list{
+		list-style-type: none;
+	}
+	ul.media_list li{
+		display: list-item;
+		border-top: 1px solid #e7e7eb;
+	    padding: 18px 0 18px 0;
+	    overflow: hidden;
+	}
+	.inner{
+		min-height: 100px;
+	}
+	.inner .content{
+		position:relative;
+	}
+	.inner .content img{
+		width:100px;height:100px; position:absolute;top:0;left:0;
+	}
+	.content_abstract{
+		display:inner-block;padding-left:114px;
+	}
+	ul.media_list a{
+		color:#222;
+	}
+	ul.media_list a:hover{
+		text-decoration: underline;
+	}
+	.info{
+		color: #8d8d8d;
+	}
+	ul.media_list div.opr a{
+		color: #459ae9;
+	}
+	.pagination {
+  padding: 20px 0 0;
+  border-top: 1px solid #e7e7eb;
+  width: 100%;
+  text-align: right;
+  padding:  15px;
+}
+.goto_area input[type="text"] {
+  vertical-align: middle;
+  width: 75px;
+  line-height: 22px;
+  padding: 4px 0;
+  border: 1px solid #e7e7eb;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+   text-align: center; 
+  font-size: 14px;
+  margin-right: 4px;
+}
+.page_num {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 14px;
+  letter-spacing: normal;
+  margin: 5px;
+}
+ul.media_list a.edit-info {
+  margin-left: 10px;
+  color: rgb(255, 143, 0);
+  display: none;
+}
+img{
+	max-width: 100%;
+}
+.hightlight{
+	color:#44b549;
+}
+</style>
+<div class="sub_title_bar" style="padding:0 30px;">
+	<div>
+		<div class="input-group" style="width:190px;">
+		<input type="text" name="search-title" value="{$_GPC['query']}" placeholder="标题/作者/摘要/内容" style="padding:0 10px;height:28px;"><a name="title-search" href="javascript:void(0);" class="input-group-addon"><i class="fa fa-search"></i></a>
+		</div>
+		<script type="text/javascript">
+		$(function(){
+			$('[name=title-search]').click(function(event) {
+				var keyword = $('[name=search-title]').val();
+				if(keyword == ''){
+					alert('请输入搜索关键词');
+					return;
+				}
+				window.location = "{php echo $this->createWebUrl('permanent',array('action'=>'search'));}&query="+keyword;
+			});
+		});
+		</script>
+	</div>
+	<div class="info" style="float:left;">
+		<h3 style="vertical-align:middle;" id="page_title"><span>图文消息</span><span>(共{$total_count}个)</span></h3>
+	</div>
+	
+	<div style="clear:both;"></div>
+</div>
+<ul class="media_list">
+	{loop $items $item}
+	<li>
+		<div class="inner">
+			<div class="content col-xs-6" >
+				<img src="{php echo mediaId2local($item['content']['news_item'][0]['thumb_media_id']);}" title="图文图片">
+				<div class="content_abstract">
+					{loop $item['content']['news_item'] $key $new}
+						{if count($item['content']['news_item']) > 1}
+						<p><a target="_blank" href="{$new['url']}">{php echo ($key+1).'.';}{$new['title']}</a></p>
+						{else}
+						<p><a target="_blank" href="{$new['url']}">{$new['title']}</a></p>
+						{/if}
+
+					{/loop}
+				</div>
+			</div>
+			
+			
+			<div class="date col-xs-2">
+				<p class="info" >&nbsp;</p>
+				{php $cats = media_cats($item['media_id']);}
+				{if !empty($cats)}
+					<p>分类：</p>
+					{loop $cats $cat}
+						<p>{php echo cat_id2name($cat);}</p>
+					{/loop}
+				{/if}
+			</div>
+			<div class="opr col-xs-2">
+				<!-- <a  href="">编辑</a> -->
+				<a class="btn btn-link media-category" data-media="{$item['media_id']}" href="javascript:void(0);" >编辑分类</a>
+			</div>
+		</div>
+	</li>
+	{/loop}
+	
+</ul>
+<script type="text/javascript">
+	$(function(){
+		$('.btn_del').click(function(){
+			var yes = confirm('确定删除？');
+			var l_url = "{php echo $this->createWebUrl('permanent',array('type'=>'news','action'=>'list'));}";
+				
+			if(yes == true){
+				$.ajax({
+					url:"{php echo $this->createWebUrl('permanent',array('type'=>'news','action'=>'del'));}",
+					data:{media:$(this).attr('data-media')},
+					success:function(res){
+						util.message('删除成功',l_url,'success');
+					},
+					error:function(){
+						alert('ajax error');
+					}
+				});
+			}
+		});
+	});
+</script>
+<div class="pagination">
+	{if $page > 1}
+	<a class="btn btn-default" href="{php echo $this->createWebUrl('permanent',array('type'=>'news','page'=>$page-1,'count'=>$count));}"><i class="fa fa-caret-left"></i></a>
+	{/if}
+	<span class="page_nav_area"><span class="page_num"><label>{php echo $page}</label><span class="num_grap">/</span><label>{$pages}</label></span><a class="btn btn-default" href="{php echo $this->createWebUrl('permanent',array('type'=>'news','page'=>$page+1,'count'=>$count));}"><i class="fa fa-caret-right"></i></a></span>
+	<span class="goto_area"><input type="text" id="go_page"><a class="btn btn-default page_go" href="javascript:void(0);">跳转</a></span>
+</div>
+<input type="hidden" id="media_to_send" value="">
+
+<script type="text/javascript">
+	$(".page_go").click(function(event) {
+		var url = "{php echo $this->createWebUrl('permanent',array('type'=>'news','count'=>$count));}"+"&page="+$(this).parent().find('input').val();
+		window.location = url;
+	});
+
+	$('.media_list .inner').hover(function(){
+		$(this).find('.edit-info').show();
+	},function(){
+		$(this).find('.edit-info').hide();
+	});
+	
+	
+</script>
+
+{template 'article_category'}

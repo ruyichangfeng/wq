@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>会员中心</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <script src="../addons/hy_uscr/template/js/jquery.min.js"></script>
+    <link href='../addons/hy_uscr/template/mobile/style_cz.css' rel='stylesheet' type='text/css'>
+    <link href='../addons/hy_uscr/template/mobile/style_jf.css' rel='stylesheet' type='text/css'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+    .header .jf_box .ling {
+        position: relative;
+    }
+
+    .recharge {
+        position: absolute;
+        right: 0px;
+        font-size: 14px;
+        margin-top: 5px;
+        margin-right: 15px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="cz_box">
+            <div class="cz">
+                <p>我的总余额（元）</p>
+                <a class="wen">
+                    <i class="fa fa-question-circle-o"></i>
+                  </a>
+            </div>
+            <div class="ling">{$member['credit2']}</div>
+        </div>
+        <div class="amfng_box" id="accallloglist">
+        </div>
+    </div>
+    <script>
+    var ajaxurl = "{php echo $this->createMobileUrl('sendlog');}";
+    var i = 1;
+    var getopenid = "{$_GPC['getopenid']}";
+    $(function() {
+        i++;
+        function getData(page) {
+            $.get(ajaxurl, { page: page, type: 2, getopenid: getopenid }, function(data) {
+                var jsonObj = JSON.parse(data);
+                insertDiv(jsonObj);
+            });
+        }
+        //初始化加载第一页数据  
+        getData(1);
+        //生成数据html,append到div中  
+        function insertDiv(result) {
+            var mainDiv = $("#accallloglist");
+            var chtml = '';
+            for (var j = 0; j < result.length; j++) {
+                chtml += '<div class="zhixian">';
+	                chtml += '<div class="margin">';
+		                chtml += '<a>';
+			                chtml += '<div class="left">';
+				                chtml += '<p>';
+					                chtml += '<i class="fa fa-database"></i>';
+					                chtml += "&nbsp;&nbsp;" + result[j].typestr + "&nbsp;";
+					                chtml += '<i class="shijian">' + result[j].createtime + '</i>';
+				                chtml += '</p>';
+				                chtml += '<div class="xiaofei">';
+					                chtml += result[j].storename;
+				                chtml += '</div>';
+				                chtml += '<div class="xiaofei">';
+				                chtml += '</div>';
+			                chtml += '</div>';
+			                chtml += '<div class="right">';
+			                chtml += result[j].addsub;
+			                chtml += result[j].fee;
+			                chtml += '</div>';
+		                chtml += '</a>';
+	                chtml += '</div>';
+                chtml += '</div>';
+            }
+            mainDiv.append(chtml);
+        }
+        //==============核心代码=============  
+        var winH = $(window).height(); //页面可视区域高度  
+        var scrollHandler = function() {
+            var pageH = $(document.body).height();
+            var scrollT = $(window).scrollTop(); //滚动条top   
+            var aa = (pageH - winH - scrollT) / winH;
+            if (aa < 0.02) {
+                if (i % 1 === 0) {
+                    getData(i);
+                    $(window).unbind('scroll');
+                    //$("#btn_Page").show();
+                } else {
+                    getData(i);
+                    //$("#btn_Page").hide();
+                }
+            }
+        }
+        $(window).scroll(scrollHandler);
+    });
+    </script>
+    <!--底部导航-->
+    {template 'footer'}
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+{template 'common/header'}
+<style>
+    .modal-dialog { width:1100px}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="post" class="form-horizontal" role="form">
+                <div class="form-group col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                    <label>合同名称</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="search-contract-name" type="text" value="" style="width:60%;display: inline-block;">
+                    <button type="submit" class="btn btn-md btn-primary">查询</button>
+                </div>
+                <input type="hidden" name="page" value="search">
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <h4>合同列表</h4>
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:15%;">名称</th>
+                    <th class="text-center" style="width:30%;">简介</th>
+                    <th class="text-center" style="width:10%;">价格</th>
+                    <th class="text-center" style="width:10%;">时长</th>
+                    <th class="text-center" style="width:25%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {if $contracts}
+                    {loop $contracts $index $contract}
+                    {php $i = 1}
+                    <tr>
+                        <td class="text-center">{$i}</td>
+                        <td class="text-center">{$contract['contract_name']}</td>
+                        <td class="text-center"><a href="javascript:;" data-toggle="modal" data-target="#contract_detail{$contract['id']}" >点击查看合同简介</a></td>
+                        <td class="text-center">¥{$contract['contract_price']}</td>
+                        <td class="text-center">{$contract['contract_duration']}天</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="{php echo $this->createWebUrl('contract', array('page' => 'period', 'id' => $contract['id']))}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="管理课时">管理课时</a>
+                                <a href="{php echo $this->createWebUrl('contract', array('page' => 'class', 'id' => $contract['id']))}" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="管理课程">管理课程</a>
+                                <a href="{php echo $this->createWebUrl('contract', array('page' => 'edit', 'id' => $contract['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;
+                                <a href="{php echo $this->createWebUrl('contract', array('page' => 'delete', 'id' => $contract['id']))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+                            </div>
+                            <div id="contract_detail{$contract['id']}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contract_detail" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">{$contract['contract_name']}</h4>
+                                        </div>
+                                        <div class="modal-body" style="white-space: initial;text-align: left">
+                                            {$contract['contract_description']}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {php $i++}
+                    {/loop}
+                {else}
+                    <tr><td colspan="6"><p class="text-center">未找到合同</p></td></tr>
+                {/if}
+                </tbody>
+            </table>
+            <div class="text-right">
+                <a href="{php echo $this->createWebUrl('contract', array('page' => 'create'))}" class="btn btn-md btn-default"><i class="fa fa-plus"></i> 增加合同</a>
+            </div>
+            {$pager}
+        </div>
+    </div>
+</div>
+<!--
+<div class="modal fade contract_detail" tabindex="-1" role="dialog" aria-labelledby="contract_detail" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">这里是合同名称</h4>
+            </div>
+            <div class="modal-body">
+                合同内容合同内容合同内容合同内容合同内容合同内容合同内容
+                合同内容
+                合同内容
+                合同内容合同内容合同内容合同内容合同内容合同内容
+                合同内容合同内容合同内容合同内容合同内容
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+<script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+{template 'common/footer'}

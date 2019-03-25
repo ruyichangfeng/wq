@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>消费明细</title>
+    {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+</head>
+<body>
+        <form action="{php echo $this->createMobileUrl('consume', array('op' => 'create'))}" method="post" id="consume-form">
+            <div class="dz-filehead dz-detailhead">
+                <a href="{php echo $this->createMobileUrl('consume', array('archive_id' => $archive_id))}"><img src="{RES}mobile/images/left2.png" class="goback"></a>
+            消费明细
+            </div>
+            <div class="dz-detail">
+                    <div class="dz-detail-li">
+                        <span>时间:</span>
+                        <input type="date" name="consume[consume_date]" value="{$consume['consume_date']}" >
+                    </div>
+                    <div class="dz-detail-li">
+                            <span>门店:</span>
+                            <select name="consume[consume_storeid]" >
+                                {loop $stores $item}
+                                <option value="{$item['store_id']}" {if $consume['consume_storeid'] == $item['store_id']}selected{/if}>{$item['store_name']}</option>
+                                {/loop}
+                            </select>
+                    </div>
+                    <div class="dz-detail-li dz-detail-li3">
+                        <div class="dz-detail-tab">
+                                {loop $projects $item}
+                                <li {if in_array($item['project_id'], $consume['consume_projectid'])}class="this-tab"{/if} data-checkid="{$item['project_id']}" onclick="detatab(this)">{$item['project_name']}</li>
+                                <input id="check_{$item['project_id']}" hidden type="checkbox"  name="consume[consume_projectid][]" value="{$item['project_id']}" {if in_array($item['project_id'], $consume['consume_projectid'])}checked{/if}>
+                                {/loop}
+
+                                <div class="clear"></div>
+                        </div>
+                            <div class="clear"></div>
+                    </div>
+                    <div class="dz-detail-price">
+                        <span>单价:</span>
+                        <div style="text-align: left"><input type="number" name="consume[consume_price]" value="{$consume['consume_price']}">￥</div>
+                    </div>
+                    <div class="dz-detail-li dz-detail-li-text">
+                        <span>备注:</span>
+                        <textarea name="consume[consume_remark]" cols="22" rows="8">{$consume['consume_remark']}</textarea>
+                        <div class="clear"></div>
+                    </div>
+            </div>
+            <input type="hidden" name="consume[consume_id]" value="{$consume['consume_id']}">
+            <input type="hidden" name="consume[consume_staffid]" value="{$consume['consume_staffid']}">
+            <input type="hidden" name="consume[consume_archiveid]" value="{$archive_id}">
+            <input type="hidden" name="token" value="{$_W['token']}">
+            <div class="dz-deta-sub">
+                <input type="submit" name="submit" value="保存">
+            </div>	
+        </form>
+        <div class="dz-fixed" id="message">
+
+        </div>
+    <script>
+        var winheight=window.screen.height;
+        $("#deta-form").height(winheight);
+
+        function detatab(that)
+        {
+
+            if($(that).hasClass("this-tab"))
+            {
+                $(that).removeClass("this-tab");
+                var id = $(that).data('checkid');
+                $('#check_' + id).attr('checked', false);
+
+            }else
+            {
+                var id = $(that).data('checkid');
+                $('#check_' + id).attr('checked', true);
+                $(that).addClass("this-tab");
+            }
+        }
+    </script>
+
+        <script>
+            function message(text) {
+
+                $('#message').html(text);
+                $('#message').show();
+
+                var timerid = setInterval(function () {
+
+                    $('#message').hide();
+                    clearInterval(timerid);
+
+                }, 2000);
+            }
+
+            /** 提交 */
+            $('#consume-form').submit(function () {
+
+
+                if($('input[name="consume[consume_date]"]').val() == ''){
+                    message('未选择消费时间!');
+                    return false;
+                }
+                if($('select[name="consume[consume_storeid]"]').val() == ''){
+                    message('请填门店!');
+                    return false;
+                }
+
+                return true;
+            })
+        </script>
+</body>
+</html>

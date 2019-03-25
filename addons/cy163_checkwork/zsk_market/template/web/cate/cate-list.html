@@ -1,0 +1,138 @@
+{template 'public/header'}
+
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >分类管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('cate.listview');?>" method="post" id="keyform">
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" value="<?php echo $name ? $name : ''; ?>" placeholder="请输入分类名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+
+					  <?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					  <a href="javascript:void(0);" class="btn btn-default" style="display: inline-block;" onclick="addCate(0,'顶级分类')">添加分类</a>
+						<?php } ?>
+
+				  </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 250px;">分类名称</th> 
+					<th style="width: 100px;">分类等级</th> 
+					<th style="width: 100px;">图片</th> 
+					<th style="width: 100px;">排序</th>   
+					<th style="">状态</th>
+					<?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					<th  >操作</th>
+					<?php } ?>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $cates $index $item}
+				<?php if($item['parentid'] < 1){ ?>
+				<tr> 
+					<td>
+						<?php if(count($item['children'])>0){ ?>
+						<span class="glyphicon glyphicon-minus" aria-hidden="true" sts="1" onclick="swithParentSts(this)" pid="{$item['id']}" style="color:#999;padding-right: 10px;"></span>
+						<?php }else{ ?> 
+						<span style="padding-right: 10px;">&nbsp;&nbsp;</span>
+						<?php } ?>{$item['name']} &nbsp;&nbsp;&nbsp;&nbsp;ID : {$item['id']} </td>
+					<?php if($item['parentid']){ ?>
+					<td>二级</td>
+					<?php }else{ ?>
+					<td>一级</td>
+					<?php } ?>
+					<td><img src="{$item['src']}" style="widows:30px;height: 30px;"/> </td>
+					<td>{$item['sort']} </td>  
+					<td>{$item['sts']} </td>
+					<?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					<td>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="cateEdit({$item['id']},'{$item['name']}')">编辑</a>
+						 
+						<?php if($item['parentid']=="0"){?>
+							<a href="javascript:void(0);" class="linkbtn" onclick="addCate({$item['id']},'{$item['name']}')">添加子分类</a>
+						<?php } ?>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+					<?php } ?>
+				</tr>
+				{loop $item['children'] $index2 $item2}
+				<tr parentid="{$item2['parentid']}" class="children"> 
+					<td style="padding-left: 60px;">{$item2['name']} &nbsp;&nbsp;&nbsp;ID : {$item2['id']}</td>
+					 <td >二级</td>
+					<td><img src="{$item2['src']}" style="widows:30px;height: 30px;"/> </td>
+					<td>{$item2['sort']} </td>
+					<td>{$item2['sts']} </td>
+					<?php  if($_SESSION['power'] > 1 || $_SESSION['judgeid'] == 'owner'){  ?>
+					<td>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="cateEdit({$item2['id']},'{$item['name']}')">编辑</a>
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item2['id']},'{$item['name']}')">删除</a>
+					</td>
+					<?php } ?>
+				</tr>
+
+				{/loop}
+				<?php }else if($item['parentid'] >= 1 && !empty($name)){ ?>
+				<tr>
+				<td>{$item['name']} &nbsp;&nbsp;&nbsp;&nbsp;ID : {$item['id']}</td>
+				<td>二级</td>
+				<td><img src="{$item['src']}" style="widows:30px;height: 30px;"/> </td>
+				<td>{$item['sort']} </td>
+				<td>{$item['sts']} </td>
+				<td>
+					<a href="javascript:void(0);" class="linkbtn" onclick="cateEdit({$item['id']},'{$item['name']}')">编辑</a>
+
+					<?php if($item['parentid']=="0"){?>
+					<a href="javascript:void(0);" class="linkbtn" onclick="addCate({$item['id']},'{$item['name']}')">添加子分类</a>
+					<?php } ?>
+					<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+				</td>
+				</tr>
+				<?php } ?>
+
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function addCate(id,name){ 
+	 window.location.href="<?php echo $this->routeUrl('cate.addview');?>&pid="+id+"&name="+name;
+	}
+	function cateEdit(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('cate.editview');?>&cid="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除"+text+"及其所有子分类?",function(){
+		window.location.href="<?php echo $this->routeUrl('cate.delcate');?>&cid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

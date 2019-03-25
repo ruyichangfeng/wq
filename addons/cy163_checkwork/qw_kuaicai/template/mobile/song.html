@@ -1,0 +1,212 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}/resource/css/jquery-labelauty.css">
+<link rel="stylesheet" href="{MODULE_URL}/resource/css/common.css">
+<link rel="stylesheet" type="text/css" href="{MODULE_URL}/resource/css/DateTimePicker.css" />
+<link href="{MODULE_URL}/resource/css/mobiscroll.custom-2.5.0.min.css" rel="stylesheet" type="text/css" />
+<script src="{MODULE_URL}/resource/js/jquery-labelauty.js"></script>
+
+<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="{MODULE_URL}/resource/js/DateTimePicker.js"></script>
+<style>
+    body { font-family: "Microsoft Yahei";}
+    a { color:#333;text-decoration: none;}
+    a:hover, a:focus { color:#333;text-decoration: none;}
+    .form-control { border-radius:0;}
+    .panel-default>.panel-heading { font-weight: bold;}
+    .panel-info>.panel-heading { font-weight: bold;padding: 10px 15px;color: #333;background-color: #f5f5f5;border-color: #ddd;}
+    .btn { border-radius: 0;}
+    .panel-heading { background-color: #ebebeb;}
+    input.labelauty + label { width: 25px;
+        height: 25px;
+        border-radius: 100%;
+        line-height: 20px;
+        text-align: center;padding:0;}
+    input.labelauty:checked + label { color: #f49025;border: 1px solid #f49025;background-color: white;}
+    input.labelauty:checked:not([disabled]) + label:hover { color: #f49025;border: 1px solid #f49025;background-color: white;}
+</style>
+<div class="main">
+    <div class="bs-example" data-example-id="media-alignment" style="margin-top: 0;">
+        <div style="padding:10px;border-bottom: 1px solid #e6e6e6;">
+            <label style="padding-top:10px;margin-bottom:0;">配送时间</label>
+            <input type="text" placeholder="请点击选择配送时间" class="time pull-right datetimepicker" data-format="yyyy-MM-dd" data-field="date" id="datetimepicker" readonly />
+            <div id="dtBox"></div>
+            <div class="clearfix"></div>
+        </div>
+        {loop $cailist $item}
+        <div class="media">
+            <div class="media-left media-middle">
+                <a href="#">
+                    <div class="media-object" style="width:80px;height:80px;background: url('{php echo tomedia($item['pic']);}') 0 0 no-repeat;border:1px solid #e6e6e6;background-position: 50%;background-size: cover;" src=" "></div>
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading" style="font-size: 15px;">{$item['title']}</h4>
+                <p style="margin-bottom: 5px;color:#646464;">简介：<span>{$item['des']}</span></p>
+                <div>
+                    <span class="pull-left" style="margin-bottom: 5px;color:#646464;">数量：{$item['num']}</span>
+                    <span class="pull-right">
+                        <input type="checkbox" name="choose" value="{$item['id']}" data-labelauty="√" />
+                    </span>
+                    <div class="clearfix"></div>
+                </div>
+<!--                <div class="form-group">
+                    <div class="col-xs-offset-7 col-xs-5 col-sm-5">
+
+                    </div>
+                </div>-->
+            </div>
+        </div>
+        {/loop}
+        <div style="margin:10px 10px 50px 10px;">
+            <textarea class="form-control" id="mark" rows="5" placeholder="请填写备注信息"></textarea>
+            <a class="btn btn-warning btn-lg btn-block" id="send" href="{php echo $this->createMobileUrl('order')}">确认</a>
+        </div>
+    </div>
+</div>
+<footer class="fixed">
+    <ul>
+        <li><a href="{php echo $this->createMobileUrl('song')}" class="icon active"> <img src="/addons/qw_kuaicai/resource/img/icon_home_active.png" class="" /><p>首页</p></a></li>
+        <li><a href="{php echo $this->createMobileUrl('order')}" class="icon"> <img src="/addons/qw_kuaicai/resource/img/icon_list.png" /><p>订单</p></a></li>
+        <li><a href="{php echo $this->createMobileUrl('person_center')}" class="icon"> <img src="/addons/qw_kuaicai/resource/img/icon_center.png" /><p>我的</p></a></li>
+    </ul>
+</footer>
+<script>
+
+    function CurentTime() {
+        var now = new Date();
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+        var clock = year + "-";
+        if (month < 10)
+            clock += "0";
+        clock += month + "-";
+        if (day < 10)
+            clock += "0";
+        clock += day + " ";
+        return (clock);
+        console("CurentTime()");
+    }
+
+    $(function(){
+        $(':input').labelauty();
+    });
+
+        $("#dtBox").DateTimePicker({
+            minDateTime: "CurentTime()"
+        });
+
+
+
+</script>
+
+
+
+{template 'common/footer'}
+
+<script>
+
+    $(document).ready(function(){
+
+
+
+         $("#send").click(function(){
+             var str ='';
+
+             var num =0;
+
+             $("input[name='choose']").each(function(){
+
+
+
+
+               if( true==$(this).is(':checked')){
+
+
+                   str+=$(this).val()+',';
+                   num+=1;
+
+               }else{
+
+                  // alert("没有被选择");
+               }
+
+;
+             });
+
+             if(num<1){
+
+                 alert("您还没有选择商品");
+                 return false;
+             }
+
+//             if(str1.trim()==''){
+//
+//                 alert("你还没有选择");
+//                 return false;
+//
+//             }else{
+//
+//                 alert(str);
+//             }
+
+             var addtime = $("#datetimepicker").val();
+           if(addtime==''){
+
+               alert("请选择日期");
+               $("#datetimepicker").focus;
+               return false;
+           }
+
+             var mark = $("#mark").val().trim();
+
+
+
+             var Url = "{php echo $this->createMobileurl('song')}";
+
+             $.post(Url,{xuanze:str,addtime:addtime,mark:mark},function(data){
+
+                    var data = $.parseJSON(data);
+                 if(data.error==1){
+
+
+                     alert(data.message);
+
+                     var or =confirm("成功下单，是否跳转到订单页面？");
+                     if(true==or){
+                         var orderurl="{php echo $this->createMobileurl('order')}";
+                         window.location.href=orderurl;
+
+                     }
+
+
+                 }else if(data.error==3){
+
+                    // alert(data.message);
+
+                     //
+                     var r = confirm(data.message+'是否要完善个人信息？');
+                     if(true==r){
+
+                         var centerurl = "{php echo $this->createMobileurl('person_center')}";
+
+                         window.location.href=centerurl;
+                         return false;
+                     }
+
+
+                 }else{
+                     alert(data.message);
+
+                 }
+
+             })
+
+             return false;
+         })
+
+    })
+
+
+</script>
+ 

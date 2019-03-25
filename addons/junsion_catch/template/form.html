@@ -1,0 +1,639 @@
+<style>
+.control-label{
+	padding-top: 0 !important;
+}
+.item{
+		padding: 10px;
+		border: 1px solid gainsboro;
+		margin: 5px;
+		width: 330px;
+		float: left;
+		position: relative;
+		text-align: center;
+	}
+	
+	.item img{
+		width: 100%;
+	}
+	
+	.item input{
+		margin-top: 10px;
+		display: inline;
+	}
+	
+	.item input[type=text]{
+		width: 65%;
+	}
+	.item input[type=number]{
+		width: 30%;
+		margin-right: 2%;
+	}
+	
+	.item span{
+		position: absolute;
+		right: 0;
+		font-size: 25px;
+		color: red;
+	}
+	.item span:hover{
+		font-size: 30px;
+		border: 1px solid gainsboro;
+		border-radius: 5px;
+		background: black;
+		cursor: pointer;
+	}
+	.img_group p{
+		text-align: center;
+	}
+</style>
+{php load()->func('tpl');}
+<div class="panel panel-default">
+	<div class="panel-heading">活动设置</div>
+	<div class="panel-body">
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动名称</label>
+            <div class="col-sm-9 col-xs-12">
+               	<input type="text" id="title" class="form-control" placeholder="" name="title" value="{if $rule['title']}{$rule['title']}{else}七夕,大家一起来抓喜鹊,赢大奖{/if}">
+            </div>
+        </div>
+ 		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动图片</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('thumb',!empty($rule['thumb'])?$rule['thumb']:"../addons/$this->modulename/template/mobile/img/net1.png");}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动说明</label>
+            <div class="col-sm-9 col-xs-12">
+               	<textarea style="height:60px;" id='description' name="description" class="form-control" cols="60">{if $rule['description']}{$rule['description']}{else}{/if}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动时间</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_daterange('datelimit', array('start'=>date('Y-m-d H:i',$rule['starttime']?$rule['starttime']:time()),'end'=>date('Y-m-d H:i',$rule['endtime']?$rule['endtime']:time()+3600*24*7)), true)}
+            </div>
+        </div> 
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动地区</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_district('place',$places)}
+            </div>
+        </div> 
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 初始游戏次数</label>
+            <div class="col-sm-9 col-xs-12">
+               	<input type="number" min="0" id="free_times" class="form-control" name="free_times" value="{if !empty($rule)}{$rule['free_times']}{else}10{/if}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="vertical-align: middle;"> 次数增长模式</label>
+            <div class="col-sm-9 col-xs-12">
+               	<label style="margin-right: 20px;"><input type="radio" name="more_type" value="0" checked> 加入游戏就开始增长</label>
+               	<label>
+               		<input type="radio" name="more_type" value="1" {if $rule['more_type']}checked{/if}>
+		            <div class="input-group" style="display: inline-table;vertical-align: middle;width: 350px;">
+						 <div class="input-group-addon"> 当游戏次数小于等于</div>
+						 <input type="number" min="0"  class="form-control" name="more_num" value="{$rule['more_num']}" >
+						 <div class="input-group-addon">次时开始增长</div>
+					</div>
+				</label>
+            </div>
+        </div>
+         <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 增长游戏次数</label>
+            <div class="col-sm-9 col-xs-12">
+               		<div class="input-group" >
+						 <div class="input-group-addon">每</div>
+						 <input type="number" min="0"  class="form-control" name="more_time" value="{if !empty($rule)}{$rule['more_time']}{else}10{/if}">
+						 <div class="input-group-addon">分钟，自动增加</div>
+						 <input type="number" min="0"  class="form-control" name="more_times" value="{if !empty($rule)}{$rule['more_times']}{else}1{/if}">
+						 <div class="input-group-addon">游戏次数</div>
+					</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 参与条件</label>
+            <div class="col-sm-9 col-xs-12">
+               	<label><input type="radio" name="describe_limit" value="0" checked> 必须关注</label>
+               	<label style="margin-left: 20px;"><input type="radio" name="describe_limit" value="1" {if $rule['describe_limit']}checked{/if}> 不必关注</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 朋友助力</label>
+            <div class="col-sm-9 col-xs-12">
+               	<div class="input-group" >
+					 <div class="input-group-addon"><input type="radio" name="limit_type" value="0" checked> 每个朋友可提供</div>
+					 <input type="number" min="0"  class="form-control" name="love_limit" value="{if $rule['love_limit']}{$rule['love_limit']}{else}5{/if}">
+					 <div class="input-group-addon">游戏次数</div>
+				</div>
+				<div class="input-group" style="margin-top: 10px;">
+					 <div class="input-group-addon"><input type="radio" name="limit_type" value="1" {if $rule['love_limit'] === 0}checked{/if}> 每个朋友可随机提供</div>
+					 <input type="number" min="0"  class="form-control" name="love_limit1" value="{$rule['love_limit1']}">
+					 <div class="input-group-addon">至</div>
+					 <input type="number" min="0"  class="form-control" name="love_limit2" value="{$rule['love_limit2']}">
+					 <div class="input-group-addon">游戏次数</div>
+				</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 排行榜显示人数</label>
+            <div class="col-sm-9 col-xs-12">
+               	<input type="number" min="0" id="rank" class="form-control" name="rank" value="{if $rule['rank']}{$rule['rank']}{else}10{/if}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 活动规则</label>
+            <div class="col-sm-9 col-xs-12">
+               	<textarea name="content" class="form-control richtext-clone" style="height: 100px;" >{if !empty($rule)}{$rule['content']}{else}1、点击屏幕即可发射捕捉网
+2、分享给朋友可获得游戏次数
+3、活动结束后，将按照分数高低来发放奖品
+               	{/if}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+ 			<label class="col-xs-12 col-sm-3 col-md-2 control-label">兑奖输入项提示词</label>
+            <div class="col-sm-9 col-xs-6">
+				<input type="text" class="form-control" name="awardtips" value="{if $rule['awardtips']}{$rule['awardtips']}{else}为了将活动奖品更快、更准确的送达您手中，请留下您的个人信息，谢谢!{/if}">
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 兑奖输入参数项</label>
+            <div class="col-sm-9 col-xs-12">
+				<div style="border:1px #eee dashed; padding:10px;background:#F5F5F5;">					
+               	    <label for="isrealname" class="checkbox-inline"><input id="isrealname" type="checkbox" name="isrealname" value="1" {if $rule['isrealname'] || !$rule['stitle']}checked{/if}> 姓名</label>
+				    <label for="ismobile" class="checkbox-inline"><input id="ismobile" type="checkbox" name="ismobile" value="1"  {if $rule['ismobile'] || !$rule['stitle']}checked{/if}> 手机</label>
+				    <label for="isqq" class="checkbox-inline"><input id="isqq" type="checkbox" name="isqq" value="1" {if $rule['isqq']}checked{/if}> QQ号</label>
+				    <label for="isemail" class="checkbox-inline"><input id="isemail" type="checkbox" name="isemail" value="1" {if $rule['isemail']}checked{/if}> 邮箱</label>
+				    <label for="isaddress" class="checkbox-inline"><input id="isaddress" type="checkbox" name="isaddress" value="1" {if $rule['isaddress']}checked{/if}> 地址</label>
+				</div>
+					<div class="help-block">活动开启后最好不要修改 </div>
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label" style="padding-top: 7px !important;"> 兑奖输入参数同步</label>
+            <div class="col-sm-9 col-xs-12">
+				<label for="isfans_0" class="radio-inline"><input id="isfans_0" type="radio" name="isinfo" value="0" checked> 参数项只保留本模块下</label>
+				<label for="isfans_1" class="radio-inline"><input id="isfans_1" type="radio" name="isinfo" value="1"  {if $rule['isinfo']}checked{/if}> 参数项同步更新至官方会员信息表中</label>
+            </div>
+        </div>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">游戏设置</div>
+	<div class="panel-body">
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 游戏背景</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('bg',!empty($rule['bg'])?$rule['bg']:"../addons/$this->modulename/template/mobile/img/bg2.jpg");}
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 捕捉对象</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('fthumb',!empty($rule['fthumb'])?$rule['fthumb']:"../addons/$this->modulename/template/mobile/img/birds.png");}
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象帧数</div>
+	               	<input class="form-control" type="number" min="1" name="frame" value='{if $rule["frame"]}{$rule["frame"]}{else}3{/if}'>
+               	</div>
+				<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象名称</div>
+	               	<input class="form-control" type="text" name="fname" value='{if $rule["fname"]}{$rule["fname"]}{else}喜鹊{/if}'>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象速度(穿过屏幕时间)</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed1" value='{if $rule["fspeed1"]}{$rule["fspeed1"]}{else}3500{/if}'>
+	               	<div class="input-group-addon">至</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed2" value='{if $rule["fspeed2"]}{$rule["fspeed2"]}{else}4500{/if}'>
+	               	<div class="input-group-addon">毫秒</div>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象数量(一屏幕)</div>
+	               	<input class="form-control" type="number" min="1" name="ftotal" value='{if $rule["ftotal"]}{$rule["ftotal"]}{else}15{/if}'>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">抓到奖励分数</div>
+	               	<input class="form-control" type="number" min="1" name="score" value='{if $rule["score"]}{$rule["score"]}{else}10{/if}'>
+               	</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 捕捉对象缩略图</label>
+             <div class="col-sm-9 col-xs-12">
+		        {php echo tpl_form_field_image('fthumb2',!empty($rule['fthumb2'])?$rule['fthumb2']:"../addons/$this->modulename/template/mobile/img/bird.png");}
+		        <div class="help-block">用于游戏玩法说明</div>
+		     </div>
+        </div>
+        <hr/>
+        <div style="display: none;" id="objmodel">
+        <div>
+        <div class="form-group obj">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 捕捉对象<span id="objnum"></span></label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image("fthumb_o[]","");}
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象帧数</div>
+	               	<input class="form-control" type="number" min="1" name="frame_o[]" value="3">
+               	</div>
+				<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象名称</div>
+	               	<input class="form-control" type="text" name="fname_o[]">
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象速度(穿过屏幕时间)</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed1_o[]" value="3500">
+	               	<div class="input-group-addon">至</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed2_o[]" value="4500">
+	               	<div class="input-group-addon">毫秒</div>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象数量(一屏幕)</div>
+	               	<input class="form-control" type="number" min="1" name="ftotal_o[]" value="5">
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">抓到奖励分数</div>
+	               	<input class="form-control" type="number" min="1" name="score_o[]" value="10">
+               	</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label" > 捕捉对象<span id="objnum2"></span>缩略图</label>
+             <div class="col-sm-9 col-xs-12">
+		        {php echo tpl_form_field_image("fthumb2_o[]","");}
+		        <div class="help-block">用于游戏玩法说明</div>
+		     </div>
+        </div>
+        <div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+				<div class="col-sm-9">
+				<button type="button" class="btn btn-danger btn_del_obj">删除</button>
+				</div>
+			</div>
+			<hr/>
+        </div>
+        </div>
+        {loop $objs $k $o}
+        <div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 捕捉对象{php echo $k+2}</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('fthumb_o[]',$o['fthumb']);}
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象帧数</div>
+	               	<input class="form-control" type="number" min="1" name="frame_o[]" value='{if $o["frame"]}{$o["frame"]}{else}3{/if}'>
+               	</div>
+				<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象名称</div>
+	               	<input class="form-control" type="text" name="fname_o[]" value='{$o["fname"]}'>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象速度(穿过屏幕时间)</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed1_o[]" value='{if $o["fspeed1"]}{$o["fspeed1"]}{else}3500{/if}'>
+	               	<div class="input-group-addon">至</div>
+	               	<input class="form-control" type="number" min="1" name="fspeed2_o[]" value='{if $o["fspeed2"]}{$o["fspeed2"]}{else}4500{/if}'>
+	               	<div class="input-group-addon">毫秒</div>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">对象数量(一屏幕)</div>
+	               	<input class="form-control" type="number" min="1" name="ftotal_o[]" value='{if $o["ftotal"]}{$o["ftotal"]}{else}15{/if}'>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">抓到奖励分数</div>
+	               	<input class="form-control" type="number" min="1" name="score_o[]" value='{if $o["score"]}{$o["score"]}{else}10{/if}'>
+               	</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 捕捉对象{php echo $k+2}缩略图</label>
+             <div class="col-sm-9 col-xs-12">
+		        {php echo tpl_form_field_image('fthumb2_o[]',$o['fthumb2']);}
+		        <div class="help-block">用于游戏玩法说明</div>
+		     </div>
+        </div>
+        <div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+				<div class="col-sm-9">
+				<button type="button" class="btn btn-danger btn_del_obj">删除</button>
+				</div>
+			</div>
+			<hr/>
+        </div>
+        {/loop}
+        <span id="obj_insert_flag" style="display: none;"></span>
+        <div class="form-group">
+		    <div class="col-sm-5"></div>
+			<div class="col-sm-7">
+				<button id="btn_add_obj" type="button" class="btn btn-warning">
+					<span class="glyphicon glyphicon-plus"></span> 添加捕捉对象
+				</button>
+			</div>
+		</div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 网</label>
+            <div class="col-sm-9 col-xs-12">
+               	<div class="img_group">
+               		<label onclick="netSelect(this)"><img src="../addons/{php echo $this->modulename}/template/mobile/img/net1.png"><p><input name="nets" type="radio"></p></label>
+               		<label onclick="netSelect(this)"><img src="../addons/{php echo $this->modulename}/template/mobile/img/net2.png"><p><input name="nets" type="radio"></p></label>
+               		<label onclick="netSelect(this)"><img src="../addons/{php echo $this->modulename}/template/mobile/img/net3.png"><p><input name="nets" type="radio"></p></label>
+               		<label onclick="netSelect(this)"><img src="../addons/{php echo $this->modulename}/template/mobile/img/net4.png"><p><input name="nets" type="radio"></p></label>
+               	</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('net',!empty($rule['net'])?$rule['net']:"../addons/$this->modulename/template/mobile/img/net1.png");}
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">速度(到达最远点的时间)</div>
+	               	<input class="form-control" type="number" min="1" name="nspeed" value='{if $rule["nspeed"]}{$rule["nspeed"]}{else}2000{/if}'>
+	               	<div class="input-group-addon">毫秒</div>
+               	</div>
+               	<div class="input-group" style="margin-top: 10px;">
+	               	<div class="input-group-addon">无效边距(网的边缘地方)</div>
+	               	<input class="form-control" type="number" min="1" name="netuseless" value='{if $rule["netuseless"]}{$rule["netuseless"]}{else}20{/if}'>
+	               	<div class="input-group-addon">像素</div>
+               	</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"> 枪炮</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_image('gun',!empty($rule['gun'])?$rule['gun']:"../addons/$this->modulename/template/mobile/img/fire.png");}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+	function prizetype(obj,name,val,type){
+		if(val != -1) $(obj).val(type)
+		else val = '';
+		if($(obj).val() == 0){
+			$(obj).parents('#topparent').find('#prizetitle').text('奖品名称');
+			$(obj).parents('#topparent').find('#prizeval').html('<input class="form-control" type="text" value="'+val+'" name="'+name+'">');
+			$(obj).parents('#topparent').find('#pic').show();
+			$(obj).parents('#topparent').find('#desc').show();
+		}else if($(obj).val() == 1){
+			$(obj).parents('#topparent').find('#prizetitle').text('积分数量');
+			$(obj).parents('#topparent').find('#prizeval').html('<input class="form-control" type="number" value="'+val+'" name="'+name+'">');
+			$(obj).parents('#topparent').find('#pic').show();
+			$(obj).parents('#topparent').find('#desc').show();
+		}else if($(obj).val() == 2){
+			$(obj).parents('#topparent').find('#prizetitle').text('余额数量');
+			$(obj).parents('#topparent').find('#prizeval').html('<input class="form-control" type="number" value="'+val+'" name="'+name+'">');
+			$(obj).parents('#topparent').find('#pic').show();
+			$(obj).parents('#topparent').find('#desc').show();
+		}else if($(obj).val() == 3){
+			$(obj).parents('#topparent').find('#prizetitle').text('折扣券');
+			var options = '<select class="form-control" name="'+name+'">';
+			{loop $coupons $c}
+				{if $c['type'] == 1}
+					options += '<option value="{$c["id"]}" ';
+					if("{$c['id']}" == val) options += ' selected ';
+					options += '>{$c["title"]}</option>';
+				{/if}
+			{/loop}
+			options += '</select>';
+			$(obj).parents('#topparent').find('#prizeval').html(options);
+			$(obj).parents('#topparent').find('#pic').hide();
+			$(obj).parents('#topparent').find('#desc').hide();
+		}else if($(obj).val() == 4){
+			$(obj).parents('#topparent').find('#prizetitle').text('代金券');
+			var options = '<select class="form-control" name="'+name+'">';
+			{loop $coupons $c}
+				{if $c['type'] == 2}
+					options += '<option value="{$c["id"]}" ';
+					if("{$c['id']}" == val) options += ' selected ';
+					options += '>{$c["title"]}</option>';
+				{/if}
+			{/loop}
+			options += '</select>';
+			$(obj).parents('#topparent').find('#prizeval').html(options);
+			$(obj).parents('#topparent').find('#pic').hide();
+			$(obj).parents('#topparent').find('#desc').hide();
+		}else if($(obj).val() == 5){
+			$(obj).parents('#topparent').find('#prizetitle').text('真实物品');
+			var options = '<select class="form-control" name="'+name+'">';
+			{loop $coupons $c}
+				{if $c['type'] == 3}
+					options += '<option value="{$c["id"]}" ';
+					if("{$c['id']}" == val) options += ' selected ';
+					options += '>{$c["title"]}</option>';
+				{/if}
+			{/loop}
+			options += '</select>';
+			$(obj).parents('#topparent').find('#prizeval').html(options);
+			$(obj).parents('#topparent').find('#pic').hide();
+			$(obj).parents('#topparent').find('#desc').hide();
+		}
+	}
+</script>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		奖品信息(根据排名高到低)
+	</div>
+	<div class="panel-body">
+			{loop $prize $item}
+			<div id="topparent">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 control-label">奖品类别</label>
+                <div class="col-sm-3">
+                        <input class="form-control" type="text" value="{$item['prizepro']}" name="prizepro[]">
+                </div>
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">奖品数量</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input class="form-control" type="text" value="{$item['prizetotal']}" name="prizetotal[]">
+                        <span class="input-group-addon">份</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 control-label">奖品</label>
+                <div class="col-sm-3">
+                   <select id="prizetype{$item['id']}" class="form-control" name="prizetype[{$item['id']}]" onchange="prizetype(this,'prizename[{$item['id']}]',-1)">
+                   		<option value='0'>自定义</option>
+                   		<!-- <option value='1'>积分</option>
+                   		<option value='2'>余额</option>
+                   		<option value='3'>优惠券</option>
+                   		<option value='4'>代金券</option>
+                   		<option value='5'>真实物品</option> -->
+                   </select>
+                </div>
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label" id="prizetitle">奖品名称</label>
+                <div class="col-sm-4" id="prizeval">
+                    <input class="form-control" type="text" value="{$item['prizename']}" name="prizename[]">
+                </div>
+            </div>		
+            <div class="form-group" id="pic" {if $item['prizetype'] > 2}style="display: none;"{/if}>
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">奖品图片</label>
+                <div class="col-sm-9">
+				    {php echo tpl_form_field_image('prizepic[]',$item['prizepic']);}
+				</div>
+            </div>
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+				<div class="col-sm-9">
+				<button type="button" class="btn btn-danger btn_del_award">删除</button>
+				</div>
+			</div>
+			<hr/>
+			</div>
+			 <script>prizetype($('#prizetype{$item["id"]}'),'prizename[]','{$item["prizename"]}','{$item["prizetype"]}')</script>
+			{/loop}		
+		<div id="jiangpin" style="display: none">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 control-label">奖品类别</label>
+                <div class="col-sm-3">
+                        <input class="form-control" type="text"  name="prizepro[]">
+                </div>
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">奖品数量</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input class="form-control" type="text"  name="prizetotal[]">
+                        <span class="input-group-addon">份</span>
+                    </div>
+                </div>
+            </div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 control-label">奖品</label>
+                <div class="col-sm-3">
+                   <select class="form-control" name="prizetype[]" onchange="prizetype(this,'prizename[]',-1)">
+                   		<option value='0'>自定义</option>
+                   	<!--	<option value='1'>积分</option>
+                   		<option value='2'>余额</option>
+                   		<option value='3'>折扣券</option>
+                   		<option value='4'>代金券</option>
+                   		<option value='5'>真实物品</option>
+                   		 <option value='6'>红包</option> -->
+                   </select>
+                </div>
+                <label class="col-xs-12 col-sm-2 col-md-2 control-label" id="prizetitle">奖品名称</label>
+                <div class="col-sm-4" id="prizeval">
+                    <input class="form-control" type="text" value="" name="prizename[]">
+                </div>
+            </div>
+            <div class="form-group" id="pic">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">奖品图片</label>
+                <div class="col-sm-9">
+					{php echo tpl_form_field_image('prizepic[]','');}
+				</div>
+            </div>
+		</div>
+		<span id="award_insert_flag" style="display: none"></span>
+		<div class="form-group">
+		    <div class="col-sm-5"></div>
+			<div class="col-sm-7">
+				<button id="btn_add_award" type="button" class="btn btn-warning">
+					<span class="glyphicon glyphicon-plus"></span> 添加奖品
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		广告设置
+	</div>
+	<div class="panel-body">
+				<span id="selectimage1" class="btn btn-primary"><i class="icon-plus"></i> 上传图片</span>
+				<div class="help-block">建议上传高度为80像素的图片</div>
+				<div id="listimage1" style="margin-top: 10px;">
+				{loop $slider $p}
+					<div class="item">
+						<span onclick="$(this).parent().remove()" class="glyphicon glyphicon-remove-circle"></span>
+						<img src="{php echo toimage($p['picurl'])}">
+						<input name="picurl[{$p['id']}]" value="{$p['picurl']}" type="hidden">
+						<input placeholder="排序" class="form-control" name="displayorder[{$p['id']}]" type="number"  min="0" value="{$p['displayorder']}">
+						<input placeholder="链接地址" class="form-control" name="link[{$p['id']}]" type="text" value="{$p['link']}">
+					</div>
+				{/loop}
+				</div>
+     </div>
+ </div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		分享设置
+	</div>
+	<div class="panel-body">
+            <div class="form-group">
+	            <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享标题</label>
+	            <div class="col-sm-9 col-xs-12">
+	               	<input type="text" class="form-control" placeholder="" name="sharetitle" value="{if $rule['sharetitle']}{$rule['sharetitle']}{else}七夕,大家一起来抓喜鹊,赢大奖{/if}">
+	            </div>
+	        </div>	
+	         <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享图片</label>
+                <div class="col-sm-9">
+					{php echo tpl_form_field_image('sharethumb',!empty($rule['sharethumb'])?$rule['sharethumb']:"../addons/$this->modulename/template/mobile/img/net1.png");}
+				</div>
+            </div>
+	        <div class="form-group">
+	            <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享概述</label>
+	            <div class="col-sm-9 col-xs-12">
+	               	<input type="text" class="form-control" placeholder="" name="sharedesc" value="{if $rule['sharedesc']}{$rule['sharedesc']}{else}七夕,大家一起来抓喜鹊,赢大奖~{/if}">
+	            </div>
+	        </div>	
+     </div>
+ </div>
+<script type="text/javascript">
+	function netSelect(obj){
+		var src = $(obj).find('img').attr('src');
+		$('input[name="net"]').val(src);
+		$('input[name="net"]').parent().parent().find('img').attr('src',src)
+	}
+
+	$('#btn_add_award').bind('click', function(){
+		var content = '<div id="topparent">';
+		content += $("#jiangpin").html();
+		content += '<div class="form-group">';
+		content += '<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>';
+		content += '<div class="col-sm-9">';
+		content += '<button type="button" class="btn btn-danger btn_del_award">删除</button>';
+		content += '</div>';
+		content += '</div>';
+		content += '<hr/>';
+		content += '</div>';
+		$('#award_insert_flag').before(content);
+	});
+	$('.btn_del_award').bind('click', function(){
+		var obj = $(this).parent().parent().parent();
+		obj.slideUp(300, function() {
+			obj.remove();
+		});
+	});
+	
+	$('.btn_del_obj').bind('click', function(){
+		var obj = $(this).parent().parent().parent();
+		obj.slideUp(300, function() {
+			obj.remove();
+		});
+	});
+	
+	$('#btn_add_obj').bind('click',function(){
+		var size = $('.obj').length;
+		$('#objmodel').find('#objnum').text(size+1);
+		$('#objmodel').find('#objnum2').text(size+1);
+		$('#obj_insert_flag').before($('#objmodel').html());
+	});
+	
+	
+	require(['jquery', 'util'], function($, util){
+		$(function(){
+			// 对象绑定点击事件
+			$('#selectimage1').click(function(){
+				util.uploadMultiPictures(function(list){
+					// your code here
+					for(var i=0; i<list.length; i++){
+						var s = '<div class="item"><span onclick="$(this).parent().remove()" class="glyphicon glyphicon-remove-circle"></span>';
+						s += '<img src="'+list[i]['url']+'">';
+						s += '<input name="picurl[]" type="hidden" value="'+list[i]['filename']+'">';
+						s += '<input placeholder="排序" class="form-control" name="displayorder[]" type="number" min="0" value="0">';
+						s += '<input placeholder="跳转链接" class="form-control" name="link[]" type="text"></div>';
+						$('#listimage1').append(s);
+					}
+				});
+			});
+		});
+	});
+</script>

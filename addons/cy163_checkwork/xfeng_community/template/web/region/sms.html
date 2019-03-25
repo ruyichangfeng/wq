@@ -1,0 +1,172 @@
+{template 'web/common/header'}
+<ul class="nav nav-tabs">
+    <li>
+        <a href="{php echo $this->createWebUrl('region', array('op' => 'list'));}">小区管理</a>
+    </li>
+    <li><a href="{php echo $this->createWebUrl('region', array('op' => 'set','regionid' => $regionid));}">小区设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('region', array('op' => 'fields','regionid' => $regionid));}">业主注册字段</a></li>
+    <li class="active"><a href="#">短信设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('region', array('op' => 'xqprint','regionid' => $regionid));}">打印机设置</a></li>
+</ul>
+<form action="" method="post" class="form-horizontal form">
+    <div class="main">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">短信设置</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">短信接口</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[api]"  value="1" {if empty($set['api']) || $set['api']==1} checked{/if} /> 乐信通(开户网站<a href="http://cn.mikecrm.com/0Z3k25z">http://cn.mikecrm.com/0Z3k25z</a>)</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[api]"  value="2" {if $set['api']==2 } checked{/if} /> 聚合(开户网站<a href="https://www.juhe.cn/docs/api/id/54">https://www.juhe.cn/docs/api/id/54</a> )</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">房号短信提醒</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[room]" value="1" {if $set['room']==1} checked{/if} /> 开启</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[room]" value="0" {if empty($set['room'])} checked{/if} /> 不开启</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">注册短信提醒</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[code]"  value="1" {if $set['code']==1 } checked{/if} /> 开启</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[code]"  value="0" {if empty($set['code']) } checked{/if} /> 不开启</label>
+                        <span class="help-block">开启短信验证后，用户注册微小区信息时自动验证其手机号的真实性（发送验证码）。</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">意见报修短信提醒</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[report]" value="1" {if $set['report']==1 } checked{/if} /> 开启</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[report]" value="0" {if empty($set['report']) } checked{/if} /> 不开启</label>
+                        <span class="help-block">开启报修投诉后，用户报修投诉信息会自动发给小区管理员手机号（发送验证码）。</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">物业缴费短信提醒</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[cost]" value="1" {if $set['cost']==1 } checked{/if} /> 开启</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sms[cost]" value="0" {if empty($set['cost'])} checked{/if} /> 不开启</label>
+                        <span class="help-block">开启短信提醒后，可通过短信通知小区用户催缴物业费。</span>
+                    </div>
+                </div>
+                <div class="panel panel-default" id="wwt">
+                <div class="panel-body">
+                <div>
+                    <div class="form-group">
+                        <label for="account" class="col-sm-2 control-label">用户账户</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[account]" id='account' class="form-control" value="{$set['account']}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd" class="col-sm-2 control-label">用户密码</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[pwd]" id='pwd' class="form-control" value="{$set['pwd']}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sign" class="col-sm-2 control-label">用户签名</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[sign]" id='sign' class="form-control" value="{$set['sign']}" />
+                        </div>
+                    </div>
+                </div>
+                </div>
+                </div>
+                <div class="panel panel-default" id="juhe" style="display: none">
+                    <div class="panel-body">
+                    <div class="form-group">
+                        <label for="reportid" class="col-sm-2 control-label">报修投诉模板ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[reportid]" id='reportid' class="form-control" value="{$set['reportid']}" />
+                            <span class='help-block'>
+                            注意：先去申请如下的模板：【微小区】报修信息#content#,报修人电话#mobile#。
+                        </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="resgisterid" class="col-sm-2 control-label">注册微小区模板ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[resgisterid]" id='resgisterid' class="form-control" value="{$set['resgisterid']}" />
+                            <span class='help-block'>
+                            注意：先去聚合，申请如下的模板：【微小区】您的验证码是#code#。如非本人操作，请忽略本短信
+                          </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="shopping_id" class="col-sm-2 control-label">超市发货模板ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[shopping_id]" id='shopping_id' class="form-control" value="{$set['shopping_id']}" />
+                            <span class='help-block'>
+                          注意：先去申请如下的模板：【微小区】您的快递是#express_name#,快递单号#express_code#。有任何问题请随时与我们联系，谢谢。
+                       </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="property_id" class="col-sm-2 control-label">物业费催缴模板ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[property_id]" id='property_id' class="form-control" value="{$set['property_id']}" />
+                            <span class='help-block'>
+                            注意：先去申请如下的模板：【微小区】您好,您本月物业费已出。物业费金额#price#。请尽快缴纳，如有疑问，请咨询#phone#。
+                        </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="room_id" class="col-sm-2 control-label">房号通知模板ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[room_id]" id='room_id' class="form-control" value="{$set['room_id']}" />
+                            <span class='help-block'>
+                            注意：先去申请如下的模板：【微小区】您好,您在本小区注册码#code#，请尽快到我们的公众号#account#上注册使用在线功能哦。
+                        </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sms_account" class="col-sm-2 control-label">短信接口Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="sms[sms_account]" id='sms_account' class="form-control" value="{$set['sms_account']}" />
+                            <p class="help-block">目前暂时1个短信平台</p>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label"></label>
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary span3" name="submit" value="提交">提交</button>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+$(function () {
+    $("input:radio[name='sms[api]']").click(function () {
+        var api= $('input:radio[name="sms[api]"]:checked').val();
+        if(api == 1){
+            $("#wwt").show();
+            $("#juhe").hide();
+        }
+        if(api == 2){
+            $("#juhe").show();
+            $("#wwt").hide();
+        }
+    })
+})
+</script>
+{template 'web/common/footer'}

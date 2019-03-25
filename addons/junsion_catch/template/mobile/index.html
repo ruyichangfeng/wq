@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+{php $MOBILE = '../addons/'.$this->modulename.'/template/mobile/';}
+<head>
+ <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+ <script type="text/javascript" src="{$MOBILE}js/jquery-1.7.2.min.js"></script>
+ <script type="text/javascript" src="{$MOBILE}js/sweetalert.min.js"></script>
+ <script type="text/javascript" src="{$MOBILE}js/anijs.js"></script>	
+ <script type="text/javascript" src="{$MOBILE}js/flipsnap.js" ></script>
+ <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=5PESLgvMcSbSUbPjmDKgvGZ3"></script>
+ <link rel="stylesheet" href="{$MOBILE}css/sweetalert.css">
+ <link rel="stylesheet" href="{$MOBILE}css/style.css?t={TIMESTAMP}">
+<meta charset="UTF-8">
+<title>{$rule['title']}</title>
+<style type="text/css">
+#game{
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+	background: transparent url({php echo toimage($rule['bg'])}) top left no-repeat;
+	background-size:100% 100%;
+}
+.bird {
+	position: absolute;
+}
+.net{
+	position: absolute;
+	background: transparent url({php echo toimage($rule['net'])}) top left no-repeat;
+	background-size:100% 100%;
+}
+#bottom{
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	bottom: 0;
+	z-index: 100;
+	height:{$rule['gunH']}px;  
+}
+.fire{
+	display: inline-block;
+	height:{$rule['gunH']}px;  
+	width: {$rule['gunW']}px;
+	background: transparent url({php echo toimage($rule['gun'])}) top left no-repeat;
+	background-size:100% 100%;
+}
+
+#down{
+	vertical-align: middle;
+  	color: orange;
+  	{if !$down}display: none;{/if}
+}
+</style>
+</head>
+<body>
+<img id="net_model" src="{php echo toimage($rule['net'])}" style="display: none">
+{if !empty($slide)}<div class='slider'>{template 'slider'}</div>{/if}
+<div id="game">
+<div class="score"><img src="{$MOBILE}img/score.png"><font id="score">{if empty($player)}0{else}{$player['score']}{/if}</font></div>
+<div class="times"><img src="{$MOBILE}img/flash.png"><font id="times">{if empty($player)}{$rule['free_times']}{else}{$player['times']}{/if}</font><label id="down">(<label id="countdown">{$down}</label>)</label></div>
+<div id="bottom">
+	<span class="hand" onclick="$('.dialog').hide();$('.award').show()"><img src="{$MOBILE}img/font_award.png"></span>
+	<span class="hand" onclick="$('.dialog').hide();$('.rank').show()"><img src="{$MOBILE}img/font_rank.png"></span>
+	<span class="fire"></span>
+	<span class="hand" onclick="$('.dialog').hide();$('.rule').show()"><img src="{$MOBILE}img/font_rule.png"></span>
+	<span class="hand" onclick="$('.dialog').hide();$('.game').show()"><img src="{$MOBILE}img/font_game.png"></span>
+</div>
+</div>
+
+<div class='dialog rank'>
+	<div class="dialog_title" style="background: url({$MOBILE}img/title_rank.png);background-size: 100% 100%;"></div>
+	<div class="dialog_close" onclick="$('.rank').hide()"></div>
+	<div class="list_dialog">
+		{php $inrank = false}<!-- 判断自己是否在排行榜中 -->
+		{loop $rank $k $r}
+		<div class="item_dialog {if $r['id'] == $player['id']}{php $inrank = true;}item_dialog2{/if}">
+			<div class="icon_rank"><font>{php echo $k+1}</font></div>
+			<div class="item_img" style="background: url({$r['avatar']});background-size: 100% 100%;"></div>
+			<div class="rank_name">{if $r['realname']}{$r['realname']}{elseif $r['nickname']}{$r['nickname']}{else}粉丝玩家{/if}</div>
+			<div class="rank_score">{$r['score']}</div>
+		</div>
+		{/loop}
+		{if !$inrank}
+		<div class="item_dialog item_dialog2">
+			<div class="icon_rank"><font>{php echo count($rank)+1}</font></div>
+			<div class="item_img" style="background: url({$player['avatar']});background-size: 100% 100%;"></div>
+			<div class="rank_name">{if $player['realname']}{$player['realname']}{elseif $player['nickname']}{$player['nickname']}{else}粉丝玩家{/if}</div>
+			<div class="rank_score">{$player['score']}</div>
+		</div>
+		{/if}
+	</div>
+</div>
+<div class='dialog award'>
+	<div class="dialog_title" style="background: url({$MOBILE}img/title_award.png);background-size: 100% 100%;"></div>
+	<div class="dialog_close" onclick="$('.award').hide()"></div>
+	<div class="list_dialog">
+	{loop $prize $p}
+		<div class="item_dialog item_dialog2">
+			<div class="item_img" style="background: url({php echo toimage($p['prizepic'])});background-size: 100% 100%;left: 30px;"></div>
+			<div class="item_award"><font>{$p['prizepro']}</font></div>
+			<div class="award_text">{$p['prizename']} 数量：<font>{$p['prizetotal']}</font></div>
+			{if $award && $award['prize']['id'] == $p['id']}{if !$player['status']}<div class="award_btn" onclick="$('.dialog3').show();">领奖</div>{else}<div class="award_btn" style="background: green">已领奖</div>{/if}{/if}
+		</div>
+	{/loop}
+	</div>
+</div>
+<div class='dialog dialog2 rule'>
+	<div class="dialog_title" style="top: 5px;background: url({$MOBILE}img/title_rule.png);background-size: 100% 100%;"></div>
+	<div class="dialog_close" onclick="$('.rule').hide()" style="top:25px;"></div>
+	<pre class="rule_content">{$rule['content']}</pre>
+</div>
+
+<div class='dialog dialog2 game' style="height: 310px;">
+	<div class="dialog_title" style="top: 5px;background: url({$MOBILE}img/title_game.png);background-size: 100% 100%;"></div>
+	<div class="dialog_close" onclick="$('.game').hide()" style="top:25px;"></div>
+				<div class="swiper-container">
+			        <div class="swiper-wrapper">
+			        	<!--item-->
+			            {loop $objs $o}
+			            <div class="swiper-slide">
+			            	<div class="swiper-slide-main">
+				            	<div class="flip front Hascompleted">
+					            		<h5>{$o['fname']}</h5>
+					            		<div class="swiper-slide-content">
+					            			<img src="{php echo toimage($o['fthumb2'])}">
+					            		</div>
+					            		<p><span>{$o['fname']},只要在网的区域内即可捕捉到，捉到获取{$o['score']}分</span></p>
+					            </div>	
+				            </div>	
+			            </div>
+			            {/loop}
+			        	<!--item end-->
+			        </div>
+			        			        
+			        <div class="pointer">
+			        {loop $objs $k $o}
+						<span {if $k==0}class="current"{/if}></span>
+					{/loop}
+					</div>
+			         
+			    </div>	
+</div>
+
+<div class='dialog dialog2' style="height: auto;" id="info">
+	<div class="dialog_title" style="top: 1%;background: url({$MOBILE}img/title_info.png);background-size: 100% 100%;"></div>
+	<div class="rule_content" style="text-align: center;height: auto;margin-top: 12%;min-height: 100px;">
+		<div>{$rule['awardtips']}</div>
+		<ul class="input_item">
+		{if $rule['isrealname']}
+			<li><label>真实姓名</label><input type="text" id="realname" value="{if $player['realname']}{$player['realname']}{else}{$mc['realname']}{/if}"></li>
+		{/if}
+		{if $rule['ismobile']}
+			<li><label>手机号码</label><input type="tel" id="mobile" maxlength="11" value="{if $player['mobile']}{$player['mobile']}{else}{$mc['mobile']}{/if}"></li>
+		{/if}
+		{if $rule['isqq']}
+			<li><label>QQ</label><input type="tel" id="qq" value="{if $player['qq']}{$player['qq']}{else}{$mc['qq']}{/if}"></li>
+		{/if}
+		{if $rule['isemail']}
+			<li><label>邮箱</label><input type="text" id="email" value="{if $player['email']}{$player['email']}{else}{$mc['email']}{/if}"></li>
+		{/if}
+		{if $rule['isaddress']}
+			<li><label>地址</label><textarea id="address">{if $player['address']}{$player['address']}{else}{$mc['address']}{/if}</textarea></li>
+		{/if}
+		</ul>	
+	</div>
+	<div style="text-align: center;margin: 5px;"><span class="btn_submit"></span></div>
+</div>
+{if !empty($award)}
+<div class="dialog dialog3" {if !$player['status']}style="display: block;"{/if}>
+<div class="dialog_close" onclick="$('.dialog3').hide()" style="top: 95px;right: 20px;"></div>
+<div class="prize_content">
+	<div style="text-align: center;"><span class="prize_index"><b>{$award['prize']['prizepro']}</b></span></div>
+	<div class="prize_info"><img src="{php echo toimage($award['prize']['prizepic'])}"><b>{$award['prize']['prizename']}</b></div>
+	<div class="qrcode"><img src="{php echo toimage($award['qrcode'])}"><p>向商家员工出示该二维码</p><p>扫码后即可领奖</p></div>
+	{if $cfg['name']}<div style="text-align: center;"><a style="font-size: 15px;color: blue;" href="{php echo $this->createMobileUrl('map')}">商家地址</a></div>{/if}
+</div>
+</div>
+{/if}
+<div id="describe" onclick="$(this).hide()" style="display:none;position: fixed;top:0;background: rgba(0,0,0,.5);width: 100%;height: 100%;z-index: 100;text-align: right; padding: 0 10px;">
+	<img src="{$MOBILE}img/describe.png" style="width: 100%;">
+</div>
+<span id="fps" style="position: absolute;left: 0;bottom: 50px;"></span>
+</body>
+<script type="text/javascript">
+(function($) {
+	$(document).ready(function() {
+		
+		var gunH = parseFloat("{$rule['gunH']}");
+		var gunW = parseFloat("{$rule['gunW']}");
+		var winW = $(window).width();
+		var winH = $(window).height();
+		var slideH = {if !empty($slide)}80{else}0{/if};
+		$('#game').css('height',(winH - slideH)+'px');
+		$('.hand').css('width',((winW - gunW)/4 - 20)+'px').css('height',2*gunH/3+'px');
+		var NETSPEED = {$rule['nspeed']};
+		var NETUNUSELESS = {$rule['netuseless']};  //网的无效边距
+		var fireX = winW/2;//炮X中心
+		var fireY = $(window).height()-gunH/2;//炮Y中心
+		var catchbird = [];//被抓住的对象
+		var first_flag = 0; //标志是否第一次进入页面 是的话创建对象时 先不加动画
+		var countdownFlag = 1; //倒计时开关
+		var reset = 0; //倒计时重置
+		var info = true;//用户信息标识
+		
+		
+		{loop $objs $o}
+			 for(var i = 0; i < parseInt("{$o['ftotal']}"); i++){
+				 createBird(parseInt('{php echo $o["frameW"]/$o["frame"]}'),parseInt('{$o["frameH"]}'),parseInt('{$o["fspeed1"]}'),parseInt('{$o["fspeed2"]}'),'{php echo toimage($o["fthumb"])}',parseInt('{$o["score"]}'));
+			 }
+		{/loop}
+		
+		first_flag = 1;
+		var size = $('.bird').length;
+		var count = 0;
+		birdAnimateStart();
+		window.setTimeout(birdAnimateStart,500);
+		function birdAnimateStart(){
+			if(count < size){
+				var bird = $('.bird').eq(count);
+				var way = Math.random() > 0.5 ? 'linear' : 'swing';
+				var speed = parseInt(bird.attr('minS')) + Math.random() * (parseInt(bird.attr('maxS')) - parseInt(bird.attr('minS')));//对象速度
+				bird.animate({
+					top : bird.attr('lasty')+"px",
+					left : bird.attr('lastx')+"px",
+				},speed,way,function(){
+					birdPosition(bird);
+				});
+				count++;
+				window.setTimeout(birdAnimateStart,500);
+			}
+		}
+		
+		function createBird(birdW,birdH,minS,maxS,fthumb,score){
+			$('#game').append('<div class="bird" style="width:'+birdW+'px;height:'+birdH+'px" minS="'+minS+'" maxS="'+maxS+'" score="'+score+'" ></div>');
+			var bird = $('.bird').eq($('.bird').length-1);
+			bird.anijs({
+				image: fthumb, 
+				fps: 12, 
+				frameWidth: parseFloat(birdW), 
+				frameHeight: parseFloat(birdH),
+			});
+			birdPosition(bird);
+		}
+
+		function birdPosition(bird){
+			var birdW = parseInt(bird.width());
+			var birdH = parseInt(bird.height());
+			var widthEdage = winW + birdW;
+			var heightEdage = winH - birdH - gunH - slideH;
+			bird.css('-webkit-transform','rotate3d(0,0,0,0)');
+			var min = -100;//y的最小值
+			var top = Math.random()*(heightEdage-min+1)+min; //y
+			
+			var random_x = Math.random() > 0.5 ? widthEdage : - birdW;
+			bird.css('top',top+"px").css('left',random_x+'px');
+			var final_x = widthEdage;
+			if(random_x == widthEdage){
+				final_x = -birdW;
+				bird.css('-webkit-transform','rotate3d(0,1,0,-180deg)');
+			}
+			top = Math.random()*(heightEdage-min+1)+min; //y 
+			var way = Math.random() > 0.5 ? 'linear' : 'swing';
+			var speed = parseInt(bird.attr('minS')) + Math.random() * (parseInt(bird.attr('maxS')) - parseInt(bird.attr('minS')));//对象速度
+			if(!first_flag){
+				bird.attr('lastx',final_x).attr('lasty',top);
+			}else{
+				bird.animate({
+					top : top+"px",
+					left : final_x+"px",
+				},speed,way,function(){
+					birdPosition(bird);
+				});
+			}
+		}
+		
+		var gameTop = $('#game').offset().top; //游戏区域的最高点
+		var mLength = getTwoPointDistant(0,gameTop,fireX,fireY); //炮中心到游戏区域最远的距离
+		$('#game').append('<div class="net" style="top:'+(winH - gunH - slideH)+'px;left:'+fireX+'px;"></div>');
+		$('#game').click(function(event){
+			if($('.net').width() > 0) return;
+			//枪炮的上方才有效
+			if(event.clientY >= $(window).height()-gunH) return;
+			
+			{if $rule['starttime'] > time()}
+				swal('很抱歉，该活动还未开始！','请耐心等候活动开始吧……','error');
+				return;
+			{/if}
+			{if $rule['endtime'] <= time()}
+				swal('很抱歉，该活动已经结束！','下次活动记得来参加哦，亲！','error');
+				return;
+			{/if}
+			
+			if(OUT){
+				swal('很抱歉，您不能参与活动！','该活动限于{$rule["province"]}{$rule["city"]}{$rule["area"]}粉丝参加','error');
+				return;
+			}
+			
+			{if $rule['isrealname'] && empty($player['realname']) || $rule['ismobile'] && empty($player['mobile']) || $rule['isqq'] && empty($player['qq']) || $rule['isemail'] && empty($player['email']) || $rule['isaddress'] && empty($player['address'])}
+				if(info){
+					$('#info').show();
+					return;
+				}
+			{/if}
+			if(!changeTimes()){
+				swal('木有游戏次数了！','分享给好友可获得游戏次数哦！','warning')
+				return;
+			}
+			event.clientY -= slideH;
+			var x = event.clientX - $('#net_model').width()/2; //点中的点 为网的中心
+			var y = event.clientY - $('#net_model').height()/2;
+			var length = getTwoPointDistant(fireX,fireY,event.clientX,event.clientY); //炮中心到点击点的距离
+			netSpeed = length/mLength * NETSPEED; //根据距离计算速度
+			$('.net').css('width',"2px").css('height','10px');
+			$('.net').animate({
+				top : y+"px",
+				left : x+"px",
+				width : $('#net_model').width()+'px',
+				height : $('#net_model').height()+'px',
+			},netSpeed,function(){
+				findBirds(x,y+slideH);
+				window.setTimeout(function(){
+					$('.net').css('width',"0").css('height','0').css('top',(winH - gunH - slideH)+'px').css('left',fireX+'px');
+					var size = catchbird.length;
+					var score = 0;
+					for(var i = 0; i < size; i++ ){
+						birdPosition(catchbird[i]);
+						score += parseInt(catchbird[i].attr('score'));
+					}
+					changeScore(score);
+					catchbird = [];
+				},1000);
+			});
+			changeFireDirection(event.clientX,event.clientY);
+		});
+		
+		function changeTimes(){ //更改次数
+			var times = parseInt($('#times').text());
+			if(times == 0) return false;
+			$('#times').text(--times);
+			
+			{if $rule['more_type']}
+				if(times == {$rule['more_num']}){
+					if($('#down').css('display') == 'none'){
+						$('#down').show();
+						countdownFlag = 1;
+						reset = 1;
+						countDown();
+					}
+				}else if(times > {$rule['more_num']}){
+					countdownFlag = 0;
+					$('#down').hide();
+					reset = 0;
+				}
+			{/if}
+			
+			return true;
+		}
+				
+		function changeScore(score){
+			var hscore = parseInt($('#score').text());
+			$('#score').text(score + hscore);
+			$.ajax({  //修改分数并且减少次数1
+				url:'{php echo $this->createMobileUrl("score",array("rid"=>$rid))}',
+				type:'post',
+				data:{score:score},
+				error:function(){
+					swal('网络请求失败！','网络不通情况下，游戏数据将无效','error')
+				}
+			});
+		}
+				
+		function getTwoPointDistant(x1,y1,x2,y2){
+			var xdiff = x2 - x1;            // 计算两个点的横坐标之差
+			var ydiff = y2 - y1;            // 计算两个点的纵坐标之差
+			return Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);  
+		}
+				
+		function findBirds(x,y){
+			var birds = $('.bird');
+			var size = birds.size();
+			for(var i = 0; i < size; i++ ){
+				var bird = birds.eq(i);
+				var left = bird.offset().left;
+				var top = bird.offset().top;
+				//判断鸟的中心是否在网内
+				var birdMX = left + bird.width()/2;
+				var birdMY = top + bird.height()/2;
+				if(birdMX >= x+NETUNUSELESS && birdMX <= x+$('#net_model').width()-NETUNUSELESS && birdMY >=y+NETUNUSELESS && birdMY <= y+$('#net_model').height()-NETUNUSELESS){
+					bird.stop();
+					catchbird[catchbird.length] = bird;
+				}
+			}
+		}
+				
+		function changeFireDirection(x2,y2){
+			// 直角的边长
+			var x = Math.abs(fireX - x2);
+			var y = Math.abs(fireY - y2);
+			// 斜边长
+			var z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		 	// 余弦
+			var cos = y / z;
+			// 弧度
+			var radina = Math.acos(cos);
+			// 角度
+			var angle =  180 / (Math.PI / radina);
+			if(x2 < fireX) angle = -angle;
+			$('.fire').css('-webkit-transform','rotate('+angle+'deg)');
+		}
+		
+		
+		var now = new Date();
+		{if $down}countDown();{/if}
+		function countDown(){
+			var time = $('#countdown').text().split(':');
+			if($('#countdown').text() == '00:00' || reset){
+				time = [{$rule["more_time"]},00];
+				if(!reset){
+					//发请求增加次数并且重置最后时间
+					$.ajax({
+						url:'{php echo $this->createMobileUrl("times",array("pid"=>$player["id"]))}',
+						type:'post',
+					});
+					var times = parseInt($('#times').text()) + parseInt('{$rule["more_times"]}');
+					$('#times').text(times);
+					if(times > {$rule['more_num']}){
+						$('#down').hide();
+						countdownFlag = 0;
+					}
+				}
+				reset = 0;
+			}
+			now.setMinutes(time[0]);
+			now.setSeconds(time[1]);
+			now.setTime(now.getTime() - 1000);
+			$('#countdown').text(checkTime(now.getMinutes())+':'+checkTime(now.getSeconds()));
+			if(countdownFlag == 1) window.setTimeout(countDown,1000);
+		}
+		
+		function checkTime(i){
+			if (i < 10) {
+				i = "0" + i
+			}
+			return i
+		}
+		
+		var submit = 0;
+		$('.btn_submit').click(function(){
+			if(submit > 0) return;
+			submit++;
+			var inputs = $('#info').find('input');
+			for(var i = 0;i < inputs.length; i++ ){
+				if($.trim(inputs.eq(i).val()) == ''){
+					swal('请完善您的信息！','','warning');
+					return;
+				}
+			}
+			if($('#address').length > 0 && $.trim($('#address').val()) == ''){
+				swal('请完善您的信息！','','warning');
+				return;
+			}
+			$.ajax({
+				url: '{php echo $this->createMobileUrl("info",array("pid"=>$player["id"]))}',
+				type:'post',
+				data:{realname:$('#realname').val(),mobile:$('#mobile').val(),qq:$('#qq').val(),email:$('#email').val(),address:$('#address').val()},
+				success : function(msg){
+					if(msg == "1"){
+						swal('信息提交成功！','赶快玩游戏赢大奖吧，亲！','success');
+						info = false;
+						$('#info').hide();
+					}else{
+						swal(msg,'','error');
+					}
+				},
+				error : function(){
+					swal('网络请求失败，请重试!','','error');
+				},
+			});
+		});
+		var OUT = false;
+		{if !empty($rule['province'])}
+		var geolocation = new BMap.Geolocation();
+		geolocation.getCurrentPosition(function(r) {
+			var address = r.address;
+		    if(address.province != '{$rule["province"]}'){
+		    	OUT = true;
+		    }else{
+		    	{if !empty($rule['city'])}
+			    	if(address.city != '{$rule["city"]}'){
+				    	OUT = true;
+				    }
+		    	{/if}
+		    	{if !empty($rule['area'])}
+			    	if(address.district != '{$rule["ciareaty"]}'){
+				    	OUT = true;
+				    }
+		    	{/if}
+		    }
+		    if(OUT) swal('很抱歉，您不能参与活动！','该活动限于{$rule["province"]}{$rule["city"]}{$rule["area"]}粉丝参加','error');
+		}, {
+		    enableHighAccuracy: true
+		});
+		{/if}
+	});
+})(jQuery);
+</script>
+<script>
+$(function(){
+	var w = $(window).width();
+	$(".swiper-slide").width(w*0.6);
+	
+	//滑动
+	var _w = $(".swiper-slide").width();
+	var $pointer = $('.pointer span');
+	var len =$('.swiper-wrapper .swiper-slide').length;
+	var flipsnap = Flipsnap('.swiper-wrapper', {
+		distance: _w,
+		//maxPoint:len-1
+		
+	});
+	flipsnap.element.addEventListener('fspointmove', function() {
+		$pointer.filter('.current').removeClass('current');
+		$pointer.eq(flipsnap.currentPoint).addClass('current');
+		var i = $(".pointer span.current").index();
+		$(".swiper-wrapper .swiper-slide").eq(i).addClass("cur").siblings().removeClass("cur");
+	}, false);	
+	//旋转
+	$(".TaskDetailsBtn").click(function(){
+		$(this).parents(".swiper-slide-main").stop().css({transform: "rotateY(180deg)"},300);
+		$(this).parents(".front").siblings(".fliplast").css("z-index","3");
+	});
+	$(".rotating").click(function(){
+		$(this).parents(".swiper-slide-main").stop().css({transform: "rotateY(0deg)"},300);
+		$(this).parents(".fliplast").css("z-index","1");
+	});
+});
+</script>
+
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js?v=20150120"></script>
+<script type="text/javascript">
+	{php $signPackage = $_W['account']['jssdkconfig']}
+    wx.config({
+	    debug: false,
+	    appId: "{$signPackage['appId']}",
+	    timestamp: "{$signPackage['timestamp']}", 
+	    nonceStr: "{$signPackage['nonceStr']}", 
+	    signature: "{$signPackage['signature']}",
+	    jsApiList: [
+	        'checkJsApi',
+	        'onMenuShareTimeline',
+	        'onMenuShareAppMessage',
+	        'onMenuShareQQ',
+	        'onMenuShareWeibo'
+	     ]
+	});
+        var shareData = {
+        	      title: "{$rule['sharetitle']}",
+        	      link: "{php echo $_W['siteroot']."app".substr($this->createMobileUrl('index',array('pid'=>$player['id'],'rid'=>$rid)),1)}",
+        	      desc: '{$rule["sharedesc"]}',
+        	      imgUrl: "{php echo toimage($rule['sharethumb'])}"
+        	    };
+
+        	wx.ready(function () {
+        	    wx.onMenuShareAppMessage(shareData);
+        	    wx.onMenuShareTimeline(shareData);
+        	    wx.onMenuShareQQ(shareData);
+        	    wx.onMenuShareWeibo(shareData);
+        	});
+</script>
+</html>

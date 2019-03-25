@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  {template 'web/header'}
+
+</head>
+
+<body>
+
+    <!-- 内容主体区域 -->
+
+    <div class="layui-elem-quote lineh38 fontsize16">
+
+      <a href="{php echo $this->createWebUrl('print')}">打印列表</a>
+
+      <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('print', array('op' => 'post'))}">添加打印</a>
+
+    </div>
+
+{if $op == 'list'} 
+
+<table class="layui-table">
+
+	<thead>
+
+        <tr>
+
+            <th width="50">类型</th>
+
+            <th>店面</th>
+
+            <th width="120">打印机类型设置</th>
+
+            <th width="200">操作</th>
+
+        </tr>
+
+	</thead>
+
+    <tbody>
+
+    	{loop $list $v}
+
+        <tr> 
+
+        	<td style="text-align:center;">{if $v['type']==1}充值{/if}{if $v['type']==2}消费{/if}</td> 
+
+            <td>{$v['storename']}</td>
+
+            <td style="text-align:center;">{if $v['prtype']==1}365小票打印机{/if}{if $v['prtype']==2}飞鹅打印机{/if}</td>
+
+            <td>
+
+                <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('print', array('op'=>'post','id' => $v['id']))}">修改打印设置</a>
+
+                <a class="layui-btn layui-btn-sm layui-btn-danger item-action-delete" href="{php echo $this->createWebUrl('print',array('op' => 'del','id'=>$v['id']))}">删除打印</a>
+
+            </td>
+
+        </tr>  
+
+    	{/loop} 
+
+        {if empty($list)}
+
+        <tr>
+
+            <td colspan="20" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+
+        </tr>
+
+        {/if}
+
+    </tbody>
+
+</table>
+
+<script>
+
+layui.use(['layer', 'element'], function(){
+
+  var $ = layui.jquery
+
+  ,layer = layui.layer //弹层
+
+  ,element = layui.element; //元素操作
+
+  
+
+  $('.item-action-delete').click(function(){
+
+	  var href  = $(this).attr('href') ;
+
+	  layer.confirm('该操作不可逆，请确认是否删除？',function(){
+
+		  layer.closeAll();
+
+		  location.href  = href;
+
+	  })
+
+	  return false ;
+
+  })
+
+});
+
+</script>
+
+{elseif $op == 'post'}
+
+<form action="" method="post" id="form1" class="layui-form layui-form-pane" enctype="multipart/form-data">
+
+	<input type="hidden" name="id" value="{$item['id']}" > 
+
+	<div class="layui-form-item">
+
+        <label class="layui-form-label"> * 类型</label>
+
+        <div class="layui-input-inline layui-input" style="width: 300px;">
+
+            <input class="layui-input" type="radio" name="type"  id="type" value="1" placeholder="请在此输入名称" title="充值"  {if  $item['type']==1} checked="checked"{/if}>
+
+            <input class="layui-input" type="radio" name="type"  id="type" value="2" placeholder="请在此输入名称" title="消费"  {if  $item['type']==2} checked{/if} >
+
+
+
+		</div>
+
+	</div>
+
+    <div class="layui-form-item"> 
+
+        <label class="layui-form-label"> * 店面</label>
+
+        <div class="layui-input-inline" style="width: 300px;"> 
+
+			<select name="storeid" class="layui-input layui-unselect">
+
+				<option value="" {if empty($item['storeid'])} selected{/if}>请选择</option>	
+
+				{loop $stores  $store}
+
+				<option value="{$store['id']}" {if  $item['storeid']==$store['id']} selected{/if}>{$store['title']}</option>
+
+                {/loop}	
+
+			</select>
+
+		</div>
+
+	</div>
+
+	<div class="layui-form-item"  pane  style="width: 505px;"> 
+
+		<label class="layui-form-label" style="width: 180px;">打印机类型设置</label>
+
+        <div class="layui-input-block" style="margin-left: 180px;">
+
+            <input type="radio" id="prtype" name="prtype" value="1" lay-filter="filter" {if $item['prtype']==1||empty($item['prtype'])} checked {/if}  title="365小票打印机"/> 
+
+            <input type="radio" id="prtype" name="prtype" value="2" lay-filter="filter" {if $item['prtype']==2} checked {/if}  title="飞鹅打印机" />
+
+            <span class="help-block"></span>
+
+        </div>
+
+	</div> 
+
+    <div id="oneprint">
+
+        <div class="layui-form-item">
+
+            <label class="layui-form-label">打印机编号</label>
+
+            <div class="layui-input-inline"  style="width:300px;" >
+
+                <input type="text" class="layui-input" placeholder="打印机编号" name="odeviceno" value="{$item['odeviceno']}">
+
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+
+            <label class="layui-form-label">打印机key</label>
+
+            <div class="layui-input-inline"  style="width:300px;" >
+
+                <input type="text" class="layui-input" placeholder="打印机key" name="odevicekey" value="{$item['odevicekey']}">
+
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+
+            <label class="layui-form-label" style="height:150px;">打印内容</label>
+
+            <div class="layui-input-inline" style="width:398px;" >
+
+                <textarea style="height:150px;" class="layui-textarea" id="odevicecontent" name="odevicecontent" cols="70">{$item['odevicecontent']}</textarea>
+
+            </div>
+
+        </div>
+
+        <div class="layui-form-item" >
+
+            <div class="layui-input-inline"  style="width:300px;" >
+
+                <p style="color:#FF0000;"><b>请按下面内容格式复制到打印内容文本框中</b></p>
+
+                <p>
+
+                    会员名称：{nickname}<br />
+
+                    手&nbsp;机&nbsp;&nbsp;号：{mobile}<br />
+
+                    类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型：{type}<br />
+
+                    金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：{fee}<br /> 
+
+                    方&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;式：{chaneltype}<br />
+
+                    赠送余额：{amount}<br />
+
+                    当前余额：{usercredit2}<br />
+
+                    赠送积分：{usercredit1}<br />
+
+                    时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;间：{createtime}<br />
+
+                    门&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;店：{storename}<br /> 
+
+                    操&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作：{paytype}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>  
+
+    <div id="twoprint">
+
+        <div class="layui-form-item">
+
+            <label class="layui-form-label">注册账号</label>
+
+            <div class="layui-input-inline" style="width:300px;" >
+
+                <input type="text"   class="layui-input"  placeholder="注册账号" name="tdeviceacc" value="{$item['tdeviceacc']}">
+
+            </div>
+
+        </div>
+		<div class="layui-form-item">
+
+            <label class="layui-form-label">UKEY</label>
+
+            <div class="layui-input-inline" style="width:300px;" >
+
+                <input type="text" class="layui-input" placeholder="打印机UKEY" name="tdevicekey" value="{$item['tdevicekey']}">
+
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+
+            <label class="layui-form-label">打印机编号</label>
+
+            <div class="layui-input-inline" style="width:300px;" >
+
+                <input type="text"   class="layui-input"  placeholder="打印机编号" name="tdeviceno" value="{$item['tdeviceno']}">
+
+            </div>
+
+        </div>
+
+        
+
+        <div class="layui-form-item">
+
+            <label class="layui-form-label" style="height:100px;">打印内容</label>
+
+            <div class="layui-input-inline" style="width:398px;">
+
+                <textarea style="height:100px;"  class="layui-textarea" id="tdevicecontent" name="tdevicecontent" cols="70">{$item['tdevicecontent']}</textarea>
+
+            </div>
+
+        </div>
+
+        <div class="layui-form-item" >
+
+            <div class="layui-input-inline"  style="width:300px;" >
+
+                <p style="color:#FF0000;"><b>请按下面内容格式复制到打印内容文本框中</b></p>
+
+                <p>
+
+                    会员名称：{nickname}<br />
+
+                    手&nbsp;机&nbsp;&nbsp;号：{mobile}<br />
+
+                    类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型：{type}<br />
+
+                    金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：{fee}<br /> 
+
+                    方&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;式：{chaneltype}<br />
+
+                    赠送余额：{amount}<br />
+
+                    当前余额：{usercredit2}<br />
+
+                    赠送积分：{usercredit1}<br />
+
+                    时&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;间：{createtime}<br />
+
+                    门&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;店：{storename}<br /> 
+
+                    操&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作：{paytype}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+	<div class="layui-form-item">
+
+        <div class="layui-input-block">
+
+          <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">立即提交</button>
+
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button><input type="hidden" name="token" value="{$_W['token']}" /><input   type="hidden"   name="menunumber"  value="{$menunumber}" />
+
+        </div>
+
+  	</div> 
+
+</form>
+
+<script> 
+
+var $isprtype = {$isprtype}; 
+
+if ($isprtype==2) 
+
+{
+
+	$("#oneprint").hide();
+
+	$("#twoprint").show();
+
+}else{
+
+	$("#oneprint").show();
+
+	$("#twoprint").hide();
+
+}
+
+
+
+layui.use(['layer','form', 'element'], function(){
+
+  var $ = layui.jquery
+
+  ,form = layui.form
+
+  ,layer = layui.layer //弹层
+
+  ,element = layui.element; //元素操作
+
+  
+
+  form.on('radio(filter)', function(data){
+
+       if (data.value==1){
+
+	   		$("#oneprint").show();
+
+			$("#twoprint").hide();
+
+	   }
+
+	   if (data.value==2){
+
+	   		$("#oneprint").hide();
+
+			$("#twoprint").show();
+
+	   } 
+
+  });
+
+});
+
+
+
+</script>	 
+
+{/if}
+
+</body>
+
+</html>

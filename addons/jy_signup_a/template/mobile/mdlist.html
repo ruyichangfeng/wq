@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>门店列表</title>
+{template style}
+<style>
+a{text-decoration: none;color: #000}
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background: #f7f6f6;
+    font-family: 微软雅黑
+}
+#bodybox {
+    position: relative;
+    margin: 0 auto;
+    overflow: hidden;
+    max-width: 640px;
+}
+img{vertical-align: middle}
+.ovfl{overflow: hidden}
+.floL{float: left}
+.floR{float: right}
+.txtAC{text-align: center}
+.mainColor{color: #f55a8e}
+.mainBg{background-color:#f55a8e}
+.head{width:100%; height:45px; line-height:45px; box-shadow:0 2px 2px 0 rgba(0,0,0,0.2); position:fixed; z-index:9; left:0; top:0}
+.head .bn{display:inline-block; height:30px; line-height:30px; padding:0 10px; margin-top:4px}
+.head .bn.pull-left{position:absolute; left:5px; top:0}
+.head .bn.pull-right{position:absolute; right:5px; top:0}
+.head .title{font-size:16px;text-align:center;height:45px;line-height:45px;text-overflow:ellipsis;white-space:nowrap;overflow: hidden;width: 80%;margin: 0 auto;color: #fff}
+.icon{width:20px;height:20px;margin-top: 5px}
+.zhanwei{height:45px}
+.listCon{background-color: #fff;border:1px solid #e3e3e3;border-radius: 4px;width: 85%;margin: 10px auto;padding:7px 5px;}
+.con{border-bottom: 1px solid #e3e3e3;overflow: hidden;color: #4a4646;padding-bottom: 5px}
+.con>img{width: 50px;height: 50px;float: left;margin-left: 5px}
+.con>div{width: 75%;float: right;}
+.con>div>div{padding: 1px 0;line-height: 16px;margin-top: 3px}
+.font13{font-size: 13px}
+.tipDiv{width: 50%;color:#4a4646;text-decoration: none;margin:7px 0 2px 0}
+.tipDiv>img{margin-right: 8px;vertical-align:top;margin-top: 2px}
+.phone{width: 17px}
+.ads{width: 13px}
+.lineDiv{width: 1px;height: 20px;margin-top: 10px;background-color: #e3e3e3;margin-left: -1px}
+/**/
+.con1{overflow: hidden;color: #4a4646;padding-bottom: 5px}
+.con1>div{width: 100%;padding: 2px 0}
+.con1>div>span{margin-top: 2px;margin-right: 2px}
+.msg{border-top: 1px solid #e3e3e3;}
+</style>
+</head>
+<body>
+<div id="bodybox">
+    <div class="head latecolorbg">
+        <a href="javascript:history.go(-1)" class="bn pull-left"><img class="icon" src="../addons/jy_signup_a/images/back.png"></a>
+        <div class="title">门店列表</div>
+        <a href="{php echo $this->createMobileUrl('geren')}" class="bn pull-right"><img class="icon" src="../addons/jy_signup_a/images/ren.png"/></a>
+    </div>
+    <div class="zhanwei"></div>
+
+    <!-- begin -->
+    {loop $mendian $m}
+    <div class="listCon">
+        <!-- <div class="con">
+            <img src="../addons/jy_signup_a/images/listicon.png"/>
+            <div>
+                <div>{$m['mendianname']}</div>
+                <div class="font13">{$m['address']}</div>
+            </div>
+        </div> -->
+        <div class="con1">
+            <div>{$m['mendianname']}{if !empty($m['juli'])}<span class="floR latecolor font13"><?php echo round($m['juli'],1);?>km</span>{/if}</div>
+            <div class="font13">{$m['address']}</div>
+        </div>
+        {if !empty($m['tel']) || !empty($m['lat'])}
+        <div class="ovfl msg">
+            {if !empty($m['tel'])}
+            {if $mobile==1}
+            <a href="tel:{$m['tel']}" class="floL txtAC tipDiv"><img class="phone" src="../addons/jy_signup_a/images/phone.png"/><span>电话</span></a>
+            {else}
+            <a href="javascript:void(0)" onclick="alert('门店联系电话:{$m["tel"]}')" class="floL txtAC tipDiv"><img class="phone" src="../addons/jy_signup_a/images/phone.png"/><span>电话</span></a>
+            {/if}
+            {/if}
+            <div class="floL lineDiv"></div>
+            {if !empty($m['lat'])}
+            <a href="http://api.map.baidu.com/marker?location={$m['lat']},{$m['lng']}&title={$m['address']}&content={$m['address']}&output=html&src=weiba|weiweb" class="floR txtAC tipDiv"><img class="ads" src="../addons/jy_signup_a/images/address.png"/><span>地址</span></a>
+            {/if}
+        </div>
+        {/if}
+    </div>
+    {/loop}
+    <!-- end -->
+</div>
+{template footer}
+
+ {if $weixin==1}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+    {php $signPackage=$_W['account']['jssdkconfig'];}
+    <script>
+
+        var appid = '{$_W['account']['jssdkconfig']['appId']}';
+        var timestamp = '{$_W['account']['jssdkconfig']['timestamp']}';
+        var nonceStr = '{$_W['account']['jssdkconfig']['nonceStr']}';
+        var signature = '{$_W['account']['jssdkconfig']['signature']}';
+
+        wx.config({
+            debug: false,
+            appId: appid,
+            timestamp: timestamp,
+            nonceStr: nonceStr,
+            signature: signature,
+            jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+        });
+
+
+        function showPhone(){
+            // alert("门店联系电话{$m['tel']}");
+        }
+    </script>
+    <script type="text/javascript">
+        var params = {
+            {if empty($sitem['sharetitle'])}
+            title: "活动管理!",
+            {else}
+            title: "{$sitem['sharetitle']}",
+            {/if}
+            {if empty($sitem['sharedesc'])}
+            desc: "活动管理!",
+            {else}
+            desc: "{$sitem['sharedesc']}",
+            {/if}
+            link: "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('index'),2)}",
+            {if empty($sitem['sharelogo'])}
+            imgUrl: "{$_W['siteroot']}addons/jy_signup_a/icon.jpg",
+            {else}
+            imgUrl: "{$_W['attachurl']}{$sitem['sharelogo']}",
+            {/if}
+        };
+        wx.ready(function () {
+            wx.showOptionMenu();
+            wx.onMenuShareAppMessage.call(this, params);
+            wx.onMenuShareTimeline.call(this, params);
+        });
+    </script>
+    {/if}
+</body>
+</html>

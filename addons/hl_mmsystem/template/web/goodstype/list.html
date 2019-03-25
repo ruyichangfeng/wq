@@ -1,0 +1,169 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品分类管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goodstype')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="col-sm-2">
+                    <a href="{php echo $this->createWebUrl('goodstype', array('op' => 'add'));}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i>添加商品分类</a>
+                    </div>
+                    <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="goodstype" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-2">
+                            <select name="ifIsPackage" class="form-control">
+                                <option value="3" {if $_GPC['ifIsPackage'] == 3 || empty($_GPC['ifSetStore'])}selected{/if}>请选择是否套餐分类</option>
+                                <option value="1" {if $_GPC['ifIsPackage'] == 1}selected{/if}>套餐分类</option>
+                                <option value="2" {if $_GPC['ifIsPackage'] == 2}selected{/if}>非套餐分类</option>
+                            </select>
+                        </div>
+                    <div class="col-sm-2">
+                        <select name="ifSetStore" class="form-control">
+                            <option value="3" {if $_GPC['ifSetStore'] == 3 || empty($_GPC['ifSetStore'])}selected{/if}>请选择是否店铺启用</option>
+                            <option value="1" {if $_GPC['ifSetStore'] == 1}selected{/if}>启用</option>
+                            <option value="2" {if $_GPC['ifSetStore'] == 2}selected{/if}>未启用</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keyword" placeholder="输入关键字"/>
+                            <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                        </div>
+                    </div>
+                    </form>
+
+
+
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th style="width:20px;">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"> </label>
+                                    </div>
+                                </th>
+                                <th>排序</th>
+                                <th>分类名称</th>
+                                <th>是否套餐</th>
+                                <th>是否店铺可用</th>
+                                <th>所属商家</th>
+                                <th>分类描述</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    {$item['gt_displayOrder']}
+                                </td>
+                                <td>{$item['gt_name']}</td><!--商品分类名称-->
+                                <td><input type="checkbox" name="status" data="{$item['gt_ifIsPackage']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['gt_ifIsPackage'] == 1 }checked="checked"{/if}></td>
+                                <td>{if $item['gt_ifSetStore']==1}<span class="badge badge-primary">启用</span>{else}<span class="badge badge-danger">未启用</span>{/if}</td><!--商品状态-->
+                                <td>{php echo util::getSetStoreName($item['store_id'])}</td>
+                                <td>{$item['gt_description']}</td>
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('goodstype', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('goodstype',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input name="token" type="hidden" value="{$_W['token']}"/>
+                                    <input type="submit" class="btn btn-danger btn-sm" name="pldelete" value="批量删除"/> &nbsp;
+
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var id = $this.attr('data-id');
+            var status = this.checked ? 1 : 2;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('goodstype')}",{id:id,status:status},function () {
+            })
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+
+</script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        {if intval($item['gt_ifSetStore'])==2}
+        $(document).ready(function(){
+            $(".kaiqi").hide();
+            $(".guanbi").show();
+        });
+
+        $(".guanbi").click(function(){
+            $(".kaiqi").show();
+            $(".guanbi").hide();
+        });
+        {else}
+        $(document).ready(function(){
+            $(".kaiqi").show();
+            $(".guanbi").hide();
+        });
+        $(".kaiqi").click(function(){
+            $(".kaiqi").hide();
+            $(".guanbi").show();
+        });
+        {/if}
+
+
+    });
+</script>
+
+{template 'web/common/footer'}

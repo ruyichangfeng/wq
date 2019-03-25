@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    {if $op == 'list'}
+    <style>
+    #articleCategory {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    #articleCategory input[name="orderNum"] {
+        width: 60px;
+        text-align: center;
+    }
+    #articleCategory .space{
+        display: inline-block;
+        width: 20px;
+    }
+    #articleCategory .pcategory{
+        text-align: left;
+        padding-left: 10px;
+    }
+    </style>
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">分类管理</a>
+        <a class="layui-btn layui-btn-normal right " style="margin-left:10px;" href="{php echo $this->createWebUrl('articleCategory', array('op'=>'add'))}">添加分类</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>分类列表</legend>
+        <div class="layui-field-box">
+            <blockquote class="layui-elem-quote layui-quote-nm" style="color: #666; font-size: 14px;line-height: 30px; display: none; position: relative;" id="createUrlBlock">生成文章分类url：<input type="text" style="border: 0;display: inline-block; width: 76%;background-color: #fff;" id="createUrl" disabled="disabled"> <div class="right" style="position: absolute; top: 15px; right: 15px; background-color: #fff; padding-left: 15px;"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm mr10" onclick="createUrl()" >复制</a> <input type="text" style="position: absolute;top: 0;left: 0;opacity: 0;z-index: -10;" id="copyUrl"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm" onclick="closeUrl()" id="closeUrl">关闭</a></div></blockquote>
+            <table class="layui-table" id="articleCategory" style="text-align: center;">
+                <colgroup>
+                    <col width="60">
+                    <col width="50">
+                    <col width="100">
+                    <col width="100">
+                    <col width="80">
+                    <col width="80">
+                    <col width="100">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>排序</th>
+                        <th>id</th>
+                        <th>名称</th>
+                        <th>父类名称</th>
+                        <th>修改时间</th>
+                        <th>生成url</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loop $listCategory $key $value}
+                    <tr>
+                        <td>
+                            <input type="number" name="orderNum" autocomplete="off" class="layui-input" value="{$value['rank']}" data-id="{$value['id']}">
+                        </td>
+                        <td>{$value['id']}</td>
+                        <td class="pcategory"><?php $str='';for($i=0;$i<$value['depth']-1;$i++){ $str .= '<span class="space">—</span>';}; echo $str;?>{$value['name']}</td>
+                        <td>{$value['pname']}</td>
+                        <td>{php echo date('Y-m-d H:i:s',$value['update_time'])}</td>
+                        <td><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary" onclick="showCreatUrl({$value['id']},{$value['pid']})">生成</a></td>
+                        <td><a href="{php echo $this->createWebUrl('articleCategory', array('op'=>'update','id'=>$value['id'],'storeid'=>$value['storeid']))}" class="layui-btn layui-btn-sm layui-btn-normal">修改</a><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-danger" onclick="deleteCategory({$value['id']})">删除</a></td>
+                    </tr>
+                    {/loop}
+                    {if count($listCategory) == 0}
+                    <tr><td colspan="7" style="color: red;text-align: center;line-height: 50px;font-weight: bold;">列表数据为空</td></tr>
+                    {/if}
+                </tbody>
+            </table>
+            <div class="btn-block">
+                <button class="layui-btn" id="categroyRank">排序</button>
+            </div>
+        </div>
+    </fieldset>
+    <script>
+    //layui
+    layui.use(['layer'], function() {
+        var layer = layui.layer;//弹层
+    });
+    //排序按钮
+    $('#categroyRank').on('click', function() {
+        if($('#articleCategory input[name="orderNum"]').length>0){
+            var idsArr = [],ranksArr = [];
+            $('#articleCategory input[name="orderNum"]').each(function(index, ele) {
+                idsArr.push($(ele).attr('data-id'));
+                ranksArr.push($(ele).val());
+            })
+
+            $.post('{php echo $this->createWebUrl("articleCategory", array("op"=>"rank"))}', {idsArr:idsArr,ranksArr:ranksArr}, function(data) {
+                if(data == true){
+                    layer.msg('分类排序成功', function() {
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('分类排序失败 '+data, function() {
+                        window.location.reload();
+                    });
+                }
+            })
+        }else{
+            layer.msg('分类列表为空,不支持排序');
+        }
+    })
+    //删除
+    function deleteCategory(id){
+        layer.confirm('您确定删除数据吗?', function() {
+            $.post('{php echo $this->createWebUrl("articleCategory", array("op"=>"delete"))}', {id:id}, function(data) {
+                if(data == true){
+                    layer.msg('删除分类成功', function() {
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('删除分类失败 '+data, function() {
+                        window.location.reload();
+                    });
+                }
+            })
+        });
+    }
+    //生成url
+    function showCreatUrl(id,pid){
+        if(pid){
+            var url = '{$_W["siteroot"]}app/index.php?i={$_W["uniacid"]}&c=entry&categoryLevelOneId='+pid+'&categoryLevelTwoId='+id+'&do=article&m=hy_supstore';
+        }else{
+            var url = '{$_W["siteroot"]}app/index.php?i={$_W["uniacid"]}&c=entry&categoryLevelOneId='+id+'&do=article&m=hy_supstore';
+        }
+        
+        $('#createUrl').val(url);
+        $('#createUrlBlock').show();
+    }
+    //复制url
+    function createUrl(){
+        var text = document.getElementById("createUrl").value;
+        var input = document.getElementById("copyUrl");
+        input.value = text; // 修改文本框的内容
+        input.select(); // 选中文本
+        document.execCommand("copy"); // 执行浏览器复制命令
+        layer.msg('复制成功');
+    }
+    //关闭url
+    function closeUrl(){
+        //关闭弹窗
+        $('#closeUrl').parent().parent().hide();
+    }
+    </script>
+    {elseif $op == 'update'}
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">修改分类</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>修改选项</legend>
+        <div class="layui-field-box">
+            <form class="layui-form" method="post" action="{php echo $this->createWebUrl('articleCategory', array('op'=>'update'))}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择父类:</label>
+                    <div class="layui-input-block">
+                        <div style="width: 60%;float: left; margin-right: 10px;">
+                            <select name="articleCategoryPid" lay-verify="required" lay-filter="selectPid">
+                                <option value="0" data-depth="0">文章基类</option>
+                                {loop $listCategory $key $value}
+                                {if $value['id'] != $row['id']}
+                                <option value="{$value['id']}" data-depth="{$value['depth']}" {if $row['pid'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                                {/if}
+                                {/loop}
+                            </select>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">父类不能大于二级分类</div>
+                    </div>
+                    <input name="articleCategoryDepth" type="hidden" value="{$row['depth']}">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类名称:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="articleCategoryName" required lay-verify="required" placeholder="请输入分类名称" autocomplete="off" class="layui-input" style="width: 60%" value="{$row['name']}">
+                    </div>
+                </div>
+                <input type="hidden" name="id" value="{$row['id']}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序:</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;" value="{$row['rank']}">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" value="提交">立即生成</button>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['form'], function() {
+        var form = layui.form;
+        //下拉框
+        form.render('select');
+        form.on('select(selectPid)', function(data){            
+            $('select[name="articleCategoryPid"] option').each(function(index,ele){
+                if($(ele).attr('value') == data.value){
+                    $('input[name="articleCategoryDepth"]').attr('value',Number($(ele).attr('data-depth'))+1);
+                }
+            })
+        });
+    });
+    </script>
+    {elseif $op == 'add'}
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">添加分类</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>添加选项</legend>
+        <div class="layui-field-box">
+            <form class="layui-form" method="post" action="{php echo $this->createWebUrl('articleCategory', array('op'=>'add'))}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">选择父类:</label>
+                    <div class="layui-input-block">
+                        <div style="width: 60%;float: left; margin-right: 10px;">
+                            <select name="articleCategoryPid" lay-verify="required" lay-filter="selectPid">
+                                <option value="0" data-depth="0">文章基类</option>
+                                {loop $listCategory $key $value}
+                                <option value="{$value['id']}" data-depth="{$value['depth']}"><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">父类不能大于二级分类</div>
+                    </div>
+                    <input type="hidden" name="articleCategoryDepth" value="1">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类名称:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="articleCategoryName" required lay-verify="required" placeholder="请输入分类名称" autocomplete="off" class="layui-input" style="width: 60%">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序:</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" value="提交">立即生成</button>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['form'], function() {
+        var form = layui.form;
+        //下拉框
+        form.render('select');
+        form.on('select(selectPid)', function(data){            
+            $('select[name="articleCategoryPid"] option').each(function(index,ele){
+                if($(ele).attr('value') == data.value){
+                    $('input[name="articleCategoryDepth"]').attr('value',Number($(ele).attr('data-depth'))+1);
+                }
+            })
+        });
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

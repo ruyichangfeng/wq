@@ -1,0 +1,205 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="{php echo $this->createWebUrl('festival', array('op'=>'display'));}">分类管理</a></li>
+    <li ><a href="{php echo $this->createWebUrl('festival', array('op'=>'create'));}">添加分类</a></li>
+</ul>
+<div class="main">
+<div class="panel panel-primary">
+            <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3  col-lg-2 control-label">类别标题</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" class="form-control" name="search[festival_title]" value="{$data['search']['festival_title']}" placeholder="可模糊查询"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+			<div class="panel-heading">分类管理</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive"style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:20%;">序号</th>
+                                <th style="width:20%;">类别标题</th>
+                                <th style="width:20%;">开启状态</th>
+                                <th style="width:40%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {php echo $i}
+								</td>
+                                <td>
+                                    {$item['festival_title']}
+								</td>
+                                <td>
+                                    {if $item['festival_state']==1}开启{else}关闭{/if}
+                                </td>
+                                <td>
+                                    <a  href="{php echo $this->createWebUrl('language', array('op'=>'create','festival_id'=>$item['festival_id'],'editsavelang'=>'fas_lang'));}" class="btn btn-primary">添加节日祝福语</a>
+                                    <a  href="{php echo $this->createWebUrl('language', array('op'=>'display','festival_id'=>$item['festival_id'],'search'=>'fas_lang'));}" class="btn btn-info">查看节日祝福语</a>
+                                    <a  href="{php echo $this->createWebUrl('festival', array('op'=>'create','festival_id'=>$item['festival_id']));}" class="btn btn-primary">编辑</a> 
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('festival', array('op'=>'delete','festival_id'=>$item['festival_id']));}" class="btn btn-danger">删除</a> 
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="6">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="6">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+				</div>
+			</div>
+		</div>
+</div>
+<div class="modal fade" id="myModal2{php echo $i }" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">编辑修改</h4>
+        </div>
+        <div class="modal-body">
+        <form action="" method="post" id="addForm1{php echo $i}" class="form-horizontal">
+               <div class="form-group">
+                    <div >
+                        <label  class="col-sm-2 control-label"><span class="formx">*</span>节日标题</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="festival[festival_title]" id="festival_title" value="" class="form-control limited" maxlength="10">
+                        </div>
+                        <!-- <div class="col-sm-2"></div> -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="data_titleDIV">
+                        <label for="data_title" class="col-sm-2 control-label"><span class="formx"></span>节日简述</label>
+                        <div class="col-sm-10">
+                            <textarea name="festival[festival_description]" id="festival_description" cols="30" class="form-control limited"></textarea>
+                        </div>   
+                        <!-- <div class="col-sm-2"></div> -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="data_introductionDIV">
+                        <label for="data_introduction" class="col-sm-2 control-label">开启状态</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                              <input type="radio" name="festival[festival_state]" id="inlineRadio1" value="1" > 开启
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" name="festival[festival_state]" id="inlineRadio2" value="2" > 关闭
+                            </label>
+                        </div>  
+                        <!-- <div class="col-sm-2"></div> -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="data_orderDIV">
+                        <label for="data_order" class="col-sm-2 control-label"><span class="formx">*</span>排序</label>
+                        <div class="col-sm-10">
+                            <input type="number" id="data_order" name="festival[festival_order]" id="festival_order" value="{$festival['festival_order']}" class="form-control" maxlength="10" oninput="if(value.length>4)value=value.slice(0,4)">
+                        </div>   
+                        <!-- <div class="col-sm-2"></div> -->
+                    </div>
+                </div>
+            <div class="modal-footer">
+                <input type="hidden" name="festival_id" id="festival_id" value="{$festival['festival_id']}">
+                 <button type="button" class="btn btn-success" data-dismiss="modal" onclick="addsave({php echo $i})">保存</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#product_state_0").attr("checked",'checked');
+}
+require(['jquery', 'util'], function($, util){
+    $(function(){
+        $('#form').submit(function(){
+            return true;
+        });
+    });
+});
+
+function addsave(i)
+{
+    $.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxfestivaldes');}",
+        data:$('#addForm1'+i).serialize(),
+        dataType:"json",
+        async:false,
+        success:function(data){
+            if(data.result=='success')
+            {
+                util.message('修改成功');
+            }else{
+                util.message('修改失败');
+            }
+        }
+    });  
+}
+function editsave(fid)
+{
+    $.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxfestivallist');}",
+        data:{'festival_id':fid},
+        dataType:"json",
+        async:false,
+        success:function(data){
+            if(data.result=='success')
+            {
+                
+
+            }else{
+                util.message('未找到节日信息');
+            }
+        }
+    });  
+}
+
+</script>
+{template 'common/footer'}

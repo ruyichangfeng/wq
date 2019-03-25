@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('msgsend')}">模板消息发送</a>
+        <!--a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('msgsend', array('op' => 'post'))}">添加模板消息</a-->
+    </div>
+    <style>
+    .layui-btn {
+        margin: 0 0 5px 0 !important;
+    }
+    .layui-form-item{
+        margin-bottom: 0;
+    }
+    </style>
+    {if $op=='list'}
+    <fieldset class="layui-elem-field">
+        <legend>注意事项</legend>
+        <div class="layui-field-box">
+            <p>请将公众平台模板消息所在行业选择为：<b>IT科技/互联网|电子商务&nbsp;&nbsp;&nbsp;其他/其他</b>，所选行业不一致将会导致模板消息不可用。</p>
+            <p>{if $primary_industry}您的公众平台模板消息目前所属行业为：<b>{$primary_industry['first_class']}/{$primary_industry['second_class']}&nbsp;&nbsp;&nbsp;{$secondary_industry['first_class']}/{$secondary_industry['second_class']}&nbsp;&nbsp;&nbsp;</b>{else}您尚未设置行业，请登录公众平台将行业设置为：<b>IT科技/互联网|电子商务&nbsp;&nbsp;&nbsp;其他/其他</b>{/if}</p>
+        </div>
+    </fieldset>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th width="100">模板名称</th>
+                <th>模板格式</th>
+                <th>模板示例</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $v}
+            <tr>
+                <td style="text-align:center">
+                    {$v["template_id_short"]}
+                    <br> {$v["title"]}
+                </td>
+                <td>{$v["content"]}</td>
+                <td>{$v["example"]}</td>
+                <td style="text-align:center">
+                    {if $v["template_id_short"]}
+                    <a class="layui-btn layui-btn-sm  layui-btn-warm" href="{php echo $this->createWebUrl('msgsend', array('op' =>'set','id' => $v['id']))}">设置</a> {/if}
+                </td>
+            </tr>
+            {/loop} {if empty($list)}
+            <tr>
+                <td colspan="20" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+    {elseif $op=='set'}
+        {if $item['template_id_short']== "TM00006" }
+        <fieldset class="layui-elem-field">
+            <legend>参数设置</legend>
+            <div class="layui-field-box">
+                <form action="" method="post" id="form1" class="layui-form " enctype="multipart/form-data">
+                    <input type="hidden" name="id" value="{$item['id']}" />
+                    <div class="layui-form-item" style="margin-bottom: 10px;">
+                        <label class="layui-form-label">功能</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-input" style="margin-bottom: 0!important;">{$item['title']}</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="margin-bottom: 10px;">
+                        <label class="layui-form-label">模板名称</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-input" style="margin-bottom: 0!important;">{$item['template_id_short']}</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板格式</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-form-mid layui-word-aux" style="color: #666!important;">
+                                <green>{{first.DATA}}</green>
+                                <br> {{accountType.DATA}}：{{account.DATA}}
+                                <br> 充值金额：{{amount.DATA}}
+                                <br> 充值状态：{{result.DATA}}
+                                <br> <green>{{remark.DATA}}</green>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板样例</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-form-mid layui-word-aux" style="color: #666!important;">
+                                <green>您好，您已充值成功。</green>
+                                <br> 充值赠送：赠送金额30元 固定积分30个 满100减5 优惠券 1 张
+                                <br> 充值金额：50元
+                                <br> 充值状态：充值成功
+                                <br> <green>备注：如有疑问，请致电13912345678联系我们。</green>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-form-mid layui-word-aux" style="color:red !important;">
+                            请您对照微信公众平台模板消息示例,上方模板标绿部分可以修改内容,其余自动生成
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板template_id</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <input type="text" name="template_id" required lay-verify="required" placeholder="请输入模板template_id" autocomplete="off" class="layui-input" value="{$item['template_id']}" style="margin-bottom: 0!important;">
+                            <div class="layui-form-mid layui-word-aux" style="color:red !important;">不同的微信公众号的template_id值不同,如不相同请自行修改</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="margin-bottom: 15px;">
+                        <label class="layui-form-label">模板{{first.DATA}}</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <input type="text" name="first" required lay-verify="required" placeholder="请输入模板头部" autocomplete="off" class="layui-input" value="{if $item['data']['first']}{$item['data']['first']}{else}您好，您已充值成功。{/if}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="margin-bottom: 15px;">
+                        <label class="layui-form-label">模板{{remark.DATA}}</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <input type="text" name="remark" placeholder="请输入模板备注" autocomplete="off" class="layui-input" value="{$item['data']['remark']}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板消息跳转url</label>
+                        <div class="layui-input-inline" style="width: 500px;">
+                            <input type="text" name="url" required="" lay-verify="required" placeholder="请输入模板消息跳转url" autocomplete="off" class="layui-input" value="{php echo $_W['siteroot'].'app/index.php?i='.$_W['uniacid'].'&c=entry&m=hy_supstore&do=IndexMob';}" style="margin-bottom: 0!important;">
+                            <div class="layui-form-mid layui-word-aux" style="color:red !important;">默认跳转到微信端主页</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="submit" class="layui-btn" name="submit" value="提交">立即提交</button>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        {elseif $item['template_id_short']== "TM00005"}
+        <fieldset class="layui-elem-field">
+            <legend>参数设置</legend>
+            <div class="layui-field-box">
+                <form action="" method="post" id="form1" class="layui-form " enctype="multipart/form-data">
+                    <input type="hidden" name="id" value="{$item['id']}" />
+                    <div class="layui-form-item" style="margin-bottom: 10px;">
+                        <label class="layui-form-label">功能</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-input" style="margin-bottom: 0!important;">{$item['title']}</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="margin-bottom: 10px;">
+                        <label class="layui-form-label">模板名称</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-input" style="margin-bottom: 0!important;">{$item['template_id_short']}</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板格式</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-form-mid layui-word-aux" style="color: #666!important;">
+                                您好，您已成功消费。
+                                <br> {{productType.DATA}}：{{name.DATA}}
+                                <br> 消费时间：{{time.DATA}}
+                                <br> <green>{{remark.DATA}}</green>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板样例</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <div class="layui-form-mid layui-word-aux" style="color: #666!important;">
+                                您好，您已成功消费。
+                                <br> 消费金额：100元
+                                <br> 消费时间：2018年1月1日
+                                <br> <green>备注：如有疑问，请致电13912345678联系我们。</green>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-form-mid layui-word-aux" style="color:red !important;">
+                            请您对照微信公众平台模板消息示例,上方模板标绿部分可以修改内容,其余自动生成
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板template_id</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <input type="text" name="template_id" required lay-verify="required" placeholder="请输入模板template_id" autocomplete="off" class="layui-input" value="{$item['template_id']}" style="margin-bottom: 0!important;">
+                            <div class="layui-form-mid layui-word-aux" style="color:red !important;">不同的微信公众号的template_id值不同,如不相同请自行修改</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="margin-bottom: 15px;">
+                        <label class="layui-form-label">模板{{remark.DATA}}</label>
+                        <div class="layui-input-inline" style="width: 400px;">
+                            <input type="text" name="remark" placeholder="请输入模板备注" autocomplete="off" class="layui-input" value="{$item['data']['remark']}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板消息跳转url</label>
+                        <div class="layui-input-inline" style="width: 500px;">
+                            <input type="text" name="url" required="" lay-verify="required" placeholder="请输入模板消息跳转url" autocomplete="off" class="layui-input" value="{php echo $_W['siteroot'].'app/index.php?i='.$_W['uniacid'].'&c=entry&m=hy_supstore&do=IndexMob';}" style="margin-bottom: 0!important;">
+                            <div class="layui-form-mid layui-word-aux" style="color:red !important;">默认跳转到微信端主页</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="submit" class="layui-btn" name="submit" value="提交">立即提交</button>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        {/if}
+    {/if}
+</body>
+
+</html>

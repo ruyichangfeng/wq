@@ -1,0 +1,220 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('public/header', TEMPLATE_INCLUDEPATH)) : (include template('public/header', TEMPLATE_INCLUDEPATH));?>
+
+<body>
+	<!--加载进度开始-->
+    <div id="pageLoader" class="weui_loading_toast">
+       <div class="weui_mask_transparent"></div>
+       <div class="weui_toast">
+           <div class="weui_loading">
+               <!-- :) -->
+               <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+           </div>
+           <p class="weui_toast_content">数据加载中</p>
+       </div>
+    </div>
+    <!--加载进度结束-->
+    
+<div class="ub ub-ver bga page" id="page0">
+	<!--pc端头部--> 
+
+	<div class="ub ub-pc ub-ac c-wh t-wh ub-ver uinn8 ub-img1" style="background-image:url(<?php echo MODULE_URL;?>static/images/u-rate-bg.jpg)">
+  		<div class="uc-a50 ub ub-ac ub-pc tx-c rod-imgbox2 uba2 b-wh50 imgbox ub-img1 us1">
+  			<?php  if($headurl != '') { ?>
+  				<img src="<?php  echo $headurl;?>" width="200" height="200" class="rod-imgbox2 uc-a50">
+  			<?php  } ?>
+  		</div>
+  		<div class="tx-c ulev-3 umar-t"><?php  echo $nickname;?></div>
+  		<div class="tx-c ulev-4 umar-t">评价<?php  echo $count;?>条</div>
+	</div>
+ 	
+  	<!--评价列表-->
+  	<div class="order_list_box">
+  		<ul id="show" class="ub-f1 ub-ver">
+  			<!--循环开始-->
+  				
+  			<!--循环结束-->
+  		</ul>
+  		
+  		<div id="more" style="display:none;">
+		    <div class="ub ub-pc uc-a1 ub-f1 btnn" onClick="getMore()" style="margin-bottom:0.5em; height:2em; line-height:2em;" type="submit"><span class="ulev0 tx-c">点击加载更多</span>
+		    </div>
+		</div>	
+  </div>
+  
+  <div class="hbt"></div>
+  <!--手机端底部-->
+  <?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('footer', TEMPLATE_INCLUDEPATH)) : (include template('footer', TEMPLATE_INCLUDEPATH));?>
+  <!--手机端底部-->
+  
+   
+</div>
+<?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('public/footerjs', TEMPLATE_INCLUDEPATH)) : (include template('public/footerjs', TEMPLATE_INCLUDEPATH));?>
+<script type="text/javascript" src="<?php echo MODULE_URL;?>static/js/baidutmp.js"></script>
+
+<script id='near' type="text/template">
+	<!-- 模板部分 -->
+	<%if(json != 0){%>
+		<%for(var i=0;i<json.length;i++){%>
+			<li class="ub-fl ubb ubt b-bla01 uinn ub-ver ubb umar-t c-wh">
+  				<a class="ub-fl ub ubb b-gra5 block ub-ac ub-pc" href="<%=json[i].url%>">
+  					<div class="ub t-gra ulev-4 uinn3 ub-f1">
+
+    					<div class="rod-imgbox3 ub-img1 imgbox uba b-gra5 umar-r uc-a50 ub ub-ac ub-pc tx-c">
+    						<%if(json[i].avatar != ''){%>
+                  <img src="<%=json[i].avatar%>" width="200" height="200" class="rod-imgbox2 uc-a50">
+							  <%}%>
+   						</div>
+   						<span class="block-in" style="padding-top:0.4rem"><%=json[i].staff_name%></span>
+ 					</div>
+    				<div class="ub">
+    					<%if(json[i].xing == 1){%>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>	
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-chevron-right t-gra ulev1"></i>
+              <%}%>
+    					<%if(json[i].xing == 2){%>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-chevron-right t-gra ulev1"></i>
+              <%}%>
+    					<%if(json[i].xing == 3){%>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-chevron-right t-gra ulev1"></i>
+              <%}%>
+    					<%if(json[i].xing == 4){%>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-dgra"></i>
+              <i class="iconfont icon-chevron-right t-gra ulev1"></i>
+              <%}%>
+    					<%if(json[i].xing == 5){%>
+    					<i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-wujiaoxing ulev-1 t-org"></i>
+              <i class="iconfont icon-chevron-right t-gra ulev1"></i>
+              <%}%>
+    				</div>
+  				</a>
+  				<div class="ub-f1 uinn ulev0">
+  					<%if(json[i].comment == ''){%>
+  						他很懒，什么都没评价！
+  					<%}else{%>
+  						<%=json[i].comment%>
+  					<%}%>
+  				</div>
+  				<div class="ub-fl uinn ulev-4 ub-ac ub-pc ub">
+  					<div class=" t-dgra ub-f1"><%=json[i].addtime%></div>
+  					<div class="ub">
+  						<a href="<%=json[i].url%>" class="block-in umar-r a1">
+  							<i class="iconfont icon-fenxiang ulev1"></i>
+  						</a>
+  						<!--
+  						<a onClick="openPe(1)" class="block-in a1">
+  							<i class="iconfont icon-gengduo ulev1"></i>
+  						</a>-->
+  					</div>
+  				</div>
+  			</li>
+		<%}%>
+	<%}else{%>
+        <!--无记录-->
+        <div class="weui_msg">
+    		<div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div>
+    		<div class="weui_text_area">
+      			<h2 class="weui_msg_title">暂无评价</h2>
+    		</div>
+        </div>
+  		<!--无记录-->
+    <%}%>    
+    <!-- 模板结束 -->
+</script>
+
+<script type="text/javascript">
+//进页面加载数据
+$(document).ready(function(){  
+	getInit();
+}); 
+
+
+var forumPage = 1;
+function getInit(){
+	forumPage = 1;
+	var data = {};
+  data['forumPage'] = forumPage;
+	$.ajax({
+		url: "<?php  echo $this->createMobileUrl('myinfo', array('foo'=>'getmycomment'));?>",
+		type:"POST",
+		data: data,
+		dataType:"json",
+		success: function(res){
+			if(res == 0){
+				document.getElementById('pageLoader').style.display = 'none';
+				document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无评论</h2></div></div>';
+			}else{
+				var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        document.getElementById('show').innerHTML = near;
+        document.getElementById('pageLoader').style.display = 'none';
+				if(json.length == 5){
+					document.getElementById('more').style.display = "block";  
+				}
+			}
+		}
+	});
+}
+
+function getMore(){
+	forumPage = forumPage + 1;
+    
+	var data = {};
+  data['forumPage'] = forumPage;
+	
+	$.ajax({
+		url: "<?php  echo $this->createMobileUrl('myinfo', array('foo'=>'getmycomment'));?>",
+		type:"POST",
+		data: data,
+		dataType:"json",
+		success: function(res){
+			if(res == "0"){
+				document.getElementById('more').innerHTML = '已无数据';
+			}else{
+				var json = eval(res);
+				var near = baidu.template("near",{json:json});
+                $("#show").append(near); 
+				if(json.length<5){
+					document.getElementById('more').innerHTML = "<div class='tx-c'>已无数据</div>";  
+				}else{
+					document.getElementById('more').style.display = "block";  
+				}
+			}
+		}
+	});
+}
+</script>
+<script>;</script><script type="text/javascript" src="http://simplife.cc/app/index.php?i=14&c=utility&a=visit&do=showjs&m=xm_gohome"></script></body>
+</html>

@@ -1,0 +1,246 @@
+{template 'public/header'}
+{template 'public/comhead'}
+{if $operation == 'display'}
+<div class="main">
+    <style>
+        .form-control-excel {
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+    </style>
+    <div class="panel panel-info">
+        <div class="panel-heading">闲书管理</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="fk_cs" />
+                <input type="hidden" name="do" value="book" />
+                <input type="hidden" name="schoolid" value="{$schoolid}" />
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width: 100px;">关键字</label>
+                    <div class="col-sm-2 col-lg-2">
+                        <input class="form-control" name="keyword" id="" type="text" value="{$_GPC['keyword']}">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">按类别</label>
+                    <div class="col-sm-2 col-lg-2">
+                        <select style="margin-right:15px;" name="lb_id" class="form-control">
+                            <option value="0">请选择类别搜索</option>
+                            {loop $book_lb $row}
+                            <option value="{$row['sid']}" {if $row['sid'] == $_GPC['lb_id']} selected="selected"{/if}>{$row['sname']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">按年龄</label>
+                    <div class="col-sm-2 col-lg-2">
+                        <select style="margin-right:15px;" name="lb_id" class="form-control">
+                            <option value="0">请选择年龄搜索</option>
+                            {loop $book_age $row}
+                            <option value="{$row['sid']}" {if $row['sid'] == $_GPC['lb_id']} selected="selected"{/if}>{$row['sname']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                    <div class="col-sm-2 col-lg-2">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="panel panel-default file-container" style="display:none;">
+        <div class="panel-body">
+            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                <input type="hidden" name="leadExcel" value="true">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="fk_cs" />
+                <input type="hidden" name="do" value="UploadExcel" />
+                <input type="hidden" name="ac" value="book" />
+                <input type="hidden" name="schoolid" value="{$schoolid}" />
+                <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
+                <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;" onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
+                <!--<input type="file" class=" pull-left btn-primary span3" name="inputExcel">-->
+                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
+                <a class="btn btn-primary" href="../addons/fk_cs/public/example/example_book.xls">下载导入模板</a>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body">
+            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+                <input type="hidden" name="schoolid" value="{$schoolid}" />
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th class='with-checkbox' style="width: 2%;"><input type="checkbox" class="check_all" /></th>
+                        <th style="width:10%;">ID</th>
+                        <th style="width:10%">书名</th>
+                        <th style="width:15%;">作者</th>
+                        <th style="width:15%;">价格</th>
+                        <th style="width:15%;">出版社 </th>
+                        <th style="width:15%;">类别</th>
+                        <th style="width:15%;">适合年龄</th>
+                        <th style="text-align:right; width:8%;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {loop $list $item}
+                    <tr>
+                        <td class="with-checkbox"><input type="checkbox" name="check" value="{$item['id']}"></td>
+                        <td style ="color:red;><div class="type-parent"><h5>{$item['id']}</h5></div></td>
+                        <td>
+                            {$item['title']}
+                        </td>
+                        <td>
+                            {$item['author']}
+                        </td>
+                        <td>
+                            {$item['price']}
+                        </td>
+                        <td>
+                            {$item['publisher']}
+                        </td>
+                        <td>
+                            {$book_lb[$item['cat_id']]['sname']}
+                        </td>
+                        <td>
+                            {$book_age[$item['age_id']]['sname']}
+                        </td>
+                        <td style="text-align:right;">
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('book', array('id' => $item['id'], 'op' => 'post', 'schoolid' => $schoolid))}" title="编辑"><i class="fa fa-pencil"></i></a>
+                        </td>
+             </tr>
+        {/loop}
+        </tbody>
+        <tr>
+            <td colspan="10">
+                <input name="token" type="hidden" value="{$_W['token']}" />
+            </td>
+        </tr>
+        </table>
+        {$pager}
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    <!--
+    var category = {php echo json_encode($children)};
+    //-->
+    $(function(){
+        $(".check_all").click(function(){
+            var checked = $(this).get(0).checked;
+            $("input[type=checkbox]").attr("checked",checked);
+        });
+
+        $("input[name=btndeleteall]").click(function(){
+            var check = $("input[type=checkbox][class!=check_all]:checked");
+            if(check.length < 1){
+                alert('请选择要删除的教师!');
+                return false;
+            }
+            if(confirm("确认要删除选择的教师?")){
+                var id = new Array();
+                check.each(function(i){
+                    id[i] = $(this).val();
+                });
+                var url = "{php echo $this->createWebUrl('book', array('op' => 'deleteall','schoolid' => $schoolid))}";
+                $.post(
+                        url,
+                        {idArr:id},
+                        function(data){
+                            if(data.result){
+                                alert(data.msg);
+                                location.reload();
+                            }else{
+                                alert(data.msg);
+                            }
+                        },'json'
+                );
+            }
+        });
+
+    });
+</script>
+{elseif $operation == 'post'}
+<div class="panel panel-info">
+    <div class="panel-heading"><a class="btn btn-primary" onclick="javascript :history.back(-1);"><i class="fa fa-tasks"></i> 返回列表</a></div>
+</div>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$item['id']}" />
+        <input type="hidden" name="schoolid" value="{$schoolid}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                编辑闲书详情
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">书名</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input type="text"  class="form-control" value="{$item['title']}" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">作者</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{$item['author']}" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">出版社</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input type="text"  class="form-control" value="{$item['publisher']}" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">类别</label>
+                    <div  class="col-sm-3 col-lg-3">
+                        <select style="margin-right:15px;" name="lb_id" class="form-control">
+                            <option value="0">请选择类别</option>
+                            {loop $book_lb $it}
+                            <option value="{$it['sid']}" {if $it['sid'] == $item['cat_id']} selected="selected"{/if}>{$it['sname']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">适合年龄</label>
+                    <div  class="col-sm-3 col-lg-3">
+                        <select style="margin-right:15px;" name="age_id" class="form-control">
+                            <option value="0">请选择年龄</option>
+                            {loop $book_age $it}
+                            <option value="{$it['sid']}" {if $it['sid'] == $item['age_id']} selected="selected"{/if}>{$it['sname']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+{/if}
+{template 'common/footer'}

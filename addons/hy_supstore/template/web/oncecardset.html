@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+    <style>
+    @media screen and (max-width:740px) {
+        .layui-form-mid{
+            margin-left: 150px !important;
+        }
+    }
+    </style>
+</head>
+
+<body class="layui-layout-body" style="overflow: auto;">
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('oncecardset')}">次卡设置</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>参数设置</legend>
+        <div class="layui-field-box">
+            <form action="" method="post" id="form1" class="layui-form " enctype="multipart/form-data">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 是否开启次卡 </label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="isopenoncecard" lay-filter="isopenoncecard" id="isopenoncecard" value="1" {if $item[ 'isopenoncecard']==1 }checked="checked" {/if} lay-skin="primary" title="是">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux oncecardtip"></div>
+                </div>
+                <div class="layui-form-item oncecardtitle">
+                    <label class="layui-form-label">次卡导航名称</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <input class="layui-input" type="text" name="oncecardtitle" id="oncecardtitle" value="{$item['oncecardtitle']}" placeholder="次卡管理">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">不填写则为默认值</div>
+                </div>
+                <div class="layui-form-item oncecardimg">
+                    <label class="layui-form-label">次卡背景</label>
+                    <div class="layui-input-inline" style="width: 400px;">
+                        <div class="layui-upload">
+                            <button type="button" class="layui-btn" id="test1">上传图片</button>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">尺寸：900*569，大小：4M</div>
+                        <div class="layui-upload-list">
+                            <img src="{if $item['oncecardimg']}{php echo $item['oncecardimg']}{else}./resource/images/nopic.jpg{/if}" style="width:400px; max-height:400px;" class="layui-upload-img" id="demo1">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="oncecardimg" id="oncecardimg" value="{$item['oncecardimg']}" />
+                <div class="layui-form-item" class="clear:none;">
+                    <div class="layui-input-block">
+                        <button type="submit" class="layui-btn" name="submit" value="提交">立即提交</button>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    var $isopenoncecard = "{$item['isopenoncecard']}";
+    if ($isopenoncecard == 1) {
+        $('.oncecardtitle').show();
+        $('.oncecardimg').show();
+    } else {
+        // $('.oncecardtitle').hide();
+        // $('.oncecardimg').hide();
+    }
+
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            upload = layui.upload,
+            layer = layui.layer //弹层
+            ,
+            element = layui.element; //元素操作
+
+        //次卡背景上传
+        var uploadInst = upload.render({
+            elem: '#test1',
+            url: './index.php?c=utility&a=file&do=upload',
+            size: 4096 //限制文件大小，单位 KB
+                ,
+            done: function(res) {
+                $('#oncecardimg').val(res.url);
+                $('#demo1').attr('src', res.url);
+                //上传成功
+
+                //如果上传失败
+            }
+        });
+
+
+        form.on('checkbox(isopenoncecard)', function(data) {
+            if (data.elem.checked) {
+                $('.oncecardtitle').show();
+                $('.oncecardimg').show();
+                $('.oncecardtip').html("");
+            } else {
+                $('.oncecardtitle').hide();
+                $('.oncecardimg').hide();
+                $('.oncecardtip').html("关闭次卡功能时，请删除储值规则中的次卡内容");
+
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>

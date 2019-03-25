@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="google-site-verification" content="DVVM1p1HEm8vE1wVOQ9UjcKP--pNAsg_pleTU5TkFaM">
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>闲书结算</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<div class="page">
+    <div class="weui-cells__title" style="z-index: 10000;position: fixed;width: 90%;background-color: #1071b7;margin-top: 0;color: #FFF;">
+        <span>闲书车</span>
+        <a href="./index.php?i=9&c=entry&do=index&m=jing_cash&schoolid={$schoolid}" style="float: right;font-size: 15px;color: #333;background-color: #dd8a37">临时提额</a>
+    </div>
+    <div class="weui-cells weui-cells_checkbox" id="books_box" style="padding-top: 20px;">
+    {loop $books $item}
+    <label class="weui-cell weui-check__label" for="{$item['id']}">
+        <div class="weui-cell__hd" >
+            <input type="checkbox" class="weui-check" name="bookids" id="{$item['id']}" value="{$item['id']}" checked="checked" onclick="choose(this,{$item['price']});">
+            <i class="weui-icon-checked"></i>
+        </div>
+        <div class="weui-panel__bd">
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="{php echo tomedia($item['images_medium']);}" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{$item['title']}</h4>
+                    <p class="weui-media-box__desc">{$item['author']}</p>
+                    <p class="weui-media-box__desc">
+                        <span>原价：{$item['price']}</span>
+                        <span>闲书币：{$item['price']}</span>
+                    </p>
+                </div>
+            </a>
+        </div>
+    </label>
+    {/loop}
+</div>
+    <div class="weui-form-preview">
+    <div class="weui-form-preview__hd">
+        <label class="weui-form-preview__label">订书总额(闲书币)</label>
+        <em class="weui-form-preview__value" id="showChooseAmount">{$chooseAmount}元</em>
+        <input type="hidden" id="chooseAmount" name="chooseAmount" value="{$chooseAmount}">
+    </div>
+    <div class="weui-form-preview__hd">
+        <label class="weui-form-preview__label">我的闲书币余额</label>
+        <em class="weui-form-preview__value">{$balance}元</em>
+        <input type="hidden" id="balance" name="balance" value="{$balance}">
+    </div>
+    <div class="weui-form-preview__ft" style="background-color: #dd8a37;font-size: 15px;">
+        {if $orderId != null && $orderType == 'transfer' && $order['openid'] != $openid}
+        <a  class="weui-form-preview__btn weui-form-preview__btn_default" onclick="jiesuan('transfer');" href="#">互换</a>
+        {else}
+        <!--<a class="weui-form-preview__btn weui-form-preview__btn_default" href="{php echo $this->createMobileUrl('bookpay',array('schoolid'=> $schoolid))}">临时调额</a>-->
+        <!--<a class="weui-form-preview__btn weui-form-preview__btn_default" onclick="showPanel('panel')" href="#">申请互换</a>-->
+        <a class="weui-form-preview__btn weui-form-preview__btn_default" onclick="jiesuan('borrow');" href="#">闲书币结算</a>
+        {/if}
+    </div>
+        <div class="js_dialog" id="panel" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog" style="width: 95%">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">温馨提示</strong>
+                </div>
+                <div class="weui-dialog__bd" id='panel_title' style="font-size: 14px;text-align: left;">
+                    
+                </div>
+                <!--<div class="weui-dialog__bd" style="font-size: 14px;text-align: left;">-->
+                    <!--①当对方的回选金额≥您的首发金额,差额部分由对方匹配,被锁闲书币全额释放,并增记您的余额-->
+                <!--</div>-->
+                <!--<div class="weui-dialog__bd" style="font-size: 14px;text-align: left;">-->
+                    <!--②当对方的回选金额＜您的首发金额,差额部分由您匹配,被锁闲书币扣除匹配部分手释放-->
+                <!--</div>-->
+                <div class="weui-dialog__ft">
+                    <a onclick="jiesuan('transfer');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">继续</a>
+                    <a onclick="hidePanel('panel');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">取消</a>
+                    <!--<a onclick="jiesuan('borrow');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">转余额支付</a>-->
+                </div>
+            </div>
+        </div>
+        <div class="js_dialog" id="panel1" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog" style="width: 95%">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">温馨提示</strong>
+                </div>
+                <div class="weui-dialog__bd">
+                您的余额不足哦!
+                </div>
+                <div class="weui-dialog__ft">
+                    <a href="./index.php?i=9&c=entry&do=index&m=jing_cash&schoolid={$schoolid}" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">临时提额</a>
+                    <a onclick="hidePanel('panel1');" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">关闭</a>
+                </div>
+            </div>
+        </div>
+</div>
+
+    <!--<div class="page__hd">-->
+        <!--<div class="weui-panel weui-panel_access">-->
+            <!--<div class="weui-panel__bd">-->
+                <!--<a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">-->
+                    <!--<div class="weui-media-box__bd">-->
+                        <!--<h4 class="weui-media-box__title">结算说明</h4>-->
+                        <!--<p class="page__desc">1、余额支付:适用于闲书币充足用户，可快速获取所选的书。</p>-->
+                        <!--<p class="page__desc">2、申请互换:等价易书,差额自动调剂双方闲书币账户，有一定匹配难度。</p>-->
+                        <!--<p class="page__desc">3、用户点击"临时提额",通过押金方式快速增加余额。</p>-->
+                    <!--</div>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+
+</div>
+</body>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    var userid =  $("#userid").val();
+    var oss = 'http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/';
+    //闲书结算
+    function jiesuan(type){
+        var hasPanel = $("#panel").css('display');
+        var hasPanel1 = $("#panel1").css('display');
+        if(hasPanel == 'block'){
+                hidePanel('panel');
+        }
+        if(hasPanel1 == 'block'){
+            hidePanel('panel1');
+        }
+        var book_ids = new Array();
+        $("#books_box :checked").each(function(index){
+            book_ids.push($(this).val());
+        });
+        if(book_ids.length <=0 ){
+            Weui.alert('请至少选择一本书!');
+            return;
+        }
+        //判断是否可以借书
+        var balance = $("#balance").val()*1;
+        var chooseAmount = $("#chooseAmount").val()*1;
+        var is_accept_exchange;
+        if(type == 'borrow'){
+            is_accept_exchange = 1;
+        }else{
+            is_accept_exchange = 2;
+        }
+        if(is_accept_exchange == 1){
+            if(balance < chooseAmount){
+                $("#panel1").show();
+                return false;
+            }
+        }
+        var submitData = {
+            schoolid    : "{$schoolid}",
+            weid        : "{$_W['uniacid']}",
+            openid      : "{$openid}",
+            bookownerid : "{$ownerOpenId}",
+            price       : $("#chooseAmount").val(),
+            bookIds     : book_ids.join(','),
+            is_accept_exchange : is_accept_exchange,
+            orderId     : "{$orderId}",
+            orderType   : "{$orderType}"
+        };
+        Weui.confirm({"title":"确定结算?","content":'',"cancelCallback":function(e){},"sureCallback":function(e){
+            $.post("{php echo $this->createMobileUrl('mybookorder',array('op'=>'jiesuan'))}",submitData,function(data){
+                if(data.result){
+//                    Weui.alert(data.msg);
+                    if(is_accept_exchange == 1){
+                        window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid,'op' => 'borrow_in','orderType' => 'borrow'), true)}";
+                    }else{
+                        window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid,'op' => 'transfer','orderType' => 'transfer'), true)}";
+                    }
+                }else{
+                    Weui.alert(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    function choose(obj,price){
+        var currentAmount = $("#chooseAmount").val();
+        if(obj.checked == false){
+            var newAmount = (currentAmount*1-price*1).toFixed(2);
+        }else{
+            var newAmount = (currentAmount*1+price*1).toFixed(2);
+        }
+        $("#chooseAmount").val(newAmount);
+        document.getElementById("showChooseAmount").innerHTML = "￥"+newAmount.toString();
+    }
+
+    function showPanel(id) {
+        $("#"+id).show();
+        var balance = "{$balance}";
+        var chooseAmount = $("#chooseAmount").val();
+
+        if(Number(balance) < Number(chooseAmount)){
+            document.getElementById('panel_title').innerHTML = '为了配合互换订单的等价匹配,您的账户余额将暂时锁住'+balance+'闲书币,订单完成后，被锁闲书币根据实际订单情况释放。';
+        }else{
+            document.getElementById('panel_title').innerHTML = '为了配合互换订单的等价匹配,您的账户余额将暂时锁住'+$("#chooseAmount").val()+'闲书币,订单完成后，被锁闲书币根据实际订单情况释放。';
+        }
+    }
+    function hidePanel(id){
+        $("#"+id).hide();
+    }
+</script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+</html>

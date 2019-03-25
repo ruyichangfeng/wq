@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1,user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>购物车</title>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/reset.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/iconfont/iconfont.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/jquery-weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/common.css"/>
+	{php echo register_jssdk(false);}
+	<script>
+        var deviceWidth = document.documentElement.clientWidth;
+        document.documentElement.style.fontSize = deviceWidth / 7.5 + 'px';
+    </script>
+	<style>
+		body{background:#f5f5f5;padding-bottom:1.2rem;}
+		.list .item{background:#fff;padding:0.2rem 0;height:1.8rem;border-bottom:solid 1px #E5E5E5;}
+		.list .item .iconfont{width:0.6rem;text-align:center;height:1.8rem;line-height:1.8rem;font-size:0.5rem;float:left;margin-left:0.2rem;color:red;}
+		.list .item .img{width:1.8rem;height:1.8rem;float:left;margin-left:0.2rem;}
+		.list .item .img img{width:1.6rem;height:1.6rem;margin:0.1rem auto;}
+		.list .item .goodsmsg{width:4.5rem;margin-right:0.1rem;margin-left:0.1rem;height:1.8rem;float:left;}
+		.list .item .goodsmsg .title{font-size:0.28rem;height:0.8rem;line-height:0.4rem;}
+		.list .item .goodsmsg .title a{color:#333;}
+		.list .item .goodsmsg .guige{font-size:0.28rem;height:0.4rem;line-height:0.4rem;color:#9B9B9B;}
+		.list .item .goodsmsg .pandn{height:0.6rem;line-height:0.6rem;}
+		.list .item .goodsmsg .pandn .price{width:50%;height:0.6rem;line-height:0.6rem;float:left;}
+		.list .item .goodsmsg .pandn .price{font-size:0.26rem;color:#EF2527;}
+		.list .item .goodsmsg .pandn .price span{font-size:0.32rem;}
+
+		.footer{position:fixed;z-index:99;bottom:0;height:1.2rem;background:#fff;}
+		.footer .allselect{height:1.2rem;line-height:1.2rem;float:left;width:2rem;margin-left:0.2rem;color:#333;font-size:0.34rem;}
+		.footer .allselect span{margin-right:0.15rem;font-size:0.5rem;color:red;position:relative;top:0.05rem;}
+		.footer .allprice{width:3.4rem;height:1.2rem;float:left;margin-right:0.2rem;}
+		.footer .allprice div{height:0.6rem;line-height:0.7rem;font-size:0.32rem;color:#333;text-align:right;}
+		.footer .allprice div strong{color:#EF2527;font-size:0.26rem;}
+		.footer .allprice div strong span{font-size:0.32rem;}
+		.footer .jiesuan{width:1.7rem;text-align:center;color:#fff;background:red;font-size:0.36rem;float:left;height:1.2rem;line-height:1.2rem;}
+		.footer .jiesuan a{color:#fff;}
+
+		.numgroup{width:50%;float:left;}
+		.numgroup .Decrease i,.numgroup .DisDe i,.numgroup .Increase i{width:0.6rem;height:0.6rem;line-height:0.5rem;font-size:0.55rem;color:#666;display:block;float:left;text-align:center;border:solid 1px #ccc; font-style:normal;}
+		.numgroup .DisDe i,.numgroup .Decrease i{border-right:none;}
+		.numgroup .DisDe i{background:#f2f2f2;}
+		.numgroup .Increase i{border-left:none;font-size:0.42rem;line-height:0.6rem;}
+		.numgroup .Amount{width:0.8rem;height:0.6rem;line-height:0.6rem;display:block;float:left;text-align:center;border:solid 1px #ccc;border-radius:0;}
+
+		.nogoods{margin-top:2rem;text-align:center;}
+		.nogoods .iconfont{font-size:1rem;color:#ccc;}
+		.nogoods .text{font-size:0.32rem;color:#ccc;height:0.6rem;line-height:0.6rem;}
+	</style>
+</head>
+
+<body>
+<div id="header">
+	<div class="goback iconfont" onclick="history.go(-1);">&#xe612;</div>
+	<div class="title textellipsis1 text-c">购物车</div>
+	<div class="empty text-c"></div>
+</div>
+
+<div class="list">
+	{if !empty($cartWeChatGoodsList)}
+	{loop $cartWeChatGoodsList $row}
+	<div class="item">
+		<div class="iconfont" data-id="{$row['id']}">&#xe676;</div>
+		<div class="img"><a href="{php echo $this->createMobileUrl('wechatmalldetail',array('goodsid'=>$row['goods_id'],'memberid'=>$memberid,'storeid'=>$storeid))}"><img src="{php echo tomedia(util::getGoodsOneData($row['goods_id'])['goo_picture'])}" /></a></div>
+		<div class="goodsmsg">
+			<div class="title textellipsis2"><a href="{php echo $this->createMobileUrl('wechatmalldetail',array('goodsid'=>$row['goods_id'],'memberid'=>$memberid,'storeid'=>$storeid))}">{$row['chud_goo_name']}</a></div>
+			<div class="guige">
+                规格 ：{$row['chud_goo_specification']}
+				{if util::getGoodsOneData($row['goods_id'])['goo_goodsOrService'] == 1 }
+				库存：{php echo util::getGoodsOneData($row['goods_id'])['goo_number']}
+				{else}
+				无限制
+				{/if}
+
+			</div>
+			<div class="pandn">
+				<div class="price"><span>
+              {$row['chud_goo_price']}
+
+				</span> 元</div>
+				<div class="numgroup Spinner{$row['id']}" data-id="{$row['id']}"></div>
+			</div>
+		</div>
+	</div>
+	{/loop}
+	{else}
+		<div class="nogoods">
+			<div class="iconfont">&#xe679;</div>
+			<div class="text">购物车中没有商品</div>
+		</div>
+	{/if}
+</div>
+
+{if !empty($cartWeChatGoodsList)}
+<div class="footer">
+	<div class="allselect">
+		<span class="iconfont">&#xe676;</span>清空
+	</div>
+	<div class="allprice">
+		<div>合计：<strong><span id="allprice">{$allprice}</span> 元</strong></div>
+		<div style="line-height:0.5rem;color: red">到店自提</div>
+	</div>
+	<div class="jiesuan"><a href="{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'shoppingcartSettlement','member'=>$memberid,'storeid'=>$storeid))}">结算<span class="jsnum">({$allnum})</span></a></div>
+</div>
+{/if}
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}messi/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/fastclick.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/jquery-weui.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/jquery.Spinner.js"></script>
+<script>
+var images = {
+	localId: [],
+	serverId: []
+};
+$(function() {
+	FastClick.attach(document.body);
+	{loop $cartWeChatGoodsList $row}
+	$(".Spinner"+{$row['id']}).Spinner({value:{$row['chud_consumeNumber']}, len:3, max:999});
+	{/loop}
+});
+</script>
+<script type="text/javascript">
+    $(function() {
+       $(".numgroup").on('click','.Increase',function(){　　　　//动态事件绑定  为页面所有的dd添加一个事件 包括新增的节点
+           var num = $(this).parents(".numgroup").children('.Amount').val();
+           var cartid = $(this).parents(".numgroup").attr('data-id');
+           var obj = $(this);
+		   $.ajax({
+                   url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'WeChatchangecartnum','storeid'=>$storeid))}",
+                   type:'post',
+                   data:{
+                       openid:"{php echo $openid}",
+                       cartid:cartid,
+					   num:num,
+				   },
+                   dataType:'json',
+			   success:function(data){
+                 if(data.error == 1){
+                     $.alert(data.message,function(){
+                       obj.parents(".numgroup").children('.Amount').val(num-1);
+                     });
+                 }else{
+                      $("#allprice").text(data.allprice);
+                      $(".jsnum").text("("+data.allnum+")");
+                  }
+               }
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function() {
+        $(".numgroup").on('click','.Decrease',function(){　　　　//动态事件绑定  为页面所有的dd添加一个事件 包括新增的节点
+            var num = parseInt($(this).parents(".numgroup").children('.Amount').val());
+            var cartid = $(this).parents(".numgroup").attr('data-id');
+            var obj = $(this);
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'WeChatchangecartnum','storeid'=>$storeid))}",
+                type:'post',
+                data:{
+                    openid:"{php echo $openid}",
+                    cartid:cartid,
+                    num:num,
+                },
+                dataType:'json',
+                success:function(data){
+                    if(data.error == 1){
+                        $.alert(data.message,function(){
+                            obj.parents(".numgroup").children('.Amount').val(num+1);
+                        });
+                    }else{
+                        $("#allprice").text(data.allprice);
+                        $(".jsnum").text("("+data.allnum+")");
+                    }
+                }
+            });
+        });
+        $(".numgroup").on('click','.DisDe',function(){　　　　//动态事件绑定  为页面所有的dd添加一个事件 包括新增的节点
+                var num = $(this).parents(".numgroup").children('.Amount').val();
+                var cartid = $(this).parents(".numgroup").attr('data-id');
+                $.ajax({
+                    url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'WeChatchangecartnum','storeid'=>$storeid))}",
+                    type:'post',
+                    data:{
+                        openid:"{php echo $openid}",
+                        cartid:cartid,
+                        num:num,
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        if(data.error == 1){
+                            $.alert(data.message,function(){
+                                $(this).parents(".numgroup").children('.Amount').val(num+1);
+                            });
+                        }else{
+                            $("#allprice").text(data.allprice);
+                            $(".jsnum").text("("+data.allnum+")");
+                        }
+                    }
+                });
+            });
+        $(".Amount").on('focus',function(){　　　　//动态事件绑定  为页面所有的dd添加一个事件 包括新增的节点
+            $(this).parents(".numgroup").children('.Amount').val('');
+        });
+        $(".Amount").on('keyup',function(){　　　　//动态事件绑定  为页面所有的dd添加一个事件 包括新增的节点
+            var num = $(this).parents(".numgroup").children('.Amount').val();
+            var cartid = $(this).parents(".numgroup").attr('data-id');
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'WeChatchangecartnum','storeid'=>$storeid))}",
+                type:'post',
+                data:{
+                    openid:"{php echo $openid}",
+                    cartid:cartid,
+                    num:num,
+                },
+                dataType:'json',
+                success:function(data){
+                    if(data.error == 1){
+                        $.alert(data.message,function(){
+                            $(this).parents(".numgroup").children('.Amount').val(num+1);
+                        });
+                    }
+                    else{
+                        $("#allprice").text(data.allprice);
+                        $(".jsnum").text("("+data.allnum+")");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function() {
+        $(".list .item .iconfont").click(function(){
+            var cartid = $(this).attr('data-id');
+            var obj = $(this);
+            $.confirm("您确定要删除购物车该商品吗?", "确认删除?", function() {
+                $.ajax({
+                    url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'wechatdelcartgoods','storeid'=>$storeid))}",
+                    type:'post',
+                    data:{
+                        id:cartid,
+                        openid:"{php echo $openid}",
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        obj.parents(".item").remove();
+                        if($('.list .item').length <= 0){
+                            $(".list").html('<div class="nogoods"><div class="iconfont">&#xe679;</div><div class="text">购物车中没有商品</div></div>');
+                            $(".footer").remove();
+                        }
+                        else{
+                            $('.allprice strong').html("¥<span>"+data.allprice+"</span>");
+                            $('.jsnum').text("("+data.allnum+")");
+                        }
+                    }
+                });
+            }, function() {
+                //取消操作
+            });
+        });
+
+        $(document).on("click", ".allselect .iconfont", function() {
+            $.confirm("您确定要清空购物车吗?", "确认清空?", function() {
+                $.ajax({
+                    url:"{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'wechatdelcartgoodsAll','storeid'=>$storeid))}",
+                    type:'post',
+                    data:{
+                        openid:"{php echo $openid}",
+                    },
+                    dataType:'json',
+                    success:function(data){
+                        $(".list").html('<div class="nogoods"><div class="iconfont">&#xe679;</div><div class="text">购物车中没有商品</div></div>');
+                        $(".footer").remove();
+                    }
+                });
+            }, function() {
+                //取消操作
+            });
+        });
+    });
+</script>
+</body>
+</html>

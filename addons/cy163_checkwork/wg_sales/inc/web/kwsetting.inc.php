@@ -1,0 +1,8 @@
+<?php
+/*   __________________________________________________
+    |  Obfuscated by YAK Pro - Php Obfuscator          |
+    |              on 2018-08-04 11:37:48              |
+    |    GitHub: https://github.com/pk-fr/yakpro-po    |
+    |__________________________________________________|
+*/
+ class Wg_sales_Web_Kwsetting extends SalesBaseController { public $cate = array(); public function init() { parent::init(); $this->uid = $this->site->_W["\165\156\151\141\143\151\x64"]; } public function index() { goto nJR3B; d7178: goto h7ATV; goto ZKrbH; fKHyA: $write["\144\x65\163\143\162\x69\160\x74\x69\x6f\x6e"] = trim($this->site->_GPC["\144\x65\163\143\x72\x69\160\164\x69\x6f\x6e"]); goto SzN26; M9sBR: message("\xe5\206\231\345\205\245\xe5\xa4\261\xe8\xb4\xa5", $this->site->webUrl("\153\x77\163\x65\x74\x74\x69\x6e\x67")); goto d7178; OxV7b: $this->site->assign($data); goto ciBl9; ZUL1j: $write["\164\151\164\x6c\x65"] = trim($this->site->_GPC["\x74\x69\x74\x6c\145"]); goto fKHyA; BwJVH: message("\346\x9b\xb4\346\x96\xb0\xe6\x88\220\xe5\212\237", $this->site->webUrl("\153\167\163\x65\x74\164\151\x6e\147")); goto IJTEE; q30Ue: $write["\165\x72\x6c"] = trim($this->site->_GPC["\x75\162\154"]); goto ZdPqy; ZdPqy: if ($this->site->setKw($write)) { goto b_fM5; } goto M9sBR; thRy1: EITL8: goto OxV7b; nJR3B: $data = $this->site->getKw(); goto twoL4; ZKrbH: b_fM5: goto BwJVH; IJTEE: h7ATV: goto thRy1; SzN26: $write["\160\151\x63\x75\x72\x6c"] = trim($this->site->_GPC["\160\x69\143\165\x72\154"]); goto q30Ue; twoL4: if (!$this->site->ispost()) { goto EITL8; } goto ZUL1j; ciBl9: } }

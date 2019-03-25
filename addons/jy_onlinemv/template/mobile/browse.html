@@ -1,0 +1,104 @@
+{template 'inc/header'}
+    <style>
+        html,body{margin: 0;padding: 0;width: 100%;background: #f8f8f8;height: 100%;}
+        #bodybox {position: relative;margin: 0 auto;max-width: 480px;width: 100%;background-color: #f8f8f8;min-height: 80%;}
+    </style>
+    
+<div class="weui_tab tabSty" style="max-width: 480px;margin: 0 auto;">
+    
+
+    <div id="bodybox">
+        
+        {if !empty($user_browse)}
+        {loop $user_browse $item}
+        <div class="weui_cells weui_cells_access">
+            <a class="weui_cell" href="###">
+                
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>视频分类：{$item['catename']} </p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+            <a class="weui_cell" href="###">
+                
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>视频名称：{$item['videoname']} </p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+            
+            <a class="weui_cell" href="###">
+                
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p>浏览时间：{php echo date("Y-m-d",$item['createtime']);}</p>
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+        </div>
+        {/loop}
+        {else}
+        <div style="width:100%;height:900px;background-color:#ff0000;"></div>
+        {/if}
+            
+    </div>
+
+    <div class="upload" style="display:none;" data-page="{$page}">
+        <div class="showindex" style="width:20%;margin:0 auto;">
+            <img src="{ONLINEMV_IMAGE}123.gif" width="20px;">
+            <div style="float:left;">加载中</div>
+        </div>
+    </div>
+    <input id="page" type="hidden" name="page" value="{if $pindex} {$pindex} {else}1{/if}">
+    <input id="isscroll" type="hidden" name="page" value="1">
+
+    <div class="copyright" style="padding:0;margin-bottom:0px;background-color:#f8f8f8;">
+        <a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a>
+    </div> 
+    <div style="width:100%;height:60px;"></div> 
+    </div>
+
+    {template 'menu'}
+
+
+<script type="text/javascript">
+$(function(){
+    $("#page").val(1);
+    $("#isscroll").val(1);
+})
+$(window).scroll(function(){
+    
+    var page = parseInt($("#page").val())+1;
+    var isscroll = $("#isscroll").val();
+    var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('ajaxbrowse'),2)}"+"&rad="+Math.random();
+    if(isscroll==1){
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            $(".upload").show();
+            $("#isscroll").val(2);
+            setTimeout(function(){
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: {doajax:1,page:page},
+                        success:function(datas){
+                            if(datas.statue==1){
+                                $("#bodybox").append(datas.data);
+                                $("#page").val(datas.page);
+                                $("#isscroll").val(1);
+                                $(".upload").hide();
+                            }else{
+                                $("#isscroll").val(2);
+
+                                $(".showindex").html('已加载全部');
+                            }
+                        },
+                        error:function(datas){
+
+                        },
+                        dataType:'json',
+                    })
+                },1000);
+        }
+    }
+})
+</script>
+{template 'inc/footer'}

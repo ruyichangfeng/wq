@@ -1,0 +1,141 @@
+{template 'style5/header'}
+<body class="max-width bg-f5">
+<header class="bar bar-nav bg-green">
+    <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+    <!--<a class="icon icon-search pull-right txt-fff"></a>-->
+    <h1 class="title txt-fff">二手市场</h1>
+</header>
+<div class="content">
+    <div class="buttons-tab fled-nav">
+
+        <a href="{php echo $this->createMobileUrl('fled')}" class="tab-link active button">最新发布</a>
+        <a href="#tab2" class="tab-link button" >分类<span class="icon icon-caret"></span>
+            <ul class="nav-btn-list" id="category">
+
+            </ul>
+        </a>
+        <a href="#tab3" class="tab-link button">筛选<span class="icon icon-caret"></span>
+            <ul class="nav-btn-list">
+                <li class="nav-btn-item"><div {if empty($_GPC['cate'])}class="on" {/if} onclick="window.location.href='{php echo $this->createMobileUrl('fled')}'">全部</div></li>
+                <li class="nav-btn-item"><div {if $_GPC['cate'] == 1}class="on" {/if} onclick="window.location.href='{php echo $this->createMobileUrl('fled',array('cate' => 1))}'">赠送邻居</div></li>
+                <li class="nav-btn-item"><div {if $_GPC['cate'] == 2}class="on" {/if} onclick="window.location.href='{php echo $this->createMobileUrl('fled',array('cate' => 2))}'">转卖闲置</div></li>
+                <li class="nav-btn-item"><div {if $_GPC['cate'] == 3}class="on" {/if} onclick="window.location.href='{php echo $this->createMobileUrl('fled',array('cate' => 3))}'">求购闲置</div></li>
+            </ul>
+        </a>
+    </div>
+    <div class="list-block media-list  fled-list-block mt0">
+        <ul id="xqlist">
+
+
+        </ul>
+    </div>
+</div>
+<div id="btn_div">
+    <div id="btn_dj"><span id="btn_input" class="btn_img hide_b"></span></div>
+    <div id="menu_b" class="menu_btn hide_m" style="width: 167px"><a href="{php echo $this->createMobileUrl('fled',array('op' => 'add'))}">发布信息</a><a href="{php echo $this->createMobileUrl('fled',array('op' => 'my'))}">我的发布</a></div>
+</div>
+
+<script>
+
+    $(function() {
+        $("#btn_dj").click(function() {
+            var input_btn = $("#btn_input")
+            if (input_btn.attr("class") == "btn_img hide_b") {
+                input_btn.removeClass();
+                input_btn.addClass("btn_img show_b");
+            } else {
+                input_btn.removeClass();
+                input_btn.addClass("btn_img hide_b");
+            }
+            var menu_b = $("#menu_b")
+            if (menu_b.attr("class") == "menu_btn hide_m") {
+                menu_b.removeClass();
+                menu_b.addClass("menu_btn show_m");
+            } else {
+                menu_b.removeClass();
+                menu_b.addClass("menu_btn hide_m");
+            }
+        })
+    })
+
+</script>
+<script>
+    $(document).ready(function(){
+
+            $('.fled-nav a').click(function(){
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active');
+                    $(this).find('.nav-btn-list').fadeOut();
+                    return;
+                }
+
+                $('.fled-nav a').each(function(index,value){
+                if($(this).hasClass('active')){
+                    //移除选中
+                    $(this).removeClass('active');
+                    $(this).find('.nav-btn-list').fadeOut();
+                }
+            })
+            //添加选中
+            if(!$(this).hasClass('active')){
+                $(this).addClass('active');
+                $(this).find('.nav-btn-list').slideToggle("");
+            }
+        });
+    })
+    var data = {$data} || [];//菜单
+    $(function(){
+        var item = '';
+        item += '<li class="nav-btn-item">';
+        for(var i=0;i<data.length;i++){
+            var val = data[i];
+            if(i%3 == 0 && i!=0){
+                item += '</li><li>';
+            }
+            var url = "{php echo $this->createMobileUrl('fled')}&category="+val['value'];
+            var category = "{$_GPC['category']}";
+            if(val['value'] == category){
+               item += '<div><a class="on" href="'+url+'" >'+val['title']+'</a></div>';
+            }else{
+                item += '<div><a href="'+url+'" >'+val['title']+'</a></div>';
+            }
+
+
+        }
+        $('#category').html(item);
+
+    })
+</script>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <li onclick="javascript:window.location.href='{{ d.list[i].url }}'">
+        <div class="item-content">
+            {{# if(d.list[i].img){ }}<div class="item-media"><img src="{{ d.list[i].img }}" style='width: 4.5rem;height: 4.5rem'></div>{{# } }}
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-title"><span class="color-warning">【{{ d.list[i].name}}】</span>{{ d.list[i].title }}({{ d.list[i].regionname}})</div>
+                </div>
+                <div class="item-subtitle"><span class="fled-lable">{{ d.list[i].rolex }}</span>
+                    <span class="fled-price color-warning">
+                        {{# if(d.list[i].zprice == 0){ }}
+                            面议
+                        {{# }else{ }}
+                            {{ d.list[i].zprice }}
+                        {{# } }}
+                    </span>
+                </div>
+                <div class="item-subtitle item-subtitle-time">发布时间：{{ d.list[i].datetime }}</div>
+            </div>
+        </div>
+    </li>
+    {{# } }}
+
+</script>
+<script>
+    $(document).ready(function() {
+        var cate ="{$_GPC['cate']}";
+        var category ="{$_GPC['category']}";
+        loaddata("{php echo $this->createMobileUrl('fled',array('op'=>'list'))}&category="+category+"&cate="+cate, $("#xqlist"),'xq_list', true);
+    });
+</script>
+{template 'style5/footer'}

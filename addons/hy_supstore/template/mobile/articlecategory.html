@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrom=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>文章分类</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/category.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/article.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/public/dropload/dropload.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">文章分类</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 头部模块 -->
+        <nav class="top-nav">
+            <ul class="clearfix">
+                <li {if $categoryLevelOneId == 'all'}class="active"{/if}><a href="{php echo $this->createMobileUrl('article',array('categoryLevelOneId'=>'all'))}">全部</a></li>
+                <li {if $categoryLevelOneId != 'all'}class="active"{/if}>分类 <i class="fa fa-caret-down"></i>
+                    <div class="drop-down">
+                        <div class="arrow"></div>
+                        {loop $listLevelOne $key $item}
+                            <a href="{php echo $this->createMobileUrl('article',array('categoryLevelOneId'=>$item['id']))}"{if $categoryLevelOneId == $item['id']}style="color: #666;{/if}">{$item['name']}</i></a>
+                        {/loop}
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <div class="nav-category clearfix">
+            <ul class="category-head">
+                <li {if $categoryLevelTwoId == 'all'}class="active"{/if}><a href="{php echo $this->createMobileUrl('article',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>'all'))}">全部</a></li>
+                {loop $listLevelTwo $key $item}
+                <li {if $categoryLevelTwoId == $item['id']}class="active"{/if}><a href="{php echo $this->createMobileUrl('article',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>$item['id']))}">{$item['name']}</a></li>
+                {/loop}
+            </ul>
+        </div>
+        <div class="article-list" id="articleList">
+            <ul class="list">
+                {loop $listArticle $key $item}
+                <li>
+                    <a href="{php echo $this->createMobileUrl('article',array('op'=>'info','id'=>$item['id']))}">
+                        <div class="left">
+                            <div class="img lazyload" data-original="{$_W['attachurl']}{$item['img_url']}"></div>
+                        </div>
+                        <div class="right">
+                            <p class="title">{$item['name']}</p>
+                            <p class="content">{$item['digest']}</p>
+                            <p class="bottom"><span class="category">{$item['category_name']}</span><span class="time">{$item['release_time']}</span></p>
+                        </div>
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+            {if empty($listArticle) || count($listArticle)<1} 
+            <div class="no-content">无数据</div>
+            {/if}
+        </div>
+        <input type="hidden" name="minId" value="{$minId}">
+        <!-- 返回顶部 -->
+        <div id="goTop"><a href="javascript:void(0);" class="fa fa-angle-double-up fa-lg"></a></div>
+        <!-- 返回顶部 -->
+        <!-- 底部导航 -->
+        {template 'footerindex'}
+        <!-- 底部导航 -->
+    </div>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/lazyload/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/layer-mobile/layer.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/dropload/dropload.min.js"></script>
+    <script>
+    $(function(){
+        //懒加载
+        $(".lazyload").lazyload({
+            threshold : 200, // 设置阀值
+            effect : "fadeIn" // 设置图片渐入特效
+        });
+        $('.top-nav li').on('click', function(event) {
+            var $target = $(event.target);
+            if ($target.is("li")) {
+                if ($(this).children('.drop-down').is(':visible')) {
+                    $(this).children('.drop-down').hide();
+                } else {
+                    $(this).children('.drop-down').show();
+                }
+            }
+        })
+        goScrollTop();
+        //返回顶部的火箭
+        function goScrollTop(){
+            if($('#goTop>a')[0]){
+                var gotop = $('#goTop>a')[0];
+                var leader = 0,target = 0,timer = 0;
+                $(window).scrollTop() > 0 ? show(gotop):hide(gotop);
+                window.onscroll = function(){
+                    leader = $(window).scrollTop();
+                    leader > 0 ? show(gotop):hide(gotop);
+                    gotop.onclick = function(){
+                        $(window).scrollTop(0);
+                    }
+                };
+                function show(obj){
+                    $(obj).parent().fadeIn('100');
+                }
+                function hide(obj){
+                    $(obj).parent().fadeOut('100');
+                }
+            }
+        }
+        // var page = 1; //页数
+        // // 上拉加载
+        // $('#articleList').dropload({
+        //     scrollArea : window,
+        //     loadDownFn : function(me){
+        //         var result = '';
+        //         $.ajax({
+        //             type:'POST',
+        //             url:"{php echo $this->createMobileUrl('article',array('categoryLevelOneId'=>$categoryLevelOneId,'categoryLevelTwoId'=>$categoryLevelTwoId))}",
+        //             dataType: 'json',
+        //             data:{minId:$('input[name="minId"]').val(),pagesize:4,pageindex:page},
+        //             success:function(data){
+        //                 var list = data.list;
+        //                 var arrLen = list.length;
+        //                 var minId = $('input[name="minId"]').val(data.minId);
+        //                 if(arrLen > 0){
+        //                     page ++;
+        //                     for (var i = 0; i < arrLen; i++) {
+        //                         result += '<li>';
+        //                             result += '<a href="{php echo $this->createMobileUrl("article",array("op"=>"info","id"=>"'+Number(list[i].id)+'"))}">';
+        //                                 result += '<div class="left">';
+        //                                     result += '<div class="img" src="{$_W["attachurl"]}'+list[i].img_url+'"></div>';
+        //                                 result += '</div>';
+        //                                 result += '<div class="right">';
+        //                                     result += '<p class="title">'+list[i].name+'</p>';
+        //                                     result += '<p class="content">'+list[i].digest+'</p>';
+        //                                     result += '<p class="bottom"><span class="category">'+list[i].category_name+'</span><span class="time">2018-05-15</span></p>';
+        //                                 result += '</div>';
+        //                             result += '</a>';
+        //                         result += '</li>';
+        //                     };
+        //                 }else{
+        //                     me.lock();// 锁定
+        //                     me.noData();// 无数据
+        //                 }
+                        
+        //                 setTimeout(function(){
+        //                     $('#articleList .list').append(result);
+        //                     me.resetload();// 每次数据插入，必须重置
+        //                 },500);
+        //             },
+        //             error: function(xhr, type){
+        //                 layer.open({
+        //                     content: '加载数据有误',
+        //                     skin: 'msg',
+        //                     time: 2
+        //                 });
+        //                 // 即使加载出错，也得重置
+        //                 me.resetload();
+        //             }
+        //         });
+        //     }
+        // });
+    })
+    </script>
+</body>
+
+</html>

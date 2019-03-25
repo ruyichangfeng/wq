@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+<meta name="format-detection" content="telephone=no">
+<title>户发起业务请求 - {$cwgl_config['webtitle']}</title>
+<link href="{$templateurl}/css/css.css" rel="stylesheet" type="text/css">
+<link href="{$templateurl}/css/common.css" rel="stylesheet" type="text/css">
+
+<!--日期控件 start-->
+<script src="{$templateurl}/js/jquery-1.9.1.min.js"></script>
+<link href="{$templateurl}/css/mobiscroll.custom-2.5.0.min.css" rel="stylesheet" type="text/css" />
+<script src="{$templateurl}/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	$(function(){
+		$("#scroller").mobiscroll().date();
+		
+		var currYear = (new Date()).getFullYear();  
+
+		//初始化日期控件
+		var opt = {
+			preset: 'date', //日期，可选：date\datetime\time\tree_list\image_text\select
+			theme: 'default', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+			display: 'modal', //显示方式 ，可选：modal\inline\bubble\top\bottom
+			mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+			lang:'zh',
+			dateFormat: 'yyyy-mm-dd', // 日期格式
+			setText: '确定', //确认按钮名称
+			cancelText: '取消',//取消按钮名籍我
+			dateOrder: 'yyyymmdd', //面板中日期排列格式
+			dayText: '日', monthText: '月', yearText: '年', //面板中年月日文字
+			showNow: false,  
+			nowText: "今",  
+			startYear:currYear, //开始年份  
+			endYear:currYear + 100 //结束年份  
+			//endYear:2099 //结束年份
+		};
+		
+		$("#scroller").mobiscroll(opt);
+	});
+</script>
+<!--日期控件 end-->	
+
+<!--附件上传 start-->
+<script type="text/javascript" src="{$templateurl}/js/jquery.form.js"></script>
+<style>
+	.btn {overflow: hidden; display: inline-block; font-size: 14px; line-height: 80px; color: #fff; float: left; margin-right: 10px; height: 80px; width: 80px; text-align: center; cursor: pointer; background-color:#999999; border-radius: 5%; position: relative; }
+	.btn input {position: absolute; top: 0; right: 0; width: 100%; height: 100%; margin: 0; border: solid transparent; opacity: 0; filter: alpha(opacity=0); cursor: pointer; }
+	#showimg{ height: 80px;position: relative; float: left;line-height: 80px;color: #f00;}
+	#showimg img { height: 100%; }
+</style>
+<!--附件上传 end-->
+</head>
+<body >
+<div class="head">
+   <div class="content-top clearFix">
+    <a href="{$urltk}">
+	 <em class="return"><</em>
+	 <span class="fanhui">返回</span>
+	</a>
+   </div>
+</div>
+
+<div id="content">
+   
+   <div class="contbox">
+     <div class="titbox">
+	   <i class="yewu"></i>
+	   <span>发起业务请求事项</span>
+	 </div>
+	 <form id="myupload" name="formpt" action="{$urltk}&op=add" method="post"  enctype="multipart/form-data" onsubmit='return formcheck()'>
+	 <input type="hidden" name="token" value="{$_W['token']}" />
+	 <div class="toushu-bd">
+	     <div class="message clearFix">
+		    <label>公司名称：</label>
+		    <span class="company">{$user_show['compname']}</span>
+		 </div>
+	     <div class="message clearFix">
+		   <label>业务类型：</label>
+		   <select name="type" class="xlsele">
+				{loop $category $row1}
+				<option value="{$row1['cid']}" >{$row1['name']}</option>
+				{/loop}
+            </select>
+		 </div>
+		  <div class="message clearFix">
+		   <label>要求办结时间：</label>
+		   <input id="scroller" name="endtimes" class="xlsele"/>
+		 </div>
+		  <div class="message clearFix">
+		   <label>紧急程度：</label>
+		   <select name="urgency" class="xlsele">
+		   		<option value="0">正常</option>
+                <option value="1">十分紧急</option>
+            </select>
+		 </div>
+		  <div class="message clearFix">
+		   <label>描述：</label>
+		   <textarea name="content" class="textarea"></textarea>
+		 </div>
+		  <div class="message clearFix">
+		   <label>上传附件：</label>
+		   <div class="line">
+		   		<p style="color:#999999;">说明：只允许上 zip | rar | jpg | jpeg | bmp | gif | png | doc | docx | xls | xlsx 格式的文件，文件大小不能超过5M。</p>
+			 	<div class="btn"> 上传附件 <input id="fileupload" type="file" name="mypic"> </div>
+				<input type="hidden" name="download" id="JimgSrc">
+				<div id="showimg"></div>
+			</div>
+		 </div>
+		 <input type="submit" name="add_submit" value="提  交" class="submit" />
+	 </div>
+	 </form>
+	 <script type="text/javascript">
+		$(function () {
+			var showimg = $('#showimg');
+			$(document).on('change','#fileupload',function(){
+				$("#myupload").ajaxSubmit({
+					dataType:  'json',
+					url:'{$url_attachment}',
+					success: function(data) {
+						var imgsrc = "files/" + data['src'];
+						showimg.html('上传成功');
+						$('#JimgSrc').val(imgsrc);
+					},
+					error:function(xhr){
+						console.log(xhr)
+						showimg.html("上传失败");
+					}
+				});
+			});
+		});
+		</script>
+   </div>
+  
+</div>
+
+<!--footer star-->
+{template 'user_footer'}
+</body>
+</html>

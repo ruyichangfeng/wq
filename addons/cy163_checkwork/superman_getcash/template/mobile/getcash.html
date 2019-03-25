@@ -1,0 +1,86 @@
+{template 'common/header'}
+<style>
+	body{background:#d2e6e9;}
+	.charge select{position:absolute;}
+	.charge .panel-body span input{position:absolute; width:150px; height:30px; top:2px; border:none; left:42px; z-index:10; padding-left:10px; outline:none;}
+	.charge.panel{margin:.5em; border:none;}
+	.charge.panel-info>.panel-heading {background: -webkit-gradient(linear, 0 0, 100% 0, from(#ebebeb), to(#f3f9fa), color-stop(30%, #f5f9f9)); color:#666666; border:none;}
+	a{color:#666666;}a:hover{color: #3ebacc;}
+	.charge .btn.btn-primary{background: #56c6d6; color: #FFF; border: 0;}
+	.charge i{display:inline-block; width:15px; height:15px; text-align:center; line-height:15px;}
+</style>
+<div class="charge panel panel-info">
+	<div class="panel-body">
+		<p>
+			可申请提现{$credit[title]}：{$credit[value]}
+		</p>
+		<form name="theform" method="post" role="form" id="form1">
+			<input type="hidden" name="c" value="entry" />
+			<input type="hidden" name="m" value="superman_getcash" />
+			<input type="hidden" name="i" value="{$_W['uniacid']}" />
+			<input type="hidden" name="do" value="getcash" />
+			{if $conf['getcash']['realname']}
+			<div class="form-group input-group">
+				<div class="input-group-addon"><i class="fa fa-user"></i></div>
+				<input type="text" class="form-control" id="realname" name="realname" placeholder="请输入收款账号姓名">
+			</div>
+			{/if}
+			<div class="form-group input-group">
+				<div class="input-group-addon"><i class="fa fa-cny"></i></div>
+				<input type="text" placeholder="请输入提现金额" class="form-control" name="money" id="money">
+			</div>
+			<div class="form-group" style="position:relative;">
+				<textarea name="remark" id="remark" class="form-control" rows="5" placeholder="备注留言，选填"></textarea>
+			</div>
+			<input type="hidden" name="token" value="{$_W['token']}">
+			{if $conf['base']['open']}
+				{if $conf['getcash']['min'] > 0 && $conf['getcash']['min'] > $credit[value]}
+				<input disabled type="submit" name="submit" class="btn btn-primary btn-block" value="申请提现（最低提现金额{$conf['getcash']['min']}）">
+				{else}
+				<input type="submit" name="submit" class="btn btn-primary btn-block" value="申请提现">
+				{/if}
+			{else}
+				<input disabled type="submit" name="submit" class="btn btn-primary btn-block" value="申请提现（未开启）">
+			{/if}
+		</form>
+	</div>
+</div>
+{if !empty($conf['getcash']['desc'])}
+<div class="alert alert-info" style="margin: .5em">
+	{php echo htmlspecialchars_decode($conf['getcash']['desc'])}
+</div>
+{/if}
+<script>
+	require(['jquery', 'util'],function($, u){
+		$('#form1').submit(function(){
+			<!--{if $conf['getcash']['realname']}-->
+			var realname = $('#realname').val().trim();
+			if (realname == '') {
+				u.message('请输入微信钱包绑定的真实姓名，提现时将校验，否则无法提现', '', 'error');
+				return false;
+			}
+			<!--{/if}-->
+			var money = parseFloat($('#money').val().trim());
+			if(isNaN(money)) {
+				u.message('请输入正确的提现金额', '', 'error');
+				return false;
+			}
+			if(money < 1) {
+				u.message('最低提现金额为1元', '', 'error');
+				return false;
+			}
+			<!--{if $credit[value] > 0}-->
+			if(money > '<!--{$credit[value]}-->') {
+				u.message('提现金额超过可申请提现额度', '', 'error');
+				return false;
+			}
+			<!--{/if}-->
+			var remark = $('#remark').val().trim();
+			if (remark.length > 200) {
+				u.message('备注内容最多200个字符', '', 'error');
+				return false;
+			}
+			return true;
+		});
+	});
+</script>

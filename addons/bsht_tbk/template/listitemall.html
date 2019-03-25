@@ -1,0 +1,728 @@
+{template 'header'}
+<script src="../addons/bsht_tbk/res/js/MagicZoom.js"></script>
+<script src="../addons/bsht_tbk/res/js/main.js"></script>
+
+<script>
+$(function(){
+lazy_img();	
+});
+</script>
+<ul class="nav nav-tabs">
+	<li {if $_GPC['op']==''}class="active"{/if}><a href="{php echo $this->createWebUrl('listitemall');}">商品列表</a></li>
+	<li {if $_GPC['op']=='post'}class="active"{/if}><a href="{php echo $this->createWebUrl('listitemall',array('op'=>'post'));}">添加/编辑商品</a></li>
+</ul>
+<style>
+.table td span{display:inline-block;margin-top:4px;}
+.table td input{margin-bottom:0;}
+th{
+	text-align: center !important;
+}
+td{
+	text-align: center !important;
+}
+.red{color:red;font-weight:bold}
+</style>
+{if $op == 'display'}
+<div class="main">
+<div class="panel panel-info">
+<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+			<input type="hidden" name="c" value="site" />
+			<input type="hidden" name="a" value="entry" />
+        	<input type="hidden" name="m" value="bsht_tbk" />
+        	<input type="hidden" name="do" value="listitemall" />
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">关键字</label>
+				<div class="col-sm-8 col-lg-2">
+					<input class="form-control" name="keyword" id="" placeholder="输入商品名称或商品代码" type="text" value="{$_GPC['keyword']}">
+				</div>
+
+
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">分类</label>
+					<div class="col-sm-8 col-lg-2">
+						<select name="cate_id" class="form-control">
+							
+							<option value="999" {if intval($_GPC['cate_id']) == 999}selected="selected"{/if}>全部分类</option>
+                          {loop $cateall $ii}
+							<option value="{$ii['id']}" {if intval($_GPC['cate_id']) == $ii['id']}selected="selected"{/if}>{$ii['name']}</option>
+                          {/loop}
+						</select>
+					</div>
+
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">状态</label>
+					<div class="col-sm-8 col-lg-2">
+						<select name="zhuangtai" class="form-control">
+			  <option value="0" {if intval($_GPC['zhuangtai']) == 0}selected="selected"{/if}>全部商品</option>	
+			  <option value="1" {if intval($_GPC['zhuangtai']) == 1}selected="selected"{/if}>无优惠券</option>
+              <option value="2" {if intval($_GPC['zhuangtai']) == 2}selected="selected"{/if}>已下架商品</option>
+			  <option value="22" {if intval($_GPC['zhuangtai']) == 22}selected="selected"{/if}>全部置顶商品</option>
+			  <option value="3" {if intval($_GPC['zhuangtai']) == 3}selected="selected"{/if}>点击从高到低</option>
+			  <option value="4" {if intval($_GPC['zhuangtai']) == 4}selected="selected"{/if}>分享从高到低</option>
+			  <option value="5" {if intval($_GPC['zhuangtai']) == 5}selected="selected"{/if}>佣金从高到低</option>
+			  <option value="6" {if intval($_GPC['zhuangtai']) == 6}selected="selected"{/if}>收益从高到低</option>
+						</select>
+					</div>
+                
+				
+			</div>
+
+           <div class="form-group">
+           <label class="col-xs-3 col-sm-3 col-md-5 col-lg-1 control-label">佣金比高于</label>
+				<div class="col-sm-3 col-lg-2">
+					<input class="form-control" name="yjgy" id="" placeholder="例如30%请填写30" type="text" value="{$_GPC['yjgy']}">
+				</div> 
+
+           <label class="col-xs-3 col-sm-3 col-md-5 col-lg-1 control-label">售价低于</label>
+				<div class="col-sm-3 col-lg-1">
+					<input class="form-control" name="sjdy" id="" placeholder="10" type="number" value="{$_GPC['sjdy']}">
+				</div> 
+
+			<label class="col-xs-3 col-sm-3 col-md-5 col-lg-1 control-label">收入高于</label>
+				<div class="col-sm-3 col-lg-1">
+					<input class="form-control" name="srgy" id="" placeholder="50" type="text" value="{$_GPC['srgy']}">
+				</div> 
+			<label class="col-xs-3 col-sm-3 col-md-5 col-lg-1 control-label">收入低于</label>
+				<div class="col-sm-3 col-lg-1">
+					<input class="form-control" name="srdy" id="" placeholder="30" type="text" value="{$_GPC['srdy']}">
+				</div> 
+		    </div>
+
+			<div class="form-group">
+
+                <label class="col-xs-2 col-sm-2 col-md-2 col-lg-1 control-label">分页显示量</label>
+				<div class="col-sm-2 col-lg-1">
+					<input class="form-control" name="psize" id="" placeholder="默认10个" type="text" value="{$_GPC['psize']}">
+				</div>
+
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">缩略图</label>
+					<div class="col-sm-8 col-lg-1">
+						<select name="thumb" class="form-control">
+			  <option value="0" {if intval($_GPC['thumb']) == 0}selected="selected"{/if}>显示</option>	
+			  <option value="1" {if intval($_GPC['thumb']) == 1}selected="selected"{/if}>隐藏</option>
+						</select>
+					</div>
+
+				<div class=" col-xs-12 col-sm-2 col-lg-2">
+					<button class="btn btn-info"><i class="fa fa-search"></i> 搜 索</button>
+				</div>
+			</div>
+
+ 			<div class="form-group">
+			</div>
+		</form>
+		
+	</div>
+</div>
+
+<div class="panel panel-success">
+<div class="panel-heading">工具箱（当前栏目商品总数：{$total}）（无优惠券商品总数：{$total_none}）（已下架商品总数：{$total_xiajia}）（有效商品总数：{$total_youxiao}）</div>
+	<div class="panel-body">
+		
+			<div class="form-group">
+
+<a onclick="return confirm('该操作比较耗时，确认吗？'); return false;" href="{php echo $this->createWebUrl('listitemall_delall');}" title="删除" class="btn btn-sm btn-danger"><i class="fa fa-remove"></i> 一键清空商品</a>
+&nbsp;&nbsp;
+<a onclick="return confirm('该操作比较耗时，确认吗？'); return false;" href="{php echo $this->createWebUrl('yhj_all_op');}" title="删除" class="btn btn-sm btn-success"><i class="fa fa-remove"></i> 清理无效优惠券</a>
+&nbsp;&nbsp;
+
+<a onclick="return confirm('该操作比较耗时，确认吗？'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'show_none'));}" title="删除" class="btn btn-sm btn-warning"><i class="fa fa-remove"></i> 清理已下架商品</a>
+&nbsp;&nbsp;
+{if $_W['isfounder']}
+<a onclick="return confirm('该操作比较耗时，确认吗？'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'fix_all'));}" title="删除" class="btn btn-sm btn-info"><i class="fa fa-remove"></i> 修复商品数据库</a>
+&nbsp;&nbsp;
+
+<a onclick="return confirm('该操作比较耗时，确认吗？'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'fix_allcaiji'));}" title="删除" class="btn btn-sm btn-info"><i class="fa fa-remove"></i> 修复采集数据库</a>
+&nbsp;&nbsp;
+{/if}
+<div style="height:10px"></div>
+<a onclick="return confirm('确认进行此操作吗？数据量大请耐心等待！'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'xiajia_daoqi'))}" title="一键清空优惠券到期商品" class="btn btn-sm btn-info">【下架】优惠券【到期】商品</a>
+
+&nbsp;&nbsp;
+				
+<a onclick="return confirm('确认进行此操作吗？数据量大请耐心等待！'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'del_daoqi'))}" title="一键清空优惠券到期商品" class="btn btn-sm btn-danger">【清空】优惠券【到期】 商品</a>
+
+&nbsp;&nbsp;
+
+<a onclick="return confirm('确认进行此操作吗？数据量大请耐心等待！'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'xiajia_none'))}" title="一键清空优惠券到期商品" class="btn btn-sm btn-info">【下架】【无】优惠券商品</a>
+
+&nbsp;&nbsp;
+                
+<a onclick="return confirm('确认进行此操作吗？数据量大请耐心等待！'); return false;" href="{php echo $this->createWebUrl('itemall_op', array('op' => 'del_none'))}" title="一键清空优惠券到期商品" class="btn btn-sm btn-danger">【清空】【无】优惠券商品</a>
+				
+			</div>
+
+
+		
+	</div>
+</div>
+
+
+<form action="" method="post" class="form-horizontal" role="form">
+	<div style="padding:15px;background: white;">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				
+				<tr>
+				    <th style="width:3em;">
+                        <input type="checkbox" id="checkall"/>
+                    </th>
+					<th style="width:90px;">序号</th>
+					<th style="width:90px">分类</th>
+					<th style="width:90px">售价</th>
+					<th style="width:90px">佣金</th>
+					<th style="width:90px">收益</th>
+					<th style="width:120px;text-align:center">计划类型</th>
+					<th style="width:auto;text-align: left !important;">商品信息</th>
+					{if $_GPC['thumb']==0 || empty($_GPC['thumb'])}
+					<th style="width:90px">缩略图</th>
+					{/if}
+					<th style="width:90px">访问</th>
+					<th style="width:90px">分享</th>
+					<th style="width:90px">状态</th>
+					<th style="width:90px">置顶</th>
+					<th style="width:100px">修改/删除</th>
+				</tr>
+			</thead>
+			<tbody>
+			    <tr>
+	                <td colspan="13" style="text-align: left !important;">
+	                	
+	                    <input type="submit" class="btn btn-primary" name="submit" value="提交排序" />
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'delall'))}" href="javascript:;" class="btn btn-danger mutdelete">批量删除</a>
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'moveall'))}" href="javascript:;" class="btn btn-warning mutmove">批量移动</a>
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'topall'))}" href="javascript:;" class="btn btn-success muttop">批量加入专题</a>
+	                </td>
+	            </tr>
+				{loop $list $item}
+				<tr>
+				    <td><input type="checkbox" name="ids[]" value="{$item['id']}" /></td>
+					<td><font style="font-size:12px">ID:{$item['id']}</font>
+						<div style="height:5px"></div><input type="text" name="displayorder[{$item['id']}]" value="{$item['displayorder']}"  style="width:50px;font-size:10px;text-align: center;"></td>
+					<td style="text-align:center"><label class="label label-warning">{$item['catename']}</label></td>
+					<td style="text-align:center"><label class="label label-success">￥{$item['itemfee']}</label></td>
+					<td style="text-align:center"><label class="label label-success">{$item['shouru_bili']}%</label></td>
+					<td style="text-align:center"><label class="label label-success">￥{$item['shouru_yongjin']}</label></td>
+
+                    <td style="width:100%;text-align: center !important;">
+					{if $item['tktype']==2}<label class="label label-{if $item['tktype']==$item['isdx']}info{else}danger{/if}">鹊桥高佣</label>{/if}
+					{if $item['tktype']==1}<label class="label label-{if $item['tktype']==$item['isdx']}info{else}danger{/if}">定向计划</label>{/if}
+					{if $item['tktype']==0}<label class="label label-{if $item['tktype']==$item['isdx']}info{else}danger{/if}">通用计划</label>{/if}
+
+					<div style="height:15px"></div>
+                    <label class="label label-info faqun" data-id="{$item['id']}">查看发群模板</label>
+                    </td>
+					<td style="width:auto;text-align: left !important;">
+					<img src="../addons/bsht_tbk/res/images/{if $item['istmall']==1}tmall.png{else}taobao.png{/if}">{if $item['isdx']==2}<label class="label label-success">已走鹊桥</label>{/if}
+					{if $item['isdx']==1}<label class="label label-success">已走定向</label>{/if}
+					{if $item['isdx']==0}<label class="label label-success">已走通用</label>{/if}<label class="label label-warning">&nbsp;{$item['itemid']}</label>&nbsp;{$item['title']}<br>
+					<!--口令：{$item['itemtkl']}<br>-->
+					短链：<input style="width:95%" type="text" value="{$item['itemsurl']}"><br>
+					<!--长链：{$item['itemurl']}<br>-->
+					{if $item['itemyhj_tit']!='无'}优惠卷：{$item['itemyhj_tit']}<br>
+					优惠卷-口令：{$item['itemyhj_tkl']}&nbsp;&nbsp;卖家ID：{$item['maijia_id']}<br>
+					H5卷接：<input style="width:95%" type="text" value="{$item['quan_link']}">{/if}
+					</td>
+                    
+					{if $_GPC['thumb']==0 || empty($_GPC['thumb'])}
+					<td style="text-align:center">
+					{if !empty($item['itempic'])}
+					<a  href="{php echo tomedia($item['itempic'])}" class="MagicThumb">
+					<img class="lazy-bk" src="../addons/bsht_tbk/res/images/load.gif" data-bk="{php echo tomedia($item['itempic'])}" style="height:90px;width:90px"></a>&nbsp;&nbsp;
+					{else}
+					暂无图片
+					{/if}
+					</td>
+					{/if}
+                    
+                    <td><label class="btn btn-info">{$item['hit']}</label></td>
+                    <td><label class="btn btn-info">{$item['share']}</label></td>
+
+					<td data-id='{$item["id"]}'>{if $item['status']}<label class="label label-success status">上架</label>{else}<label class="label label-default status">下架</label>{/if}</td>
+
+					<td data-id='{$item["id"]}'>{if $item['istop']}<label class="label label-success istop">置顶</label>{else}<label class="label label-default istop">非置顶</label>{/if}</td>
+					
+					<td>
+						<a href="{php echo $this->createWebUrl('listitemall', array('op' => 'post', 'id' => $item['id']))}" title="编辑" class="btn btn-sm btn-default"><i class="fa fa-edit"></i></a>
+						<a onclick="return confirm('删除此商品，确认吗？'); return false;" href="{php echo $this->createWebUrl('listitemall', array('op' => 'del','id' => $item['id']))}" title="删除" class="btn btn-sm btn-danger"><i class="fa fa-remove"></i></a>
+					</td>
+				</tr>
+				{/loop}
+
+                <tr>
+				    <th style="width:3em;">
+                        <input type="checkbox" id="checkallbottom"/>
+                    </th>
+					
+				</tr>
+
+				<tr>
+	                <td colspan="13" style="text-align: left !important;">
+	                	<input name="token" type="hidden" value="{$_W['token']}" />
+	                    <input type="submit" class="btn btn-primary" name="submit" value="提交排序" />
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'delall'))}" href="javascript:;" class="btn btn-danger mutdelete">批量删除</a>
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'moveall'))}" href="javascript:;" class="btn btn-warning mutmove">批量移动</a>
+
+
+						<a data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'topall'))}" href="javascript:;" class="btn btn-success muttop">批量加入专题</a>
+	                </td>
+	            </tr>
+
+
+			</tbody>
+			
+		</table>
+		{$pager}
+	</div>
+</form>
+</div>
+
+
+<div id="modal-module-menus-cheat"  class="modal fade" tabindex="-1">
+        <div class="modal-dialog" style='width: 520px;'>
+            <div class="modal-content">
+                <div class="modal-header" style="height:50px"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h4>提示：即将移动已选商品到下列分类（请确认选择）</h4></div>
+                <div class="modal-body">
+                  
+				   {loop $cateall $i}
+				   <a data-id="{$i['id']}" data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'moveall'))}" href="javascript:;" class="btn btn-info mutmoveok" style="margin:5px 5px;">{$i['name']}</a>
+                   {/loop}
+
+                </div>
+            </div>
+        </div>
+</div>
+
+
+<div id="modal-module-menus-top"  class="modal fade" tabindex="-1">
+        <div class="modal-dialog" style='width: 520px;'>
+            <div class="modal-content">
+                <div class="modal-header" style="height:50px"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h4>提示：选择要加入的专题栏目（覆盖操作）</h4></div>
+                <div class="modal-body">
+                  
+				   {loop $topall $i}
+				   <a data-id="{$i['id']}" data-href="{php echo $this->createWebUrl('listitemall',array('op'=>'topall'))}" href="javascript:;" class="btn btn-info muttopok" style="margin:5px 5px;">{$i['title']}</a>
+                   {/loop}
+
+                </div>
+            </div>
+        </div>
+</div>
+
+
+<style>
+	.masklayer{ display: none; width: 100%; height: 100%; position: fixed; z-index: 1000; top: 0px; left: 0px; background: rgba(0,0,0,0.7);}
+	.mask{ display: none; width: 460px; height: auto; overflow: hidden; position: fixed; z-index: 2000; left: 50%; margin-left: -230px; background: #fff; top: 20%;}
+	.mask .title{ width: 100%; height: 40px; line-height: 40px; background:#467ab3; position: relative; z-index: 10;}
+	.mask .title span{ margin-left: 15px; color: #fff; font-size: 14px;}
+	.mask .title .close{ width: 40px; height: 40px; position: absolute; display: block; top: 7px; right: -15px;color:#fff; z-index: 20;}
+	.maskMain{  padding: 0px; height: auto; overflow: hidden; text-align: center; padding-bottom: 30px;}
+	.maskMain a{ width: 40%; height: 46px; line-height: 46px; text-align: center; display: inline-block; background: #467ab3; color: #fff; border: 1px solid #000; margin: 30px 15px 0px 15px;}
+</style>
+
+<script>
+$(document).ready(function(){ 
+
+
+$('table .faqun').click(function(){
+	var label = $(this);
+	var faid = $(this).attr('data-id');
+	var faurl = '{php echo $this->createWebUrl("show_qun")}&id='+faid;
+	//alert(faurl);
+
+var index = layer.open({
+  offset: '100px',
+  type: 2,
+  shift:2,
+  title: false,
+  shadeClose: true,
+  shade: 0.8,
+  area: ['320px', '500px'],
+  content: faurl
+  });
+
+
+});
+});
+</script>
+
+
+<script>
+require(['util'],function(util){
+
+$('.mutmove').click(function(){
+
+$('#modal-module-menus-cheat').modal();
+
+});
+
+$('.mutmoveok').click(function(){
+            var url = $(this).data('href');
+            var ids = [];
+            var idss = [];
+			var cateid = $(this).data('id');
+            $('input:checkbox[name="ids[]"]').each(function() {
+                var _that = $(this)[0];
+                if(_that.checked){
+                    ids = ids.concat($(this).val());
+                }else{
+                    idss = idss.concat($(this).val());
+                }
+            });
+			
+            console.log(cateid);
+            if(confirm("您确定要移动么？")){
+                $.post(url,{ids:ids,cateid:cateid},function(data){
+                    util.message("移动成功","{php echo $_W['siteurl']}",'success');
+                },'json');
+            }
+});
+
+
+$('.muttop').click(function(){
+
+$('#modal-module-menus-top').modal();
+
+});
+
+$('.muttopok').click(function(){
+            var url = $(this).data('href');
+            var ids = [];
+            var idss = [];
+			var cateid = $(this).data('id');
+            $('input:checkbox[name="ids[]"]').each(function() {
+                var _that = $(this)[0];
+                if(_that.checked){
+                    ids = ids.concat($(this).val());
+					//console.log(ids);
+                }else{
+                    idss = idss.concat($(this).val());
+                }
+            });
+			
+            console.log(cateid);
+            if(confirm("您确定要加入么？")){
+                $.post(url,{ids:ids,cateid:cateid},function(data){
+                    util.message("加入成功","{php echo $_W['siteurl']}",'success');
+					//alert(ids);
+                },'json');
+            }
+});
+
+
+
+$('.mutdelete').click(function(){
+            var url = $(this).data('href');
+            var ids = [];
+            var idss = [];
+            $('input:checkbox[name="ids[]"]').each(function() {
+                var _that = $(this)[0];
+                if(_that.checked){
+                    ids = ids.concat($(this).val());
+                }else{
+                    idss = idss.concat($(this).val());
+                }
+			
+            });
+			console.log(ids);
+			console.log(idss);
+            if(confirm("您确定要删除么？")){
+                $.post(url,{ids:ids},function(data){
+                    util.message("删除成功","{php echo $_W['siteurl']}",'success');
+                },'json');
+            }
+        });
+
+
+$("#checkall").click(function(){
+            console.log('checkall');
+            $('input[name="ids[]"').each(function(){
+                var _that = $(this)[0];
+                if(_that.checked){
+                    _that.checked = false;
+                }else{
+                    _that.checked = true;
+                }
+            });
+        });
+
+
+$("#checkallbottom").click(function(){
+            $("#checkall").click();
+        });
+
+/*
+$(".delyhj").click(function(){
+//更新优惠券
+var url = "{php echo $this->createWebUrl('yhj_all_op');}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+
+if(dat.status==1){
+$('#delnum').show();
+$('#delnum').html(dat.delnum);
+$('#delnum').fadeOut(1000000);
+
+}
+
+});
+//更新优惠券
+        });
+*/
+
+
+$('table .status').click(function(){
+	var label = $(this);
+	$.ajax({
+		url:'{php echo $this->createWebUrl("listitemall",array("op"=>"status"))}',
+		type:'post',
+		data:{id:label.parent().attr('data-id')},
+		success:function(status){
+			if(status == '1'){
+				if(label.hasClass('label-success')){
+					label.removeClass('label-success').addClass('label-default');
+					label.text('下架');
+				}else{
+					label.removeClass('label-default').addClass('label-success');
+					label.text('上架');
+				}
+			}
+		}
+	});
+  });
+
+
+  $('table .istop').click(function(){
+	var label = $(this);
+	$.ajax({
+		url:'{php echo $this->createWebUrl("listitemall",array("op"=>"istop"))}',
+		type:'post',
+		data:{id:label.parent().attr('data-id')},
+		success:function(status){
+			if(status == '1'){
+				if(label.hasClass('label-success')){
+					label.removeClass('label-success').addClass('label-default');
+					label.text('非置顶');
+				}else{
+					label.removeClass('label-default').addClass('label-success');
+					label.text('置顶');
+				}
+			}
+		}
+	});
+  });
+
+
+});
+</script>
+{elseif $op == 'post'}
+<div class="panel panel-info">
+		<div class="panel-body">
+			<form action="" method="post" class="form-horizontal" role="form">
+			<input type="hidden" name="id" value="{$item[id]}">
+            
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">排序</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="displayorder" type="number" min="0" value="{$item['displayorder']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">状态</label>
+				<div class="col-sm-4">
+					<label><input type="radio" name="status" checked="checked" value="0"> 下架</label>
+					<label style="margin-left: 10px;"><input type="radio" name="status" {if $item['status']}checked="checked"{/if} value="1"> 上架</label>
+				</div>
+			</div>
+
+            <div class="form-group">
+                  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品分类</label>
+					<div class="col-sm-8 col-lg-2">
+						<select name="cate_id" class="form-control">
+							
+							<!--option value="0" {if intval($_GPC['cate_id']) == 0}selected="selected"{/if}>全部分类</option-->
+                          {loop $cateall $ii}
+							<option value="{$ii['id']}" {if intval($item['cate_id']) == $ii['id']}selected="selected"{/if}>{$ii['name']}</option>
+                          {/loop}
+						</select>
+					</div>
+            </div>
+            
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品ID</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="itemid" type="text" value="{$item['itemid']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品名称</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="title" type="text" value="{$item['title']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品文案</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="wenan" type="text" value="{$item['wenan']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">缩略图</label>
+                    <div class="col-sm-6 col-xs-12">
+                        {php echo tpl_form_field_image('itempic', $item['itempic']);}
+                        <span class="help-block"></span> </div>
+            </div>
+
+
+			
+            
+			
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">店铺名称</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="shoptitle" type="text" value="{$item['shoptitle']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品金额</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemfee" type="text" value="{$item['itemfee']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">券后金额</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemfee2" type="text" value="{$item['itemfee2']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品销量</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="itemmsell" type="number" min="0" value="{$item['itemmsell']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">内部标识</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="itemstatus" type="text" value="{$item['itemstatus']}" readonly>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">开始时间</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="stime" type="text" value="{$item['stime']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">结束时间</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="etime" type="text" value="{$item['etime']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品短网址</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemsurl" type="text" value="{$item['itemsurl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品网址</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemurl" type="text" value="{$item['itemurl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品淘口令</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemtkl" type="text" value="{$item['itemtkl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券总量</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_zl" type="text" value="{$item['itemyhj_zl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券剩余</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_yl" type="text" value="{$item['itemyhj_yl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券名称</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_tit" type="text" value="{$item['itemyhj_tit']}">
+					<span class="help-block">例：“满200元减40元”或“5元无条件券”请按照规则填写</span>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠开始时间</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_stime" type="text" value="{$item['itemyhj_stime']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠结束时间</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_etime" type="text" value="{$item['itemyhj_etime']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券网址</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_url" type="text" value="{$item['itemyhj_url']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券淘口令</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="itemyhj_tkl" type="text" value="{$item['itemyhj_tkl']}">
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">优惠券地址</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="quan_link" type="text" value="{$item['quan_link']}">
+				</div>
+			</div>
+
+			
+
+			<button type="submit" class="btn btn-primary" name="submit" value="提交">保存</button>
+			<input type="hidden" name="token" value="{$_W['token']}" />
+			</form>
+	</div>
+</div>
+
+
+
+
+{/if}
+{template 'footer'}

@@ -1,0 +1,57 @@
+{template 'common/header'}
+{template 'navs/manage'}
+<style>
+    .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {overflow: visible !important;}
+    .dropdown-menu{min-width:4em;}
+    .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {white-space: normal !important;overflow: visible !important;}
+    .dropdown{display:inline-block !important;}
+    .account-stat-num > div {width: 25%;float: left;font-size: 16px;text-align: center;}
+    .account-stat-num > div span {display: block;font-size: 30px;font-weight: bold;}
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        课程表
+    </div>
+    <div class="panel-body">
+        <table st-table="items" class="table table-striped table-condensed" style="display:auto;">
+            <thead>
+            <tr>
+                <th style="width:8em;">时间</th>
+                {loop $list['list'] $li}
+                <th style="width:auto;">{$li['title']}</th>
+                {/loop}
+            </tr>
+            </thead>
+            <tbody>
+                {php $groups = M('manage_time')->getall();}
+                {loop $groups $group}
+                <tr>
+                    <td onclick="window.location.href='{php echo $this->createWebUrl('manage_time',array('act'=>'edit','id'=>$group['id']))}'">{php echo date('H:i',$group['start_time'])}-{php echo date('H:i',$group['end_time'])}</td>
+                    {loop $list['list'] $li}
+                    <td>
+                        {php $manages = M('manage')->getall(array('week_id'=>$li['id'],'time_id'=>$group['id']))}
+                        {if !empty($manages)}
+                        {loop $manages $manage}
+                        <label onclick="window.location.href='{php echo $this->createWebUrl('manage',array('act'=>'edit','id'=>$manage['id']))}'" class="label label-info">{$manage['title']}</label>
+                        {/loop}
+                        {else}
+                        <a href="{php echo $this->createWebUrl('manage',array('act'=>'edit','week_id'=>$li['id'],'time_id'=>$group['id']))}" class="btn btn-default">+添加课程</a>
+                        {/if}
+                    </td>
+                    {/loop}
+                </tr>
+                {/loop}
+                <tr>
+                    <td>
+                        <a href="{php echo $this->createWebUrl('manage_time',array('act'=>'edit'))}" class="btn btn-default">+添加时间段</a>
+                    </td>
+                    {loop $list['list'] $li}
+                    <td></td>
+                    {/loop}
+                </tr>
+            </tbody>
+        </table>
+        {php echo $list['pager']}
+    </div>
+</div>
+{template 'common/footer'}

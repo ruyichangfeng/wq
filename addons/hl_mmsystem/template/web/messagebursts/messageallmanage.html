@@ -1,0 +1,166 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagebursts')}"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="alert alert-info" style="margin-top: 10px;">
+                                        <b>注意：</b>
+                                        <p>您的公众平台模板消息目前所属行业为：
+                                            <b>
+                                                {$industry['primary_industry']['first_class']}/{$industry['primary_industry']['second_class']}&nbsp;&nbsp;&nbsp;{$industry['secondary_industry']['first_class']}/{$industry['secondary_industry']['second_class']}&nbsp;&nbsp;&nbsp;
+                                            </b>
+                                        </p>
+                                        <p>当前列表内的模板消息为您已申请的模板消息，您可以点击查看详情或者删除处理。</p>
+
+                                    </div>
+                                    <form action="" method="post">
+                                        <div class="page-toolbar row m-b-sm m-t-sm">
+                                            <div class="col-sm-4">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-default btn-sm" type="button" onclick="refresh()">
+                                                        <i class='fa fa-refresh'></i>
+                                                    </button>
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" disabled="disabled">
+                                                        <i class='fa fa-trash'></i>删除
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 pull-right">
+                                                <div class="input-group">
+                                                    <input type="text" class="input-sm form-control" id="tempcode" value="" placeholder="请输入模板编码">
+                                                    <span class="input-group-btn">
+					<button class="btn btn-sm btn-primary" type="button" onclick="add_templ_msg(this)">添加微信公众号模板</button>
+				</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="blank"></div>
+                                        {if $count_templmsg > 0}
+                                        <table class="table table-bordered table-responsive table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th style="width:25px;"><input type='checkbox' onclick="swapCheck()"/></th>
+                                                <th style="width:45px;">序号</th>
+                                                <th>模板名称</th>
+                                                <th>所属行业</th>
+                                                <th class="text-right">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {php $i = '1'}
+                                            {loop $templmsg_list $item}
+                                            <tr>
+                                                <td>
+                                                    <input type='checkbox' name="delete[]" value="{$item['template_id']}"/>
+                                                </td>
+                                                <td>
+                                                    {$i}
+                                                </td>
+                                                <td>
+                                                    {$item['title']}
+                                                </td>
+                                                <td>
+                                                    {$item['primary_industry']}/{$item['deputy_industry']}
+                                                </td>
+                                                <td class="text-right">
+                                                    <button title="查看" type="button"  style="display: none"   class="btn btn-warning btn-sm" onclick="viewDetails('{$item['template_id']}')">查看详情</button>
+                                                    <a class='btn btn-danger btn-sm' href="JavaScript:;" onclick="delete_templ_msg('{$item['template_id']}')"><i class='fa fa-trash'></i> 删除</a>
+                                                </td>
+                                            </tr>
+                                            {php $i++}
+                                            {/loop}
+                                            </tbody>
+                                        </table>
+                                        {else}
+                                        <div class='panel panel-default'>
+                                            <div class='panel-body' style='text-align: center;padding:30px;'>
+                                                暂时没有任何微信模板!
+                                            </div>
+                                        </div>
+                                        {/if}
+                                    </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function add_templ_msg(obj) {
+        $(obj).html($(obj).html() + "...");
+        var tempcode = $("#tempcode").val();
+        var data = {
+            key:tempcode
+        };
+        $.ajax({
+            url: "{php echo $this->createWebUrl('interactive',array('op'=>'add_templmsg'))}",
+            data: data,
+            cache: false
+        }).done(function (result) {
+            var  data= jQuery.parseJSON(result);
+            $(obj).html($(obj).html().replace("...",""));
+            if(data.result==1) {
+                new $.flavr({
+                    content:'添加模板消息成功',
+                    closeOverlay:true,
+                    closeEsc:true
+                });
+                setTimeout(function() {
+                    location.reload();
+                }, 2000)
+            }else{
+                util.message(data.errmsg, '', 'error');
+            }
+
+        });
+    }
+    function delete_templ_msg(template_id){
+        new $.flavr({
+            content     : '确定删除该模板消息？',
+            buttons     : {
+                close   : { text: '取消', style: 'default' },
+                success : { text: '删除', style: 'primary',
+                    action: function(){
+                        window.location="{php echo $this->createWebUrl('messageallmanage',array('op'=>'delete_templ_msg'))}&key="+template_id;
+                    }
+                },
+            }
+        });
+    }
+    function viewDetails(key){
+        var url = "{php echo $this->createWebUrl('messageallmanage', array('op' => 'viewinfo'))}&key="+key;
+        var index = parent.layer.open({
+            type: 2,
+            title: '模板消息详情',
+            shadeClose: true, //点击遮罩关闭层
+            area : ['800px' , '700px'],
+            content:url
+
+        });
+    }
+</script>
+
+
+{template 'web/common/footer'}

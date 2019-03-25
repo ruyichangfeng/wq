@@ -1,0 +1,202 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>充次项目</h5>
+                </div>
+                <div class="ibox-content">
+
+
+                    <div class="form-group">
+
+                        <div class="col-sm-9">
+                            <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                                <input type="hidden" name="c" value="site" />
+                                <input type="hidden" name="a" value="entry" />
+                                <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                                <input type="hidden" name="do" value="goodsrechargecount" />
+                                <input type="hidden" name="op" value="list" />
+                                <div class="col-sm-4">
+                                    <select name="grcstatus" class="form-control">
+                                        <option value="3" {if $_GPC['grc_status'] == 3 || empty($_GPC['grc_status'])}selected{/if}>请选择项目状态</option>
+                                        <option value="1" {if $_GPC['grc_status'] == 1}selected{/if}>正常</option>
+                                        <option value="2" {if $_GPC['grc_status'] == 2}selected{/if}>停售</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="keyword" placeholder="输入关键字"/>
+                                        <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <a class="btn btn-primary" href="{php echo $this->createWebUrl('goodsrechargecount', array('op' => 'opengoods'))}" ><i class="fa fa-level-up"></i> 一键上架</a>
+                            <a class="btn btn-danger" href="{php echo $this->createWebUrl('goodsrechargecount', array('op' => 'closegoods'))}" ><i class="fa fa-level-down"></i> 一键停售</a>
+                        </div>
+
+                        <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goodsrechargecount')}" >
+                            <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                    </div>
+
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"> </label>
+                                    </div>
+                                </th>
+                                <th width="5%">排序</th>
+                                <th>计次项目描述</th>
+                                <th>总价格</th>
+                                <th>项目状态</th>
+                                <th>添加时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="form-control" name="displayorder[{$item['id']}]" value="{$item['grc_displayOrder']}"></td>
+                                <td>{$item['grc_rechargeRuleDescription']}</td>
+                                <td>{$item['grc_totalPrice']} 元</td>
+                                <td><input type="checkbox" name="status" data="{$item['grc_status']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['grc_status'] == 1 }checked="checked"{/if}></td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[grc_addTime]);}</td>
+                                <td>
+                        <span>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('goodsrechargecount',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input name="token" type="hidden" value="{$_W['token']}"/>
+                                    <input type="submit" class="btn btn-warning" name="submit" value="批量排序" />
+                                    <input type="submit" class="btn btn-danger" name="pldelete" value="批量删除"/> &nbsp;
+                                    <button class="btn btn-warning " type="button" name="btnupall" ><i class="fa fa-level-up"></i> 批量上架</button>
+                                    <button class="btn btn-warning " type="button" name="btndownall" ><i class="fa fa-level-down"></i> 批量停售</button>
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{if empty($_GPC['id'])}
+<script>
+//    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+//    setTimeout(function(){
+//        parent.layer.close(index); //再执行关闭
+//    }, 100);
+    $("button[name=btnupall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要上架的商品！","error");
+            return false;
+        }
+        if(confirm("确认要上架选择的商品?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('goodsrechargecount', array('op' => 'upall', 'storeid' => $storeid))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+
+                },'json'
+            );
+        }
+    });
+    $("button[name=btndownall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要停售的商品！","error");
+            return false;
+        }
+        if(confirm("确认要停售选择的商品?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('goodsrechargecount', array('op' => 'downall', 'storeid' => $storeid))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+                },'json'
+            );
+        }
+    });
+</script>
+{/if}
+<script>
+
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var id = $this.attr('data-id');
+            var status = this.checked ? 1 : 2;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('goodsrechargecount')}",{id:id,status:status},function () {
+            })
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+
+</script>
+{template 'web/common/footer'}

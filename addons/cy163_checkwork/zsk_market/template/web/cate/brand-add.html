@@ -1,0 +1,91 @@
+{template 'public/header'}   
+<style type="text/css">
+	.notice{display: block;color:orange;}
+	.dileo{margin-left: 2px !important;    float: left;width: 120px;}
+	.dile{float: left;margin-left: 2px !important;width: 100%;}
+</style>
+
+<script type="text/javascript" src="{ZSK_STATIC}layui/layui.all.js"></script>
+<div class="panel panel-info">
+	<div class="panel-heading">
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('');?>">品牌管理</a></li>
+		  <li class="active">编辑品牌</li>
+		</ol>
+	</div>
+	<div class="panel-body"> 
+	 	
+		<form class="form-horizontal" method="post" id="memForm" name="memForm" action="<?php echo $this->routeUrl('cate.brandAdd');?>">
+			<input type="hidden" value="{$brand['id']}" name="id" />
+			<table style="width: 96%;margin:10px auto;">
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">关联商品分类</td>
+				<td style="width:60%;">
+					<select class="form-control" name="category_id" >
+						<?php foreach($category as $k => $v){ ?>
+						<option value="{$v['id']}" <?php if($brand['category_id'] == $v['id']){ echo 'selected = "true"'; } ?> > <?php echo $v['name']; ?></option>
+						<?php } ?>
+					</select>
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">品牌名称</td>
+				<td style="width:60%;"><input type="text" class="form-control" value="{$brand['name']}" placeholder="7字以内" maxlength="7" name="name" id="name" ></td>
+				<td style="width:30%;"><label class="notice" style="color:orange;text-align: left;">&nbsp;*必填</label></td>
+			</tr>
+			
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;padding-top:10px;vertical-align: top;">品牌logo</td>
+				<td style="width:60%;">
+						{php echo tpl_form_field_images('logo',$brand['logo']);}
+				</td>
+				<td style="width:30%;"> <label class="notice" style="color:orange;text-align: left;">&nbsp;建议100*100</label></td>
+			</tr>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">状态</td>
+				<td style="width:60%;">
+					<select class="form-control" name="status" >
+						<option value="1" <?php if(intval($brand['status'])<2){ echo 'selected="true"';}?>>启用</option>
+						<option value="2" <?php if(intval($brand['status'])>1&&intval($brand['id'])>0){ echo 'selected="true"';}?>>禁用</option>
+						
+					</select>
+				</td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;">
+				<td style="width:20%;text-align: right;padding-right: 10px;">排序</td>
+				<td style="width:60%;"><input type="text" value="{$brand['sort']}" class="form-control" placeholder="数字越大，排序越靠前" id="sort" name="sort" ></td>
+				<td style="width:30%;"> </td>
+			</tr>
+			<tr style="height: 60px;">
+				<td  colspan="3" align="center">
+					 <button type="button" onclick="subBase()" class="mybtn" >保存</button>
+				</td>
+				 
+			</tr>
+		</table> 
+		</form>
+	</div>  
+</div>
+<script>
+	function subBase(){
+		var name = $('#name').val().length;
+		if(!name){
+			modalMsg('请填写品牌名称');
+			return false;
+		}
+		var sort = $('#sort').val().length;
+		if(!sort){
+			modalMsg('请填写排序');
+			return false;
+		}
+		var logo = $('input[name=logo]').val().length;
+		if(!logo){
+			modalMsg('请上传图片');
+			return false;
+		}
+		$("form[name='memForm']").submit();
+	}
+</script>
+{template 'public/footer'}

@@ -1,0 +1,154 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('store', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;添加店铺信息</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('store',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="Store">
+                        <input type="hidden" name="id" value="{$item['id']}">
+                        <div class="form-group">
+                            <label for="name" class="col-sm-3 control-label">店铺名称</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="name" class="form-control" value="{$item['sto_name']}" id='name' placeholder="请输入店铺名称"/>
+                            </div>
+                            <label for="name" class="col-sm-1 control-label">上级机构</label>
+                            <div class="col-xs-3">
+                                <select  class="form-control"  name="upHierarchy" id="upHierarchy">
+                                    <option value=""> 请选择上级管理机构</option>
+                                    {loop $storetype $itemsto}
+                                    <option value="{$itemsto['id']}" {if $itemsto['id'] == $item['sto_upHierarchy']}selected = "selected"{/if} >{$itemsto['org_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-3 control-label">联系人</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="contactMan" class="form-control" value="{$item['sto_contactMan']}" id='contactMan' placeholder="请输入联系人"/>
+                            </div>
+                            <label for="name" class="col-sm-1 control-label">联系电话</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="contactTel" class="form-control" value="{$item['sto_contactTel']}" id='contactTel' placeholder="请输入电话号码"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-3 control-label">店铺联系手机号</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="contactMoblie" class="form-control" value="{$item['sto_contactMoblie']}" id='contactMoblie' placeholder="请输入手机号码"/>
+                            </div>
+                            <label for="name" class="col-sm-1 control-label">联系地址</label>
+                            <div class="col-xs-4">
+                                {php echo tpl_form_field_district('reside',array('province' => $item['province'],'city' => $item['city'],'district' => $item['district']));}
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-3 control-label">商家店铺描述</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="detailAdress" class="form-control" value="{$item['sto_detailAdress']}" id='detailAdress' placeholder="请输入店铺描述"/>
+                            </div>
+                            <label for="name" class="col-sm-1 control-label">详细地址</label>
+                        <div class="col-xs-3">
+                            <input type="text" name="description" class="form-control" value="{$item['sto_description']}" id='description' placeholder="请输入详细地址"/>
+                            </div>
+                    </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">请选择图片：</label>
+                            <div class="col-sm-3">
+                                {php echo tpl_form_field_image('logo', $item['sto_logo'])}
+                                <span class="help-block">建议比例:300像素 * 300像素<span style="color: red"></span></span>
+                            </div>
+                            <label for="name" class="col-sm-1 control-label">店铺状态</label>
+                            <div class="col-xs-3">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="status" id="status1" value="1" {if $item['sto_status']==1 || empty($item['sto_status'])}checked="checked" {/if}>
+                                    <label for="status1"> 开启 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="status" id="status2" value="2" {if $item['sto_status']==2 }checked="checked" {/if}>
+                                    <label for="status2"> 关闭 </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-5 control-label"></label>
+                            <div class="col-sm-7">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#Store").validate({
+        rules: {
+            name: {
+                required: true,
+                name1:true,
+                maxlength:20,
+            },
+            contactMan: {
+                required: true,
+                name1:true,
+                maxlength:7,
+                minlength:2,
+            },
+            contactTel: {
+                required: true,
+                digits:true,
+                maxlength:11,
+                minlength:11,
+            },
+            contactMoblie: {
+                required: true,
+                phone1:true,
+            },
+            description: {
+                required: true,
+            },
+            logo: {
+                url: false,
+            },
+        },
+        messages: {
+            name: {
+                required: "请输入机构名称",
+                maxlength: $.validator.format( "不能大于20个字" ),
+            },
+            contactMan: {
+                required: "请输入联系人"
+            },
+            contactTel: {
+                required: "请输入联系人电话",
+                digits:"请输入正确的电话号码",
+                maxlength: $.validator.format( "请输入正确的电话号码" ),
+                minlength: $.validator.format( "请输入正确的电话号码" )
+            },
+            contactMoblie: {
+                required: "请输入手机号"
+            },
+            description: {
+                required: "请输入地址"
+            },
+
+        }
+    });
+    jQuery.validator.addMethod("name1", function(value, element) {
+        return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+    }, "只能包含中文字符。");
+    jQuery.validator.addMethod("phone1", function(value, element) {
+        return this.optional(element) || /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(value);
+    }, "请输入正确的手机号码。");
+</script>
+{template 'web/common/footer'}

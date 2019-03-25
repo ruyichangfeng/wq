@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{if !empty($cfg['title'])}{$cfg['title']}{else}附近门店{/if}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <style type="text/css">
+        body, html, #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        #golist {
+            display: none;
+        }
+
+        @media (max-device-width: 780px) {
+            #golist {
+                display: block !important;
+            }
+        }
+    </style>
+    <style>
+        @charset "utf-8";
+        /* CSS Document */
+        body {
+            font-family: Arial, "微软雅黑", sans-serif;
+        }
+
+        img {
+            border: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .fl {
+            float: left;
+        }
+
+        .fr {
+            float: right;
+        }
+
+        .clear {
+            clear: both;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .fenge {
+            width: 100%;
+            height: 2px;
+            background-color: #ccc;
+        }
+
+        div, body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .info-txt {
+            position: relative;
+            height: 30px;
+            overflow: hidden;
+        }
+
+        .info-txt span {
+            float: left;
+            font-size: 16px;
+            height: 24px;
+            line-height: 24px;
+            margin: 2px;
+        }
+
+        .info-txt img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .info-txt .no {
+            display: none;
+        }
+
+        .info-txt-icon {
+            border: 1px #ff6b2a solid;
+            color: #ff6b2a;
+            font-size: 12px;
+            float: left;
+            height: 16px;
+            line-height: 16px;
+            margin-top: 3px;
+            margin-bottom: 3px;
+            margin-left: 2px;
+        }
+
+        .info-txt2 {
+            position: relative;
+            font-size: 12px;
+            color: #898989;
+            line-height: 18px;
+            overflow: hidden;
+            margin: 8px 5px 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .info-txt3 {
+            position: relative;
+            font-size: 14px;
+            color: #ff6b2a;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .info-icon {
+            position: relative;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .info-icon .item {
+            padding-left: 15px;
+            line-height: 19px;
+            float: left;
+            margin-right: 10px;
+        }
+
+        .info-icon .yes {
+            background: url(/weChat/lbs/rsBike/images/d_07.jpg) no-repeat left center;
+            color: #333;
+        }
+
+        .info-icon .no {
+            background: url(/weChat/lbs/rsBike/images/d_09.jpg) no-repeat left center;
+            color: #9FA0A0;
+        }
+
+        .info-btn {
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            margin: 10px auto 0;
+        }
+
+        .info-btn a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .info-btn-l {
+            float: left;
+            background: #ff6b2a;
+            margin: 0 0 0 5px;
+            border-radius: 5px;
+            width: 45%;
+            text-align: center;
+            line-height: 32px;
+        }
+
+        .info-btn-r {
+            float: right;
+            margin: 0 5px 0;
+            background: #ff6b2a;
+            border-radius: 5px;
+            width: 45%;
+            text-align: center;
+            line-height: 32px;
+        }
+
+        .hide {
+            display: none !important
+        }
+
+        .btn-sm {
+            background-color: #f2f2f2;
+        }
+
+        .mobile-hds {
+            height: 45px;
+            line-height: 45px;
+            font-size: 14px;
+            padding: 0 10px;
+            color: #fff;
+            background-color: #dd514c;
+        }
+
+        .mobile-hds span {
+            height: 35px;
+            margin-top: 5px;
+        }
+
+        .mobile-hds span img {
+            filter: Alpha(opacity=70);
+            height: 30px;
+            line-height: 45px;
+            background-color: #fff;
+            padding: 2px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        .mobile-hds .listbn {
+            display: inline-block;
+            height: 30px;
+            line-height: 48px;
+            padding: 0 10px;
+            font-size: 30px;
+            color: #FFF;
+            text-decoration: none;
+        }
+
+        .mobile-hds .list {
+            filter: Alpha(opacity=80);
+            max-height: 280px;
+            list-style: none;
+            padding: 0px;
+            top: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            z-index: 9999;
+            right: 0;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        .mobile-hds .list li > a {
+            display: block;
+            padding: 0 10px;
+            min-width: 100px;
+            height: 35px;
+            line-height: 35px;
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .mobile-hds .list li > a i {
+            display: inline-block;
+            width: 20px;
+            margin-right: 5px;
+        }
+
+        .mobile-hds .list li > a i img {
+            height: 20px;
+        }
+
+        .mobile-hds .list li > a.smtype {
+            padding-left: 15px;
+            font-size: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px
+        }
+
+        .btn:focus, .btn:active:focus, .btn.active:focus {
+            outline: thin dotted;
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px
+        }
+
+        .btn:hover, .btn:focus {
+            color: #333;
+            text-decoration: none
+        }
+
+        .btn:active, .btn.active {
+            background-image: none;
+            outline: 0;
+            -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
+        }
+
+        .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+            pointer-events: none;
+            cursor: not-allowed;
+            filter: alpha(opacity=65);
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            opacity: .65
+        }
+
+        a.toplink {
+            display: inline-block;
+            float: left;
+            margin: 0;
+            color: #fff;
+            width: 33.3%;
+            text-align: center;
+        }
+
+        a.toplink:nth-child(1) {
+            text-align: left;
+        }
+
+        a.toplink:nth-child(3) {
+            text-align: right;
+        }
+        .BMap_Marker div img{
+            display: block;
+            border: none;
+            margin-left: 0px;
+            margin-top: 0px;
+            width: 92%;
+            height: 92%;
+        }
+    </style>
+    <style type="text/css">
+        @media screen {
+            .smnoscreen {
+                display: none
+            }
+        }
+        @media print {
+            .smnoprint {
+                display: none
+            }
+        }
+        .Leftback {
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background-color:rgba(0,0,0,0.5);
+            display:inline-block;
+            font-size:16px;
+            line-height:50px;
+            text-align:center;
+            position:fixed;
+            bottom:16%;
+            color:#fff;
+            z-index:1000;
+        }
+		.bkheight{
+		height:65%;
+		}
+		.bkheight1{
+		height:30%;
+		}
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=2700be6aa0fd672d91bd3b8a50e743ac"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=2700be6aa0fd672d91bd3b8a50e743ac&services=&t=20160513110936"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+</head>
+<body>
+
+<!--百度地图容器-->
+<div id="map" style="overflow: hidden; position: relative; z-index: 0; background-color: rgb(243, 241, 236); color: rgb(0, 0, 0); text-align: left;"></div>
+<div id="aa" style="position:absolute;display:none;width:100%;height:65.5%;z-index:1;bottom:0;">
+</div>
+<script type="text/javascript">    //创建和初始化地图函数：
+function initMap() {
+    createMap();//创建地图
+    setMapEvent();//设置地图事件
+    addMapControl();//向地图添加控件
+    addMapOverlay();//向地图添加覆盖物
+}
+function createMap() {
+    var lng = "{$lng}";
+    var lat = "{$lat}";
+    map = new BMap.Map("map");
+    map.centerAndZoom(new BMap.Point(lng, lat), 11);
+	var myIcon = new BMap.Icon("{$marker}", new BMap.Size(40,40));
+    var gpsPoint = new BMap.Point(lng, lat);
+    map.addControl(new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_LARGE}));
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.centerAndZoom(gpsPoint, 10);
+	var marker=new BMap.Marker(gpsPoint,{icon:myIcon});
+    map.addOverlay(marker);
+	//marker.setAnimation(BMAP_ANIMATION_BOUNCE)
+
+    // 添加定位控件
+    var geolocationControl = new BMap.GeolocationControl({
+        anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+        showAddressBar: false,
+        offset: new BMap.Size(5, 5)
+    });
+    geolocationControl.addEventListener("locationSuccess", function (e) {
+        // 定位成功事件
+        var address = '';
+		
+        address += e.addressComponent.province;
+        address += e.addressComponent.city;
+        address += e.addressComponent.district;
+        address += e.addressComponent.street;
+        address += e.addressComponent.streetNumber;
+		//console.trace(e.point);
+        alert("当前定位地址为：" + address);
+    });
+    geolocationControl.addEventListener("locationError", function (e) {
+        // 定位失败事件
+        alert(e.message);
+    });
+    map.addControl(geolocationControl);
+}
+function setMapEvent() {
+    map.enableScrollWheelZoom();
+    map.enableKeyboard();
+    map.enableDragging();
+    map.enableDoubleClickZoom()
+}
+function clo(){
+$("#aa").hide();
+}
+function addClickHandler(target, window) {
+    target.addEventListener("click", function () {
+        $("#aa").show(500,function(){$("#aa").html(window);});
+		
+    });
+}
+
+function addMapOverlay() {
+    var markers = {$json_maps};
+    for (var index = 0; index < markers.length; index++) {
+        var point = new BMap.Point(markers[index].position.lng, markers[index].position.lat);
+        var marker = new BMap.Marker(point, {
+            icon: new BMap.Icon("{$icon}", new BMap.Size(30, 30), {
+                imageOffset: new BMap.Size(markers[index].imageOffset.width, markers[index].imageOffset.height)
+            })
+        });
+        var label = new BMap.Label(markers[index].sname + " <img src='" + markers[index].sthumb + "' style='height:10px'>" + markers[index].dist, {offset: new BMap.Size(15, -25)});
+        label.setStyle({
+            fontSize: "12px",
+            border: "1px dashed #FC6",
+            padding: "3px 5px",
+            textAlign: "center",
+            lineHeight: "15px",
+  //  background:"url(/gohome.png)",
+            cursor: "pointer"
+        });
+		if(markers[index].showc==1)
+		{
+		
+			var infoWindow ="<div style='color:white;height:38%;background-color:rgba(3,3,3,0.6);'><div style='margin-left:14%;float:left;margin-right:4.5%;margin-top:3%;width:25%;height:80%;'><img src='" + markers[index].sthumb + "' style='border-radius:50%;width:20%;height:20%;position:absolute;''></div><p style='font-size:20px;line-height:30px;'>"+ markers[index].sname +"</p><p style='font-size:16px;'>"+markers[index].stel+"</p><img src='../addons/wx_lbsmap/images/x.png' style='position:absolute;right:2%;top:7%;' width='8%' onclick='clo();''><a href='tel:"+markers[index].stel+"'><div style='position:absolute;width:33%;height:10%;top:32%;left:14.5%;color:white;background-color:#ff6b2a;text-align:center;border-radius:2px;line-height:36px;'>电话</div></a><a href='http://api.map.baidu.com/marker?location=" + markers[index].position.lat + "," + markers[index].position.lng + "&title=" + markers[index].sname + "&content=" + markers[index].saddress + "电话" + markers[index].stel + "&output=html'><div style='position:absolute;width:33%;height:10%;top:32%;left:52.5%;color:white;background-color:#ff6b2a;text-align:center;border-radius:2px;line-height:36px;'>一键导航</div></a></div><div style='color:white;height:57%;border-top:1px dashed white;background-color:rgba(3,3,3,0.6);'><div style='margin-left:5%;float:left;margin-top:20%;width:25%;height:80%;'><img src='" + markers[index].cthumb + "' style='border-radius:50%;width:20%;height:20%;position:absolute;''></div><div  style='width:50%;float:left;color:white;line-height:23px;'><p><span style='font-size:20px;'>"+ markers[index].cname +"</span><br/><span style='font-size:16px;color:orange;'>";
+			if(markers[index].level==1)
+			{
+				infoWindow+="★";
+			}
+			else if(markers[index].level==2)
+			{
+				infoWindow+="★★";
+			}
+			else if(markers[index].level==3)
+			{
+				infoWindow+="★★★";
+			}
+			else if(markers[index].level==4)
+			{
+				infoWindow+="★★★★";
+			}
+			else if(markers[index].level==5)
+			{
+				infoWindow+="★★★★★";
+			}
+			infoWindow+="</span><br/><span style='font-size:16px;'>"+markers[index].ctel+"</span><br/><span style='font-size:16px;'>"+markers[index].info+"</span></p></div><a href='tel:"+markers[index].stel+"'><img src='../addons/wx_lbsmap/images/tel.png' style='margin-left:2%;float:left;margin-right:5%;margin-top:26%;' width='12%''></a></div>";
+		
+		}
+		else
+		{
+        
+		var infoWindow ="<div style='color:white;height:50%;background-color:rgba(3,3,3,0.6);position:absolute;bottom:0;width:100%;'><img src='" + markers[index].sthumb + "' style='margin-left:16.5%;border-radius:50%;float:left;margin-right:4.5%;margin-top:5%;' width='20%''><p style='font-size:20px;'>"+ markers[index].sname +"</p><p style='font-size:16px;'>"+markers[index].stel+"</p><img src='../addons/wx_lbsmap/images/x.png' style='position:absolute;right:2%;top:7%;' width='8%' onclick='clo();''><a href='tel:"+markers[index].stel+"'><div style='position:absolute;width:33%;height:24%;top:70%;left:14.5%;color:white;background-color:#ff6b2a;text-align:center;border-radius:2px;line-height:40px;'>电话</div></a><a href='http://api.map.baidu.com/marker?location=" + markers[index].position.lat + "," + markers[index].position.lng + "&title=" + markers[index].sname + "&content=" + markers[index].saddress + "电话" + markers[index].stel + "&output=html'><div style='position:absolute;width:33%;height:24%;top:70%;left:52.5%;color:white;background-color:#ff6b2a;text-align:center;border-radius:2px;line-height:40px;'>一键导航</div></a></div>";
+		
+		}
+
+        marker.setLabel(label);
+        addClickHandler(marker, infoWindow);
+        map.addOverlay(marker);
+    }
+
+}
+
+//向地图添加控件
+function addMapControl() {
+    //var scaleControl = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});
+//		scaleControl.setUnit(BMAP_UNIT_IMPERIAL);
+    //map.addControl(scaleControl);
+    //var navControl = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_LARGE});
+   // map.addControl(navControl);
+    var cr = new BMap.CopyrightControl({anchor: BMAP_ANCHOR_BOTTOM_LEFT});  //设置版权控件位置
+    map.addControl(cr); //添加版权控件
+    var bs = map.getBounds();
+    cr.addCopyright({id: 1, content: "", bounds: bs});
+}
+var map;
+initMap();
+//$(function(){
+//    navigator.geolocation.getCurrentPosition(translatePoint); //定位
+//});
+//function translatePoint(position){
+//    var currentLat = position.coords.latitude;
+//    var currentLon = position.coords.longitude;
+//    var gpsPoint = new BMap.Point(currentLon, currentLat);
+//    BMap.Convertor.translate(gpsPoint, 0, initMap); //转换坐标
+//}
+
+</script>
+
+</body>
+</html>

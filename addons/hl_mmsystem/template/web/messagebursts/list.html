@@ -1,0 +1,112 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class="active"><a data-toggle="tab" href="{php echo $this->createWebUrl('messagebursts')}" aria-expanded="true"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="ibox-content">
+                                            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                                <input type="hidden" name="c" value="site" />
+                                                <input type="hidden" name="a" value="entry" />
+                                                <input type="hidden" name="m" value="hl_mmsystem" />
+                                                <input type="hidden" name="do" value="messagebursts" />
+                                                <div class="page-toolbar row m-b-sm m-t-sm">
+                                                    <div class="col-sm-6">
+                                                        <div class="input-group-btn">
+                                                            <a class='btn btn-success' href="{php echo $this->createWebUrl('messagebursts', array('op'=>'taskadd'))}"><i class="fa fa-plus"></i> 添加群发任务</a>
+                                                            <button type="button" class="btn btn-info" style="margin-left: 3px;"><i class="fa fa-bar-chart-o"></i> 当前任务总数: {$total}</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 pull-right">
+                                                        <div class="input-group">
+                                                            <input type="text" class="input form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入关键词">
+                                                            <span class="input-group-btn"><button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <form action="" method="post" >
+                                                {if count($list)>0}
+                                                <table class="table table-hover table-bordered table-responsive" style="margin-top: 20px;">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>任务名称</th>
+                                                        <th><span class="label label-primary">发送条数</span>  <span class="label label-info">未发送数</span>   <span class="label label-success">成功数</span>   <span class="label label-danger">失败数</span></th>
+                                                        <th>状态</th>
+                                                        <th class="text-right">操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {loop $list $row}
+                                                    <tr>
+                                                        <td>{$row['mt_title']}</td>
+                                                        <td><span class="label label-primary" style="font-size: large">{$row['num']}</span>  <span class="label label-info" style="font-size: large">{$row['nosend']}</span>   <span class="label label-success" style="font-size: large">{$row['sendsuccess']}</span>   <span class="label label-danger" style="font-size: large">{$row['sendfail']}</span></td>
+                                                        <td><span class="badge badge-warning" style="font-size: 12px;">{$row['statustext']}</span></td>
+                                                        <td  style="overflow:visible;" class="text-right">
+                                                            {if $row['mt_status'] == '0'}
+                                                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'build', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="生成发送列表"><i class='fa fa-envelope-square'></i></a>
+                                                            {/if}
+                                                            <a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'run', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="开始发送"><i class="fa fa-paper-plane"></i></a>
+                                                            <a class="btn btn-primary btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'reset', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="重置发送"><i class='fa fa-spin fa-spinner'></i></a>
+                                                            <a class="btn  btn-warning btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'reset_error', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="只重置发送失败"><i class='fa fa-spin fa-refresh'></i></a>
+                                                            <a class="btn btn-primary btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'taskadd', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="编辑任务"><i class='fa fa-pencil-square-o'></i></i></a>
+                                                            <a class="btn btn-danger btn-sm" href="{php echo$this->createWebUrl('messagebursts', array('op' => 'delete', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="删除任务"><i class='fa fa-trash'></i></a>
+                                                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'showsign', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="查看发送日志"><i class="fa fa-book"></i></a>
+
+                                                        </td>
+                                                    </tr>
+                                                    {if $row['mt_status'] == '0'}
+                                                    <script>
+                                                        hideli_{$row['id']}();
+                                                        function hideli_{$row['id']}(){
+                                                            $('.remove_{$row["id"]}').hide();
+                                                        }
+                                                    </script>
+                                                    {/if}
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                                {$pager}
+                                                {else}
+                                                <div class='panel panel-default'style="margin-top: 20px;">
+                                                    <div class='panel-body' style='text-align: center;padding:30px;'>
+                                                        暂时没有任何任务!
+                                                    </div>
+                                                </div>
+                                                {/if}
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{template 'web/common/footer'}

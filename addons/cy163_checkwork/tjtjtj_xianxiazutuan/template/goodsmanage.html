@@ -1,0 +1,275 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+	  <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('goods', array('action' => ''));}">商品列表</a>
+      </li>
+      <li {if $_GPC['action'] == 'add'}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('goods', array('action' => 'add'));}">添加商品</a>
+      </li>
+      <li {if $_GPC['action'] == 'update'}class="active"{/if}>
+	    <a>编辑商品</a>
+      </li>
+    </ul>
+    
+    {if $_GPC['action'] == 'add'}
+    <form class="form-horizontal form" action="" method="post">       
+		<div class="panel-default panel">
+			<header class="panel-heading">
+				添加商品
+			</header>
+			<div class="panel-body">
+
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">主要信息</a></li>
+					<li role="presentation"><a href="#share" aria-controls="share" role="tab" data-toggle="tab">分享配置</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane active" id="home">
+						<div class="form-group" >
+							<input type="hidden" name="sid" value="{$_W['uniacid']}">
+							<div class="col-sm-9 col-xs-12">
+								<label for="name">商品名称：</label>
+								<input type="text" name="name" class="form-control" value="" placeholder="" />
+								<label for="logo">商品缩略图：</label>
+								{php echo tpl_form_field_image('logo');}<br/>
+								<label for="cid">所属分类：</label>
+								<select class="form-control" name="cid" style="width:30%;height:30px">
+									{loop $goodscategory $sel}
+									<option value="{$sel['uid']}">{$sel['name']}</option>
+									{/loop}
+								</select><br/>
+								<label for="stock">库存：</label>
+								<input type="text" name="stock" class="form-control" value="" placeholder="" />
+								<label for="sales">销量：</label>
+								<input type="text" name="sales" class="form-control"  value="" placeholder=""/>
+								<label for="singlelimit">单次购买限制：</label>
+								<input type="text" name="singlelimit" class="form-control" value="" placeholder="" />
+								<label for="morelimit">多次购买限制：</label>
+								<input type="text" name="morelimit" class="form-control"  value="" placeholder=""/>
+								<label for="gprice">团购价：</label>
+								<input type="text" name="gprice" class="form-control" value="" placeholder="" />
+								<label for="sprice">单人价：</label>
+								<input type="text" name="sprice" class="form-control"  value="" placeholder=""/>
+								<label for="morice">市场价：</label>
+								<input type="text" name="mprice" class="form-control" value="" placeholder="" />
+								<label for="sort">顺排序：</label>
+								<input type="text" name="sort" class="form-control" value="" placeholder="" />
+								<label for="atlas">图集：</label>
+								{php echo tpl_form_field_multi_image('atlas', $images);}
+								<label for="details">商品详情：</label>
+								{php echo tpl_ueditor('details', '');}<br/>
+								<label for="lid">物流ID：</label>
+								<!--注意物流ID是用选择列表进行选择，先将物流查出来，再放入下拉列表中-->
+								<select class="form-control" name="lid" style="width:30%;height:30px">
+									{loop $logistics $sel}
+									<option value="{$sel['uid']}">{$sel['name']}</option>
+									{/loop}
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div role="tabpanel" class="tab-pane" id="share">
+						<label for="">分享标题</label>
+						<input type="text" name="share_title" class="form-control" placeholder="请输入分享标题"/>
+						<label for="">分享描述</label>
+						<textarea name="share_description" class="form-control" placeholder="请输入分享描述" cols="30" rows="10"></textarea>
+						<label for="">分享LOGO</label>
+						{php echo tpl_form_field_image('share_logo');}<br/>
+						<label for="">分享次数</label>
+						<input type="text" name="share_nums" class="form-control" placeholder="请输入分享次数" value="0" />
+					</div>
+				</div>
+
+				<div class="col-sm-offset-2 col-sm-10">
+					<input name="token" type="hidden" value="{$_W['token']}"/>
+					<button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+						<i class="fa fa-check-circle"></i> 提交
+					</button>
+				</div>
+			</div>
+		</div>
+    </form>
+    {/if}
+
+    
+    {if $_GPC['action'] == 'update'}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="sid" value="{$_W['uniacid']}" />
+        <div class="form-group" >
+
+			<div class="panel panel-default">
+				<header class="panel-heading">
+					商品编辑
+				</header>
+				<div class="panel-body">
+
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">主要信息</a></li>
+						<li role="presentation"><a href="#share" aria-controls="share" role="tab" data-toggle="tab">分享配置</a></li>
+					</ul>
+
+					<div class="tab-content">
+
+						<div role="tabpanel" class="tab-pane active" id="home">
+							<div class="col-sm-9 col-xs-12">
+								<label for="name">商品名称：</label>
+								<input type="text" name="name" class="form-control" value="{$re['name']}" placeholder="" />
+								<label for="logo">商品缩略图：</label>
+								{php echo tpl_form_field_image('logo',$re['logo']);}<br/>
+								<label for="cid">所属分类：</label>
+								<select class="form-control" name="cid" style="width:30%;height:30px">
+									{loop $goodscategory $sel}
+									<option value="{$sel['uid']}" {if $sel['uid'] == $re['cid']}selected{/if}>{$sel['name']}</option>
+									{/loop}
+								</select><br/>
+								<label for="stock">库存：</label>
+								<input type="text" name="stock" class="form-control" value="{$re['stock']}" placeholder="" />
+								<label for="sales">销量：</label>
+								<input type="text" name="sales" class="form-control"  value="{$re['sales']}" placeholder=""/>
+								<label for="singlelimit">单次购买限制：</label>
+								<input type="text" name="singlelimit" class="form-control" value="{$re['singlelimit']}" placeholder="" />
+								<label for="morelimit">多次购买限制：</label>
+								<input type="text" name="morelimit" class="form-control"  value="{$re['morelimit']}" placeholder=""/>
+								<label for="gprice">团购价：</label>
+								<input type="text" name="gprice" class="form-control" value="{$re['gprice']}" placeholder="" />
+								<label for="sprice">单人价：</label>
+								<input type="text" name="sprice" class="form-control"  value="{$re['sprice']}" placeholder=""/>
+								<label for="mprice">市场价：</label>
+								<input type="text" name="mprice" class="form-control" value="{$re['mprice']}" placeholder="" />
+								<label for="gpeople">团购人数：</label>
+								<input type="text" name="gpeople" class="form-control"  value="{$re['gpeople']}" placeholder=""/>
+								<label for="sort">顺排序：</label>
+								<input type="text" name="sort" class="form-control" value="{$re['sort']}" placeholder="" />
+								<label for="atlas">图集：</label>
+								{php echo tpl_form_field_multi_image('atlas', explode('$', $re['atlas']));}
+								<label for="details">商品详情：</label>
+								{php echo tpl_ueditor('details',$re['details']);}<br/>
+								<label for="lid">物流ID：</label>
+								<!--注意物流ID是用选择列表进行选择，先将物流查出来，再放入下拉列表中,所属分类也是-->
+								<select class="form-control" name="lid" style="width:30%;height:30px">
+									{loop $logistics $sel}
+									<option value="{$sel['uid']}" {if $sel['uid'] == $re['lid']}selected{/if}>{$sel['name']}</option>
+									{/loop}
+								</select>
+							</div>
+						</div>
+
+						<div role="tabpanel" class="tab-pane" id="share">
+							<input type="hidden" name="shareid" value="{$re['shareid']}">
+							<label for="">分享标题</label>
+							<input type="text" name="share_title" value="{$re['share_title']}" class="form-control" placeholder="请输入分享标题"/>
+							<label for="">分享描述</label>
+							<textarea name="share_description" class="form-control" placeholder="请输入分享描述" cols="30" rows="10">{$re['share_description']}</textarea>
+							<label for="">分享LOGO</label>
+							{php echo tpl_form_field_image('share_logo', $re['share_thumb']);}<br/>
+							<label for="">分享次数</label>
+							<input type="text" name="share_nums" class="form-control" placeholder="请输入分享次数" value="{$re['share_nums']}" />
+						</div>
+				</div>
+			</div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="update" value="编辑">
+                    <i class="fa fa-check-circle"></i> 提交修改
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+
+    {if $_GPC['action'] ==''}
+
+	<div class="panel-default panel">
+		<header class="panel-heading">
+			筛选
+		</header>
+		<div class="panel-body">
+			<form id="filter" action="" method="get">
+
+				<div class="form-group col-lg-6">
+					<label for="">商品名（支持模糊查询）</label>
+					<input type="text" name="goodsname" value="{if $_GPC['goodsname']}{$_GPC['goodsname']}{/if}" class="form-control" placeholder="请输入商品名关键字" />
+				</div>
+				<div class="form-group col-lg-6">
+					<label for="">商品分类</label>
+					<select name="goodscate" class="form-control">
+						<option value="0">全部</option>
+						{loop $goodscategory $category}
+						<option value="{$category['uid']}" {if $_GPC['goodscate'] == $category['uid']}selected{/if}>{$category['name']}</option>
+						{/loop}
+					</select>
+				</div>
+				<input type="button" value="筛选" class="btn btn-primary" onclick="location.href = '{php echo $this->createWebUrl('goods')}&' + $('#filter').serialize();" />
+			</form>
+		</div>
+	</div>
+
+	<div class="panel-default panel">
+		<div class="panel-body">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+				<tr>
+					<th>ID</th>
+					<th>商品名称</th>
+					<th>商品缩略图</th>
+					<th>所属分类</th>
+					<th>库存</th>
+					<th>销量</th>
+					<th>单次购买限制</th>
+					<th>多次购买限制</th>
+					<th>团购价</th>
+					<th>单人价</th>
+					<th>市场价</th>
+					<th>物流ID</th>
+					<th>状态</th>
+					<th style=" width:200px" >操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{loop $records $res}
+				<tr>
+					<td>{$res['uid']}</td>
+					<td>{$res['name']}</td>
+					<td><img src="{$_W['attachurl']}{$res['logo']}" width="35px" height="35px"></td>
+					<td>{$res['categoryname']}</td>
+					<td>{$res['stock']}</td>
+					<td>{$res['sales']}</td>
+					<td>{$res['singlelimit']} 次</td>
+					<td>{$res['morelimit']} 次</td>
+					<td>{$res['gprice']} 元</td>
+					<td>{$res['sprice']} 元</td>
+					<td>{$res['mprice']} 元</td>
+					<td>{$res['logisticname']}</td>
+					<td>
+						{if $res['status'] == 0}<span class="label label-success">正常</span>
+						{elseif $res['status'] == -1}<span class="label label-default">下架</span>
+						{else}<span class="label label-warning">锁定</span>{/if}</td>
+					<td>
+						<a class="btn btn-sm btn-danger" onclick="if(confirm('确定要删除？')){ location.href = '{php echo $this->createWebUrl('goods',array('action'=>'delete', 'uid' => $res['uid']));}'; }">删除</a>
+						<a class="btn btn-sm btn-warning" href="{php echo $this->createWebUrl('goods',array('action'=>'update', 'uid' => $res['uid']));}">编辑</a>
+					</td>
+				</tr>
+				{/loop}
+				</tbody>
+			</table>
+			<div class="col-xs-12">
+				{php echo $pager}
+			</div>
+		</div>
+	</div>
+    {/if}
+    
+</div>
+
+{template 'common/footer'}

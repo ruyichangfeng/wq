@@ -1,0 +1,137 @@
+{php define(MUI, true);}
+{template 'common/header_base'}
+<script src="{HLMMS_JS}JsBarcode.all.min.js"></script>
+<style>
+    body{
+        background-color: white;
+    }
+    .mui-content{
+        background-color: white;
+    }
+    .head img {
+        border-radius: 50%;
+    }
+    .head{
+        text-align: center;
+        background-image: url("{HLMMS_MOBILE_IMG}bg.png");
+        background-size:100% 100%;
+    }
+</style>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: black"></a>
+    <h1 class="mui-title">云支付</h1>
+</header>
+<div class="mui-content">
+    <div class="mui-card">
+        <div class="head" style="height: 100px">
+            {if $baksettingsopenid['set_storeLogo']}
+            <img src="{php echo tomedia($baksettingsopenid['set_storeLogo'])}" width="60px" height="60px" style="margin-top:2%"/>
+            {else}
+            <img src="{HLMMS_MOBILE_IMG}touxiang_logo.jpg" width="60px" height="60px" style="margin-top:2%"/>
+            {/if}
+            <h4>{$baksettingsopenid['set_storeName']}</h4>
+        </div>
+        <div class="mui-card-content">
+            <ul class="mui-table-view" >
+                <div class="mui-row" style="width: 100%;">
+                    <div class="mui-col-sm-6 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            <a class="mui-navigate-right">
+                                今日总收入： {$sellerTodayMoneyCount} 元 ，一共{$sellerTodayMoneyCountNum} 笔
+                            </a>
+                        </li>
+                    </div>
+                    <div class="mui-col-sm-6 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            <a class="mui-navigate-right">
+                                今日微信收入： {$sellerTodayWechatMoneyCount} 元 ， 一共 {$sellerTodayWechatMoneyCountNum} 笔
+                            </a>
+                        </li>
+                    </div>
+                    <div class="mui-col-sm-6 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            <a class="mui-navigate-right">
+                                今日支付宝收入： {$sellerTodayAliPayMoneyCount} 元 ， 一共 {$sellerTodayAliPayMoneyCountNum} 笔
+                            </a>
+                        </li>
+                    </div>
+
+                    <div class="mui-col-sm-6 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            <a class="mui-navigate-right">
+                                本月总收入：{$sellerNowMonthMoneyCount} 元 ， 一共 {$sellerNowMonthMoneyCountNum} 笔
+                            </a>
+                        </li>
+                    </div>
+                    <div class="mui-col-sm-6 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            <a class="mui-navigate-right">
+                                本年度总收入：{$sellerYearMoneyCount} 元 ， 一共 {$sellerYearMoneyCountNum} 笔
+                            </a>
+                        </li>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <div class="mui-slider-item">
+        <ul class="mui-table-view mui-grid-view mui-grid-9"  style="background-color: white">
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                <a href="{php echo $this->createMobileUrl('payment',array('op' => 'onecodepay'))}">
+                    <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}yimafu.png" />
+                    <div class="mui-media-body">一码付</div>
+                </a>
+
+            </li>
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" >
+                <a href="{php echo $this->createMobileUrl('payment',array('op' => 'quotalist'))}">
+                    <img class="mui-icon" style="width: 32px; height:32px;" src="{HLMMS_MOBILE_ICOS}de.png" />
+                    <div class="mui-media-body">定额收款</div>
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                <a href="{php echo $this->createMobileUrl('payment',array('op' => 'activePay'))}">
+                    <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}sk.png"/>
+                    <div class="mui-media-body">主动收款</div>
+                </a>
+            </li>
+
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3"  id="count">
+                <a href="#" id="scanqrcode">
+                    <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}saoyi.png" />
+                    <div class="mui-media-body">刷卡收款</div>
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                <a href="{php echo $this->createMobileUrl('payment',array('op' => 'documents'))}">
+                    <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}xiaofeijilu.png" />
+                    <div class="mui-media-body">收款账单</div>
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                <a href="{php echo $this->createMobileUrl('payment',array('op' => 'setup'))}">
+                    <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}sz.png" />
+                    <div class="mui-media-body">设置提醒</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    mui.init();
+    document.querySelector('#scanqrcode').onclick = function () {
+        wx.scanQRCode({
+            needResult: 1,
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            desc: 'scanQRCode desc',
+            success: function (res) {
+                var result = res.resultStr;
+                $("#cmdVerificationcode").val(result);
+            }
+        });
+    };
+</script>
+{template 'common/footer_base'}

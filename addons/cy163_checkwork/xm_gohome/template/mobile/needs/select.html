@@ -1,0 +1,227 @@
+{template 'public/header'}
+
+<body>
+<!--加载进度开始-->
+    <div id="pageLoader" class="weui_loading_toast">
+       <div class="weui_mask_transparent"></div>
+       <div class="weui_toast">
+           <div class="weui_loading">
+               <!-- :) -->
+               <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+               <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+           </div>
+           <p class="weui_toast_content">初始化设备</p>
+       </div>
+    </div>
+    <!--加载进度结束-->
+<div class="ub ub-ver bga page" id="page0">
+ <div class="ub c-red1 ub-ver ub-ac ub-pc ub-img1" style="padding:0 0rem 3rem 0rem; background-image:url({MODULE_URL}static/images/u-center-bg.jpg)">
+	    <div class="bid_header ub">
+	    	<a href="{php echo $this->createMobileUrl('needs',array('foo'=>'look', 'id' => $id))}" class="block"><span class="uc-a15 t-yel uba b-yel absolute ulev-4" style="left:1rem; top:1rem; padding:0.2rem 0.5rem;">查看订单</span></a>
+	        {if in_array(1,$idStr)==0}
+	        <a onClick="orderDel({$id})" class="block"><span class="uc-a15 t-yel uba b-yel absolute ulev-4" style="right:1rem; top:1rem; padding:0.2rem 0.5rem;">取消竞价</span></a>
+	        {/if}
+	    </div>
+	        
+	    <div class="ub ub-ver" style="width:5rem; height:5rem; margin-top:2rem">
+	       	<div class="loadaaa absolute" style="left:0; top:0;width:100%; height:100%"></div>
+	        <div class="ub-f1 tx-c ub ub-ver ub-pc">
+	            <div class="t-yel"><span class="ulev4" id="num"></span></div>
+	        </div>
+	    </div>
+	    
+	    <div class="t-wh umar-t">已有竞价商铺</div>
+	    <div class="absolute tx-c ulev-4 t-yel ubt b-bla01" style="left:0; bottom:0;width:100%; padding:0.5rem 0">请从以下竞价人中选定商铺</div>
+    </div>
+    
+    <!--无记录-->
+    <div class="weui_msg" style="display:none">
+    	<div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div>
+    	<div class="weui_text_area">
+      		<h2 class="weui_msg_title">暂无竞价</h2>
+    	</div>
+  	</div>
+  	<!--无记录-->
+  	
+  	<form class="ub-f1 blcok connn" action="{php echo $this->createMobileUrl('needs',array('foo'=>'selectedsure'))}" method="post" onSubmit="return checkform()">
+  		<input type="hidden" name="order_id" value="{$id}" />
+	  	<div class="bid_body ub-fl">
+	    <!--竞单列表-->
+	    	<ul id="show" class="ub-f1 uinn8 ww-check">
+		    	
+	    	</ul>
+	    	<div class="ulev-4 t-dgra tx-c uinn1">系统将通知您选定的商铺完成服务</div>
+	    	<div class="umar-b1 umar-l umar-r umar-t1 pc_btn">
+	    		{if count($list) != 0}
+		        	{if in_array(1,$idStr)==0}
+		            	<input name="submit" type="submit" value="选定竞价人" class="weui_btn weui_btn_warn"  />
+		            	<input type="hidden" name="token" value="{$_W['token']}" />
+		            {/if}
+		            
+		            {if in_array(1,$idStr)==1}
+		            	<div class="weui_btn weui_btn_default" onClick="sureok()">已选定竞价人</div>
+		            {/if}
+		        {/if}
+	    	</div>
+	    </div>
+    </form>
+   
+    <div class="" style="height:3.125rem"></div>
+  	
+  	<!--手机端底部-->
+  	{template 'footer'}
+  	<!--手机端底部-->
+    
+</div>
+{template 'public/footerjs'}
+<script type="text/javascript" src="{MODULE_URL}static/js/baidutmp.js"></script>
+
+<script id='near' type="text/template">
+	<!-- 模板部分 -->
+	<%if(json != 0){%>
+		<%for(var i=0;i<json.length;i++){%>
+			<li class="uba b-bla01 uc-a15 ub umar-b">
+	        	<div class="uinn ub ub-ver tx-c">
+	        		<div class="uc-a50 ub ub-ac ub-pc tx-c rod-imgbox uba b-gra5 imgbox ub-img1" >
+	                	<img src="<%=json[i].coverpic%>" class="uc-a50" style="height: 3em;">		
+	                </div>
+	                
+	            </div>
+	            <div class="ub-f1 uinn ubl b-bla01" style="">
+	            	<div class="ub ub-ac">
+	                	<div class=""><%=json[i].merchant_name%></div>
+	                    <div class="ub-f1 ulev-2 tx-r">
+	                    	
+	                    </div>
+	                </div>
+	                <div class="ulev-4 t-gra">
+	                	<div class="ub">报价：
+	                		<%=json[i].offer%>元
+	                	</div>
+	                	
+	                    <div>地址：<%=json[i].merchant_address%></div>
+	                </div>
+	            </div>
+	            <input name="radio_v" type="radio" id="ww<%=i%>" value="<%=json[i].id%>|<%=json[i].merchant_id%>" >
+	            <label class="ubl b-bla01 ub ub-ac ub-pc block" for="ww<%=i%>" style="padding:0.5rem 0.75rem">
+	            	<i class="iconfont icon-xuanzhong ulev2 t-dgra"></i>
+	            </label>
+	        </li>
+		<%}%>
+	<%}else{%>
+        <!--无记录-->
+        <div class="weui_msg">
+			<div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div>
+			<div class="weui_text_area">
+		  		<h2 class="weui_msg_title">暂无竞价</h2>
+			</div>
+		</div>
+  		<!--无记录-->
+    <%}%>    
+    <!-- 模板结束 -->
+</script>
+
+<script type="text/javascript">
+$(".closealert").click(function() {
+	 $(".mban").animate({top:'-800px'})
+	 $(".loginmask").fadeOut(500);
+});
+function openPe(){
+	$(".loginmask").fadeIn(500), $(".mban").animate({top:'0px'})
+}
+function addsz(){
+	document.getElementById('num').innerHTML++;
+}
+
+//进页面加载数据
+$(document).ready(function(){
+	getInit();
+	setInterval('getInit()',5000);
+}); 
+
+
+var forumPage = 1;
+function getInit(){
+	forumPage = 1;
+    
+	var id = "{$id}";
+	var data = {};
+    data['forumPage'] = forumPage;
+	data['id'] = id;
+    
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('needs', array('foo'=>'getselected'));}",
+		type:"POST",
+		data: data,
+		dataType:"json",
+		success: function(res){
+			
+			if(res == 0){
+				document.getElementById('num').innerHTML = 0;
+				document.getElementById('pageLoader').style.display = 'none';
+				document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无竞价</h2></div></div>';
+			}else{
+				var json = eval(res);
+                var near = baidu.template("near",{json:json});
+                document.getElementById('show').innerHTML = near;
+                document.getElementById('pageLoader').style.display = 'none';
+                document.getElementById('num').innerHTML = json.length; 
+                
+			}
+		}
+	});
+}
+
+function checkform(){
+	var radio=document.getElementsByName("radio_v");
+	var selectvalue=null;   //  selectvalue为radio中选中的值
+    for(var i=0;i<radio.length;i++){
+		if(radio[i].checked==true) {
+			selectvalue=radio[i].value;
+			break;
+		}
+	}
+	
+	if(selectvalue == '' || selectvalue == null){
+		alert('请选择一个竞价人');
+		return false;
+	}
+}
+
+function orderDel(id){
+	if(window.confirm('确定取消该订单？')){
+		$.ajax({ 
+			url: "{php echo $this->createMobileUrl('needs', array('foo'=>'delorder'));}",
+			type:"POST",
+			data:{'id':id},
+			dataType:"json",
+			success: function(res){
+				if(res == "0"){
+					alert('对不起,取消失败！请稍后再试');
+				}else{
+					window.location.href = "{php echo $this->createMobileUrl('needs', array('foo'=>'order'))}";
+				}
+			}
+		});
+    }else{
+		return false;
+	}
+}
+
+function sureok(){
+	alert('您已选定竞价人员');
+}
+</script>
+
+</body>
+</html>

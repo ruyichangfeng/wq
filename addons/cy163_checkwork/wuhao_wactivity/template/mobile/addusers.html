@@ -1,0 +1,83 @@
+{template 'common/header'}
+
+<div class="container">  
+  <form  class="form-horizontal" action="" method="POST" onsubmit='return check()'>
+    <!-- <div class="form-group">
+      <h2>请补充您的姓名和电话信息,方便及时联系您<h2>
+    </div> -->
+    <div class="form-group" style="margin-top:30px;">      
+        <label for="place" class="col-xs-3 col-md-1">姓名</label>   
+        <div class="col-xs-9">     
+          <input type="text" class="form-control" id="name" name="name"/>
+        </div>             
+    </div>
+    <div class="form-group">      
+        <label for="place" class="col-xs-3 col-md-1">电话</label>   
+        <div class="col-xs-9">     
+          <input type="text" class="form-control" id="phone" name="phone"/>
+        </div>             
+    </div>
+
+    <div class="form-group">      
+        <label for="place" class="col-xs-3 col-md-1">群组</label>   
+        <div class="col-xs-9">     
+          <select name="groupname" id="groupname" class="form-control">          
+          </select>
+        </div>             
+    </div>         
+    
+    <div class="form-group">
+      <div class="col-xs-3 col-md-1"></div>      
+      <div class="col-xs-9">
+        <input type="submit" class="btn btn-default" name="addusers" style="width:120px;height:50px;" value="提交">
+        <input type="hidden" value="{$_W['token']}" name="token">        
+      </div>
+    </div>
+  </form>
+</div>
+
+
+<script type="text/javascript">
+
+  function check(){
+    var name=document.getElementById("name").value;
+    var phone=document.getElementById("phone").value;
+    if(!/^[\u4E00-\u9FA5\uf900-\ufa2d]{2,4}$/.test(name)){
+      alert('姓名不合法,请输入2到4个中文字符！');
+      return false;
+    }
+    if(!/^1[0-9]{10}$/.test(phone)){
+      alert('手机格式不合法，请重新输入');
+      return false;
+    }
+    return true;
+  }
+
+
+  
+
+  $(document).ready(function(){
+    var url = "{php echo $this->createMobileUrl('getcategory')}";
+    
+    var output = [];
+    $.ajax({
+      url:url,
+      type:'get',
+      
+      dataType:'json',
+      async:false,
+      success:function(data){
+        //console.log(data);
+        for(var i in data){
+          output.push('<option>'+ data[i]['groupname'] +'</option>');
+        }
+        $('#groupname').html(output.join(''));
+
+      },
+      error: function (msg) {  
+          alert("出错了！");  
+      }
+    });
+  });
+</script>
+{template 'common/footer'}

@@ -1,0 +1,116 @@
+{template 'inc/header'}
+<body>
+	{if $baners}
+	<header class="swiper-container">
+		<div class="swiper-wrapper">
+			{loop $baners $it}
+				<div class="swiper-slide">
+					<img src="{php echo tomedia($it['thumb']);}" width="100%">
+					<div class="indexname">{$it['catename']}</div>
+				</div>
+			{/loop}
+        </div>
+	</header>
+	{/if}
+	<section>
+		{if $types}
+		<div class="type">
+			<ul>
+				{loop $types $item}
+					<li>
+						<a href="{$item['url']}">
+						<img src="{php echo tomedia($item['thumb']);}" >
+						{$item['catename']}
+						</a>
+					</li>
+				{/loop}
+			</ul>
+		</div>
+		{/if}
+		<div class="notice">
+			<div class="title" style="{if $setting['color']} color:{$setting['color']}; {/if}">
+				{if $setting['wdcx']}{$setting['wdcx']}{else}网点查询{/if}
+			</div>
+			<div class="content">
+				<marquee behavior="scroll" scrollamount="5" onmouseout="this.start();">{if $setting['notice']}{$setting['notice']}{else}暂无公告{/if}</marquee>	
+			</div>
+		</div>
+		<div class="point">
+			{loop $stores $sto}
+			<div class="point-div">
+				<div class="con">
+					<a href="{php echo $this->createMobileUrl('showDetail',array('id'=>$sto['id']));}">
+					<div class="detail">
+						<div class="pic">
+							{if $sto['storelogo']}
+							<img src="{php echo tomedia($sto['storelogo']);}" width="100%">
+							{elseif $setting['avar']}
+							<img src="{php echo tomedia($setting['avar']);}" width="100%">
+							{else}
+							<img src="{NEARBY_IMAGE}123.png" width="100%">
+							{/if}
+						</div>
+						<div class="title">
+							{php $name =  mb_substr($sto['storename'],0,12,'utf-8');}
+							<h3>{$name}...</h3>
+							{php $address=mb_substr($sto['province'].$sto['city'].$sto['address'],0,18,'utf-8')}
+							<p style="color:#AFADAD;">{$address}...</p>
+						</div>
+						{if $sto['disc']}
+						<div class="disc">
+							<span style="{if $setting['color']} background-color:{$setting['color']}; {/if}">{$sto['disc']}km</span>
+						</div>
+						{/if}
+					</div>
+					</a>
+					<div class="contact">
+						<div class="tel">
+							<a data="{$sto['tel']}" >
+								<div class="mid">
+									<img src="{NEARBY_IMAGE}tel.png" width="25%" height="100%"><span style="{if $setting['color']} color:#000; {/if}">一键拨号</span>
+								</div>
+							</a>
+						</div>
+						<div class="nav">
+							<?php 
+									$sto['remark']= htmlspecialchars_decode($sto['remark']);
+									$sto['remark']= preg_replace("/<(.*?)>/","",$sto['remark']); 
+							?>
+							{if $sto['lat']&&$sto['lng']}
+							<a href="http://api.map.baidu.com/marker?location={$sto['lat']},{$sto['lng']}&title={$hd['address']}&content={$hd['address']}&output=html&src=weiba|weiweb" data-la="{$sto['lat']}" data-lg="{$sto['lng']}">
+								<div class="mid">
+									<img src="{NEARBY_IMAGE}dw.png" width="25%" height="100%"><span style="{if $setting['color']} color:#000; {/if}">一键导航</span>
+								</div>
+							</a>
+							{else}
+								<div class="mid nodh">
+									<img src="{NEARBY_IMAGE}dw.png" width="25%" height="100%"><span style="{if $setting['color']} color:#000; {/if}">一键导航</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+			</div>
+			{/loop}
+		</div>
+	</section>
+	<div class="copyright"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+</body>
+<script src="{NEARBY_JS}swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container');
+    $(".tel a").click(function(){
+    	var a = $(this).attr("data");
+    	if(a){
+    		window.location.href = "tel:"+a;
+    	}else{
+    		swal('商家很懒，未标明电话号码!');
+    	}
+    })
+
+    $(".nav .nodh").click(function(){
+    	swal('商家很懒，未标明地址!');
+    })
+
+</script>
+</html>

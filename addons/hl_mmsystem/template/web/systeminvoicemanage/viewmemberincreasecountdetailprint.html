@@ -1,0 +1,125 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content p-xl">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <address>
+                            <strong>{php echo $setStoreData['set_storeName']}</strong><br>
+                            {php echo $setStoreData['set_storeDetailAdress']}<br> <abbr title="Phone">总机：</abbr>
+                            {php echo $setStoreData['set_storeContactTel']}
+                        </address>
+                    </div>
+
+                    <div class="col-sm-6 text-right">
+                        <h4 class="text-navy">单据编号：{$getconsumeinvoice['mrci_invoiceCode']}</h4>
+                        <address>
+                            <strong>会员名称：{$getconsumeinvoice['mrci_memberName']}</strong><br>
+                           操作员： {php echo util::getAccountUser($getconsumeinvoice['roleuser_id'])['username'];}<br>
+                            会员卡号： {$getconsumeinvoice['mrci_memberCardNum']}<br>
+                            <span><strong>消费时间：</strong> {php echo date('Y-m-d H:i:s', $getconsumeinvoice[mrci_addTime]);}</span>
+                        </address>
+
+                    </div>
+                </div>
+
+                <div class="table-responsive m-t">
+                    <table class="table invoice-table">
+                        <thead>
+                        <tr>
+                            <th>消费项目</th>
+                            <th>单价（元）</th>
+                            <th>数量</th>
+                            <th>小计金额</th>
+                            <th>获得积分</th>
+                            <th>有效期至</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $getincreasecountlist $getincreasecountitem}
+                        <tr>
+                            <td>{$getincreasecountitem['mrc_goodsName']}</td>
+                            <td>{$getincreasecountitem['mrc_goodsprice']}</td>
+                            <td>{$getincreasecountitem['mrc_count']}</td>
+                            <td>{$getincreasecountitem['mrc_totalPrice']}</td>
+                            <td>{$getincreasecountitem['mrc_givePoints']} </td>
+                            <td>
+                                {$getincreasecountitem[mrc_specifiedEndTime]}
+                            </td>
+                            <td>{$getincreasecountitem['mrc_note']}</td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /table-responsive -->
+
+                <table class="table invoice-total">
+                    <tbody>
+                    <tr>
+                        <td><strong>应付金额：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_handleMoneyCount']} 元</td>
+                    </tr>
+                    <tr>
+                        <td><strong>实付金额：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_realMoneyCount']} 元</td>
+                    </tr>
+                    <tr>
+                        <td><strong>获得积分：</strong>
+                        </td>
+                        <td>{$getconsumeinvoice['mrci_getPoint']} 积分</td>
+                    </tr>
+                    {if !empty($getconsumeinvoice['mrci_cashPaymentCount'])}
+                    <tr>
+                        <td><strong>现金支付：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_cashPaymentCount']} 元</td>
+                    </tr>
+                    {/if}
+                    {if !empty($getconsumeinvoice['mrci_otherPaymentCount'])}
+                    <tr>
+                        <td><strong>一码付支付：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_otherPaymentCount']} 元</td>
+                    </tr>
+                    {/if}
+                    {if !empty($getconsumeinvoice['mrci_wechatPaymentCount'])}
+                    <tr>
+                        <td><strong>微信支付：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_wechatPaymentCount']} 元</td>
+                    </tr>
+                    {/if}
+                    {if !empty($getconsumeinvoice['mrci_alipayPaymentCount'])}
+                    <tr>
+                        <td><strong>支付宝：</strong>
+                        </td>
+                        <td>&yen;{$getconsumeinvoice['mrci_alipayPaymentCount']} 元</td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+
+                <div class="well m-t"><strong>备注：</strong> {$getconsumeinvoice['mrci_note']}
+                </div>
+                <div class="text-center">
+
+                    <button class="btn btn-primary" id="printnow" onclick="printdata()"><i class="fa fa-print" aria-hidden="true"></i> 打印</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function printdata(){
+        $("#printnow").hide();
+        window.print();
+    }
+</script>
+{template 'web/common/footer'}

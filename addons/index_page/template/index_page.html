@@ -1,0 +1,221 @@
+{template 'common/header'}
+<div class="main">
+	{php load()->func('tpl');}
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" {if $type=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('setting',array('type'=>'display'));}">现有引导页</a></li>
+			<li role="presentation" {if $type=='edit'||$type=='add'}class="active"{/if}><a href="{php echo $this->createWebUrl('setting',array('type'=>'add'));}">引导页添加/编辑</a></li>
+		</ul>
+		<!-- Tab panes -->
+		{if $type=='display'}
+		<table class="table">
+			<tr>
+				<td width="10%">模块</td>
+				<td width="10%">模块浏览量</td>
+				<td width="10%">引导页二维码</td>
+				<td width="30%">引导页地址</td>
+				<td width="20%">操作</td>
+			</tr>
+		{loop $result $settings}
+			<tr>
+				<td>{$settings['name']}</td>
+				<td>{$settings['readed']}</td>
+				<td><a href="{$settings['qrcodeurl']}"><img src="{$settings['qrcodeurl']}" class="img-thumbnail" width="100px;" height="100px;"></a></td>
+				<td>{php echo $_W['siteroot'].'app' . str_replace('./', '/', $this->createMobileUrl('index',array('id'=>$settings['id'])));}</td>
+				<td  style="overflow:visible;">
+                        
+                    <div class="btn-group btn-group-sm" >
+                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
+                        <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>
+							<li><a href="{php echo $this->createWebUrl('setting',array('type'=>'edit','id'=>$settings['id']));}"><span class="glyphicon glyphicon-th-large">查看/编辑</span></a></li>
+							<li><a href="{php echo $this->createWebUrl('setting',array('type'=>'read','id'=>$settings['id']));}"><span class="glyphicon glyphicon-book">浏览量详情</span></a></li>
+							<li><a href="{php echo $this->createWebUrl('setting',array('type'=>'addwxshare','moduleid'=>$settings['id']));}"><span class="glyphicon glyphicon-cloud">微信分享设置</span></a></li>
+							<li><a href="{php echo $this->createWebUrl('setting',array('type'=>'del','id'=>$settings['id']));}"><span class="glyphicon glyphicon-remove">删除</span></a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		{/loop}
+		{if empty($result)}
+			<tr>
+				<td colspan="4" style="text-align:center;padding:100px;font-size:20px;font-weight:bold;">暂无引导页，请添加引导页</td>
+			</tr>
+		{/if}
+		</table>
+		{/if}
+		{if $type=='edit'||$type=='add'}
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="home">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							引导页设置
+						</div>
+						<div class="panel-body">
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">模块名称</label>
+								<div class="col-sm-9 col-xs-12">
+								<input type="text" class="form-control" name="name" value="{$settings['name']}">
+								<span class="help-block">填写模块名称</span>
+								</div>
+							</div>
+						{if !empty($settings)}
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">首页地址</label>
+								<div class="col-sm-9 col-xs-12">
+								<input type="text" class="form-control" value="{php echo $_W['siteroot'].'app' . str_replace('./', '/', $this->createMobileUrl('index',array('id'=>$settings['id'])));}" readonly="">
+								<span class="help-block">这个直接复制然后作为你的mobile入口地址</span>
+								</div>
+							</div>
+						{/if}
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">跳转地址</label>
+								<div class="col-sm-9 col-xs-12">
+									<input type="text" name="url" class="form-control" value="{$settings['url']}">
+									<span class="help-block">这个必填的你原来的入口地址</span>
+								</div>
+							</div>
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否开启</label>
+								<div class="col-sm-9 col-xs-12">
+									<select name="status" class="form-control">
+											<option value="1" {if $settings['status']==1}selected{/if} >是</option>
+											<option value="0" {if $settings['status']==0}selected{/if} >否</option>
+									</select>
+								<span class="help-block">选择否一个礼拜用户进去后只显示一次，选择是每次进去都显示</span>
+								</div>
+							</div>
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">微信显示</label>
+								<div class="col-sm-9 col-xs-12">
+									<select name="weixin" class="form-control">
+											<option value="1" {if $settings['weixin']==1}selected{/if} >是</option>
+											<option value="0" {if $settings['weixin']==0}selected{/if} >否</option>
+									</select>
+								<span class="help-block">选择是限制只能在微信上访问</span>
+								</div>
+							</div>
+							<div class="form-group" id="account">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">上传封面图片</label>
+								<center><div class="col-sm-9 col-xs-12"><?php echo tpl_form_field_multi_image('images', $settings['images']); ?></div></center>
+							</div>
+						{if !empty($settings)}
+							<div class="form-group" id="account" style="margin-top:70px">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label">首页二维码</label>
+								<img src="{$qrcodeurl}">
+							</div>
+						{/if}
+						</div>
+				</div>
+			</div>
+			{if $_GPC['type']=='add'}<input type="hidden" name="type" value="add">{/if}
+			{if $_GPC['type']=='edit'}<input type="hidden" name="type" value="edit">{/if}
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+		{else if $type=='addwxshare'}
+		<div class="panel panel-default">
+			<div class="panel-heading">分享参数设置</div>
+			<div class="panel-body">
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab_share">
+
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">是否开启</label>
+							<div class="col-sm-8">
+								<select class="form-control" name="share">
+									<option value="0" {if $settings['share']==0}selected{/if} >否</option>
+									<option value="1" {if $settings['share']==1}selected{/if} >是</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">分享标题</label>
+							<div class="col-sm-8">
+								<input type="text" name="share_title" class="form-control" value="{$settings['share_title']}" />
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">分享图片</label>
+							<div class="col-sm-8">
+								{php echo tpl_form_field_image('share_image', $settings['share_image']);}
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">分享描述</label>
+							<div class="col-sm-8">
+								<input type="text" name="share_desc" class="form-control" value="{$settings['share_desc']}" />
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+			{if $_GPC['type']=='addwxshare'}<input type="hidden" name="type" value="addwxshare">
+											<input type="hidden" name="moduleid" value="{$_GPC['moduleid']}">
+			{/if}
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+		{else if $type=='read'}
+		<div class="panel panel-default">
+			<div class="panel-heading">查询</div>
+			<div class="panel-body">
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab_share">
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">昵称</label>
+							<div class="col-sm-10">
+								<input type="text" name="name" class="form-control" value="{$_GPC['name']}" style="width: 50%" placeholder="可查询昵称" />
+							</div>
+							{if $_GPC['type']=='read'}
+								<input type="hidden" name="type" value="read">
+								<input type="hidden" name="id" value="{$_GPC['id']}">
+							{/if}
+							<div class="form-group" style="margin-top: 50px;">
+								<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"></label>
+								<div class="col-sm-10">
+									<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">查看浏览量</div>
+			<div class="panel-body">
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab_share">
+								<table class="table">
+									<tr>
+										<td width="10%">会员名称</td>
+										<td width="10%">头像</td>
+										<td width="10%">模块浏览量</td>
+									</tr>
+								{loop $list $member}
+									<tr>
+										<td>{$member['nickname']}</td>
+										<td><img src="{$member['avatar']}" width="35px" height="35px"></td>
+										<td>{$member['readed']}</td>
+									</tr>
+								{/loop}
+								{if empty($list)}
+									<tr>
+										<td colspan="3" style="text-align:center;padding:100px;font-size:20px;font-weight:bold;">暂无数据</td>
+									</tr>
+								{/if}
+								</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{/if}
+		
+	</form>
+</div>
+{template 'common/footer'}

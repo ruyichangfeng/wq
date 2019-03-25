@@ -1,0 +1,170 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('extension', array('op'=>'display'));}">推广任务管理</a></li>
+    <li><a href="{php echo $this->createWebUrl('extension', array('op'=>'create'));}">添加任务</a></li>
+   
+</ul>
+<div class="main">
+    <div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">任务名称</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[extension_title]" value="{$data['search']['extension_title']}" placeholder="可模糊查询"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">奖励类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_taskredtype]" id="store_state_1"  value="" {if $data['search']['extension_taskredtype']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_taskredtype]"  value="1" {if $data['search']['extension_taskredtype']=='1'} checked="checked"{/if} > 积分
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_taskredtype]"  value="2" {if $data['search']['extension_taskredtype']=='2'} checked="checked"{/if} > 余额
+                        </label>
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">开启状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_state]" id="store_state_0"  value="" {if $data['search']['extension_state']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_state]"  value="1" {if $data['search']['extension_state']=='1'} checked="checked"{/if} > 开启
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[extension_state]"  value="2" {if $data['search']['extension_state']=='2'} checked="checked"{/if} > 关闭
+                        </label>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">推广任务管理</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:6%">序号</th>
+								<th style="width:10%">任务名称</th>
+								<th style="width:15%;">任务时间</th>
+								<th style="width:10%;">展示模式</th>
+                                <th style="width:10%;">奖励类型</th>
+                                <th style="width:7%;">奖励总额</th>
+                                <th style="width:7%;">已奖励</th>
+                                <th style="width:7%;">分享人数</th>
+                                <th style="width:7%;">点击人数</th>
+                               
+                                <th style="width:8%;">任务状态</th>  
+                                <th style="width:15%;">操作</th>  
+							</tr>
+						</thead>
+						<tbody>
+							{if !empty($data["records"])}
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['extension_title']}
+								</td>
+								<td title="{php echo date('Y.m.d H:i:s',strtotime($item['extension_statetime']))}~{php echo date('Y.m.d H:i:s',strtotime($item['extension_endtime']))}">
+								{php echo date('Y.m.d',strtotime($item['extension_statetime']))}~{php echo date('Y.m.d',strtotime($item['extension_endtime']))}
+								</td>
+								<td>
+								  {if $item['extension_openmode']==1}普通模式{else}边缘模式{/if}
+									
+								</td>
+								<td>
+                                    {if $item['extension_taskredtype']==1}积分{else}余额{/if}
+								</td>
+								<td>
+                                    {$item['extension_maxred']}{if $item['extension_taskredtype']==1}积分{else}余额{/if}
+								</td>
+								<td>
+                                    {$item['extension_bymaxred']}{if $item['extension_taskredtype']==1}积分{else}余额{/if}
+								</td>
+								<td>
+                                    {$item['extension_shareed']}
+								</td>
+								<td>
+                                    {$item['extension_clicked']}
+								</td>
+								<td>
+                                    {if $item['extension_state']==1}开启{else}关闭{/if}
+								</td>
+								<td>
+									 <a href="{php echo $this->createWebUrl('extension', array('op'=>'create','extension_id'=>$item['extension_id']));}" class="btn btn-primary">编辑</a>
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('extension', array('op'=>'delete', 'extension_id'=>$item['extension_id']));}" class="btn btn-danger">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="create[mobile_member_title]"]').val() == ''){
+				util.message('请填写店员入口顶部title');
+				return false;
+			}	
+			if($('input[name="create[mobile_fans_title]"]').val() == ''){
+				util.message('请填写粉丝入口顶部title');
+				return false;
+			}
+			$('.mobile_fans_inforedit').attr('disabled',false);
+			return true;
+		});
+	});
+});
+function formreset()
+{
+	$('.form-control').val("");
+    $("#store_state_1").prop("checked","checked");
+    $("#store_state_0").prop("checked","checked");
+
+}
+</script>
+{template 'common/footer'}

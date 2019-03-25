@@ -1,0 +1,536 @@
+{template 'web/common/header'}
+{template 'web/messagebursts/common'}
+{if $rfid1statedata == 1}
+<script language="javascript" src="http://127.0.0.1:8008/YOWOCloudRFIDReader.js"></script>
+<script src="{HLMMS_JS}YOWOReaderBase.js"></script>
+<script language="javascript" type="text/javascript">
+    key('1', function(){
+
+        WriteBlock();
+    });
+    key('2', function(){
+        ReadBlock();
+    });
+
+    rfidreader.onResult(function(resultdata) {
+            switch(resultdata.FunctionID)
+            {
+                case 14:
+                    document.getElementById("CloudReaderVer").value = resultdata.strData;
+                    break;
+                case 7:
+                    if(resultdata.Result>0)
+                    {
+                        $("#ModalRfiDataInfo").append("<h4>"+resultdata.strData+"</h4>");
+                        //document.getElementById("ModalRfiDataInfo").value = resultdata.strData;
+                    }
+                    else
+                    {
+                        $("#ModalRfiDataInfo").append(GetErrStr(resultdata.Result));
+                        //document.getElementById("ModalRfiDataInfo").value = GetErrStr(resultdata.Result);
+                    }
+
+                    break;
+                case 8:
+                    var SectorIDArray = new Array();
+                    SectorIDArray = {php echo $rfidSetDataArray};
+                    var SectorCount = SectorIDArray.length;
+                    if(resultdata.Result>0)
+                    {
+                        //alert("写入成功！");
+                    }
+                    else
+                    {
+                        alert("写入失败，错误：" + GetErrStr(resultdata.Result));
+                        //alert("写入失败！");
+                    }
+                    break;
+            }
+        }
+    );
+
+    function ReadBlock() {
+        var Key;
+        var SectorIDArray = new Array();
+        $('#ModalRfiData').modal('show');
+        Key =document.getElementById("KeyCard").value;
+        SectorIDArray = {php echo $rfidSetDataArray};
+        rfidreader.KeyMode=0;
+        rfidreader.KeyStringMode=0;
+        rfidreader.KeyString=Key;
+        rfidreader.Repeat=0
+        for (var i=0;i<SectorIDArray.length;i++)
+        {
+            rfidreader.M1ReadSector(SectorIDArray[i], 1);
+        }
+    }
+
+    function WriteBlock(){
+
+        var Key;
+        var SectorIDArray = new Array();
+        var SectorDataArray = new Array();
+        var dstr = new Date();
+        Key =document.getElementById("KeyCard").value;
+        var Data_memberCardNum =document.getElementById("memberCardNum").value;
+        var Data_storeId ="{php echo $setStoreData['set_storeName']}";
+        var Data_memberMobile =document.getElementById("memberMobile").value;
+        var Data_memberIdentityNum =document.getElementById("memberIdentityNum").value;
+        var Data_memberName =document.getElementById("memberName").value;
+        var Data_memberAddtime =dstr.toLocaleString();
+        SectorIDArray = {php echo $rfidSetDataArray};
+        //alert(JSON.stringify(SectorIDArray));
+        $.each(SectorIDArray, function(index,value){
+            if(value == 1){
+                SectorDataArray.push(Data_memberCardNum);
+            }
+            if(value == 2){
+                SectorDataArray.push(0);
+            }
+            if(value == 3){
+                SectorDataArray.push(0);
+            }
+            if(value == 4){
+                SectorDataArray.push(0);
+            }
+            if(value == 5){
+                SectorDataArray.push(Data_memberMobile);
+            }
+            if(value == 6){
+                SectorDataArray.push(Data_memberIdentityNum);
+            }
+            if(value == 8){
+                SectorDataArray.push(Data_memberName);
+            }
+            if(value == 9){
+                SectorDataArray.push(Data_memberAddtime);
+            }
+            if(value == 11){
+                SectorDataArray.push(Data_storeId);
+            }
+        });
+        //alert(JSON.stringify(SectorDataArray));
+        rfidreader.KeyMode=0;
+        rfidreader.KeyStringMode=0;
+        rfidreader.KeyString=Key;
+        rfidreader.Repeat=0
+        for (var i=0;i<SectorIDArray.length;i++)
+        {
+            rfidreader.M1WriteSector(SectorIDArray[i], SectorDataArray[i],1);
+        }
+    }
+
+</script>
+{/if}
+<div class="col-sm-12">
+    <div class="ibox-title">
+        <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('member', array('op' => 'list'))}"></a>会员信息登记</h5>
+        <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('member',array('op' => 'add','id' => $id))}"></a></h5>
+    </div>
+    <div class="ibox-content">
+        <form action="" id="memberinfoform" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+            <input type="hidden" name="id" value="{$item['id']}">
+            <input name="CloudReaderVer" type="hidden" id="CloudReaderVer" maxlength="10" readonly="readonly" />
+            <input name="KeyCard" type="hidden" id="KeyCard" value="FFFFFFFFFFFF" size="15" maxlength="12">
+            <div class="form-group">
+                <label  class="col-sm-1 control-label">会员卡号</label>
+                <div class="col-xs-3">
+                    <input name="memberCardNum" class="form-control" value="{if $item['id'] =='' }{php echo $weid.$storeid.$randCardNum.TIMESTAMP}{else}{$item['mem_memberCardNum']}{/if}" id='memberCardNum' placeholder="请输入会员卡号"/>
+                </div>
+                <div class="col-xs-4">
+                    {if $rfid1statedata == 1 && $item['id'] ==''}
+                    <span class="input-group-btn"><button type="button" style="margin-right: 5px;"  class="btn btn-danger"  onclick="WriteBlock()" ><i class="fa fa-paint-brush"></i>写入数据制卡(1)</button><button type="button" class="btn btn-info"  onClick="ReadBlock()"><i class="fa fa-crosshairs"></i>读卡校验写入数据(2)</button></span>
+                    {/if}
+                </div>
+                <label class="col-sm-1 control-label">会员级别</label>
+                <div class="col-xs-3">
+                    <select class="form-control" name="membercardlevel" id="membercardlevel">
+                        <option>请选择会员等级</option>
+                        {loop $membercardsql $itemmember}
+                        <option value="{$itemmember['id']}" {if $itemmember['id'] == $item['membercardlevel_id']}selected ='selected'{/if}>{$itemmember['mcl_levelName']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label  class="col-sm-1 control-label">会员姓名</label>
+                <div class="col-xs-3">
+                    <input name="memberName" id='memberName' class="form-control" value="{$item['mem_memberName']}" placeholder="请输入会员姓名"/>
+                </div>
+                <label class="col-sm-1 control-label">手机号</label>
+                <div class="col-xs-3">
+                    <input type="number" name="memberMobile" id='memberMobile' class="form-control" value="{$item['mem_memberMobile']}"  id='memberMobile'  placeholder="请输入手机号"/>
+                </div>
+                <label class="col-sm-1 control-label">性别</label>
+                <div class="col-xs-3">
+                    <select  class="form-control m-b" name="memberSex">
+                        <option value="0" >请选择性别</option>
+                        <option value="1" >男</option>
+                        <option value="2" >女</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label  class="col-sm-1 control-label">身份证号</label>
+                <div class="col-xs-3">
+                    <input type="text" name="memberIdentityNum" class="form-control" value="{$item['mem_memberIdentityNum']}" id='memberIdentityNum' placeholder="请输入身份证号"/>
+                </div>
+                <label class="col-sm-1 control-label">会员密码</label>
+                <div class="col-xs-3">
+                    <input type="password" class="form-control" value="{$item['mem_memberPassword']}" name="memberPassword" placeholder="留空则为系统默认密码：{php echo $setStoreData['set_memberSetPassword']}">
+                </div>
+                <label class="col-sm-1 control-label"><spam class="text-danger font-bold">推荐人手机号</spam></label>
+                <div class="col-xs-3">
+                    <input type="text" name="memberRecommendMobile" class="form-control" value="{$item['mem_memberRecommendMobile']}" id='memberRecommendMobile' placeholder="请输入推荐人手机号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">出生日期</label>
+                <div class="col-xs-2">
+                    <select  class="form-control m-b" name="memberBirthdayType" >
+                        <option value="1">公历</option>
+                        <option value="2">农历</option>
+                    </select>
+                </div>
+                <div class="col-xs-4">
+                    {php echo tpl_form_field_calendar(memberbirthday, array('year' => $item['mem_memberBirthdayYear'],'month' => $item['mem_memberBirthdayMonth'],'day' => $item['mem_memberBirthdayDay']));}
+                </div>
+                <label class="col-sm-1 control-label">绑定微信号</label>
+                <div class="col-xs-4">
+                    <input type="text" name="memberWechat" class="form-control" value="{$item['mem_memberWechat']}" id='memberWechat' placeholder="会员微信号"/>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">联系地址</label>
+                <div class="col-xs-5">
+                    {php echo tpl_form_field_district('reside',array('province' => $item['province'],'city' => $item['city'],'district' => $item['district']));}
+                </div>
+                <label for="" class="col-sm-1 control-label">详细地址</label>
+                <div class="col-xs-5">
+                    <input name="memberDetailAddress" id="memberDetailAddress" class="form-control"  value="{$item['mem_memberDetailAddress']}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">会员头像</label>
+                <div class="col-xs-4">
+                    {php echo tpl_form_field_image('memberPicture', $item['mem_memberPicture'])}
+                </div>
+            </div>
+            <div class="panel-body" style="margin: 0px;padding: 0px;">
+                <div class="panel-group" id="accordion">
+                    <div class="col-sm-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                会员自定义字段信息
+                            </div>
+                            <div class="panel-body">
+                                {loop $membercustomizealllist $membercustomizeallitem}
+                                {if $membercustomizeallitem['mc_type'] == number || $membercustomizeallitem['mc_type'] == text}
+                                <div class="form-group">
+                                    <label  class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                    <div class="col-xs-8">
+                                        <input name="array[]" type="{$membercustomizeallitem['mc_type']}" class="form-control" value="{$membercustomizedetailed[$membercustomizeallitem['mc_fields']]}" {if $membercustomizeallitem['mc_required'] == 1}{else}required{/if} />
+                                        <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+
+                                    </div>
+                                </div>
+                                {else if $membercustomizeallitem['mc_type'] == radio}
+                                <div class="form-group">
+                                    <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+                                    <label for="title" class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                    <div class="col-xs-8">
+                                        <div class="radio radio-info radio-inline">
+                                            <input type="radio" name="array[]" id="goodsOrService_{$membercustomizeallitem['id']}" value="1" {if $membercustomizedetailed[$membercustomizeallitem['mc_fields']] == 1}checked="checked" {/if}>
+                                            <label for="goodsOrService_{$membercustomizeallitem['id']}"> 是 </label>
+                                        </div>
+                                        <div class="radio radio-inline radio-danger">
+                                            <input type="radio" name="array[]" id="goodsOrService_{$membercustomizeallitem['mc_fields']}" value="2" {if $membercustomizedetailed[$membercustomizeallitem['mc_fields']] == 2}checked="checked" {/if}>
+                                            <label for="goodsOrService_{$membercustomizeallitem['mc_fields']}"> 否 </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {else if $membercustomizeallitem['mc_type'] == image}
+                                <div class="form-group">
+                                    <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+
+                                    <label class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                    <div class="col-xs-8">
+                                        {php echo tpl_form_field_image('array[]', $membercustomizedetailed[$membercustomizeallitem['mc_fields']])}
+                                    </div>
+                                </div>
+                                {else if $membercustomizeallitem['mc_type'] == textarea}
+                                <div class="form-group">
+
+                                    <input name="customizefield[]"  type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">{$membercustomizeallitem['mc_title']}</label>
+                                        <div class="col-sm-8">
+                                            <textarea name="array[]" id="memberContent" class="form-control" {if $membercustomizeallitem['mc_required'] == 1}{else}required{/if} >{$membercustomizedetailed[$membercustomizeallitem['mc_fields']]}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/if}
+                                {/loop}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <label for="" class="col-sm-5 control-label"></label>
+                <div class="col-sm-7">
+                    <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal inmodal fade" id="ModalRfiData" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body" id="ModalRfiDataInfo">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{template 'web/common/footer'}
+
+<script>
+    //    $("#memberCardNum").focus();
+    $().ready(function() {
+        var memberCardNumValue = "{php echo $memberCardNumLocation}";
+        var memberMobileValue = "{php echo $memberMobileLocation}";
+        if(memberCardNumValue.length > 0 && memberMobileValue.length > 0){
+            new $.flavr({
+                buttonDisplay: 'stacked',
+                content: '请选择继续操作',
+                buttons: {
+                    info: {
+                        style: 'info',
+                        text: '继续登记会员',
+                        action: function() {
+                            window.location.href="{php echo $this->createWebUrl('member',array('op'=>'add'))}";
+                        }
+                    },
+                    success: {
+                        style: 'success',
+                        text: '进入会员信息',
+                        action: function() {
+                            window.location.href="{php echo $this->createWebUrl('memberinfo',array('memberCardNum'=>$memberCardNumLocation))}";
+                        }
+                    },
+                    danger  : {
+                        style: 'danger',
+                        text: '进入消费收银',
+                        action: function() {
+                            window.location.href="{php echo $this->createWebUrl('memberconsume',array('memberCardNum'=>$memberCardNumLocation))}";
+                        }
+                    },
+                    warning: {
+                        style: 'warning',
+                        text: '会员积分录入',
+                        action: function() {
+                            window.location.href="{php echo $this->createWebUrl('pointsinsert',array('memberCardNum'=>$memberCardNumLocation))}";
+                        }
+                    },
+                    close: {
+                        style: 'default',
+                        text: '关闭',
+                        action: function() {
+                            window.location.href="{php echo $this->createWebUrl('member')}";
+                        }
+                    }
+                }
+            });
+        }
+        $("#memberinfoform").validate({
+            rules: {
+                memberCardNum: {
+                    required: true,
+                },
+                memberName:{
+                    required: true,
+                    minlength: 2,
+                    isChinese:true
+                },
+                memberMobile:{
+                    required: true,
+                    maxlength:11,
+                    isphoneNum:true
+                },
+                memberIdentityNum:{
+                    maxlength:18,
+                    isIdCardNo:true
+                },
+                memberRecommendMobile:{
+                    maxlength:11,
+                    isphoneNum:true
+                },
+                memberPicture:{
+                    url:false
+                }
+            },
+            messages: {
+                memberCardNum: "请输入卡号",
+                memberName: {
+                    required: "请输入会员姓名",
+                    isChinese:"只能输入中文",
+                    minlength: "名字必需由两个字组成"
+                },
+                memberMobile:{
+                    required:"请输入手机号",
+                    maxlength:"请填写11位的手机号",
+                    minlength:"请填写11位的手机号",
+                    isMobile:"请填写正确的手机号码"
+                },
+                memberIdentityNum:{
+                    required:"请输入身份证号",
+                    maxlength:"请输入18位",
+                    isIdCardNo:"请输入正确的身份证号"
+                },
+                memberPassword:{
+                    required:"请输入会员密码"
+                },
+                memberRecommendMobile:{
+                    maxlength:"请填写11位的手机号",
+                    minlength:"请填写11位的手机号",
+                    isMobile:"请填写正确的手机号码"
+                }
+            }
+        });
+        jQuery.validator.addMethod("isChinese", function(value, element) {
+            return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+        }, "只能包含中文字符。");
+
+        jQuery.validator.addMethod("isphoneNum", function(value, element) {
+            debugger
+            var length = value.length;
+            var mobile = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/;
+            return this.optional(element) || (length == 11 && mobile.test(value));
+        }, "请正确填写您的手机号码");
+
+        jQuery.validator.addMethod("isMobile", function(value, element) {
+            var length = value.length;
+            return this.optional(element) || (length == 11 && /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/.test(value));
+        }, "请正确填写您的手机号码。");
+
+        jQuery.validator.addMethod("isIdCardNo", function(value, element) {
+            //var idCard = /^(\d{6})()?(\d{4})(\d{2})(\d{2})(\d{3})(\w)$/;
+            return this.optional(element) || isIdCardNo(value);
+        }, "请输入正确的身份证号码。");
+    });
+    function isIdCardNo(num){
+        //if (isNaN(num)) {alert("输入的不是数字！"); return false;}
+        var len = num.length, re;
+        if (len == 15)
+            re = new RegExp(/^(\d{6})()?(\d{2})(\d{2})(\d{2})(\d{2})(\w)$/);
+        else if (len == 18)
+            re = new RegExp(/^(\d{6})()?(\d{4})(\d{2})(\d{2})(\d{3})(\w)$/);
+        else {
+            //alert("输入的数字位数不对。");
+            return false;
+        }
+        var a = num.match(re);
+        if (a != null)
+        {
+            if (len==15)
+            {
+                var D = new Date("19"+a[3]+"/"+a[4]+"/"+a[5]);
+                var B = D.getYear()==a[3]&&(D.getMonth()+1)==a[4]&&D.getDate()==a[5];
+            }
+            else
+            {
+                var D = new Date(a[3]+"/"+a[4]+"/"+a[5]);
+                var B = D.getFullYear()==a[3]&&(D.getMonth()+1)==a[4]&&D.getDate()==a[5];
+            }
+            if (!B) {
+                //alert("输入的身份证号 "+ a[0] +" 里出生日期不对。");
+                return false;
+            }
+        }
+        if(!re.test(num)){
+            //alert("身份证最后一位只能是数字和字母。");
+            return false;
+        }
+        return true;
+    }
+
+    $("#memberCardNum").change(function(){
+        var memberCardNum = $("#memberCardNum").val();
+        $.ajax({
+            type: "post",
+            url: "{php echo $this->createWebUrl('member', array('op' => 'limitationfactor'))}",
+            data: { memberCardNum:memberCardNum},
+            dataType: 'JSON',
+            success: function (data) {
+                if (data['message']['sign'] == 1) {
+                    swal({
+                            title: "请确认卡号唯一性！",
+                            type:"error",
+                            showConfirmButton: true
+                        },
+                        function(){
+                            $("#memberCardNum").val('');
+                            $("#memberCardNum").focus();
+                        });
+                }
+            },
+        });
+
+    })
+    $("#memberIdentityNum").change(function(){
+        var memberIdentityNum = $("#memberIdentityNum").val();
+        $.ajax({
+            type: "post",
+            url: "{php echo $this->createWebUrl('member', array('op' => 'limitationfactor'))}",
+            data: {memberIdentityNum:memberIdentityNum},
+            dataType: 'JSON',
+            success: function (data) {
+                if(data['message']['sign'] == 2){
+                    swal({
+                            title: "请确认身份证号码唯一性！",
+                            type:"error",
+                            showConfirmButton: true
+                        },
+                        function(){
+                            $("#memberIdentityNum").val('');
+                            $("#memberIdentityNum").focus();
+                        });
+                }
+            },
+        });
+
+    })
+    $("#memberMobile").change(function(){
+        var memberMobile = $("#memberMobile").val();
+        $.ajax({
+            type: "post",
+            url: "{php echo $this->createWebUrl('member', array('op' => 'limitationfactor'))}",
+            data: {memberMobile:memberMobile},
+            dataType: 'JSON',
+            success: function (data) {
+                if(data['message']['sign'] == 3){
+                    swal({
+                            title: "请确认手机号唯一性！",
+                            type:"error",
+                            showConfirmButton: true
+                        },
+                        function(){
+                            $("#memberMobile").val('');
+                            $("#memberMobile").focus();
+                        });
+                }
+            },
+        });
+
+    })
+
+</script>

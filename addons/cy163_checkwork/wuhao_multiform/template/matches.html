@@ -1,0 +1,509 @@
+{template 'common/header'}
+<!-- <link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/wuhao_multiform/template/css/default.css"> -->
+<link href="{$_W['siteroot']}addons/wuhao_multiform/template/css/fileinput.css" media="all" rel="stylesheet" type="text/css">
+<div class="wrap" id="app">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#">发布活动</a></li>
+        <li><a href="{php echo $this->createWebUrl('listallmatches', array());}">活动列表</a></li>
+        <!-- <li><a href="#">推送消息</a></li> -->
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">编辑活动</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal" enctype="multipart/form-data" action="">                
+                <input type="hidden" name="length" id="length" value="{$data_template['length']}">
+                <input type="hidden" name="template_data_detail" id="template_data_detail" value="{$data_template['data_detail']}">
+                <input type="hidden" name="matches_data_detail" id="matches_data_detail" value="{$data_matches['data_detail']}">
+                <input type="hidden" name="tname" id="tname" value="{$data_template['templatename']}">
+                <input type="hidden" name="matchesurl" id="matchesurl" value="{php echo $this->createWebUrl('matches')}">
+                <input type="hidden" name="editmatchesurl" id="editmatchesurl" value="{php echo $this->createWebUrl('editmatches')}">
+                <input type="hidden" name="templateid" id="templateid" value="{$data_template['templateid']}">
+                <input type="hidden" name="matchid" id="matchid" value="{$data_matches['matchid']}">                
+                <input type="hidden" name="pagetype" id="pagetype" value="{$op}">
+                <input type="hidden" name="title" id="title" value="{$data_matches['title']}">
+               <div class="form-group">
+                    <label class="col-sm-2 control-label">标题</label>
+                    <div class="col-sm-6">
+                        <input type="text" v-model="title" class="form-control" placeholder="填写标题">
+                    </div>
+                </div>
+                <template v-for="entry in data | orderBy  'order' order">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{entry['title']}}</label>
+                        <div class="col-sm-6" v-if="entry.type==1">
+                            <input type="text" v-model="entry['content']" class="form-control" placeholder="填写字段内容">
+                        </div>
+                        <template v-if="entry.type==2 || entry.type==3 || entry.type==4 || entry.type==13">
+                            <div class="col-sm-4" >
+                                <input type="hidden" v-model="entry['startDate']">
+                                <input type="hidden" v-model="entry['endDate']">
+                                <button class="btn btn-default daterange daterange-time" data-order="{{entry.order}}" type="button">
+                                <span class="date-title" v-if="entry['startDate'].length>0">{{entry['startDate']}}至{{entry['endDate']}}</span>
+                                <span class="date-title" v-else>点击设置时间</span>
+                                <i class="fa fa-calendar"></i></button>
+                            </div>
+                            
+                        </template>
+                        <div class="col-sm-6" v-if="entry.type==5">
+                            <input onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" type="text" v-model="entry['content']" class="form-control" placeholder="填写字段内容">
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==6">
+                            <input onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" type="text" v-model="entry['content']" class="form-control" placeholder="填写字段内容">
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==7">
+                            <select class="form-control" v-model="entry['content']">
+                                <option v-for="tmp in entry.ext[entry.type].split(',')" v-bind:value="tmp">{{tmp}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 radio" v-if="entry.type==8">
+                            <label style="margin-right:8px;" v-for="tmp in entry.ext[entry.type].split(',')">
+                            <input type="radio" v-model="entry['content']" v-bind:value="tmp">{{tmp}}</label>
+                        </div>
+                        <div class="col-sm-6 checkbox" v-if="entry.type==9">
+                            <label style="margin-right:8px;" v-for="tmp in entry.ext[entry.type].split(',')">
+                            <input type="checkbox" v-model="entry['contentarray']" v-bind:value="tmp">{{tmp}}</label>
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==10">
+                            <select class="form-control" v-model="entry['content']">
+                                <option v-for="tmp in entry.ext[entry.type].split(',')" v-bind:value="tmp">{{tmp}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==11">
+                            <textarea rows="15" class="form-control" v-model="entry['content']" placeholder="填写字段内容"></textarea>
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==12">
+                            <div class="input-group ">
+                                <input v-model="entry['content']" data-order="{{entry['order']}}" class="form-control" autocomplete="off" type="text">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"  @click="showImageDialog($event);">选择图片</button>
+                                </span>
+                            </div>
+                            <div class="input-group " style="margin-top:.5em;">
+                                <img src="./resource/images/nopic.jpg" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail" width="150" v-if="entry['content']==''">
+                                <img :src="'/attachment/'+entry['content']" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail" width="150" v-else>
+                                <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" @click="deleteImage($event)">×</em>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 dis_sel" v-if="entry.type==14">
+                          <input type="hidden" v-model="entry['province']">
+                          <input type="hidden" v-model="entry['city']">
+                          <input type="hidden" v-model="entry['district']">
+                          <!-- <div class="am-u-sm-3"> -->
+                            <select id="p" class="form-control" v-model="entry['province']"></select>
+                          <!-- </div> -->
+                          <!-- <div class="am-u-sm-3"> -->
+                            <select id="c" class="form-control" v-model="entry['city']"></select>
+                          <!-- </div> -->
+                          <!-- <div class="am-u-sm-3"> -->
+                            <select id="d" class="form-control" v-model="entry['district']"></select>
+                          <!-- </div>     -->
+                          
+                        </div>
+                        <div class="col-sm-6" v-if="entry.type==15">
+                            <div class="htmleaf-container">
+                                <!-- <form enctype="multipart/form-data"> -->
+                                    <div class="form-group">
+                                        <!-- <input type="hidden" name="matchid" id="matchid" value="{$matchid}"> -->
+                                        <input id="file-0" class="file" type="file" multiple data-min-file-count="1">
+                                    </div>
+                                    
+                                <!-- </form> -->
+                             </div>
+                             <div class="input-group" style="margin-top:.5em;" v-if="entry.contentarray!=''" v-for="tmp in entry.contentarray.split(',')">
+                             <label>{{tmp}}</label><input type="button" class="btn btn-default" @click="delfile($event)" value="删除">
+                        </div>
+                    </div>
+                </template>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="button" class="btn btn-default" @click="submit" value="保存">
+                        <input type="hidden" name="token" value="{$_W['token']}">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- <script src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script> -->
+<!-- <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script> -->
+<script src="{$_W['siteroot']}addons/wuhao_multiform/template/js/fileinput.js" type="text/javascript"></script>
+<script src="{$_W['siteroot']}addons/wuhao_multiform/template/js/fileinput_locale_zh.js" type="text/javascript"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+<!-- <script src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js" type="text/javascript"></script> -->
+<!-- <script type="text/javascript" src="../web/resource/js/require.js"></script> -->
+
+<script type="text/javascript">
+//require(["http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.min.js"], function(Vue) {
+require(["../addons/wuhao_multiform/template/js/vue.js"], function(Vue) {
+    new Vue({
+        el: '#app',
+        data: function() {
+            //pagetype 0:新增 ,1:编辑
+            return {
+                //place:"",
+                title:"",
+                //content:"",
+                pagetype:0,
+                templatename: '',
+                //detail_content: '',
+                length: 9,
+                data: [],
+                cols: [{
+                    'id': 1,
+                    'name': '文本框'
+                }, {
+                    'id': 2,
+                    'name': '时间'
+                // }, {
+                //     'id': 3,
+                //     'name': '报名时间'
+                // }, {
+                //     'id': 4,
+                //     'name': '签到时间'
+                // }, {
+                //     'id': 5,
+                //     'name': '人数'
+                // }, {
+                //     'id': 6,
+                //     'name': '价格'
+                // }, {
+                //     'id': 7,
+                //     'name': '分组'
+                }, {
+                    'id': 8,
+                    'name': '单选框'
+                }, {
+                    'id': 9,
+                    'name': '复选框'
+                }, {
+                    'id': 10,
+                    'name': '下拉选择'
+                }, {
+                    'id': 11,
+                    'name': '文本块'
+                }, {
+                    'id': 12,
+                    'name': '图片'
+                }, {
+                    'id': 14,
+                    'name': '地区'
+                }, {
+                    'id': 15,
+                    'name': '文件'
+                }]
+            }
+        },
+        ready: function() {
+            this.title=$("#title").val();
+            //this.content=$("#content").val();
+            this.templatename=$("#tname").val();
+            this.length=$("#length").val();
+            if($("#pagetype").val().length>0){
+                this.pagetype=Number($("#pagetype").val());
+            }
+            if(this.pagetype==0){
+                this.data=JSON.parse($("#template_data_detail").val());
+            }else if(this.pagetype==1){
+                this.data=JSON.parse($("#matches_data_detail").val());
+            }
+            
+
+            console.log(this.templatename);
+            console.log(this.length);
+            console.log(JSON.stringify(this.data));
+
+            var that = this;
+            require(["daterangepicker"], function($) {
+                $(function() {
+                    $(".daterange.daterange-time").each(function() {
+                        var elm = this;
+                        var startD = $(elm).prev().prev().val();
+                        var endD = $(elm).prev().val();
+                        if (!startD) {
+                            startD = new Date();
+                        }else{
+                            startD = new Date(startD);
+                        }
+                        if (!endD) {
+                            endD = new Date();
+                        }else{
+                            endD = new Date(endD);
+                        }
+                        var timeflag=that.gettimeflag($(elm).data('order'));
+                        var format = "YYYY-MM-DD HH:mm";
+                        if(!timeflag){
+                            format = "YYYY-MM-DD";
+                        }
+                        $(this).daterangepicker({
+                            startDate: startD,
+                            endDate: endD,
+                            format: format,
+                            timePicker: timeflag,
+                            timePicker12Hour: false,
+                            timePickerIncrement: 1,
+                            minuteStep: 1
+                        }, function(start, end) {
+                            that.checktime($(elm).data('order'),start.toDateTimeStr(),end.toDateTimeStr());
+                        });
+                    });
+                });
+            });
+
+
+            require(['jquery', '../web/resource/js/app/district.js'], function($, d){
+                $(function(){
+                  $(".dis_sel").each(function() {
+                    var elm = this;                    
+                    var province = $(elm).children().val();
+                    var city = $(elm).children().next().val();
+                    var district = $(elm).children().next().next().val();
+                    console.log(province);
+                    console.log(city);
+                    console.log(district);
+                    d.render(
+                      {province: $('#p')[0], city: $('#c')[0], district: $('#d')[0]},
+                      // {province: '山西省', city: '太原市', district: '小店区'},
+                      {province: province, city: city, district: district},
+                      {withTitle: true}
+                    );                   
+                    
+                  });
+                });
+            });
+                
+            
+
+            var uploadUrl="{php echo $this->createWebUrl('uploadfiles_add')}";
+            console.log(uploadUrl);
+            var that=this;
+            require(["{$_W['siteroot']}addons/wuhao_multiform/template/js/fileinput.js"], function() {
+                that.initFileInput("file-0",uploadUrl);
+                $("#file-0").on("fileuploaded",function(event,data,previewId,index) {
+                    alert(data.response);
+                    that.data.forEach(function(element, index) {
+                    	if(element.type==15){
+                    		if(element.contentarray==''){
+                    			element.contentarray=data.response;
+                    			console.log(element.contentarray);
+                    		}else{
+                    			element.contentarray=element.contentarray+','+data.response;
+                    		}
+                    	}
+                    });                    
+                });
+            });
+        },
+        methods: {
+            initFileInput:function(ctrlName,uploadUrl) {
+                var control=$('#'+ctrlName);
+                control.fileinput({
+                    language:'zh',
+                    uploadUrl:uploadUrl,
+                    allowedFileExtensions:['jpg','png','gif','jpeg','pdf','doc','docx','ppt','pptx','xls','xlsx'],
+                    showUpload:true,
+                    showCaption:true,
+                    showPreview:true,
+                    showRemove:true,
+                    browseClass:"btn btn-primary",
+                    previewFileIcon:"<i class='glyphicon glyphicon-king'></i>",
+                    maxFileCount:4,
+                    dropZoneEnabled:true,
+
+                    initialPreviewConfig:{
+                        caption:ctrlName,
+                        width:'120px',
+                        url:uploadUrl,
+                        key:101,
+                        success:function(){
+
+                        }
+                    }
+                });
+            },
+            submit: function() {      
+                //计算单独的值
+                var peoplenum = "";
+                var price = "";
+                var time_start_end = {};
+                var timebaoming_start_end = {};
+                var timeqiandao_start_end =[];
+                var timebaodao_start_end={};
+
+                this.data.forEach(function(element, index) {
+                    if(element.type==2){
+                        time_start_end={'start':element.startDate,'end':element.endDate};
+                    }
+                });
+
+                //TODO
+                console.log(JSON.stringify(this.data)); 
+                console.log(JSON.stringify(timeqiandao_start_end)); 
+                console.log(JSON.stringify(timebaoming_start_end)); 
+                var url = "";
+                if(this.pagetype==0){
+                    url = $("#matchesurl").val();
+                }else if(this.pagetype==1){
+                    url = $("#editmatchesurl").val();
+                }
+                var templateid=$("#templateid").val();
+                var matchid = $("#matchid").val();                
+                
+                $.ajax({
+                    "url":url,
+                    type:'POST',
+                    data:{title:this.title,matchid:matchid,templateid:templateid,length:this.length,data_detail:JSON.stringify(this.data),submit:1},
+                    dataType:'json',
+                    async:false,
+                    success:function(data){
+                        console.log(data);
+                        if(this.pagetype==0){
+                            alert('添加活动成功');         
+                        }else {
+                            alert('更新活动成功'); 
+                        }                                       
+                    },
+                    error: function (msg) {  
+                        alert(msg['responseText']);  
+                        console.log(msg);                       
+                    }
+                });
+            },
+            checktime:function(order,start,end){
+                var targets = this.data.filter(function(ele){
+                    return ele.order==order;
+                });
+                targets.forEach(function(element,index){
+                    element.startDate=start;
+                    element.endDate=end;
+                });
+            },
+            gettimeflag:function(order){
+                var targets = this.data.filter(function(ele){
+                    return ele.order==order;
+                });
+                var result= false;
+                targets.forEach(function(element,index){
+                    result = element.timeflag;
+                });
+                return result;
+            },
+            add: function() {
+                this.length++;
+                this.data.push({
+                    'title': '',
+                    'order': this.length,
+                    'content': '',
+                    'contentarray': [],
+                    'type': 1,
+                    'ext': [],
+                    'province':'',
+                    'city':'',
+                    'district':'',
+                    'startDate': '',
+                    'endDate': ''
+                });
+            },
+            delitem: function(item) {
+                this.length--;
+                this.data.$remove(item);
+            },
+            checkimg:function(order,img){
+                var targets = this.data.filter(function(ele){
+                    return ele.order==order;
+                });
+                targets.forEach(function(element,index){
+                    element.content=img;
+                });
+            },
+            changeorder: function(item) {
+                var order = item.order;
+                item.order = 2000;
+                this.data.sort(function(a, b) {
+                    return a.order - b.order;
+                });
+                this.data.forEach(function(element, index) {
+                    var targetorder = index + 1;
+                    if (element.order == order && element.order == index + 1) {
+                        targetorder = index + 2;
+                    } else if (element.order > order) {
+                        targetorder = index + 2;
+                    }
+                    element.order = targetorder;
+                });
+                item.order = order;
+            },
+            showImageDialog: function(event,elm, opts, options) {
+                var that = this;
+                require(["util"], function(util) {
+                    // var btn = $(event.originalTarget);
+                    var btn = $(event.target);
+                    var ipt = btn.parent().prev();
+                    var val = ipt.val();
+                    var img = ipt.parent().next().children();
+                    options = {
+                        'global': false,
+                        'class_extra': '',
+                        'direct': true,
+                        'multiple': false
+                    };
+                    util.image(val, function(url) {
+                        if (url.url) {
+                            if (img.length > 0) {
+                                img.get(0).src = url.url;
+                            }
+                            ipt.val(url.attachment);
+                            that.checkimg(ipt.data('order'),url.attachment);
+                            ipt.attr("filename", url.filename);
+                            ipt.attr("url", url.url);                            
+                        }
+                        if (url.media_id) {
+                            if (img.length > 0) {
+                                img.get(0).src = "";
+                            }
+                            ipt.val(url.media_id);
+                        }
+                    }, null, options);
+                });
+            },
+            deleteImage: function(event,elm){
+                require(["jquery"], function($) {
+                    $(event.target).prev().attr("src", "./resource/images/nopic.jpg");
+                    $(event.target).parent().prev().find("input").val("");
+                });
+            },
+            delfile: function(event,elm){
+            	var that=this;
+                require(["jquery"], function($) {
+                    console.log($(event.target).prev().text());
+                    var delstr=$(event.target).prev().text();
+                    
+                    that.data.forEach(function(element, index) {
+                    	if(element.type==15){
+                    		console.log(element.contentarray);
+                    		if(element.contentarray.indexOf(delstr+',') >= 0){
+                    			element.contentarray=element.contentarray.replace(delstr+',','');                    			
+                    		}else if(element.contentarray.indexOf(','+delstr) >= 0){
+                    			element.contentarray=element.contentarray.replace(','+delstr,'');
+                    		}else if(element.contentarray.indexOf(delstr) >= 0){
+                    			element.contentarray=element.contentarray.replace(delstr,'');
+                    		}else{
+                    			alert('没有找到'+delstr);
+                    		}
+                    		console.log(element.contentarray);
+                    	}
+                    });
+                });
+            }
+        }
+    });
+});
+
+
+
+</script>
+
+{template 'common/footer'}

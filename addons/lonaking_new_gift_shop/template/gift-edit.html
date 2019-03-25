@@ -1,0 +1,729 @@
+{template 'common/header'}
+<script type="text/javascript" src="../web/resource/js/lib/bootstrap.min.js"></script>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+	</ul>
+	<form class="form-horizontal form" id="setting-form" action=""
+		method="post">
+		<div class="panel panel-default">
+			<div class="panel-heading">基本信息设置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 礼品名称</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[title]"
+							value="{$data['title']}" required/>
+							<span class="help-block">前台展示给用户的主标题,建议10个字左右</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 排序</label>
+					<div class="col-sm-8">
+						<input type="number" class="form-control" name="data[rank]"
+							   value="{$data['rank']}" required/>
+						<span class="help-block">排序越高，越在前面展示,默认为1</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 礼品分组</label>
+					<div class="col-sm-8">
+						<select name="data[group_id]" class='form-control'>
+							{loop $this->groupService->selectAll() $group}
+								<option value="{$group['id']}" {if $group['id'] == $data['group_id']} selected{/if}>{$group['name']}</option>
+							{/loop}
+						</select>
+					</div>
+				</div>
+				<!-- 礼品模式 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 礼品模式</label>
+					<div class="col-sm-8">
+						<select name="data[type]" class='form-control' id="gift-mode-selector">
+							<option value="1" {if $data['type'] == 1} selected{/if}>微信红包(认证服务号可用)</option>
+							<option value="2" {if $data['type'] == 2} selected{/if}>虚拟物品(卡、券)</option>
+							<option value="3" {if $data['type'] == 3} selected{/if}>实物礼品</option>
+							<option value="4" {if $data['type'] == 4} selected{/if}>自领礼品(用户前往某地自行领取)</option>
+							<!--<option value="5" {if $data['type'] == 5} selected{/if}>话费</option>-->
+							<!--<option value="5" {if $data['type'] == 6} selected{/if}>流量</option>-->
+						</select>
+						<span class="help-block">这里选择礼品的模式是什么，不同的模式用户兑换礼品所需要的资料是不同的</span>
+						<span class="help-block"><code>1.微信红包:</code>支持自定义金额的定额红包、随机红包，可实时自动发送;</span>
+						<span class="help-block"><code>2.虚拟物品:</code>支持各种虚拟卡密、帐号密码类商品，如充值卡、爱奇艺会员帐号;</span>
+						<span class="help-block"><code>3.实物礼品:</code>需要进行邮寄等礼品，可以设置需要用户支付邮费，支持快递查询;</span>
+						<span class="help-block"><code>4.自领礼品:</code>用户兑换后会得到一个对应商户的卡券（号码）,前往商户处核销消费后即可领取相应礼品或者享受相应服务;</span>
+						<!--<span class="help-block"><code>5.话费、流量:</code>用户填写手机号码即可兑换，兑换后不能实时到账，后台可导出相应记录，手动充值后可导入发货;</span>-->
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 是否限制会员组</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[mc_group_limit]" value="0" {if $data['mc_group_limit'] == '0'}checked="true"{/if}> 不限制
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[mc_group_limit]" value="1" {if $data['mc_group_limit'] == '1'}checked="true"{/if}> 限制
+						</label>
+						<span class="help-block">若选择限制会员组，则需要选择下方会员组</span>
+					</div>
+				</div>
+
+				<div class="form-group mc-limit-input">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 会员组限制</label>
+					<div class="col-sm-8">
+						{loop $mc_groups $group}
+						<label class="radio-inline">
+							<input type="checkbox" name="mc_group[]" value="{$group['groupid']}" {if $group['checked']} checked="true"{/if}>  {$group['title']}
+						</label>
+						{/loop}
+						<span class="help-block">若限制会员组，则该礼品仅限该会员组的用户兑换</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 数量</label>
+					<div class="col-sm-8">
+						<input type="number" class="form-control" name="data[num]"
+							   value="{$data['num']}" />
+						<span class="help-block">剩余数量</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 购买方式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[buy_type]" value="1" {if $data['buy_type'] == '1'}checked="true"{/if}> {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[buy_type]" value="2" {if $data['buy_type'] == '2'}checked="true"{/if}> 余额
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[buy_type]" value="3" {if $data['buy_type'] == '3'}checked="true"{/if}> {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}+余额
+						</label>
+						<span class="help-block">设置礼品开放兑换或者停止兑换</span>
+					</div>
+				</div>
+				<!-- 积分 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 价格设置</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="number" class="form-control" name="data[score]" value="{$data['score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+									<input type="text" class="form-control" name="data[money]" value="{$data['money']}" />
+									<span class="input-group-addon">余额(元)。该商品市场价格为</span>
+									<input type="text" class="form-control" name="data[market_price]" value="{$data['market_price']}" />
+									<span class="input-group-addon">(元)</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">购买方式为1时，仅{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}设置有效;购买方式为2时,仅余额设置有效,购买方式为3时,{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}、余额均有效;<code>市场价格</code>仅在页面展示使用</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}不足现金抵扣</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[money_to_score_flag]" value="1" {if $data['money_to_score_flag'] == '1'}checked="true"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[money_to_score_flag]" value="0" {if $data['money_to_score_flag'] == '0'}checked="true"{/if}> 关闭
+						</label>
+						<span class="help-block">当积分不足时，可使用对应比例的现金支付来抵扣</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 积分/现金兑换比例</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon">1元可抵</span>
+									<input type="text" class="form-control" name="data[money_to_score]" value="{$data['money_to_score']}" />
+									<span class="input-group-addon">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">当积分不足时，使用现金抵扣，1元现金可当多少积分使用,折算后的现金精确到分</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 购买奖励</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="number" class="form-control" name="data[reward_score]" value="{$data['reward_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+									<input type="number" class="form-control" name="data[reward_amount]" value="{$data['reward_amount']}" />
+									<span class="input-group-addon">余额(元)。</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">用户购买本商品，成功交易的时候，对用户的奖励</span>
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 分享购买奖励</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="number" class="form-control" name="data[share_score]" value="{$data['share_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+									<input type="text" class="form-control" name="data[share_amount]" value="{$data['share_amount']}" />
+									<span class="input-group-addon">余额(元)。</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">设置为0表示无奖励，当用户通过分享页面或者该商品页面的时候，有用户通过分享的链接购买，将会奖励分享人</span>
+					</div>
+				</div>
+
+				<!-- 领取限制 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 购买/兑换限制</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">每</span>
+									<input type="number" class="form-control" name="data[buy_limit_day]" value="{$data['buy_limit_day']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">天每人最多兑换</span>
+									<input type="number" class="form-control" name="data[buy_limit_num]" value="{$data['buy_limit_num']}" />
+									<span class="input-group-addon">次,允许总共兑换</span>
+									<input type="number" class="form-control" name="data[buy_limit_total]" value="{$data['buy_limit_total']}" />
+									<span class="input-group-addon">次</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">对用户的兑换次数进行限制，这里的设置会有效的防止不法分子刷积分无节制兑换礼品。</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 标签名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;"> <span class="text-danger">*</span> 名称</span>
+									<input type="text" class="form-control" name="data[tag]" value="{$data['tag']}" />
+								</div>
+							</div>
+						</div>
+						<span class="help-block">给此兑换项带上自定义的角标和自定义的标签底色。</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 标签颜色</label>
+					<div class="col-sm-8">
+						{php echo tpl_form_field_color('data[tag_color]', $data['tag_color'])}
+						<span class="help-block">给此兑换项带上自定义的角标和自定义的标签底色</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 礼品允许兑换定位中心点</label>
+					<div class="col-sm-8 col-xs-12" id="map">
+						{php echo tpl_form_field_coordinate('data',$data)}
+						<span class="help-block"><code>中心点：</code>以该点为中心，距离改点多少米外，不允许兑换</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">允许兑换半径</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="number" class="form-control" name="data[radius]"
+										   value="{$data['radius']}" />
+									<span class="input-group-addon">千米</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">若该礼品仅允许某个地区的用户兑换、或者某个地点周边的用户兑换，在设置了定位圆点后，设置这个半径，在半径之外的位置不能兑换</span>
+						<span class="help-block"><code>注意：</code>设置为-1表示不限制</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 展示状态</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[view_type]" value="1" {if $data['view_type'] == '1'}checked="true"{/if}> 默认
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[view_type]" value="2" {if $data['view_type'] == '2'}checked="true"{/if}>横排
+						</label>
+						<span class="help-block"><code>横排:</code>当模板选择[图片]的时候，选择“横排”则会显示大图</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="text-danger">*</span> 领取有效期</label>
+					<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+						{php echo tpl_form_field_daterange('get_valid_date', array('start' => date('Y-m-d', strtotime($data['start_date'])), 'end' => date('Y-m-d', strtotime($data['end_date'])),));}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 核销有效期形式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[valid_date_type]" value="1" {if $data['valid_date_type'] == '1'}checked="true"{/if}> 有效期
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[valid_date_type]" value="2" {if $data['valid_date_type'] == '2'}checked="true"{/if}> 兑换后指定天数内有效
+						</label>
+						<span class="help-block">设置礼品开放兑换或者停止兑换</span>
+					</div>
+				</div>
+
+				<div class="form-group valid-date-1-input">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="text-danger">*</span> 核销有效期</label>
+					<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+						{php echo tpl_form_field_daterange('use_valid_date', array('start' => date('Y-m-d', strtotime($data['validate_start_date'])), 'end' => date('Y-m-d', strtotime($data['validate_end_date'])),));}
+					</div>
+				</div>
+
+				<div class="form-group valid-date-2-input">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">下单后几天内有效</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[valid_date_after_days]"
+							   value="{$data['valid_date_after_days']}" />
+						<span class="help-block">设置为0或不设置表示永久有效，默认不设置</span>
+					</div>
+				</div>
+
+				<!-- 状态 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 状态</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[status]" value="1" {if $data['status'] == '1'}checked="true"{/if}> 在售
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[status]" value="-1" {if $data['status'] == '-1'}checked="true"{/if}>停止
+						</label>
+						<span class="help-block">设置礼品开放兑换或者停止兑换</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">购买成功后跳转</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[success_redirect]"
+							   value="{$data['success_redirect']}" />
+						<span class="help-block">默认为空，用户兑换成功后，将会跳转到此页面，不设置将不跳转</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 审核机制</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[auto]" value="1" {if $data['auto'] == '1'}checked="true"{/if}> 自动通过
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[auto]" value="0" {if $data['auto'] == '0'}checked="true"{/if}>人工审核
+						</label>
+						<span class="help-block">设置礼品开放兑换或者停止兑换</span>
+					</div>
+				</div>
+
+				<!-- 状态 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 反作弊规则状态</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[abnormal_rank]" value="0" {if $data['abnormal_rank'] == '0'}checked="true"{/if}> 关闭
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[abnormal_rank]" value="1" {if $data['abnormal_rank'] == '1'}checked="true"{/if}>开启
+						</label>
+						<span class="help-block">开启反作弊规则，系统将会根据用户的活跃状态、积分获取情况、以及忠实度进行打分，如果被系统认为该用户存在作弊情况，则自动审核机制将会失效，需要人工介入</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 是否隐藏</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[hide]" value="1" {if $data['hide'] == '1'}checked="true"{/if}> 隐藏
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[hide]" value="0" {if $data['hide'] == '0'}checked="true"{/if}>不隐藏
+						</label>
+						<span class="help-block">设置礼品是否隐藏，当举办一些线下活动的时候，特殊时期的礼品可能只对待特殊人群</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 库存扣除</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[reduce_type]" value="1" {if $data['reduce_type'] == '1'}checked="true"{/if}> 下单后扣除
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[reduce_type]" value="2" {if $data['reduce_type'] == '2'}checked="true"{/if}>付款后扣除
+						</label>
+						<span class="help-block">设置商品/礼品库存扣减的时间</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 兑换提示</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[buy_tip]"
+							   value="{$data['buy_tip']}" />
+						<span class="help-block">当用户点击"马上兑换"后，弹出框中的说明主体</span>
+					</div>
+				</div>
+				<!-- 礼品详情-->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">礼品详情</label>
+					<div class="col-sm-8">
+						{php echo tpl_ueditor('data[description]', htmlspecialchars_decode($data['description']));}
+					</div>
+				</div>
+
+				<!-- 使用说明-->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">使用说明</label>
+					<div class="col-sm-8">
+						{php echo tpl_ueditor('data[guidelines]', htmlspecialchars_decode($data['guidelines']));}
+						<span class="help-block">用户兑换礼品成功后，进入兑换详情页面，页面主体内容将展示这里填写的使用说明信息,建议200字以内</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-default" id="">
+			<div class="panel-heading">图片设置</div>
+			<div class="panel-body">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 详情图片设置</label>
+					<div class="col-sm-8">
+						{php echo tpl_form_field_multi_image('data[detail_image]', unserialize($data['detail_image']))}
+						<span class="help-block">详情图为必填选项，可以上传单张或者多张。尺寸为640*300像素，格式为jpg、png、jpeg，图片大小不可大于1M</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">缩略图</label>
+					<div class="col-sm-8">
+						{php echo tpl_form_field_image('data[thumbnail]', $data['thumbnail'])}
+						<span class="help-block">缩略图为必填选项,尺寸为225*140像素，格式为jpg、png、jpeg，图片大小不可大于1M</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 图标</label>
+					<div class="col-sm-8">
+						{php echo tpl_form_field_image('data[icon]', $data['icon'])}
+						<span class="help-block">图标为必填项。用于呈现品牌信息的图标，兑换记录等页面。尺寸为100*100像素，格式为jpg、png、jpeg，图片大小不可大于1M</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">首页Banner</label>
+					<div class="col-sm-8">
+						{php echo tpl_form_field_image('data[banner]', $data['banner'])}
+						<span class="help-block">展示在首页Banner区的图片,尺寸为640*280像素，格式为jpg、png、jpeg，图片大小不可大于1M</span>
+						<span class="help-block"><code>注意：</code>若模板选择为[图片]时，该项目为必填</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">抽奖模式配置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 是否抽奖模式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[raffle]" value="0" {if $data['raffle'] == '0'}checked="true"{/if}>普通模式
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[raffle]" value="1" {if $data['raffle'] == '1'}checked="true"{/if}> 抽奖模式
+						</label>
+						<span class="help-block"><code>普通模式:</code>默认，用户使用相应{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}、余额即可兑换该礼品;</span>
+						<span class="help-block"><code>抽奖模式:</code>系统检测将根据下方设置概率来判断是否中奖，<code>概率并非绝对，请同时设置奖品提供数量</code>;</span>
+					</div>
+				</div>
+
+				<div class="form-group raffle-input">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">中奖概率</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="number" class="form-control" name="data[raffle_chance]"
+										   value="{$data['raffle_chance']}" />
+									<span class="input-group-addon">％</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">设置本商品抽奖的概率，设置后，您可以<a href="javascript:void(0);" id="test-raffle">点击这里测试您的中奖概率</a></span>
+						<span class="help-block"><code>提示：</code>设置为0或空 表示永远不中奖；设置为<code>100</code>表示一定中奖。</span>
+					</div>
+				</div>
+
+				<div class="form-group raffle-input">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">最多中奖数量</label>
+					<div class="col-sm-8">
+						<input type="number" class="form-control" name="data[raffle_max]"
+							   value="{$data['raffle_max']}" />
+						<span class="help-block">设置本商品最多中奖多少次，超过此处设置的次数之后，一概不中奖</span>
+						<span class="help-block"><code>提示：</code>设置为0或空 表示不限制；设置为<code>-1</code>表示永远不中奖。</span>
+					</div>
+				</div>
+				<div class="form-group hide">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">中奖次数</label>
+					<div class="col-sm-8">
+						<input type="number" class="form-control" name="data[raffle_hit]"
+							   value="{$data['raffle_hit']}" />
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="panel panel-default select-panel"  style="display: none;" id="mode-detail-1">
+			<div class="panel-heading">微信红包模式配置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">红包模式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[hb_mode]" value="1" {if $data['hb_mode'] == '1'}checked="true"{/if}> 固定金额红包
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[hb_mode]" value="2" {if $data['hb_mode'] == '2'}checked="true"{/if}> 随机金额红包(随机金额大于1元)
+						</label>
+						<span class="help-block"><code>固定金额:</code>发送固定金额红包;</span>
+						<span class="help-block"><code>随机金额:</code>系统会从下方随机金额区间中发送随机金额红包;</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">红包金额设置</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">固定发放</span>
+									<input type="text" class="form-control" name="data[hb_amount]" value="{$data['hb_amount']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">元，若设置为随机红包，则从</span>
+									<input type="text" class="form-control" name="data[hb_random_min]" value="{$data['hb_random_min']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">元到</span>
+									<input type="text" class="form-control" name="data[hb_random_max]" value="{$data['hb_random_max']}" />
+									<span class="input-group-addon" style="border-left:none;">元系统随机发放</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block"><code>固定金额最低为1元</code>,随机区间最低为1元,最高小于200元</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- 卡券、虚拟帐号类 -->
+		<div class="panel panel-default select-panel"  style="display: none;" id="mode-detail-2">
+			<div class="panel-heading">卡券、虚拟帐号类</div>
+			<div class="panel-body">
+
+			</div>
+		</div>
+
+		<!-- 实物礼品模式配置 -->
+		<div class="panel panel-default select-panel"  style="display: none;" id="mode-detail-3">
+			<div class="panel-heading">实物礼品模式配置</div>
+			<div class="panel-body">
+				<!-- 支付方式-->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">邮费支付方式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[trans_fee_pay_way]" value="1" {if $data['trans_fee_pay_way'] == '1'}checked="true"{/if}> 微信支付
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[trans_fee_pay_way]" value="2" {if $data['trans_fee_pay_way'] == '2'}checked="true"{/if}> 货到付款
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[trans_fee_pay_way]" value="3" {if $data['trans_fee_pay_way'] == '3'}checked="true"{/if}> 微信支付+货到付款
+						</label>
+						<span class="help-block">设置礼品邮费的支付方式</span>
+					</div>
+				</div>
+				<!-- 实物礼品的邮费设置 -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">邮费</label>
+					<div class="col-sm-8">
+						<input type="number" class="form-control" name="data[trans_fee]"
+							   value="{$data['trans_fee']}" />
+						<span class="help-block">当礼品模式为实物礼品的时候，这个设置才会生效</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 自领礼品模式配置 -->
+		<div class="panel panel-default select-panel" style="display: none" id="mode-detail-4">
+			<div class="panel-heading">自领礼品模式配置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">联系地址</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[link_address]"
+							   value="{$data['link_address']}" />
+						<span class="help-block">用户兑换礼品后看到的联系地址</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">联系电话</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[link_phone]"
+							   value="{$data['link_phone']}" />
+						<span class="help-block">用户兑换礼品后看到的联系电话</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="panel panel-default select-panel" style="display: none;" id="mode-detail-5">
+			<div class="panel-heading">充值模式配置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">话费金额</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="text" class="form-control" name="data[hf_amount]" value="{$data['hf_amount']}" />
+									<span class="input-group-addon" style="border-left:none;">元话费</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">当礼品模式为充值卡的时候，这个设置才会生效</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">流量充值</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<input type="text" class="form-control" name="data[ll_amount]" value="{$data['ll_amount']}" />
+									<span class="input-group-addon" style="border-left:none;">M流量</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">当礼品模式为流量的时候，这个设置才会生效</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<input type="text" class="form-control hide" name="data[id]" value="{$data['id']}" />
+		<input type="text" class="form-control hide" name="data[uniacid]" value="{if $data['uniacid']}{$data['uniacid']}{else}{$_W['uniacid']}{/if}" />
+		<input type="text" class="form-control hide" name="data[create_time]" value="{if $data['create_time']}{$data['create_time']}{else}{php echo time();}{/if}"/>
+		<div class="form-group col-sm-12">
+			<input name="token" type="hidden" value="{$_W['token']}" /> <input
+				type="submit" class="btn btn-primary col-lg-1" name="submit"
+				value="提交" />
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+	$(function(){
+		showRight();
+		showMcGroupInput();
+		showValidDateInput();
+
+		$("#gift-mode-selector").change(function () {
+			showRight();
+		});
+		$('input[name="data[raffle]"]').change(function () {
+			showRight();
+		})
+
+		$("input[name='data[mc_group_limit]']").change(function () {
+			showMcGroupInput();
+		});
+
+		$("input[name='data[valid_date_type]']").change(function () {
+			showValidDateInput();
+		});
+
+		$("#test-raffle").on("click", function () {
+			var chance = $("input[name='data[raffle_chance]']").val();
+			if(chance == undefined){
+				chance = 0;
+			}
+			console.log(chance);
+			window.open("{php echo $this->createWebUrl('RaffleTest')}&raffle_chance="+chance);
+		});
+
+	});
+
+	function showValidDateInput(){
+		var radio = $('input[name="data[valid_date_type]"]:checked').val();
+		if(radio == 1){
+			$(".valid-date-1-input").show();
+			$(".valid-date-2-input").hide();
+		}else if(radio == 2){
+			$(".valid-date-2-input").show();
+			$(".valid-date-1-input").hide();
+		}
+	}
+
+	function showMcGroupInput(){
+		var radio = $('input[name="data[mc_group_limit]"]:checked').val();
+		if(radio == 1){
+			$(".mc-limit-input").show();
+		}else if(radio == 0){
+			$(".mc-limit-input").hide();
+		}
+
+
+
+	}
+	function showRight(){
+		var mode = $("#gift-mode-selector").val();
+		var select = "#mode-detail-"+mode;
+		$(".select-panel").hide();
+		$(select).show();
+		if(raffle == 1){
+			$("#raffle-mode").show();
+		}else {
+			$("#raffle-mode").hide();
+		}
+
+		var raffle = $('input[name="data[raffle]"]:checked').val();
+		if(raffle == 1){
+			$(".raffle-input").show();
+		}else if(raffle == 0){
+			$(".raffle-input").hide();
+		}
+	}
+</script>
+{template 'common/footer'}

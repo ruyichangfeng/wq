@@ -1,0 +1,199 @@
+{template 'style5/header'}
+<script>
+    {if $s}
+    var data = {$s} || [];//菜单
+    {/if}
+
+    var mobile = "{$member['mobile']}";
+</script>
+<body class="max-width bg-ff ">
+<div id="page-swiper" class="page page-current page-inited bg-ff">
+
+    <div class="content">
+        {if $slides}
+        <div class="banner bg-f2">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    {loop $slides $row}
+                    <div class="swiper-slide" onclick="javascript:window.location.href='{$row['url']}';">
+                        <img src="{$_W['attachurl']}{$row['thumb']}" style="height: 238px;">
+                    </div>
+                    {/loop}
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        {/if}
+        <!--<div class="bg-f2" style="height: 5px"></div>-->
+        {if $notice}
+        <div class="scrollNews" >
+            <div class="yy">            <!--通知轮播-->
+                {loop $notice $n}
+                <div class="notice">
+                    <a href="{php echo $this->createMobileUrl('announcement',array('op'=> 'detail','id' => $n['id']))}">
+                        <div class="notice_pic" >
+                            <img class="notice_pic1" src="{MODULE_URL}template/mobile/style5/static/images/icon-notice.png">
+                        </div>
+                        <div class="notice_txt" >
+                            <p class="notice_h1" style="margin-top: 8px">
+                                {$n['title']}
+                            </p>
+                        </div>
+                    </a>
+                </div>
+                {/loop}
+            </div>
+        </div>
+        {/if}
+        <div class="bg-f2" style="height: 10px"></div>
+        <div class="case">
+            <div class="swiper-container " style="height: 210px;padding-top: 10px">
+                <div class="swiper-wrapper home">
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        {if $good}
+        <div class="bg-f2" style="height: 10px"></div>
+        <div class="home-list">
+            <div class="home-list-tit">
+                <span>猜你喜欢</span>
+            </div>
+            <ul class="home-list-content">
+
+            </ul>
+        </div>
+
+        <div class=" load-more">
+            <p> <a href="#" class="open-preloader-title" onclick="javascript:window.location.href='{php echo $this->createMobileUrl('shopping',array('op' => 'list'))}';">点击查看更多</a></p>
+        </div>
+        {/if}
+        <div style="color:#999;margin: 0 auto;font-size: 13px;text-align: center">{php echo $this->module['config']['copyright']}</div>
+    </div>
+</div>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <li>
+        <a class="home-list-item" href="{{ d.list[i].url }}">
+            <div class="home-item-img">
+                <img src="{{ d.list[i].thumb }}" class="img-adaptation"/>
+            </div>
+            <h3 class="home-item-name"> {{ d.list[i].title }}  </h3>
+            <div class="home-item-price">
+                <span class="home-item-price-now"><b>¥{{ d.list[i].marketprice }}</b></span>
+                <span class="home-item-price-cost"><del>{{ d.list[i].productprice }}</del></span>
+            </div>
+        </a>
+        <div class="home-list-lable"></div>
+        <div class="home-lable-txt">热卖</div>
+    </li>
+    {{# } }}
+
+</script>
+<script>
+    //小区主页菜单
+    $(function(){
+        var item = '';
+        item += '<div class="swiper-slide"><div class="swiper-index">';
+        for(var i=0;i<data.length;i++){
+            var val = data[i];
+            if(i%4 == 0 && i!=0){
+                item += '</div>';
+                if(i%8 == 0 ){
+                    item += '</div><div class="swiper-slide"><div class="swiper-index">';
+                }else{
+                    item += '<div class="swiper-index">';
+                }
+            }
+            if(mobile){
+                item +='<a href="'+val['url']+'"><img src="'+val['thumb']+'" style="width: 50px;height: 50px;"/> <p>'+val['title']+'</p> </a>';
+            }
+            else{
+                if(val['view'] == 1){
+                    item +='<a href="'+val['url']+'"><img src="'+val['thumb']+'" style="width: 50px;height: 50px;"/> <p>'+val['title']+'</p> </a>';
+                }
+                else{
+                    item +='<a onclick="show()"><img src="'+val['thumb']+'" style="width: 50px;height: 50px;"/> <p>'+val['title']+'</p> </a>';
+                }
+            }
+
+        }
+        $('.home').html(item);
+
+    })
+    function show() {
+        alert('对不起,你不是本小区的业主,可在个人中心完善账户信息');
+        var regionid = "{$member['regionid']}";
+        window.location.href = "{php echo $this->createMobileUrl('register',array('op' => 'member'))}&regionid=" + regionid;
+    }
+    //小区主页产品
+    $(document).ready(function () {
+        loaddata("{php echo $this->createMobileUrl('home')}", $(".home-list-content"), 'xq_list', true);
+
+    });
+</script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript" type="text/javascript"></script>
+<script>
+    // jssdk config 对象
+    jssdkconfig = {php echo json_encode($_W['account']['jssdkconfig']);} ||{};
+    // 是否启用调试
+    jssdkconfig.debug = false;
+    jssdkconfig.jsApiList = [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+    ];
+    wx.config(jssdkconfig);
+    var $_share = {php echo json_encode($_share);};
+    wx.ready(function () {
+        wx.hideMenuItems({
+            menuList: [
+                'menuItem:copyUrl',
+                'menuItem:openWithQQBrowser',
+                'menuItem:share:email',
+                'menuItem:openWithSafari'
+            ],
+            success: function (res) {
+            },
+            fail: function (res) {
+            }
+        });
+        wx.onMenuShareTimeline($_share);
+        wx.onMenuShareAppMessage($_share);
+    });
+</script>
+
+{template 'style5/footer'}

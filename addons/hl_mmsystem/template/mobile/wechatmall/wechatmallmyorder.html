@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1,user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <title>我的订单</title>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/reset.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/iconfont/iconfont.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/common.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}messi/css/myorder.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/weui.min.css"/>
+	<link rel="stylesheet" href="{HLMMS_MOBILE_MESSI}jqueryweui/css/jquery-weui.min.css"/>
+    <script>
+        var deviceWidth = document.documentElement.clientWidth;
+        document.documentElement.style.fontSize = deviceWidth / 7.5 + 'px';
+    </script>
+	<style>
+		body{background:#f5f5f5;padding-bottom:1.2rem;}
+		.list .item{background:#fff;padding:0.2rem 0;height:1.8rem;border-bottom:solid 1px #E5E5E5;}
+		.list .item .iconfont{width:0.6rem;text-align:center;height:1.8rem;line-height:1.8rem;font-size:0.5rem;float:left;margin-left:0.2rem;color:red;}
+		.list .item .img{width:1.8rem;height:1.8rem;float:left;margin-left:0.2rem;}
+		.list .item .img img{width:1.6rem;height:1.6rem;margin:0.1rem auto;}
+		.list .item .goodsmsg{width:5.2rem;margin-right:0.1rem;margin-left:0.1rem;height:1.8rem;float:left;}
+		.list .item .goodsmsg .title{font-size:0.28rem;height:0.8rem;line-height:0.4rem;}
+		.list .item .goodsmsg .title a{color:#333;}
+		.list .item .goodsmsg .guige{font-size:0.28rem;height:0.4rem;line-height:0.4rem;color:#9B9B9B;}
+		.list .item .goodsmsg .pandn{height:0.6rem;line-height:0.6rem;}
+		.list .item .goodsmsg .pandn .price{width:50%;height:0.6rem;line-height:0.6rem;float:left;}
+		.list .item .goodsmsg .pandn .price{font-size:0.26rem;color:#EF2527;}
+		.list .item .goodsmsg .pandn .price span{font-size:0.32rem;}
+
+		.footer{position:fixed;z-index:99;bottom:0;height:1.2rem;background:#fff;}
+		.footer .allselect{height:1.2rem;line-height:1.2rem;float:left;width:2rem;margin-left:0.2rem;color:#333;font-size:0.34rem;}
+		.footer .allselect span{margin-right:0.15rem;font-size:0.5rem;color:red;position:relative;top:0.05rem;}
+		.footer .allprice{width:3.4rem;height:1.2rem;float:left;margin-right:0.2rem;}
+		.footer .allprice div{height:0.6rem;line-height:0.7rem;font-size:0.32rem;color:#333;text-align:right;}
+		.footer .allprice div strong{color:#EF2527;font-size:0.26rem;}
+		.footer .allprice div strong span{font-size:0.32rem;}
+		.footer .jiesuan{width:1.7rem;text-align:center;color:#fff;background:red;font-size:0.36rem;float:left;height:1.2rem;line-height:1.2rem;}
+		.footer .jiesuan a{color:#fff;}
+
+		.numgroup{width:50%;float:left;}
+		.numgroup .Decrease i,.numgroup .DisDe i,.numgroup .Increase i{width:0.6rem;height:0.6rem;line-height:0.5rem;font-size:0.55rem;color:#666;display:block;float:left;text-align:center;border:solid 1px #ccc; font-style:normal;}
+		.numgroup .DisDe i,.numgroup .Decrease i{border-right:none;}
+		.numgroup .DisDe i{background:#f2f2f2;}
+		.numgroup .Increase i{border-left:none;font-size:0.42rem;line-height:0.6rem;}
+		.numgroup .Amount{width:0.8rem;height:0.6rem;line-height:0.6rem;display:block;float:left;text-align:center;border:solid 1px #ccc;border-radius:0;}
+
+		.nogoods{margin-top:2rem;text-align:center;}
+		.nogoods .iconfont{font-size:1rem;color:#ccc;}
+		.nogoods .text{font-size:0.32rem;color:#ccc;height:0.6rem;line-height:0.6rem;}
+	</style>
+</head>
+
+<body style="background:#f5f5f5;">
+<div id="header">
+	<a class="goback iconfont" href="{php echo $this->createMobileUrl('wechatmallmine',array('op' => 'list','memberid' =>$memberid,'storeid'=>$storeid))}">&#xe612;</a>
+	<div class="title textellipsis1 text-c">我的订单</div>
+	<div class="empty"></div>
+</div>
+<div class="filter">
+	<div class="item text-c {if $_GPC['statuss'] == 1}now{/if}">未支付</div>
+	<div class="item text-c {if $_GPC['statuss'] == 2}now{/if}">待发货</div>
+	<div class="item text-c {if $_GPC['statuss'] == 3}now{/if}">待收货</div>
+	<div class="item text-c {if $_GPC['statuss'] == 4}now{/if}">已完成</div>
+</div>
+<div class="orderlist {if $_GPC['statuss'] != 1}hide{/if}" data-index="1" data-count="2" data-status="1" data-allpage="{$allpage1}">
+	<div class="list">
+		{if !empty($cartPointsGoodsList)}
+		{loop $cartPointsGoodsList $row}
+		<div class="item">
+			<!--<div class="iconfont" data-id="{$row['id']}">&#xe676;</div>-->
+			<div class="img"><a href="{php echo $this->createMobileUrl('pointscart',array('memberid'=>$memberid))}"><img src="{php echo tomedia($row['pp_coverpic']);}" /></a></div>
+			<div class="goodsmsg">
+				<div class="title textellipsis2"><a href="{php echo $this->createMobileUrl('pointscart',array('memberid'=>$memberid))}">{$row['pp_name']}</a></div>
+				<div class="guige">剩余库存{$row['pp_stock']}，每用户限兑：{$row['pp_maxbuy_oneuser']}</div>
+				<div class="pandn">
+					<div class="price"><span>{$row['pp_sellprice']}</span> ￥ ×{$row['cat_num']}</div>
+					<div class="num text-r btns">
+						<a href="{php echo $this->createMobileUrl('pointscart',array('memberid'=>$memberid))}" class="pay text-c">立即购买</a>
+					</div>
+					<div class="numgroup Spinner{$row['id']}" data-id="{$row['id']}"></div>
+				</div>
+			</div>
+		</div>
+		{/loop}
+		{else}
+		<div class="nogoods">
+			<div class="iconfont">&#xe679;</div>
+			<div class="text">购物车中没有商品</div>
+		</div>
+		{/if}
+	</div>
+	<div class="load text-c hide">数据加载中</div>
+</div>
+<div class="orderlist {if $_GPC['statuss'] != 2}hide{/if}" data-index="2" data-count="2" data-status="2" data-allpage="{$allpage2}">
+	<div class="append">
+		{if $myorderlist1}
+			{loop $myorderlist1 $row}
+		<div class="item">
+			<div class="top">
+				<div class="storename textellipsis1">店铺：{php echo $setStoreData['set_storeName']}</div>
+				<div class="status text-r">代发货</div>
+				<div class="ordersn">订单编号：{$row['wo_memberOrderInvoice']}</div>
+			</div>
+			<div class="btns">
+				<div class="priceitem">合计：<span class="c-orange">￥{$row['wo_orderPointTotal']}</span></div>
+				<a href="{php echo $this->createMobileUrl('WechatMallOrdertDetail',array('op'=>'list','wo_orderCode'=>$row['wo_orderCode']))}" class="pay text-c">订单详情</a>
+
+			</div>
+		</div>
+			{/loop}
+		{else}
+		<div class="noorder text-c">( ⊙ o ⊙ )啊哦，没有更多订单啦~</div>
+		{/if}
+	</div>
+	<div class="load text-c hide">数据加载中</div>
+</div>
+<div class="orderlist {if $_GPC['statuss'] != 3}hide{/if}" data-index="3" data-count="2" data-status="3" data-allpage="{$allpage3}">
+	<div class="append">
+		{if $myorderlist2}
+		{loop $myorderlist2 $row}
+		<div class="item">
+			<div class="top">
+				<div class="storename textellipsis1">店铺：{php echo $setStoreData['set_storeName']}</div>
+				<div class="status text-r">待收货</div>
+				<div class="ordersn">订单编号：{$row['wo_memberOrderInvoice']}</div>
+			</div>
+			<div class="btns">
+				<div class="priceitem">合计：<span class="c-orange">￥{$row['wo_orderPointTotal']}</span></div>
+				<a href="{php echo $this->createMobileUrl('WechatMallOrdertDetail',array('op'=>'list','wo_orderCode'=>$row['wo_orderCode']))}" class="pay text-c">订单详情</a>
+
+			</div>
+		</div>
+		{/loop}
+		{else}
+		<div class="noorder text-c">( ⊙ o ⊙ )啊哦，没有更多订单啦~</div>
+		{/if}
+	</div>
+	<div class="load text-c hide">数据加载中</div>
+</div>
+<div class="orderlist {if $_GPC['statuss'] != 4}hide{/if}" data-index="4" data-count="2" data-status="4" data-allpage="{$allpage3}">
+	<div class="append">
+		{if $myorderlist3}
+		{loop $myorderlist3 $row}
+		<div class="item">
+			<div class="top">
+				<div class="storename textellipsis1">店铺：{php echo $setStoreData['set_storeName']}</div>
+				<div class="status text-r">已支付</div>
+				<div class="ordersn">订单编号：{$row['wo_memberOrderInvoice']}</div>
+			</div>
+			<div class="btns">
+				<div class="priceitem">合计：<span class="c-orange">￥{$row['wo_orderPointTotal']}</span></div>
+				<a href="{php echo $this->createMobileUrl('WechatMallOrdertDetail',array('op'=>'list','wo_orderCode'=>$row['wo_orderCode']))}" class="pay text-c">订单详情</a>
+
+			</div>
+		</div>
+		{/loop}
+		{else}
+		<div class="noorder text-c">( ⊙ o ⊙ )啊哦，没有更多订单啦~</div>
+		{/if}
+	</div>
+	<div class="load text-c hide">数据加载中</div>
+</div>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}messi/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/fastclick.js"></script>
+<script type="text/javascript" src="{HLMMS_MOBILE_MESSI}jqueryweui/js/jquery-weui.min.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	FastClick.attach(document.body);
+	$('.filter .item').click(function(){
+		$('.filter .item').removeClass('now');
+		$(this).addClass('now');
+		$('.orderlist').addClass('hide');
+		$('.orderlist').eq($(this).index()).removeClass('hide');
+	});
+})
+
+
+$(document.body).infinite().on("infinite", function() {
+	var nowindex = $(".orderlist:not([class='hide']").attr('data-index');
+	var count = parseInt($(".orderlist:not([class='hide']").attr('data-count'));
+	var allpage = parseInt($(".orderlist:not([class='hide']").attr('data-allpage'));
+	var status = parseInt($(".orderlist:not([class='hide']").attr('data-status'));
+	var loading = false;
+	var self = $(".orderlist").eq(nowindex);
+	if(loading) return;
+	loading = true;
+	if(count < allpage){
+		self.children('.load').removeClass('hide');
+		setTimeout(function() {
+			$.ajax({
+				url:"{php echo $this->createMobileUrl('wechatmallmyorder')}",
+				data:{
+					page:count,
+					isajax:1,
+					status:status,
+				},
+				dataType:'html',
+				type:'post',
+				success:function(data){
+					if(data != ''){
+						self.children('.append').append(data);
+						count++;
+						self.attr('data-count',count);
+					}
+					loading = false;
+				},
+			});
+		}, 500);   //模拟延迟
+	}else{
+		self.children('.load').text('全部数据已经加载完毕');
+	}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li><a href="{php echo  $this->createWebUrl('servetype', array('foo'=>'index'));}">服务项目管理</a></li>
+    <li class="active"><a href="#">服务子类列表</a></li>
+</ul>
+
+<div class="clearfix">    
+    <div class="panel panel-default">
+    	<div class="panel-heading">
+            服务子类列表
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <table class="table table-hover">
+            	<thead>
+                	<tr class="active">
+                    	<td>序号</td>
+                        <td>类别名称</td>
+                        <td>父类名称</td>
+                        <td>描述</td>
+                        <td>模板名称</td>
+                        <td width="300">品台佣金方式</td>
+                        <td width="350">操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                	{php $n=0;}
+                	{loop $list $val}
+                    {php $n+=1;}
+                	<tr>
+                    	<td>{$n}</td>
+                        <td>{$val[type_name]}</td>
+						<td>{php echo $this->getServeType($val[parent_id]);}</td>
+                        <td>{php echo substr($val[remark],0,60)}</td>
+                        <td>{php echo $this->getTempName($val[temp_id]);}</td>
+                        <td>
+                        {if $val['gettype'] == 1}
+                        按百分比[{$val['bili_bai']}%]——>{$val[start]}元-{$val[end]}元
+                        {else}
+                        按每单[{$val['bili_money']}元]——>{if $val[times]==1}在选定人员时结算{else}在付款时结算{/if}
+                        {/if}
+                        </td>
+                        <td style="overflow:visible;">
+                        	<div class="btn-group btn-group-sm">
+								<a class="btn btn-default" href="{php echo $this->createWebUrl('servetype',array('foo'=>'edit', 'id'=>$val['id']));}"><i class="fa fa-edit"></i> 编辑</a>
+                                <a class="btn btn-default" href="{php echo $this->createWebUrl('servetype', array('foo'=>'deletechild', 'id'=>$val['id'],'parent_id'=>$val['parent_id']))}" onclick="return confirm('确认删除该服务子类别?');"><i class="fa fa-remove"></i> 删除</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {/loop}
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="panel-body text-center">
+            {$pager}
+        </div>
+        
+        <div class="panel-footer">
+        	<!--
+            <a class="btn btn-default" href="{php echo $this->createWebUrl('servetypeadd', array())}">新增服务类别</a>
+            -->
+        </div>
+    </div>
+</div>
+
+
+{template 'common/footer'}

@@ -1,0 +1,115 @@
+{template 'common/header'}
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('business', array('op'=>'display'));}">商家管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('business', array('op'=>'create'));}">添加商家</a></li>
+    </ul>
+    <form action="{php echo $this->createWebUrl('business', array('op'=>'create'))}" method="post" class="form-horizontal form" id="business_form">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">{if $op == 'create'}添加商家{else if $op == 'modify'}编辑商家{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" hidden>
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="business[business_id]"  class="form-control" value="{$business['business_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>排序</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="business[business_order]"  class="form-control" value="{$business['business_order']}" />
+                        <div class="help-block">序号越大越靠前</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>商家名称</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="business[business_name]"  class="form-control" value="{$business['business_name']}" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>商家logo</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_image('business[business_logo]', $business['business_logo'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>负责人</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="business[business_admin]"  class="form-control" value="{$business['business_admin']}" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>联系电话</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="business[business_tel]"  class="form-control" value="{$business['business_tel']}" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>使用套餐</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="business[business_package]"  class="form-control">
+                            <option value="0" {if empty($business['business_package'])}selected{/if}>永久</option>
+                            <option value="1" {if $business['business_package'] == 1}selected{/if}>年套餐</option>
+                            <option value="2" {if $business['business_package'] == 2}selected{/if}>季度套餐</option>
+                            <option value="3" {if $business['business_package'] == 3}selected{/if}>月套餐</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>项目审核</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="look-1" class="radio-inline">
+                            <input id="look-1" type="radio" name="business[business_look]"   value="1" {if $business['business_look'] == 1}checked{/if}/>关闭
+                        </label>
+                        <label for="look-2" class="radio-inline">
+                            <input id="look-2" type="radio" name="business[business_look]"  value="2" {if $business['business_look'] == 2}checked{/if}/>开启
+                        </label>
+                        <div class="help-block">开启后通过商家添加和修改的项目需要总部审核后才能使用</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">商家介绍</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_ueditor('business[business_info]',$business['business_info'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#business_form').submit(function(){
+
+                if($('input[name="business[business_order]"]').val() == ''){
+                    util.message('未填写排序.');
+                    return false;
+                }
+                if($('input[name="business[business_name]"]').val() == ''){
+                    util.message('未填写商家名称.');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

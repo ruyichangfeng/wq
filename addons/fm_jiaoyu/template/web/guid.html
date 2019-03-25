@@ -1,0 +1,152 @@
+{template 'common/header'}
+{template 'public/comhead'}
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#">平台设置</a></li>
+</ul>
+{if $operation == 'post'}   
+<div class="main">
+	<form action="" method="post" class="form-horizontal form"	enctype="multipart/form-data">
+		<div class="panel panel-default">
+		{if $_W['isfounder']}
+		    <div class="alert alert-success">
+                温馨提示:</br>
+				更多平台化设置方法，请参看微教育商业用户群平台功能商业化运营指南
+            </div>	
+		{/if}		
+			<div class="panel-heading">	
+				<div class="row-fluid">
+					<div class="span8 control-group">
+						<a class="btn btn-default" href="{php echo $this->createWebUrl('guid', array('op' => 'display' ))}"><i class="fa fa-search"></i>返回列表</a>
+						<a class="btn {if $operation == 'post'}btn-primary {else}btn-default"{/if} href="{php echo $this->createWebUrl('guid', array('op' => 'post' ))}"><i class="fa fa-edit"></i>新增新手引导</a>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>标题</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="bannername" class="form-control" value="{$banner['bannername']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">引导图片</label>
+					<input type="hidden" name="old_thumb" value="{$banner['thumb']}" />
+					<div class="col-sm-9 col-xs-12">
+						{if $banner['thumb']}{php echo tpl_form_field_multi_image('thumb', $imgsss)}{else}{php echo tpl_form_field_multi_image('thumb',$banner['thumb'])}{/if}
+					<div class="help-block">可上传多张图片,推荐图片尺寸为750*1206</div>
+					<div class="help-block" style="color:red">最多9张图</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示时间</label>
+                   <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">开始时间:</label>
+                     <div class="col-sm-2 col-lg-2">
+				        <div class="input-group">
+						{if $banner['begintime']}{php echo tpl_form_field_date('begintime', date('Y-m-d', $banner['begintime']))}{else}{php echo tpl_form_field_date('begintime', date('Y-m-d', TIMESTAMP))}{/if}
+                        </div>
+				     </div>
+                   <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">结束时间:</label>
+                     <div class="col-sm-2 col-lg-2">
+				        <div class="input-group">
+						{if $banner['endtime']}{php echo tpl_form_field_date('endtime', date('Y-m-d', $banner['endtime']))}{else}{php echo tpl_form_field_date('endtime', date('Y-m-d', TIMESTAMP+500000))}{/if}
+                        </div>
+				     </div>					 
+                </div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2  control-label text-danger">选择学校</label>
+					<div class="col-sm-9 col-xs-6">
+						<div class="input-group text-info">
+							{loop $school $uni}
+							{php $is = $this->uniarr($uniarr,$uni['id']);}
+									<label for="uni_{$uni['id']}" class="checkbox-inline"><input id="uni_{$uni['id']}" type="checkbox" name="arr[]" value="{$uni['id']}"{if ($is)}checked="checked"{/if}> {$uni['title']}</label>
+							{/loop}
+						</div>
+						<div class="help-block">选择要将此幻灯片展示的学校,可多选</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">针对人群</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='place' value=1 {if $banner['place']==1 || empty($banner['place'])}checked{/if} /> 学生
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='place' value=2 {if $banner['place']==2}checked{/if} /> 老师
+						</label>
+					</div>
+				</div>				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否显示</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value=1 {if $banner['enabled']==1}checked{/if} /> 是
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value=0 {if $banner['enabled']==0}checked{/if} /> 否
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+</div>
+{elseif $operation == 'display'}
+<div class="main">
+		<div class="panel panel-default">
+		{if $_W['isfounder']}
+		    <div class="alert alert-success">
+                温馨提示:</br>
+				更多平台化设置方法，请参看微教育商业用户群平台功能商业化运营指南
+            </div>	
+		{/if}	
+            <div class="row" style="margin-left: 15px;">
+                {template 'public/ctrl_nave'}
+            </div>			
+			<div class="panel-heading">	
+				<div class="row-fluid">
+					<div class="span8 control-group">
+						<a class="btn {if $operation == 'post'}btn-primary {else}btn-default"{/if} href="{php echo $this->createWebUrl('guid', array('op' => 'post' ))}"><i class="fa fa-edit"></i>新增新手引导</a>
+					</div>
+				</div>
+			</div>
+				<div style="position:relative">
+					<div class="panel-body table-responsive">
+						<table class="table table-hover" style="position:relative">
+						<thead class="navbar-inner">
+							<tr>
+								<th>ID</th>				
+								<th>标题</th>
+								<th>针对人群</th>
+								<th>状态</th>
+								<th>显示时间</th>
+								<th >操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $list $banner}
+								<tr>
+									<td>{$banner['id']}</td>
+									<td>{$banner['bannername']}</td>
+									<td>{if $banner['place'] ==1}学生{else}老师{/if}</td>
+									<td>{if $banner['enabled']}显示{else}隐藏{/if}</td>
+									<td>{php echo date('Y-m-d',$banner['begintime'])}至{php echo date('Y-m-d',$banner['endtime'])}</td>
+									<td style="text-align:left;">
+										<a href="{php echo $this->createWebUrl('guid', array('op' => 'post', 'id' => $banner['id']))}" data-toggle="tooltip" data-placement="top"  class="btn btn-default btn-sm manage"><i class="fa fa-edit"></i>修改</a>
+										<a href="{php echo $this->createWebUrl('guid', array('op' => 'delete', 'id' => $banner['id']))}" data-toggle="tooltip" data-placement="top"  class="btn btn-default btn-sm manage"><i class="fa fa-del"></i>删除</a> 
+									</td>
+								</tr>
+							{/loop}
+							
+						</tbody>
+						</table>
+					</div>
+				</div>
+			{$pager}
+		</div>
+    </div>
+{/if}
+{template 'common/footer'}

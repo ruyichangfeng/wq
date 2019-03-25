@@ -1,0 +1,378 @@
+{template 'common/header'}
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('record', array('op'=>'display'));}">预约记录管理</a></li>
+        <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('record', array('op'=>'create'));}">添加预约订单</a></li>
+        {if $op == 'modify'}
+        <li class="active"><a href="#">编辑预约订单</a></li>
+        {/if}
+    </ul>
+    <form action="{php echo $this->createWebUrl('record', array('op'=>'create'))}" method="post" class="form-horizontal form" id="order_form">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">{if $op == 'create'}添加预约订单{else if $op == 'modify'}编辑预约订单{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" hidden>
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="order[order_id]"  class="form-control" value="{$order['order_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">订单编号</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" readonly name="order[order_number]"  class="form-control" value="{$number}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>商家</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="business" name="order[order_businessid]" class="form-control">
+                            <option value="">请选择</option>
+                            {loop $business $key $item}
+                            <option value="{$item['business_id']}" {if $order['order_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>门店</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="store" name="order[order_storeid]" class="form-control">
+                            <option value="">请选择</option>
+                            {loop $stores $key $item}
+                            <option value="{$item['store_id']}" {if $order['order_storeid'] == $item['store_id']}selected{/if}>{$item['store_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>项目</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="project" name="order[order_projectid]" class="form-control">
+                            <option value="">请选择</option>
+                            {loop $projects $key $item}
+                            <option value="{$item['project_id']}" {if $order['order_projectid'] == $item['project_id']}selected{/if}>{$item['project_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>员工</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="staff" name="order[order_staffid]" class="form-control">
+                            <option value="">请选择</option>
+                            {loop $staffs $key $item}
+                            <option value="{$item['staff_id']}" {if $order['order_staffid'] == $item['staff_id']}selected{/if}>{$item['staff_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                {if empty($order['order_id'])}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>预约日期</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="dating_day" name="order[order_dating_day]" class="form-control">
+                            <option value="" selected>请选择</option>
+                            {loop $weeks $key $item}
+                            <option value="{$item}" {if $item == $order['order_dating_day']}selected{/if}>{$item}</option>
+                            {/loop}
+
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>预约时段</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="dating_time" name="order[order_dating_time]" class="form-control">
+                            <option value="">请选择</option>
+                            {loop $dating['dating_time'] $key $item}
+
+                            <option value="{$item['start']}-{$item['end']}" {if $item['start'] == $order['order_dating_start'] && $item['end'] == $order['order_dating_end']}selected{/if}>{$item['start']}-{$item['end']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                {else}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>预约日期</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="date" class="form-control" name="order[order_dating_day]" value="{$order['order_dating_day']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>预约时段</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" class="form-control" name="order[order_dating_time]" value="{$order['time']}">
+                    </div>
+                </div>
+                {/if}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>预约人</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="order[order_username]"  class="form-control" value="{$order['order_username']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>预约人电话</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="number" name="order[order_userphone]"  class="form-control" value="{$order['order_userphone']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>预约人openID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="order[order_useropenid]"  class="form-control" value="{$order['order_useropenid']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>支付方式</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="pay_type" name="order[order_pay_type]" class="form-control">
+                            <option value="" selected>请选择</option>
+                            <option value="1" {if $order['order_pay_type'] == 1}selected{/if}>免支付</option>
+                            <option value="2" {if $order['order_pay_type'] == 2}selected{/if}>在线支付</option>
+                            <option value="3" {if $order['order_pay_type'] == 3}selected{/if}>会员卡</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="pay_money">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>支付金额</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="number" name="order[order_pay_money]"  class="form-control" value="{$order['order_pay_money']}" min="0" step="0.01" oninput="if(value.length>6)value=value.slice(0,6)" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>订单状态</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select id="order_state" name="order[order_state]" class="form-control">
+                            <option value="" selected>请选择</option>
+                            {if $order['order_pay_type'] == 2}<option value="1" {if $search['order_state'] == 1}selected{/if}>未支付</option>{/if}
+                            <option value="2" {if $order['order_state'] == 2}selected{/if}>已支付</option>
+                            <option value="3" {if $order['order_state'] == 3}selected{/if}>已完成</option>
+                            <option value="4" {if $order['order_state'] == 4}selected{/if}>已关闭</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color">*</span>订单备注</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                      <textarea name="order[order_remark]" style="height: 80px" cols="80">
+                          {$order['order_remark']}
+                      </textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="red_color"></span>保存并发送消息提醒</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="send_state1" class="radio-inline">
+                            <input id="send_state1" type="radio" name="send_state" value="1" checked>否
+                        </label>
+                        <label for="send_state2" class="radio-inline">
+                            <input id="send_state2" type="radio" name="send_state" value="2" >是
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+
+    $(function () {
+
+        payMoneyState();
+    })
+    /** 根据商家联动 */
+    $('#business').change(function () {
+
+        var businessid = $(this).val();
+        selectDay();
+        $.ajax({
+            type:"get",
+            url:"{php echo $this->createWebUrl('getDatingInfo', array())}"+"&businessid="+businessid,
+            dataType:"json",
+            success:function (data) {
+
+                $('#store').html(data.store);
+                $('#staff').html(data.staff);
+                $('#project').html(data.project);
+            }
+
+        })
+
+    })
+    $('#store').change(function () {
+
+        selectDay();
+    })
+    $('#project').change(function () {
+
+        selectDay();
+    })
+    $('#staff').change(function () {
+
+        selectDay();
+    })
+    /** 获取当前可预约日期 */
+    function selectDay() {
+
+        var businessid =  $('select[name="order[order_businessid]"]').val();
+        if (businessid == '')
+        {
+            return false;
+        }
+        var storeid =  $('select[name="order[order_storeid]"]').val();
+        if (storeid == '')
+        {
+            return false;
+        }
+        var projectid =  $('select[name="order[order_projectid]"]').val();
+        if (projectid == '')
+        {
+            return false;
+        }
+        var staffid =  $('select[name="order[order_staffid]"]').val();
+        if (staffid == '')
+        {
+            return false;
+        }
+
+        $.ajax({
+            type:"get",
+            url:"{php echo $this->createWebUrl('getDayInfo', array())}"+"&businessid="+businessid+'&storeid='+storeid+"&projectid="+projectid+"&staffid="+staffid,
+            dataType:"json",
+            success:function (data) {
+                if (data.result == 'success')
+                {
+                    $('#dating_day').html(data.day)
+                } else if (data.result == 'fail')
+                {
+                    alert(data.error);
+                }
+            }
+
+        })
+    }
+    /** 日期改变 获取时间 */
+    $('#dating_day').change(function () {
+
+        selectTime();
+    })
+    $('#pay_type').change(function () {
+
+        payMoneyState();
+        var value = $(this).val();
+        if (value == 2)
+        {
+            var str = '<option value="" selected>请选择</option> <option value="1" >未支付</option> <option value="2" >已支付</option> <option value="3" >已完成</option> <option value="4" >已关闭</option>';
+
+        } else
+        {
+            var str = '<option value="" selected>请选择</option> <option value="2" >已支付</option> <option value="3" >已完成</option> <option value="4" >已关闭</option>';;
+        }
+        $('#order_state').html(str);
+    })
+    /** 支付金额显示状态 */
+    function payMoneyState() {
+
+        var type = $('#pay_type').val();
+        if (type == 2)
+        {
+            $('#pay_money').show();
+
+        } else
+        {
+            $('#pay_money').hide();
+        }
+    }
+    /** 获取当前日期下可预约时间 */
+    function selectTime() {
+
+        var businessid =  $('select[name="order[order_businessid]"]').val();
+        if (businessid == '')
+        {
+            return false;
+        }
+        var storeid =  $('select[name="order[order_storeid]"]').val();
+        if (storeid == '')
+        {
+            return false;
+        }
+        var projectid =  $('select[name="order[order_projectid]"]').val();
+        if (projectid == '')
+        {
+            return false;
+        }
+        var staffid =  $('select[name="order[order_staffid]"]').val();
+        if (staffid == '')
+        {
+            return false;
+        }
+        var day = $('select[name="order[order_dating_day]"]').val();
+        if (day == '')
+        {
+            return false;
+        }
+
+        $.ajax({
+            type:"get",
+            url:"{php echo $this->createWebUrl('getTimeInfo', array())}"+"&businessid="+businessid+'&storeid='+storeid+"&projectid="+projectid+"&staffid="+staffid+"day="+day,
+            dataType:"json",
+            success:function (data) {
+
+                if (data.result == 'success')
+                {
+                    $('#dating_time').html(data.time)
+
+                } else if (data.result == 'fail')
+                {
+                    alert(data.error);
+                }
+            }
+
+        })
+    }
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#circle_form').submit(function(){
+
+
+                if($('input[name="circle[circle_order]"]').val() == ''){
+                    util.message('未填写排序.');
+                    return false;
+                }
+                if($('input[name="circle[circle_name]"]').val() == ''){
+                    util.message('未填写商圈名称.');
+                    return false;
+                }
+
+                if($('select[name="circle[circle_address][province]"]').val() == ''){
+                    util.message('未选择商圈所属省份.');
+                    return false;
+                }
+                if($('select[name="circle[circle_address][city]"]').val() == ''){
+                    util.message('未选择商圈所属市.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

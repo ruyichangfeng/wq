@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['pc_member_title']}</title>
+{template '../pc/head'}
+</head>
+</head>
+<body class="bodybg bgimg" style="{if $config['pc_loginbg']!=""} background-image:url(../attachment/{$config['pc_loginbg']});{/if}">
+	<div class='container pc-login-content' id="pc-login-content">
+		<div class="pc-login-head">
+			<img src="{if $config['pc_logo']==''}{RES}public/images/pc-logo.png{else}../attachment/{$config['pc_logo']}{/if}" alt="" style="width:80%;">
+		</div>
+
+		<div class="pc-login-qrcode">
+			<img src="{$QR}" id="qrcod" style="border:1px solid #CFCEDC;">
+		</div>
+		<div class="pc-login-tishi" id="timetishi" >
+			二维码有效期一分钟
+		</div>
+		<div class="pc-login-p">
+			请使用微信扫描二维码登录
+		</div>
+	</div>
+</body>
+<script>
+	var countdown=60,
+		loginid="{$logining_id}";
+	$(function(){
+		setInterval(runajax,3000);
+		settime();
+	})
+	function settime() { 
+		var tishi = $('#timetishi');
+
+		if (countdown == 0) {
+			countdown = 60;
+			//ajax 处理 添加二维码图片
+			gqtqrcode();
+		}else{ 
+			tishi.html("二维码有效期剩余" + countdown + "秒");
+			countdown--;  
+		}
+
+		setTimeout(function() { 
+			settime();
+		},1000)
+	}
+	function gqtqrcode()
+	{
+		$.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('ajaxlogining', array('qf'=>'delete'));}",
+          data:{logining_id:loginid},
+          dataType:"json",
+          async:false,
+          success:function(data){
+            $("#qrcod").attr('src',data.qr); 
+            loginid=data.logining_id;
+          }
+        });
+	}
+    //ajax方法执行  
+    function runajax(){
+        $.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('pcloginchecked');}",
+          data:{logining_id:loginid},
+          dataType:"json",
+          async:false,
+          success:function(data){
+            	if(data.result==1)
+            	{
+            		var url="{php echo $this->createMobileUrl('memberindex');}";
+            		window.location.href=url+"&logining_id="+data.login_id;
+            	}else{
+            		
+            	}
+          }
+        });
+    } 
+</script>
+</html>

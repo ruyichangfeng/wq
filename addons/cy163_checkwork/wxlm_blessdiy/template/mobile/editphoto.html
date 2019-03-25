@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<title>{$cfg['sharetitle']}</title>
+{template 'head'}
+<script type="text/javascript">
+	wx.ready(function () {
+		sharedata = {
+			title: "{$cfg['sharetitle']}",
+			desc: "{$cfg['sharedesc']}",
+			link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('index', array()))}",
+			imgUrl: "{php echo tomedia($cfg['sharethumb'])}",
+			type: '', // 分享类型,music、video或link，不填默认为link
+			dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+			success: function(){
+			},
+			cancel: function(){
+			}
+		};
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+		wx.onMenuShareQZone(sharedata);
+	});	
+</script>
+</head>
+<body class="bodybg" style="background: url({RES}images/background.jpg);">
+    <div id="wrapper" class="container-fluid" style="margin-top:60px;">
+        <form action="" role="form" class="form-inline myform" method="post"  id="form1" onSubmit="return checksubmit();" style="margin-bottom:30px;">
+                <div class="form-group">
+                    <label for="tel"><span class="xhred"></span>祝福语</label>
+                    <textarea class="form-control"  name="member[member_slogan]" id="slogan" rows="3" style="border:5px;background:rgba(0, 0, 0, 0.1); ">{$member['member_slogan']}</textarea>
+                    <div style="color:#888;font-size: 14px;"><span class="xhred">*</span> 祝福语支持回车换行显示</div>
+                </div>
+                <div class="form-group" >
+                    <label for="tel"><span class="xhred">*</span>上传照片</label>
+                    <input type="hidden" value="{$member['member_pic_upload']}" name="member[member_pic_upload]" id="picupload" />
+					<div class="mui-input-cell" style="border:5px;background:rgba(0, 0, 0, 0.1); ">
+					    <div style="display:none" id="jsimageinput"></div>
+					    <ul class="mui-table-view mui-table-view-chevron" style="background:rgba(0, 0, 0, 0); ">
+							<li class="mui-table-view-cell js-image-image" style="background:rgba(0, 0, 0, 0);  " >
+								<a href="javascript:;" style="background:rgba(0, 0, 0, 0);">
+									<div class="mui-pull-left">
+										<img class="mui-pull-left" src="{php echo tomedia($member_picshow)}" width="60" height="60" >
+									</div>
+								</a>
+							</li>
+						</ul>
+						<script>
+							util.image($('.js-image-image'), function(url){
+								$('.js-image-image img').attr('src', url.url);
+								$('#picupload').val(url.attachment);
+								util.toast('图片上传成功');
+							}, {
+								crop : {if $cut_state}true{else}false{/if},
+								aspectRatio:{$templet['templet_memberconfig_width']}/{$templet['templet_memberconfig_height']}
+							});
+						</script>
+					</div>  
+         
+                </div>
+                <input type="hidden" name="qf" value="saveedit">
+                <input type="hidden" name="do" value="editphoto">
+                <input type="hidden" name="member[member_templetid]" value="{$templet_id}">
+                <input type="hidden" name="templet_id" value="{$templet_id}">
+                <input type="hidden" name="id" value="{$member['member_id']}">
+                <input name="submit" type="submit" value="生成专属图片" class="btn btn-info" style="width:100%; font-size:18px;"/>     
+        </form>
+    </div>
+{template 'footer-menu'}
+{template 'foot-msg'}
+<script type="text/javascript">
+function checksubmit()
+{
+//	if($('#slogan').val() == ''){
+//		alert("请输入宣言");
+//		return false;
+//	}
+	if($('#slogan').val().length < {$templet['templet_holidaygreetings_min']})
+	{
+		alert("祝福语不能小于{$templet['templet_holidaygreetings_min']}个字");
+		return false;
+	}
+		
+	
+
+	if ($('#slogan').val().length > {$templet['templet_holidaygreetings_max']})
+	{
+		alert("祝福语不能超过{$templet['templet_holidaygreetings_max']}个字");
+		return false;
+	}
+
+	if($('#picupload').val() == ''){
+		alert("请上传图片");
+		return false;
+	}
+	return true;
+}
+
+</script>
+</body>
+
+</html>

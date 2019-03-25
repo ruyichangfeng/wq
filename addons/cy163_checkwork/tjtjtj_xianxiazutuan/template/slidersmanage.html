@@ -1,0 +1,117 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+	  <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('sliders', array('action' => ''));}">幻灯片列表</a>
+      </li>
+      <li {if $_GPC['action'] == 'add'}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('sliders', array('action' => 'add'));}">添加幻灯片</a>
+      </li>
+      <li {if $_GPC['action'] == 'update'}class="active"{/if}>
+	    <a>编辑幻灯片</a>
+      </li>
+    </ul>
+
+	{if $_GPC['action'] == 'add'}
+    <form class="form-horizontal form" action="" method="post">       
+        <div class="form-group" >
+            <input type="hidden" name="sid" value="{$_W['uniacid']}">
+            <div class="col-sm-9 col-xs-12">
+			       <label for="title">标题：</label>
+                   <input type="text" name="title" class="form-control" value="" placeholder="" /> 
+				   <label for="sort">顺排序：</label>
+                   <input type="text" name="sort" class="form-control" value="" placeholder="" />
+				   <label for="thumb">图片：</label>
+                   {php echo tpl_form_field_image(thumb);}
+				   <label for="href" >链接：</label>
+				   <input type="text" name="href" class="form-control" value="" placeholder="" />
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+                    <i class="fa fa-check-circle"></i> 提交
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+    
+    {if $_GPC['action'] == 'update'}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="sid" value="{$_W['uniacid']}" />
+        <div class="form-group" >
+            <div class="col-sm-9 col-xs-12">
+                   <label for="title">标题：</label>
+                   <input type="text" name="title" class="form-control" value="{$old_data['title']}" placeholder="" /> 
+				   <label for="sort">顺排序：</label>
+                   <input type="text" name="sort" class="form-control" value="{$old_data['sort']}" placeholder="" />
+				   <label for="thumb">图片：</label>
+                   {php echo tpl_form_field_image('thumb',$old_data['thumb']);}
+				   <label for="href" >链接：</label>
+				   <input type="text" name="href" class="form-control" value="{$old_data['href']}" placeholder="" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="update" value="编辑">
+                    <i class="fa fa-check-circle"></i> 提交修改
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+
+    {if $_GPC['action'] ==''}
+    <table class="table table-hover">
+        <thead class="navbar-inner">
+        <tr>
+            <th>ID</th>
+			<th>标题</th>
+			<th>图片</th>
+			<th>链接</th>
+			<th>顺排序</th>
+			<th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $result $res}
+        <tr>
+			<td>{$res['uid']}</td>
+			<td>{$res['title']}</td>
+			<td><img src="{$_W['attachurl']}{$res['thumb']}" width="35px" height="35px"></td>
+			<td>{$res['href']}</td>
+			<td>{$res['sort']}</td>
+            <td>			   
+                <a class="btn btn-sm btn-danger" onclick="if (confirm('确定要删除吗？')) { location.href = '{php echo $this->createWebUrl('sliders',array('action'=>'delete', 'uid' => $res['uid']));}'; }">删除</a>
+                <a class="btn btn-sm btn-warning" href="{php echo $this->createWebUrl('sliders',array('action'=>'update', 'uid' => $res['uid']));}">编辑</a>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+		<tr>
+		<td><a href="{php echo $this->createWebUrl('sliders',array('action' => 'add'))}">添加新幻灯片</a><td>
+		</tr>
+    </table>
+
+	<div class="col-xs-12">
+        {php echo $pager}
+    </div>
+    {/if}
+    
+</div>
+
+
+{template 'common/footer'}

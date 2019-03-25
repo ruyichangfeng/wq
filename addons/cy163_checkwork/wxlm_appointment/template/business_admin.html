@@ -1,0 +1,258 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'display'));}">商家管理</a></li>
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'create'));}">添加商家</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('business', array('op'=>'admine', 'id'=>$business_id));}">商家账号</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >用户名</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[admin_name]" value="{$search['admin_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">账号</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[admin_account]" value="{$search['admin_account']}" placeholder="可模糊查询" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">商家账号列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th>序号</th>
+                        <th>姓名</th>
+                        <th>账号</th>
+                        <th>级别</th>
+                        <td>最后修改</td>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $admins $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['admin_name']}</td>
+                        <td>{$item['admin_account']}</td>
+                        <td>{if $item['admin_level'] == 1}高级{else}普通{/if}</td>
+                        <td>{$item['admin_time_update']}</td>
+                        <td>
+                            <a class="btn btn-primary" href="javascript:modifyAdmin('{$item['admin_id']}')">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('business', array('op'=>'admin_delete', 'id'=>$item['admin_id'], 'businessid'=>$business_id))}">删除</a>
+                        </td>
+                    </tr>
+                    {/loop}
+                    {if !empty($admins)}
+                    <tr>
+                        <td colspan="6">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="6">
+                            暂无商家账号
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+
+                </table>
+                <button onclick="addAdmin()" class="btn btn-default" type="button">添加商家账号</button>
+            </div>
+            <div style="text-align: center">
+                {$page}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+            <form action="{php echo $this->createWebUrl('business', array('op'=>'add'));}" method="post" class="form-horizontal form" id="form_admin">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">商家账号信息</div>
+                    <div class="panel-body">
+                        <div class="form-group" style="display: none">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="text" name="admin[admin_id]" class="form-control" value="" />
+                                <input type="text" name="admin[admin_businessid]" class="form-control" value="{$business_id}" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>姓名</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="text" name="admin[admin_name]" class="form-control" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>登录账号</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="text" name="admin[admin_account]" class="form-control" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>密码</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="password" name="admin[admin_password]" class="form-control" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>确认密码</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <input type="password" id="password-2" class="form-control" value="" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>头像</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                {php echo tpl_form_field_image('admin[admin_avatar]', '')}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>级别</label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <select name="admin[admin_level]" id="admin_level" class="form-control">
+                                    <option value="">请选择</option>
+                                    <option value="1">高级</option>
+                                    <option value="2">普通</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"></label>
+                            <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8" style="margin-bottom: 30px">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px; "/>
+                                <button style="width:100px;" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+    function addAdmin() {
+
+        $('input[name="admin[admin_id]"]').val('')
+        $('input[name="admin[admin_name]"]').val('');
+        $('input[name="admin[admin_account]"]').val('');
+        $('input[name="admin[admin_password]"]').val('');
+        $('input[name="admin[admin_avatar]"]').val('');
+        $('#password-2').val('');
+        $('select[name="admin[admin_level]"]').val('')
+        $('#myModal').modal('show');
+    }
+    function modifyAdmin(id) {
+
+        if (id == '')
+        {
+            alert('未获取账号信息, 请稍后再试');
+        }
+        var businessid = $('input[name="admin[admin_businessid]"]').val();
+
+        $.ajax({
+
+            type:"get",
+            url:"{php echo $this->createWebUrl('business', array('op'=>'admin_modify'))}"+"&businessid="+businessid+"&adminid="+id,
+            dataType:"json",
+            success:function (data) {
+
+                if (data.result == 'ok')
+                {
+                    $('input[name="admin[admin_id]"]').val(id)
+                    $('input[name="admin[admin_name]"]').val(data.admin['admin_name']);
+                    $('input[name="admin[admin_account]"]').val(data.admin['admin_account']);
+                    $('input[name="admin[admin_avatar]"]').val(data.admin['admin_avatar']);
+                    var $current = $("#form_admin")
+                    $current.find("img").each(function(i){
+                        $(this).attr('src', data.admin['admin_avatarurl']);
+                    });
+
+                    $('input[name="admin[admin_password]"]').val('');
+                    $('#password-2').val('');
+                    $('select[name="admin[admin_level]"]').val(data.admin['admin_level'])
+                    $('#myModal').modal('show');
+
+                } else if (data.result == 'error')
+                {
+                    alert(data.state);
+                }
+            }
+        })
+    }
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#form_admin').submit(function(){
+
+                if($('input[name="admin[admin_name]"]').val() == ''){
+                    util.message('未填写姓名.');
+                    return false;
+                }
+                if($('input[name="admin[admin_account]"]').val() == ''){
+                    util.message('未填登录账号.');
+                    return false;
+                }
+                if($('input[name="admin[admin_password]"]').val() == ''){
+                    util.message('未填写密码.');
+                    return false;
+                }
+                if($('input[name="admin[admin_password]"]').val() != $('#password-2').val()){
+                    util.message('两次密码不一致.');
+                    return false;
+                }
+                if($('select[name="admin[admin_level]"]').val() == ''){
+                    util.message('未选择等级.');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

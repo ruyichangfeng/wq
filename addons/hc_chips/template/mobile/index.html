@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<title>众筹卡券</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="max-age=0" />
+<meta name="apple-touch-fullscreen" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="stylesheet" href="../addons/hc_chips/style/css/mobi.css"/>
+</head>
+<body style="background-image:url(../addons/hc_chips/style/images/bg.jpg);">
+<section class="main animated fadeInDown">
+<div class="main-box">
+	<div class="activity-list">
+		{php $time=time()}
+		{loop $chips $l}
+			<div class="regular activity-box">
+				<h1>{$l['title']}</h1>
+				<figure class="figure"><a {if !empty($a['url'])}href="{$a['url']}"{/if} class="enter"> <img src="{$_W['attachurl']}{$l['picture']}" alt="" /></a> </figure>
+				<div class="look fn-clear">
+					<div class="view">
+						<p class="fn-clear"><i class="icon-eye-1"></i><span>{$l['view']}</span></p>
+						<p class="text">浏览量</p>
+					</div>
+					<div class="residue">
+						<p class="fn-clear"><i class="icon-gift"></i><span>{$l['price']}</span></p>
+						<p class="text">奖品价值</p>
+					</div>
+				</div>
+				<p class="activity-btn fn-clear"> 
+					<a href="{php echo $this->createMobileUrl('chip', array('id'=>$l['id'], 'op'=>'join'))}" class="enter">我要众筹</a> 
+					<a href="{php echo $this->createMobileUrl('rule', array('id'=>$l['id']))}" class="rule-btn">查看规则</a>
+				</p>
+				{if allJoinMoney($l['id']) >= $l['price']}
+					<i class="icon icon-end"></i>
+				{else}
+					{if $time < $l['starttime']}<i class="icon icon-start"></i>{/if}
+					{if $time >= $l['endtime']}<i class="icon icon-end"></i>{/if}
+					{if $time >= $l['starttime'] && $time < $l['endtime']}<i class="icon icon-hot"></i>{/if}
+				{/if}
+			</div> 
+		{/loop}
+		<a href="{php echo $this->createMobileUrl('rule')}" class="more fn-clear">
+		<h1 class="know-more"></h1>
+		<i class="icon-right-open-big"></i> </a> 
+	</div>
+</div>
+</section>
+<footer class="foot">
+	<div style="color:#fff;">@{$_W['account']['name']}</div>
+</footer>
+<nav class="nav fn-clear"> 
+	<a href="{php echo $this->createMobileUrl('index')}" class="active"><i class="icon-award"></i>众筹活动</a> 
+	<a href="{php echo $this->createMobileUrl('home', array('op'=>'mychips'))}"><i class="icon-inbox"></i>我的众筹</a>
+	<a href="{php echo $this->createMobileUrl('award')}"><i class="icon-user-1"></i>中奖名单</a> 
+</nav>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{php $signPackage=$_W['account']['jssdkconfig'];}	
+<script>
+wx.config({
+	debug: false,   
+	appId: '<?php echo $signPackage["appId"];?>',
+	timestamp: '<?php echo $signPackage["timestamp"];?>',
+	nonceStr: '<?php echo $signPackage["nonceStr"];?>',
+	signature: '<?php echo $signPackage["signature"];?>',
+	jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+});
+
+wx.ready(function () {
+	var shareData = {
+		title: "{$rule['title']}",
+		desc: "{$rule['description']}",
+		link: "{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('index')}",
+		imgUrl: "{$_W['attachurl']}{$rule['picture']}",
+		trigger: function (res) {},
+		complete: function (res) {},
+		success: function (res) {},
+		cancel: function (res) {},
+		fail: function (res) {}
+	};
+	wx.onMenuShareAppMessage(shareData);
+	wx.onMenuShareQQ(shareData);
+	wx.onMenuShareWeibo(shareData);
+	wx.onMenuShareTimeline(shareData);
+});
+</script>
+</body>
+</html>

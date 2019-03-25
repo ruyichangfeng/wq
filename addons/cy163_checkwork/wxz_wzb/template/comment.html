@@ -1,0 +1,202 @@
+{template 'common/header'}
+<div class="main">
+	{template 'list_nav'}
+	<div class="panel panel-default">
+		<div class="panel-heading" style="position:relative;">
+			<span>视频评论列表</span>
+			<span style="position:absolute;right:10rem;top:4px;"><a class="btn btn-default" href="{php echo $this->createWebUrl('dummyComment',array('rid'=>$rid))}">虚拟评论</a></span>
+			<span style="position:absolute;right:.5rem;top:4px;"><a class="btn btn-default" href="{php echo $this->createWebUrl('sendGroupPacket',array('rid'=>$rid))}">发放群红包</a></span>
+		</div>
+		<div class="panel-body">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+				<tr>
+					<th style="width:3%;text-align:center;"></th>
+					<th align="center" style="width:10%;text-align:center;">昵称</th>
+					<th align="center" style="width:10%;text-align:center;">评论内容</th>
+					<th align="center" style="width:8%;text-align:center;">是否显示</th>
+					<th align="center" style="width:8%;text-align:center;">是否是红包</th>
+					<th align="center" style="width:8%;text-align:center;">总金额</th>
+					<th align="center" style="width:8%;text-align:center;">数量</th>
+					<th align="center" style="width:8%;text-align:center;">已发数量</th>
+					<th align="center" style="width:8%;text-align:center;">已发金额</th>
+					<th align="center" style="width:10%;text-align:center;">评论时间</th>
+					<th align="center" style="text-align:center;">操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{loop $Comment $row}
+				{if $row['dsid']==0 || ($row['dsid']>0 && $row['dsstatus']==1)}
+				<tr>
+					<td><input class="check-delete tagids-{$row['id']}" type="checkbox" name="delete[]" value="{$row['id']}" data-tagids="{$row['groupid']}" data-openid="{$row['openid']}" data-fanid="{$row['id']}"/></td>
+					<td align="center" style="text-align:center;">{$row['nickname']}</td>
+					<td align="center" style="text-align:center;">{$row['content']}</td>
+					<td align="centet" style="text-align: center;">
+						{if $row['is_auth']==1}
+						<span style="color: green;">显示</span>{/if}
+						{if $row['is_auth']==2}
+						<span style="color: red;">不显示</span>
+						{/if}
+					</td>
+					<td align="centet" style="text-align: center;">
+						{if $row['ispacket']==1}
+						<span style="color: green;">是</span>{/if}
+						{if $row['ispacket']==0}
+						<span style="color: red;">否</span>
+						{/if}
+					</td>
+					<td align="center" style="text-align:center;">{$row['amount']}</td>
+					<td align="center" style="text-align:center;">{$row['num']}</td>
+					<td align="center" style="text-align:center;">{$row['send_num']}</td>
+					<td align="center" style="text-align:center;">{php echo $row['yifa_amount']/100}</td>
+					<td align="center" style=" text-align:center;">{php echo date('Y-m-d H:i',$row['dateline'])}</td>
+					<td align="center" style=" text-align:center;">
+						{if $row['is_auth']==1}
+						<a onclick="auth({$row['id']},2,{$row['rid']});"><button type="button" class="btn btn-warning" >不显示</button></a>
+						<!--<a href="{php echo $this->createWebUrl('isauth',array('id' =>$row['id'],'is_auth'=>'2','rid'=>$row['rid']))}"><button type="button" class="btn btn-warning" >不显示</button></a>-->
+						{/if}
+						{if $row['is_auth']==2}
+						<a onclick="auth({$row['id']},1,{$row['rid']});"><button type="button" class="btn btn-success" >显示</button></a>
+						{/if}
+						{if $row['isshutup']==0}
+						<a href="{php echo $this->createWebUrl('isshutup',array('uid' =>$row['uid'],'isshutup'=>'1','rid'=>$row['rid']))}"><button type="button" class="btn btn-success" >禁言</button></a>
+						{/if}
+						{if $row['isshutup']==1}
+						<a href="{php echo $this->createWebUrl('isshutup',array('uid' =>$row['uid'],'isshutup'=>'0','rid'=>$row['rid']))}"><button type="button" class="btn btn-warning" >取消禁言</button></a>
+						{/if}
+						{if $row['ispacket']==1 && $row['isadmin']==1}
+						<a href="{php echo $this->createWebUrl('getpacket',array('toid' =>$row['id'],'is_auth'=>'1','rid'=>$row['rid']))}"><button type="button" class="btn btn-success" >领取用户</button></a>{/if}
+						{if $row['ispacket']!=1 && $row['isadmin']!=1 && $row['touid']==0 && $row['dsid']==0}<a href="{php echo $this->createWebUrl('reply',array('id' =>$row['id'],'rid'=>$row['rid']))}"><button type="button" class="btn btn-success" >回复</button></a>{/if}
+					</td>
+				</tr>
+				{/if}
+				{/loop}
+				</tbody>
+			</table>
+			<table class="table table-hover">
+				<tr>
+					<td width="30">
+						<input type="checkbox" onclick="var ck = this.checked;$('.check-delete').each(function(){this.checked = ck});" />
+					</td>
+					<td class="text-left">
+						<input type="submit" name="submit" class="btn btn-primary span2" value="删除" onclick="del()"/> &nbsp;
+					</td>
+				</tr>
+
+			</table>
+			{$pager}
+		</div>
+	</div>
+</div>
+</div>
+
+</div>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-api-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/tis-1.1.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/demo_base.js"></script>
+<script>
+	window.alert = function (e) {
+		if (e != null && e.indexOf("提示内容")>-1){
+		}else {
+		}
+	};
+	function getQueryStr(str) {
+		var LocString = String(window.document.location.href);
+		var rs = new RegExp("(^|)" + str + "=([^&]*)(&|$)", "gi").exec(LocString), tmp;
+		if (tmp = rs) {
+			return decodeURIComponent(tmp[2]);
+		}
+		return "";
+	}
+	$(function () {
+		var api = TISAPI.New("{php echo $this->createWebUrl('interface')}", { tisId: getQueryStr("tisId") }, false);
+		console.log(api);
+		window.tis = TIS(".tis-container", {
+			api: api,                               //必须
+			//clientid:"clientId1"                  //可选，默认随机生成
+			name: '.',                           //可选，默认为Anonymous
+			image: '.',          //可选，默认未定义
+			generateUserEvent: true,             //可选，默认为true
+			template:           {onReceiveMessage: onReceiveMessage},     //界面模版
+			//以下均可选
+			failure: function (error, when) {       //某个操作失败时调用
+				if (typeof error != "string") {
+					if (when == "sendMsg" && error.code == 400 && error.error == "instance closed") {
+						alert("TIS实例已关闭");
+						return;
+					}
+					alert(when + "操作失败");
+				} else {
+					alert("操作失败：" + error);
+				}
+			},
+			onSendSuccess: function (data) {
+				//当发送消息成功时调用
+				console.log("消息发送成功");
+			},
+			onReconnect: function () {
+				//当需要与服务器重新连接时调用
+				console.log("正在与服务器重连");
+			},
+			onConnect: function () {
+				//当与服务器连接成功时调用
+				console.log('我进来了');
+				console.log("与服务器重连接成功");
+			},
+			onLoadComponent: function () {
+				//当组件加载完成时调用
+				console.log("组件加载完成");
+			},
+			updateUser: function (total, clientId) {
+				//当generateUserEvent=true,并且在线人数发生变化时调用
+				console.log("在线人数:",total);
+			}
+		});
+
+	});
+
+</script>
+<script>
+	function auth(id,isauth,rid) {
+		$.post('{php echo $this->createWebUrl("isauth")}', {id:id,is_auth:isauth,rid:rid},function(data){
+			if(data.s==1 && data.auth ==1){
+				var result = data.data;
+				var loginInfo = {
+					'identifier': 'user_'+result.uid, //当前用户ID,必须是否字符串类型，选填
+					'uid':result.uid,
+					'identifierNick': ''+result.nickname+'', //当前用户昵称，选填
+					'headurl': ''+result.headimgurl+'', //当前用户默认头像，选填
+					'isadmin':result.isadmin,
+					'rid':result.rid,
+					'shutup':result.shutup,
+					'type':'comment',
+					'siteroot':"{$_W['siteroot']}"
+				};
+				tis.SendMessage(result.content,'',JSON.stringify(loginInfo));
+			}
+			window.location.reload();
+		},'json');
+	}
+	function del(){
+		var check = $("input:checked");
+
+		if(check.length<1){
+			alert('请选择要删除的记录!');
+			return false;
+		}
+		if( confirm("确认要删除选择的记录?")){
+			var id = new Array();
+			check.each(function(i){
+				if($(this).val()!='on'){
+					id[i] = $(this).val();
+				}
+			});
+
+			$.post('{php echo $this->createWebUrl('delcom')}', {idArr:id},function(data){
+				window.location.reload();
+			},'json');
+		}
+	}
+</script>
+{template 'common/footer'}

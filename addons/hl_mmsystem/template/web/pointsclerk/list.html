@@ -1,0 +1,124 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>积分核销营业员管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('pointsclerk')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display: block">
+                            搜索条件 ↓  （点击可展开）
+                        </a>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                <input type="hidden" name="c" value="site" />
+                                <input type="hidden" name="a" value="entry" />
+                                <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                                <input type="hidden" name="do" value="pointsclerk" />
+                                <input type="hidden" name="op" value="list" />
+                                <div class="form-group">
+                                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">昵称</label>
+                                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                        <input type="text" class="form-control" name="keyword" placeholder="昵称"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">openID</label>
+                                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                        <input type="text" class="form-control" name="Openid" placeholder="openID"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                                        <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                        <input type="hidden" name="searchflag" value="1" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                    <a href="{php echo $this->createWebUrl('pointsclerk', array('op' => 'add'));}" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>添加营业员信息</a>
+                    <form class="form-horizontal form" method="post">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>姓名</th>
+                                <th>昵称</th>
+                                <!--<th>OpenID</th>-->
+                                <th>手机号</th>
+                                <th>性别</th>
+                                <th>添加时间</th>
+                                <!--<th>更新时间</th>-->
+                                <!--<th>所属商家店铺id</th>-->
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>{$item['id']}</td>
+                                <td>{php echo util::getRoleUser($item['pc_name']);}</td>
+                                <td>{$item['pc_nickname']}</td>
+                                <!--<td>{$item['pc_openid']}</td>-->
+                                <td>{$item['pc_phone']}</td>
+                                <td>{if $item['pc_gender']==1}<span class="badge badge-primary">男</span>
+                                    {elseif $item['pc_gender']==2}<span class="badge badge-danger">女</span>
+                                    {elseif $item['pc_gender']==3}<span class="badge badge-dark">未知</span>
+                                    {/if}
+                                <td>{php echo date('Y-m-d H:i:s', $item[pc_addtime]);}</td>
+                                <!--<td>{php echo date('Y-m-d H:i:s', $item[pc_updatetime]);}</td>-->
+                                <!--<td>{$item['businessid']}</td>-->
+                                <td>
+                        <span>
+							<a href="{php echo $this->createWebUrl('pointsclerk', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm">编辑</a>
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('pointsclerk',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-default btn-sm">删除</a>
+                        </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+        $('.input-c').attr('checked', false);
+    };
+    function productLink(url) {
+
+        $('#product_link').html(url);
+        $('#product-link').modal('show');
+    }
+</script>
+
+{template 'web/common/footer'}

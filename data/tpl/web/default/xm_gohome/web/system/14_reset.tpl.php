@@ -1,0 +1,54 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<ul class="nav nav-tabs">
+	<li><a href="<?php  echo  $this->createWebUrl('version', array('foo'=>'index'));?>">系统更新</a></li>
+    <li><a href="<?php  echo  $this->createWebUrl('version', array('foo'=>'ma'));?>">更新码更新</a></li>
+    <li class="active"><a href="<?php  echo  $this->createWebUrl('version', array('foo'=>'reset'));?>">重置系统</a></li>
+    <li><a href="<?php  echo  $this->createWebUrl('version', array('foo'=>'xiu'));?>">字段修复</a></li>
+    <li><a href="<?php  echo  $this->createWebUrl('version', array('foo'=>'power'));?>">分权管理</a></li>
+</ul>
+
+<div class="clearfix">
+	<div><strong>注意：系统重制将清空业务数据库中所有数据</strong></div>    
+    
+    <div class="panel-body">
+              
+    </div>
+    
+    <div class="form-group">
+    	<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+    		<div class="col-md-2 col-lg-1">
+    			<div id="show_11">
+    				<input name="submit" type="submit" onclick="check()" value="确定重置" class="btn btn-primary btn-block" />
+                </div>
+            </div>
+    </div>
+</div>
+
+<script>
+function check(){
+	var str=prompt("请输入大写的OK","");
+    if(str)
+    {
+        if(str == 'OK'){
+			$.ajax({
+				url: "<?php  echo $this->createWebUrl('version', array('foo'=>'resetok'));?>",
+				type:"POST",
+				data:{},
+				dataType:"json",
+				success: function(res1){
+					if(res1 == 1){
+						alert('重置成功！');
+					}else{
+						alert('重置失败！');
+					}
+				}
+			});
+		}else{
+			alert('输入错误，不能重置！');
+			return false;
+		}
+    }
+}
+</script>
+
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

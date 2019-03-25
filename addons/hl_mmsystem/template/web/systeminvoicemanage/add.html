@@ -1,0 +1,1372 @@
+{template 'web/common/header'}
+<script src="{HLMMS_JS}plugins/bootstrap-table/bootstrap-table-export.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/xlsx.core.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/FileSaver.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/html2canvas.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.plugin.autotable.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/tableExport.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#tab_cashRegister" aria-expanded="true"> 消费收银</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_consumption" aria-expanded="false">快速消费</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_deduction" aria-expanded="false">储值扣费</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_countConsumption" aria-expanded="false">计次消费</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_memberRecharge" aria-expanded="false">会员充值</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_increaseCount" aria-expanded="false">增加计次</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_integralExchange" aria-expanded="false">积分兑换</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab_returninvoice" aria-expanded="false">退货单据</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div id="tab_cashRegister" class="tab-pane active">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperator" id="selectoperator"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['uid']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="DocumentNumber" id="DocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="CardNumber" id="CardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('limittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#cashRegistertabledata').bootstrapTable('refresh');"><i class="fa fa-search"></i> 搜索</button>
+
+                                </div>
+                                <table id="cashRegistertabledata" data-mobile-responsive="true" >
+
+                                </table>
+                            </div>
+                        </div>
+                        <div id="tab_consumption" class="tab-pane">
+                            <div class="panel-body">
+
+                                    <div class="col-sm-2 col-xs-2">
+                                        <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatorconsumption" id="selectoperatorconsumption"  style="width: 100%" tabindex="4">
+                                            {if in_array('0', $thisoperatorlist) }
+                                            <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                            {else}
+                                            <option value="0"   hassubinfo="true">无操作员选择</option>
+                                            {/if}
+                                            {loop $accountlist $key $value}
+                                            <option value="{$value['uid']}" hassubinfo="true">{$value['username']}</option>
+                                            {/loop}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                            <input type="text" name="consumptionDocumentNumber" id="consumptionDocumentNumber" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                            <input type="text" name="consumptionCardNumber" id="consumptionCardNumber" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {php echo tpl_form_field_daterange('consumptionlimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-outline btn-primary" type="button" onclick="$('#consumptionTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                    </div>
+                                <table id="consumptionTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_deduction" class="tab-pane">
+                            <div class="panel-body">
+                                    <div class="col-sm-2 col-xs-2">
+                                        <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatordeduction" id="selectoperatordeduction"  style="width: 100%" tabindex="4">
+                                            {if in_array('0', $thisoperatorlist) }
+                                            <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                            {else}
+                                            <option value="0"   hassubinfo="true">无操作员选择</option>
+                                            {/if}
+
+                                            {loop $accountlist $key $value}
+                                            <option value="{$value['uid']}" hassubinfo="true">{$value['username']}</option>
+                                            {/loop}
+
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                            <input type="text" name="consumptionDocumentNumber" id="deductionDocumentNumber" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                            <input type="text" name="consumptionCardNumber" id="deductionCardNumber" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        {php echo tpl_form_field_daterange('deductionlimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-outline btn-primary" type="button" onclick="$('#deductionTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                    </div>
+                                <table id="deductionTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_countConsumption" class="tab-pane">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatorcountConsumption" id="selectoperatorcountConsumption"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['uid']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="DocumentNumber" id="countConsumptionDocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="CardNumber" id="countConsumptionCardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('countConsumptionlimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#countConsumptionTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <table id="countConsumptionTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_memberRecharge" class="tab-pane">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatormemberRecharge" id="selectoperatormemberRecharge"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['id']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="DocumentNumber" id="memberRechargeDocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="CardNumber" id="memberRechargeCardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('memberRechargelimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#memberRechargeTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <table id="memberRechargeTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_increaseCount" class="tab-pane">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatorincreaseCount" id="selectoperatorincreaseCount"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['id']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="increaseCountDocumentNumber" id="increaseCountDocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="increaseCountCardNumber" id="increaseCountCardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('increaseCountlimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#increaseCountTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <table id="increaseCountTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_integralExchange" class="tab-pane">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="selectoperatorpointsproductExchange" id="selectoperatorpointsproductExchange"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['id']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="DocumentNumber" id="pointsproductExchangeDocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="CardNumber" id="pointsproductExchangeCardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('pointsproductExchangelimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#pointsproductExchangetabledata').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <table id="pointsproductExchangetabledata" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab_returninvoice" class="tab-pane">
+                            <div class="panel-body">
+                                <div class="col-sm-2 col-xs-2">
+                                    <select data-placeholder="请选择操作员"  class="chosen-select" name="returnInvoiceselectoperator" id="returnInvoiceselectoperator"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisoperatorlist) }
+                                        <option value="0"   hassubinfo="true" selected>无操作员选择</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无操作员选择</option>
+                                        {/if}
+
+                                        {loop $accountlist $key $value}
+                                        <option value="{$value['id']}" hassubinfo="true">{$value['username']}</option>
+                                        {/loop}
+
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">单据号</span>
+                                        <input type="text" name="DocumentNumber" id="returnInvoiceDocumentNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                        <input type="text" name="CardNumber" id="returnInvoiceCardNumber" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    {php echo tpl_form_field_daterange('returnInvoicelimittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline btn-primary" type="button" onclick="$('#returnInvoiceTableData').bootstrapTable('refresh');" id="btn_searchsubmit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <table id="returnInvoiceTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+
+
+    $(document).ready(function(){
+        cashRegister();//消费收银
+        consumption();//快速消费
+        deduction()//储值扣费
+        countConsumption();//计次消费
+        increaseCount();//增加计次
+        memberRecharge();//会员充值
+        pointsproductExchange();//积分兑换
+        memberReturnInvoice();//退货单据
+
+        $('#selectoperator,#selectoperatorconsumption,#selectoperatordeduction,#selectoperatorcountConsumption,#selectoperatormemberRecharge,#selectoperatorincreaseCount,#selectoperatorpointsproductExchange,#returnInvoiceselectoperator').chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 1,
+            no_results_text: '暂无选项！',
+            enable_split_word_search:true,
+            width: '95%'
+        });
+    });
+
+    /****消费收银----start  **/
+    function cashRegister(){
+
+    $('#cashRegistertabledata').bootstrapTable({
+        url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberCashRegisterTableData'));}',
+        method:"post",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded",
+       // showRefresh: true,
+       // search:true, //显示搜索框
+      //  clickToSelect: true,
+        showPaginationSwitch:false,//是否显示数据条数选择框
+        striped:true,//隔行变色
+        showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+       // exportDataType: "all",              //basic', 'all', 'selected'.
+        exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+        showColumns: true,
+       // exportTypes:[ 'excel'],  //导出文件类型
+        queryParamsType:'',
+        queryParams: querygoodsParamspage,//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber:1,                       //初始化加载第一页，默认第一页
+        pageSize: 1,                       //每页的记录行数（*）
+        pageList: [10, 20, 40, 100],
+        pagination: true,
+        height: 556,
+        selectItemName:"id",
+        uniqueId: "id",
+        searchable:true,
+        columns: [{
+            radio: true
+        },{
+            field: 'sc_invoiceCode',
+            title: '消费单据号',
+            align: "center",
+            valign: "middle"
+        },{
+            field: 'sc_consumeType',
+            title: '消费方式',
+            align: "center",
+            valign: "middle"
+        },{
+            field: 'sc_memberName',
+            title: '会员姓名',
+            align: "center",
+            valign: "middle"
+        },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+            field: 'sc_getPoint',
+            title: '获得积分',
+            align: "center",
+            valign: "middle"
+        },{
+            field: 'sc_handleMoneyCount',
+            title: '应付总金额',
+            align: "center",
+            valign: "middle"
+        }, {
+                field: 'sc_realMoneyCount',
+                title: '实收金额',
+                align: "center",
+                valign: "middle"
+            },{
+            field: 'sc_addTime',
+            title: '时间',
+            align: "center",
+            valign: "middle",
+            formatter:consumeinvoiceaddTime
+        },
+            {
+                    field: 'sc_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                }, {
+            field: 'id',
+            title: '查看',
+            align: "center",
+            valign: "middle",
+            formatter:actionFormatter
+        },]
+    });
+    function querygoodsParamspage (params) {
+        var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            pageSize: params.pageSize,  //页面大小
+            pageNumber: params.pageNumber, //页码
+            DocumentNumber: $("#DocumentNumber").val(),
+            CardNumber: $("#CardNumber").val(),
+            selectoperator: $("#selectoperator").val(),
+            start_specifiedStartTime:$('input[name="limittime[start]"]').val(),
+            end_specifiedEndTime: $('input[name="limittime[end]"]').val(),
+
+
+        };
+        return temp;
+    }
+    function actionFormatter(value, row, index) {
+        var id = value;
+        var result = "";
+        result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+        result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+        return result;
+    }
+
+    }
+    /****消费收银----end  **/
+
+
+    /****积分兑换----start  **/
+    function pointsproductExchange(){
+
+        $('#pointsproductExchangetabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getPointsProductExchangeTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            exportOptions:{
+                //ignoreColumn: [0,0],            //忽略某一列的索引
+                fileName: '数据导出',              //文件名称设置
+                worksheetName: 'Sheet1',          //表格工作区名称
+                tableName: '数据表',
+                excelstyles: ['background-color', 'color', 'font-size', 'font-weight'],
+                //onMsoNumberFormat: DoOnMsoNumberFormat
+            },
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 500],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'sc_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatorpointsproductExchange: $("#selectoperatorpointsproductExchange").val(),//操作员
+                pointsproductExchangeDocumentNumber: $("#pointsproductExchangeDocumentNumber").val(),//单据号
+                pointsproductExchangeCardNumber: $("#pointsproductExchangeCardNumber").val(),//会员卡号
+                start_pointsproductExchangelimittime:$('input[name="pointsproductExchangelimittime[start]"]').val(),
+                end_pointsproductExchangelimittime: $('input[name="pointsproductExchangelimittime[end]"]').val(),
+
+
+            };
+            return temp;
+        }
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****积分兑换----end  **/
+
+
+    /****消费收银详细----start  **/
+    function ViewCashRegister(cashRegisterid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewcashregister'))}&id=" + cashRegisterid;
+        parent.layer.open({
+            type: 2,
+            title: '详细',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****消费收银详细----end  **/
+
+    /****消费收银打印----start  **/
+    function ViewCashRegisterPrint(cashRegisterprintid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewcashregisterprint'))}&cashRegisterprintid=" + cashRegisterprintid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****消费收银打印----end  **/
+
+    /****-------------------------------------------------**/
+
+
+    /****快速消费----start  **/
+    function consumption(){
+
+        $('#consumptionTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMembersconsumptionTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 500],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_handleMoneyCount',
+                title: '应付总金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_realMoneyCount',
+                title: '实收金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                    field: 'sc_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatorconsumption: $("#selectoperatorconsumption").val(),//操作员
+                consumptionDocumentNumber: $("#consumptionDocumentNumber").val(),//单据号
+                consumptionCardNumber: $("#consumptionCardNumber").val(),//会员卡号
+                start_consumptionlimittime:$('input[name="consumptionlimittime[start]"]').val(),
+                end_consumptionlimittime: $('input[name="consumptionlimittime[end]"]').val(),
+            };
+            return temp;
+        };
+
+
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****快速消费----end  **/
+
+    /****会员充值----start  **/
+    function memberRecharge(){
+
+        $('#memberRechargeTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberRechargeTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 500],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_handleMoneyCount',
+                title: '充值金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_realMoneyCount',
+                title: '实付金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                    field: 'sc_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatormemberRecharge: $("#selectoperatormemberRecharge").val(),//操作员
+                memberRechargeDocumentNumber: $("#memberRechargeDocumentNumber").val(),//单据号
+                memberRechargeCardNumber: $("#memberRechargeCardNumber").val(),//会员卡号
+                start_memberRechargelimittime:$('input[name="memberRechargelimittime[start]"]').val(),
+                end_memberRechargelimittime: $('input[name="memberRechargelimittime[end]"]').val(),
+            };
+            return temp;
+        };
+
+
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewMemberRechargeDetails(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewMemberRechargePrintDetails('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****会员充值----end  **/
+
+    /****会员充值详细----start  **/
+    function ViewMemberRechargeDetails(MemberRechargeid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewMemberRechargeDetails'))}&MemberRechargeid=" + MemberRechargeid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '400px'],
+            content: url
+        });
+    }
+    /****会员充值详细----end  **/
+
+    /****会员充值打印----start  **/
+    function ViewMemberRechargePrintDetails(MemberRechargePrintId){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewMemberRechargePrintDetails'))}&MemberRechargePrintId=" + MemberRechargePrintId;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '400px'],
+            content: url
+        });
+    }
+    /****会员充值打印----end  **/
+
+    /****储值扣费----start  **/
+    function deduction(){
+
+        $('#deductionTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberDeductionTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_consumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_handleMoneyCount',
+                title: '应付总金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'sc_realMoneyCount',
+                title: '实收金额',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },  {
+                    field: 'sc_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                deductionDocumentNumber: $("#deductionDocumentNumber").val(),
+                deductionCardNumber: $("#deductionCardNumber").val(),
+                selectoperatordeduction: $("#selectoperatordeduction").val(),//操作员
+                start_deductionlimittime:$('input[name="deductionlimittime[start]"]').val(),
+                end_deductionlimittime: $('input[name="deductionlimittime[end]"]').val(),
+            };
+            return temp;
+        };
+
+
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****储值扣费----end  **/
+
+    /****-------------------------------------------------****/
+
+    /****计次消费----start  **/
+    function countConsumption(){
+        $('#countConsumptionTableData').bootstrapTable({
+            url: "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberCountConsumptionTableData'));}",
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'mrci_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doStyle',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doCount',
+                title: '扣除次数',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mrci_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, {
+                    field: 'mrci_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatorcountConsumption: $("#selectoperatorcountConsumption").val(),//操作员
+                countConsumptionDocumentNumber: $("#countConsumptionDocumentNumber").val(),//单据号
+                countConsumptionCardNumber: $("#countConsumptionCardNumber").val(),//会员卡号
+                start_countConsumptionlimittime:$('input[name="countConsumptionlimittime[start]"]').val(),
+                end_countConsumptionlimittime: $('input[name="countConsumptionlimittime[end]"]').val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewMemberCountConsume(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewMemberMemberCountConsumePrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****计次消费----end  **/
+
+    /****计次消费详细----start  **/
+    function ViewMemberCountConsume(invoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewmemberCountConsume'))}&invoiceid=" + invoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '400px'],
+            content: url
+        });
+    }
+    /****计次消费详细----end  **/
+
+    /****计次消费打印----start  **/
+    function ViewMemberMemberCountConsumePrint(invoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewmembercountdetailprint'))}&invoiceid=" + invoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '550px'],
+            content: url
+        });
+    }
+    /****计次消费打印----end  **/
+
+    /****增加计次----start  **/
+    function increaseCount(){
+
+        $('#increaseCountTableData').bootstrapTable({
+            url: "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberIncreaseCountTableData'));}",
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'mrci_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doStyle',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doCount',
+                title: '增加次数',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_handleMoneyCount',
+                title: '应付总金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mrci_realMoneyCount',
+                title: '实收金额',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mrci_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                    field: 'mrci_note',
+                    title: '备注',
+                    align: "center",
+                    valign: "middle"
+                },{
+                    field: 'id',
+                    title: '查看',
+                    align: "center",
+                    valign: "middle",
+                    formatter:actionFormatter
+                },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatorincreaseCount: $("#selectoperatorincreaseCount").val(),//操作员
+                increaseCountDocumentNumber: $("#increaseCountDocumentNumber").val(),//单据号
+                increaseCountCardNumber: $("#increaseCountCardNumber").val(),//会员卡号
+                start_increaseCountlimittime:$('input[name="increaseCountlimittime[start]"]').val(),
+                end_increaseCountlimittime: $('input[name="increaseCountlimittime[end]"]').val(),
+            };
+            return temp;
+        };
+
+
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewIncreaseCount(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewIncreaseCountPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****增加计次----end  **/
+
+    /****增加计次详细----start  **/
+    function  ViewIncreaseCount(increasecountid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewincreasecountdatails'))}&increasecountid=" + increasecountid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****增加计次详细----end  **/
+
+
+    /****增加计次打印----start  **/
+    function  ViewIncreaseCountPrint(increasecountprintid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewincreasecountdatailsprint'))}&increasecountprintid=" + increasecountprintid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '700px'],
+            content: url
+        });
+    }
+    /****增加计次打印----end  **/
+
+    /****顾客退货----start  **/
+    function memberReturnInvoice(){
+        $('#returnInvoiceTableData').bootstrapTable({
+            url: "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberReturnInvoiceTableData'));}",
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            showColumns: true,
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'mri_membererueninvoiceCode',
+                title: '退货单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_returnnumber',
+                title: '退货数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_returntotalprice',
+                title: '退货总金额',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_returntotalintegral',
+                title: '扣除总积分',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mri_addTime',
+                title: '退货时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, {
+                field: 'mri_note',
+                title: '备注',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                returnInvoiceselectoperator: $("#returnInvoiceselectoperator").val(),//操作员
+                returnInvoiceDocumentNumber: $("#returnInvoiceDocumentNumber").val(),//单据号
+                returnInvoiceCardNumber: $("#returnInvoiceCardNumber").val(),//会员卡号
+                start_returnInvoicelimittime:$('input[name="returnInvoicelimittime[start]"]').val(),
+                end_returnInvoicelimittime: $('input[name="returnInvoicelimittime[end]"]').val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewMemberReturnInvoice(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewMemberReturnInvoicePrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }
+    /****顾客退货----end  **/
+
+    /****顾客退货详细----start  **/
+    function  ViewMemberReturnInvoice(returninvoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewMemberReturnInvoice'))}&invoiceid=" + returninvoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '400px'],
+            content: url
+        });
+    }
+    /****顾客退货详细----end  **/
+
+
+    /****顾客退货打印----start  **/
+    function  ViewMemberReturnInvoicePrint(returninvoiceid){
+        var url = "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'viewMemberReturnInvoicePrint'))}&invoiceid=" + returninvoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '打印',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '600px'],
+            content: url
+        });
+    }
+    /****顾客退货打印----end  **/
+
+//时间转换
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+
+
+</script>
+
+
+{template 'web/common/footer'}

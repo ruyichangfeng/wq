@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>绑定手机</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <style>
+    .header .header_box {
+        background: linear-gradient(to right, #5a92ff, #4078e4);
+    }
+
+    .header a.icon-left,
+    .header a.icon-right,
+    .header .title {
+        color: #fff;
+    }
+
+    .from-group {
+        display: block;
+        width: 100%;
+        background-color: #fff;
+        height: 46px;
+        border-bottom: 1px solid #F0EEEF;
+        padding-left: 80px;
+        position: relative;
+    }
+
+    .from-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 80px;
+        color: #AEACAC;
+        font-size: 13px;
+        line-height: 44.5px;
+        text-align: center;
+    }
+
+    .from-group input {
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        border: none;
+        padding-left: 10px;
+        color: #AEACAC;
+        position: relative;
+        font-size: 13px;
+    }
+
+    input::-webkit-input-placeholder {
+        color: #AEACAC;
+    }
+
+    .user-info {
+        width: 100%;
+        height: 100%;
+        padding: 8px 0 8px 10px;
+    }
+
+    .user-info img {
+        height: 100%;
+        border-radius: 50%;
+        border: none;
+    }
+
+    .user-info span {
+        margin-left: 10px;
+        color: #AEACAC;
+        vertical-align: middle;
+    }
+
+    .from-group .code-btn {
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        width: 80px;
+        height: 30px;
+        border: 1px solid #DE8745;
+        border-radius: 5px;
+        color: #DE8745;
+        text-align: center;
+        background-color: #fff;
+    }
+
+    .error-text {
+        padding-left: 90px;
+        margin-top: 10px;
+        color: #FF0000;
+    }
+
+    .submit-btn {
+        position: relative;
+        display: block;
+        width: 94%;
+        margin-top: 100px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 14px;
+        padding-right: 14px;
+        box-sizing: border-box;
+        font-size: 18px;
+        text-align: center;
+        text-decoration: none;
+        color: #FFFFFF;
+        line-height: 45px;
+        border-radius: 5px;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
+        background: linear-gradient(to right, #5a92ff, #4078e4);
+    }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">绑定手机</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 头部模块 -->
+        <form method="post" enctype="multipart/form-data">
+            <div class="from-group" style="height: 56px; margin-bottom: 10px;">
+                <label class="from-label" style="line-height: 55px;">用户名:</label>
+                <div class="user-info"><img src="{if $_W['fans']['avatar']}{$_W['fans']['avatar']}{else}../addons/hy_supstore/template/mobile/images/avatar.jpg{/if}" alt=""><span>{$_W['fans']['nickname']}</span></div>
+            </div>
+            <div class="from-group">
+                <label class="from-label">手机号:</label>
+                <input type="number" class="mobile from-input" name="mobile" placeholder="请输入手机号" value="{if $member['mobile']}{$member['mobile']}{/if}">
+            </div>
+            <div class="from-group" style="padding-right:100px;">
+                <label class="from-label">验证码:</label>
+                <input type="number" class="code from-input" name="code" placeholder="请输入短信验证码">
+                <button id="getCode" class="code-btn">获取验证码</button>
+            </div>
+            <div class="error-text"></div>
+            <input type="submit" class="submit-btn" name="submit" value="提交" />
+            <input type="hidden" name="gotourl" value="{$_SERVER['HTTP_REFERER']}" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script>
+    var timeout = 0; //剩余时间计时
+    var cansend = true; //是否能发短信    
+
+    function showMsg(msg) {
+        $('.error-text').html(msg);
+    }
+
+    //计时
+    function showProgress() {
+        if (timeout <= 0) {
+            $('#getCode').html('获取验证码');
+            cansend = true;
+            $('#getCode').attr('disabled', false);
+            return;
+        }
+
+        $('#getCode').html('剩余 ' + timeout + '秒');
+        timeout--;
+        setTimeout('showProgress()', 1000);
+        $('#getCode').attr('disabled', true);
+    }
+
+    function myfunction() {
+        $('#getCode').attr('disabled', false);
+    }
+
+    //点击发送短信
+    $('#getCode').click(function() {
+        $('#getCode').attr('disabled', true);
+        setTimeout('myfunction()', 1000);
+        showMsg('');
+
+        if (!cansend) {
+            showMsg('请稍候获取验证码');
+            return;
+        }
+
+        var mobile = $('input[name=mobile]').val();
+
+        if (mobile == '' || mobile.length != 11) {
+            showMsg('请输入有效手机号');
+            return;
+        }
+
+        $url = "{php echo $this->createMobileUrl('sms')}";
+
+        $.get($url, { mobile: mobile }, function(data) {
+            data = JSON.parse(data);
+
+            if (data.errcode == 0) {
+                timeout = data.expire;
+                cansend = false;
+                showProgress();
+            } else {
+                showMsg(data.errmsg);
+            }
+        });
+        return false;
+    });
+    </script>
+</body>
+</html>

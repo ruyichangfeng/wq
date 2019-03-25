@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+<meta name="format-detection" content="telephone=no">
+<title>代记账管理公司催费列表 - {$cwgl_config['webtitle']}</title>
+<link href="{$templateurl}/css/css.css" rel="stylesheet" type="text/css">
+<link href="{$templateurl}/css/common.css" rel="stylesheet" type="text/css">
+</head>
+<body >
+<!--分页-->
+<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+<!--分页-->
+<style>
+	.form-control_pp{width:180px;height:34px;padding:6px 12px;font-size:14px;line-height:1.42857143;color:#555;background-color:#fff;background-image:none;border:1px solid #ccc;border-radius:4px;-webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075);box-shadow:inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}
+</style>
+<div class="head">
+	<div class="content-top clearFix">
+	{if $op == 'add' || $op == 'edit'}
+	<a href="{$urltk}">
+	 <em class="return"><</em>
+	 <span class="fanhui">返回</span>
+	</a>
+	{else}
+	<a href="{php echo $this->createMobileUrl('staff_userlist')}">
+	 <em class="return"><</em>
+	 <span class="fanhui">返回</span>
+	</a>
+	{/if}
+    
+	<!--start-->
+	<div style="float:right;">
+	<a href="{$urltk}&op=add" class="btn btn-default"><font color="#666666">发布催费信息</font></a>
+	</div>
+	<!--end-->
+   </div>
+</div>
+	
+<div id="content" >
+   {if $op == 'add' || $op == 'edit'}
+   <script>
+		function ckgpt(num){
+			if(num==0){
+				document.getElementById('show0').style.display="";
+				document.getElementById('show1').style.display="none";
+			}else{
+				document.getElementById('show0').style.display="none";
+				document.getElementById('show1').style.display="";
+			}
+		}
+		function formcheck(){					
+			var titlename = document.formpt.titlename.value;
+			if (titlename == ""){
+				alert("催费名称不能为空!");
+				document.formpt.titlename.focus();
+				return false; 
+			}
+		}
+   </script>
+   <form name="formpt" action="{$urltk}" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+   <input type="hidden" name="token" value="{$_W['token']}" />
+   <input type="hidden" name="id" value="{$srdb['id']}" />
+   <div class="contbox">
+     <div class="titbox">
+	   <i class="toushu"></i>
+	   <span>{if $op == 'add'}发布催费信息{elseif $op == 'edit'}修改催费信息{/if}</span>
+	 </div>
+	 
+	 <div class="toushu-bd">
+	     <div class="message clearFix">
+		   <label>催费名称：</label>
+		   <input name="titlename" id="" type="text" value="{$srdb['titlename']}" class="toushu-inp">
+		 </div>
+		 <div class="message clearFix">
+		   <label>催费类型：</label>
+		   <input type="radio" name="type" value="0" onclick="ckgpt(0)" {if $srdb['type']==0}checked{/if} />&nbsp;其他 &nbsp;&nbsp;&nbsp;&nbsp;
+		   <input type="radio" name="type" value="1" onclick="ckgpt(1)" {if $srdb['type']==1}checked{/if}/>&nbsp;默认服务费用
+		 </div>
+		 
+		 <div id="show0" class="message clearFix" {if $srdb['type']==1}style="display:none;"{/if}>
+		   <label>催费金额：</label>
+		   <input name="paymoney" id="" type="text" value="{$srdb['paymoney']}" onkeyup="value=value.replace(/[^\d.]/g,'')" style="width:100px;" class="toushu-inp">&nbsp;元
+		 </div>
+		 <div id="show1" class="message clearFix" {if $srdb['type']!=1}style="display:none;"{/if}>
+		   <label>催费金额：</label>
+		   {if $op == 'add'}
+			<input name="paymoney2" id="" type="text" {if $srdb_user['payfees']>0}value="{$srdb_user['payfees']}"{else}value="{$cwgl_config['month_money']}"{/if} onkeyup="value=value.replace(/[^\d.]/g,'')" style="width:100px;" class="toushu-inp">&nbsp;元
+		   {elseif $op == 'edit'}
+			<input name="paymoney2" id="" type="text" value="{$srdb['paymoney']}" onkeyup="value=value.replace(/[^\d.]/g,'')" style="width:100px;" class="toushu-inp">&nbsp;元
+		   {/if}
+		 </div>
+		 
+		 <div class="message clearFix">
+		   <label>催费说明：</label>
+		   <textarea name="message" class="textarea">{$srdb['message']}</textarea>
+		 </div>
+		 <input type="submit" name="{$op}_submit" value="提交" class="submit"/>
+	 </div>
+   </div>
+   </form>
+   {else}
+   <div class="k-manage-bd">
+      <div class="titbox">
+	    <h3 class="htit">{$srdb_user['compname']}催费列表</h3>
+	  </div>
+	  <div class="k-manage-list clearFix">
+	    <ul>
+		  {loop $list $key $value}
+		  <li>
+		    <div class="info">
+			   <p>
+			     <em>缴费项目：</em>
+				 <span>{$value['titlename']}</span>
+			   </p>
+               <p>
+			     <em>费用类型：</em>
+				 <span>{if $value['type']==1}默认服务费用{else}其他{/if}</span>
+			   </p>
+               <P>
+			     <em>缴纳金额：</em>
+				 <span><font color="#FF6600">￥{$value['paymoney']}</font></span>
+			   </P>
+			   <P>
+			     <em>发布时间：</em>
+				 <span>{php echo date('Y-m-d H:i', $value['dateline']);}</span>
+			   </P>
+			   <P>
+			     <em>状态：</em>
+				 <span>
+				 	{if $value['status']==1}已支付
+					{else}<font color="#CC0000">未支付</font>
+					{/if}
+				 </span>
+			   </P>
+		    </div>
+			{if $value['status']==0}
+		    <a href="{$urltk}&op=edit&id={$value[id]}" class="look-btn">修改</a>
+			{/if}
+			<a href="{$urltk}&op=delete&id={$value[id]}" class="look-btn">删除</a>
+		 </li>
+		 {/loop}
+		</ul>
+	  </div>
+	  <div style="padding: 0 10px; text-align:center;">
+			<style>
+				.pagination {margin-top: 0px;}
+			</style>
+			{$pager}
+	  </div>
+   </div>
+   {/if}
+</div>
+
+<!--footer star-->
+{template 'staff_footer'}
+</body>
+</html>

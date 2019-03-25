@@ -1,0 +1,111 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .form-control { width:60%}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'index'))}">客户管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'followup'))}">跟进管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'student'))}">学员管理</a>
+        </li>
+        <li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>合同名称</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="contract-name" type="text" value="" style="width:60%;display: inline-block;margin-right:3%">
+                    <button class="btn btn-md btn-primary">查询</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            合同列表
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:50%;">合同名称</th>
+                    <th class="text-center" style="width:45%;">合同简介</th>
+                    <th class="text-center" style="width:10%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $contract_list $key $item}
+                <tr>
+                    <td class="text-center">{$item['id']}</td>
+                    <td class="text-center">{$item['contract_name']}</td>
+                    <td class="text-center"><a href="javascript:;" data-toggle="modal" data-target=".contract_detail{$item['id']}">点击查看合同详情</a> </td>
+                    <td class="text-center"><input type="checkbox" name="contract" class="xuanze" {if $item['status']==1}disabled checked="checked"{/if} /> </td>
+                </tr>
+                <div class="modal fade contract_detail{$item['id']}" tabindex="-1" role="dialog" aria-labelledby="contract_detail" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" >
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4 class="modal-title" id="myModalLabel">合同详情</h4>
+                            </div>
+                            <div class="modal-body">
+                                {$item['contract_description']}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/loop}
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-primary purchase">购买</button>
+            {$pager}
+        </div>
+    </div>
+</div>
+{template 'common/footer'}
+<script>
+    $("document").ready(function(){
+        $(".purchase").click(function(){
+            var aaa =new Array();
+            var pid = "{$_GPC['pid']}";
+            $(".xuanze").each(function(){
+                var rrr= $(this).is(":checked");
+                var xxx = $(this).parent().parent();
+                if(rrr){
+                    var bianhao = xxx.find('td').eq(0).text();
+                    aaa.push(bianhao);
+                }
+            })
+            if(aaa.length==0){
+                alert("请选择相应的合同");
+                return false;
+            }
+            //此处不检测状态,后台检测状态
+            var Url = "{php echo $this->createWeburl('user')}";
+            var vdata = {allid:aaa,caozuo:'purchasecontracts',pid:pid};
+            $.post(Url,vdata,function(data){
+                if(data.error==1){
+                    alert(data.message);
+                    //window.location.reload();
+                }else{
+                    alert(data.message);
+                }
+            },'json')
+            return false;
+        })
+    })
+</script>

@@ -1,0 +1,50 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}template/css/back.css" type="text/css"/>
+
+<div class="panel-body">
+	<table class="table table-hover table-responsive">
+		<thead>
+			<tr style="background-color:#f5f5f5">
+				<th>#</th>
+				<th>活动图片</th>
+				<th>活动标题</th>
+				<th>活动时间</th>
+				<th>活动操作</th>
+				<th>其他操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{loop $listdata $key $item}
+				<tr class="table_tr">
+					<td>{php echo ++$key}</td>
+					<td><img class="img-thumbnail" style="width:100px;height:100px;" src="{php echo tomedia($item['picture'])}" /></td>
+					<td>{$item['title']}</td>
+					<td>开始：{php echo substr($item['start_time'],0,16)} <br> 结束：{php echo substr($item['end_time'],0,16)}</td>
+					<td class="table-manage-td">
+						<div class="btn-group" role="group">
+							<a class="btn btn-primary" role="button" href="{php echo $this->createWebUrl('vote',array('id'=>$item['id'],'op'=>'update'))}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 修改</a>
+							<a class="btn btn-default" role="button" href="javascript:votedelete('{$item['id']}')"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除</a>
+						</div>
+					</td>
+					<td>
+						<div class="btn-group" role="group">
+							<a class="btn btn-default" role="button" href="{php echo $_W['siteroot']}app/index.php?i={php echo $_W['uniacid']}&c=entry&do=index&m={MODULE_ID}&voteid={php echo $item['id']}" target="_blank"><span class="glyphicon glyphicon-magnet" aria-hidden="true"></span> 右键复制链接</a>
+							<a class="btn btn-default" role="button" href="{php echo $this->createWebUrl('join',array('voteid'=>$item['id']))}"><span class="glyphicon glyphicon-open" aria-hidden="true"></span> 查看参与用户</a>
+						</div>
+					</td>
+				</tr>
+   			{/loop}
+		</tbody>
+	</table>
+</div>
+<nav aria-label="Page navigation">
+	{php echo pagination($total, $currpage, $pagesize);}
+</nav>
+{template 'common/footer'}
+<script>
+	function votedelete(id){
+		if(confirm("确定要删除数据吗？")){
+			location.href = "{php echo $this->createWebUrl('vote', array('op'=>'delete'))}&id=" + id;
+		}
+	}
+</script>

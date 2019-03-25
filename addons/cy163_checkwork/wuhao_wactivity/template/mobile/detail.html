@@ -1,0 +1,220 @@
+{template 'common/header'}
+
+<link rel="stylesheet" href="../addons/wuhao_wactivity/template/mobile/css/style.css" />
+{loop $data_matches_new $index $item}
+
+<HR style="border:3 double #987cb9" width="100%" color=#987cb9 SIZE=3>
+
+<div class="container">
+	<form class="form-horizontal" action="" method="POST">
+		<div class="form-group">
+			<h2 style="text-align:center">{$item[0]['title']}</h2>
+		</div>		
+		<div class="form-group">
+		    <label for="time" class="col-xs-3 col-md-1">活动时间</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="time" id="time" value="{$item['time']}" readOnly="true">
+				<input type="hidden" class="form-control" name="time_start_ori" id="time_start_ori" value="{$item['time_start_ori']}">
+				<input type="hidden" class="form-control" name="time_end_ori" id="time_end_ori" value="{$item['time_end_ori']}">
+				<input type="hidden" class="form-control" name="module_chinese" id="module_chinese" value="{$item['module_chinese']}">
+				<input type="hidden" class="form-control" name="module" id="module" value="{$item['module']}">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label for="time_start" class="col-xs-3 col-md-1">{$item['module_chinese']}开始时间</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="time_start" id="time_start" value="{$item['time_start']}" readOnly="true">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label for="time_end" class="col-xs-3 col-md-1">{$item['module_chinese']}截止时间</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="time_end" id="time_end" value="{$item['time_end']}" readOnly="true">
+		    </div>
+		</div>
+		
+		<div class="form-group">
+		    <label for="place" class="col-xs-3 col-md-1">活动地点</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="place" id="place" value="{$item[0]['place']}" readOnly="true">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label for="peoplenum" class="col-xs-3 col-md-1">活动人数</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="peoplenum" id="peoplenum" value="{$item[0]['peoplenum']}" readOnly="true">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label for="price" class="col-xs-3 col-md-1">活动费用</label>
+		    <div class="col-xs-9">
+		    	<input type="text" class="form-control" name="price" id="price" value="{$item[0]['price']}" readOnly="true">
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label for="content" class="col-xs-3 col-md-1">具体内容</label>
+		    <div class="col-xs-9">	
+		    	<div contenteditable="true" class="t_area">&nbsp;&nbsp;{$item[0]['content']}</div>		    	
+		    	<!-- <textarea style="width:100%" name="content" readOnly="true">{$item[0]['content']}</textarea> -->
+		    </div>
+		</div>
+
+		<div class="form-group">	 	  	
+		  	<input type="hidden" name="matchid" id="matchid{$index}" value="{$item[0]['matchid']}">
+		  	<input type="hidden" name="buttoncancel" id="buttoncancel{$index}" value="{$item['buttoncancel']}">		  	
+		  	<div class="col-xs-4 col-md-2">
+		  		<input type="submit" name="status" id="status{$index}" class="button_huodong" style="width:120px;height:50px;" value="{$item['module_chinese']}">		  		
+		  	</div>  
+		  	<div class="col-xs-4 col-md-2">
+		  		<input type="button" name="info" id="info{$index}" class="button_huodong" style="width:120px;height:50px;" value="{$item['module_chinese']}详细信息">		  		 		
+		  	</div>		  	
+		  	<input type="hidden" value="{$_W['token']}" name="token">	
+		</div>	
+
+
+		<div class="form-group">		   	
+		   	<label for="num" class="col-xs-6 col-md-3">{$item['module_chinese']}总人数 {$item['num']}人</label>		   		
+		</div>
+
+
+		<div class="form-group">
+			<table class="table table-hover table-bordered">
+				<thead>
+					<tr>
+						<th class="col-xs-2 col-md-1">
+						群组
+						</th>
+						<th class="col-xs-2 col-md-1">
+						人数
+						</th>
+						<th class="col-xs-8 col-md-5">
+						详细列表
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $data_total_group[$index] $index_group $item_group}					
+						<tr>
+							<td class="col-xs-2 col-md-1">
+								{$item_group['groupname']}								
+							</td>
+							<td class="col-xs-2 col-md-1">
+								<input type="text" style="width:100%;border:none;" name="num{$index_group}" value="{$item_group['num']}">		
+							</td>
+							<td class="col-xs-8 col-md-5" style="word-wrap:break-word;">							    
+							    {$item_group['listmyself']} 							    	
+						    </td>
+					    </tr>					
+					{/loop}	
+				</tbody>
+			</table>	
+		</div>	
+			
+	</form>
+</div>
+{/loop}
+<script type="text/javascript">	
+	var module=document.getElementById("module").value;
+	function check(){
+		//获取活动时间
+
+	    var module_chinese=document.getElementById("module_chinese").value;
+	    var tqd_start=document.getElementById("time_start_ori").value;	    
+	    var tqd_end=document.getElementById("time_end_ori").value;
+	    var time_start=tqd_start.replace("-","/").replace("-","/");
+	    var time_end=tqd_end.replace("-","/").replace("-","/");
+	    console.log(tqd_start);
+	    console.log(tqd_end);
+	    //获取当前时间
+	    var d = new Date();
+		var vYear = d.getFullYear();
+		var vMon = d.getMonth() + 1;
+		var vDay = d.getDate();
+		var h = d.getHours(); 
+		var m = d.getMinutes(); 
+		var se = d.getSeconds();	    	
+		var timenow=vYear+'/'+(vMon<10 ? "0" + vMon : vMon)+'/'+(vDay<10 ? "0"+ vDay : vDay)+' '+(h<10 ? "0"+ h : h)+':'+(m<10 ? "0" + m : m)+':'+(se<10 ? "0" +se : se);
+		
+
+	    var dtqd_start = new Date(Date.parse(time_start));
+	    var dtqd_end = new Date(Date.parse(time_end));
+		var dtnow= new Date(Date.parse(timenow));
+		//console.log(dt1);
+	    //console.log(dt2);
+		//var diff1 = parseInt((dtnow.getTime() - dtqd_start.getTime()) / (1000 * 60 * 60));
+		//var diff2 = parseInt((dtqd_end.getTime() - dtnow.getTime()) / (1000 * 60 * 60));
+		var diff1 = parseInt(dtnow.getTime() - dtqd_start.getTime());
+		var diff2 = parseInt(dtqd_end.getTime() - dtnow.getTime());
+		console.log(diff1);
+		console.log(diff2);
+		if((diff1>0)&&(diff2>0)){
+			return true;
+		}else{
+			alert("请在规定时间内"+module_chinese+"！");
+	    	return false;
+		}
+
+  	}
+
+
+
+  	$("#info0").click(function(){
+  		var matchid=document.getElementById("matchid0").value;
+  		console.log(matchid);  		
+  		if(module=='baoming'){
+  			window.location.href="{php echo $this->createMobileUrl('getbaominginfo')}"+"&matchid="+matchid;
+  		}else if(module=='qiandao'){
+  			window.location.href="{php echo $this->createMobileUrl('getqiandaoinfo')}"+"&matchid="+matchid;
+  		}
+  	});
+  	$("#info1").click(function(){
+  		var matchid=document.getElementById("matchid1").value;
+  		console.log(matchid);
+  		if(module=='baoming'){
+  			window.location.href="{php echo $this->createMobileUrl('getbaominginfo')}"+"&matchid="+matchid;
+  		}else if(module=='qiandao'){
+  			window.location.href="{php echo $this->createMobileUrl('getqiandaoinfo')}"+"&matchid="+matchid;
+  		}  		
+  	});
+  	$("#info2").click(function(){
+  		var matchid=document.getElementById("matchid2").value;
+  		console.log(matchid);
+  		if(module=='baoming'){
+  			window.location.href="{php echo $this->createMobileUrl('getbaominginfo')}"+"&matchid="+matchid;
+  		}else if(module=='qiandao'){
+  			window.location.href="{php echo $this->createMobileUrl('getqiandaoinfo')}"+"&matchid="+matchid;
+  		}
+  	});
+  	
+  	
+
+  	$(document).ready(function(){
+  		var buttoncancel0=document.getElementById("buttoncancel0").value;  		
+  		console.log(buttoncancel0);  		
+  		if(buttoncancel0 == 1){
+  			$("#status0").attr("disabled", true);
+  		}else{
+  			$("#status0").attr("disabled", false);
+  		}
+
+  		var buttoncancel1=document.getElementById("buttoncancel1").value;  		
+  		console.log(buttoncancel1);  		
+  		if(buttoncancel1 == 1){
+  			$("#status1").attr("disabled", true);
+  		}else{
+  			$("#status1").attr("disabled", false);
+  		}
+
+  		var buttoncancel2=document.getElementById("buttoncancel2").value;  		
+  		console.log(buttoncancel2);  		
+  		if(buttoncancel2 == 1){
+  			$("#status2").attr("disabled", true);
+  		}else{
+  			$("#status2").attr("disabled", false);
+  		}
+  	});
+
+
+
+</script>
+{template 'common/footer'}

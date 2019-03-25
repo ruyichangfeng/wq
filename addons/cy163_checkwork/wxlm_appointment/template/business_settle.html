@@ -1,0 +1,171 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'display'));}">商家管理</a></li>
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'create'));}">添加商家</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('business', array('op'=>'settle'));}">结算信息</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="{php echo $this->createMobileUrl('business', array('op'=>'settle', 'business_id'=>$business_id))}" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >订单号</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[order_number]" value="{$search['order_number']}"  class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2  control-label" >预约人</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[order_username]" value="{$search['order_username']}" placeholder="可模糊搜索" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">预约人电话</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[order_userphone]" value="{$search['order_userphone']}"  class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">门店</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_storeid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $stores $key $item}
+                                    <option value="{$item['store_id']}" {if $search['order_storeid'] == $item['store_id']}selected{/if}>{$item['store_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">项目</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_projectid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $projects $key $item}
+                                    <option value="{$item['project_id']}" {if $search['order_projectid'] == $item['project_id']}selected{/if}>{$item['project_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">员工</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_staffid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $staffs $key $item}
+                                    <option value="{$item['staff_id']}" {if $search['order_staffid'] == $item['staff_id']}selected{/if}>{$item['staff_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input  type="button" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;" onclick="searchOrder(0)"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;margin-right: 30px;" onclick="formreset()"/>
+                            <input  type="button" value="一键结算" class="btn btn-info" style="width:120px;" onclick="searchOrder(1)"/>
+
+                            <input type="hidden" id="action" name="action" value="0" />
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">预约记录</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="">订单号</th>
+                        <th style="">商家</th>
+                        <th style="">门店</th>
+                        <th style="">项目</th>
+                        <th style="">员工</th>
+                        <th style="">预约人</th>
+                        <th style="">订单价钱</th>
+                        <th style="">支付状态</th>
+                        <th style="">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $orders $key $item}
+                    <tr>
+                        <td>{$item['order_number']}</td>
+                        <td>{$business['business_name']}</td>
+                        <td>{$item['order_storeid']}</td>
+                        <td>{$item['order_projectid']}</td>
+                        <td>{$item['order_staffid']}</td>
+                        <td>{$item['order_username']}</td>
+                        <td>{$item['order_pay_money']}</td>
+                        <td>{$item['order_state']}</td>
+                        <td>
+                            {if $item['order_settlement'] == 1}
+                            <a  class="btn btn-warning" href="javascript:void (0)">待结算</a>
+                            {else}
+                            <a  class="btn btn-info" href="javascript:void (0)">已结</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($orders)}
+                    <tr>
+                        <td colspan="9">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="9">
+                            暂无结算信息
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+
+                </table>
+                <div style="margin-bottom: 15px; text-align: right; font-weight: bold">待结: {$wait}元   已结: {$finish}元</div>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+    function searchOrder(state) {
+
+        $('#action').val(state);
+        $('#form').submit();
+
+    }
+</script>
+{template 'common/footer'}

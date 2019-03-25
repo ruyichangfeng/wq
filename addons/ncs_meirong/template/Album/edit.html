@@ -1,0 +1,130 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="../addons/ncs_meirong/resource/css/style.css" />
+<div class="model" style="display: none;">
+    <div class="col-sm-3 ibox">
+        {php echo tpl_form_field_image('bimg',$list['bimg']);}
+        <div class="ibox-tools">
+            <i class="fa fa-arrow-left xmove" data-move="1"></i>
+            <i class="fa fa-arrow-right xmove" data-move="2"></i>
+            <i class="fa fa-plus addmodel"></i>
+            <i class="fa fa-times muddel"></i>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {$xtitle}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="post" action="{url 'site/entry/'.$url,array('m'=>'ncs_meirong','op'=>'savemodel','version_id'=>$_GPC['version_id'])}" name="submit" style="padding: 20px 0;">
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control"  name="name" id="name" value="{$list['name']}">
+                    <input type="hidden" name="id" value="{$list['id']}">
+                    <input type="hidden" name="imgs" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">图片(350*200)</label>
+                <div class="col-sm-8">
+                    {loop $list['imgs'] $index $item}
+                    <div class="col-sm-3 ibox">
+                        {php echo tpl_form_field_image('bimg',$item);}
+                        <div class="ibox-tools">
+                            <i class="fa fa-arrow-left xmove" data-move="1"></i>
+                            <i class="fa fa-arrow-right xmove" data-move="2"></i>
+                            <i class="fa fa-plus addmodel"></i>
+                            <i class="fa fa-times muddel"></i>
+                        </div>
+                    </div>
+                    {/loop}
+                    {if $list['imgs']}
+                    {else}
+                    <div class="col-sm-3 ibox">
+                        {php echo tpl_form_field_image('bimg');}
+                        <div class="ibox-tools">
+                            <i class="fa fa-arrow-left xmove" data-move="1"></i>
+                            <i class="fa fa-arrow-right xmove" data-move="2"></i>
+                            <i class="fa fa-plus addmodel"></i>
+                            <i class="fa fa-times muddel"></i>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">内容</label>
+                <div class="col-sm-10">
+                    {php echo tpl_ueditor('content',$list['content']);}
+                </div>
+            </div>
+            <div class="form-group">
+
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="submit" name="submit" class="btn btn-default">
+                </div>
+            </div>
+
+
+
+        </form>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        //增加
+        $(".form-group").on('click','.addmodel',function(){
+            var objc=$(this);
+            $data=objc.parent().parent();
+            $clone=$(".model .ibox").clone();
+            $data.after($clone);
+        });
+        //删除
+        $(".form-group").on('click','.muddel',function(){
+            var objc=$(this);
+            $(this).parent().parent().remove();
+        })
+        //移动
+        $(".form-group").on('click','.xmove',function(){
+            var objc=$(this);
+            var cid=$(this).attr('data-move');
+            $_tobj=objc.parent().parent();
+            if(cid==1)
+            {
+                if($_tobj.prev().length>0)
+                {
+                    $_tobj.after( $_tobj.prev() )
+
+                }
+            }else if(cid==2)
+            {
+                if($_tobj.next().length>0)
+                {
+                    $_tobj.next().after($_tobj);
+
+                }
+
+            }
+        })
+        $("input[name='submit']").click(function(){
+            getimgs();
+        });
+        //收集图片
+        function getimgs(){
+            var imgs='';
+            $(".form-group .ibox").each(function(){
+                if(imgs==''){
+                    imgs=$(this).find('img').attr("src");
+                }else{
+                    imgs=imgs+','+$(this).find('img').attr("src");
+                }
+            });
+            $("input[name='imgs']").val(imgs);
+        }
+    })
+</script>
+{template 'common/footer'}

@@ -1,0 +1,254 @@
+{template 'common/header'}
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li{if $_GPC['do'] == 'manage' || $_GPC['do'] == '' } class="active"{/if}><a href="{php echo $this->createWebUrl('manage');}">大转盘管理</a></li>
+		<li{if $_GPC['do'] == 'post'} class="active"{/if}><a href="{php echo url('platform/reply/post',array('m'=>'bc_zhbd'));}">添加大转盘规则</a></li>
+	</ul> 
+    
+    <div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+				<input type="hidden" name="m" value="bc_dzp" />
+				<input type="hidden" name="do" value="manage" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">关键字</label>
+					<div class="col-xs-12 col-sm-8 col-lg-9">
+						<input class="form-control" name="keyword" id="" type="text" value="{$_GPC['keyword']}">
+					</div>
+					<div class=" col-xs-12 col-sm-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
+				<div class="form-group">
+				</div>
+			</form>
+		</div>
+    </div>
+
+<table class="table">
+	<thead>
+		<tr><th>显示名称</th><th>填写说明</th><th>填写类型</th><th>验证类型</th><th>原型效果</th><th>是否必填</th><th>显示顺序</th><th>错误提示</th><th>操作</th></tr>
+	</thead>
+	<tbody id="bctbody">
+	</tbody>
+</table>
+
+
+<!-- 按钮触发模态框 -->
+<button class="btn btn-primary editinput" >
+   开始演示模态框
+</button>
+
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" 
+               aria-hidden="true">×
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               <strong>填写项目设置</strong>
+            </h4>
+         </div>
+         <div class="modal-body">
+		 <form class="form-horizontal" id="inputform"> 
+			<input type="hidden" name="key" value="-1">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示名称</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="title" value="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示顺序</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="1" name="sortnumber" value="">
+				</div>
+			</div>				
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">填写说明</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="desc" value="">
+				</div>
+			</div>	
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">填写类型</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio1" value="1" checked> 单行文本
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio2" value="2"> 多行文本
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio3" value="3"> 选择项
+					</label>					
+				</div>
+			</div>		
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">可选项</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<textarea class="form-control" rows="3" name="options"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+				  <div class="checkbox">
+					<label>
+					  <input type="checkbox" name="isneed"> 是否必填
+					</label>
+				  </div>
+				</div>
+			</div>			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">验证类型</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio1" value="0" checked="true"> 不验证
+					</label>				
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio1" value="1"> 电话
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio2" value="2"> 身份证号码
+					</label>			
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">错误提示</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="errormsg" value="">
+				</div>
+			</div>	
+		
+			
+		</form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary" onclick="saveinput();">确定</button>
+         </div>
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+var tb = (function () {
+	var inputtype = new Array("","单行文本","多行文本","选择项");
+	var checktype = new Array("","电话","身份证号码");
+	var yesno = new Array("否","是");
+	var datas = new Array();
+	var input = function(t,l){
+		var s = "";
+		var t = parseInt(t);
+		switch (t){
+			case 0:
+				s = "<input type='text'>";
+				break;
+			case 1:
+				s = "<textarea></textarea>";
+				break;
+			case 2:
+				s = "<select>";
+				for (var k in l){
+					s = s + "<option value =" + k + ">" + k + "</option>"
+				}
+				s = s + "</select>";
+				break;
+			default:
+				s = "";
+		}
+		return s;
+	};
+	var refresh = function (el) {
+		var el = arguments[0] ? arguments[0] : "#bctbody";
+		var s = "";
+		datas.sort(function (a, b) {
+			return a.sortnumber - b.sortnumber
+		});
+		var d;
+		for (d in datas) {
+			s = s + "<tr>";
+			s = s + "<td>" + datas[d].title +"</td>";
+			s = s + "<td>" + datas[d].desc +"</td>";
+			s = s + "<td>" + inputtype[datas[d].inputtype] +"</td>";
+			s = s + "<td>" + checktype[datas[d].checktype] +"</td>";
+			s = s + "<td>" + input(datas[d].checktype,datas[d].options) +"</td>";
+			s = s + "<td>" + yesno[datas[d].isneed] +"</td>";
+			s = s + "<td>" + datas[d].sortnumber +"</td>";
+			s = s + "<td>" + datas[d].errormsg +"</td>";
+			s = s + "<td>" + "<a href='javascript:;' onclick='' >" 
+				+ "<span class='glyphicon glyphicon-pencil'></span></a>" 
+				+ "&nbsp;" 
+				+ "<a href='javascript:;' onclick='' ><span class='glyphicon glyphicon-trash'></span></a>"
+				+ "</td>";
+			s = s + "</tr>";
+		}
+		$(el).html(s);
+	};
+	var append = function (d) {
+		datas.push(d);
+	};
+	var update = function (i, d) {
+		datas[i] = d;
+	};
+	var remove = function (i) {
+		datas.splice(i, 1);
+	};
+	var getinput = function(i){
+		return datas[i];
+	};
+	var initdata = function(oridata){
+		datas = data.concat(oridata);
+	};
+	return{
+		get : getinput,
+		update : update,
+		append : append,
+		remove : remove,
+		refresh : refresh,
+		init : initdata
+	}
+})();
+</script>
+<script>
+$(document).ready(function(){
+	$(document).on("click",".editinput",function(){
+		var key = $(this).attr("data");
+		if (!key){
+			key = -1;
+		}
+		$("#inputform input[name='key']").val(key);
+		key = parseInt(key);
+		if (key >= 0){
+			var d = tb.get(key);
+		}
+		$("#myModal").modal("show");
+	});
+});
+function saveinput(){
+	var key = $("#inputform input[name='key']").val();
+	var title = $("#inputform input[name='title']").val();
+	var desc = $("#inputform input[name='desc']").val();
+	var inputtype = $("#inputform input[name='inputtype']:checked").val();
+	var checktype = $("#inputform input[name='checktype']:checked").val();
+	var isneed = $("#inputform input[name='isneed']").val() == "on" ? 1 : 0;
+	var sortnumber = $("#inputform input[name='sortnumber']").val();
+	var errormsg = $("#inputform input[name='errormsg']").val();
+	var d = {title:title,desc:desc,inputtype:parseInt(inputtype),checktype:parseInt(checktype),isneed:parseInt(isneed),sortnumber:parseInt(sortnumber),errormsg:errormsg};
+	if (key < 0){
+		tb.append(d);
+	}else{
+		tb.update(key,d);
+	}
+	tb.refresh();
+}
+</script>
+{template 'common/footer'}

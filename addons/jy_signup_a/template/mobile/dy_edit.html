@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" type="text/css" href="../addons/jy_signup_a/css/header.css">
+<title>店员信息</title>
+{template style}
+<style>
+html,body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+    font-family: 微软雅黑
+}
+#bodybox {
+    position: relative;
+    margin: 0 auto;
+    height: 100%;
+    overflow: hidden;
+    max-width: 480px;
+    overflow-y:scroll;
+    background-color: #fff
+}::-webkit-scrollbar{width:0}
+.header{text-align: center;margin-top: 5%;margin-bottom: 5%}.headImage{width:70px;height:70px;border-radius:50%}.topbtn{background-color:#57d6dc;color:#fff;padding:5px;border-radius:3px;font-size:13px;display:inline-block}.msg{width:80%;height:35px;margin:0 auto;border:1px solid #57d6dc;border-bottom:0;overflow:hidden;color:#57d6dc;max-width: 350px}.msg-label{width:28%;height:35px;line-height:35px;text-align:center;float:left;border-right:1px solid #57d6dc}.msg-input{margin-left:3%;width:65%;height:33px;float:left;border:0;font-size:16px;outline:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.msg1{max-width: 350px;width:80%;height:70px;margin:0 auto;border:1px solid #57d6dc;overflow:hidden;color:#57d6dc}.msg-label1{width:28%;height:70px;line-height:35px;text-align:center;float:left;border-right:1px solid #57d6dc}#textArea{margin-top:6px;margin-left:5%;border:0;width:65%;height:50px;float:left;font-size:16px;outline:0}.sureBtn{width:100%;text-align:center;margin-top:30px}.sureBtn>span{display:inline-block;color:#fff;padding:10px 25px;border-radius: 10px}
+.borTLR{border-top-left-radius: 10px;border-top-right-radius: 10px}
+.borBLR{border-bottom-left-radius: 10px;border-bottom-right-radius: 10px}
+.red{color: red}
+</style>
+</head>
+<body>
+
+    <header>
+      <a href="javascript:history.go(-1);"><div class="navbar-btn floL"><img class="icon-back" src="../addons/jy_signup_a/images/header-back.png"></div></a>
+      <a href="{php echo $this->createMobileUrl('geren')}"><div class="navbar-btn floR"><img class="icon-back" src="../addons/jy_signup_a/images/header-person.png"></div></a>
+      <h1 class="latecolorbg">{if !empty($sitem['aname'])}{$sitem['aname']}{else}店员信息{/if}</h1>
+    </header>
+<div id="bodybox">
+    <div class="header">
+        {if !empty($dy['avatar'])}
+        <img class="headImage" src="{$dy['avatar']}"/>
+        {else}
+        <img class="headImage" src="../addons/jy_fruits/images/head.jpg"/>
+        {/if}
+    </div>
+    <div class="msg borTLR">
+        <div class="msg-label latecolor">店员名</div>
+        <input type="text" class="msg-input" name="shopName" value="{$dy['username']}"/>
+    </div>
+    <div class="msg">
+        <div class="msg-label latecolor">手机</div>
+        <input type="tel" class="msg-input" name="mobile" value="{$dy['mobile']}"/>
+    </div>
+    <div class="msg">
+        <div class="msg-label latecolor">密码</div>
+        <input type="tel" class="msg-input" name="password" value="{$dy['password']}"/>
+    </div>
+    <div class="msg">
+        <div class="msg-label latecolor">QQ</div>
+        <input type="tel" class="msg-input" name="qq" value="{$dy['QQ']}"/>
+    </div>
+    <div class="msg">
+        <div class="msg-label latecolor">邮箱</div>
+        <input type="tel" class="msg-input" name="email" value="{$dy['mail']}"/>
+    </div>
+    <div class="msg">
+        <div class="msg-label latecolor">微信</div>
+        <input type="tel" class="msg-input" name="wechat" value="{$dy['wechat']}"/>
+    </div>
+    <div class="msg1 borBLR">
+        <div class="msg-label1 latecolor">备注</div>
+        <textarea name="textArea" id="textArea">{$dy['description']}</textarea>
+    </div>
+
+    <div class="sureBtn"><span class="latecolorbg" id="submitBtn">确定</span></div>
+    {template footer}
+</div>
+
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    // 提交按钮
+    $("#submitBtn").bind("click",function(){
+        var shopName = getValue("shopName");
+        var mobile = getValue("mobile");
+        var password = getValue("password");
+        var qq = getValue("qq");
+        var email = getValue("email");
+        var wechat = getValue("wechat");
+        var textArea = getValue("textArea");
+        if(!shopName){
+            alert("请输入店名");
+        }
+        else if(validatemobile(mobile)){
+            if(!password){
+                alert("请输入密码");
+            }
+            else{
+                $.post("{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('dy_edit',array('op'=>'add')),2)}"+"&username="+shopName+"&mobile="+mobile+"&password="+password+"&qq="+qq+"&mail="+email+"&wechat="+wechat+"&description="+textArea,function(data){
+                    if (data == 1) {
+                        alert("编辑店员信息成功！");
+                        setTimeout(function(){
+                            window.location.href="{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('dy'),2)}";
+                            }, 1200);
+                    }
+                    else {
+                        alert("编辑店员信息失败！"+data);
+                    }
+                });
+            }
+        }
+    });
+
+    //不用管 begin
+    function getValue(nameStr){
+        return $('[name='+nameStr+']').val();
+    }
+    function validatemobile(mobile) {
+        var myreg = /^1[345789]\d{9}$/;
+        if(mobile.length==0) {
+           alert('请输入手机号码！');
+           return false;
+        } 
+        if(mobile.length!=11 || !myreg.test(mobile)) {
+            alert('请输入有效的手机号码！');
+            return false;
+        }
+        return true;
+    }
+</script>
+{if $weixin==1}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+    {php $signPackage=$_W['account']['jssdkconfig'];}
+    <script>
+
+        var appid = '{$_W['account']['jssdkconfig']['appId']}';
+        var timestamp = '{$_W['account']['jssdkconfig']['timestamp']}';
+        var nonceStr = '{$_W['account']['jssdkconfig']['nonceStr']}';
+        var signature = '{$_W['account']['jssdkconfig']['signature']}';
+
+        wx.config({
+            debug: false,
+            appId: appid,
+            timestamp: timestamp,
+            nonceStr: nonceStr,
+            signature: signature,
+            jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+        });
+    </script>
+    <script type="text/javascript">
+        var params = {
+            {if empty($sitem['sharetitle'])}
+            title:"活动管理",
+            {else}
+            title: "{$sitem['sharetitle']}",
+            {/if}
+            {if empty($sitem['sharedesc'])}
+            desc: "活动管理!",
+            {else}
+            desc: "{$sitem['sharedesc']}",
+            {/if}
+            link: "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('index'),2)}",
+            {if empty($sitem['sharelogo'])}
+            imgUrl: "{$_W['siteroot']}addons/jy_signup_a/icon.jpg",
+            {else}
+            imgUrl: "{$_W['attachurl']}{$sitem['sharelogo']}",
+            {/if}
+        };
+        wx.ready(function () {
+            wx.showOptionMenu();
+            wx.onMenuShareAppMessage.call(this, params);
+            wx.onMenuShareTimeline.call(this, params);
+        });
+    </script>
+    {/if}
+</body>
+</html>

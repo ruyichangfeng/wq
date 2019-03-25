@@ -1,0 +1,185 @@
+{template 'common/header'}
+<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<div class="mian">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#">处理留言</a></li>
+    </ul>
+</div>
+<div class="main">
+    <div class="col-lg-12">
+
+
+
+            <div class="panel panel-default">
+                <header class="panel-heading">
+                    处理留言
+                </header>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <td>发布人</td>
+                        <td>内容</td>
+                        <td>时间</td>
+                        <td>状态</td>
+                        <td>操作</td>
+                    </tr>
+                    </thead>
+                    {loop $goodses $key $val}
+                    <tr>
+                        <td>{$val['user']}</td>
+                        <td>{$val['info']}</td>
+                        <td>{php echo date("Y-m-d H:i:s",$val['time'])}</td>
+                        <td>{if $val['status'] == 1} <button class="pass">通过</button> {else} <button class="nopass" style="background-color: #09BB07" sid="{$val['id']}">审核</button> {/if}</td>
+                        <td>
+                            <button class="doing btn" wid="{$val['id']}">回复</button>
+                            <button class="btn-del" del_id="{$val['id']}">删除</button>
+                        </td>
+                    </tr>
+                    {/loop}
+
+                </table>
+                {$pager}
+            </div>
+
+
+    </div>
+</div>
+<form action="" method="post">
+        <div id="show_content" style="display: none;width: 500px;height: 300px;border: solid 1px aqua;position: absolute;width: 800px;margin-left: 250px">
+            <table class="table table-hover" style="background-color: #ddd" id="huifu_tr">
+                <tr>
+                    <td>内容</td>
+                    <td>图片</td>
+                </tr>
+                <tr>
+                    <td class="content_td">
+
+                    </td>
+                    <td id="show_img">
+
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        回复:<textarea name="content" id="huifu_input" cols="20" rows="6"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <input type="hidden" id="uid" name="uid" value="">
+                        <input type="hidden" id="lid" name="lid" value="">
+                        <button id="huifu" type="submit" class="btn btn-info">回复</button>  &nbsp;&nbsp;&nbsp;<button type="button" id="panel_close" class="btn btn-info">关闭</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+</form>
+
+
+<script>
+    $(document).ready(function () {
+        $(".doing").each(function () {
+            $(this).click(function () {
+
+                $.post("{php echo url('site/entry/Getimg', array('m' => 'tjtjtj_liuyan'));}",{
+                    do : "Getimg",
+                    wid : $(this).attr("wid")
+                },function (data) {
+                    $("#show_content").show();
+                    var res = $.parseJSON(data);
+                    $(".content_td p").remove();
+                    var content = "<p>"+res.info+"</p>"
+                    $(".content_td").append(content);
+                    $("#show_img").attr("src","");
+
+                    $("#uid").attr("value",res.uid);
+                    $("#lid").attr("value",res.id);
+                    var img = "";
+                    $.each(res.img,function (k,v) {
+                        $("#show_img img").remove();
+                        img += "<img src="+v.name+" style='width:80px;height:80px;'>";
+                        $("#show_img").append(img);
+                    });
+
+                });
+
+                //获取留言回复内容
+
+                $.post("{php echo url('site/entry/Datadoing', array('m' => 'tjtjtj_liuyan'));}",{
+                    do : "Datadoing",
+                    uid : $(this).attr("uid"),
+                    id : $(this).attr("lid"),
+                },function (data) {
+                    var datas = $.parseJSON(data);
+                    $(".js_add").remove();
+                    $.each(datas,function (k,v) {
+                        var str = "<tr class='js_add'><td colspan='2'>{if v.type == 0}管理员回复:{else}用户回复:{/if}"+v.content+"</td></tr>";
+                        $("#huifu_tr").append(str);
+                    });
+                });
+
+            });
+        });
+
+        $("#panel_close").click(function () {
+            $("#show_content").hide();
+        });
+
+        $("#huifu").click(function () {
+            var content = $("#huifu_input").val();
+
+            if(content == "")
+            {
+                alert("回复内容为空！");
+                return false;
+            }
+        });
+
+        $(".nopass").each(function () {
+            $(this).click(function () {
+                var id = $(this).attr("sid");
+
+                $.post("{php echo url('site/entry/Change', array('m' => 'tjtjtj_liuyan'));}",{
+                    do : "Change",
+                    id : id
+                },function (data) {
+                    window.location.reload();
+                });
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $(".btn-del").each(function () {
+            $(this).click(function () {
+               var del_id = $(this).attr("del_id");
+
+                if(del_id < 0)
+                {
+                    alert("参数错误");
+                    return false;
+                }
+                $.ajax({
+                    url : "{php echo url('site/entry/Delliuyan', array('m' => 'tjtjtj_liuyan'));}",
+                    type : 'post',
+                    data :{
+                        del_id : del_id
+                    },
+                    success:function (res) {
+                        if(res)
+                        {
+                            alert("删除成功");
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+{template 'common/footer'}

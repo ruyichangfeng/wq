@@ -1,0 +1,99 @@
+{template 'common/header'} 
+<ul class="nav nav-tabs">
+	<li {if $_GPC['do']=="fabu"}class="active"{/if}><a href="{php echo $this->createWebUrl('fabu', array('op' => 'display'))}">发布管理</a></li>
+	<li {if $_GPC['do']=="order"}class="active"{/if}><a href="{php echo $this->createWebUrl('order', array('op' => 'display'))}">订单管理</a></li>
+	<li {if $_GPC['do']=="tousu"}class="active"{/if}><a href="{php echo $this->createWebUrl('tousu', array('op' => 'display'))}">举报管理</a></li>
+	<!--<li {if $op=="dianyuan"}class="active"{/if}><a href="{php echo $this->createWebUrl('member', array('op' => 'dianyuan'))}">店员列表</a></li>-->
+</ul>
+{if $op=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form" id="form">
+			<input type="hidden" name="c" value="site" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="xuan_js" />
+            <input type="hidden" name="do" value="tousu" />
+            <input type="hidden" name="op" value="display" />
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字类型</label>
+				<div class="col-sm-8 col-xs-12">
+					<select name="type" class="form-control">
+						<option value="2" {if $_GPC['type'] == 2}selected{/if}>标题</option>
+						
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字</label>
+				<div class="col-md-8">
+					<input type="text" class="form-control" name="keyword" id="keyword" value="{$_GPC['keyword']}" />
+				</div>
+				<div class="pull-right col-md-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="panel panel-default">
+    <table class="table">
+        <thead class="navbar-inner">
+			<tr>
+				<th style="width:50px;">编号</th>
+				<th style="width:50px;">头像</th>
+				<th style="width:50px;">举报人</th>
+				<th style="width:50px;">类型</th>
+				<th style="width:110px;">理由</th>
+				<th style="width:100px;">处理状态</th>
+				<th style="width:100px;">举报时间</th>
+				<th style="width:100px;" class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{loop $goods $li}
+			<tr>
+				<td>{$li['id']}</td>
+				<td><image src="{php echo tomedia($li['avatar']);}" style="max-width: 48px; max-height: 48px; border: 1px dotted gray"></td>
+				<td>{$li['nickname']}</td>
+				<td>{$li['reason']}</td>
+				<td>{$li['otherreason']}
+				</td>
+				<td >{if $li['status']==0}<span class="label label-warning">未处理</span>{else}<span class="label label-primary">已处理</span>{/if}</td>
+				<td>
+					{php echo date('Y-m-d H:m:s',$li['createtime'])}
+				</td>
+
+				<td style="overflow:visible;">
+                        
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
+                            <ul class="dropdown-menu dropdown-menu-left" role="menu" style="z-index: 9999;min-width: 50px">
+                                
+                                <li><a href="{php echo $this->createMobileUrl('goods',array('id'=>$li['goodsid']))}" target="_blank" title="发布详情"><i class="fa fa-edit"></i> 查看举报商品</a></li>
+                               	<!--<li><a href="" title="会员订单"><i class="fa fa-list"></i> 会员订单</a></li>-->
+                                <!--<li><a href="" title="佣金记录"><i class="fa fa-credit-card"></i> 佣金记录</a></li>-->
+                                <li><a href="{php echo $this->createWebUrl('tousu',array('op'=>'chuli','id'=>$li['id']))}" title="标注为已处理" onclick="return confirm('标注为已处理？');"><i class="fa fa-credit-card"></i> 标注为处理</a></li>
+                                <li><a href="{php echo $this->createWebUrl('fabu',array('op'=>'del','id'=>$li['goodsid']))}" title="删除发布" onclick="return confirm('确定要删除该举报商品吗？');"><i class="fa fa-remove"></i> 删除举报商品</a></li>
+
+                                
+                            </ul>
+                        </div>
+                        
+                    </td>
+			</tr>
+		{/loop}
+        </tbody>
+    </table>
+</div>
+{$pager}
+<script>
+	require(['trade', 'bootstrap'], function(trade){
+		trade.init();
+	});
+</script>
+{/if}
+
+
+
+{template 'common/footer'}

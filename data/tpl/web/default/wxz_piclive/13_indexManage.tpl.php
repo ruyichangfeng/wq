@@ -1,0 +1,119 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+
+<script type="text/javascript" src="resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="../addons/wxz_store/images/uploadify_t.css" />
+<style type='text/css'>
+	.tab-pane {padding:20px 0 20px 0;}
+</style>
+
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1" name="theForm">
+		<div class="panel panel-default">
+			<div class="panel-heading">聚合页链接：<?php  echo $index_url;?></div>
+			<div class="panel-body">
+				<div class="tab-content">
+                                    <div class="tab-pane  active" id="tab_basic">
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域1标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="block_t1" class="form-control" value="<?php  echo $item['block_t1'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域1副标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="subtitle1" class="form-control" value="<?php  echo $item['subtitle1'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域1链接</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="link_url1" placeholder="http://www.xxx.com" class="form-control" value="<?php  echo $item['link_url1'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域2标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="block_t2" class="form-control" value="<?php  echo $item['block_t2'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域2副标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="subtitle2" class="form-control" value="<?php  echo $item['subtitle2'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域2链接</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="link_url2" placeholder="http://www.xxx.com" class="form-control" value="<?php  echo $item['link_url2'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域3标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="block_t3" class="form-control" value="<?php  echo $item['block_t3'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域3副标题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="subtitle3" class="form-control" value="<?php  echo $item['subtitle3'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">区域3链接</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="link_url3" placeholder="http://www.xxx.com" class="form-control" value="<?php  echo $item['link_url3'];?>" />
+                                                </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">Banner图片</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <?php  echo tpl_form_field_image('banner', $item['banner'], '', array('extras' => array('text' => 'readonly')))?>
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享标题及主题</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="share_title" class="form-control" value="<?php  echo $item['share_title'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享简介</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <input type="text" name="share_brief" class="form-control" value="<?php  echo $item['share_brief'];?>" />
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-xs-12 col-sm-3 col-md-2 control-label">分享图片</label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                        <?php  echo tpl_form_field_image('share_img', $item['share_img'], '', array('extras' => array('text' => 'readonly')))?>
+                                                </div>
+                                        </div>
+
+                                    </div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="<?php  echo $_W['token'];?>" />
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	$(function () {
+		window.optionchanged = false;
+		$('#myTab a').click(function (e) {
+			e.preventDefault();//阻止a链接的跳转行为
+			$(this).tab('show');//显示当前选中的链接及关联的content
+		})
+	});
+</script>
+
+
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

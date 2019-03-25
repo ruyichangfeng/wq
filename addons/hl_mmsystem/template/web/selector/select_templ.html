@@ -1,0 +1,51 @@
+
+<br />
+<div class="form-group container" style="width: 500px;">
+	<div class="col-sm-12">
+		<div class="input-group form-group">
+			<input type="text" class="form-control" placeholder="模板名称" id="templ_title" />
+			<span class="input-group-addon btn btn-default" style="background-color: #00CA79;color: white;" onclick="get_templ(this)">
+				搜索
+			</span>
+		</div>
+        <div class="input-group col-sm-12">
+			<div id="select_templalte"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    function get_templ(obj){
+        var templ_title = $('#templ_title').val();
+        $(obj).html($(obj).html() + "...");
+        $("#select_templalte div").remove();
+        $.post("{php echo $this->createWebUrl('messagecommon',array('op'=>'get_templ'))}"
+                ,{templ_title:templ_title}
+                ,function(d){
+                    $(obj).html($(obj).html().replace("...",""));
+                    if(d.status == 1){
+                        var items = d.result;
+                        for(var i=0;i<items.length;i++){
+                            $("#select_templalte").append(  "<div class='col-sm-6'>"+
+                                                            "<input type='text' class='form-control' value='"+items[i].mt_title+"' onclick='chose(\""+items[i].id+"\",\""+items[i].mt_title+"\")' style='cursor: pointer;' readonly='true'>"+
+                                                        "</div>"
+                            );
+                        }
+                    }else{
+                        new $.flavr(d.errmsg);
+                    }
+                },"json"
+        );
+    }
+    
+    function chose(id,title){
+        $("#{$id1}").val(id);
+        $("#{$id2}").val(title);
+        $('body').find('.flavr-container').each(function() {
+            var a = $(this).data('flavr').instance;
+            a.close()
+        });
+                        
+ 
+    }
+    
+</script>

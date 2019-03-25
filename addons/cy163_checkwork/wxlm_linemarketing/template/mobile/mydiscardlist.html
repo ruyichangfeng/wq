@@ -1,0 +1,60 @@
+{template 'head2'}
+<title>{$title}</title>
+<script>
+         wx.ready(function () {
+            sharedata = {
+                title: "{$config['mobile_card_sharetitle']}",
+                desc: "{$config['mobile_card_sharedesc']}",
+                link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('Carddis',array('parent'=>$openid)))}",
+                imgUrl: "{php echo tomedia($config['mobile_card_shareimg'])}",
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function(){
+                },
+                cancel: function(){
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata);
+            wx.onMenuShareQQ(sharedata);
+            wx.onMenuShareWeibo(sharedata);
+            wx.onMenuShareQZone(sharedata);
+        }); 
+     </script>   
+</head>
+<body style="{if count($discard_list)==0}background-color: white;{else}background-color: #ececec;{/if}">
+<div class="box" style="{if count($discard_list)==0}background-color: white;{/if}">
+	{template 'head-nav1'}
+	<div class="zkk-con-box" style="{if count($discard_list)==0}background-color: white;{/if}">
+        {if count($discard_list)>0}
+         <ul class="zkk-con">
+        {loop $discard_list $key1 $item1}
+            <a href="{php echo $this->createMobileUrl('Mydiscardcon',array('discountcard_id'=>$item1['discountcard_id']));}">
+            <li>
+                <div class="zkk-t">
+                    <div class="zkk-image01">
+                        <img src="{php echo tomedia($item1['discountcard_thumb'])}">
+                    </div>
+                    <div class="zkk-image02">
+                        <img src="{RES}/public/discount/images/zkk-bg01.png">
+                    </div>
+                    <div class="zkk-text01">{$item1['discountcard_title']}</div>
+                    <!-- <div class="zkk-text02">￥{$item1['discountcard_price']}</div> -->
+                </div>
+                <div class="zkk-c">可用次数：{$item1['discountcard_times']}次</div>
+                <div class="zkk-b">
+                    <div class="zkk-text03">从购买日算起{$item1['discountcard_term']}天内有效</div>
+                    <div class="zkk-text04">{$item1['tishi']}</div>
+                </div>
+            </li>
+             </a>
+        {/loop}
+        </ul>
+        {else}
+    	<div class="collect-image" style="background-color: white;">
+        	<img src="{if empty($config['mobile_discard_logo2'])}{$sysdefaultset['mobile_discard_logo2']}{else}../attachment/{$config['mobile_discard_logo2']}{/if}">
+        </div>
+        <div class="collect-text">{if empty($config['mobile_discard_title2'])}{$sysdefaultset['mobile_discard_title2']}{else}{$config['mobile_discard_title2']}{/if}</div>
+        {/if}
+    </div>
+      {template 'foot-nav'}

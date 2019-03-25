@@ -1,0 +1,592 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messagebursts')}"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content" style="margin-top: 15px;">
+                                    <form action="" method="post" class="form-horizontal form">
+
+                                        <div class="alert alert-info">
+                                            <p><i class="fa  fa-lg fa-bomb" style="color: orangered"></i> 根据选择的用户群体不同，发送时间会不相同，发送期间请耐心等待! </p>
+                                            <p><i class="fa  fa-lg fa-bomb" style="color: red"></i> 模板消息群发有风险，请谨慎使用，大用户量建议使用公众平台推送!</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label must" >任务名称</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <input type="text" name="title" class="form-control" value="{$item['mt_title']}" placeholder="任务名称，例：优惠券群发通知" data-rule-required='true' required >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">发送进程数</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <select name="processnum" class="form-control"  >
+                                                    <?php for($i = 1; $i <= $founder_settings['allowProcessNum']; $i++){ ?>
+                                                    <option value="{$i}"  {if $item['mt_processNum']==$i}selected{/if}>{$i}</option>
+                                                    <?php } ?>
+                                                </select>
+                                                <span class='help-block'></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">发送消息类型</label>
+                                            <div class="col-sm-9 col-xs-12" >
+                                                <label class="radio-inline coupon-radio">
+                                                    <input type="radio" name="messagetype" value="0" {if $item['mt_messageType'] == 0}checked="true"{/if} onclick="$('.customermessage').hide();$('.selecttemplate').show();" /> 发送模板消息
+                                                </label>
+                                                <label class="radio-inline coupon-radio">
+                                                    <input type="radio" name="messagetype" value="1" {if $item['mt_messageType'] == 1}checked="true"{/if}  onclick="$('.selecttemplate').hide();$('.customermessage').show();"/> 发送客服消息
+                                                </label>
+                                                <label class="radio-inline coupon-radio">
+                                                    <input type="radio" name="messagetype" value="2" {if $item['mt_messageType'] == 2}checked="true"{/if}  onclick="$('.selecttemplate').show();$('.customermessage').show();"/> 发送混合消息
+                                                </label>
+                                                <span class='help-block'>混合消息发送方式为先发送客服消息,如果发送失败再次发送模板消息</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group selecttemplate"  {if $item['mt_messageType']==1 }style="display:none"{/if}>
+                                        <label class="col-sm-2 control-label must">选择模板</label>
+                                        <div class="col-sm-9 col-xs-12">
+                                            <input type="hidden" name="templateid" id="templateid" value="{$item['masstemplate_id']}" />
+                                            <input type="text" name="template" id="template" class="form-control" value="{php echo util::getMsgTempl($item['templateid'], 'mt_title')}" style="cursor: pointer;" onclick="select_templ('templateid','template')" placeholder="点击这里选择模板" readonly="true" data-rule-required='true' />
+                                        </div>
+                                </div>
+
+                                <div class="form-group customermessage"  {if empty($item['messagetype'])}style="display:none"{/if} >
+
+                                <label class="col-sm-2 control-label"> 客服消息类型</label>
+                                <div class="col-sm-9 col-xs-12" >
+                                    <label class="radio-inline coupon-radio">
+                                        <input type="radio" name="customertype" value="0" {if $item['mt_customerType'] == 0}checked="true"{/if} onclick="$('.custm').hide();$('.news').show();$('.voice').hide();" /> 发送图文消息
+                                    </label>
+                                    <label class="radio-inline coupon-radio">
+                                        <input type="radio" name="customertype" value="1" {if $item['mt_customerType'] == 1}checked="true"{/if}  onclick="$('.news').hide();$('.custm').show();$('.voice').hide();"/> 发送文字消息
+                                    </label>
+                                    <label class="radio-inline coupon-radio">
+                                        <input type="radio" name="customertype" value="2" {if $item['mt_customerType'] == 2}checked="true"{/if}  onclick="$('.news').hide();$('.custm').hide();$('.voice').show();"/> 发送语音消息
+                                    </label>
+                                    <span class='help-block'></span>
+                                </div>
+                                <br /><br /><br />
+                                <div class="form-group news" {if !empty($item['mt_customerType']) || $item['mt_customerType'] != 0}style="display:none"{/if}>
+                                <script type="text/javascript">
+                                    //图片选择器
+                                    function showImageDialog(elm, opts, options) {
+                                        require(["util"], function(util){
+                                            var btn = $(elm);
+                                            var ipt = btn.parent().prev();
+                                            var val = ipt.val();
+                                            var img = ipt.parent().next().children();
+                                            options = {'global':false,'class_extra':'','direct':true,'multiple':false,'fileSizeLimit':2097152};
+                                            util.image(val, function(url){
+                                                if(url.url){
+                                                    if(img.length > 0){
+                                                        img.get(0).src = url.url;
+                                                    }
+                                                    ipt.val(url.attachment);
+                                                    ipt.attr("filename",url.filename);
+                                                    ipt.attr("url",url.url);
+                                                }
+                                                if(url.media_id){
+                                                    if(img.length > 0){
+                                                        img.get(0).src = "";
+                                                    }
+                                                    ipt.val(url.media_id);
+                                                }
+                                            }, options);
+                                        });
+                                    }
+                                    function deleteImage(elm){
+                                        $(elm).prev().attr("src", "./resource/images/nopic.jpg");
+                                        $(elm).parent().prev().find("input").val("");
+                                    }
+                                    //链接选择器
+                                    var appSiteroot = window.sysinfo.siteroot+"app/";
+                                    function showLinkDialog(elm) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.linkBrowser(function(href){
+                                            var multiid = "";
+                                            if (multiid) {
+                                                href = /(&)?t=/.test(href) ? href : href + "&t=" + multiid;
+                                            }
+                                            ipt.val(appSiteroot+href);
+                                        });
+                                    }
+                                    function newsLinkDialog(elm, page) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.newsBrowser(function(href, page){
+                                            if (page != "" && page != undefined) {
+                                                newsLinkDialog(elm, page);
+                                                return false;
+                                            }
+                                            var multiid = "";
+                                            if (multiid) {
+                                                href = /(&)?t=/.test(href) ? href : href + "&t=" + multiid;
+                                            }
+                                            ipt.val(appSiteroot+href);
+                                        }, page);
+                                    }
+                                    function pageLinkDialog(elm, page) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.pageBrowser(function(href, page){
+                                            if (page != "" && page != undefined) {
+                                                pageLinkDialog(elm, page);
+                                                return false;
+                                            }
+                                            var multiid = "";
+                                            if (multiid) {
+                                                href = /(&)?t=/.test(href) ? href : href + "&t=" + multiid;
+                                            }
+                                            ipt.val(appSiteroot+href);
+                                        }, page);
+                                    }
+                                    function articleLinkDialog(elm, page) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.articleBrowser(function(href, page){
+                                            if (page != "" && page != undefined) {
+                                                articleLinkDialog(elm, page);
+                                                return false;
+                                            }
+                                            var multiid = "";
+                                            if (multiid) {
+                                                href = /(&)?t=/.test(href) ? href : href + "&t=" + multiid;
+                                            }
+                                            ipt.val(appSiteroot+href);
+                                        }, page);
+                                    }
+                                    function phoneLinkDialog(elm, page) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.phoneBrowser(function(href, page){
+                                            if (page != "" && page != undefined) {
+                                                phoneLinkDialog(elm, page);
+                                                return false;
+                                            }
+                                            ipt.val(href);
+                                        }, page);
+                                    }
+                                    function mapLinkDialog(elm) {
+                                        var ipt = $(elm).parent().parent().parent().prev();
+                                        util.map(elm, function(val){
+                                            var href = 'https://api.map.baidu.com/marker?location='+val.lat+','+val.lng+'&output=html&src=we7';
+                                            var multiid = "";
+                                            if (multiid) {
+                                                href = /(&)?t=/.test(href) ? href : href + "&t=" + multiid;
+                                            }
+                                            ipt.val(href);
+                                        });
+                                    }
+                                    var respNews_count = '{$respNews_count}';
+                                    function addRespNews() {
+                                        var respNews_id = respNews_count+1;
+                                        $(".btn-add-news").button("loading");
+                                        var html = '<div class="respNews">'+
+                                            '<div class="col-sm-1"></div>'+
+                                            '<div class="col-sm-9">'+
+                                            '<div class="form-group">'+
+                                            '<label class="col-sm-2 control-label">图文标题</label>'+
+                                            '<div class="col-sm-9 col-xs-12">'+
+                                            '<input type="text" name="resptitle[]" id="title" class="form-control" value="" />'+
+                                            '</div>'+
+                                            '</div>'+
+                                            '<div class="form-group">'+
+                                            '<label class="col-sm-2 control-label">图文图片</label>'+
+                                            '<div class="col-sm-9 col-xs-12">'+
+                                            '<div class="input-group ">'+
+                                            '<input type="text" name="respthumb[]" value="" class="form-control" autocomplete="off">'+
+                                            '<span class="input-group-btn">'+
+                                            '<button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>'+
+                                            '</span>'+
+                                            '</div>'+
+                                            '<div class="input-group " style="margin-top:.5em;">'+
+                                            '<img src="./resource/images/nopic.jpg" onerror="this.src=\'./resource/images/nopic.jpg\'; this.title=\'图片未找到.\'" class="img-responsive img-thumbnail"  width="150" />'+
+                                            '<em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>'+
+                                            '</div>'+
+                                            '</div>'+
+                                            '</div>'+
+                                            '<div class="form-group">'+
+                                            '<label class="col-sm-2 control-label">图文描述</label>'+
+                                            '<div class="col-sm-9 col-xs-12">'+
+                                            '<textarea name="respdesc[]" class="form-control dtwDesc_'+respNews_id+'" ></textarea>'+
+                                            '<span class=\'help-block\'>'+
+                                            '点击插入：<a href="javascript:emojiBrowser('+respNews_id+');" title="插入emoji">'+
+                                            '<img src="{HLMMS_IMG}emoji.png" width="18px" height="18px"/>'+
+                                            '</a><br/>'+
+                                            '<code>图文描述，只有在单图文时才有效，多图文时自动隐藏</code>'+
+                                            '</span>'+
+                                            '</div>'+
+                                            '</div>'+
+
+                                            '<div class="form-group">'+
+                                            '<label class="col-sm-2 control-label">图文链接</label>'+
+                                            '<div class="col-sm-9 col-xs-12">'+
+                                            '<div class="input-group">'+
+                                            '<input type="text" value="" name="respurl[]" class="form-control" autocomplete="off" style="">'+
+                                            '<span class="input-group-btn">'+
+                                            '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">选择链接 <span class="caret"></span></button>'+
+                                            '<ul class="dropdown-menu">'+
+                                            '<li><a href="javascript:" data-type="system" onclick="showLinkDialog(this);">系统菜单</a></li>'+
+                                            '<li><a href="javascript:" data-type="page" onclick="pageLinkDialog(this);">微页面</a></li>'+
+                                            '<li><a href="javascript:" data-type="article" onclick="articleLinkDialog(this)">文章及分类</a></li>'+
+                                            '<li><a href="javascript:" data-type="news" onclick="newsLinkDialog(this)">图文回复</a></li>'+
+                                            '<li><a href="javascript:" data-type="map" onclick="mapLinkDialog(this)">一键导航</a></li>'+
+                                            '<li><a href="javascript:" data-type="phone" onclick="phoneLinkDialog(this)">一键拨号</a></li>'+
+                                            '</ul>'+
+                                            '</span>'+
+                                            '</div>'+
+                                            '<span class="help-block"></span>'+
+                                            '</div>'+
+                                            '</div>'+
+                                            '</div>'+
+                                            '<div class="col-sm-2">'+
+                                            '<a class="btn btn-default" href="javascript:;" onclick="$(this).closest(\'.respNews\').remove()"><i class="fa fa-remove"> 移除</i></a>'+
+                                            '</div>'+
+                                            '<div class="container col-sm-12">'+
+                                            '<div class="col-sm-1"></div>'+
+                                            '<div class="col-sm-10"><hr /></div>'+
+                                            '</div>'+
+                                            '</div>';
+                                        $(".btn-add-news").button("reset");
+                                        if(respNews_count < 8){
+                                            $("#reps_News").append(html);
+                                        }else{
+                                            new $.flavr('多图文最多只能8条！');
+                                            return false;
+                                        }
+                                        respNews_count++;
+                                    }
+
+
+                                    function emojiBrowser(id){
+                                        util.emojiBrowser(function(emoji){
+                                            var text = '[U+'+emoji[0].text+']';
+                                            var content = $('.dtwDesc_'+id).val()+text;
+                                            $('.dtwDesc_'+id).val(content);
+                                            //console.log(cont)
+                                        });
+                                    }
+
+
+                                </script>
+                                {php $tw_num = 1;}
+                                {loop $item['mt_respNews'] $i}
+                                <div class="respNews">
+                                    <div class="col-sm-1"></div>
+                                    <div class="col-sm-9">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">图文标题</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <textarea name="resptitle[]" id="title" class="form-control" >{$i['title']}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">图文图片</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class="input-group ">
+                                                    <input type="text" name="respthumb[]" value="{$i['picurl']}" class="form-control" autocomplete="off" />
+                                                    <span class="input-group-btn">
+            				    <button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>
+                 			</span>
+                                                </div>
+                                                <div class="input-group " style="margin-top:.5em;">
+                                                    <img src="{php echo tomedia($i['picurl'])}" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail"  width="150" />
+                                                    <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">图文描述</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <textarea name="respdesc[]" class="form-control dtwDesc_{$tw_num}" >{$i['description']}</textarea>
+                                                <span class='help-block'>
+                            点击插入：
+                            <a href="javascript:emojiBrowser('{$tw_num}');" title="插入emoji">
+                                <img src="{HLMMS_IMG}emoji.png" width="18px" height="18px"/>
+                            </a><br/>
+                            <code>图文描述，只有在单图文时才有效，多图文时自动隐藏</code>
+                        </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">图文链接</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class="input-group">
+                                                    <input type="text" value="{$i['url']}" name="respurl[]" class="form-control" autocomplete="off" />
+                                                    <span class="input-group-btn">
+                     			    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">选择链接 <span class="caret"></span></button>
+     			                    <ul class="dropdown-menu">
+                        				<li><a href="javascript:" data-type="system" onclick="showLinkDialog(this);">系统菜单</a></li>
+                        				<li><a href="javascript:" data-type="page" onclick="pageLinkDialog(this);">微页面</a></li>
+                        				<li><a href="javascript:" data-type="article" onclick="articleLinkDialog(this)">文章及分类</a></li>
+                        				<li><a href="javascript:" data-type="news" onclick="newsLinkDialog(this)">图文回复</a></li>
+                        				<li><a href="javascript:" data-type="map" onclick="mapLinkDialog(this)">一键导航</a></li>
+                        				<li><a href="javascript:" data-type="phone" onclick="phoneLinkDialog(this)">一键拨号</a></li>
+                        			</ul>
+                        		</span>
+                                                </div>
+                                                <span class='help-block'></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a class="btn btn-default" href="javascript:;" onclick="$(this).closest('.respNews').remove()"><i class="fa fa-remove"> 移除</i></a>
+                                    </div>
+                                    <div class="container col-sm-12">
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-10"><hr /></div>
+                                    </div>
+                                </div>
+                                {php $tw_num++}
+                                {/loop}
+                                <div id="reps_News"></div>
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-9 col-xs-12">
+                                    <a class="btn btn-default btn-add-news" href="javascript:;" onclick="addRespNews();"><i class="fa fa-plus" title=""></i> 添加一条图文</a>
+                                    <span class='help-block'></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group custm"  {if $item['mt_customerType'] != 1}style="display:none"{/if}>
+                            <script>
+                                require(['jquery','util'], function($, util){
+                                    $(function(){
+                                        $('#btn').click(function(){
+                                            util.emojiBrowser(function(emoji){
+                                                var text = '[U+'+emoji[0].text+']';
+                                                var content = $('#content').val()+text;
+                                                $('#content').val(content);
+
+                                            });
+                                        });
+
+                                        qqEmoji($('#emotion'), $('#content'));
+
+                                        $('#link').click(function () {
+                                            var link="<a href=\"您要插入的链接\">链接文字</a>";
+                                            var content = $('#content').val()+link;
+                                            $('#content').val(content);
+                                        });
+
+                                        $('#wxapp').click(function () {
+                                            var link='<a href="对于不支持小程序的客户端，则跳转到这个链接" data-miniprogram-appid="和当前公众号关联过的小程序的appid" data-miniprogram-path="页面路径,如pages/index/index">点击跳小程序</a>';
+                                            var content = $('#content').val()+link;
+                                            $('#content').val(content);
+                                        });
+                                    });
+                                });
+                            </script>
+                            <div class="col-sm-1"></div>
+                            <label class="col-sm-2 control-label">输入文字内容</label>
+                            <div class="col-sm-8 col-xs-12">
+                                <textarea name="resdesc2" style="height: 150px;resize: none;" class="form-control" placeholder='支持<a href=""></a>标签' name="content" id="content">{$item['mt_respDescTwo']}</textarea>
+                                <div class="edit" style="width: 100%;height: 30px;border-bottom:1px solid #e5e6e7;border-left:1px solid #e5e6e7;border-right:1px solid #e5e6e7;">
+                                    <div style="width: 30px;height: 30px;float: left;margin-left: 20px">
+                                        <a href="javascript:" id="btn" title="插入emoji">
+                                            <img src="{HLMMS_IMG}emoji.png" width="18px" height="18px" style="margin-top: 7px;">
+                                        </a>
+                                    </div>
+                                    <div style="width: 30px;height: 30px;float: left;margin-left: 20px">
+                                        <a href="javascript:" id="emotion" title="插入表情">
+                                            <img src="{HLMMS_IMG}qq.png" width="18px" height="18px" style="margin-top: 7px;">
+                                        </a>
+                                    </div>
+                                    <div style="width: 30px;height: 30px;float: left;margin-left: 20px">
+                                        <a href="javascript:" id="link" title="插入链接">
+                                            <img src="{HLMMS_IMG}link.png" width="18px" height="18px" style="margin-top: 7px;">
+                                        </a>
+                                    </div>
+                                    <div style="width: 30px;height: 30px;float: left;margin-left: 20px">
+                                        <a href="javascript:" id="wxapp" title="插入小程序">
+                                            <img src="{HLMMS_IMG}wxapp.png" width="18px" height="18px" style="margin-top: 7px;">
+                                        </a>
+                                    </div>
+                                </div>
+                                <span class='help-block'><code>插入小程序。如果href中的链接过长，有发生乱码的情况。所以建议进行<a href="{php echo url('platform/url2qr')}" target="_blank">短链接转换</a></code></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group voice"  {if $item['mt_customertype'] != 2}style="display:none"{/if}>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">语音ID</label>
+                            <div class="col-sm-9 col-xs-12">
+                                {php echo tpl_form_field_wechat_voice('wechat_voice',$item['mt_voice']);}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" >发送类型</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <label class="radio-inline"><input type="radio" name="sendlimittype" value="1" {if $item['mt_sendLimitType'] == 1}checked="true"{/if} /> 按openid发送</label>
+                        <label class="radio-inline"><input type="radio" name="sendlimittype" value="2" {if $item['mt_sendLimitType'] == 2}checked="true"{/if}  /> 指定用户发送</label>
+                        <label class="radio-inline"><input type="radio" name="sendlimittype" value="3" {if $item['mt_sendLimitType'] == 3}checked="true"{/if} /> 按用户标签发送</label>
+                        <label class="radio-inline"><input type="radio" name="sendlimittype" value="6" {if $item['mt_sendLimitType'] == 6}checked="true"{/if}/>全部发送</label>
+                    </div>
+                </div>
+                <div class="form-group choose choose_1"  {if $item['mt_sendlimittype'] != 1}style='display: none'{/if}>
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label" >会员openid</label>
+                <div class="col-sm-9 col-xs-12">
+                    <textarea name="send_openid1" class="form-control" style="height:250px;" placeholder="请用半角逗号隔开OPENID, 如 aaa,bbb" id="value_1">{$send_openid1}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group choose choose_2" {if $item['mt_sendlimittype'] != 2}style='display: none'{/if}>
+            <?php for($i=0;$i<count($salers);$i++){ ?>
+            <div id="fans">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-9 col-xs-12">
+                    <input type="hidden" name="send_openid2[]" id="openid_{$i}" value="{$salers[$i]['openid']}" />
+                    <input type="text" name="nickname" id="nickname_{$i}" class="form-control" value="{$salers[$i]['nickname']}" onclick="select_fans('openid_{$i}','nickname_{$i}')" style="cursor: pointer;" placeholder="点击这里选择粉丝" readonly="true" data-rule-required='true' />
+                </div>
+                <a class="btn btn-default" href='javascript:;' onclick="$(this).closest('#fans').remove()"><i class='fa fa-remove'></i></a>
+            </div><br />
+            <?php } ?>
+            <div id="type-items"></div>
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-9 col-xs-12">
+                <a class="btn btn-default btn-add-user" href="javascript:;" onclick="addUser();"><i class="fa fa-plus" title=""></i></a>
+                <span class='help-block'></span>
+            </div>
+            <script type="text/javascript">
+                var i = "{php echo ($i+1)}";
+                function addUser() {
+                    $(".btn-add-user").button("loading");
+                    var html = '<div id="fans">'+
+                        '<label class="col-sm-2 control-label"></label>'+
+                        '<div class="col-sm-9 col-xs-12">'+
+                        '<input type="hidden" name="send_openid2[]" id="openid_'+i+'" value="" />'+
+                        '<input type="text" name="nickname" id="nickname_'+i+'" class="form-control" style="cursor: pointer;" value="" onclick="select_fans(\'openid_'+i+'\',\'nickname_'+i+'\')" placeholder="点击这里选择粉丝" readonly="true" data-rule-required="true" />'+
+                        '</div>'+
+                        '<a class="btn btn-default" href="javascript:;" onclick="$(this).closest(\'#fans\').remove()"><i class="fa fa-remove"></i></a>'+
+                        '</div><br />';
+                    $(".btn-add-user").button("reset");
+                    $("#type-items").append(html);
+                    i++;
+                }
+            </script>
+        </div>
+
+        <div class="form-group choose choose_3" {if $item['mt_sendlimittype'] != 3}style='display: none'{/if}>
+        <label class="col-xs-12 col-sm-3 col-md-2 control-label" >选择粉丝标签</label>
+        <div class="col-sm-8 col-lg-9 col-xs-12">
+            <select name="send_group" class="form-control">
+                <option value="">请选择粉丝标签</option>
+                <option value="0" {if $item['mt_send_group']=='0'}selected{/if}>未分组({$ungroups_fans})</option>
+                {loop $groups['tags'] $type2}
+                <option value="{$type2['id']}" {if $item['mt_send_group']==$type2['id']}selected{/if}>{$type2['name']}（{$type2['count']}）</option>
+                {/loop}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-12 col-sm-3 col-md-2 control-label" ></label>
+        <div class="col-sm-9 col-xs-12">
+            <div class="help-block">
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <input type="submit" onclick="Subm()" name="submit"  value="提交" class="btn btn-primary"  />
+                <input type="button" onclick='window.location="{php echo $this->createWebUrl('messagebursts')}"' style='margin-left:10px;' value="返回列表" class="btn btn-default" />
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function(){
+            $(':radio[name=sendlimittype]').click(function(){
+                var v = $(this).val();
+                $(".choose").hide();
+                $(".choose_"+v).show();
+            })
+        })
+
+
+        //右侧浮窗
+        layui.use('layer', function(){
+            var layer = layui.layer;
+
+            layer.open({
+                title: '变量选择器'
+                ,offset: 'r'
+                ,shade: 0
+                ,content: '<div class="panel-body">'+
+                '<select class="form-control" onclick="$(\'.tm\').hide();$(\'.tm-\' + $(this).val()).show()">'+
+                '<option value="">选择模板变量类型</option>'+
+                '<option value="mass">群发消息变量</option>'+
+                '<option value="trace">触发消息变量</option>'+
+                '</select>'+
+                '</div>'+
+                '<div class="panel-body tm tm-mass" style="display:none">'+
+                '<a href=\'JavaScript:;\' class="btn btn-default btn-sm">粉丝昵称</a>'+
+                '</div>'+
+                '<div class="panel-body tm tm-trace" style="display:none">'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">粉丝昵称</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">公众号名称</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">时间</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">年</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">月</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">日</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">时</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">分</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">秒</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">省份</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">城市</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">区县</a>'+
+                '<a href="JavaScript:;" class="btn btn-default btn-sm">街道</a>'+
+                '</div>'+
+                '<div class="panel-body">'+
+                '点击变量后会自动插入选择的文本框的焦点位置，在发送给粉丝时系统会自动替换对应变量值'+
+                '<div class="text text-danger">群发消息变量仅支持群发时使用，触发消息变量仅支持触发消息时使用。</div>'+
+                '</div>'
+                ,btn: '关闭'
+            });
+        });
+
+        $(function () {
+            require(['jquery.caret'],function(){
+                var jiaodian;
+                $(document).on('focus', 'input,textarea',function () {
+                    jiaodian = this;
+                });
+
+                $("a[href='JavaScript:;']").click(function () {
+                    if (jiaodian) {
+                        $(jiaodian).insertAtCaret("#"+this.innerText+"#" );
+                    }
+                })
+
+            })
+        })
+    </script>
+    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{template 'web/common/footer'}

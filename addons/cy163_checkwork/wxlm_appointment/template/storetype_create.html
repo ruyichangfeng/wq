@@ -1,0 +1,134 @@
+{template 'common/header'}
+<style>
+    .stress_red {
+        color: red;
+    }
+
+    #container {
+        width:800px;
+        height:400px;
+    }
+</style>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('storetype', array('op'=>'display'));}">类型管理</a></li>
+    <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('storetype', array('op'=>'create'));}">添加类型</a></li>
+    {if $op == 'modify'}
+    <li {if $op == 'modify'}class="active"{/if}><a href="#">编辑类型</a></li>
+    {/if}
+</ul>
+
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-primary">
+            <div class="panel-heading">添加类型</div>
+            <div class="panel-body">
+                <div class="form-group" style="display:none;">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="storetype[storetype_id]" class="form-control" value="{$storetype['storetype_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>类型标题</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="storetype[storetype_title]" class="form-control" value="{$storetype['storetype_title']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>类型缩略图</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_image('storetype[storetype_img]', $storetype['storetype_img'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>自定义链接状态</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label  class="radio-inline">
+                            <input type="radio" name="storetype[storetype_type]" id="storetype1" value="1" onclick="checkedtype(1)" {if $storetype['storetype_type'] == 1 }checked{/if}/>开启
+                        </label>
+                        <label  class="radio-inline">
+                            <input type="radio" name="storetype[storetype_type]" id="storetype2" value="2" onclick="checkedtype(2)" {if $storetype['storetype_type'] == 2|| $storetype['storetype_type'] == '' }checked{/if}/>关闭
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group hide storetypeurl">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>链接地址</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="storetype[storetype_url]" class="form-control" value="{$storetype['storetype_url']}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>状态</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="storetype[storetype_state]" id="state1" value="1" {if $storetype['storetype_state'] == 1 || $storetype['storetype_state'] == '' }checked{/if}/>开启
+                        </label>
+                        <label  class="radio-inline">
+                            <input type="radio" name="storetype[storetype_state]" id="state2" value="2" {if $storetype['storetype_state'] == 2}checked{/if}/>关闭
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>排序</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="storetype[storetype_order]" class="form-control" value="{if empty($storetype) }{$maxorder}{else}{$storetype['storetype_order']}{/if}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                        <input type="hidden" name="op" value="create" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(function () {
+
+        var value = $('input[name="storetype[storetype_type]"]:checked').val();
+        checkedtype(value)
+    })
+
+    function checkedtype(num){
+        if(num==1)
+        {
+            $('.storetypeurl').removeClass('hide');
+        }else{
+            $('.storetypeurl').addClass('hide');
+        }
+    }
+
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#form').submit(function(){
+
+                if($('input[name="storetype[storetype_title]"]').val() == ''){
+                    util.message('未填类型名称');
+                    return false;
+                }
+                if($('input[name="storetype[storetype_img]"]').val() == ''){
+                    util.message('未上传类型展示图');
+                    return false;
+                }
+                if ($('input:radio[name="storetype[storetype_type]"]:checked').val() == 1)
+                {
+                    if($('input[name="storetype[storetype_url]"]').val() == '')
+                    {
+                        util.message('未填链接地址');
+                        return false;
+                    }
+                }
+                return true;
+            });
+        });
+    });
+</script>
+
+
+{template 'common/footer'}

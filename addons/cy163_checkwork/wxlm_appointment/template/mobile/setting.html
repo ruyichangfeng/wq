@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/style_admin.css">
+    <style>
+        a,a:focus,a:hover{
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body style="background-color: #f7f5f5;">
+     <div class="banner">
+        <img src="{RES}mobile/images/admin_top.png" alt="">
+        <div class="headname headname2"><p>{$staff['staff_name']}</p> </div>
+        <div class="headimg"><img src="{php echo tomedia($staff['staff_avatar'])}" alt=""></div>
+    </div>
+    <div class="goback"><a href="javascript:history.back()"> <img src="{RES}mobile/images/balck.png"></a></div>
+    <div class="dy-title">
+        <div class="dy-title-left">
+            <img src="{RES}mobile/images/zj.png" alt="">
+            <span>时间管理</span>
+        </div>
+        <div class="dy-title-right">
+            <img id="together_1" onclick="together(2)" src="{RES}mobile/images/tb1.png" alt="">
+            <img id="together_2" onclick="together(1)" src="{RES}mobile/images/tb2.png" alt="" style="display: none">
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="table4 table5">
+        {php $i = 1;}
+        {loop $weeks $key $item}
+        <a href="javascript:dateChange('{$key}', '{$item}', '{$dating['dating_id']}')">
+            <li class="date">
+                <div class="week">{$week_ch[$key]}</div>
+                <div id="day_{$key}" class="day_default {if $i == 1}day{/if}">{$item}</div>
+            </li>
+        </a>
+        {php $i++;}
+        {/loop}
+
+        <div class="clear"></div>
+    </div>
+    <div class="clear"></div>
+    <div class="li-me" id="time-content">
+        {loop $times $key $item}
+        <a href="javascript:switchState('{$item['start']}', '{$item['end']}', '{$dating['dating_id']}', '{$key}')">
+        <li id="time_{$key}" class="li-me-list {if $item['switch'] == 2}li-me-list2{/if}">
+            <p>{$item['start']}-{$item['end']}</p>
+            <p>预约{$item['count']}</p>
+        </li>
+        </a>
+        {/loop}
+
+        <div class="clear"></div>
+    </div>
+     <div class="li-dd-title">
+         <div class="dy-title-left">
+             <img src="{RES}mobile/images/dd.png" alt="">
+             <span>订单管理</span>
+         </div>
+         <div class="li-dd-title-right" role="tablist">
+             <div role="presentation" id="one" class="li-dfw li-dd active"><a href="#home" aria-controls="home" role="tab" onclick="changeActive(1)" data-toggle="tab">待服务</a>	</div>
+             <div role="presentation" id="two" class="li-yfw"><a href="#profile" aria-controls="profile" role="tab" onclick="changeActive(2)" data-toggle="tab">已服务</a></div>
+         </div>
+         <div class="clear"></div>
+     </div>
+
+     <div class="tab-content" style="padding-bottom: 20px">
+         <div role="tabpanel" class="tab-pane active" id="home">
+             <div id="order_1">
+             {loop $orders_wait $key $item}
+             <div class="li-dd-info">
+                 <p>订单编号：{$item['order_number']}</p>
+                 <p><span>预约人：{$item['order_username']}</span><span style="float: right;padding-right: 20px;">手机号：{$item['order_userphone']}</span></p>
+                 <p>支付方式：{if $item['order_pay_type'] == 1}免支付{else if $item['order_pay_type'] == 2}在线支付  支付金额:{$item['order_pay_money']}元{else if $item['order_pay_type'] == 3}会员卡{/if}</p>
+                 <p>预约时间：{$item['order_dating_day']} {$item['order_dating_start']}-{$item['order_dating_end']}</p>
+                 <p>提交时间: {$item['order_time_add']}</p>
+                 <span class="li-dd-info-span1"></span>
+             </div>
+             {/loop}
+             </div>
+             {if empty($orders_wait)}
+             <div class="li-dd-info" style="line-height: 80px;text-align: center">
+                 暂无订单
+             </div>
+             {/if}
+             {if count($orders_finish) == 1}<a href="javascript:loadMore(1)"><div class="load_more" id="load_1">
+             点击加载更多
+         </div></a>
+             {/if}
+         </div>
+         <div role="tabpanel" class="tab-pane" id="profile">
+             <div id="order_2">
+             {loop $orders_finish $key $item}
+             <div class="li-dd-info">
+                 <p>订单编号：{$item['order_number']}</p>
+                 <p><span>预约人：{$item['order_username']}</span><span style="float: right;padding-right: 20px;">手机号：{$item['order_userphone']}</span></p>
+                 <p>预约时间：{$item['order_dating_day']} {$item['order_dating_start']}-{$item['order_dating_end']}</p>
+                 <p>提交时间: {$item['order_time_add']}</p>
+                 <span class="li-dd-info-span2"></span>
+             </div>
+             {/loop}
+             </div>
+             {if empty($orders_finish)}
+             <div class="li-dd-info" style="line-height: 80px;text-align: center">
+                 暂无订单
+             </div>
+             {/if}
+             {if count($orders_finish) == 1}<a href="javascript:loadMore(2)"><div class="load_more" id="load_2">
+                 点击加载更多
+             </div></a>
+             {/if}
+         </div>
+     </div>
+
+
+     <form action="" method="post" hidden>
+         <input type="text" name="together"  value="1">
+         <input type="text" name="date"  value="{$default_week}">
+         <input type="text" name="order_state"  value="2">
+     </form>
+
+
+    <!--<div class="div" id="barrage" style="width: 3000px;height: 100px;background-color: rebeccapurple;position: absolute;left: 0;" >
+        12341355555555555555555555555555333333333333333333333333333333335555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+    </div>-->
+
+    <script type="text/javascript">
+
+
+
+//           $(function(){
+// 34         var cont=$("#barrage");    
+// 35         var contW=$("#barrage").width();
+// 36         var contH=$("#barrage").height();            
+// 37         var startX,startY,sX,sY,moveX,moveY;        
+// 38         var winW=$(window).width();    
+// 39         var winH=$(window).height();
+// 40         var barrage_name=$("#barrage_name");
+// 41         var barrage_frame=$("#barrage_frame");
+// 42         var body=$("body");
+// 43         
+//      cont.on({//绑定事件
+// 46             touchstart:function(e){                
+// 47                 startX = e.originalEvent.targetTouches[0].pageX;    //获取点击点的X坐标    
+// 48                 startY = e.originalEvent.targetTouches[0].pageY;    //获取点击点的Y坐标
+// 49                 //console.log("startX="+startX+"************startY="+startY);
+// 50                 sX=$(this).offset().left;//相对于当前窗口X轴的偏移量
+// 51                 sY=$(this).offset().top;//相对于当前窗口Y轴的偏移量
+// 52                 //console.log("sX="+sX+"***************sY="+sY);
+// 53                 leftX=startX-sX;//鼠标所能移动的最左端是当前鼠标距div左边距的位置
+// 54                 rightX=winW-contW+leftX;//鼠标所能移动的最右端是当前窗口距离减去鼠标距div最右端位置
+// 55                 topY=startY-sY;//鼠标所能移动最上端是当前鼠标距div上边距的位置
+// 56                 bottomY=winH-contH+topY;//鼠标所能移动最下端是当前窗口距离减去鼠标距div最下端位置                
+// 57                 },
+// 58             touchmove:function(e){                
+// 59                 e.preventDefault();
+// 60                 moveX=e.originalEvent.targetTouches[0].pageX;//移动过程中X轴的坐标
+// // 61                 moveY=e.originalEvent.targetTouches[0].pageY;//移动过程中Y轴的坐标
+// 62                 //console.log("moveX="+moveX+"************moveY="+moveY);
+// 63                 if(moveX<leftX){moveX=leftX;}                                
+// 64                 if(moveX>rightX){moveX=rightX;}
+// // 65                 if(moveY<topY){moveY=topY;}
+// // 66                 if(moveY>bottomY){moveY=bottomY;}
+// 67                 $(this).css({
+// 68                     "left":moveX+sX-startX,               
+// 70                     })
+// 71                 }
+// 72             
+// 73         })
+// 74         
+// 75         })
+
+        /** 同步设置 */
+        function together(value) {
+
+            if (value == 1)
+            {
+                $('#together_1').css('display', 'block');
+                $('#together_2').css('display', 'none');
+
+            } else
+            {
+                $('#together_2').css('display', 'block');
+                $('#together_1').css('display', 'none');
+            }
+            $('input[name="together"]').val(value);
+
+        }
+
+        /** 选择日期 */
+        function dateChange(key, date, dating_id) {
+
+            $('.day_default').removeClass('day');
+            $('#day_'+key).addClass('day');
+            $('input[name="date"]').val(date);
+
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('ajaxTime')}",
+                type:"post",
+                data:{date:date, dating:dating_id},
+                success:function (res) {
+
+                    $('#time-content').html(res);
+                }
+            })
+
+        }
+
+        /** 时间开关状态 */
+        function switchState(start, end, dating_id, key) {
+
+           var together = $('input[name="together"]').val();
+           var date = $('input[name="date"]').val();
+            var store = "{$store_id}";
+            var staff = "{$staff['staff_id']}";
+
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('ajaxSwitch')}",
+                type:"post",
+                data:{date:date, dating:dating_id, together:together, start:start, end:end, store:store, staff:staff},
+                success:function (res) {
+
+                    var obj = eval('(' + res + ')');
+                    if (obj.state == 'success')
+                    {
+                        if (obj.switch == 1)
+                        {
+                            $('#time_' + key).removeClass('li-me-list2');
+
+                        } else if (obj.switch == 2)
+                        {
+                            $('#time_' + key).addClass('li-me-list2');
+                        }
+                    }
+
+                }
+            })
+        }
+
+        /** 选项卡状态改变 */
+        function changeActive(value) {
+
+            if (value == 1)
+            {
+                $('#one').addClass('li-dd')
+                $('#two').removeClass('li-dd')
+
+            } else if (value == 2)
+            {
+                $('#two').addClass('li-dd')
+                $('#one').removeClass('li-dd')
+            }
+        }
+
+        var page1 = 2;
+        var page2 = 2;
+
+        /** 加载更多*/
+        function loadMore(type) {
+
+            var page;
+            if (type == 1)
+            {
+                if (page1 == 0)
+                {
+                    return false;
+                }
+                page = page1;
+            }
+
+            if (type == 2)
+            {
+                if (page2 == 0)
+                {
+                    return false;
+                }
+                page = page2;
+            }
+            var storeid = "{$store_id}";
+            var staffid = "{$staff['staff_id']}";
+            var projectid = "{$project_id}";
+            $.ajax({
+
+                url:"{php echo $this->createMobileUrl('ajaxLoad')}",
+                type:"post",
+                data:{type:type, page:page, store:storeid, staff:staffid, projectid:projectid},
+                success:function (res) {
+
+                    if (res == '')
+                    {
+                        if (type == 1)
+                        {
+                            page1 = 0;
+
+                        } else if (type == 2)
+                        {
+                            page2 = 0;
+                        }
+
+                        $('#load_' + type).html('已加载全部')
+
+                    } else
+                    {
+                        $('#order_' + type).append(res);
+                        if (type == 1)
+                        {
+                            page1++;
+
+                        } else
+                        {
+                            page2++;
+                        }
+                    }
+
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>

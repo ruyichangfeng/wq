@@ -1,0 +1,137 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="panel panel-default" style="padding: 0px; margin: 0px;">
+                        <div class="panel-heading">
+                            单据明细详情
+                        </div>
+                        <div class="panel-body"  style="padding: 0px; margin: 0px;">
+                            <div class="col-sm-12" style="padding: 0px; margin: 0px;">
+                                <table class="table table-bordered table-hover">
+                                    <tbody>
+                                    <tr>
+                                        <td>单据编号：</td>
+                                        <td>{$getinvoicedetail['sc_invoiceCode']}</td>
+                                        <td>消费方式：</td>
+                                        <td>{$getinvoicedetail['sc_consumeType']}</td>
+                                        <td>支付方式</td>
+                                        <td>
+                                            {if $getinvoicedetail['sc_consumePayType'] == 1}
+                                            <span class="label label-info">一码付（微信、支付宝）</span>
+                                            {elseif $getinvoicedetail['sc_consumePayType'] == 2}
+                                            <span class="label label-info">刷卡付款（微信、支付宝）</span>
+                                            {elseif $getinvoicedetail['sc_consumePayType'] == 3}
+                                            <span class="label label-primary">现金支付</span>
+                                            {else}
+                                            <span class="label label-default">其他支付</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>会员卡号：</td>
+                                        <td>{$getinvoicedetail['sc_memberCardNum']}</td>
+                                        <td>获得积分：</td>
+                                        <td>{$getinvoicedetail['sc_getPoint']}</td>
+                                        <td>消费时间：</td>
+                                        <td>{php echo date('Y-m-d H:i:s', $getinvoicedetail['sc_addTime']);}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>应付总金额：</td>
+                                        <td>{$getinvoicedetail['sc_handleMoneyCount']} 元</td>
+                                        <td>优惠金额：</td>
+                                        <td>{$getinvoicedetail['sc_preferentialMoney']} 元</td>
+                                        <td>实收金额：</td>
+                                        <td>{$getinvoicedetail['sc_realMoneyCount']} 元</td>
+                                    </tr>
+                                    <tr>
+                                        <td>现金支付(一码付)：</td>
+                                        <td>
+                                            {if $getinvoicedetail['sc_consumePayType'] == 3}
+                                            <span class="badge label-danger">{$getinvoicedetail['sc_cashPaymentCount']} 元</span>
+                                            {elseif $getinvoicedetail['sc_consumePayType'] == 1}
+                                            <span class="label label-success">{$getinvoicedetail['sc_otherPaymentCount']} 元</span>
+                                            {else}
+                                            {$getinvoicedetail['sc_cashPaymentCount']} 元
+                                            {/if}
+                                        </td>
+                                        <td>储值支付：</td>
+                                        <td>{$getinvoicedetail['sc_rechargePaymentCount']} 元</td>
+                                        <td>积分抵现：</td>
+                                        <td>{$getinvoicedetail['sc_pointPaymentCount']} 元</td>
+                                    </tr>
+                                    <tr>
+                                        <td>银行卡支付：</td>
+                                        <td>{if $getinvoicedetail['sc_consumePayType'] == 5}<span class="badge label-success">{$getinvoicedetail['sc_blankPaymentCount']} 元</span>{else}{$getinvoicedetail['sc_blankPaymentCount']} 元{/if}</td>
+                                        <td>微信支付：</td>
+                                        <td>{if $getinvoicedetail['sc_consumePayType'] == 2 && floatval($getinvoicedetail['sc_wechatPaymentCount']) > 0}<span class="badge label-primary">{$getinvoicedetail['sc_wechatPaymentCount']} 元</span>{else}{$getinvoicedetail['sc_wechatPaymentCount']} 元{/if}</td>
+                                        <td>支付宝支付：</td>
+                                        <td>{if $getinvoicedetail['sc_consumePayType'] == 2 &&  floatval($getinvoicedetail['sc_alipayPaymentCount']) > 0}<span class="badge label-info">{$getinvoicedetail['sc_alipayPaymentCount']} 元</span>{else}{$getinvoicedetail['sc_alipayPaymentCount']} 元{/if}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>优惠券抵现：</td>
+                                        <td>{$getinvoicedetail['sc_couponPaymentCount']} 元</td>
+                                        <td>其他支付：</td>
+                                        <td>{if $getinvoicedetail['sc_consumePayType'] > 6}<span class="badge label-default">{$getinvoicedetail['sc_otherPaymentCount']} 元</span>{else}{$getinvoicedetail['sc_otherPaymentCount']} 元{/if}</td>
+                                        <td>消费商家：</td>
+                                        <td>{$setStoreData['set_storeName']}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>消费备注：</td>
+                                        <td colspan="5">{$getinvoicedetail['sc_note']}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>商品ID</th>
+                            <th>商品编码</th>
+                            <th>商品名称</th>
+                            <th>消费数量</th>
+                            <th>商品售价</th>
+                            <th>折后总金额</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $getinvoicedetaildata $item}
+                        <tr>
+                            <td>{$item['goods_id']}</td>
+                            <td>{$item['cid_goo_code']}</td>
+                            <td>{$item['cid_goo_name']}</td>
+                            <td>{$item['cid_consumeNumber']}</td>
+                            <td><span class="badge badge-success"><i class="fa fa-rmb"></i> {$item['cid_goo_price']} 元</span></td>
+                            <td><span class="badge badge-danger"><i class="fa fa-rmb"></i> {$item['cid_goo_bargainPrice']} 元</span></td>
+                            <td>{$item['cid_note']}</td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                    <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                        <thead>
+                        {if $getinvoicedetaildata}
+                        <tr>
+                            <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                        </tr>
+                        {else}
+                        <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                        {/if}
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{template 'web/common/footer'}

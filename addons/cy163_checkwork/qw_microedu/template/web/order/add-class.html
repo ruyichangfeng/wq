@@ -1,0 +1,252 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .datetimepicker { width:20%;margin-right:2%;display: inline-block;margin-bottom:5px;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'orderlist'))}">排课表</a>
+        </li>
+    </ul>
+    <style>
+        .label{cursor:pointer;}
+    </style>
+    <div class="panel panel-default">
+        <div class="panel-heading">{$contractclass['contract_name']} - {$contractclass['class_name']}</div>
+        <div class="panel-body">
+            <form name="theform" action="" method="POST" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">校区</label>
+                    <div class="col-sm-10">
+                        <select name="campus_id" class="form-control" style="width:400px;">
+                            {if $campuses}
+                                {loop $campuses $index $campus}
+                                <option value="{$campus['id']}">{$campus['name']}</option>
+                                {/loop}
+                            {/if}
+                        </select>
+                        <span class="help-block">已过滤禁用本课程的校区</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">教师</label>
+                    <div class="col-sm-10">
+                        <select name="tutor_id" class="form-control" style="width:400px;">
+                            {if $tutors}
+                                {loop $tutors $index $tutor}
+                                <option value="{$tutor['id']}">{$tutor['fullname']} ({$tutor['mobile']})</option>
+                                {/loop}
+                            {/if}
+                        </select>
+                        <span class="help-block">只显示可教此课的教师</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">消耗课时</label>
+                    <div class="col-sm-10">
+                        <select name="classhour_id" class="form-control" style="width:400px;">
+                            {if $classhours}
+                                {loop $classhours $index $classhour}
+                                <option value="{$classhour['id']}">{$classhour['classhour_name']}</option>
+                                {/loop}
+                            {/if}
+                        </select>
+                        <span class="help-block">只显示本合同课程所包含的课时类型</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">时长</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="duration" placeholder="请输入时长" style="width:380px;margin-right:5px;display: inline-block;">分钟
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">教室</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="classroom" class="form-control" placeholder="请输入教室名" style="width:380px;margin-right:5px;display: inline-block;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">可否试听</label>
+                    <div class="col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="trialable" id="inlineRadio1" value="1" checked="true"> 是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="trialable" id="inlineRadio2" value="0"> 否
+                        </label>
+                    </div>
+                </div>
+                <div class="panel panel-default col-lg-offset-1 col-md-offset-1 col-sm-offset-0 col-xs-offset-0" style="width:70%;">
+                    <div id="pupilsCount" class="panel-heading">已选{php echo count($children)}个学员</div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th class="text-center" style="width:5%;">序号</th>
+                                <th class="text-center" style="width:25%;">学员姓名</th>
+                                <th class="text-center" style="width:25%;">家长姓名</th>
+                                <th class="text-center" style="width:30%;">手机号</th>
+                                <th class="text-center" style="width:15%;">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if $children}
+                                {loop $children $index $child}
+                                <tr>
+                                    <td class="text-center">{$index}</td>
+                                    <td class="text-center">{$child['pupil_fullname']}</td>
+                                    <td class="text-center">{$child['parent_fullname']}</td>
+                                    <td class="text-center">{$child['parent_mobile']} </td>
+                                    <td class="text-center">
+                                        <!--<a href="javascript:;" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>-->
+                                        <input type="checkbox" name="chosen_children[]" value="{$child['id']}" checked="true" onclick="countPupil()"/>
+                                    </td>
+                                    <!--<td><input type="hidden" name="child{$child['id']}" value="{$child['id']}" />-->
+                                </tr>
+                                {/loop}
+                            {else}
+                                <tr><td class="text-center">该合同课程暂无签约学员</td></tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel panel-default col-lg-offset-1 col-md-offset-1 col-sm-offset-0 col-xs-offset-0" style="width:70%;">
+                    <div id="datesCount" class="panel-heading">排课日期</div>
+                    <div class="panel-body">
+                        <table class="table table-hover datestable">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th class="text-center" style="width:25%;">排课日期</th>
+                                <th class="text-center" style="width:15%;">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" style="text-align: left">选择日期</label>
+                    <div class="col-sm-12 col-xs-12 col-lg-12 col-md-12">
+                        {php echo tpl_form_field_date('date','','true');}
+                        <!--
+                        <button type="button" class="btn btn-sm btn-primary add-date">添加</button>
+                        <button type="button" class="btn btn-sm btn-warning del-date">删除</button>
+                        <button type="button" id="testdel-date" class="btn btn-sm btn-warning testdel-date">测试删除</button>
+                        -->
+                        <button type="button" id="add-date" count="1" class="btn btn-sm btn-primary testadd-date">添加</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                        <button type="submit" class="btn btn-block btn-primary">提交</button>
+                    </div>
+                </div>
+                <input type="hidden" name="contractclass_id" value="{$contractclass['id']}" />
+                <input type="hidden" name="page" value="add-class" />
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    // 统计选中学员数量
+    function countPupil() {
+        var count = $("input[type=checkbox]:checked").length;
+        document.getElementById('pupilsCount').innerHTML = '已选' + count + '个学员';
+    }
+
+    $(".testadd-date").on("click", function (){
+        var date = theform.date.value;
+        var $table = $(".datestable");
+        var trHTML = "<tr><td class='text-center'>" + date + "</td>" +
+                        "<td class='text-center'>" +
+                        "<input type='checkbox' name='chosen_dates[]' value='" +
+                        date + "' checked='true' /></td></tr>"
+        $table.append(trHTML);
+        /*
+        // Calculate count
+        var currentCount = document.getElementById("testadd-date").getAttribute("count");
+        currentCount = parseInt(currentCount) + 1;
+        document.getElementById("testadd-date").setAttribute("count", parseInt(currentCount));
+
+        // Add datepicker control
+        var _html = $(this).prev(".datetimepicker").clone();
+        console.log(_html);
+        $(this).before(_html);
+        require(["datetimepicker"], function(){
+            $(function(){
+                var option = {
+                    lang : "zh",
+                    step : 5,
+                    timepicker : true,
+                    closeOnDateSelect : true,
+                    format : "Y-m-d H:i",
+                    name : "haha"
+                };
+            });
+        });
+        */
+    });
+
+/*
+    $(".add-date").on("click",function () {
+        var _html = $(this).prev(".datetimepicker").clone();
+        //console.log(_html);
+        $(this).before(_html);
+        require(["datetimepicker"], function(){
+            $(function(){
+                var option = {
+                    lang : "zh",
+                    step : 5,
+                    timepicker : true,
+                    closeOnDateSelect : true,
+                    format : "Y-m-d H:i"
+                };
+                $(".datetimepicker[name = 'date']").datetimepicker(option);
+            });
+        });
+    })
+    $(".del-date").on("click",function () {
+        var t = $(".datetimepicker").length;
+        //alert(t);
+        if (t >1 ){
+            $(this).prev().prev().remove();
+        }else{
+            alert("至少需要一个日期设定")
+        }
+
+    })
+*/
+
+</script>
+{template 'common/footer'}

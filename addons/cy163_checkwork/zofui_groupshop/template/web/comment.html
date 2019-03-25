@@ -1,0 +1,276 @@
+{template 'common/header'}
+	<link href="../addons/zofui_groupshop/template/web/css/common.css" rel="stylesheet">
+	
+<ul class="page_top">
+	</a>
+	<a href="{php echo $this->createWebUrl('comment',array('op'=>'add'))}">
+		<li class="top_btn {if $op == 'add'}activity_bottom{/if}">添加评价</li>
+	</a>
+	<a href="{php echo $this->createWebUrl('comment',array('op'=>'list'))}">
+		<li class="top_btn {if $op == 'list'}activity_bottom{/if}">评价列表</li>
+	</a>
+	{if $op == 'edit'}
+		<a href="{php echo $this->createWebUrl('comment',array('op'=>'edit','id'=>$_GPC['id']))}">
+			<li class="top_btn {if $op == 'edit'}activity_bottom{/if}">编辑评价</li>
+		</a>
+	{/if}
+</ul>
+
+<div class="page_body">
+
+{if $op == 'add' || $op == 'edit'}
+<form action="" method="post" class="addgood_body" name="addcomment_form">
+	<div class="input_item item_cell_box">
+		<div class="input_title">评价的商品</div>
+		<div class="input_form item_cell_flex">
+			{if empty($_GPC['gid'])}
+				请输入要评价的商品id<span class="input_box input_box_200">
+					<input type="text" class="input_input" name="selectgood" value="">
+				</span>，然后点击  <span class="btn_44b549 select_commnet_good">搜索</span>
+				<li class="content_good comment_good"></li>
+			{else}
+				<li class="content_good comment_good">
+					<img src="{php echo tomedia($good['pic'][0])}"> 
+					<p>{$good['title']}</p>
+					<input type="hidden" value="{$good['id']}" name="commentgoodid">
+				</li>
+			{/if}
+		</div>
+	</div>	
+	
+	<div class="input_item item_cell_box">
+		<div class="input_title">评价文字</div>
+		<div class="input_form item_cell_flex">
+			<textarea class="input_textarea input_box_600" rows="3" name="text">{$comment['text']}</textarea>
+		</div>
+	</div>
+
+	<div class="input_item item_cell_box good_rule">
+		<div class="input_title">评价等级</div>
+		<div class="input_form item_cell_flex checkbox good_rule_type">
+			<label><input type="radio" name="level" value="1" {if $comment['level'] == 1 || empty($comment['level'])}checked="checked"{/if}> 好评</label>
+			<label><input type="radio" name="level" value="2"  {if $comment['level'] == 2}checked="checked"{/if}> 中评</label>
+			<label><input type="radio" name="level" value="3"  {if $comment['level'] == 3}checked="checked"{/if}> 差评</label>
+		</div>
+	</div>	
+	
+	<div class="input_item item_cell_box good_rule good_pic">
+		<div class="input_title">评价图片</div>
+		<div class="input_form item_cell_flex checkbox">
+			{php echo tpl_form_field_multi_image('pic', $comment['pic'],'');}
+		</div>
+	</div>		
+	
+	<div class="input_item item_cell_box">
+		<div class="input_title">评价人昵称</div>
+		<div class="input_form item_cell_flex">
+			<span class="input_box input_box_200">
+				<input type="text" class="input_input" name="nickname" value="{$comment['nickname']}">
+			</span> <span class="modif_btn btn_44b549 rand_getnickname">随机获取</span>
+		</div>
+	</div>	
+	<div class="input_item item_cell_box good_rule good_pic headimg_box">
+		<div class="input_title">评价人头像</div>
+		<div class="input_form item_cell_flex checkbox">
+			{php echo  WebCommon::tpl_form_field_image('headimg',$comment['headimg'])}
+		</div>
+	</div>	
+	
+	<div class="input_item item_cell_box good_rule">
+		<div class="input_title">评价时间</div>
+		<div class="input_form item_cell_flex checkbox time_inbox">
+			{php echo tpl_form_field_date('commenttime', $comment['commenttime'], true);}
+		</div>
+	</div>	
+	
+	<div class="input_item item_cell_box good_rule">
+		<div class="input_title">是否显示</div>
+		<div class="input_form item_cell_flex checkbox good_rule_type">
+			<label><input type="radio" name="status" value="0" {if $comment['status'] == 0 || !isset($comment['status'])}checked="checked"{/if}> 显示</label>
+			<label><input type="radio" name="status" value="1" {if $comment['status'] == 1}checked="checked"{/if}> 隐藏</label>			
+		</div>
+	</div>	
+	
+	<div class="confirm_add">
+		<input name="confirm_addcomment" value="提交保存" class="btn_44b549" type="submit">
+		<input type="hidden" name="token" value="{$_W['token']}" />
+	</div>	
+</form>	
+
+{elseif $op == 'list'}
+	<div class="list_body">
+		<div class="list_top">	
+		
+			<form action="./index.php" method="get" class="form-horizontal search_box" role="form" id="form1" style="margin-right:10px;display: inline-block;">
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+				<input type="hidden" name="m" value="zofui_groupshop" />
+				<input type="hidden" name="do" value="comment" />
+				<input type="hidden" name="op" value="list" />
+				<div class="item_cell_box">
+					<div class="item_cell_flex item_cell_box search_write">
+						<div class="order_search_item">
+							<span>商品ID</span>
+							<span class="input_box input_box_150">
+								<input type="text" class="input_input" name="gid" value="{$_GPC['gid']}">
+							</span>
+						</div>
+						<div class="order_search_item">
+							<input type="submit" class="btn_44b549" value="搜索">
+						</div>						
+					</div>
+				</div>
+			</form>
+		
+			<div class="input-group select_btn">
+				<div class="btn-group">
+				  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  {if $_GPC['level']=='1'}好评
+					  {elseif $_GPC['level']=='2'}中评
+					  {elseif $_GPC['level']=='3'}差评
+					  {else}全部评价{/if}
+					  <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu">
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'level','1')}">好评</a></li>		
+					<li role="separator" class="divider"></li>	
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'level','2')}">中评</a></li>		
+					<li role="separator" class="divider"></li>				
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'level','3')}">差评</a></li>
+					<li role="separator" class="divider"></li>				
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'level','')}">全部评价</a></li>					
+				  </ul>
+				</div>	
+			</div>	
+			<div class="input-group select_btn">
+				<div class="btn-group">
+				  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  {if $_GPC['order']== 'gid'}商品id排序
+					  {else}最新排序	
+					  {/if}
+					  <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu">
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'order','gid')}">商品id排序</a></li>
+					<li role="separator" class="divider"></li>					
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'order','id')}">最新排序</a></li>
+				  </ul>
+				</div>
+			</div>			
+			<div class="input-group select_btn">
+				<div class="btn-group">
+				  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  {if $_GPC['by']== 1}正序
+					  {else}倒序
+					  {/if}
+					  <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu">
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'by',1)}">正序</a></li>		
+					<li role="separator" class="divider"></li>	
+					<li><a href="{php echo WebCommon::structCommentUrl($_GPC,'by','')}">倒序</a></li>
+				  </ul>
+				</div>
+			</div>			
+			
+		</div>
+		<div class="list_table good_list">
+<form action="" method="post">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th class="col-sm-1">
+								<label class="my_checkbox">
+								<input class="" type="checkbox" name="" onclick="var ck = this.checked;$('.goodid_check input').each(function(){this.checked = ck});"> 全选/取消
+								</label>
+							</th>
+							<th class="col-sm-2">商品</th>
+							<th class="col-sm-1">来源订单</th>							
+							<th class="col-sm-3">评价内容</th>
+							<th class="col-sm-1">评价等级</th>
+							<th class="col-sm-1">状态</th>
+							<th class="col-sm-1">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $list $li}
+						<tr>
+							<td class="">
+								<label class="my_checkbox goodid_check">
+									<input type="checkbox" name="checkid[]" value="{$li['id']}" class=""> {$li['id']}
+								</label>
+							</td>
+							<td class="font_13px_999">
+								<li class="good_list_img item_cell_box"> 
+									<div class=""><img src="{php echo tomedia($li['gpic'])}"></div>
+									<div class="item_cell_flex">
+										<p>商品id：{$li['gid']}</p>
+										<p><a target="_blank" class="a_href" href="{php echo $this->createWebUrl('good',array('op'=>'edit','id'=>$li['gid'],'look'=>1))}">{$li['title']}</a></p>
+									</div>
+								</li>
+							</td>
+							<td>
+								{if $li['idoforder'] > 0}
+								<a target="_blank" class="a_href" href="{php echo $this->createWebUrl('order',array('op'=>'info','id'=>$li['idoforder']))}">查看订单详情</a>
+								{else}
+									无
+								{/if}
+							</td>							
+							<td class="font_13px_999" style="white-space: normal;">
+								{$li['text']}
+								<li class="good_list_img">
+									{loop $li['cpic'] $item}
+										<a target="_blank" href="{php echo tomedia($item)}"><img src="{php echo tomedia($item)}" /></a>
+									{/loop}
+								</li>										
+							</td>
+							<td>
+								{if $li['level'] == 1} 好评
+								{elseif $li['level'] == 2} 中评
+								{elseif $li['level'] == 3} <span class="font_ff5f27">差评</span>{/if}
+							</td>
+
+							<td style="position:relative">
+								{if $li['status'] == 0}
+									<li><span>显示</span></li>
+								{elseif $li['status'] == 1}
+									<li><span class="font_ff5f27">隐藏</span></li>
+								{/if}
+							</td>
+							<td class="opclass">
+								<a class="a_href" target="_blank" href="{php echo $this->createWebUrl('comment',array('op'=>'edit','id'=>$li['id'],'gid'=>$li['gid']))}">编辑</a>
+								<a class="a_href" href="{php echo $this->createWebUrl('comment',array('op'=>'delete','id'=>$li['id']))}" onclick="return confirm('确定要删除吗？');">删除</a>
+								{if $li['status'] == 0}
+									<a class="a_href" href="{php echo $this->createWebUrl('comment',array('op'=>'downcomment','id'=>$li['id']))}" onclick="return confirm('确定要隐藏吗？');">隐藏</a>
+								{else}
+									<a class="a_href" href="{php echo $this->createWebUrl('comment',array('op'=>'upcomment','id'=>$li['id']))}" onclick="return confirm('确定要显示吗？');">显示</a>
+								{/if}								
+							</td>
+						</tr>
+						{/loop}						
+					</tbody>
+				</table>		
+		</div>		
+		<div class="list_bottom item_cell_box good_list good_list_bot">
+			<div class="item_cell_flex">
+				<label class="">
+					<input class="" type="checkbox" name="" onclick="var ck = this.checked;$('.goodid_check input').each(function(){this.checked = ck});"> 全选/取消
+				</label>&nbsp;&nbsp;&nbsp;
+				<input type="submit" name="delete" class="btn_44b549" value="删除所选" onclick="return confirm('确定要删除吗？');">
+				<input type="submit" name="downcomment" class="btn_44b549" value="隐藏所选" onclick="return confirm('确认对所选评价隐藏吗？');">
+				<input type="submit" name="upcomment" class="btn_44b549" value="显示所选" onclick="return confirm('确认对所选评价显示吗？');">
+				<input name="token" type="hidden" value="{$_W['token']}" />
+			</div>
+			<div class="">{$pager}</div>
+		</div>
+</form>			
+	</div>
+	
+{/if}
+</div>
+
+
+
+
+	<script src="../addons/zofui_groupshop/template/web/js/fsjs.js"></script>
+{template 'common/footer'}

@@ -1,0 +1,149 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li><a href="{php echo  $this->createWebUrl('fall', array());}">员工佣金列表</a></li>
+    <li><a href="{php echo  $this->createWebUrl('ping', array());}">平台佣金列表</a></li>
+    <li><a href="{php echo  $this->createWebUrl('txlog', array());}">提现申请列表</a></li>
+    <li class="active"><a href="#">提现申请操作</a></li>
+</ul>
+
+<div class="clearfix">    
+    <div class="panel panel-default">
+    	<div class="panel-heading">
+            操作列表
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <table class="table table-hover">
+            	<thead>
+                	<tr class="active">
+                    	<td>待发金额</td>
+                        <td>实发金额</td>
+                        <td>操作员</td>
+                        <td>备注</td>
+                        <td>操作时间</td>
+                    </tr>
+                </thead>
+                <tbody>
+                	{loop $list $val}
+                	<tr>
+                    	<td>
+                        	<p class="form-control-static">{$val[money1]}</p>
+                        </td>
+                        <td>
+                        	<p class="form-control-static">{$val[money2]}</p>
+                        </td>
+                        <td>
+                        	<p class="form-control-static">{$val[username]}</p>
+                        </td>
+                        <td>
+                        	<p class="form-control-static">{$val[remark]}</p>
+                        </td>
+                        <td>
+							<p class="form-control-static">{$val[addtime]}</p>
+                        </td>
+                        
+                    </tr>
+                    {/loop}
+                </tbody>
+            </table>
+        </div>
+       
+    </div>
+</div>
+
+<div class="clearfix">
+申请人:{php echo $this->getStaffOpenid($item[openid])}；公司名称:{php echo $this->getCompanyName($item[openid])}；开户银行：{php echo $this->getStaffInfo($item[staff_id],'bank')};
+银行卡号：{php echo $this->getStaffInfo($item[staff_id],'bank_num')};支付宝账号：{php echo $this->getStaffInfo($item[staff_id],'alipay')};
+</div>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="{php echo $this->createWebUrl('txlog', array('foo'=>'tixianaddok'));}" method="post" onsubmit="return checkform()">
+    <input type="hidden" name="tid" value="{$id}"  />    
+    <input type="hidden" name="type" value={$type} />
+    <input type="hidden" name="staff_id" value="{$item['staff_id']}" />
+    <input type="hidden" name="s_openid" value="{$item['openid']}" />    
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                
+            </div>
+            <div class="panel-body">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">待发金额</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="money1" id="money1" value="{$item['yumoney']}" class="form-control" readonly>
+                    </div>
+                </div>
+                 
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">实发金额</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="money2" id="money2" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付方式</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <div>
+                            <label class="radio-inline">
+                                <input type="radio" name="fangshi" value="1" checked >线下支付
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fangshi" value="2" >银行打款
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">收方账号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="CRTACC" id="CRTACC" value="{php echo $this->getStaffInfo($item[staff_id],'bank_num')}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">收方帐户名</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="CRTNAM" id="CRTNAM" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">收方开户行</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="CRTBNK" id="CRTBNK" value="{php echo $this->getStaffInfo($item[staff_id],'bank')}" class="form-control">
+                    </div>
+                </div>
+                -->
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">摘要备注</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<textarea class="form-control" name="remark" rows="5"></textarea>
+                    </div>
+                </div>
+                
+               
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" type="submit" value="确定" class="btn btn-primary btn-block" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+	function checkform(){
+		var money2 = document.getElementById('money2').value;
+		if(money2 == ''){
+			alert('实发金额不能为空！');
+			return false;
+		}
+	}
+</script>
+{template 'common/footer'}

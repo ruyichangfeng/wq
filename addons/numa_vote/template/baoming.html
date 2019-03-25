@@ -1,0 +1,256 @@
+{template 'common/header'}  
+{template 'common_header'}    
+{if $operation == 'post'}
+<div class="main">
+	<ul class="nav nav-tabs"> 
+	 		    <li><a href="{php echo $this->createWebUrl('baoming')}">报名列表</a></li> 
+			    <li class="active"><a href="{php echo $this->createWebUrl('baoming',array('op'=>'post','aid'=>$aid,'id'=>$id))}">处理报名</a></li>  
+ </ul> 
+ <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="application_form">
+				{if $item['status']==0}
+						<div class="panel panel-default">
+								 <div class="panel-body"> 
+									   <div class="col-xs-12 col-sm-12">
+									 			  <a href="javascript:void(0)" id="btn_pass" data-url="{php echo $this->createWebUrl('baoming', array('id' => $item['id'], 'op' => 'deal','aid'=>$aid))}"  data-msg="审核通过后活动页面即可显示，确认要通过?"   class="btn btn-primary btn-sm col-lg-2" data-toggle="tooltip" data-placement="top" title="审核通过">审核通过</a>
+										  		 <input type="hidden" name="token" value="{$_W['token']}" />
+												  &nbsp;&nbsp;<a href="{php echo $this->createWebUrl('baoming', array('id' => $item['id'], 'op' => 'delete'))}" onclick="return confirm('删除选手报名信息且不可恢复，确认删除？');return false;" class="btn btn-danger btn-sm col-lg-2" data-toggle="tooltip" data-placement="top" title="删除">删除报名</a>
+										 </div> 
+								 </div> 
+						</div>
+				{/if}
+			   <ul class="nav nav-tabs" role="tablist" style="margin-bottom:10px">
+							<li role="presentation" class="active"><a href="#jcsz" aria-controls="jcsz" role="tab" data-toggle="tab">基本信息</a></li>
+			 				{if !empty($fields)}
+			 					<li role="presentation"><a href="#kzzd" aria-controls="kzzd" role="tab" data-toggle="tab">扩展信息</a></li>
+			 				{/if}
+				</ul>  
+				<div class="panel panel-default">  
+				<!-- 基本设置 -->
+					<div role="tabpanel" class="tab-pane active" id="jcsz"> 
+							<div class="panel-body"> 
+								{if $item['no']}
+									   <div class="form-group"> 
+											<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>选手编号</label>
+											<div class="col-sm-6 col-xs-12">
+													<input type="text"  readonly="readonly" class="form-control"  value="{$item['no']}"/>
+											</div>
+										</div>
+								{/if}
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>选手名称</label>
+									<div class="col-sm-6 col-xs-12">
+											<input type="text" name="name" readonly class="form-control" check-type="required" value="{$item['name']}" required-message="请填写选手名称"/>
+									</div>
+								</div> 
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>封面图片</label>
+									<div class="col-sm-6 col-xs-12">
+										{php echo tpl_form_field_image('thumb', $item['thumb'], '', array('extras' => array('text' => 'readonly')))}
+									</div>
+								</div>   
+								<div class="form-group">
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">手机号码</label>
+	            				 			<div class="col-sm-6">
+													 <input type="text" name="mobile" readonly class="form-control" value="{php echo $item['mobile'];}" placeholder="填写选手手机号码" />
+													<span class="help-block"><b style=" color:red;"></b></span>
+											 </div>
+				                  </div>  
+				                  <div class="form-group">
+											<label class="col-xs-12 col-sm-3 col-md-2 control-label">参赛宣言</label>
+											<div class="col-sm-6 col-xs-12">
+														<textarea name="desc" readonly class="form-control" cols="70" row="5">{$item['desc']}</textarea>
+											</div>
+								 </div>     
+								<div class="form-group">
+					                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">状态</label>
+					                    <div class="col-sm-8">
+											<div class="btn-group" data-toggle="buttons">
+												 <label data-value="1" class=" btn btn-default {if $item['status'] == '1'} active{/if}">
+					                                	<input type="radio" readonly name="status" value="1" autocomplete="off"  {if $item['status'] == "1" }checked{/if}>审核通过
+					                            </label>
+					                              <label data-value="0" class=" btn btn-default {if empty($item['status'])} active{/if}">
+					                                	<input type="radio" readonly name="status" value="0" autocomplete="off"  {if empty($item['status'])}checked{/if}>待审核
+					                            </label> 
+					                        </div>
+											<span class="help-block"></span>
+										</div>
+				                  </div>   
+									<div class="form-group">
+									{php $pics = json_decode($item['pics'],true);}
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>选手多图片</label>
+												<div class="col-sm-6 col-xs-12">
+													 {php echo tpl_form_field_multi_image('pics',$pics);}
+												</div>
+									</div>     
+							</div>
+					</div>   
+					{if !empty($fields)}
+							<div  role="tabpanel" class="tab-pane" id="kzzd" >
+										<div class="panel-body"> 
+										            {loop $fields $field} 
+															 <div class="form-group">
+							            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">{if $field['is_required']==1}<span class="c-red">*</span>{/if}{$field['name']}</label>
+							            				 			      {php $field_id=$field['id']; $content_value = isset($extend_values[$field_id])?$extend_values[$field_id]:$field['default'];}
+							            				 			       {if $field['type']=='input'}
+									            				 					 <div class="col-sm-9">
+									            				 					 		<input type="text" class="form-control"   name="fields[{$field_id}]" value="{php echo $content_value;}" />
+									            				 					</div>
+							            				 					 {elseif $field['type']=='date'}
+							            				 					          <div class="col-sm-3"> 
+							            				 					 					 {php echo  _tpl_form_field_date("fields[$field_id]",$content_value,false);} 
+							            				 					 		 </div>
+							            				 					 {elseif $field['type']=='textarea'}
+							            				 					         <div class="col-sm-9">
+							            				 					        		 <textarea name="fields[{$field_id}]" class="form-control" cols="70" row="5">{php echo $content_value;}</textarea>
+							            				 					 		</div>
+							            				 					 {elseif $field['type']=='image'}
+							            				 					          <div class="col-sm-6">
+							            				 								  {php echo tpl_form_field_image("fields[$field_id]", '', '', array('extras' => array('text' => 'readonly')))}
+							            				 					 		  </div>
+							            				 					 {elseif $field['type']=='multi_image'}
+							            				 					            <div class="col-sm-6">
+							            				 										 {php echo tpl_form_field_multi_image("fields[$field_id]",$content_value,$muti_params);}
+							            				 								</div>
+							            				 					 {elseif $field['type']=='editor'}
+							            				 								 <div class="col-sm-9">
+									            				 					               {php echo tpl_ueditor("fields[$field_id]",$content_value);} 
+							            				 								  </div>
+							            				 					 {elseif $field['type']=='checkbox'}
+							            				 					           <div class="col-sm-9">
+									            				 					           <div class="checkbox">
+											            				 					 			{loop $field['options'] $k_fop $i_fop}
+											            				 					 					 <label><input type="checkbox"  name="fields[{$field['id']}][]"  {if in_array($k_fop,$content_value)}checked{/if}  value="{$k_fop}" />{$i_fop}</label>
+											            				 					 			{/loop} 
+									            				 					 		   </div>
+							            				 					 		   </div>
+							            				 					 {elseif $field['type']=='radio'}
+							            				 					            <div class="col-sm-9">
+							            				 					 			 	{loop $field['options'] $k_fop $i_fop} 
+							            				 					 					<lable><input type="radio" name="fields[{$field_id}]"  {if $content_value==$k_fop}checked{/if} value="{$k_fop}" />{$i_fop}</lable>
+							            				 					 			   {/loop}
+							            				 					 			 </div>
+							            				 					  {elseif $field['type']=='select'}
+							            				 					   			<div class="col-sm-5">
+									            				 					  			  <select name="fields[{$field['id']}]" class="form-control">
+											            				 					  			    {loop $field['options'] $k_fop $i_fop}
+											            				 					 					  <option value="{$k_fop}"  {if $content_value==$k_fop}selected{/if} >{$i_fop}</option>
+											            				 					 			   {/loop}
+									            				 					  			   </select>
+							            				 					  			  </div>
+							            				 					  {elseif $field['type']=='number'}
+							            				 					   <div class="col-sm-3">
+							            				 					 			<input type="text" class="form-control"  check-type="number" number-message="请填写数字" name="fields[{$field_id}]" value="{php echo $content_value}" />
+							            				 					  	</div> 
+							            				 					  {elseif $field['type']=='url'}
+							            				 					   <div class="col-sm-9">
+							            				 					 			<input type="text" class="form-control"  check-type="url" number-message="请正确填写链接地址" name="fields[{$field_id}]" value="{php echo $content_value}" />
+							            				 					  	</div> 
+							            				 					   {elseif $field['type']=='email'}
+							            				 					  		<div class="col-sm-5">
+							            				 					 				<input type="text" class="form-control"  check-type="mail" mail-message="请填写正确的邮件地址" name="fields[{$field_id}]" value="{php echo $content_value}" />
+							            				 					 		</div>
+							            				 					  {elseif $field['type']=='datetime'} 
+							            				 							  <div class="col-sm-3"> 
+							            				 					             	{php echo  _tpl_form_field_date("fields[$field_id]",$content_value,true);} 
+							            				 					           </div>
+							            				 					 {/if} 
+										                      </div>   
+												 {/loop}
+										</div>
+							</div>  
+					{/if}
+		</div> 
+	</form>
+	<script type="text/javascript"> 
+	 $(function(){   
+		    $("#btn_pass").click(function(){
+		    	  var url = $(this).data("url");
+		    	  var msg = $(this).data("msg"); 
+		    	  if(confirm(msg)){
+		    		      $.ajax({"url":url,"dataType":'json',success:function(data){ 
+		    		    	    if(data.type=='success'){
+		    		    	    		  alinuma.alert(data.message,6)
+		    		    	    		 document.location = data.redirect;
+		    		    	    }else{
+		    		    	    	alinuma.alert(data.message,5)
+		    		    	    }
+		    		      }})
+		    	  } 
+		    })
+	   }) 
+	</script>
+</div> 
+{elseif $operation == 'display'}
+<ul class="nav nav-tabs">
+		    <li class="active"><a href="{php echo $this->createWebUrl('baoming')}">报名列表</a></li> 
+</ul> 
+<div class="main">
+	<div class="panel panel-info">
+				<div class="panel-heading">筛选</div>
+				<div class="panel-body">
+					<form action="./index.php" method="get" class="form-inline" role="form">
+						<input type="hidden" name="c" value="site" />
+						<input type="hidden" name="a" value="entry" />
+						<input type="hidden" name="m" value="numa_vote" />
+						<input type="hidden" name="do" value="baoming" /> 
+						<input type="hidden" name="op" value="display" /> 
+						<div class="form-group">
+								 <div class="col-xs-12 col-sm-12 col-lg-12">
+											<select name="opt_type" class='form-control'>
+														<option value="">请选择</option>
+														<option value="name" {if $_GPC['opt_type']=='name'}selected{/if} >选手名称</option> 
+														<option value="activity_id" {if $_GPC['opt_type']=='activity_id'}selected{/if} >活动ID</option> 
+														<option value="activity_title" {if $_GPC['opt_type']=='activity_title'}selected{/if} >活动名称</option> 
+														 <option value="mobile" {if $_GPC['opt_type']=='mobile'}selected{/if} >手机号码</option> 
+											</select>  
+											<input class="form-control" name="keywords" id="" type="text" value="{$_GPC['keywords']}"> 
+											<select name="type" class='form-control' style="width:200px">
+														<option value="-1" {if $type==-1}selected{/if}>全部状态</option>
+														<option value="1" {if $type==1}selected{/if}>审核通过</option> 
+														<option value="0" {if $type==0}selected{/if} >等待审核</option>  
+											</select>  
+											<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+									</div>
+						</div>   
+					</form>
+				</div>
+       </div>
+       <div class="panel panel-default">
+				<div class="panel-body table-responsive">
+					<table class="table table-hover">
+						<thead class="navbar-inner">
+							<tr class="text-c">
+								<th style="width:5%;">ID</th>
+								<th style="">活动标题</th>  
+								<th style="width:10%;">选手名称</th>
+								<th style="width:10%;">联系电话</th> 
+								<th style="width:5%">图片</th>  
+								<th style="width:8%;">状态</th> 
+								<th style="width:15%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $data_list $item}
+							<tr class="text-c">
+									<td>{$item['id']}</td>
+									<td>[{$item['activity_id']}]{$item['activity_title']}</td>  
+									<td>{$item['name']}</td>
+									<td>{$item['mobile']}</td>
+									<td><img src="{php echo tomedia($item['thumb']);}" class="preview" width='50px' height="30" style='padding:1px;border: 1px solid #ccc;float:left;' /></td>
+									<td>{if $item['status']==1}<label class="label label-success radius">已通过</label>{else}<label class="label label-warning radius">待审核</label>{/if}</td>
+									<td style="text-align:center;">
+											 <a href="{php echo $this->createWebUrl('baoming', array('id' => $item['id'], 'op' => 'post','aid'=>$item['activity_id']))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="处理"><i class="fa fa-pencil"></i></a>
+											 {if $item['status']==0}
+											 		&nbsp;<a href="{php echo $this->createWebUrl('baoming', array('id' => $item['id'], 'op' => 'delete'))}" onclick="return confirm('删除选手报名信息且不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+											 {/if}
+									 </td>
+							</tr>
+							{/loop}
+						</tbody>
+					</table>
+					{$pager}
+			 </div>
+	</div>
+</div>  
+{/if}
+{template 'common/footer'}

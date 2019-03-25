@@ -1,0 +1,115 @@
+{template 'common/header'}
+<style>
+    .l_tableWrap .l_table_tit .l_formBar {
+        border: 0;
+        float: left;
+        font-size: 0;
+    }
+    .y_sele {
+        display: inline-block;
+        padding: 5px 0 12px 12px;
+    }
+    .y_sele_tit {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+    }
+    .l_table_search{
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+<?php if($ec !=200) {?>
+<script>
+alert("{$em}");
+</script>
+<?php } ?>
+<div class="clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            搜索结果
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <div class="l_table_tit clearfix">
+                <form method="get" action="" class="l_formBar">
+                    <span class="y_sele_tit">关键词:</span>
+                    <?php foreach($_GET as $key => $value){ ?>
+                    <input type="hidden" class="form-control" name="{$key}" value="{$value}">
+                    <?php } ?>
+                    <div class="y_sele y_size02">
+                        <input type="text" class="form-control" name="kw" value="{$kw}">
+                    </div>
+                    <div class="btn-group l_table_search">
+                        <button type="submit" class="btn btn-success">搜索</button>
+                    </div>
+                </form>
+            </div>
+            <style>
+                .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td
+                {
+                    white-space: normal;
+                }
+            </style>
+
+            <table class="table table-hover">
+                <tr>
+                    <th>标题</th>
+                    <th>来源</th>
+                    <th>地址</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                </tr>
+                {loop $data $row}
+                <tr>
+                    <td>
+                        <p class="form-control-static">
+                            <a target="_blank" href="{$row['url']}">{$row['title']}</a>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static" >
+                            {$row['author']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static" >
+                            <a target="_blank" href="{$row['url']}">{$row['url']}</a>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static" >
+                            {php echo date('Y-m-d H:i:s',$row['time']);}
+                        </p>
+                    </td>
+                    <td style="width: 100px;">
+                        <p class="form-control-static">
+                            <a target="_blank" class="btn btn-success" href="{php echo $this->createWebUrl('article', array('url' => $row['url'],'_wg' => 'edit'))}" >编辑</a>
+                        </p>
+                    </td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    <?php if($ec && $em && $ec!=200) { ?>
+        alert("{$em}");
+    <?php }?>
+    require(['jquery'], function ($) {
+        $('.del_category').click(function () {
+            if(!confirm('删除此分类，分类文章也会被删除，确定删除？')) {
+                return false;
+            }
+            var url = "{php echo $this->createWebUrl('category', ['_wg' => 'del'])}";
+            var id = $(this).attr('data-id');
+            $.get(url,{id:id},function (data) {
+                if(data.message.errno == 0) {
+                } else {
+                    alert(data.message.message);
+                }
+                location.reload();
+            },'JSON');
+        });
+    });
+</script>
+{template 'common/footer'}

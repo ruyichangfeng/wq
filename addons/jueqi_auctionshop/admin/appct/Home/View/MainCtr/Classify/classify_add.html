@@ -1,0 +1,170 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-body">
+        <form class="layui-form">
+          
+        	  <div class="layui-form-item">
+                <label  class="layui-form-label">分类所属</label>
+                <div class="layui-input-block">
+                    <select name="classify_id" lay-filter="aihao">
+				        <option <?php if($classify['id']==0){ echo 'selected'; } ?> value="0" >顶级分类</option>
+				      <!--  <volist name="classify_id" id="v" >	
+				           <option <?php if($v['id']==$classify['classify_id']){ echo 'selected';} ?> value="{$v.id}" >{$v.name}</option>
+				        </volist>-->
+				    </select>
+				     <!-- <div class="layui-form-mid layui-word-aux">菜单默认值显示二级</div>-->
+                </div>
+              </div>
+              
+              <div class="layui-form-item"  style="height: ;">
+                <label  class="layui-form-label">分类名称 </label>
+                <div class="layui-input-block">
+                    <input type="text"  name="name"  lay-verify="required" autocomplete="off" value="{$classify['name']}"  class="layui-input">
+                </div>
+              </div>
+              
+           <!--    <div class="layui-form-item">
+                <label  class="layui-form-label">分类图片 </label>
+                <div class="layui-input-block">
+	                 <button type="button" class="layui-btn layui-btn-sm" onclick="$('#classify_img').click();">
+					      <i class="layui-icon">&#xe67c;</i>上传图片
+					</button>
+					<input style="display: none;" type="file" id="classify_img"  onchange="previewImage(this,1,'classify_img_val')"   multiple  class="input-file">
+	                <div>
+	                   <img id="imghead1" border="0"  style="margin-top: 5px;max-height:100px;"                   	
+	                   <?php 
+	                   	   if( empty($classify['classify_img']) ){
+	                   	   	   echo 'src="__ROOT__/Public/images/z_add.png"   onclick="$(\'#classify_img\').click();"';
+	                   	   }else{
+	                   	       echo 'src="__ROOT__/Uploads/'.$classify['classify_img'].'"';
+	                   	   }
+	                    ?>
+	                   >
+	                </div>
+	                 <div class="layui-form-mid layui-word-aux">建议300px*362px</div>
+                </div>
+              </div>-->
+              
+              <div class="layui-form-item">
+                <label  class="layui-form-label">序号 </label>
+                <div class="layui-input-block">
+                    <input type="text"  name="rank" lay-verify="required" autocomplete="off" value="{$classify['rank']}"  class="layui-input">
+                </div>
+              </div>
+              
+              <div class="layui-form-item layui-form-text">
+			    <label class="layui-form-label">分类描述</label>
+			    <div class="layui-input-block">
+			      <textarea name="desc" placeholder="请输入内容" class="layui-textarea">{$classify['desc']}</textarea>
+			    </div>
+			  </div>
+             
+             <input type="hidden"  name="id" value="{$classify['id']}" />
+             
+             <div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+               <button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+            </div>
+            <input type="hidden"  id="classify_img_val" value="" >
+        </form>
+    </div>
+    
+    <include file="Public/footer.html"/>
+    <script type="text/javascript" src="__ROOT__/Public/js/tools.js"></script> 
+
+    <script>
+      layui.use(['form','layer','laydate'], function(){
+           $ = layui.jquery;
+           var form = layui.form;
+           var layer = layui.layer;
+           var laydate = layui.laydate;
+             
+           laydate.render({
+		     elem: '#birthday'
+		   });
+          
+          form.on('submit(save)', function(data){
+            
+				var tjing = parent.layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form=document.forms[0];
+	  		    var formData = new FormData(form);  
+	  		    
+			 /*   if($("#classify_img_val").val()!=''){
+			      formData.append("classify_img",convertBase64UrlToBlob($("#classify_img_val").val()));
+				} */
+				
+				$.ajax({
+			        url: "{:U('Home/MainCtr/Classify/do_classify')}",
+			        type : "POST",
+			        data :formData,
+			        dataType:"text",
+			        processData : false,         
+			        contentType : false,      
+			        success:function(data){
+			            parent.layer.close(tjing);
+		               if(data == '1'){
+		              	 var index = parent.layer.getFrameIndex(window.name);
+		                 parent.layer.msg('提交成功', {icon: 1,offset: '40%',time:2000,shade: 0.3},function(){ 
+					        parent.location.reload();
+						 })
+		               }else if(data == '2'){
+		              	 parent.layer.msg('提交失败', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		               }else{
+		              	 parent.layer.msg(data, {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		               }
+		               
+			        }
+			    });
+					
+            return false;
+          });
+     });
+    
+    
+    function convertBase64UrlToBlob(urlData){
+	    var bytes=window.atob(urlData.split(',')[1]);    
+	    var ab = new ArrayBuffer(bytes.length);
+	    var ia = new Uint8Array(ab);
+	    for (var i = 0; i < bytes.length; i++) {
+	        ia[i] = bytes.charCodeAt(i);
+	    }
+	    return new Blob( [ab] , {type : 'image/jpg'});
+    }
+    
+        
+   function previewImage(file,flag,ob){
+     var img =$('#imghead'+flag);
+     var oFile = file.files[0]; 
+    
+     if(!new RegExp("(jpg|jpeg|png)+","gi").test(oFile.type)){  
+          layer.msg("照片上传：文件类型必须是JPG、JPEG、PNG", {icon: 2,offset: '40%',time:2000,shade: 0.3});
+          return;  
+     }
+     var reader = new FileReader();  
+     var tjing =  parent.layer.msg('图片加载中', {icon: 16,shade: 0.3,time: 60*1000});
+     reader.onload = function(e) {  
+        var base64Img= e.target.result;
+        var _ir=ImageResizer({  
+        resizeMode:"auto"  
+        ,dataSource:base64Img  
+        ,dataSourceType:"base64"  
+        ,maxWidth:1200   
+        ,maxHeight:1200 
+        ,onTmpImgGenerate:function(img){ }   
+        ,success:function(resizeImgBase64,canvas){
+		parent.layer.close(tjing);
+		img.attr("src",resizeImgBase64);  
+	    $('#'+ob).val(resizeImgBase64.substr(22));
+		
+        },debug:false});            
+     };  
+     reader.readAsDataURL(oFile);  
+   }
+        
+        
+    </script>
+  
+</body>
+
+</html>

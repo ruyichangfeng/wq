@@ -1,0 +1,173 @@
+{template 'common/header'}
+<div class="we7-page-title">站点设置</div>
+<ul class="we7-page-tab">
+	<li{if $do == 'copyright'} class="active"{/if}><a href="{php echo url('system/site');}">站点信息</a></li>
+</ul>
+<div class="clearfix">
+	<form action="" method="post"  class="we7-form" role="form" enctype="multipart/form-data" id="form1">
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">关闭站点</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" name="status" id="status-1" {if $settings['status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="status-1">
+					 是
+				</label>
+				<input type="radio" name="status" id="status-0" {if $settings['status'] == 0} checked="checked" {/if} value="0" /> 
+				<label class="radio-inline" for="status-0">
+					否
+				</label>
+			</div>
+		</div>
+		<div class="form-group reason" {if $settings['status'] == 0} style="display:none;" {/if}>
+			<label class="col-sm-2 control-label" style="text-align:left;">关闭原因</label>
+			<div class="col-sm-8">
+				<textarea style="height:150px;" class="form-control" cols="70" name="reason" autocomplete="off">{$settings['reason']}</textarea>
+				<input type="hidden" name="reasons" value="{$settings['reason']}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">备案号</label>
+			<div class="col-sm-8">
+				<input type="text" name="icp" class="form-control" value="{$settings['icp']}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">是否开启手机登录</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" name="mobile_status" id="mobile_status_status-1" {if $settings['mobile_status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="mobile_status_status-1">
+					是
+				</label>
+				<input type="radio" name="mobile_status" id="mobile_status_status-0" {if $settings['mobile_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="mobile_status_status-0">
+					否
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">默认登录方式</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" name="login_type" id = "login_type_status-0" {if $settings['login_type'] == 0 || $settings['mobile_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="login_type_status-0">
+					账号密码登录
+				</label>
+				<input type="radio" name="login_type" id = "login_type_status-1" {if $settings['login_type'] == 1} checked="checked" {/if} {if $settings['mobile_status'] == 0} disabled {/if}value="1" />
+				<label class="radio-inline" for="login_type_status-1">
+					手机登录
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">强制绑定信息</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" id="bind_status-0" name="bind" value="" {if empty($settings['bind'])}checked{/if}/>
+				<label class="radio-inline" for="bind_status-0">
+					无
+				</label>
+				<input type="radio" id="bind_status-1" name="bind" value="qq" {if $settings['bind'] == 'qq'}checked{/if}/>
+				<label class="radio-inline" for="bind_status-1">
+					qq
+				</label>
+				<input type="radio" id="bind_status-2" name="bind" value="wechat" {if $settings['bind'] == 'wechat'}checked{/if}/>
+				<label class="radio-inline" for="bind_status-2">
+					微信
+				</label>
+				<input type="radio" id="bind_status-3" name="bind" value="mobile" {if $settings['bind'] == 'mobile'}checked{/if}/>
+				<label class="radio-inline" for="bind_status-3">
+					手机号
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">第三方登录绑定</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" name="oauth_bind" id="oauth_bind-1" value="1" {if $settings['oauth_bind'] == 1}checked{/if} />
+				<label class="radio-inline" for="oauth_bind-1">
+					是
+				</label>
+				<input type="radio" name="oauth_bind" id="oauth_bind-0" value="0"  {if $settings['oauth_bind'] == 0}checked{/if}/>
+				<label class="radio-inline" for="oauth_bind-0">
+					否
+				</label>
+				<div class="help-block">用户使用微信或者ＱＱ等第三方登录后，是否强制用户注册绑定信息</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">用户首页设置</label>
+			<div class="col-sm-8">
+				<select name="welcome_link" class="form-control">
+					<option value="{WELCOME_DISPLAY_TYPE}" {if $settings['welcome_link']==WELCOME_DISPLAY_TYPE}selected{/if}>用户欢迎页</option>
+					<option value="{PLATFORM_DISPLAY_TYPE}" {if $settings['welcome_link']==PLATFORM_DISPLAY_TYPE}selected{/if}>平台</option>
+				</select>
+				<div class="help-block">统一设置用户登录后跳转的页面，用户也可以自行设置，以用户设置的为准</div>
+			</div>
+		</div>
+
+		<h5 class="page-header">调试开关</h5>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">是否开启调试模式</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" id="develop_status-1" name="develop_status" {if $settings['develop_status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="develop_status-1">
+					是
+				</label>
+				<input type="radio" id="develop_status-0" name="develop_status" {if $settings['develop_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="develop_status-0">
+					否
+				</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" style="text-align:left;">是否开启日志</label>
+			<div class="col-sm-8 form-control-static">
+				<input type="radio" id="log_status-1" name="log_status" {if $settings['log_status'] == 1} checked="checked" {/if} value="1" />
+				<label class="radio-inline" for="log_status-1">
+					是
+				</label>
+				<input type="radio" id="log_status-0" name="log_status" {if $settings['log_status'] == 0} checked="checked" {/if} value="0" />
+				<label class="radio-inline" for="log_status-0">
+					否
+				</label>
+			</div>
+		</div>
+		
+		
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-1 col-xs-12 col-sm-10 col-md-10 col-lg-11">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</form>
+	<script type="text/javascript">
+			$("#form1").submit(function() {
+				if ($("input[name='status']:checked").val() == 1) {
+					if ($("textarea[name='reason']").val() == '') {
+						util.message('请填写站点关闭原因');
+						return false;
+					}
+				}
+			});
+			$("input[name='status']").click(function() {
+				if ($(this).val() == 1) {
+					$(".reason").show();
+					var reason = $("input[name='reasons']").val();
+					$("textarea[name='reason']").text(reason);
+				} else {
+					$(".reason").hide();
+				}
+			});
+			$("input[name='mobile_status']").click(function() {
+				if ($(this).val() == 0) {
+					$("#login_type_status-1").attr("checked", false);
+					$("#login_type_status-0").prop("checked", true);
+					$("#login_type_status-1").attr("disabled", true);
+				} else {
+					$("#login_type_status-1").attr("disabled", false);
+				}
+			});
+	</script>
+</div>
+{template 'common/footer'}

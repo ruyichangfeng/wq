@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>会员中心</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link href='../addons/hy_supstore/template/mobile/menidan.css' rel='stylesheet' type='text/css'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='../addons/hy_supstore/template/mobile/style_nd.css' rel='stylesheet' type='text/css'>
+    <style>
+    .right_box {
+        line-height: 1.5rem;
+    }
+
+    .wesjds {
+        font-size: 1.5em;
+    }
+    </style>
+    <script type="text/javascript" src="{$_W['siteroot']}app/resource/js/app/util.js"></script>
+    <script src="{$_W['siteroot']}app/resource/js/require.js"></script>
+    <script>
+    function getdistance(id, lat, lng) {
+        var url = "{php   echo $this->createMobileUrl('distance')}";
+
+        $.get(url, { lat: lat, lng: lng },
+            function(data) {
+            });
+    }
+
+    function createcode($id, $ermurl) {
+        require(['jquery.qrcode'], function() {
+            $('#erm' + $id).html('').qrcode({
+                render: 'canvas',
+                width: 50,
+                height: 50,
+                text: $ermurl
+            });
+        })
+    }
+    </script>
+</head>
+
+<body>
+    <div id="contentbox">
+        <div class="header">
+            <div class="md_top_box">
+                <div class="cz1">
+                    <p>我的门店</p>
+                </div>
+                <div class="cz">
+                    <p>共计{$storecounts}家门店</p>
+                </div>
+            </div>
+        </div>
+        {loop $list $v}
+        <div class="amfng_box">
+            <div class="zx_cjbifj">
+                <div class="margin">
+                    <img src="{php echo tomedia($v['thumb'])}" class="img_ritu">
+                    <div class="right_box">
+                        <p class="wesjds">
+                            <span class="wenzi">{if $v["thumb"]}{/if}</span> {$v['title']}
+                        </p>
+                        <p class="kuangzi_box">会员数：{$v['usercount']}个</p>
+                        <p>电话：{$v['mobile']}</p>
+                        <p>地址：{$v['address']}</p>
+                        {if $v['lng']>0&&$v['lat']>0}
+                        <script>
+                        getdistance("{$v['id']}", "{$v['lat']}", "{$v['lng']}");
+                        </script>
+                        <p id="distance{$v['id']}" style="margin-bottom: 5px;"></p>
+                        {/if}
+                    </div>
+                </div>
+                <div class="xuain_box">
+                    <ul>
+                        <li>
+                            <p>充值总额：{$v['rechargeamount']}元</p>
+                            <p>消费总额：{$v['amount']}元</p>
+                        </li>
+                        <li>
+                            <p>实际充值金额：{$v['creditamount2']}元</p>
+                            <p>赠送金额：{$v['creditamount1']}元</p>
+                        </li>
+                        <li>
+                            <p>赠送积分：{$v['creditamount3']}个</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ttou">
+                    {loop $v['user'] $user}
+                    <div class="fkgigje ">
+                        <img src="{if !empty($user['avatar'])}{$user['avatar']}{else}resource/images/noavatar_middle.gif{/if}">
+                        <div class="mingzi">{$user['name']}</div>
+                        <!--<div class="img_fjgit" id="erm{$v['id']}">
+                          <script>createcode("{$v['id']}","{$v['ermurl']}");</script>
+                       </div>-->
+                    </div>
+                    {/loop}
+                </div>
+            </div>
+        </div>
+        {/loop}
+    </div>
+    <!--底部导航-->
+    {template 'adminfooter'}
+</body>
+
+</html>

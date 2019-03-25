@@ -1,0 +1,99 @@
+{template 'common/header-base'}  
+{template 'common_header'}     
+<div class="main">
+	<div class="panel panel-info"> 
+				<div class="panel-body">
+					<form action="./index.php" method="get" class="form-inline" role="form">
+						<input type="hidden" name="c" value="site" />
+						<input type="hidden" name="a" value="entry" />
+						<input type="hidden" name="m" value="numa_vote" />
+						<input type="hidden" name="do" value="sponsor" /> 
+						<input type="hidden" name="op" value="choice" /> 
+						<input type="hidden" name="single" value="{$single}" /> 
+						<div class="form-group">
+								 <div class="col-xs-12 col-sm-12 col-lg-12">
+											<select name="opt_type" class='form-control'>
+														<option value="">请选择</option>
+														<option value="name" {if $_GPC['opt_type']=='name'}selected{/if} >赞助商名称</option> 
+											</select>  
+											<input class="form-control" name="keywords" id="" type="text" value="{$_GPC['keywords']}">
+									</div>
+						</div> 
+						<div class="form-group">  
+							<div class="col-xs-12 col-sm-2 col-lg-2">
+								<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+							</div> 
+						</div>  
+					</form>
+				</div>
+       </div>
+       <div class="panel panel-default">
+				<div class="panel-body table-responsive">
+					<table class="table table-hover">
+						<thead class="navbar-inner">
+							<tr class="text-c">
+								  {if  $single!=1} 
+										<th style="width:5%;"><label><input type="checkbox" class="J_check_all" data-direction="x" data-checklist="J_check_x"></label>
+								 {else}
+								 	<th style="width:5%;"></th>
+								 {/if}
+								<th style="width:5%;">ID</th>
+								<th style="">赞助商名称</th>  
+								<th style="width:5%">图标</th> 
+								<th style="width:15%">联系人</th> 
+								<th style="width:13%">电话</th> 
+								<th style="width:8%;">状态</th> 
+								<th style="width:18%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $data_list $item}
+							<tr class="text-c">
+							    <td>
+								   {if  $single==1} 
+											<input type="radio" class="J_check wxmsg" data-yid="J_check_y" data-xid="J_check_x" name="id[]" value="{$item['id']}" title="{$item['name']}">
+							       {else}
+											<input type="checkbox" class="J_check wxmsg" data-yid="J_check_y" data-xid="J_check_x" name="id[]" value="{$item['id']}" title="{$item['name']}">
+							       {/if}
+							     </td>
+								<td>{$item['id']}</td>
+								<td>{$item['name']}</td> 
+								<td><img src="{php echo tomedia($item['logo']);}" class="preview" width='50px' height="30" style='padding:1px;border: 1px solid #ccc;float:left;' /></td>
+							 	<td>{$item['contact']}</td> 
+							 	<td>{$item['mobile']}</td> 
+							 	<td>{if $item['status']==1}<label class="label label-success radius">开启</label>{else}<label class="label label-warning radius">禁用</label>{/if}</td>
+								<td style="text-align:center;">
+												<a href="{php echo $this->createWebUrl('sponsor', array('id' => $item['id'], 'op' => 'post'))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;
+											    <a href="{php echo $this->createWebUrl('sponsor', array('id' => $item['id'], 'op' => 'delete'))}" onclick="return confirm('删除后不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>&nbsp;
+									  </td>
+							</tr>
+							{/loop}
+						</tbody>
+					</table>
+					{$pager}
+			 </div>
+	</div>
+</div>  
+ <div style="text-align: center; position: fixed; bottom: 0px; background: #F0F0F0; left: 0; right: 0; border-top: 1px solid #C4C4C4; height: 40px; line-height: 40px; "><button class="btn btn-primary" onclick="saveMsg()">确定</button></div>
+ <script type="text/javascript">  
+	    var flag = "{$single}";
+	    $(function(){
+	    	   $(".J_check_all").click(function(){ 
+	    		       $(".J_check").prop("checked",$(this).prop("checked"));
+	    	   })
+	    })
+		function saveMsg(){ 
+		   num = 0;
+		   var tem = "";
+		   $(".wxmsg").each(function() { 
+				var val = $(this).val();  
+				if(!!$(this).prop("checked")){
+					num++;
+					tem += $(this).val()+":"+$(this).attr('title')+"|"; 
+				} 
+			});
+			if(tem!='') tem = tem.slice(0,-1); 
+			var index = parent.layer.getFrameIndex(window.name); 
+	    	  parent.add_msgs(tem,num,flag,index);  
+		 } 
+	</script>

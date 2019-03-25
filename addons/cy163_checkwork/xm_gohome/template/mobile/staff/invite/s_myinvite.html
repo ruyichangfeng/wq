@@ -1,0 +1,171 @@
+
+{template 'staff/header'}
+
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+    
+    <ul class="ub-f1 uinn8 c-wh" id="show">
+    	<div>
+        	<ul style="padding:60px 30px 50px 30px">
+            	<li style="text-align:center">
+                	<div class="wks ub-img1"></div>
+                </li>
+                <li class="t-gra" style="text-align:center; margin-top:30px">数据加载中...</li>
+            </ul>
+        </div>
+    </ul>
+    
+    <div id="more" style="display:none;">
+    	<div class="ub ub-pc uc-a1 ub-f1 btnn" onClick="getMore()" style="margin-bottom:0.5em; height:2em; line-height:2em;" type="submit"><span class="ulev0 t-wh tx-c">点击加载更多</span>
+        </div>
+    </div>
+    
+    <div class="" style="height:3.125rem"></div>
+    <div id="footer" class="fix0 c-foot" style="width:100%; bottom:0; z-index:999">
+        <div class="ub">
+            <a href ="{php echo $this->createMobileUrl('invite', array('foo'=>'myinvite'))}" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-nan ulev1"></i> 
+                    <span class="block ulev-1" style="">我邀请的伙伴</span>
+                </div>
+            </a>
+            <a href ="{php echo $this->createMobileUrl('Validate', array())}" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-shouye ulev1"></i> 
+                    <span class="block ulev-1" style="">首页</span>
+                </div>
+            </a>
+            <a href ="{php echo $this->createMobileUrl('invite', array('foo'=>'myattend'))}" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-nan ulev1"></i> 
+                    <span class="block ulev-1" style="">我加入的伙伴</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+</div>
+
+
+{template 'public/footerjs'}
+<script type="text/javascript" src="{MODULE_URL}template/mobile/js/baidutmp.js"></script>
+
+
+<script id='near' type="text/template">
+    <!-- 模板部分 -->
+        <%if(json != 0){%>
+            <%for(var i=0;i<json.length;i++){%>
+                <div class="uba b-bla01 uc-a15 ub ub-ac umar-b" style="padding:0.2rem 0">
+					<div class="uinn ub ub-ver ub-ac ub-pc tx-c">
+						<div class="uc-a100 c-blu uinn ub ub-ac ub-pc tx-c" style="height:2.5rem; width:2.5rem;" >
+							<img src="<%=json[i].avatar%>" style="width:1.5rem"> 
+						</div>
+						<div class="ulev-2 t-gre1 umar-t"><%=json[i].staff_name%></div>
+					</div>
+					<div class="ub-f1 ub ub-ver ubl ubr b-bla01" style=" padding:0.3rem 0.5rem">
+						<div class="ub ub-ac">
+							<div class="ulev-4 t-sbla">邀请码</div>
+							<div class="ub-f1 tx-r ulev-1 t-gre1"></div>
+							<div class="t-gre1"><span class=" ulev1"><%=json[i].invite%></span></div>
+						</div>
+						<div class="ubt ubb b-bla01" style="margin:0.3rem 0; padding:0.3rem 0">
+							<div class="ulev-4 t-sbla">服务项目:<%=json[i].pro%></div>
+						</div>
+						
+					</div>
+					<div onclick="jiechu(<%=json[i].id%>)" class="ub ub-ver ub-ac ub-pc uinn8 ">
+						<i class="iconfont icon-ayiluru ulev2 t-gre1"></i>
+						<div class="ulev-4 t-gre1 umar-t">解除关系</div>
+					</div>
+					<div class="absolute uinn3 ulev-2 c-org t-wh uc-b15 uc-bl1 uc-br1" style="right:0.4rem; top:0;"></div>
+				</div>
+            <%}%>    
+        <%}else{%>
+            <li class="ubb b-bla01 uinn5 ub ub-ac tx-c">暂无数据</li>
+        <%}%>    
+    <!-- 模板结束 -->
+    </script>
+    
+<script type="text/javascript">
+$(document).ready(function(){  
+	getInit();
+});  
+
+var forumPage = 1;
+function getInit(){
+	forumPage = 1;
+    
+	var data = {};
+    data['forumPage'] = forumPage;
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('invite', array('foo'=>'getmyinvite'));}",
+		type:"POST",
+		data: data,
+		dataType:"json",
+		success: function(res){
+			//alert(res);
+			if(res == "0"){
+				document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_warn weui_icon_msg"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无伙伴</h2></div></div>';
+			}else{
+				var json = eval(res);
+                var near = baidu.template("near",{json:json});
+                document.getElementById('show').innerHTML = near; 
+				if(json.length == 10){
+					document.getElementById('more').style.display = "block";  
+				}
+			}
+		}
+	});
+}
+
+function getMore(){
+	forumPage = forumPage + 1;
+    
+	var data = {};
+	data['forumPage'] = forumPage;
+    $.ajax({
+		url: "{php echo $this->createMobileUrl('invite', array('foo'=>'getmyinvite'));}",
+		type:"POST",
+		data: data,
+		dataType:"json",
+		success: function(res){
+			if(res == "0"){
+				document.getElementById('more').innerHTML = '已无数据';
+			}else{
+				var json = eval(res);
+				var near = baidu.template("near",{json:json});
+                $("#show").append(near); 
+				if(json.length<10){
+					document.getElementById('more').innerHTML = "<div class='tx-c'>已无数据</div>";  
+				}else{
+					document.getElementById('more').style.display = "block";  
+				}
+			}
+		}
+	});
+}
+
+function jiechu(id){
+	if(window.confirm('你确定要解除伙伴关系吗？')){
+		$.ajax({
+			url: "{php echo $this->createMobileUrl('invite', array('foo'=>'jiechuok'));}",
+			type:"POST",
+			data: {"id":id},
+			dataType:"json",
+			success: function(res){
+				if(res == 1){
+					getInit();
+				}else{
+					alert('解除伙伴关系失败!');
+				}
+			}
+		});
+    }else{
+		return false;
+    }
+}
+</script>
+
+</body>
+</html>

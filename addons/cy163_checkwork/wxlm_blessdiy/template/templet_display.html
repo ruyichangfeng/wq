@@ -1,0 +1,111 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('templet', array('op'=>'display'));}">模板信息</a></li>
+    <li><a href="{php echo $this->createWebUrl('templet', array('op'=>'create'));}">添加模板</a></li>
+</ul>
+
+<div class="main">
+    <div class="panel panel-primary">
+            <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3  col-lg-2 control-label">模板标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control" name="search[templet_title]" value="{$data['search']['templet_title']}" placeholder="可模糊查询"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">模版管理</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:10%;">序号</th>
+                                <th style="width:20%;">模板标题</th>
+                                <th style="width:20%;">更新时间</th>
+                                <th style="width:20%;">开启状态</th>
+                                <th style="width:30%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {php echo $i}
+								</td>
+                                <td>
+                                    {$item['templet_title']}
+								</td>
+
+                                <td>
+                                    {$item['templet_time_update']} 
+								</td>
+								 <td>
+                                    {$item['templet_state']}
+								</td>
+								<td>
+									{if $item['templet_uniacid']!=0}
+                                    <a href="{php echo $this->createWebUrl('templet', array('op'=>'create','templet_id'=>$item['templet_id']));}" class="btn btn-primary">编辑模板</a>
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('templet', array('op'=>'delete', 'templet_id'=>$item['templet_id']));}" class="btn btn-danger">删除模板</a>
+									{else}
+									<a href="{php echo $this->createWebUrl('templet', array('op'=>'create','templet_id'=>$item['templet_id']));}" class="btn btn-primary">编辑模板</a>
+									<a  href="javascript:;" class="btn btn-danger" disabled>删除模板</a>
+									{/if}
+								</td>
+								<td></td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="11">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="10">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#templet_state_0").attr("checked",'checked')
+}
+</script>
+
+{template 'common/footer'}

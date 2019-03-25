@@ -1,0 +1,146 @@
+
+{template 'public/header'}  
+<script itemClass="text/javascript" src="{ZSK_STATIC}js/drag.js"></script>
+<script itemClass="text/javascript" src="{ZSK_STATIC}js/md5.js"></script>
+<link rel="stylesheet" itemClass="text/css" href="{ZSK_STATIC}css/item.css">
+<script type="text/javascript" src="{ZSK_STATIC}js/jquery.qrcode.min.js"></script>
+ <style type="text/css">
+ 	.mmmtab td{
+ 		padding: 10px 10px;
+ 	}
+ 	.layui-form-switch{width: 54px;height: 26px;line-height: 26px}
+ 	.maill{text-align: right !important;width: 30%;vertical-align: middle !important;}
+ 	.mailr{text-align: left !important;width: 70%;vertical-align: middle !important;}
+	.notice{display: block;color:orange;} 
+</style>
+ <div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title">
+   
+    
+    <li   class="layui-this">海报二维码</li>
+    <li  >分销设置</li>  
+  </ul>
+  <div class="layui-tab-content"  >
+   
+    <div class="layui-tab-item  layui-show">
+
+    	<div class="phone"  id="phone" style="width: 240px;height: 428px;border: 1px solid #999;display: inline-block;vertical-align: top;background-repeat: no-repeat;background-size: 100%;background-image: url({$_W['attachurl']}{$layout['picture']})">
+    		
+    		<img id="dirA" class="dirA" src="{ZSK_STATIC}images/qr_demo.jpg" style="width: 80px;height: 80px;border: 1px solid #ccc;top:<?php echo floatval($layout['top'])*100;?>%;left:<?php echo floatval($layout['left'])*100;?>%;"/>
+    		 
+    	</div>
+    	
+    	<div style="display: inline-block;width: 400px;border:1px solid #999;vertical-align: top;height: 400px;">
+    		<form class="layui-form" action="<?php echo  routeUrl('agents.saveHaibao');?>"  method="post" id="haigao">
+    		<div class="layui-form-item">
+    			 <div class="layui-form-item">
+	    			 <label class="layui-form-label">二维码背景</label>
+				    <div class="layui-input-block">  
+				    	<input type="radio" name="is_hyaline"  value="1" title="透明" <?php  echo $layout['is_hyaline']=="1"?"checked":"";?>>
+	      				<input type="radio" name="is_hyaline" value="0" title="白色"  <?php  echo $layout['is_hyaline']!="1"?"checked":"";?>> 
+		  		    </div>
+		  		</div>
+		  		 <div class="layui-form-item">
+		  		 	{php echo tpl_form_field_images1('picture','',1);}
+				    <label class="layui-form-label">选择背景图</label>
+				    <div class="layui-input-block"> 
+				    	<input type="hidden" name="picture" value="{$layout['picture']}" >
+			    		<input type="hidden" name="top" id="top" value="{$layout['top']}">
+			    		<input type="hidden" name="left" id="left" value="{$layout['left']}">
+		  				<img src="{$_W['attachurl']}{$layout['picture']}" id="picture" class="item-input-icon" style="width:100px;height:177px;"> 
+						<button type="button" onclick="getIcon()" id="item-sid" class="layui-btn layui-btn-sm layui-btn-primary" value="" >选择</button> 
+						
+						<p style="margin-top: 10px;">建议尺寸：720*1280，大小500k以内</p>
+		  		    </div>
+	  			</div>
+	  			 <div class="layui-form-item">
+	  			 	  <label class="layui-form-label"> </label>
+				    <div class="layui-input-block"> 
+	  			 	<button type="submit"  onclick="saveTemp()" id="item-sid" class="layui-btn  layui-btn-default" value="" >保存</button> 
+	  			 </div>
+	  			 </div>
+			</div>  
+
+    	</form>
+    	</div>
+
+    </div>
+    <div class="layui-tab-item">
+    	<form class="layui-form"  method="post" id="modeForm"  action="<?php echo $this->routeUrl('agents.setSetting');?>">
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">代理审核</label>
+			    <div class="layui-input-block">
+			      <input type="checkbox" form="modeForm" <?php if($set['auto_sign']=='on'){ echo "checked";}?> name="auto_sign"  lay-skin="switch" lay-filter="switchTest" lay-text="自动|手动"> 
+			    </div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">代理等级分配</label>
+			    <div class="layui-input-block">
+			      <input type="checkbox" form="modeForm" <?php if($set['auto_levelup']=='on'){ echo "checked";}?> name="auto_levelup"  lay-skin="switch" lay-filter="switchTest" lay-text="自动|手动"> 
+			    </div>
+			</div>
+
+		  <div class="layui-form-item" style="width: 100%;margin: 20px;auto;text-align: center;">
+		    <div class="layui-input-block" style="margin-left: auto!important;">
+		      <button type="submit" class="layui-btn" lay-submit lay-filter="*"  form="modeForm" >保存</button> 
+		    </div>
+		  </div>
+		</form>
+    </div>
+  </div>
+</div>   
+<script type="text/javascript">
+	 
+	function delPusher(aid){
+		modalDlg("是否删除？",function(){
+			window.location.href='<?php  echo $this->routeUrl("setting.delKefu");?>&id='+aid;
+			 
+		});
+	}
+	 function subNo(){ 
+		modalDlg("是否继续？",function(){
+			$("#noticeForm").submit();
+		});   	 
+	 
+	}
+ 
+	function addRec(){
+		var html='<form  action="<?php echo $this->routeUrl('shop.addpusher');?>&active=email" method="post" id="pusheremail">';
+		html+=$("#mail-dlg").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#pusheremail").submit();
+		});   
+	} 
+	function getIcon(){
+		public_imgclick('picture',1);
+	} 
+	var screenHeight=428;//手机模拟高度
+	var screenWidth=240;//手机模拟宽度，计算百分比时统一使用宽度计算
+	function saveTemp(){
+		var tops=$("#dirA").css("top").split("p") ; 
+		$("#top").val(parseFloat(tops[0]/screenHeight));
+		var lefts=$("#dirA").css("left").split("p") ; 
+		$("#left").val(parseFloat(lefts[0]/screenWidth));
+		$("#haibao").submit();
+	}
+	$(function(){
+		$('.phone #dirA').each(function(index){
+			$(this).myDrag({
+				parent:'.phone',
+				randomPosition:false,
+				direction:'all'
+			});
+		});
+	})
+</script>
+{template 'public/footer'}
+<script type="text/javascript"> 
+layui.use('form', function(){
+  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  form.render("radio");
+  form.on('submit(*)', function(data){
+    
+  });
+}); 
+</script>

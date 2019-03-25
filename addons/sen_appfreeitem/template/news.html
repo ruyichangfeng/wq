@@ -1,0 +1,167 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('report',array('op'=>'display'));}">报告列表</a></li>
+	{if $operation == 'post' && $id}<li class="active"><a href="{php echo $this->createWebUrl('report',array('op'=>'post'));} ">查看报告</a></li>{/if}
+</ul>
+{if $operation == 'display'}
+<div class="clearfix">
+	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="site">
+				<input type="hidden" name="a" value="entry">
+				<input type="hidden" name="do" value="news">
+				<input type="hidden" name="m" value="sen_appfreeitem">
+				<input type="hidden" name="cateid" value="{$_GPC['cateid']}">
+				<input type="hidden" name="createtime" value="{$_GPC['createtime']}">
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">添加时间</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<div class="btn-group">
+							<a href="{php echo filter_url('createtime:0');}" class="btn {if $_GPC['createtime'] == 0}btn-primary{else}btn-default{/if}">不限</a>
+							<a href="{php echo filter_url('createtime:3');}" class="btn {if $_GPC['createtime'] == 3}btn-primary{else}btn-default{/if}">三天内</a>
+							<a href="{php echo filter_url('createtime:7');}" class="btn {if $_GPC['createtime'] == 7}btn-primary{else}btn-default{/if}">一周内</a>
+							<a href="{php echo filter_url('createtime:30');}" class="btn {if $_GPC['createtime'] == 30}btn-primary{else}btn-default{/if}">一月内</a>
+							<a href="{php echo filter_url('createtime:90');}" class="btn {if $_GPC['createtime'] == 90}btn-primary{else}btn-default{/if}">三月内</a>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					
+					<div class="pull-left col-xs-12 col-sm-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<form action="{php echo $this->createWebUrl('news',array('op'=>'batch_post'));}" method="post" class="form-horizontal" role="form">
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th width="300">产品名称</th>
+							<th>申请人</th>
+							<th>申请编号</th>
+							<th>提交时间</th>
+							<th class="text-right">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					{loop $news $new}
+						<input type="hidden" name="ids[]" value="{$new['id']}" />
+						<tr>
+							<td>
+								{$new['title']}
+							</td>
+							<td>
+							<img src="{$new['avatar']}" style="width:40px;height:40px;"/>
+								{$new['nickname']}
+							</td>
+							<td>
+								{$new['ordersn']}
+							</td>
+							<td>{$new['tijiaotime']}</td>
+							<td class="text-right">
+								<a href="{php echo $this->createWebUrl('report', array('op'=>'post','id' => $new['id']));}" class="btn btn-default">查看报告</a>
+								<a href="{php echo $this->createWebUrl('report', array('op'=>'delete','id' => $new['id']));}" onclick="if(!confirm('确定删除吗')) return false;" class="btn btn-default">删除</a>
+							</td>
+						</tr>
+					{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		{$pager}
+	</form>
+</div>
+{elseif $operation == 'post'}
+<div class="clearfix">
+	<form action="{php echo $this->createWebUrl('report',array('op'=>'post'));}" method="post" class="form-horizontal" role="form" id="form1">
+		<input type="hidden" name="id" value="{$new['id']}"/>
+		<div class="panel panel-default">
+			<div class="panel-heading">查看报告</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">产品名称</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<input type="text" class="form-control" readonly="readonly" name="title" value="{$new['title']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">标题</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<input type="text" class="form-control" readonly="readonly" name="title" value="{$new['rtitle']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">申请人</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<input type="text" class="form-control" readonly="readonly" name="title" value="{$new['nickname']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">申请编号</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" readonly="readonly" name="title" value="{$new['ordersn']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">提交时间</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" readonly="readonly" name="title" value="{$new['tijiaotime']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">内容</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<textarea style="height:150px;" class="form-control" name="content" cols="70">{$new['content']}</textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">图片</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						 {loop $item['images'] $i}
+                        <img src="{$i}" style="width:100px;height:100%;">
+                    {/loop}
+						
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">是否显示</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12">
+						<label class="radio-inline"><input type="radio" name="is_display" value="1" {if $new['is_display'] == 1} checked{/if}> 显示</label>
+						<label class="radio-inline"><input type="radio" name="is_display" value="0" {if $new['is_display'] == 0} checked{/if}> 不显示</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-8 col-lg-9 col-xs-12">
+				<a class="btn btn-primary" href="{php echo $this->createWebUrl('report',array('op'=>'display'));}" >返回</a>
+				
+				<input type="submit" class="btn btn-primary" name="submit" value="提交" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</form>
+</div>
+{/if}
+<script>
+	$(function(){
+		$('#form1').submit(function(){
+			
+			if(!$.trim($('textarea[name="content"]').val())) {
+				util.message('请填写报告内容', '', 'error');
+				return false;
+			}
+			return true;
+		});
+	});
+</script>
+{template 'common/footer'}

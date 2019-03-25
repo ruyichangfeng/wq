@@ -1,0 +1,104 @@
+
+{template 'staff/header'}
+
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+    <div class="c-gre3 ub ub-ver ub-ac ub-pc" style=" padding:2rem 0rem 3rem 0rem ">
+    	<div><i class="iconfont icon-ayiluru t-yel" style="font-size:5rem"></i> </div>
+        
+        <div class="umar-t ulev1 t-yel">加入伙伴</div>
+    </div>
+    <div class="ub-f1">
+    	<form class="form-horizontal ub ub-f1 ub-ver" id="form1" action="javascript:;" method="post">
+        <div class="uinn8 umar-t1 tx-c">
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-phone ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="mobile" id="mobile" placeholder="邀请人手机号码" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-phone ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="invite" id="invite" placeholder="邀请码" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+    	</div>
+        <div class="uinn8 ub">
+            <button class="c-gre3 ub ub-pc uc-a1 ub-f1 btnn block" onClick="submit1()" style="margin-bottom:0.5em;padding:0.75rem 3rem" type="submit"><span class="ulev0 t-wh">提交</span></button>
+        </div>
+        </form>
+    </div>    
+</div>
+
+
+{template 'public/footerjs'}
+<script type="text/javascript">
+function submit1(){
+	var mobile = document.getElementById('mobile').value;	
+	if(mobile == ''){
+		alert('请输入邀请人手机号码！');
+		return false;
+	}
+	if (!/^1[34578]{1}[0-9]{9}/.test(mobile)) {
+		alert('请输入正确的手机号码！');
+		return false;
+	}
+	
+	var invite = document.getElementById('invite').value;	
+	if(invite == ''){
+		alert('请输入邀请码！');
+		return false;
+	}			
+			
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('attendok', array());}",
+		type:"POST",
+		data:{"mobile":mobile,"invite":invite},
+		dataType:"json",
+		success: function(res){
+			//alert(res);
+			if(res == "0"){
+				alert('你输入的邀请人手机号码或邀请码错误，加入失败！');
+				return false;
+			}
+			if(res == "1"){
+				alert('加入伙伴成功！');
+				window.location.href = "{php echo $this->createMobileUrl('Validate', array())}"; 
+			}
+			if(res == "2"){
+				alert('加入伙伴失败，请重试！');
+				return false;
+			}
+			if(res == "3"){
+				alert('你已用该邀请码加入成功，不能重复加入！');
+				return false;
+			}
+			if(res == "4"){
+				alert('不可任性，不能自己加入自己！');
+				return false;
+			}
+		}
+	});
+				
+}
+</script>
+
+</body>
+</html>

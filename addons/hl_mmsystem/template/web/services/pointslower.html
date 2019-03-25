@@ -1,0 +1,198 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('pointslower')}"></a></h5>
+                <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="deductPointsCountForm" role="form" >
+                    <input type="hidden" name="c" value="site" />
+                    <input type="hidden" name="a" value="entry" />
+                    <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                    <input type="hidden" name="do" value="pointslower" />
+                    <input type="hidden" name="op" value="savePointsLowerData" />
+                    <input type="hidden" name="storeid" value="{$storeid}" />
+                    <div class="col-sm-12">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <i class="fa fa-user-circle" aria-hidden="true"></i> 积分扣除
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">扣除</label>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <input type="text" name="deductPointsCount" id="deductPointsCount" class="form-control"  style="font-size: xx-large; color: #e10c14 !important;height: 60px;" />
+                                                <span class="input-group-addon">积分</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <button type="button" class="btn btn-outline btn-info" id="span_showGivePoint" style="font-size: large; font-weight: bold">会员消费：1元={php echo $setStoreData['set_pointsAsMoney']}积分</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="txt_PayNote" class="col-sm-2 control-label">备注</label>
+                                        <div class="col-xs-6">
+                                            <textarea id="txt_PayNote" name="txt_PayNote" class="form-control" ></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-3 control-label"></label>
+                                <div class="col-sm-9">
+                                    <button type="button"  onclick="btn_showReadCard()" class="btn btn-warning btn-lg"><i class="fa fa-spin fa-spinner"></i>&nbsp;读卡</button>
+                                    <button  class="btn btn-lg btn-danger " type="button" name="submitdeductPointsCount" id="submitdeductPointsCount" ><i class="fa fa-database" aria-hidden="true"></i>&nbsp;扣&nbsp;除&nbsp;</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                    <button name="referer_submitdeductconsume"  onclick="btn_clearMemberInfo()"  id="referer_submitdeductconsume" type="button" class="btn btn-lg btn-info"><i class="fa fa-refresh" aria-hidden="true"></i> 清空</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 会员信息 --start--->
+                        {template 'web/common/panel-member-card-info'}
+                        <!-- 会员信息 --end--->
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        btn_showReadCard();
+        $("#realMoneyCount").focus();
+        $("#deductPointsCount").attr("disabled",true);
+        $("#submitdeductPointsCount").attr("disabled",true);
+        $("#referer_submitdeductconsume").attr("disabled",true);
+        $("#span_showGivePoint").hide();
+        $("#deductPointsCountForm").validate({
+            rules: {
+                deductPointsCount: {
+                    required: true,
+                    number:true,
+                    min:0.01
+                }
+            },
+            messages: {
+                deductPointsCount: {
+                    required: "请输入扣除积分数量",
+                    number: "必须输入大于0的积分数量",
+                    min: $.validator.format( "请输入大于0.01的积分数量" )
+                }
+            }
+        });
+    });
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert(data['message']['code']);
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+
+                        } else {
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+                            swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                            $("#deductPointsCount").attr("disabled",false);
+                            $("#submitdeductPointsCount").attr("disabled",false);
+                            $("#referer_submitdeductconsume").attr("disabled",false);
+                            //$("#deductPointsCount").focus();
+                        }
+                    }
+
+                });
+            });
+
+    }
+    $("#deductPointsCount").on('keyup', function (){
+        $("#span_showGivePoint").show();
+        var pointsNum = parseFloat($("#deductPointsCount").val());
+        var memberId = parseInt($("#memberId").val());
+        var memberPointsCount = parseFloat($("#memberPointsCount").val());
+        if(memberId > 0){
+            if(pointsNum > memberPointsCount){
+                swal("扣除积分超额！", "当前会员卡的积分数额不足以支持扣除数额。","error");
+            }
+        }
+    });
+    //清空会员信息
+    function btn_clearMemberInfo() {
+        $("#memberId").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#memberNote").attr("value","");
+        $("#deductPointsCount").val("");
+        $("#deductPointsCount").attr("disabled",true);
+        $("#submitdeductPointsCount").attr("disabled",true);
+        $("#referer_submitdeductconsume").attr("disabled",false);
+    }
+
+
+    $('#submitdeductPointsCount').click(function() {
+        $("#submitdeductPointsCount").attr('type','submit');
+        $("#submitdeductPointsCount").click(function () {
+            $("#submitdeductPointsCount").attr('disabled',true);
+        });
+    });
+
+</script>
+{template 'web/common/footer'}

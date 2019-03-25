@@ -1,0 +1,177 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}js/util.js"></script>
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+	.sortab td{vertical-align: middle !important;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >账号管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('account.shopmanagement');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" placeholder="请输入用户名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			        <a class="btn btn-default" style="display: inline-block;"  onclick="adduser()">添加账号</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 16%;">员工账号</th> 
+					<th style="width: 16%;">姓名</th> 
+					<th style="width: 16%;">手机号</th>
+					<th style="width: 16%;">创建时间</th> 
+					<!-- <th style="width: 120px;">权限</th>    -->
+					<th style="width: 16%;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $memberlist $index $item}
+				<tr> 
+					 
+					<td>{$item['username']}</td> 
+					<td>{$item['name']}</td>
+					<td>{$item['mobile']}</td>  
+					<td><?php echo date("Y-m-d",$item['createtime']);?></td>
+					<td>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="editShop({$item['uid']})">编辑</a> 
+						<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="remove0({$item['uid']})">删除</a> 
+					</td>
+				</tr>
+				 
+				{/loop}
+				<tr>
+					<td colspan="8">
+					{template 'public/pagenation'}	
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<!-- 模态框（Modal） -->
+<script id="contentr" type="text/html">
+	<form class="layui-form" id="formid" action="<?php echo $this->routeUrl('account.shopaddmanagement');?>" method="post">
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">用户名</label>
+	    <div class="layui-input-block">
+	    	<input type="hidden" name="id">
+	      <input type="text" name="username" required id="username"  lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+	       <span id="helpBlock" style="display: none;color: red" class="help-block helpBlockusername">请输入6位字符以上的用户名</span>
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">姓名</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="name" required id="truename"  lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+	      <span id="helpBlock" style="display: none;color: red" class="help-block helpBlockname">请输入姓名</span>
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">手机号</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="mobile" required id="mobile"  lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+	       <span id="helpBlock" id="" style="display: none;color: red" class="help-block helpBlockmobile">请输入正确手机号</span>
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">密码</label>
+	    <div class="layui-input-block">
+	      <input type="password" name="password" id="inputPassword1" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+	      <span id="helpBlock" style="display: none;color: red" class="help-block helpBlockpassword">两次密码不一致</span>
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">确认密码</label>
+	    <div class="layui-input-block">
+	      <input type="password" name="password" id="inputPassword2" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+  </div>
+	</form>
+</script>
+<script type="text/javascript">
+	function adduser(){
+		layer.open({
+		   title:"添加账号"
+		  ,content: $("#contentr").html()
+		  ,btn: ["确认"]
+		  ,shade: 0
+		  ,area: ['500px', '500px']
+		  ,yes: function(index, layero){
+		  	console.log("---------")
+		  	$(".helpBlockusername").hide();
+		  	$(".helpBlockname").hide();
+		  	$(".helpBlockmobile").hide();
+		  	$(".helpBlockpassword").hide();
+		  	var username= $("#username").val()
+		  	var name = $("#truename").val()
+		  	var mobile = $("#mobile").val()
+		  	var password = $("#inputPassword1").val()
+		  	var password2 = $("#inputPassword2").val()
+		  	if(!username||username.length<6){
+		  		$(".helpBlockusername").css("display","block");
+		  		console.log("-----")
+		  		return false;
+		  	}
+		  	if(!name){
+		  		$(".helpBlockname").show();
+		  		return false;
+		  	}
+		  	if(!mobile||mobile.length!=11){
+		  		$(".helpBlockmobile").show();
+		  		return false;
+		  	}
+		  	if(!password||password!=password2){
+		  		$(".helpBlockpassword").show();
+		  		return false;
+		  	}
+		  	$("#formid").submit();
+		  }
+		});
+	}
+	function editShop(id){ 
+		 layer.open({
+		   title:"添加账号"
+		  ,content: $("#contentr").html()
+		  ,btn: []
+		  ,shade: 0
+		  ,area: ['500px', '400px']
+		  ,yes: function(index, layero){
+
+		  }
+		});
+		 $.ajax({
+		 	url:"<?php echo $this->routeUrl('account.shopfindman');?>",
+		 	dataType:"json",
+		 	type:"post",
+		 	data:"id="+id,
+		 	success:function(res){
+		 		console.log(res)
+		 		$("input[name='id']").val(res.id)
+		 		$("#username").val(res.username)
+			  	$("#truename").val(res.name)
+			  	$("#mobile").val(res.mobile)
+		 	}
+		 })
+	}
+	function remove0(id){
+	modalDlg("<span style='color:#ff4444;'>是否删除当前管理，此操作不可恢复，请谨慎操作?</span>",function(){
+		window.location.href="<?php echo $this->routeUrl('account.shopdeleteman');?>&id="+id; 
+	});
+	}
+	 
+</script> 
+{template 'public/footer'} 

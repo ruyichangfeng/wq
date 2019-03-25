@@ -1,0 +1,110 @@
+{template 'web/common/header-base-index'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板添加</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('smstemplate')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing')}"><i class="fa fa-lg fa-telegram" style="color: #ed8902"></i>短信群发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsbirthdaycare'))}"><i class="fa fa-lg fa-calendar-check-o" style="color: #e10c14"></i>生日关怀</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smstemplate')}"><i class="fa fa-lg fa-ticket" style="color:#0abc89"></i>短信模板</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smstemplate'))}"><i class="fa fa-lg fa-industry" style="color:dodgerblue"></i>短信记录</a></li>
+                                    <!--<li class=""><a href="{php echo $this->createWebUrl('smssign')}"><i class="fa fa-lg fa-magic" style="color:deeppink; display: none;"></i>短信签名</a></li>-->
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsinterface'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信接口</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smspackage'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信套餐</a></li>
+
+                                </ul>
+                                <div class="tab-content">
+                                        <div class="panel-body">
+                                            <form action="" id="smstemplateadd" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                                <input type="hidden" name="id" value="{$item['id']}">
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="stname" class="col-sm-1 control-label">模板名称<span style="color: red;">*</span></label>
+                                                    <div class="col-sm-5">
+                                                        <input type="text" name="stname" class="form-control" value="{$item['st_name']}" id='stname' readonly placeholder="例：订单创建成功通知（自定义）"/>
+                                                        <input type="hidden" value="{$item['id']}" name="smsinterfaceid">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sttemplateCode" class="col-sm-1 control-label">模板Code<span style="color: red;">*</span></label>
+                                                    <div class="col-sm-5">
+                                                        <input type="text" name="sttemplateCode" class="form-control" value="{$item['st_templateCode']}" id='sttemplateCode' placeholder="请输入模板Code"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sttemplateCode" class="col-sm-1 control-label">模板Code标识<span style="color: red;">*</span></label>
+                                                    <div class="col-sm-5">
+                                                        <input type="text" name="sttemplateCodeType" class="form-control" readonly  value="{$item['st_templateCodeType']}" id='sttemplateCodeType'/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sttemplateContent" class="col-sm-1 control-label">模板内容<span style="color: red;">*</span></label>
+                                                    <div class="col-sm-5">
+                                                        <textarea  name="sttemplateContent" class="form-control" readonly  id='sttemplateContent' placeholder="请输入模板内容"/>{$item['st_templateContent']}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">模板状态</label>
+                                                    <div class="col-sm-5">
+                                                        <div class="radio radio-info radio-inline">
+                                                            <input type="radio" name="templateStatus" id="status1" value="1" {if $item['st_templateStatus']==1 || empty($item['st_templateStatus'])}checked="checked" {/if}>
+                                                            <label for="status1"> 开启 </label>
+                                                        </div>
+                                                        <div class="radio radio-inline radio-danger">
+                                                            <input type="radio" name="status" id="status2" value="2" {if $item['st_templateStatus']==2 }checked="checked" {/if}>
+                                                            <label for="status2"> 关闭 </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-5 control-label"></label>
+                                                    <div class="col-sm-7">
+                                                        <input name="submit" type="submit" value="保存" class="btn btn-primary" style="width:100px;"/>
+                                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    $("#smstemplateadd").validate({
+        rules: {
+            stname: {
+                required: true,
+            },
+            sttemplateCode: {
+                required: true,
+            },
+        },
+        messages: {
+            stname: {
+                required: "请输入模板名称",
+            },
+            sttemplateCode: {
+                required: "请输入模板Code",
+            },
+        }
+    });
+</script>
+
+
+
+{template 'web/common/footer'}

@@ -1,0 +1,398 @@
+{template 'common/header'}
+<style type="text/css">
+
+	table tbody tr{
+		line-height: 30px;
+	}
+	tr td .sub{
+		color: #959595;
+		font-size: 13px;
+		overflow:hidden;
+		white-space:nowrap;
+		text-overflow:ellipsis;
+		width: 100%;
+	}
+	tr td .sub .value,a.value{
+		color: #ce643f;
+		font-size: 13px;
+		overflow:inherit;
+		white-space:initial;
+		text-overflow:inherit;
+		width: 100%;
+	}
+	tr td .sub .value.success{
+		color: #5cb85c;
+	}
+	tr td .sub .value.primary{
+		color: #428bca;
+	}
+	tr td .sub .value.danger{
+		color: #d9534f;
+	}
+	tr td .sub .value.warning{
+		color: #f0ad4e;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+	</ul>
+	<style type="text/css">
+		table thead tr th,table tbody tr td{
+			text-align: left;
+		}
+	</style>
+	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="site">
+				<input type="hidden" name="a" value="entry">
+				<input type="hidden" name="do" value="OrderManage">
+				<input type="hidden" name="m" value="lonaking_new_gift_shop">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">兑换时间</label>
+					<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+						{php echo tpl_form_field_daterange('create_time', array('start' => date('Y-m-d', $start), 'end' => date('Y-m-d', $end),));}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">昵称/openid</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="nickname" value="{$_GPC['nickname']}" placeholder="请输入用户名称或openid，支持模糊查询"/>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">礼品名称</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="gift_name" value="{$_GPC['gift_name']}" placeholder="请输入礼品名称，支持模糊查询"/>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 状态</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="status" value="-2" {if $_GPC['status'] == '-2' || $_GPC['status'] == null}checked="true"{/if}>全部
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="status" value="-1" {if $_GPC['status'] == '-1'}checked="true"{/if}>已拒绝
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="status" value="1" {if $_GPC['status'] == '1'}checked="true"{/if}>已审核
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="status" value="0" {if $_GPC['status'] == '0'}checked="true"{/if}>未审核
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 抽奖</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="raffle" value="-1" {if $_GPC['raffle'] == '-1' || $_GPC['raffle'] == null}checked="true"{/if}>全部
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="raffle" value="1" {if $_GPC['raffle'] == '1'}checked="true"{/if}>抽奖模式
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="raffle" value="0" {if $_GPC['raffle'] == '0'}checked="true"{/if}>正常模式
+						</label>
+					</div>
+				</div>
+				{if $_GPC['raffle'] == 1}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 是否中奖</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="raffle_status" value="-1" {if $_GPC['raffle_status'] == '-1' || $_GPC['raffle_status'] == null}checked="true"{/if}>全部
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="raffle_status" value="1" {if $_GPC['raffle_status'] == '1'}checked="true"{/if}>中奖
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="raffle_status" value="0" {if $_GPC['raffle_status'] == '0'}checked="true"{/if}>未中奖
+						</label>
+					</div>
+				</div>
+				{/if}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 礼品类型</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="type" value="-1" {if $_GPC['type'] == '-1' || $_GPC['type'] == null}checked="true"{/if}>全部
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="type" value="1" {if $_GPC['type'] == '1'}checked="true"{/if}>微信红包
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="type" value="2" {if $_GPC['type'] == '2'}checked="true"{/if}>虚拟卡密(券)
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="type" value="3" {if $_GPC['type'] == '3'}checked="true"{/if}>实物礼品(邮寄)
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="type" value="4" {if $_GPC['type'] == '4'}checked="true"{/if}>自领礼品
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> 每页显示(导出时使用)</label>
+					<div class="col-sm-9">
+						<select class="form-control" name="size">
+							<option value="20" {if $_GPC['size'] == 20}selected{/if}>20</option>
+							<option value="50" {if $_GPC['size'] == 50}selected{/if}>50</option>
+							<option value="100" {if $_GPC['size'] == 100}selected{/if}>100</option>
+							<option value="500" {if $_GPC['size'] == 500}selected{/if}>500</option>
+							<option value="1000" {if $_GPC['size'] == 1000}selected{/if}>1000</option>
+							<option value="10000" {if $_GPC['size'] == 10000}selected{/if}>10000</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">订单编号</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="order_num" value="{$_GPC['order_num']}" placeholder="请输入订单号码"/>
+					</div>
+					<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+						<input type="hidden" name="token" value="{$_W['token']}"/>
+						<input class="btn btn-primary" type="submit" name="export_submit" id="export_submit" value="导出">
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+				<tr>
+					<th width="5%">#</th>
+					<th width="15%">礼品</th>
+					<th width="20%"></th>
+					<th width="20%">实际支付</th>
+					<th width="200px">购买信息</th>
+					<th width="15%">状态</th>
+					<th width="20%">操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{loop $page['data'] $o}
+				<tr class="text-left">
+					<td data-id="{$o['id']}">
+						<p>{$o['id']}</p>
+						<p>{if $o['abnormal'] == 1}<span class="label label-danger">异常</span>{/if}</p>
+
+					</td>
+					<td>
+						<img src="{php echo tomedia($o['gift']['thumbnail'])}" width="100px">
+					</td>
+					<td style="text-align: left;">
+						<p>{$o['gift']['title']}</p>
+						{if $o['raffle'] == 0 || ( $o['raffle'] >=1 && $o['raffle_status'] == 1)}
+						<p class="text-warning sub">类别：
+							<span class="value">
+								{$module_config['gift']['type'][$o['type']]}&nbsp;
+								{if $o['type'] == 1}
+								({$o['hb_amount']}元)
+								{/if}
+								{if $o['type'] == 5}
+								({$o['hf_amount']}元)
+								{/if}
+								{if $o['type'] == 6}
+								({$o['ll_amount']}M)
+								{/if}
+								{if $o['type'] == 7}
+								({$o['raffle_score_amount']}积分)
+								{/if}
+							</span>
+						</p>
+						<p class="sub">模式：
+							<span class="value">
+								{$module_config['gift']['raffle'][$o['raffle']]}
+							</span>
+						</p>
+						{/if}
+						{if $o['type'] == 4}
+						<p class="sub">是否领取：
+							<span class="value">
+								{if $o['zl_status'] == 2}已领取（{php echo date('Y-m-d H:i:s',$o['zl_time'])}）{/if}
+								{if $o['zl_status'] == 1}未领取{/if}
+							</span>
+						</p>
+						{/if}
+
+					</td>
+
+					<td>
+
+
+						{if $o['pay_status'] == 1}
+						<p class="sub">
+							{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}：
+							<span class="value success">{$o['order_score']}{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+						</p>
+
+						<p class="sub">
+							现金
+							<span class="value success">{$o['order_money']}元</span>
+						</p>
+						{if $o['trans_fee'] > 0}
+						<p class="sub">
+							运费{$o['trans_fee']}元：
+							{if $o['trans_fee_status'] == 2}
+							<span class="value success">已支付</span>
+							{else}
+							<span class="value danger">未支付</span>
+							{/if}
+						</p>
+						{/if}
+						{else}
+						<span class="value success">未支付</span>
+						{/if}
+					</td>
+					<td>
+
+						<p class="">
+							{if $o['follow'] == 1}
+							<span class="label label-success">已关注</span>
+							{/if}
+							{if $o['follow'] == 0}
+							<span class="label label-success">未关注</span>
+							{/if}
+						</p>
+						<p class="sub">
+							用户昵称：<span class="value">{$o['nickname']}</span>
+						</p>
+						<p class="sub">
+							下单时间：<span class="value">{php echo date("Y-m-d H:i:s",$o['create_time'])}</span>
+						</p>
+					</td>
+					<td data-option="status">
+						{if $o['raffle'] >= 1}
+							{if $o['raffle_status'] == 0}
+							<p class="status">
+								<span class="label label-danger">{$module_config['order']['raffle_status'][$o['raffle_status']]}</span>
+							</p>
+							{elseif $o['raffle_status'] == 1}
+							<p class="status">
+								<span class="label label-success">{$module_config['order']['raffle_status'][$o['raffle_status']]}</span>
+							</p>
+							{/if}
+						{/if}
+						{if $o['raffle'] == 0 || ($o['raffle'] >= 1 && $o['raffle_status'] == 1)}
+						<p class="status">
+							<span class="label label-success">{$module_config['order']['status'][$o['status']]}</span>
+						</p>
+						{if $o['type'] == 1}
+						<p><span class="label label-danger">{$module_config['order']['hb_status'][$o['hb_status']]}</span></p>
+						{/if}
+						{if $o['type'] == 3}
+						<p><span class="label label-primary">{$module_config['order']['trans_status'][$o['trans_status']]}</span></p>
+						{/if}
+						{if $o['type'] == 4}
+						<p><span class="label label-warning">{$module_config['order']['zl_status'][$o['zl_status']]}</span></p>
+						{/if}
+						{if $o['type'] == 5}
+						<p><span class="label label-primary">{$module_config['order']['hf_status'][$o['hf_status']]}</span></p>
+						{/if}
+						{if $o['type'] == 6}
+						<p><span class="label label-primary">{$module_config['order']['hf_status'][$o['hf_status']]}</span></p>
+						{/if}
+						{/if}
+					</td>
+					<td>
+						<a href="{php echo $resource['urls']['OrderDetail']}&order_num={$o['order_num']}" class="btn btn-danger btn-sm" data-id="{$o['id']}" data-openid="{$o['openid']}" data-order-num="{$o['order_num']}">订单详情</a>
+						<a href="javascript:void(0);" class="btn btn-success btn-sm opt-gift-order" data-id="{$o['id']}" data-url="{$resource['urls']['AccessOrder']}&order_num={$o['order_num']}" {if $o['status'] != 0 ||( $o['raffle'] >=1 && $o['raffle_status'] == 0)}disabled="disabled"{/if}><i class="glyphicon glyphicon-ok"> 通过</i></a>
+						<a href="javascript:void(0);" class="btn btn-danger btn-sm refuse-button" data-id="{$o['id']}" data-order-num="{$o['order_num']}" data-url="{$resource['urls']['RefuseOrder']}&order_num={$o['order_num']}" {if $o['status'] != 0 ||( $o['raffle'] >=1 && $o['raffle_status'] == 0)}disabled="disabled"{/if}><i class="glyphicon glyphicon-remove"> 拒绝</i></a>
+					</td>
+				</tr>
+				{/loop}
+				</tbody>
+			</table>
+		{$page['pager']}
+		</div>
+	</div>
+</div>
+<!-- 拒绝模态框（Modal） -->
+<div class="modal fade" id="refuse-modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true" >×
+				</button>
+				<h4 class="modal-title">
+					拒绝理由
+				</h4>
+			</div>
+			<div class="modal-body">
+				<textarea id="remark-text" class="form-control" name="remark" rows="3" placeholder="请输入拒绝理由"></textarea>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default submit-refuse" data-dismiss="modal">
+					确认拒绝
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+	$(function(){
+		//更改订单状态
+		$(".opt-gift-order").on("click",function(){
+			var btn = $(this);
+			var url = btn.data('url');
+			var orderNum = $(this).data('order-num');
+			var data = {
+				order_num : orderNum
+			};
+			$.post(url,data, function(result){
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					alert(json.message);
+					return false;
+				}else{
+					btn.attr("disabled","disabled");
+					var html = '<span class="label label-success">已审核</span>';
+					btn.parent().siblings("td[data-option='status']").children(".status").html(html);
+				}
+			});
+		});
+		//拒绝订单
+		var refuseBtn;
+		$(".refuse-button").on("click",function(){
+			refuseBtn = $(this);
+			$('#refuse-modal').modal();
+		});
+
+		$(".submit-refuse").on("click", function () {
+			refuseOrder(refuseBtn,$("#remark-text").val());
+		});
+
+		function refuseOrder(btn,remark){
+			var url = btn.data('url');
+			var postData = {
+				remark : remark
+			};
+			$.post(url,postData,function(result){
+				var id = $(this).attr('data-id');
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					alert(json.message);
+					return false;
+				}else{
+					btn.attr("disabled","disabled");
+					var html = '<span class="label label-danger">已拒绝</span>';
+					btn.parent().siblings("td[data-option='status']").children(".status").html(html);
+				}
+			});
+		}
+	});
+</script>
+{template 'common/footer'}

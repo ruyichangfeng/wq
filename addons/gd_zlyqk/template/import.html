@@ -1,0 +1,59 @@
+{template "base/child_header"}
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择标签</label>
+        <div class="layui-input-block" style="width: 150px;">
+            <select name="in[label]" lay-filter="s_label">
+                <option value="0">选择标签</option>
+                {loop $labels $label}
+                <option value="{$label['id']}">{$label['name']}</option>
+                {/loop}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" id="shows" style="display: none">
+        <label class="layui-form-label">选择文件</label>
+        <div class="layui-input-block" id="imgList">
+            <input type="file" lay-type="file" name="file" class="layui-upload-file">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block notice" style="word-break:break-all; width: 300px;">
+        </div>
+    </div>
+</form>
+<script>
+    var label=0;
+    var url= "{php echo $this->createWebUrl('import')}&label=";
+    layui.use(['form','jquery','upload'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+
+        form.on('select(s_label)', function(data){
+            label = data.value;
+            url = url+label;
+            $("#shows").show();
+            layui.upload({
+                elem: '.layui-upload-file',
+                url: url,
+                method: 'post',
+                data:{label:label},
+                title: '请选择csv文件',
+                ext:'csv',
+                success: function (res) {
+                    if(res.code==2){
+                        $(".notice").html(res.msg+":<br>"+res.data);
+                    }else{
+                        $(".notice").html("导入成功:"+res.data+"条数据");
+                    }
+                    layui.layer.msg(res.msg);
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                    return false;
+                }
+            });
+        });
+    });
+</script>
+{template "base/child_footer"}

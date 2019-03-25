@@ -1,0 +1,95 @@
+{template 'public/header'} 
+<style type="text/css">
+	.layui-table td,.layui-table th{word-break: break-all;text-align: center;}
+	.td-name{width: 140px;}.td-ava{width:80px;}.td-code{width: 80px;} .td-group{width: 100px;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >分销商浏览</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo $this->routeUrl('agents.agentlist');?>" method="post" id="keyform">			
+			<div class="col-xs-3 col-sm-3 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" style="width: 100%;" value="<?php echo $params['name'];?>" placeholder="请输入昵称或者推广码">
+			      
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button> 
+
+			      </span>
+			    </div> 
+			  </div>  
+			</form>
+		</div>
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th  >昵称</th>
+					<th  >头像</th>
+					<th >推广码</th>
+					<th >代理等级</th>
+					<th >未结算余额</th>
+					<th >可提现</th>
+					<th  >订单总额</th>
+					<th >状态</th>
+					<th >上次登录</th>
+
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $agents $index $item}
+				<tr>
+					<td class="td-name">{$item['nickname']}</td>
+
+					<td class="td-ava"><img src="{$item['avatar']}" style="width: 50px;height: 50px;"> </td>
+					<td class="td-code">{$item['code']} </td>
+					<td class="td-group"> <?php if(intval($item['groupid'])>0){
+						foreach($groups as $k=>$v){
+							if($v['id']==$item['groupid']){
+								echo $v['name'];break;
+							}
+						}
+
+					 }else { echo "<span style='color:#ccc;'>无</span>";}?></td>
+					<td class="td-free"> {$item['balance_freezing']}</td>
+					<td class="td-bal"> {$item['balance']}</td>
+					<td  class="td-total"> {$item['moneytotal']}</td>
+					<td class="td-sts"> <?php if($item['status']=="1") { ?>
+						<span class="label-green">正常</span>
+						<?php  }else if($item['status']=="-1"){ ?>
+						<span class="label-gray">冻结</span>
+						<?php }else{ ?>
+						<span class="label-orange">待审核</span>
+						<?php } ?></td>
+					<td class="td-last"> {$item['lastlogin']}</td>
+					<td class="td-act">
+						<a href="<?php echo $this->routeUrl('agents.editAgent');?>&agentid={$item['id']}" class="linkbtn" >编辑</a>
+						<a href="javascript:void(0);" onclick="delAgent({$item['id']},'{$item['nickname']}')" class="linkbtn linkbtn-red" >删除</a>
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="10" align="center">
+						{template 'public/pagenation'}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</div>
+
+  
+<script type="text/javascript">
+	function memCart(){
+		modalMsg("功能还在开发中。。。")
+	}
+	function delAgent(id,nickname){
+		
+		modalDlg("是否删除代理 "+nickname+" ，删除后相关代理关系和余额将清空！",function(){
+			window.location.href="<?php echo $this->routeUrl('agents.delAgent');?>&agentid="+id;
+		});
+	}
+	 
+</script>
+{template 'public/footer'}

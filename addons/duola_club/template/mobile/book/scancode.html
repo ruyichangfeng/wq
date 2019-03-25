@@ -1,0 +1,142 @@
+<!--正文导航-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+        .weui-navbar__item span{
+            display: block;
+        }
+        .tt a{display: inline-block;height:20px;padding: 0 0 0 15px;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$data['school']['title']}</title>
+    {php echo register_jssdk();}
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/swipe.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<div class="page">
+    <div class="page__hd" style="padding-bottom: 65px;">
+        <div class="weui-tab">
+            <div class="weui-navbar" style="position: fixed;z-index: 10000">
+                <div class="weui-navbar__item" style="color: #FFF;background-color: #1071b7;">
+                    <a href="#">
+                        <span>我的闲书库</span>
+                        <span>{$data['userAccount']['onSaleAmount']}</span>
+                    </a>
+                </div>
+                <div class="weui-navbar__item" style="color: #FFF;background-color: #1071b7;">
+                    <a href="#">
+                        <span style="display: inline-block">我的闲书币</span>
+                        <span>{$data['balance']}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page__bd" style="margin-top: 20px;padding-bottom: 20px;">
+        <div class="weui-panel" style="text-align: center;background-color: #dd8a37" onclick="scanBarCode()">
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_text">
+                    <h4 class="weui-media-box__title" style="color: #fff">扫码入库</h4>
+                    <p class="weui-media-box__desc" style="color: #333">先扫码入库/后点击上架</p>
+                </div>
+            </div>
+        </div>
+        <div class="weui-panel" style="text-align: center;background-color: #dd8a37" onclick="window.location.href='{php echo $this->createMobileUrl('myunsalebook', array('schoolid' => $data['schoolid'], 'status' => 1,'onSaleAmount' => $userAccount['onSaleAmount'],'balance' => $userAccount['balance']), true)}'">
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_text">
+                    <h4 class="weui-media-box__title" style="color: #fff">闲书上架</h4>
+                    <p class="weui-media-box__desc" style="color: #333">待上架{$data['data']['unSaleCount']}本书</p>
+                </div>
+            </div>
+        </div>
+</div>
+    <div class="js_dialog" id="scan_fail" style="display: none;">
+        <div class="weui-mask"></div>
+        <div class="weui-dialog">
+            <div class="weui-dialog__hd"><strong class="weui-dialog__title">温馨提示</strong></div>
+            <div class="weui-dialog__bd">
+                条码库持续更新中,请后续关注
+            </div>
+            <div class="weui-dialog__ft">
+                <a onclick="window.location.href='{php echo $this->createMobileUrl('myunsalebook', array('schoolid' => $data['schoolid'], 'status' => 1,'onSaleAmount' => $userAccount['onSaleAmount'],'balance' => $userAccount['balance']), true)}'" class="weui-dialog__btn weui-dialog__btn_default" style="color:#353535;">结束</a>
+                <a onclick="scanBarCode();" class="weui-dialog__btn weui-dialog__btn_primary" style="color:#0BB20C;">继续</a>
+            </div>
+        </div>
+    </div>
+<script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+<script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+<script type="text/javascript">
+    WeixinJSHideAllNonBaseMenuItem();
+    /**微信隐藏工具条**/
+    function WeixinJSHideAllNonBaseMenuItem(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+
+                wx.hideAllNonBaseMenuItem();
+            });
+        }
+    }
+    //扫码录入图书信息
+    function scanBarCode(){
+//        if($("#scan_success").css('display') == 'block'){
+//            $("#scan_success").hide();
+//        }
+        wx.scanQRCode({
+
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+
+            success: function (res) {
+
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                var url = "{php echo $this->createMobileUrl('addbook',array('schoolid'=>$data['schoolid']))}"+'&isbn='+result;
+                var subData = {
+                    'isbn' : result
+                };
+                $.post(url,subData,function(data){
+                    if(data.result){
+                        window.location.href = "{php echo $this->createMobileUrl('addbook',array('schoolid'=>$data['schoolid'],'op' => 'showAddBookData'))}"+"&bookId="+data.showData.bookId+"&isbn="+data.showData.isbn;
+                    }else{
+                        if(data.errorCode == 2){
+                            $("#scan_fail").show();
+                        }else{
+                            alert(data.msg);
+                        }
+                    }
+                },'json');
+            }
+        });
+    }
+</script>
+{php include $this->template('comad');}
+{php include $this->template('footer');}
+<!-- <script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script> -->
+<!-- <script>
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height());
+        $.jAlert('attach');
+    });
+</script> -->
+</body>
+</html>

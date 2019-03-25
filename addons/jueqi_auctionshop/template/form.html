@@ -1,0 +1,89 @@
+<script type="text/javascript" src="/addons/jueqi_auctionshop/admin/Public/js/jquery.min.js"></script>
+<script type="text/javascript" src="/addons/jueqi_auctionshop/admin/Public/lib/layui/lay/modules/layer.js"></script>
+{template 'common/header'}
+<link rel="stylesheet" href="/addons/jueqi_auctionshop/admin/Public/lib/layui/css/modules/layer/default/layer.css">
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    
+    <div class="panel panel-success">
+    	<div class="panel-heading">
+    	  如需要配置管理独立域名,请把管理独立域名指向  微擎目录/addons/jueqi_auctionshop/admin <br/>
+    	  并在下方填写相应的管理独立域名如：http://wq.baidu.com <br/>
+    	  如无管理独立域名，请填写 : 当前域名/addons/jueqi_auctionshop/admin<br/>
+    	   管理权限 初始帐号为：admin   初始密码为：123456   危险密码：xh123456<br/>
+    	   特殊权限 初始帐号为：spadmin   初始密码为：654321
+    	</div>
+    </div>
+   <div class="main">
+   	  <div class="panel panel-default">
+        <div class="panel-heading">信息重置 </div>
+        <span style="color: red;">&nbsp;&nbsp;&nbsp;
+        	(重置信息时，访问的必须是当前域名或者当前公众号，否则无法使用)</span>
+        <div class="panel-body" >
+            <input  type="button" value="域名信息重置"    data="域名"  id="mes1"  class="btn btn-danger"  onclick="reset_bt('1');"  />
+            <input  type="button" value="公众号信息重置"  data="公众号"  id="mes2"  class="btn btn-danger"  onclick="reset_bt('2');" />
+        </div>
+      </div>
+    </div>
+    
+     <div class="main">
+       <form action="{php echo $this->createWebUrl('saveYm',array());}" id="add-form" method="post" class="form-horizontal form"  >
+            <div class="panel panel-default">
+                <div class="panel-heading">域名配置</div>
+                <div class="panel-body" >
+                   <div class="form-group" >
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">
+                            <span style='color:red'>*</span>域名</label>
+                        <div class="col-sm-9"  >
+                        	  <input type="text" class="form-control"  name="ym" value="{$dataset['ym']}" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                        <div class="col-sm-4">
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input name="update" type="submit" value="保存信息" class="btn btn-primary span3" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+ <script>
+    	function reset_bt(flag){
+    		var meg = $("#mes"+flag).attr('data');
+    		
+    		if(flag=='1'){
+    			mes = '是否确定重置域名信息,重置后请及时更换相应授权和支付的域名，否则将无法使用？';
+    		}else if(flag == '2'){
+    			mes = '是否确定重置公众号信息,重置后请及时更换公众号相应信息， 否则将无法使用？';
+    		}
+    		
+    		layer.confirm(mes, {
+			  btn: ['确定','取消']
+			}, function(){
+			  
+			var tjing = layer.msg('数据重置中，切勿刷新！', {icon: 16,shade: 0.3,time: 900*1000});
+    		
+    		$.ajax({
+				type: "post",
+				url: '{php echo $this->createWebUrl("resetmes");}',
+			 	data:{'flag':flag},
+			 	dataType: 'text',
+			 	success: function(result){
+			 		layer.close(tjing);
+				    if(result=='1'){
+				       layer.msg(meg+'-重置成功！',{icon: 1,offset: '40%', time: 0,shade: 0.3 ,shadeClose:true}); 
+			 		}else{
+			 		   layer.msg(meg+'-重置失败,清重新尝试！',{icon: 2,offset: '40%', time: 1500,shade: 0.3 });
+			 		}
+			    }
+	         })	
+			  
+			  
+			},function(){});
+    	}
+    </script>

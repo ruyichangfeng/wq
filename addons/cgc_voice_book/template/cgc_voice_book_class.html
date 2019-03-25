@@ -1,0 +1,191 @@
+{template 'common/header'}
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="./resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+<ul class="nav nav-tabs">
+	<li  class="{if $op== 'display'}active{/if}">
+	    <a href="{php echo $this->createWebUrl($filename,array('op'=>'display'));}">分类管理</a>
+	</li>	
+	<li  {if $op== 'post' && empty($id)}class="active"{/if}">
+    	<a href="{php echo $this->createWebUrl($filename,array('op'=>'post'));}">添加分类</a>
+	</li>
+	{if !empty($id)}<li class="active"><a>编辑分类</a></li> {/if}
+</ul>
+
+
+
+{if $op== 'display'}
+<div class="main">
+
+
+<div class="panel panel-info">
+
+  <button  type="button" class="btn btn-default" onclick="delete_all()">删除所有记录</button>
+  <label><strong>全部记录:{$total}</strong></label>
+</div>
+ 
+
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" style="overflow: visible;">
+		<table class="table table-hover">
+		<thead class="navbar-inner">
+	   <tr>
+	    <th style="width:15%;">分类名称</th>	
+		<th style="width:15%;">封面</th>	
+		<th style="width:15%;">价格（元）</th>		
+		<th style="width:15%;">排序</th>				  
+        <th style="width:18%;">创建时间</th>
+        <th style="width:20%;">操作</th>
+		</tr>
+		</thead>
+			<tbody>
+		{loop $list $item}
+		<tr>
+		  <td>{$item['name']}</td> 
+		  <td><img alt="" src='{php echo tomedia($item["cover"]);}' width="100px" ></td>
+		  <td>{$item['price']}</td>  		  
+	      <td>{$item['sort']}</td> 
+         
+		    <td title="{php echo date('Y-m-d H:i:s', $item['createtime'])}">
+				{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>	
+			<td style="white-space: normal; word-break: break-all; overflow: visible;">
+			<div class="btn-group btn-group-sm">
+				<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">入口 <span class="caret"></span></a>
+				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+					<li>
+						<a href="{$item['url']}" target="_blank"><i class="fa fa-external-link fa-fw"></i> 直接访问</a>
+					</li>
+					<li role="presentation">
+						<a href="javascript:;" onclick="displayUrl('{$item['url']}');"><i class="fa fa-link fa-fw"></i> 查看链接</a>
+					</li>
+					<li role="presentation">
+						<a href="javascript:;" onclick="displayQr('{php echo $_W['siteroot'] . 'web/'.substr($this->createWebUrl('qr', array('raw' => base64_encode($item['url']))),2)}');"><i class="fa fa-qrcode fa-fw"></i> 查看二维码</a>
+					</li>
+				</ul>
+			</div>
+				<a  class="btn btn-default" 
+				href="{php echo $this->createWebUrl($filename, array('op' => 'post', 'id' => $item['id']))}">
+				修改</a>	
+		        <a class="btn btn-default" href="{php echo $this->createWebUrl($filename, array('op' => 'delete', 'id' => $item['id']))}"
+			     onclick="return confirm('确认删除信息吗？');return false;">删除</a>
+			</td>				
+			</tr>
+				{/loop}
+			</tbody>		
+		</table>
+		{$pager}
+	</div>
+  </div>
+</div>
+
+<script type="text/javascript">
+require(['bootstrap' ], function($) {
+  $('.btn').hover(function() {$(this).tooltip('show');},
+  function() {$(this).tooltip('hide');});
+});
+
+
+function fwUrl(url){
+  window.location.href=url;		
+}
+
+
+function displayUrl(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<p class="form-control-static" style="word-break:break-all">手机端链接: <br>'+ url + '</p>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>' + '<button type="button" class="btn btn-primary">复制直达链接</button>';
+    var diaobj = u.dialog('查看URL', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.on('shown.bs.modal', function() {u.clip(diaobj.find('.btn-primary')[0], url);});
+  diaobj.modal('show');
+  });
+}
+function displayQr(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<div class="panel panel-default text-center"><img src="' + url + '" alt="二维码" class="img-rounded"></div>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>';
+    var diaobj = u.dialog('查看URL二维码', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.modal('show');
+  });
+}
+
+</script>
+
+{elseif $op == 'post'}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        用户修改
+    </div>
+    <div class="panel-body">
+	<form action="" method="post" class="form-horizontal" role="form" id="form1">
+	
+		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">分类名称</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" id="nickname" class="form-control span7"
+                       placeholder="" name="page_data[name]" value="{$page_data['name']}">
+                       <span class="help-block">
+      
+              </span>
+            </div>  
+            </div>
+            
+        <div class="form-group model0">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">封面</label>
+                  <div class="col-sm-9 col-xs-12">            
+                    {php echo tpl_form_field_image('page_data[cover]',$page_data['cover']);}
+                <div class="help-block">
+                      </div>  
+                </div>
+      </div>
+      
+      <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">价格(元)</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" id="price" class="form-control span7"
+                       placeholder="" name="page_data[price]" value="{$page_data['price']}">
+                       <span class="help-block">
+      
+              </span>
+            </div>  
+            </div>
+      
+      <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" id="nickname" class="form-control span7"
+                       placeholder="" name="page_data[sort]" value="{$page_data['sort']}">
+                      <span class="help-block">
+		      			数字越小，排序越前
+		              </span>
+            </div>  
+            </div>
+
+
+		<div class="form-group">
+				<div class="col-sm-8">
+					<input type="hidden" name="id" value="{$id}" />
+					<input type="submit" name="submit" value="提交" class="btn btn-primary">
+					<input type="hidden" name="token" value="{$_W['token']}" />
+				</div>		
+		</div>
+		
+		</form>
+    </div>
+</div>
+{/if}
+
+<script type="text/javascript">
+
+function delete_all(){
+  if (confirm('确认删除所有信息吗,删除完不可恢复?')){
+	  location.href ="{php echo $this->createWebUrl($filename, array('op' => 'delete_all'))}";	
+  }
+}
+
+
+
+
+
+</script>
+{template 'common/footer'}

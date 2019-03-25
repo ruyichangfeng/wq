@@ -1,0 +1,125 @@
+{template "base/child_header"}
+<script type="text/javascript" src="{MODULE_URL}/static/color/jquery.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/color/jquery.colorpicker.js"></script>
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <input type="hidden" name="id" value="{$recorder['id']}">
+        <label class="layui-form-label">应用</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[name]" style="width: 300px;" value="{$recorder['name']}" required="" lay-verify="required" placeholder="请输入应用名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">流程</label>
+        <div class="layui-input-block" style="width:300px;">
+            <select name="in[flow_id]" >
+                <option value="0" >选择绑定流程</option>
+                {loop $flowList $flow}
+                <option value="{$flow['id']}" {if $flow['id']==$recorder['flow_id']}selected{/if}>{$flow['name']}</option>
+                {/loop}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+    <label class="layui-form-label">封面图</label>
+    <div class="layui-input-block">
+        <input type="hidden" id="cov" name="in[cover]" value="{$recorder['cover']}" >
+        <input type="file" name="file" class="layui-upload-file"> <span style="margin-left: 30px;">建议尺寸(375x140)</span>
+    </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面名称</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="in[name_color]" id="color_1" value="{$recorder['name_color']}">
+            <input type="text" name="in[cover_name]" style="width: 300px;{if $recorder['name_color']}color:{$recorder['name_color']}{/if}" id="cp2_text" value="{$recorder['cover_name']}" required="" lay-verify="required" placeholder="请输入封面名称" autocomplete="off" class="layui-input">
+            <img src="{MODULE_URL}/static/color/colorpicker.png" id="cp2" style="cursor:pointer"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面描述</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="in[desc_color]" id="color_2" value="{$recorder['desc_color']}">
+            <input type="text" name="in[cover_desc]" style="width: 300px;{if $recorder['desc_color']}color:{$recorder['desc_color']}{/if}" id="cp3_text" value="{$recorder['cover_desc']}" required="" lay-verify="required" placeholder="请输入封面描述" autocomplete="off" class="layui-input">
+            <img src="{MODULE_URL}/static/color/colorpicker.png" id="cp3" style="cursor:pointer"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">通知</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="in[notice_color]" id="color_3" value="{$recorder['notice_color']}">
+            <input type="text" name="in[cover_notice]" style="width: 300px;{if $recorder['notice_color']}color:{$recorder['notice_color']}{/if}" id="cp4_text" value="{$recorder['cover_notice']}" required="" lay-verify="required" placeholder="请输入通知" autocomplete="off" class="layui-input">
+            <img src="{MODULE_URL}/static/color/colorpicker.png" id="cp4" style="cursor:pointer"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="in[status]" title="正常" value="1" {if $recorder['status']==1} checked {/if}>
+            <input type="radio" name="in[status]" title="禁用" value="0" {if $recorder['status']==0} checked {/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">默认</label>
+        <div class="layui-input-block">
+            <input type="radio" name="in[is_default]" title="是" value="1" {if $recorder['is_default']==1} checked {/if}>
+            <input type="radio" name="in[is_default]" title="否" value="0" {if $recorder['is_default']==0} checked {/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    $("#cp2").colorpicker({
+        fillcolor:true,
+        success:function(o,color){
+            $("#cp2_text").css("color",color);
+            $("#color_1").val(color);
+        }
+    });
+    $("#cp3").colorpicker({
+        fillcolor:true,
+        success:function(o,color){
+            $("#cp3_text").css("color",color);
+            $("#color_2").val(color);
+        }
+    });
+    $("#cp4").colorpicker({
+        fillcolor:true,
+        success:function(o,color){
+            $("#cp4_text").css("color",color);
+            $("#color_3").val(color);
+        }
+    });
+    layui.use(['form','jquery','upload'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        layui.upload({
+            url: "{php echo $this->createWebUrl('upload')}",
+            method: 'post',
+            ext:'jpg|png|gif',
+            success: function (res) {
+                layui.layer.msg(res.msg);
+                if(res.code==2){
+                    return false;
+                }
+                $("#cov").val(res.url);
+            }
+        });
+        form.on('submit(addAdmin)', function(data){
+            $.post("{php echo $this->createWebUrl($_GPC['do'],array('tb'=>'app'))}&Ajax=",data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+    });
+</script>
+{template "base/child_footer"}

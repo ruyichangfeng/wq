@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>首页--layui后台管理模板</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{MODULE_URL}/static/admin/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_tnyc012u2rlwstt9.css" media="all" />
+    <link rel="stylesheet" href="{MODULE_URL}/static/admin/css/main.css" media="all" />
+</head>
+<body class="childrenBody">
+<form  class="layui-form">
+    <blockquote class="layui-elem-quote ">
+        <div class="layui-inline">
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <select name="scene" class="scene">
+                        <option value="0">选择场景</option>
+                        {loop $beforeList['scene'] $scene}
+                        <option value="{$scene['id']}" {if $_GPC['scene']==$scene['id']} selected {/if}>{$scene['name']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <select name="level" class="level">
+                        <option value="0">选择级别</option>
+                        {loop $beforeList['level'] $level}
+                        <option value="{$level['id']}" {if $_GPC['level']==$level['id']} selected {/if}>{$level['name']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-input-inline" style="margin-top: 15px;margin-left:10px;">
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <input class="layui-input start" name="start"  value="{$_GPC['start']}" placeholder="起始日期" id="LAY_demorange_s">
+                    </div>
+                    <div class="layui-input-inline">
+                        <input class="layui-input end" name="end" value="{$_GPC['end']}" placeholder="结束日期" id="LAY_demorange_e">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn" lay-submit lay-filter="search">查询</a>
+        </div>
+    </blockquote>
+</form>
+<div class="row">
+    <div class=" col">
+        <canvas id="canvas" style="width: 100%;height:500px;"></canvas>
+    </div>
+</div>
+
+<script type="text/javascript" src="{MODULE_URL}/static/admin/layui/layui.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/main.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/chart/Chart.bundle.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/chart/utils.js"></script>
+
+<script>
+
+    layui.use(['form','jquery'], function(){
+        var level,scene,start,end;
+        var setting =new Object();
+
+        var $ = layui.jquery;
+        var form = layui.form();
+
+        form.on('submit(search)', function(data){
+            level=$(".level").val();
+            scene=$(".scene").val();
+            start =$(".start").val();
+            end =$(".end").val();
+            url = "{php echo $this->createWebUrl('list',array('tb'=>'data'))}"+"&level="+level+"&scene="+scene+"&start="+start+"&end="+end;
+            location.href=url;
+            return false;
+        });
+    });
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        var start = {
+            max: '2099-06-16 23:59:59'
+            ,istoday: true
+            ,choose: function(datas){
+                end.min = datas;
+                end.start = datas;
+            }
+        };
+        var end = {
+            max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas;
+            }
+        };
+        document.getElementById('LAY_demorange_s').onclick = function(){
+            start.elem = this;
+            laydate(start);
+        };
+        document.getElementById('LAY_demorange_e').onclick = function(){
+            end.elem = this
+            laydate(end);
+        };
+    });
+
+    var randomScalingFactor = function() {
+        return Math.round(Math.random() * 100);
+    };
+
+    var config_line = {
+        type: 'line',
+        data: {
+            labels: {$beforeList['dateStr']},
+            datasets: [{
+                label: "已发布",
+                fill: false,
+                backgroundColor: window.chartColors.red,
+                borderColor: window.chartColors.red,
+                data: {$beforeList['pix']['1']},
+            },{
+                label: "{$beforeList['flow']['2']}",
+                fill: false,
+                backgroundColor: window.chartColors.purple,
+                borderColor: window.chartColors.purple,
+                data: {$beforeList['pix']['2']},
+            }, {
+                label: "{$beforeList['flow']['3']}",
+                fill: false,
+                backgroundColor: window.chartColors.grey,
+                borderColor: window.chartColors.grey,
+                data: {$beforeList['pix']['3']},
+            }, {
+                label: "{$beforeList['flow']['4']}",
+                fill: false,
+                backgroundColor: window.chartColors.blue,
+                borderColor: window.chartColors.blue,
+                data: {$beforeList['pix']['4']},
+            }, {
+                label: "{$beforeList['flow']['5']}",
+                fill: false,
+                backgroundColor: window.chartColors.orange,
+                borderColor: window.chartColors.orange,
+                data: {$beforeList['pix']['5']},
+            }]
+        },
+        options: {
+            responsive: false,
+            title:{
+                display:true,
+                text:'处理情况  (点击颜色块,显示隐藏曲线)'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: '消息数'
+                    },
+                    ticks: {
+                        min: 0,
+                        max: {$beforeList['config']['max']},
+                        stepSize: {$beforeList['config']['stepSize']}
+                    }
+                }]
+            }
+        }
+    };
+    window.onload = function() {
+        var ctx_line = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx_line, config_line);
+    };
+</script>
+</body>
+</html>

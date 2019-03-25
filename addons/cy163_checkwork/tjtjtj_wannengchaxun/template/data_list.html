@@ -1,0 +1,116 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+      <li {if $_GPC['action'] == 'add'}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('data', array('action' => 'add'));}">添加数据</a>
+      </li>
+      <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('data',array('action'=>''));}">数据列表</a>
+      </li>
+    </ul>
+
+    {if $_GPC['action'] == 'add'}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="update_post_uid" value="{$_GPC['uid']}"/>
+        {loop $paramArr $v}
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{$v['param_intro']}</label>
+            <div class="col-sm-9 col-xs-12">
+                {if $v['param_type'] == 'varchar'}
+                    <input type="text" name="{$v['param_name']}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {elseif $v['param_type'] == 'text'}
+                    <textarea class="form-control" name="{$v['param_name']}">{$v['param_default']}</textarea>
+                {elseif $v['param_type'] == 'int'}
+                    <input type="text" name="{$v['param_name']}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {elseif $v['param_type'] == 'upload_image'}
+                    {php echo tpl_form_field_image($v['param_name'], $v['param_default'])}
+                {else}
+                    <input type="text" name="{$v['param_name']}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {/if}
+            </div>
+        </div>
+        {/loop}
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+                    <i class="fa fa-check-circle"></i> 提交
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+    {if $_GPC['action'] == 'update'}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="update_post_uid" value="{$_GPC['uid']}" />
+        {loop $paramArr $v}
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{$v['param_intro']}</label>
+            <div class="col-sm-9 col-xs-12">
+                {if $v['param_type'] == 'varchar'}
+                    <input type="text" name="{$v['param_name']}" value="{$update_data[$v['param_name']]}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {elseif $v['param_type'] == 'text'}
+                    <textarea class="form-control" name="{$v['param_name']}">{$update_data[$v['param_name']]}</textarea>
+                {elseif $v['param_type'] == 'int'}
+                    <input type="text" name="{$v['param_name']}" value="{$update_data[$v['param_name']]}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {elseif $v['param_type'] == 'upload_image'}
+                    {php echo tpl_form_field_image($v['param_name'], $update_data[$v['param_name']])}
+                {else}
+                    <input type="text" name="{$v['param_name']}" value="{$update_data[$v['param_name']]}" class="form-control" value="{$v['param_default']}" placeholder="" />
+                {/if}
+            </div>
+        </div>
+        {/loop}
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="update_post" value="编辑">
+                    <i class="fa fa-check-circle"></i> 提交
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+    {if $_GPC['action'] ==''}
+    <table class="table table-hover">
+        <thead class="navbar-inner">
+        <tr>
+            <th style="width:60px;" class="row-first">ID</th>
+            {loop $paramArr $v2}
+            <th>{$v2['param_intro']}</th>
+            {/loop}
+            <th style="width:110px;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $dataArr $v}
+        <tr>
+            <td>{$v['uid']}</td>
+            {loop $paramTemp $v2}
+            <td>{$v[$v2]}</td>
+            {/loop}
+            <td>
+                <a href="{php echo $this->createWebUrl('data',array('action'=>'del', 'uid' => $v['uid']));}">删除</a>
+                <a href="{php echo $this->createWebUrl('data',array('action'=>'update', 'uid' => $v['uid']));}">编辑</a>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    {/if}
+
+    <div class="col-xs-12">
+        {php echo $pager}
+    </div>
+</div>
+{template 'common/footer'}

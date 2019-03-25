@@ -1,0 +1,96 @@
+{template 'style5/header'}
+<body class="max-width bg-f5 ">
+<header class="bar bar-nav bg-green">
+    <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+    <h1 class="title txt-fff">我的家政服务</h1>
+</header>
+<div class="content">
+    <div class="list-block media-list repair-list-block repair-my-block mt0" id="data-list">
+
+
+    </div>
+</div>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <ul onclick="window.location.href='{php echo $this->createMobileUrl('homemaking',array('op' => 'add'))}&id={{d.list[i].id}}'">
+        <li>
+            <a href="#" class="item-content" >
+                <div class="item-inner">
+                    <div class="item-title-row">
+                        <div class="item-title">
+                            <span class="repair-lable bg-success">【{{d.list[i].name}}】</span> {{d.list[i].content}}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+        <li class="item-content">
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-subtitle">服务时间：{{d.list[i].servicetime}}</div>
+                    <div class="item-after">
+                        <a class="repair-del fled-del-btn" onclick="delectFun({{d.list[i].id}})">删除</a>
+                        {{# if(d.list[i].status == 0){ }}
+                        <a class="fled-success-btn" onclick="confirmFun({{d.list[i].id}})">确认完成</a>
+                        {{# } }}
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+    {{# } }}
+</script>
+<script>
+    $(document).ready(function() {
+        loaddata("{php echo $this->createMobileUrl('homemaking',array('op'=>'my'))}", $("#data-list"),'xq_list', true);
+    });
+    function confirmFun(id) { //确认成交
+        if (window.confirm('你确定要确认服务完成吗？')) {
+            $.ajax({
+                async: true,
+                url: "{php echo $this->createMobileUrl('homemaking',array('op' => 'finish'))}",
+                dataType: "json",
+                type: "POST",
+                data: {
+                    id: id
+                },
+                success: function() {
+                    window.location.reload();
+                },
+                error: function() {
+                    alert("请求错误！")
+                }
+            })
+        } else {
+            //alert("取消");
+            return false;
+        }
+
+    }
+
+    function delectFun(id) { //删除对象
+        if (window.confirm('你确定要删除对象吗？')) {
+            $.ajax({
+                async: true,
+                url: "{php echo $this->createMobileUrl('homemaking',array('op' => 'delete'))}",
+                dataType: "json",
+                type: "POST",
+                data: {
+                    id: id
+                },
+                success: function() {
+                    window.location.reload();
+                },
+                error: function() {
+                    alert("请求错误！")
+                }
+            })
+
+        } else {
+            //alert("取消");
+            return false;
+        }
+    }
+</script>
+<script>$.config = {autoInit: true}</script>
+{template 'style5/footer'}

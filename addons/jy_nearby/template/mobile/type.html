@@ -1,0 +1,223 @@
+{template 'inc/header'}
+<script type="text/javascript">
+{if $_SESSION['posi']==''}
+$(function(){
+	if({WEIXIN}==1){
+		wx.ready(function() {
+		   wx.getLocation({
+		        type: 'wgs84',// 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		        success: function (res) {
+		            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+		            if(latitude&&longitude){
+			            $.ajax({
+			            	type: 'POST',
+				    		url: "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('getlalo'),2)}"+"&rad="+Math.random(),
+					    	data: {latitude:latitude,longitude:longitude},
+					    	success:function(datas){
+					    		if(datas.statue==1){
+					    			window.location.href="{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl($do,array('pid'=>$id)),2)}";
+					    		}
+					    	},
+					    	error:function(datas){
+
+						    },
+					    	dataType:'json',
+			            })
+			        }
+		    	},
+		    	error: function(res){
+		    	}
+	    });
+
+	 });
+	}
+})
+{/if}
+</script>
+<body>
+	{if $class['thumb']}
+	<a href="{$class['turl']}">
+		<div>
+			<img src="{php echo tomedia($class['thumb']);}" width="100%" style="max-height:200px;" />
+		</div>
+	</a>
+	{/if}
+	{if $children}
+		<div class="type">
+			<ul>
+				{loop $children $item}
+					<li>
+						<a href="{php echo $this->createMobileUrl('clist',array('cid'=>$item['id']));}">
+						<img src="{php echo tomedia($item['icon']);}" >
+						{$item['catename']}
+						</a>
+					</li>
+				{/loop}
+			</ul>
+		</div>
+	{/if}
+	<div class="head" style="{if $setting['color']} border-bottom-color:{$setting['color']} {/if}">
+		{if $setting['color']}
+		<a href="{php echo $this->createMobileUrl('list',array('pid'=>$id));}"><div class="new" style="{if $act=='dis'} color:{$setting['color']};{/if} border-right-color:{$setting['color']}" >距离</div></a>
+		<a href="{php echo $this->createMobileUrl('Tlist',array('pid'=>$id));}"><div class="discont" style="{if $act=='new'} color:{$setting['color']};{/if}" >最新</div></a>
+		{else}
+		<a href="{php echo $this->createMobileUrl('list',array('pid'=>$id));}"><div class="new" style="{if $act=='dis'} color:#6BA74F;{/if} border-right-color:#6BA74F;">距离</div></a>
+		<a href="{php echo $this->createMobileUrl('Tlist',array('pid'=>$id));}"><div class="discont" style="{if $act=='new'} color:#6BA74F;{/if}">最新</div></a>
+		{/if}
+	</div>
+	<section id="wrap">
+		{loop $stores $sto}
+		<a href="{php echo $this->createMobileUrl('showDetail',array('id'=>$sto['id']));}">
+		<div class="point-div">
+			<div class="con">
+				<div class="detail">
+					<div class="pic">
+						{if $sto['storelogo']}
+						<img src="{php echo tomedia($sto['storelogo']);}" width="100%">
+						{elseif $setting['avar']}
+						<img src="{php echo tomedia($setting['avar']);}" width="100%">
+						{else}
+						<img src="{NEARBY_IMAGE}123.png" width="100%">
+						{/if}
+						<!-- <img src="{NEARBY_IMAGE}123.png" width="100%" height="50px"> -->
+					</div>
+					<div class="title">
+						{php $name =  mb_substr($sto['storename'],0,12,'utf-8');}
+						<h3 style="height:25px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">{$sto['storename']}</h3>
+						{php $address=mb_substr($sto['province'].$sto['city'].$sto['address'],0,12,'utf-8')}
+						<p>{$address}...</p>
+					</div>
+					{if $sto['disc']}
+					<div class="disc" style="{if $setting['color']} background-color:{$setting['color']}; {/if}">
+						<span style="color:#fff;">{$sto['disc']}km</span>
+					</div>
+					{/if}
+				</div>
+				<div class="contact">
+					<div class="tel">
+						<a data="{$sto['tel']}">
+							<div class="mid">
+								<img src="{NEARBY_IMAGE}tel.png" width="30%" height="100%"><span>一键拨号</span>
+							</div>
+						</a>
+					</div>
+					<div class="nav">
+						<?php 
+								$sto['remark']= htmlspecialchars_decode($sto['remark']);
+								$sto['remark']= preg_replace("/<(.*?)>/","",$sto['remark']); 
+						?>
+						{if $sto['lat']&&$sto['lng']}
+						<a href="http://api.map.baidu.com/marker?location={$sto['lat']},{$sto['lng']}&title={$sto['storename']}&name={$sto['storename']}&content={$sto['remark']}&output=html&src=weiba|weiweb">
+						<!-- <a href="{php echo $this->createMobileUrl('map',array('lat'=>$sto['lat'],'lng'=>$sto['lng']));}" data-la="{$sto['lat']}" data-lg="{$sto['lng']}"> -->
+							<div class="mid">
+								<img src="{NEARBY_IMAGE}dw.png" width="30%" height="100%"><span>一键导航</span>
+							</div>
+						</a>
+						{else}
+							<div class="mid nodh">
+								<img src="{NEARBY_IMAGE}dw.png" width="25%" height="100%"><span style="{if $setting['color']} color:#000; {/if}">一键导航</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+		</div>
+		</a>
+		{/loop}
+	</section>
+	<div class="upload" style="display:none;" data-page="{$page}">
+		<div class="showindex" style="width:20%;margin:0 auto;">
+			<img src="{NEARBY_IMAGE}123.gif" width="20px;">
+			<div style="float:left;">加载中</div>
+		</div>
+	</div>
+	<input id="page" type="hidden" name="page" value="{if $pindex} {$pindex} {else}1{/if}">
+	<input id="isscroll" type="hidden" name="page" value="1">
+	<div class="copyright" style="padding:0;"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+
+	{template 'menu'}
+</body>
+<!-- <script src="js/swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container');
+</script> -->
+<script type="text/javascript">
+	$(".tel a").click(function(){
+    	var a = $(this).attr("data");
+    	if(a){
+    		window.location.href = "tel:"+a;
+    	}else{
+    		swal('商家很懒，未标明电话号码!');
+    	}
+    })
+    $(".nav .nodh").click(function(){
+    	swal('商家很懒，未标明地址!');
+    })
+</script>
+<script type="text/javascript">
+var params = {
+    {if empty($title)}
+    title: "{$setting['storename']}",
+    {else}
+    title: "{$title}",
+    {/if}
+    {if empty($setting['sharedesc'])}
+    desc: "附近门店",
+    {else}
+    desc: "{$setting['sharedesc']}",
+    {/if}
+    {if empty($setting['sharelogo'])}
+    imgUrl: "{$_W['siteroot']}addons/jy_signup_a/icon.jpg",
+    {else}
+    imgUrl: "{php echo tomedia($setting['sharelogo'])}",
+    {/if}
+};
+wx.ready(function () {
+    wx.showOptionMenu();
+    wx.onMenuShareAppMessage.call(this, params);
+    wx.onMenuShareTimeline.call(this, params);
+});
+</script>
+<script type="text/javascript">
+$(window).scroll(function(){
+	var page = parseInt($("#page").val())+1;
+	var isscroll = $("#isscroll").val();
+	{if $do=='Tlist'}
+	var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('Tlist'),2)}"+"&rad="+Math.random();
+	{/if}
+	{if $do=='list'}
+	var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('list'),2)}"+"&rad="+Math.random();
+	{/if}
+	if(isscroll==1){
+		if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+			$(".upload").show();
+			$("#isscroll").val(2);
+			setTimeout(function(){
+					$.ajax({
+						type: 'POST',
+			    		url: url,
+				    	data: {doajax:1,pid:{$id},page:page},
+				    	success:function(datas){
+				    		console.log(datas);
+				    		if(datas.statue==1){
+				    			$("#wrap").append(datas.data);
+					    		$("#page").val(datas.page);
+					    		$("#isscroll").val(1);
+					    		$(".upload").hide();
+				    		}else{
+				    			$("#isscroll").val(2);
+				    			$(".showindex").html('已加载全部');
+				    		}
+				    	},
+				    	error:function(datas){
+
+					    },
+				    	dataType:'json',
+					})
+				},1000);
+		}
+	}
+})
+</script>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>{$cfg['title']} -- 代理中心首页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet"  href="{MODULE_URL}template/mobile/css/app.css" />
+	</head>
+
+	<body style="background:#fff;">					
+			<div class="dtopbox">
+					<div class="navtar"><img src="{$user_info['avatar']}"></div>
+					<div class="agent_user_title">欢迎代理商：{$agent_truename}</div>
+			</div>
+		
+			<div class="mui-content">
+		        <ul class="mui-table-view mui-grid-view mui-grid-9"  style="background:#fff;margin-top:0px;">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+		                <div class="dtips">设备总数</div>
+						<div class="dtips_n">{$device_total}台</div>
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+		                <div class="dtips">正常设备</div>
+						<div class="dtips_n">{$device_total_ok}台</div>
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+						<div class="dtips">故障设备</div>
+						<div class="dtips_n" style="color:red;">{$device_total_er}台</div>		
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+		                <div class="dtips">充值金额</div>
+						<div class="dtips_n">						
+						{if $inser_total == 0}
+						0.00
+						{else}
+						{$inser_total}
+						{/if}
+						元</div>  
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+		                <div class="dtips">余额支付</div>
+						<div class="dtips_n">
+						{if $money_total == 0}
+						0.00
+						{else}
+						{$money_total}
+						{/if}						
+						元</div>    
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4">
+		                <div class="dtips">扫码支付</div>
+						<div class="dtips_n">
+						{if $scan_total == 0}
+						0.00
+						{else}
+						{$scan_total}
+						{/if}
+						元</div>   
+					</li>
+				
+		        </ul> 
+		</div>
+			<div class="mui-content" style="margin-top:0px;">
+		        <ul class="mui-table-view mui-grid-view mui-grid-9"  style="background:#fff;">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4"><a href="javascript::" id="scanQRCode1" alt="<?php echo $cfg['aid']?>">
+		                    <span class="mui-icon mui-icon-gear"></span>
+		                    <div class="mui-media-body">入网</div></a></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4"><a href="{php echo $this->createMobileurl('device_list',array('aid'=>$cfg['aid']))}">
+		                    <span class="mui-icon mui-icon-list"></span>
+		                    <div class="mui-media-body">设备</div></a></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4"><a href="{php echo $this->createMobileurl('area_list',array('aid'=>$cfg['aid']))}">
+		                    <span class="mui-icon mui-icon-location"></span>
+		                    <div class="mui-media-body">区域</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4"><a href="{php echo $this->createMobileurl('user_list',array('aid'=>$cfg['aid']))}">
+		                    <span class="mui-icon mui-icon-person"></span>
+		                    <div class="mui-media-body">用户</div></a></li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4"><a href="{php echo $this->createMobileurl('search',array('aid'=>$cfg['aid']))}">
+		                    <span class="mui-icon mui-icon-search"></span>
+		                    <div class="mui-media-body">查询</div></a></li>
+					<li class="mui-table-view-cell mui-media mui-col-xs-4 logout"><a href="javascript::">
+		                    <span class="mui-icon mui-icon-paperplane"></span>
+		                    <div class="mui-media-body">退出</div></a></li>			
+					
+		        </ul> 
+		</div>
+			
+			
+		</div>
+		<script src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+		<script src="{MODULE_URL}template/mobile/js/jquery-3.2.1.min.js"></script>
+		<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	</body>
+
+</html>
+<script>
+	$(function(){
+		
+		$(".logout").click(function(){
+			//document.addEventListener('WeixinJSBridgeReady', function(){
+				WeixinJSBridge.call('closeWindow');				
+			//}, false);	
+		});
+	
+	});
+		$(function(){ 
+	pushHistory(); 
+	window.addEventListener("popstate", function(e) {
+		window.location.href="{php echo $this->createMobileurl('index',array('op'=>'index','aid'=>$cfg['aid']))}";
+		
+	}, false); 
+	function pushHistory() { 
+		var state = { 
+		title: "title", 
+		url: "#"
+		}; 
+		window.history.pushState(state, "title", "#"); 
+	} 
+});
+	
+</script>
+	<script>
+	$(function(){
+		wx.config({
+		debug: false,
+		appId: '{$getSign["appId"]}',
+		timestamp: '{$getSign["timestamp"]}',
+		nonceStr: '{$getSign["nonceStr"]}',
+		signature: '{$getSign["signature"]}',
+		jsApiList: [
+			'scanQRCode',        		
+		]
+	  });
+	 // wx.ready(function () {
+		document.addEventListener('WeixinJSBridgeReady', function(){
+		//WeixinJSBridge.call('closeWindow'); 	
+		
+		  $("#scanQRCode1").click(function(){
+			var aid= $(this).attr('alt');
+			wx.scanQRCode({
+			  needResult: 1,
+			  desc: 'scanQRCode desc',
+			  success: function (res) {			
+				window.location.href="{php echo $this->createMobileurl('device_reg')}&device_id="+res['resultStr']+"&aid="+aid;
+				
+			  }
+			});
+		  });
+		
+		}, false);	
+		  
+	  //});	  
+	  $('#scanQRCode1').trigger('click'); 	
+	});
+</script>

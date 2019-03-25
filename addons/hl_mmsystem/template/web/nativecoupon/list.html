@@ -1,0 +1,172 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>会员卡券管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('nativecoupon', array('op' => 'list'))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                        <i class="fa fa-plus"></i>添加卡券</a>
+                    </button>
+                        <table class="table table-bordered">
+                            <thead class="navbar-inner">
+                            <tr>
+                                <th width="2%">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"></label>
+                                    </div></th>
+                                <th width="80px">卡券类型</th>
+                                <th width="120px">卡券标题</th>
+                                <th width="150px">卡券有效期</th>
+                                <th width="100px">库存</th>
+                                <th width="50px">限领</th>
+                                <th width="80px">上架状态</th>
+                                <th style="width:200px; text-align:right;">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td><div class="checkbox checkbox-success checkbox-inline">
+                                    <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                           value="{$item['id']}">
+                                    <label for="ids_{$item['id']}"></label>
+                                </div>
+                                </td>
+                                <td>
+                                    {php echo util::getCouponType($item['cou_type']);}
+                                </td>
+                                <td>{$item['cou_title']}</td>
+                                <td>
+                                    {php echo util::getCouponTimeDate($item['id']);}
+                                </td>
+                                <td>{$item['cou_quantity']}</td>
+                                <td>{$item['cou_get_limit']}</td>
+                                <td>
+                                    {if $item['cou_is_display'] == 1}
+                                    <span class="label label-success">上架中</span>
+                                    {else}
+                                    <span class="label label-danger">已下架</span>
+                                    {/if}
+                                </td>
+                                <td style="text-align:right;">
+                                    <a class="btn btn-primary btn-sm" onclick="updatequantity({$item['id']});">修改库存
+                                    </a>
+                                    <a class="btn btn-primary btn-sm" onclick="ViewDetails({$item['id']});">查看详情</a>
+                                    <a onclick="ViewCouponList({$item['id']})"  class="btn btn-default btn-sm" title="领取记录">领取记录</a>
+                                    <a href="{php echo $this->createWeburl('couponmanage', array('op' => 'delete', 'id' => $item['id']))}"  class="btn btn-default btn-sm" title="删除" onclick="if(!confirm('删除后将不可恢复，确定删除吗?')) return false;">删除</a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal fade" id="myModal" tabindex="-1" role="dialog"  aria-hidden="true">
+
+
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">选择你要创建的卡券类型</h4>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="modal-body clearfix form-horizontal">
+                        <div class="form-group marbot0">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                            <div class="col-sm-9 col-xs-12">
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="1"/> 折扣券
+                                </label>
+                                <div class="help-block">可为用户提供消费折扣</div>
+                            </div>
+                        </div>
+                        <div class="form-group marbot0">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                            <div class="col-sm-9 col-xs-12">
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="2"/> 代金券
+                                </label>
+                                <div class="help-block">可为用户提供抵扣现金服务。可设置成为“满*元，减*元”</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group marbot0">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                            <div class="col-sm-9 col-xs-12">
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="3"/> 团购券
+                                </label>
+                                <div class="help-block">可为用户提供团购套餐服务</div>
+                            </div>
+                        </div>
+                        <div class="form-group marbot0">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                            <div class="col-sm-9 col-xs-12">
+                                <label class="radio-inline">
+                                    <input type="radio" name="radio" value="4"/> 优惠券
+                                </label>
+                                <div class="help-block">可为用户提供团购套餐服务</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                            <div class="col-sm-9 col-xs-12">
+                                <label class="radio-info radio-inline">
+                                    <input type="radio" name="radio" value="5"/> 优惠券
+                                </label>
+                                <div class="help-block">即“通用券”，建议当以上四种无法满足需求时采用</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" id="couponmanageadd" class="btn btn-primary" data-dismiss="modal">确定</button>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script>
+
+    $('#couponmanageadd').on('click', function(){
+        var typename = $("input[name='radio']:checked").val();
+        // var typename = $('#myModal input[type=radio]:checked').val();
+        var editRowUrl = "{php echo $this->createWebUrl('nativecoupon', array('op' => 'distribute'))}&typename=" + typename;
+        var index = parent.layer.open({
+            type: 2,
+            title: '设置管理',
+            shadeClose: true,
+            area : ['1200px' , '700px'],
+            content: editRowUrl
+        });
+        parent.layer.full(index);
+    });
+
+</script>
+{template 'web/common/footer'}

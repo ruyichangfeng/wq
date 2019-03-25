@@ -1,0 +1,70 @@
+{template 'common/header'}
+<header class="mui-bar mui-bar-nav">
+    <a href="javascript:;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" id="go_back"></a>
+    <h1 class="mui-title">{php echo $this->system['title']}</h1>
+</header>
+<div class="mui-content">
+    <ul class="mui-table-view">
+        <li class="mui-table-view-cell mui-media">
+            <a href="javascript:;" class="">
+                <img class="mui-media-object mui-pull-left" src="{$member['avatar']}">
+                <div class="mui-media-body">
+                    {$member['nickname']}
+                    <p class="mui-ellipsis">
+                        <span style="color:red;">剩余金额：{$member['credit2']}元</span>
+                    </p>
+                </div>
+            </a>
+        </li>
+    </ul>
+    <div class="mui-input-group" style="margin-top:10px;">
+        <div class="mui-input-row">
+            <label>提现金额</label>
+            <input type="number" name="credit" class="mui-input-clear" placeholder="请输入提现金额">
+        </div>
+    </div>
+    <div class="mui-input-row" style="margin: 10px 5px;">
+        <textarea id="textarea" name="message" rows="5" placeholder="帮我捎句话！"></textarea>
+    </div>
+    <p style="padding-left:10px;padding-right:10px;font-size:0.8em;color:gray;">
+        {$setting['message']}
+    </p>
+    <div style="height:10px;"></div>
+    <button type="button" class="mui-btn mui-btn-blue mui-btn-block">提交</button>
+    <button type="button" id="go_log" class="mui-btn mui-btn-outlined mui-btn-block">提现记录</button>
+</div>
+<script>
+    $(function(){
+        $('#go_back')[0].addEventListener('tap',function(){
+            window.history.go(-1);
+        });
+        $('#go_log')[0].addEventListener('tap',function(){
+            window.location.href = "{php echo $this->createMobileUrl('log')}";
+        });
+
+        $('.mui-btn-block')[0].addEventListener('tap',function(){
+            var post = {};
+            post.credit = $('input[name="credit"]').val();
+            post.message = $('textarea[name="message"]').val();
+            if(!post.credit){
+                mui.alert('请输入提现金额','温馨提示');
+                return false;
+            }
+            post.credit = parseFloat(post.credit);
+            if(post.credit <= 0){
+                mui.alert('提现金额必须为大于0的数字','温馨提示');
+                return false;
+            }
+            console.log(post);
+            post.act = 'post';
+            $.post("",post,function(data){
+                if(data.status == 1){
+                    window.location.href = "{php echo $this->createMobileUrl('log',array('status'=>'0'))}";
+                }else{
+                    mui.alert(data.message,'温馨提示');
+                }
+            },'json');
+        })
+    });
+</script>
+{template 'common/footer'}

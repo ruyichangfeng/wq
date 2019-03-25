@@ -1,0 +1,8 @@
+<?php
+/*   __________________________________________________
+    |  Obfuscated by YAK Pro - Php Obfuscator          |
+    |              on 2018-05-27 10:26:56              |
+    |    GitHub: https://github.com/pk-fr/yakpro-po    |
+    |__________________________________________________|
+*/
+ namespace Core\common; class Request { public static function params($key = '') { goto eZw7r; Tm3Fg: IzaLa: goto IRf7o; eZw7r: global $_GPC; goto mAbYv; IRf7o: $data = self::_filterParams($_GPC); goto jEqeo; mAbYv: if (!$key) { goto IzaLa; } goto Kn_YQ; Kn_YQ: return $_GPC[$key]; goto Tm3Fg; jEqeo: return $data; goto tKf0z; tKf0z: } private static function _filterParams($params) { goto R_NBe; yIhSt: return $params; goto C2zA5; yFHkl: mKQmk: goto yIhSt; R_NBe: $filterArr = array("\x63", "\141", "\145\151\x64", "\166\145\162\163\x69\x6f\156\x5f\x69\144", "\137\x5f\165\151\x64", "\x5f\137\167\x78\x61\x70\160\166\145\162\163\151\x6f\156\x69\144\x73", "\137\137\163\145\x73\163\151\x6f\x6e", "\137\137\165\156\x69\141\143\151\x64", "\x5f\x5f\163\167\x69\x74\x63\150", "\137\137\x6c\x61\163\x74\166\x69\163\x69\x74\x5f\61", "\137\137\x6e\157\x74\151\x63\145", "\137\x5f\145\156\x74\x72\171", "\137\137\x73\164\x61\x74\x65", "\155", "\x64\157", "\x73\x74\141\164\x65"); goto vhK3T; vhK3T: foreach ($params as $k => $v) { goto AdB36; QIl4Q: unset($params[$k]); goto DhCd4; vpmNN: unset($params[$k]); goto Llt2E; Nmv9Q: rn2YD: goto I008v; Llt2E: vd4KF: goto CCRD8; AdB36: if (!in_array($k, $filterArr)) { goto rn2YD; } goto QIl4Q; DhCd4: goto rguMU; goto Nmv9Q; I008v: if (!(strpos($k, "\155\x6f\144\165\154\145\137\163\x74\x61\164\x75\163") === 0)) { goto vd4KF; } goto vpmNN; CCRD8: rguMU: goto zOFdk; zOFdk: } goto yFHkl; C2zA5: } }

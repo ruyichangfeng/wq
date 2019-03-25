@@ -1,0 +1,37 @@
+<?php defined('IN_IA') or exit('Access Denied');?> <div class="page-sidebar sidebar">                
+ <div class="page-sidebar-inner slimscroll">
+	 <ul class="menu accordion-menu">
+	 <li class="active">
+		<a href="<?php  echo $this->createWeburl('default')?>" class="waves-effect waves-button waves-classic"><span class="menu-icon icon-home"></span><p>首页面板</p><span class="active-page"></span></a>
+	 </li>						
+	 <li>
+		<a href="<?php  echo $this->createWeburl('list_agent')?>" class="waves-effect waves-button"><span class="menu-icon icon-users"></span><p>代理商管理</p></a>
+	</li>                        
+	 
+	 <li>
+		<a href="<?php  echo $this->createWeburl('list_user')?>" class="waves-effect waves-button"><span class="menu-icon icon-user"></span><p>用户管理</p></a>
+	</li>						 
+	 
+	 <li>
+		<a href="<?php  echo $this->createWeburl('list_area')?>" class="waves-effect waves-button"><span class="menu-icon icon-pointer"></span><p>区域管理</p></a>
+	</li>						 
+	 
+	 <li>
+		<a href="<?php  echo $this->createWeburl('list_device')?>" class="waves-effect waves-button"><span class="menu-icon icon-layers"></span><p>设备管理</p></a>
+	 </li>						  						 
+	 
+	 <li class="droplink"><a href="javascript::" class="waves-effect waves-button"><span class="menu-icon  icon-graph"></span><p>统计中心</p><span class="arrow"></span></a>                            
+		 <ul class="sub-menu">                              
+			<li><a href="<?php  echo $this->createWeburl('report_all')?>">消费明细查询</a></li>                           
+			<li><a href="<?php  echo $this->createWeburl('report_char')?>">七日内统计图形表</a></li>                           
+		 </ul>                        
+	 </li>									
+	 <li>
+		<a href="<?php  echo $this->createWeburl('roule_entry')?>" class="waves-effect waves-button"><span class="menu-icon   icon-magic-wand"></span><p>入口地址</p></a>
+	</li>						
+	 <li>
+		<a href="<?php  echo $this->createWeburl('sysconfig')?>" class="waves-effect waves-button"><span class="menu-icon icon-users"></span><p>系统配置</p></a>
+	</li>						                                           
+	 </ul>                
+ </div><!-- Page Sidebar Inner -->            
+ </div><!-- Page Sidebar -->

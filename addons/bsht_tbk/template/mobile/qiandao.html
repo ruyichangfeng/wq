@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+ <head>
+ <title>{if !empty($_W['page']['sitename'])}{$_W['page']['sitename']}{else}{$_W['account']['name']}{/if}{if !empty($title)}{$title} {/if}</title>
+  <meta name="keywords" content="牛贝折扣-微信淘宝客 @ 微擎we7.cc">
+  <meta name="description" content="牛贝折扣-微信淘宝客 @ 微擎we7.cc">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="initial-scale=1, width=device-width, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1" media="(device-height: 568px)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="full-screen" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="format-detection" content="address=no" />
+<script type="text/javascript" src="{$res}static/jwap/js/jquery-1.8.0.js"></script>
+<script type="text/javascript" src="{$res}js/layer-m/layer.js"></script>
+
+
+{if $follow!=1}
+<script>
+$(function(){
+layer.open({
+	title:'- 每日有奖签到，请先长按下图 -',
+    content: '<center><div style="width:100%;"><br><img src="{$_W['account']['qrcode']}" width="100%"><br><font color="red">本功能仅限会员使用</font></div></center>',
+    btn: ['返回首页', '返回微信'],
+    shadeClose: false,
+	closeBtn: false,
+    yes: function(){
+       window.location.href='{php echo $this->createMobileUrl('index', array('op' => 'new'))}';	
+    }, no: function(){
+		WeixinJSBridge.call('closeWindow');
+    }
+});
+});
+</script>
+{else}
+{if $setting['qiandaourl']=='内置'}
+<script>
+window.location.href="{php echo $this->createMobileUrl('index')}"; 
+</script>
+{else}
+<script>
+window.location.href="{$setting['qiandaourl']}"; 
+</script>
+{/if}
+{/if}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript">
+	if(navigator.appName == 'Microsoft Internet Explorer'){
+		if(navigator.userAgent.indexOf("MSIE 5.0")>0 || navigator.userAgent.indexOf("MSIE 6.0")>0 || navigator.userAgent.indexOf("MSIE 7.0")>0) {
+			alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+		}
+	}
+	window.sysinfo = {
+		{if !empty($_W['uniacid'])}'uniacid': '{$_W['uniacid']}',{/if}
+		{if !empty($_W['acid'])}'acid': '{$_W['acid']}',{/if}{if !empty($_W['openid'])}'openid': '{$_W['openid']}',{/if}
+		{if !empty($_W['uid'])}'uid': '{$_W['uid']}',{/if}
+		'siteroot': '{$_W['siteroot']}',
+		'siteurl': '{$_W['siteurl']}',
+		'attachurl': '{$_W['attachurl']}',
+		'attachurl_local': '{$_W['attachurl_local']}',
+		'attachurl_remote': '{$_W['attachurl_remote']}',
+		{if defined('MODULE_URL')}'MODULE_URL': '{MODULE_URL}',{/if}
+		'cookie' : {'pre': '{$_W['config']['cookie']['pre']}'}
+	};
+	// jssdk config 对象
+	jssdkconfig = {php echo json_encode($_W['account']['jssdkconfig']);} || {};
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'hideMenuItems',
+		'showMenuItems',
+		'hideAllNonBaseMenuItem',
+		'showAllNonBaseMenuItem',
+		'translateVoice',
+		'startRecord',
+		'stopRecord',
+		'onRecordEnd',
+		'playVoice',
+		'pauseVoice',
+		'stopVoice',
+		'uploadVoice',
+		'downloadVoice',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'getNetworkType',
+		'openLocation',
+		'getLocation',
+		'hideOptionMenu',
+		'showOptionMenu',
+		'closeWindow',
+		'scanQRCode',
+		'chooseWXPay',
+		'openProductSpecificView',
+		'addCard',
+		'chooseCard',
+		'openCard',
+		'openAddress'
+	];
+	</script>
+ </head>
+<body>
+
+<script type="text/javascript">
+	$(function(){
+
+{if $_GPC['do']=='uc'}
+{if empty($user)}
+layer.msg('对不起，您无权访问', {
+  shade: [0.8, '#393D49'],
+  closeBtn: 0
+}, function(){window.location.href="{php echo $this->createMobileUrl('index')}";});
+{/if}
+{/if}
+
+
+{if $_GPC['do']=='show'}
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('id'=>$_GPC['id'],'act'=>'item'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if}
+
+
+	wx.config(jssdkconfig);
+	var $_share = {php echo json_encode($_share);};
+	if(typeof sharedata == 'undefined'){
+		sharedata = $_share;
+	} else {
+		sharedata['title'] = sharedata['title'] || $_share['title'];
+		sharedata['desc'] = sharedata['desc'] || $_share['desc'];
+		sharedata['link'] = sharedata['link'] || $_share['link'];
+		sharedata['imgUrl'] = sharedata['imgUrl'] || $_share['imgUrl'];
+	}
+	if(sharedata.imgUrl == ''){
+		var _share_img = $('body img:eq(0)').attr("src");
+		if(_share_img == ""){
+			sharedata['imgUrl'] = window.sysinfo.attachurl + 'images/global/wechat_share.png';
+		} else {
+			sharedata['imgUrl'] = util.tomedia(_share_img);
+		}
+	}
+	if(sharedata.desc == ''){
+		var _share_content = util.removeHTMLTag($('body').html());
+		if(typeof _share_content == 'string'){
+			sharedata.desc = _share_content.replace($_share['title'], '')
+		}
+	}
+	wx.ready(function () {
+
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+
+        sharedata.success = function(){
+
+{if $_GPC['do']=='show'}
+var url = "{php echo $this->createMobileUrl('share_ajax',array('id'=>$_GPC['id'],'act'=>'item'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if}   
+	    }
+
+
+	});
+
+	});
+</script>
+</body>
+</html>

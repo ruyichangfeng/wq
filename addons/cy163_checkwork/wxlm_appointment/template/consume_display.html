@@ -1,0 +1,110 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li class="active"><a href="{php echo $this->createWebUrl('consume', array('op'=>'display'));}">消费记录</a></li>
+</ul>
+<div class="main">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="display:block;color:#FFF;">
+                搜索条件 ↓  （点击可展开）
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >记录人</label>
+                            <div class="col-sm-3">
+                                <select name="search[consume_staffid]" class="form-control">
+                                    <option value="">全部</option>
+                                    {loop $staffs $key $item}
+                                    <option value="{$item['staff_id']}" {if $item['staff_id'] == $search['consume_staffid']}selected{/if}>{$item['staff_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2  control-label" >消费时间</label>
+                            <div class="col-sm-3">
+                                 {php echo tpl_form_field_date('search[consume_date]', $search['consume_date']);}
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                            <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">档案列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:5%;">编号</th>
+                        <th style="width:10%;">姓名</th>
+                        <th style="width:10%;">门店</th>
+                        <th style="width:15%;">项目</th>
+                        <th style="width:10%;">费用</th>
+                        <th style="width:10%;">记录人</th>
+                        <th style="width:20%;">备注</th>
+                        <th style="width:10%;">时间</th>
+                        <th style="width:10%;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {php $i = ($pindex - 1) * $psize + 1}
+                    {loop $consumes $key $item}
+
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$archive['archive_name']}</td>
+                        <td>{$item['store_name']}</td>
+                        <td>
+                            {loop $item['project'] $row}
+                            <span style="margin-right: 5px; margin-top: 5px">{$row}</span>
+                            {/loop}
+                        </td>
+                        <td>{$item['consume_price']}</td>
+                        <td>{$item['staff_name']}</td>
+                        <td>{$item['consume_remark']}</td>
+                        <td>{$item['consume_date']}</td>
+                        <td>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" href="{php echo $this->createWebUrl('consume', array('op'=>'delete', 'id'=>$item['consume_id'], 'archive_id' => $archive_id));}" class="btn btn-default btn-danger">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if empty($consumes)}
+                    <tr>
+                        <td colspan="9">
+                            暂无消费记录
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:right;">累计消费:{$total_price}</div>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+</script>
+{template 'common/footer'}

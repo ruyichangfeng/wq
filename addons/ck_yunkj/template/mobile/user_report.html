@@ -1,0 +1,165 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li ><a href="{php echo $this->createWebUrl('user_list');}">< &nbsp;返回</a></li>
+	<li {if $op == ''}class="active"{/if}><a href="{$urlt}">账目报表管理</a></li>
+	<li {if $op == 'add'}class="active"{/if}><a href="{$urlt}&op=add">添加账目报表</a></li>
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+</style>
+{if $op == 'add' || $op == 'edit'}
+<script>
+	function ckgpt(num){
+		if(num==0){
+			document.getElementById('show0').style.display="";
+			document.getElementById('show1').style.display="none";
+		}else{
+			document.getElementById('show0').style.display="none";
+			document.getElementById('show1').style.display="";
+		}
+	}
+</script>
+<div class="main">
+	
+	<form name="formpt" action="{$urlt}" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+    <input type="hidden" name="id" value="{$srdb['id']}" />
+	<div class="panel panel-default">
+		<div class="panel-heading">{if $op == 'add'}添加账目报表{elseif $op == 'edit'}修账目报表{/if}</div>
+		<div class="panel-body">
+		
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">所属年月</label>
+				<div class="col-xs-12 col-sm-9" >
+					<select name="years" class="t_input">
+						{$yearhtml}
+					</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<select  name="month" class="t_input">
+						{$monthhtml}
+					</select>
+				</div>
+			</div>
+			{php for($i=1;$i<=30;$i++):}
+			{php $config_key='a'.$i;$msg_key='message'.$i;}
+			{if $mb_config[$config_key]}
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">{php echo !empty($mb_config[$config_key])?$mb_config[$config_key]:'参数'.$i;}</label>
+				<div class="col-xs-12 col-sm-9" >
+					<input class="form-control" name="{$msg_key}" id="" type="text" value="{php echo $srdb[$msg_key];}" >
+				</div>
+			</div>
+			{/if}
+			{php endfor;}
+		</div>
+	</div>
+	<div class="form-group col-sm-12 col-xs-12">
+		<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+	</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+		
+		  <div class="form-group">
+			<label for="exampleInputName2">公司名称：</label>
+			{$usershow2[compname]}
+		  </div>
+		  
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			<input type="hidden" name="uid" value="{$uid}">
+			  <div class="form-group">
+				<label for="exampleInputEmail2">选择： 年</label>
+				<select name="years" class="t_input">
+					{$yearhtml}
+				</select>
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">&nbsp;&nbsp;月</label>
+				<select  name="month" class="t_input">
+					{$monthhtml}
+				</select>
+			  </div>
+
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+	function checkAll(form, name) {
+		for(var i = 0; i < form.elements.length; i++) {
+			var e = form.elements[i];
+			if(e.name.match(name)) {
+				e.checked = form.elements['chkall'].checked;
+			}
+		}
+	}
+</script>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form method="post" class="form">
+	<input name="token" type="hidden" value="{$_W['token']}" />
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="50">选择</th>
+			<th>报表（年 - 月）</th>
+			<th>发布时间</th>
+			<th width="150">操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td><input type="checkbox" name="ids[]" value="{$value[id]}"></td>
+			<td>{$value['years']} - {$value['month']}</td>
+			<td>{php echo date('Y-m-d H:i', $value['deadline']);}</td>
+			<td>
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="4">{$pager}</td>
+		</tr>
+		{/if}
+		<tr >
+			<td colspan="4" align="center">
+				<input type="checkbox" id="chkall" name="chkall" onclick="checkAll(this.form, 'ids')">全选 &nbsp;&nbsp;
+				<input type="radio" name="optype" value="1">&nbsp; 删除
+				<input type="submit" name="listsubmit" value="提交" class="btn btn-default">
+			</td>
+		 </tr>
+	  </table>
+	</div>
+	</form>
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

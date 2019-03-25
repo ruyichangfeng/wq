@@ -1,0 +1,64 @@
+{template "base/child_header"}
+<style>
+</style>
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <colgroup>
+            <col width="150">
+            <col >
+        </colgroup>
+        <tbody class="news_content">
+        {loop $dataList $data}
+        <tr style="cursor: pointer" class="tr" data-id="{$data['id']}">
+            <td align="left">{$data['name']}</td>
+            <td align="left">{php echo date("Y-m-d",$data['create_time'])}</td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn save" >选取</button>
+        </div>
+    </div>
+</div>
+<div id="page"></div>
+
+<script>
+    layui.use(['form','jquery','laypage'], function(){
+
+        var name,mobile;
+        var setting =new Object();
+
+        var $ = layui.jquery;
+        var form = layui.form();
+
+        form.on('submit(search)', function(data){
+            name=$("#name").val();
+            url = "{php echo $this->createWebUrl('selectLabel')}"+"&name="+name;
+            location.href=url;
+            return false;
+        });
+
+        //分页
+        setting.cont="page";
+        setting.pages="{$totalPage}";
+        setting.curr="{$page}";
+        setting.skip=true;
+        setting.hash="page";
+        setting.jump=function(obj, first){
+            name=$("#name").val();
+            mobile=$("#mobile").val();
+            if(first!=true){
+                url = "{php echo $this->createWebUrl('selectLabel')}"+"&name="+name+"&page="+obj.curr;
+                window.location.href =url;
+            }
+        };
+        layui.laypage(setting);
+
+        $(".tr").click(function(){
+            parent.setData($(this).attr("data-id"));
+        });
+    });
+</script>
+{template "base/child_footer"}

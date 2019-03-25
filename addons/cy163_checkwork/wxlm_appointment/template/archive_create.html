@@ -1,0 +1,269 @@
+{template 'common/header'}
+<style>
+    .stress_red {
+        color: red;
+    }
+</style>
+<ul class="nav nav-tabs">
+    <li ><a href="{php echo $this->createWebUrl('archive', array('op'=>'display'));}">档案管理</a></li>
+    <li {if empty($id)}class="active"{/if}><a href="{php echo $this->createWebUrl('archive', array('op'=>'create'));}">添加档案</a></li>
+    {if !empty($id)} <li ><a href="#">编辑档案</a></li>{/if}
+</ul>
+
+
+<div class="main">
+    <form action="{php echo $this->createWebUrl('archive', array('op'=>create));}" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-primary">
+            <div class="panel-heading">档案信息</div>
+            <div class="panel-body">
+                <div class="form-group" style="display:none;">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="archive[archive_id]" class="form-control" value="{$archive['archive_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>选择档案人</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <div class="input-group">
+                            <input type="text" name="archive[archive_name]" class="form-control" value="{$archive['archive_name']}"  />
+                            <span class="input-group-addon" onclick="searchShow()" id="basic-addon2">搜索</span>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>openID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text"  name="archive[archive_openid]" class="form-control" value="{$archive['archive_openid']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>头像</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+
+                        {php echo tpl_form_field_image('archive[archive_avatar]', $archive['archive_avatar'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>性别</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="archive[archive_gender]" class="form-control">
+                            <option value="0" {if empty($archive['archive_gender'])}selected{/if}>保密</option>
+                            <option value="1" {if $archive['archive_gender'] == 1}selected{/if}>男</option>
+                            <option value="2" {if $archive['archive_gender'] == 2}selected{/if}>女</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>爱好</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="archive[archive_hobby]" class="form-control" value="{$archive['archive_hobby']}" />
+                        <div class="help-block">不同爱好请用空格隔开</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>生日</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="date" name="archive[archive_birthday]" class="form-control" value="{$archive['archive_birthday']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>管理权限</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <table class="table">
+                            <tbody class="system_fans">
+                            <?php $i = 0; ?>
+                            <?php while ($i < (count($staffs) / 4)): ?>
+                            <tr>
+                                <?php $one = $i * 4; ?>
+                                <?php $two = $i * 4 + 1; ?>
+                                <?php $three = $i * 4 + 2; ?>
+                                <?php $four = $i * 4 + 3; ?>
+                                <td style="padding: 0; border-top: none">
+                                    <div class="checkbox">
+                                        <label><input name="archive[archive_admin][]" type="checkbox" value="{$staffs[$one]['staff_id']}" {if in_array($staffs[$one]['staff_id'], $archive['archive_admin'])}checked{/if} />{$staffs[$one]['staff_name']} </label>
+                                    </div>
+                                </td>
+                                {if !empty($staffs[$two])}
+                                <td style="padding: 0; border-top: none">
+                                    <div class="checkbox">
+                                        <label><input name="archive[archive_admin][]" type="checkbox" value="{$staffs[$two]['staff_id']}" {if in_array($staffs[$two]['staff_id'], $archive['archive_admin'])}checked{/if} />{$staffs[$two]['staff_name']} </label>
+                                    </div>
+                                </td>
+                                {/if}
+                                {if !empty($staffs[$three])}
+                                <td style="padding: 0; border-top: none">
+                                    <div class="checkbox">
+                                        <label><input name="archive[archive_admin][]" type="checkbox" value="{$staffs[$three]['staff_id']}" {if in_array($staffs[$three]['staff_id'], $archive['archive_admin'])}checked{/if}/>{$staffs[$three]['staff_name']} </label>
+                                    </div>
+                                </td>
+                                {/if}
+                                {if !empty($staffs[$four])}
+                                <td style="padding: 0; border-top: none">
+                                    <div class="checkbox">
+                                        <label><input name="archive[archive_admin][]" type="checkbox" value="{$staffs[$four]['staff_id']}" {if in_array($staffs[$four]['staff_id'], $archive['archive_admin'])}checked{/if} />{$staffs[$four]['staff_name']} </label>
+                                    </div>
+                                </td>
+                                {/if}
+                            </tr>
+                            <?php $i++; ?>
+                            <?php endwhile; ?>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>电话号</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="archive[archive_tel]" class="form-control" value="{$archive['archive_tel']}" />
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="myModal-search" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-body">
+            <form action="" method="post" class="form-horizontal form" id="form1">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">选择员工</div>
+                    <div class="panel-body">
+                        <div class="form-group" style="margin-bottom: 0">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="昵称/电话号/openID" id="search_info">
+                                    <span class="input-group-btn">
+        <button class="btn btn-default" onclick="searcharchive()" type="button">搜索</button>
+      </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive panel-body">
+                            <table class="table table-hover table-responsive" style="min-width: 300px;">
+                                <thead class="navbar-inner">
+                                <tr>
+                                    <th style="">昵称</th>
+                                    <th></th>
+                                    <th style="">电话</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th style="">操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody id="search_content">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: center">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" style="width:100px;">关闭</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div><!-- /.modal -->
+</div>
+<script>
+    function searchShow() {
+
+        $('#myModal-search').modal('show');
+    }
+    function searcharchive() {
+
+        var info = $('#search_info').val();
+
+        $.ajax({
+            url:"{php echo $this->createWebUrl('ajaxFans', array())}"+"&content="+info,
+            type:"get",
+            success:function(data){
+
+                $('#search_content').html(data);
+
+            }
+        });
+
+    }
+    function chooseFans(openid, nickname, avatar) {
+
+
+        if (openid == '')
+        {
+            alert('未找到粉丝信息');
+            return false;
+        }
+        var ipt = $('input[name="archive[archive_avatar]"]')
+        var img = ipt.parent().next().children();
+        img.attr('src', avatar);
+        $('input[name="archive[archive_avatar]"]').val(avatar)
+        $('input[name="archive[archive_openid]"]').val(openid);
+        $('input[name="archive[archive_name]"]').val(nickname);
+        $('#myModal-search').modal('hide');
+    }
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#form').submit(function(){
+
+                if($('input[name="archive[archive_name]"]').val() == ''){
+                    util.message('未填写姓名.');
+                    return false;
+                }
+
+                if($('input[name="archive[archive_openid]"]').val() == ''){
+                    util.message('未选择员工.');
+                    return false;
+                }
+                if($('input[name="archive[archive_avatar]"]').val() == ''){
+                    util.message('未选择员工头像.');
+                    return false;
+                }
+
+                if($('select[name="archive[archive_businessid]"]').val() == ''){
+                    util.message('未选择所属商家.');
+                    return false;
+                }
+
+
+
+                if($('input[name="archive[archive_jobname]"]').val() == ''){
+                    util.message('未填写职称.');
+                    return false;
+                }
+
+                if($('input[name="archive[archive_tel]"]').val() == ''){
+                    util.message('未填写电话.');
+                    return false;
+                }
+                if($('input[name="archive[archive_pic]"]').val() == ''){
+                    util.message('未选择员工简介背景图.');
+                    return false;
+                }
+
+
+                return true;
+            });
+        });
+    });
+</script>
+
+
+{template 'common/footer'}

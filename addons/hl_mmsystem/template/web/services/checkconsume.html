@@ -1,0 +1,598 @@
+{template 'web/common/header'}
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+    input[type="number"]{
+        -moz-appearance: textfield;
+    }
+</style>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">请输入优惠券核销码:</label>
+                            <div class="col-sm-5">
+                                <input type="number" id="writeoffcode"  name="writeoffcode" class="form-control" onkeydown="if(event.keyCode==13){btn_checkconsumesubmit();}" value="" required aria-required="true"/>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="button" onclick="btn_checkconsumesubmit();" class="btn btn-primary" name="checkconsumesubmit"  id="btn_checkconsumesubmit" value="优惠券核销"/>
+                            </div>
+                            <div class="col-sm-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tabs-container">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab-1"  aria-expanded="true"><i class="fa fa-dot-circle-o"></i>未使用</a></li>
+                        <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="true"><i class="fa fa-circle"></i>已使用</a></li>
+                        <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="true"><i class="fa fa-circle-o"></i>未领取</a></li>
+                    </ul>
+                    <div class="tab-content"  id="memberInfoList">
+                        <div id="tab-1" class="tab-pane active">
+                            <div class="ibox-content" style="padding-top: 10px; padding-bottom: 10px;">
+                                <table id="notredeemedcheckconsumetable" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab-2" class="tab-pane">
+                            <div class="ibox-content" style="padding-top: 10px; padding-bottom: 10px;">
+                                <table id="Redeemedcheckconsumetable" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                        <div id="tab-3" class="tab-pane">
+                            <div class="ibox-content" style="padding-top: 10px; padding-bottom: 10px;"  >
+                                <table id="unaccalimedcheckconsumetable" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">请输入次卡核销码:</label>
+                            <div class="col-sm-5">
+                                <input type="number" id="Secondarycard"  name="Secondarycard" class="form-control" onkeydown="if(event.keyCode==13){checkconsumesubmit_Secondary();}" value="" required aria-required="true"/>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="button" onclick="checkconsumesubmit_Secondary()" class="btn btn-warning" name="checkconsumesubmit_Secondary"  id="checkconsumesubmit_Secondary" value="次卡核销"/>
+                            </div>
+                            <div class="col-sm-4">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tabs-container">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab-4"  aria-expanded="true"><i class="fa fa-list-alt"></i>计次消费列表</a></li>
+                    </ul>
+                    <div class="tab-content" >
+                        <div id="tab-4" class="tab-pane active">
+                            <div class="ibox-content" style="padding-top: 10px; padding-bottom: 10px;">
+                                <table id="countConsumptionTableData" data-mobile-responsive="true"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+
+    key('k', function(){
+        $("#writeoffcode").focus();
+
+    });
+
+
+    key('c', function(){
+        $("#Secondarycard").focus();
+    });
+
+
+    $(document).ready(function(){
+        $("#checkconsumesubmit_Secondary").hide();
+
+        notredeemedcheckconsumetable();
+        Redeemedcheckconsumetable ();
+        unaccalimedcheckconsumetable();
+        countConsumption();
+
+
+        $("#writeoffcode").focus(function(){
+
+            $("#checkconsumesubmit_Secondary").hide();
+            $("#btn_checkconsumesubmit").show();
+        });
+
+
+        $("#Secondarycard").focus(function(){
+            $("#btn_checkconsumesubmit").hide();
+            $("#checkconsumesubmit_Secondary").show();
+        });
+
+
+    });
+
+    function notredeemedcheckconsumetable (){
+
+        $('#notredeemedcheckconsumetable').bootstrapTable({
+            url: '{php echo $this->createWebUrl('couponmarket', array('op' => 'notredeemedcheckconsumetable'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'cmd_Verificationcode',
+                title: '核销码',
+                align: "center",
+                valign: "middle",
+                width : '200'
+
+            },{
+                field: 'act_title',
+                title: '活动',
+                align: "center",
+                valign: "middle",
+            },{
+                field: 'cmd_activityaddtime',
+                title: '派发时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberreceivetime',
+                title: '领取时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberusetime',
+                title: '使用时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_status',
+                title: '状态',
+                align: "center",
+                valign: "middle",
+                formatter:formatterstatus
+            },  ]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function formatterstatus(value){
+
+            if(value==1){
+                var result = "<span><i class='badge badge-primary'>未领取</i></span>";
+            }else if(value==2){
+                var result = "<span><i class='badge badge-warning'>已领取</i></span>";
+            }else{
+                var result = "<span><i class='badge badge-danger'>已使用</i></span>";
+            }
+            return result;
+
+        }
+        function consumeinvoiceaddTime(value, row, index) {
+            if(value){
+                return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+            }else{
+                return "--";
+            }
+
+        }
+    }//未核销
+    function Redeemedcheckconsumetable (){
+
+        $('#Redeemedcheckconsumetable').bootstrapTable({
+            url: '{php echo $this->createWebUrl('couponmarket', array('op' => 'Redeemedcheckconsumetable'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'cmd_Verificationcode',
+                title: '核销码',
+                align: "center",
+                valign: "middle",
+                width : '200'
+
+            },{
+                field: 'act_title',
+                title: '活动',
+                align: "center",
+                valign: "middle",
+            },{
+                field: 'cmd_activityaddtime',
+                title: '派发时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberreceivetime',
+                title: '领取时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberusetime',
+                title: '使用时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_status',
+                title: '状态',
+                align: "center",
+                valign: "middle",
+                formatter:formatterstatus
+            },  ]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function formatterstatus(value){
+
+            if(value==1){
+                var result = "<span><i class='badge badge-primary'>未领取</i></span>";
+            }else if(value==2){
+                var result = "<span><i class='badge badge-warning'>已领取</i></span>";
+            }else{
+                var result = "<span><i class='badge badge-danger'>已使用</i></span>";
+            }
+            return result;
+
+        }
+        function consumeinvoiceaddTime(value, row, index) {
+            if(value){
+                return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+            }else{
+                return "--";
+            }
+
+        }
+    }//已兑换
+    function unaccalimedcheckconsumetable (){
+
+        $('#unaccalimedcheckconsumetable').bootstrapTable({
+            url: '{php echo $this->createWebUrl('couponmarket', array('op' => 'unaccalimedcheckconsumetable'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100],
+            pagination: true,
+            height: 500,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'cmd_Verificationcode',
+                title: '核销码',
+                align: "center",
+                valign: "middle",
+                width : '200'
+
+            },{
+                field: 'act_title',
+                title: '活动',
+                align: "center",
+                valign: "middle",
+            },{
+                field: 'cmd_activityaddtime',
+                title: '派发时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberreceivetime',
+                title: '领取时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_memberusetime',
+                title: '使用时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'cmd_status',
+                title: '状态',
+                align: "center",
+                valign: "middle",
+                formatter:formatterstatus
+            },  ]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+            };
+            return temp;
+        };
+        function formatterstatus(value){
+
+            if(value==1){
+                var result = "<span><i class='badge badge-primary'>未领取</i></span>";
+            }else if(value==2){
+                var result = "<span><i class='badge badge-warning'>已领取</i></span>";
+            }else{
+                var result = "<span><i class='badge badge-danger'>已使用</i></span>";
+            }
+            return result;
+
+        }
+        function consumeinvoiceaddTime(value, row, index) {
+            if(value){
+                return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+            }else{
+                return "--";
+            }
+
+        }
+    }//未领取
+
+
+    function countConsumption(){
+        $('#countConsumptionTableData').bootstrapTable({
+            url: "{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberCountConsumptionTableData'));}",
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            //   showExport: true,              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportTypes:[ 'csv', 'pdf', 'txt', 'excel', 'xlsx'],  //导出文件类型
+            //     showColumns: true, //这个是选择显示列数的
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 50, 100,200,300,500,1000],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'mrci_invoiceCode',
+                title: '消费单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_doStyle',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberName',
+                title: '会员姓名',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_memberCardNum',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrci_getPoint',
+                title: '获得积分',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mrci_addTime',
+                title: '时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            }, ]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                selectoperatorcountConsumption: $("#selectoperatorcountConsumption").val(),//操作员
+                countConsumptionDocumentNumber: $("#countConsumptionDocumentNumber").val(),//单据号
+                countConsumptionCardNumber: $("#countConsumptionCardNumber").val(),//会员卡号
+                start_countConsumptionlimittime:$('input[name="countConsumptionlimittime[start]"]').val(),
+                end_countConsumptionlimittime: $('input[name="countConsumptionlimittime[end]"]').val(),
+            };
+            return temp;
+        };
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewMemberCountConsume(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewMemberMemberCountConsumePrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+
+    }//计次消费列表
+
+    function btn_checkconsumesubmit() {
+
+
+        var url =  "{php echo $this->createWebUrl('checkconsume', array('op' => 'checkconsumeadd'))}";
+
+        var params = {
+            'writeoffcode': $("#writeoffcode").val(),
+        };
+
+
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+
+                if (data['message']['code'] == 2) {
+                    swal({
+                        title: "核销失败！",
+                        text: "卡券状态未领取或者核销码不正确!",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    },function () {
+                        window.location.replace("{php echo $this->createWebUrl('checkconsume', array('op' => 'index'))}")
+
+                    });
+                    return;
+                }
+                else{
+                    swal({
+                            title: "核销成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+
+                            window.location.replace("{php echo $this->createWebUrl('checkconsume', array('op' => 'index'))}")
+
+                        });
+
+
+                }
+
+            }
+        });
+
+
+
+    }
+
+    function checkconsumesubmit_Secondary() {
+
+
+        var url =  "{php echo $this->createWebUrl('checkconsume', array('op' => 'SecondaryWriteoff'))}";
+
+
+        var params = {
+            'Secondarycard': $("#Secondarycard").val(),
+        };
+
+
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+
+                if (data['message']['code'] == 2) {
+                    swal({
+                        title: "核销失败！",
+                        text: data['message']['msg'],
+                        confirmButtonText: "确定",
+                        type: "error",
+                    },function () {
+                        window.location.replace("{php echo $this->createWebUrl('checkconsume', array('op' => 'index'))}")
+
+                    });
+                    return;
+                }
+                else{
+                    swal({
+                            title: "核销成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            window.location.replace("{php echo $this->createWebUrl('checkconsume', array('op' => 'index'))}")
+
+                        });
+
+
+                }
+
+            },error:function () {
+
+                alert("失败");
+            }
+        });
+
+    }
+
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+
+
+</script>
+{template 'web/common/footer'}

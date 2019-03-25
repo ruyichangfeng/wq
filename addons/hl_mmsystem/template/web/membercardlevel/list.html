@@ -1,0 +1,185 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>会员卡级别设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('membercardlevel')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="col-sm-2">
+                        <a href="{php echo $this->createWebUrl('membercardlevel', array('op' => 'add'));}" class="btn btn-primary">
+                            <i class="fa fa-plus"></i>添加会员卡级别</a>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modal-change-group">会员组变更设置</button>
+                    </div>
+                    <form action="./index.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="membercardlevel" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="levelname" placeholder="输入级别名称关键字"/>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th style="width:20px;">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"> </label>
+                                    </div>
+                                </th>
+                                <th width="60px">id</th>
+                                <th>级别名称</th>
+                                <th>售卡金额</th>
+                                <th>有效期</th>
+                                <th>折扣率</th>
+                                <th>积分倍率</th>
+                                <th>最低储值金额</th>
+                                <th>初始积分</th>
+                                <th>等级卡片图片</th>
+                                <th>会员卡是否自动升级</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['id']}</td>
+                                <td>{$item['mcl_levelName']}</td>
+                                <td>{$item['mcl_cardPrice']}</td>
+                                <td><button type="button" id="datebtn" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="{php echo date('Y-m-d', $item[mcl_specifiedStartTime])}至{php echo date('Y-m-d', $item[mcl_specifiedEndTime]);}">查看日期</button></td>
+                                <td>{$item['mcl_discount']}</td>
+                                <td>{$item['mcl_points']}</td>
+                                <td>{$item['mcl_initMoney']}</td>
+                                <td>{$item['mcl_initPoint']}</td>
+                                <td><img src="{php echo tomedia($item['mcl_cardPic'])}" alt="..." width="80px",height="60px"></td>
+                                <td>{if $item['memberupleveltype_id'] == 1}<span class="badge badge-primary">手动升级</span>
+                                    {else if $item['memberupleveltype_id'] == 2}<span class="badge badge-primary">自动升级</span>
+                                    {else if $item['memberupleveltype_id'] == 3}<span class="badge badge-primary">只升不降</span>{/if}</td>
+                                <span>
+                                    <td>
+                                        <a href="{php echo $this->createWebUrl('membercardlevel', array('op' => 'add', 'id'=>$item['id']))}" title="编辑" class="btn btn-primary btn-sm" id="editbtn">编辑</a>
+                                        <a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('membercardlevel',array('op'=>'delete','id'=>$item['id']))}" title="删除" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm">删除</a>
+                                </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input name="token" type="hidden" value="{$_W['token']}"/>
+                                    <input type="submit" class="btn btn-danger btn-sm" name="pldelete" value="批量删除"/> &nbsp;
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade modal-change-group" id="modal-change-group"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog we7-modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal form we7-form" id="">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">会员级别变更设置</h4>
+                </div>
+                <div class="modal-body we7-padding-horizontal">
+                    <div class="form-group">
+                        <input type="radio" name="grouplevel" value="1" id="group_level-0" ng-model="group_level"{if $item['memberupleveltype_id'] == 1 || $item['memberupleveltype_id'] == ''}checked{/if}/>
+                        <label for="group_level-0">手动变更</label>
+                        <span class="help-block">
+								会员级别的变更只能通过管理员来变更。
+							</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="radio" name="grouplevel" value="2" id="group_level-1" ng-model="group_level"{if $item['memberupleveltype_id'] == 1 || $item['memberupleveltype_id'] == ''}checked{/if}/>
+                        <label for="group_level-1">自动升降</label>
+                        <span class="help-block">
+								系统根据当前会员的总积分，按照每个会员级别所需总积分的设置进行变更。可自动升降。
+							</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="radio" name="grouplevel" value="3" id="group_level-2" ng-model="group_level"{if $item['memberupleveltype_id'] == 2 || $item['memberupleveltype_id'] == ''}checked{/if}/>
+                        <label for="group_level-2">只升不降</label>
+                        <span class="help-block">
+								系统根据当前会员的总积分，如果会员的总积分达到更高一级的会员级别，则变更会员级别，如果积分少于当前所在会员级别所需总积分，保持当前会员级别不变，不会降级。
+							</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button  class="btn btn-primary" type="button" onclick="doDeleteSelectBtn()">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <input type="hidden" name="token" value="{$_W['token']}">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function doDeleteSelectBtn() {
+        var grouplevelid = $("input[name='grouplevel']:checked").val();
+       // var grouplevelid = 5;
+        var url = "{php echo $this->createWebUrl('membercardlevel', array('op' => 'updatemembercardleveltype'))}"
+        var params = {
+            'grouplevelid':grouplevelid,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                    swal({
+                        title: "操作成功！",
+                        text: "成功将此商品移除消费列表。",
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: true
+
+                })
+                $('#modal-change-group').modal('hide'),
+                    window.location.reload();
+            }, error: function () {
+                swal("操作有误", "请选择要删除的项目！","error");
+                $('#modal-change-group').modal('hide')
+
+            },
+        });
+
+    }
+</script>
+{template 'web/common/footer'}

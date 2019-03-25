@@ -1,0 +1,448 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{RES}public/css/multiple-select.css" />
+<script src="{RES}public/js/jquery.min.js"></script>
+<script src="{RES}public/js/multiple-select.js"></script>
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'display'));}">折扣卡</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'buylist'));}">购买记录</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'paylist'));}">核销记录</a></li>
+    <li class="active">{if isset($discountcard_list[discountcard_id])}<a href="javascript:;">编辑折扣卡</a>{else}<a href="{php echo $this->createWebUrl('discountcard', array('op'=>'create'));}">添加折扣卡{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" >
+			<div class="panel-heading">基本信息</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="discountcard[discountcard_id]" class="form-control" value="{$discountcard_list['discountcard_id']}" />
+					</div>
+				</div>
+
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="discountcard[discountcard_title]" class="form-control" value="{$discountcard_list['discountcard_title']}" maxlength="20" />
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>副标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="discountcard[discountcard_subtitle]" class="form-control" value="{$discountcard_list['discountcard_subtitle']}" maxlength="60" />
+					</div>
+				</div> -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>背景图</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_form_field_image('discountcard[discountcard_thumb]', $discountcard_list['discountcard_thumb'])}
+						<div class="help-block">建议尺寸：720*400</div>
+					</div>
+
+				</div>
+				<!-- <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>微信客服</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="discountcard[discountcard_wechat]" class="form-control" value="{$discountcard_list['discountcard_wechat']}" maxlength="25" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>客服二维码</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_form_field_image('discountcard[discountcard_qrcode]', $discountcard_list['discountcard_qrcode'])}
+					</div>
+				</div> -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>支付方式</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_paytype]" id="paytype1"  value="1" {if $discountcard_list['discountcard_paytype'] == 1 ||$discountcard_list['discountcard_paytype'] == ''} checked="checked"{/if}> 积分兑换
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_paytype]" id="paytype2" o value="2" {if $discountcard_list['discountcard_paytype'] == 2} checked="checked"{/if}> 余额兑换
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_paytype]" id="paytype3" o value="3" {if $discountcard_list['discountcard_paytype'] == 3} checked="checked"{/if} {if $level != 4}disabled{/if}> 微信支付
+						</label>
+						<span class="help-block">购买折扣卡方式，单选，可以选择积分兑换、余额兑换、微信支付购买等。注意：微信支付只支持认证服务号。</span>
+						<span class="help-block">支付参数设置位置：<a href="{php echo $this->createWebUrl('syssetup');}">番瓜营销设置</a> 》<a href="{php echo $this->createWebUrl('syssetup', array('systype'=>'7'));}">支付设置</a></span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>购买价格</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<div class="input-group">
+						  <input type="text" name="discountcard[discountcard_price]" class="form-control" value="{$discountcard_list['discountcard_price']}"  aria-describedby="basic-addon2" step="0.01" oninput="if(value.length>7)value=value.slice(0,7)" >
+						  <!-- <span class="input-group-addon" id="basic-addon2">元</span> -->
+						  <span class="help-block"></span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣卡使用次数限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+							<span class="input-group-addon" id="basic-addon2">限制使用</span>
+						  	<input type="number" name="discountcard[discountcard_times]" class="form-control" value="{$discountcard_list['discountcard_times']}"  aria-describedby="basic-addon2" step="0">
+						  	<span class="input-group-addon" id="basic-addon2">次</span>
+						</div>
+						  <span class="help-block">包括所有门店使用次数，达到限制次数则卡作废；（不填写或者填写0：不限制）</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣卡每日使用次数限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+						 <span class="input-group-addon" id="basic-addon2">每日限制使用</span>
+						  <input type="number" name="discountcard[discountcard_daytimes]" class="form-control" value="{$discountcard_list['discountcard_daytimes']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)">
+						  <span class="input-group-addon" id="basic-addon2">次</span>
+						  
+						</div>
+						<span class="help-block">包括所有门店使用次数，达到限制次数当日无法再使用；（不填写或者填写0：不限制）</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>有效期</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<div class="input-group">
+						 	<span class="input-group-addon" id="basic-addon2">从发卡日算起</span>
+						  	<input type="number" name="discountcard[discountcard_term]" class="form-control" value="{$discountcard_list['discountcard_term']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)" >
+						  	<span class="input-group-addon" id="basic-addon2">天内有效</span>
+						</div>
+						
+						<span class="help-block"></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>活动日期</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+								<span class="input-group-addon" id="basic-addon2">活动</span>			  	
+								<script type="text/javascript">
+									require(["datetimepicker"], function(){
+										$(function(){
+												var option = {
+													lang : "zh",
+													step : 5,
+													timepicker : false,
+													closeOnDateSelect : true,
+													format : "Y-m-d"
+												};
+											$(".datetimepicker[name = 'discountcard[discountcard_startdate]']").datetimepicker(option);
+										});
+									});
+								</script><input type="text" name="discountcard[discountcard_startdate]" value="{$discountcard_list['discountcard_startdate']}" id="startTime" placeholder="请选择日期时间"  class="datetimepicker form-control" style="padding-left:12px;"><span class="input-group-addon" id="basic-addon2">开始，折扣卡截止</span>			  	
+								<script type="text/javascript">
+									require(["datetimepicker"], function(){
+										$(function(){
+												var option = {
+													lang : "zh",
+													step : 5,
+													timepicker : false,
+													closeOnDateSelect : true,
+													format : "Y-m-d"
+												};
+
+											$(".datetimepicker[name = 'discountcard[discountcard_enddate]']").datetimepicker(option);
+										});
+									});
+
+								</script><input type="text" name="discountcard[discountcard_enddate]" value="{$discountcard_list['discountcard_enddate']}" id="endTime" placeholder="请选择日期时间"  class="datetimepicker form-control" style="padding-left:12px;"><span class="input-group-addon" id="basic-addon2">全部失效</span>
+						</div>
+						<span class="help-block"></span>
+					</div>
+				</div>
+					
+			
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣卡权益介绍</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_ueditor('discountcard[discountcard_content]',$discountcard_list['discountcard_content']);}
+
+					</div>
+				</div> 
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="number" name="discountcard[discountcard_order]" class="form-control" value="{$discountcard_list['discountcard_order']}"  step="1" oninput="if(value.length>4)value=value.slice(0,4)"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>开启状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_state]" id="state2"  value="1" {if $discountcard_list['discountcard_state'] == 1 ||$discountcard_list['discountcard_storetype'] == ''} checked="checked"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_state]" id="state2"  value="2" {if $discountcard_list['discountcard_state'] == 2} checked="checked"{/if}> 关闭
+						</label>
+						<span class="help-block"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-primary" >
+			<div class="panel-heading">门店使用默认限制</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣卡使用次数限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+							<span class="input-group-addon" id="basic-addon2">限制使用</span>
+						  	<input type="number" name="discountcard[discountcard_storetimes]" class="form-control" value="{$discountcard_list['discountcard_storetimes']}"  aria-describedby="basic-addon2" step="0">
+						  	<span class="input-group-addon" id="basic-addon2">次</span>
+						</div>
+						  <span class="help-block">各门店使用次数，达到限制次数则无法在当前门店使用</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣卡每日使用次数限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+						 <span class="input-group-addon" id="basic-addon2">每日限制使用</span>
+						  <input type="number" name="discountcard[discountcard_storedaytimes]" class="form-control" value="{$discountcard_list['discountcard_storedaytimes']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)">
+						  <span class="input-group-addon" id="basic-addon2">次</span>  
+						</div>
+						<span class="help-block">各门店每日使用次数，当日达到限制次数则无法在当前门店使用</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>折扣</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<div class="input-group">
+						  <input type="number" name="discountcard[discountcard_number]" class="form-control" value="{$discountcard_list['discountcard_number']}"  aria-describedby="basic-addon2" step="0.1" oninput="if(value.length>3)value=value.slice(0,3)" >
+						  <span class="input-group-addon" id="basic-addon2">折</span>
+						 
+						</div>
+						 <span class="help-block">提示：0表示免费，可输入小数点后1位，最大值10</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>折扣说明</label>
+					<div class="col-xs-12 col-sm-9 col-md-8 col-lg-8">
+						  <textarea class="form-control" placeholder="" name="discountcard[discountcard_remark]" ng-model="context.activeItem.description">{$discountcard_list['discountcard_remark']}</textarea>
+						 <span class="help-block">详细的折扣说明。例如：酒水不参与折扣活动等。</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>时间设置</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_datestate]" id="datestate1" onClick="check2(1)" value="1" {if $discountcard_list['discountcard_datestate'] == 1 ||$discountcard_list['discountcard_datestate'] == ''} checked="checked"{/if}> 每星期
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="discountcard[discountcard_datestate]" id="datestate2" onClick="check2(2)" value="2" {if $discountcard_list['discountcard_datestate'] == 2} checked="checked"{/if}> 每月
+						</label>
+						<span class="help-block"></span>
+					</div>
+				</div>
+
+				<div class="form-group  " id="week">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>星期</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+ 						{loop $weeks $key $item}
+						<label class="checkbox-inline">
+						  	<input type="checkbox" name="discountcard[discountcard1][]" id="inlineCheckbox{$key}" {if in_array($key,$discountcard_list['discountcard_date1'])}checked{/if} value="{$key}"> {$item}
+						</label>
+						{/loop}
+                        <span class="help-block">每星期的***可以使用。不勾选：无限制</span>
+					</div>
+				</div>
+
+				<div class="form-group hide" id="days">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>天</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{loop $days $key $item}
+
+							<label class="checkbox-inline" style="margin-left: 10px;">
+							  	<input type="checkbox" name="discountcard[discountcard2][]" id="inlineCheckbox{$key}" {if in_array($key,$discountcard_list['discountcard_date2'])}checked{/if} value="{$key}"> <p style="display:inline-block;width:10px;">{$item}</p>
+							</label>
+							{if $key%10 ==0}</br>{/if}
+						{/loop}
+                        <span class="help-block">每月的****号，可以使用。不勾选：无限制</span>
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>可用时间</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control " placeholder="8:00-20:00"  name="discountcard[discountcard_usetime]" value="{$discountcard_list['discountcard_usetime']}" maxlength="33">
+						<span class="help-block">可以不设置， 不设置则手机端显示“全天可用”。注意：此处填写时间为24小时制 </span>
+					</div>	
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>休息时间</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" class="form-control " placeholder="12:00-14:00"  name="discountcard[discountcard_resttime]" value="{$discountcard_list['discountcard_resttime']}" maxlength="33">
+						<span class="help-block">可以不设置，设置后手机端将结合可用时间显示成(上午8:00-12:00 下午14:00-20:00)。注意：此处填写时间为24小时制</span>
+					</div>	
+				</div> -->
+			</div>
+		</div>
+		<div class="panel panel-primary" >
+			<div class="panel-heading">门店使用默认限制</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>默认积分奖励</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+						  	<input type="number" name="discountcard[discountcard_reward]" class="form-control" value="{$discountcard_list['discountcard_reward']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)">
+						  	<span class="input-group-addon" id="basic-addon2">积分</span>
+						</div>
+						<span class="help-block">每次使用赠送****积分(注释：仅针对未单独设置积分奖励的每个门店生效)</span>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="backdiscountcard()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="discountcard[discountcard_title]"]').val() == ''){
+				util.message('请填写标题');
+				return false;
+			}	
+			if($('input[name="discountcard[discountcard_thumb]"]').val() == ''){
+				util.message('请填写背景图');
+				return false;
+			}
+			// if($('input[name="discountcard[discountcard_wechat]"]').val() == ''){
+			// 	util.message('请填写微信客服');
+			// 	return false;
+			// }
+			// if($('input[name="discountcard[discountcard_qrcode]"]').val() == ''){
+			// 	util.message('请填写客服二维码');
+			// 	return false;
+			// }
+			if($('input:radio[name="discountcard[discountcard_paytype]"]:checked').val()==undefined)
+			{
+				util.message('请选择支付方式');
+				return false;
+			}
+
+			if($('input:radio[name="discountcard[discountcard_paytype]"]:checked').val()==1)
+			{
+
+				if(!isunsign($('input[name="discountcard[discountcard_price]"]').val()))
+				{
+					util.message('支付方式为积分兑换的情况下，支付价格请填写整数');
+					return false;
+				}
+			}
+
+			if($('input[name="discountcard[discountcard_price]"]').val() == ''){
+				util.message('请填写价格');
+				return false;
+			}
+			if($('input[name="discountcard[discountcard_term]"]').val() == ''){
+				util.message('请填写有效期');
+				return false;
+			}
+			if($('input[name="discountcard[discountcard_startdate]"]').val()!=''||$('input[name="discountcard[discountcard_enddate]"]').val()!='')
+			{
+				if(!checkEndTime())
+				{
+					util.message('活动起始时间格式不正确');
+					return false;
+				}
+			}
+			if($('input[name="discountcard[discountcard_term]"]').val() <= 0){
+				util.message('请填写正确有效期');
+				return false;
+			}
+			if($('input[name="discountcard[discountcard_order]"]').val() == ''){
+				util.message('请填写排序');
+				return false;
+			}
+			if($('input:radio[name="discountcard[discountcard_state]"]:checked').val()==undefined)
+			{
+				util.message('请选择开启状态');
+				return false;
+			}
+			if($('input[name="discountcard[discountcard_number]"]').val() == ''){
+				util.message('请填写折扣');
+				return false;
+			}
+
+			if($('input:radio[name="discountcard[discountcard_datestate]"]:checked').val()==undefined)
+			{
+				util.message('请选择时间设置');
+				return false;
+			}
+			return true;
+		});
+
+	$('#ms1').change(function() {
+        	$('input[name="discountcard[discountcard_storeid]"]').val($(this).val());
+        }).multipleSelect({
+            width: '100%'
+        });
+    $('#ms2').change(function() {
+        	$('input[name="discountcard[discountcard_date1]"]').val($(this).val());
+        }).multipleSelect({
+            width: '100%'
+        });
+    $('#ms3').change(function() {
+        	$('input[name="discountcard[discountcard_date2]"]').val($(this).val());
+        }).multipleSelect({
+            width: '100%'
+        });
+        check2($('input:radio[name="discountcard[discountcard_datestate]"]:checked').val());
+	});
+	
+});
+function isInteger(obj) {
+ return Math.floor(obj) === obj
+}
+
+function check2(num)
+{
+	if(num==1){
+		$('#week').addClass('show');
+		$('#week').removeClass('hide');
+		$('#days').addClass('hide');
+		$('#days').removeClass('show');
+	}
+	if(num==2)
+	{
+		$('#week').addClass('hide');
+		$('#week').removeClass('show');
+		$('#days').addClass('show');
+		$('#days').removeClass('hide');
+	}
+	
+}
+
+function isunsign(s)
+{
+	var r = /^[0-9]*[1-9][0-9]*$/;
+	return r.test(s);
+}
+
+function backdiscountcard(){
+	window.location.href="{php echo $this->createWebUrl('discountcard', array('op'=>'display'));}";
+}
+function checkEndTime(){  
+    var startTime=$("#startTime").val();  
+    var start=new Date(startTime.replace("-", "/").replace("-", "/"));  
+    var endTime=$("#endTime").val();  
+    var end=new Date(endTime.replace("-", "/").replace("-", "/"));  
+    if(end<start){  
+        return false;  
+    }  
+    return true;  
+}  
+</script>
+{template 'common/footer'}

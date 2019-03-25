@@ -1,0 +1,117 @@
+<include file="Public/header.html"/>
+</head>
+<style type="text/css">
+	.cashout{line-height: 40px;margin-left: 15%;font-weight:bold;font-size: 16px;}
+	.cashout span{color: red;}
+</style>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>返现管理</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Cashback/cashback_list')}"  method="post"  style="width:95%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">               
+                <div class="layui-input-inline">
+                  <input type="text" name="goodsname" value="{$goodsname}"  placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="nickname" value="{$nickname}"  placeholder="请输入用户昵称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+			      	 <select name="isget" lay-filter="aihao">
+			      	 	<option value="" >全部</option>
+					    <option <?php if($isget==1){ echo 'selected'; } ?> value="1" >已返现</option>
+					    <option <?php if($isget==2){ echo 'selected'; } ?> value="2" >待返现</option>
+					 </select>
+                </div> 
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>
+        <xblock style="height: 40px;">
+        	<span class="cashout">已返现虚拟币：<span>{$yescashout}个/<i style="font-size: 14px;"><?php echo round($yescashout/$coinprice,2).'元'; ?></i></span></span>
+        	<span class="cashout">待返现虚拟币：<span>{$nocashout}个/<i style="font-size: 14px;"><?php echo round($nocashout/$coinprice,2).'元'; ?></i></span></span>
+        	<span class="cashout">总虚拟币：<span>{$countcashout}个/<i style="font-size: 14px;"><?php echo round($yescashout/$coinprice,2)+round($nocashout/$coinprice,2); ?>元</i></span></span>
+        	
+       	</xblock>
+       	<form id="delform" class="layui-form">
+	      <table class="layui-table">
+	            <thead>
+	                <tr>
+	                    <th>用户昵称</th>
+	                    <th>商品名称</th>
+	                    <th>消费金额</th>
+	                    <th>返现金额</th>
+	                    <th>状态</th>
+	                    <th>领取时间</th>
+	                </tr>
+	            </thead>
+	            <tbody id="formdata">
+	              <volist name="list" id="v">	
+	                <tr>
+	                   	<td>
+	                   		<?php if(!empty($v['nickname'])){ ?>
+	                   		<u style="cursor:pointer" onclick="member_show('{$v.nickname}','{:U('Home/MainCtr/Member/member_show',array('id'=>$v['uid']))}','10001','360','455')">{$v.nickname}</u> 
+	                   		<?php }else{ ?>
+	                   		<span style='color:red;'>用户不存在或已删除</span> 	
+	                   		<?php } ?>	
+	                   	</td>
+	                    <td ><?php if(empty($v['spname'])){echo "<span style='color:red;'>商品不存在或已删除</span>";}else{echo $v['spname'];}?></td>
+	                   	<td ><?php echo round($v['xnb']/$coinprice,2);?></td>
+	                   	<td ><?php echo round($v['newxnb']/$coinprice,2);?></td>
+	                    <td class="td-status">
+	                    	<?php 
+	                    		if($v['isget'] == '1'){ 
+	                    		    echo '<span class="layui-badge">已返现</span>';
+	                    		}else{ 
+	                    		    echo '<span class="layui-badge layui-bg-green">待返现</span>';
+	                    		}
+	                    	 ?>
+	                    </td>
+	                    <td><?php if(empty($v['updatetime'])){echo '';}else{echo date('Y-m-d H:i:s', $v['updatetime']);} ?></td>
+	                </tr>
+	              </volist>  
+	            </tbody>
+	        </table>
+		</form>
+		<span class="x-right" style="line-height:40px;">共有数据：{$count} 条</span>
+        <div id="page"></div>
+        
+    </div>
+    <include file="Public/footer.html"/>    
+     <script>
+        layui.use(['form','laydate','element','laypage','layer'], function(){
+          laydate = layui.laydate;//日期插件
+          laypage = layui.laypage;//分页
+          layer = layui.layer;//弹出层
+          form = layui.form;
+          $ = layui.jquery;
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page},
+		   jump: function(obj, first){
+			   if(!first){
+			    var $purl = "{:U('Home/MainCtr/Cashback/cashback_list',array('page'=>'pageval','nickname'=>$nickname,'goodsname'=>$goodsname,'isget'=>$isget))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);
+			   }
+			}
+		  });
+        });
+
+        /*用户-查看*/
+        function member_show(title,url,id,w,h){
+            x_admin_show(title,url,w,h);
+        }
+</script>
+</body>
+</html>

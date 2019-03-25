@@ -1,0 +1,346 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+
+    <link href="{RES}public/special/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+<ul class="nav nav-tabs">
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'display'));}">折扣卡</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'buylist'));}">购买记录</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'paylist'));}">核销记录</a></li>
+	<li class="active"><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'display'));}">参与门店</a></li>
+	<li ><a href="{php echo $this->createWebUrl('discountcard', array('op'=>'create'));}">添加折扣卡</a></li>
+
+</ul>
+<div class="main">
+		<div class="panel panel-primary">
+			<div class="panel-heading">参与门店</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:12%">序号</th>
+								<th style="width:22%">门店名称</th>
+                                <th style="width:22%;">参与状态</th>
+                                <th style="width:22%;">使用限制</th>
+                                <th style="width:22%;">积分奖励</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['store_title']}
+								</td>
+								<td >
+								   <input id="switch-labelText " class="disstore{$item['store_id']}" data-switch-create-destroy  type="checkbox" data-label-text=" " {if $item[storedis_state] == 1}checked{/if}  onchange="changestate({$item['store_id']},{$discountcard_id})">
+								</td>
+								<td>
+                                    <button type="button" class="btn btn-primary" disabled id="canshushezhi{$item['store_id']}" data-toggle="modal" data-target=".bs-example-modal-lg1{$item['store_id']}">使用限制</button>
+                                    <div class="modal fade bs-example-modal-lg1{$item['store_id']}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="canshu{$item['store_id']}">
+									  <div class="modal-dialog modal-lg" role="document">
+									    <div class="modal-content" style="padding: 20px 6px 6px;">
+									    <form action="" method="post" class="form-horizontal form" id="storedisform{$item['store_id']}">
+									      	<div class="panel panel-primary" >
+												<div class="panel-heading">门店使用限制</div>
+												<div class="panel-body">
+													<div class="form-group hide">
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<div class="input-group">
+															  	<input type="text" name="storedis[storedis_id]" class="form-control" value="{$item['storedis_list']['storedis_id']}"  >
+															</div>
+														</div>
+													</div>
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>折扣卡使用次数限制</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<div class="input-group">
+																<span class="input-group-addon" id="basic-addon2">限制使用</span>
+															  	<input type="number" name="storedis[storedis_storetimes]" class="form-control" value="{$item['storedis_list']['storedis_storetimes']}"  aria-describedby="basic-addon2" step="0">
+															  	<span class="input-group-addon" id="basic-addon2">次</span>
+															</div>
+															  <span class="help-block">包括所有门店使用次数，达到限制次数则卡作废；（不填写或者填写0：不限制）</span>
+														</div>
+													</div>
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>折扣卡每日使用次数限制</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<div class="input-group">
+															 <span class="input-group-addon" id="basic-addon2">每日限制使用</span>
+															  <input type="number" name="storedis[storedis_storedaytimes]" class="form-control" value="{$item['storedis_list']['storedis_storedaytimes']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)">
+															  <span class="input-group-addon" id="basic-addon2">次</span>  
+															</div>
+															<span class="help-block">包括所有门店使用次数，达到限制次数当日无法再使用；（不填写或者填写0：不限制）</span>
+														</div>
+													</div>
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred">*</span>折扣</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<div class="input-group">
+															  <input type="number" name="storedis[storedis_number]" class="form-control" value="{$item['storedis_list']['storedis_number']}"  aria-describedby="basic-addon2" step="0.1" oninput="if(value.length>3)value=value.slice(0,3)" >
+															  <span class="input-group-addon" id="basic-addon2">折</span>
+															 
+															</div>
+															 <span class="help-block">提示：0表示免费，可输入小数点后1位，最大值10</span>
+														</div>
+													</div>
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>折扣说明</label>
+														<div class="col-xs-12 col-sm-9 col-md-8 col-lg-8">
+															  <textarea class="form-control" placeholder="" name="storedis[storedis_remark]" >{$item['storedis_list']['storedis_remark']}</textarea>
+															 <span class="help-block"></span>
+														</div>
+													</div>
+
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred">*</span>时间设置</label>
+														<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+															<label class="radio-inline">
+															  <input type="radio" name="storedis[storedis_datestate]" id="datestate1 switch-create-destroy" data-switch-no-init onClick="check2(1,{$item['storedis_list']['storedis_id']})" value="1" {if $item['storedis_list']['storedis_datestate'] == 1 ||$item['storedis_list']['storedis_datestate'] == ''} checked="checked"{/if}> 每星期
+															</label>
+															<label class="radio-inline">
+															  <input type="radio" name="storedis[storedis_datestate]" id="datestate2 switch-create-destroy" data-switch-no-init onClick="check2(2,{$item['storedis_list']['storedis_id']})" value="2" {if $item['storedis_list']['storedis_datestate'] == 2} checked="checked"{/if}> 每月
+															</label>
+															<span class="help-block"></span>
+														</div>
+													</div>
+													<script>
+														$(function(){
+															check2({$item['storedis_list']['storedis_datestate']},{$item['storedis_list']['storedis_id']});
+								
+														})
+
+													</script>
+													<div class="form-group " id="week{$item['storedis_list']['storedis_id']}">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>星期</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+									 						{loop $weeks $key1 $item1}
+															<label class="checkbox-inline">
+															  	<input type="checkbox" name="storedis[storedis1][]" id="inlineCheckbox{$key1} switch-create-destroy"  data-switch-no-init {if in_array($key1,$item['storedis_list']['storedis_date1'])}checked{/if} value="{$key1}"> {$item1}
+															</label>
+															{/loop}
+									                        <span class="help-block">每星期的***可以使用。不勾选：无限制</span>
+														</div>
+													</div>
+													<div class="form-group hide" id="days{$item['storedis_list']['storedis_id']}">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>天</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															{loop $days $key2 $item2}
+
+																<label class="checkbox-inline" style="margin-left: 10px;">
+																  	<input type="checkbox" name="storedis[storedis2][]" id="inlineCheckbox{$key2} switch-create-destroy" {if in_array($key2,$item['storedis_list']['storedis_date2'])}checked{/if} data-switch-no-init  value="{$key2}"> <p style="display:inline-block;width:10px;">{$item2}</p>
+																</label>
+																{if $key2%10 ==0}</br>{/if}
+															{/loop}
+									                        <span class="help-block">每月的****号，可以使用。不勾选：无限制</span>
+														</div>
+													</div>
+													<!-- <div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>可用时间</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<input type="text" class="form-control " placeholder="8:00-20:00"  name="storedis[storedis_usetime]" value="{$item['storedis_list']['storedis_usetime']}" maxlength="33">
+															<span class="help-block">可以不设置， 不设置则手机端显示“全天可用”。注意：此处填写时间为24小时制 </span>
+														</div>	
+													</div>
+													<div class="form-group">
+														<label class="col-xs-12 col-sm-3 col-md-3 col-lg-3 control-label"><span class="xhred"></span>休息时间</label>
+														<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+															<input type="text" class="form-control " placeholder="12:00-14:00"  name="storedis[storedis_resttime]" value="{$item['storedis_list']['storedis_resttime']}" maxlength="33">
+															<span class="help-block">可以不设置，设置后手机端将结合可用时间显示成(上午8:00-12:00 下午14:00-20:00)。</span>
+															<span class="help-block">注意：此处填写时间为24小时制</span>
+														</div>	
+													</div> -->
+													<div class="form-group">
+														<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+															<input name="button" type="button" value="提交" class="btn btn-primary" onclick="saveadd({$item['store_id']})" style="width:100px;"/>
+															<input type="hidden" name="token" value="{$_W['token']}" />
+														</div>
+													</div>
+												</div>
+											</div>
+									    </form>
+
+									    </div>
+									  </div>
+									</div>
+								</td>
+								<td>
+                                    <button type="button" class="btn btn-primary" disabled id="jifenshezhi{$item['store_id']}" data-toggle="modal" data-target=".bs-example-modal-lg2{$item['store_id']}">积分奖励</button>
+
+                                    <div class="modal fade bs-example-modal-lg2{$item['store_id']}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="jifen{$item['store_id']}">
+										  <div class="modal-dialog modal-lg" role="document">
+										    <div class="modal-content" style="padding: 20px 6px 6px;">
+												<form action="" method="post" class="form-horizontal form" id="jifenform{$item['store_id']}">
+											      	<div class="panel panel-primary"  >
+														<div class="panel-heading">门店积分奖励</div>
+														<div class="form-group hide">
+															<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+																<div class="input-group">
+																  	<input type="text" name="storedis[storedis_id]" class="form-control" value="{$item['storedis_list']['storedis_id']}"  >
+																</div>
+															</div>
+														</div>
+														<div class="panel-body">
+															<div class="form-group">
+																<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>积分奖励</label>
+																<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+																	<div class="input-group">
+																	  	<input type="number" name="storedis[storedis_reward]" class="form-control" value="{$item['storedis_list']['storedis_reward']}"  aria-describedby="basic-addon2" step="0" oninput="if(value.length>9)value=value.slice(0,9)">
+																	  	<span class="input-group-addon" id="basic-addon2">积分</span>
+																	</div>
+																	<span class="help-block">每次使用赠送****积分(注释：仅针对未单独设置积分奖励的每个门店生效)</span>
+																</div>
+															</div>
+											                <div class="form-group">
+																<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+																	<input name="button" type="button" value="提交" class="btn btn-primary" onclick="saveadd2({$item['store_id']})" style="width:100px;"/>
+																	<input type="hidden" name="token" value="{$_W['token']}" />
+																</div>
+															</div>
+														</div>
+													</div>
+												</form>
+										    </div>
+										  </div>
+										</div>
+								</td>
+							</tr>
+							<script>
+								$(function (){
+									changestate({$item['store_id']},{$discountcard_id});
+								})
+							</script>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#store_state_0").prop("checked",'checked')
+}
+function changestate(stoid,disid){
+	if($('.disstore'+stoid+':checked').val()=='on')
+	{
+		state=1;
+		$('#jifenshezhi'+stoid).prop('disabled',false);
+		$('#canshushezhi'+stoid).prop('disabled',false);
+	}else{
+		state=2;
+		$('#jifenshezhi'+stoid).prop('disabled',true);
+		$('#canshushezhi'+stoid).prop('disabled',true);
+	}
+
+	$.ajax({  
+	        type:"POST",
+	        url: "{php echo $this->createWebUrl('ajaxdisstorestate');}",
+	        data:{store_id:stoid,state:state,discountcard_id:disid},
+	        dataType:"json",
+	        // dataType:"text",
+	        async:false,
+	        success: function(data){
+	            if(data.result=='success')
+	            {
+
+	            }else{
+	            	alert(data.rs);
+	            }
+	        }
+	    });
+}
+
+
+function check2(num,id)
+{
+	if(num==1){
+		$('#week'+id).addClass('show');
+		$('#week'+id).removeClass('hide');
+		$('#days'+id).addClass('hide');
+		$('#days'+id).removeClass('show');
+	}
+	if(num==2)
+	{
+		$('#week'+id).addClass('hide');
+		$('#week'+id).removeClass('show');
+		$('#days'+id).addClass('show');
+		$('#days'+id).removeClass('hide');
+	}
+	
+}
+function clearformss(id)
+{
+	$("#credit_type1").prop("checked",'checked');
+	$('#jine'+id).val('');
+}
+function saveadd(stoid)
+{
+	$.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxdisstoresave');}",
+        data:$('#storedisform'+stoid).serialize(),
+        dataType:"json",
+        // dataType:"text",
+        async:false,
+        success: function(data){
+            if(data.result=='success')
+            {
+               	alert('参数设置成功');
+            }else{
+				alert('参数设置失败');
+            }
+             $('#canshu'+stoid).modal('hide');
+        }
+    });
+}
+function saveadd2(stoid)
+{
+	
+	$.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxdisstoresave');}",
+        data:$('#jifenform'+stoid).serialize(),
+        dataType:"json",
+        // dataType:"text",
+        async:false,
+        success: function(data){
+            if(data.result=='success')
+            {
+                alert('积分参数设置成功');
+            }else{
+            	alert('积分参数设置失败');
+            }
+            $('#jifen'+stoid).modal('hide');
+        }
+    });
+}
+</script>
+    <script src="{RES}public/special/docs/js/highlight.js"></script>
+    <script src="{RES}public/special/js/bootstrap-switch.js"></script>
+    <script src="{RES}public/special/docs/js/main.js"></script>
+{template 'common/footer'}

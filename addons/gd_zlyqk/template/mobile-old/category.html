@@ -1,0 +1,152 @@
+{template "header"}
+<style>
+    .txt{margin-bottom: 3px;font-size:13px !important;}
+</style>
+<div class="wrap page3" style="padding-bottom: 40px;">
+    {template "link2"}
+    <div class="weui-search-bar" id="searchBar" {if $_GPC['word']}style="margin-top:0"{else}style="display: none;"{/if} >
+        <form class="weui-search-bar__form">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput" value="{$_GPC['word']}" placeholder="搜索 单号 客户名 电话" required="">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText">
+                <i class="weui-icon-search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+    {loop $msgList $msg}
+    <div class="item" style="{if $_GPC['word']} margin-top:0px {else} margin-top:8px{/if};padding-top:10px;">
+        <div class="txt">应用 : {$msg['app_name']}</div>
+        <div class="txt">客户 : {$msg['name']}</div>
+        <div class="txt">单号 : {$msg['gd_sn']} <font style="font-size: 12px;font-weight: 800;color:red">{$msg['property']}</font></div>
+        {if $msg['mobile']!=" " }
+        <div class="txt">电话 : {$msg['mobile']}</div>
+        {/if}
+        <div class="txt">提交时间 : {php echo date("Y-m-d H:i:s",$msg['create_time'])}</div>
+        <div class="tags">
+            <span class="on">{$msg['node_name']}</span>
+            <span>{if $msg['node_name_status']} {$msg['node_name_status']}{else} 待处理{/if}</span>
+        </div>
+        <div class="btm" style="padding-left: 0 !important;">
+            <div class="voice-box" >
+                <span style="width: 30%;padding-right: .3rem"> {$msg['use_time']}</span>
+            </div>
+            {if  $msg['who']==1 }
+            {if  $msg['is_abort']==0}
+            {if  $msg['is_mark']==0}
+            <a href="javascript:" class="btn btn-details remark" data-id="{$msg['id']}" onclick="mark({$msg['id']})" style="right: 60px;">标记</a>
+            {/if}
+            {/if}
+            {/if}
+            <a href="{php echo $this->createMobileUrl('detail',array('id'=>$msg['recorder_id'],'app_id'=>$msg['app_id']))}" class="btn btn-details">详情</a>
+        </div>
+    </div>
+    {/loop}
+</div>
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/main.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/swiper.jquery.min.js"></script>
+{template "menu"}
+<script>
+    var search=fase;
+    function mark(id){
+        $.post("{php echo $this->createMobileUrl('remark')}&id="+id,{},function(response){
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },"json");
+    };
+
+</script>
+<script type="text/javascript">
+    $(".search").click(function(){
+        if(search){
+            search=false;
+            $("#searchBar").hide();
+            $(".item").css("margin-top","8px");
+            $(".icon-search").css("color","#9B9B9B");
+        }else{
+            $("#searchBar").show();
+            $(".hd a").removeClass("on");
+            $(".item").css("margin-top","0");
+            $(".icon-search").css("color","#89e5d2");
+            search=true;
+        }
+    });
+    $(function(){
+        var $searchBar = $('#searchBar'),
+                $searchResult = $('#searchResult'),
+                $searchText = $('#searchText'),
+                $searchInput = $('#searchInput'),
+                $searchClear = $('#searchClear'),
+                $searchCancel = $('#searchCancel');
+
+        function hideSearchResult(){
+            $searchResult.hide();
+            $searchInput.val('');
+        }
+        function cancelSearch(){
+            hideSearchResult();
+            $searchBar.removeClass('weui-search-bar_focusing');
+            $searchText.show();
+        }
+
+        $searchText.on('click', function(){
+            $searchBar.addClass('weui-search-bar_focusing');
+            $searchInput.focus();
+        });
+        $searchInput
+                .on('blur', function () {
+                    if(!this.value.length) cancelSearch();
+                })
+                .on('input', function(){
+                    if(this.value.length) {
+                        $searchResult.show();
+                    } else {
+                        $searchResult.hide();
+                    }
+                })
+        ;
+        $searchClear.on('click', function(){
+            hideSearchResult();
+            $searchInput.focus();
+        });
+        $searchCancel.on('click', function(){
+            cancelSearch();
+            $searchInput.blur();
+            $("#searchBar").hide();
+            $(".item").css("margin-top","8px");
+            search=false;
+        });
+        {if $_GPC['word']}
+            search=true;
+            $searchBar.addClass('weui-search-bar_focusing');
+            $searchInput.focus();
+            $(".icon-search").css("color","#89e5d2");
+        {/if}
+    });
+    var url="{php echo $this->createMobileUrl('msg',array('id'=>0))}";
+    $('#searchInput').bind('keypress', function(event) {
+        if (event.keyCode == "13") {
+            var word = $('#searchInput').val();
+            if(word==""){
+                return false;
+            }
+            location.href=url+"&word="+word;
+            return false;
+        }
+    });
+</script>
+</body>
+</html>

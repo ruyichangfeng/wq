@@ -1,0 +1,145 @@
+{template 'public/header'}
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+			<li><a href="<?php echo $this->routeUrl('coupon.index');?>">优惠券管理</a></li>
+			<?php if(intval($coupon['id'])>0){?>
+			<li class="active">{$coupon['name']}</li>
+			<?php }?>
+
+			<li class="active">编辑优惠券</li>
+		</ol>
+	</div>
+	<div class="panel-body">
+		<form class="form-horizontal" method="post" id="memForm"  action="<?php echo $this->routeUrl('coupon.save');?>&cid={$_GPC['cid']}">
+			<input type="hidden" name="cid" value="{$_GPC['cid']}">
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">优惠券名称</label>
+				<div class="col-sm-3">
+					<input type="text" class="form-control" name="name" value="{$coupon['name']}" valid-msg="优惠券名称1-10字" placeholder="10字以内" valid="length|1|10" >
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">类型</label>
+				<div class="col-sm-3">
+					<select class="form-control" name="type" style="width: 200px;">
+						<option value="1" <?php if($coupon['type']=="1"){echo "selected";}?> >满减</option>
+					</select>
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;</label>
+			</div>
+			<div class="form-group" style="display: none;">
+				<label for="inputPassword3" class="col-sm-2 control-label">限制分类</label>
+				<div class="col-sm-3">
+					<select class="form-control" name="type" style="width: 200px;">
+						<option value="0"  >全种类通用</option>
+						<option value="1" <?php if($coupon['type']=="1"){echo "selected";}?> >满减</option>
+						<option value="2" <?php if($coupon['type']=="2"){echo "selected";}?> >打折</option>
+					</select>
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">限制开始时间</label>
+				<div class="col-sm-3">
+					<input type="date" name="limit_start" class="form-control" style="width: 250px;" placeholder="没到指定日期无法使用" value="{$coupon['limit_start']}">
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*没到指定日期无法使用，不设置表示开始不限制时间</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">限制结束时间</label>
+				<div class="col-sm-3">
+					<input type="date" name="limit_stop" class="form-control" style="width: 250px;" placeholder="过了指定日期无法使用" value="{$coupon['limit_stop']}">
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*过了指定日期无法使用，不设置表示不限制结束时间</label>
+			</div>
+
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">满减条件</label>
+				<div class="col-sm-3">
+					<input type="float" class="form-control"  value="{$coupon['limit_money']}"  name="limit_money" placeholder="满多少元后可用" >
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:#ff4444;text-align: left;">&nbsp;*必填</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">优惠金额</label>
+				<div class="col-sm-3">
+					<input type="float" class="form-control"  value="{$coupon['reduce']}"  name="reduce" placeholder="减多少钱" >
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*</label>
+			</div>
+
+			<div class="form-group" style="display: none;">
+				<label for="inputPassword3" class="col-sm-2 control-label">折扣</label>
+				<div class="col-sm-3">
+					<input type="float" class="form-control"  value="{$coupon['discount']}"  name="discount" placeholder="打多少折" >
+				</div>
+				<label for="inputEmail3" class="col-sm-3 control-label" style="color:orange;text-align: left;">&nbsp;*填写0-1之间的小数，如“八折”请填写0.8</label>
+			</div>
+			<div class="form-group" style="display: none;">
+				<label for="inputPassword3" class="col-sm-2 control-label">图片</label>
+				<div class="col-sm-3">
+					{php echo tpl_form_field_images('thumb',$coupon['thumb']);}
+				</div>
+				<label   class="col-sm-3 control-label" style="color:#ff4444;text-align: left;">&nbsp;*选填，尺寸：270*100,大小建议不超过20k。<br/>如果上传了自定义图片以后，小程序上将只显示图片，<br/>如果不上传，则使用系统默认样式，会在优惠券上显示金额等信息。</label>
+			</div>
+			<div class="form-group">
+				<label for="inputPassword3" class="col-sm-2 control-label">状态</label>
+				<div class="col-sm-6">
+					<select class="form-control" name="status" style="width: 200px;" >
+						<option value="1" <?php if($coupon['status']=="1"){ echo "selected";}?> >启用</option>
+						<option value="0" <?php if($coupon['status']=="0"){ echo "selected";}?>  >禁用</option>
+
+					</select>
+				</div>
+
+			</div>
+
+			<div class="form-group" style="text-align: center;">
+				<div class="col-sm-6" style="text-align: center;">
+					<button type="button" class="mybtn" style="margin:0 auto;" onclick="sub()">保存
+					</button>
+				</div>
+
+			</div>
+
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	function showOpt(id){
+		$(id).css("display","block");
+	}
+	function getOpt1(that,domid){
+		$(domid).html("");
+		$.ajax({
+			url:"<?php echo $this->routeUrl('coupon.getOptByPid');?>&pid="+parseInt($(that).val()),
+			type:"post",
+			dataType:"json",
+			success:function(d){
+				var html="";
+				$.each(d,function(i,v){
+					html+="<option value='"+v.id+"'>"+v.name+"</option>";
+				});
+				$(domid).html(html);
+			}
+		});
+	}
+	function sub(){
+
+		var limit_money = $('input[name=limit_money]').val();
+		var reduce = $('input[name=reduce]').val();
+		if(parseInt(limit_money) <= parseInt(reduce)){
+			layer.alert('优惠金额不能大于等于满减金额，请认真填写');
+			return false;
+		}else if(valid_easy('form-control')){
+			modalDlg("是否继续？",function(){
+				$("#memForm").submit();
+			})
+
+		}
+
+	}
+</script>
+{template 'public/footer'}

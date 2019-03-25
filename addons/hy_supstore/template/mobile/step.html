@@ -1,0 +1,65 @@
+﻿{template 'common/header'}
+<p>
+    会员名称：{$cm['name']}
+</p>
+<p>
+    手机号：{$cm['mobile']}
+</p>
+<form method="post" enctype="multipart/form-data">
+    {loop $list $val}
+    <p>
+        {if $val['type']=='text'} {$val['name']}:
+        <input type="text" name="{$val['inputname']}" id="{$val['inputname']}" value="{$registercolumn[$val['inputname']]}" /> {/if}
+    </p>
+    <p>
+        {if $val['type']=="radio"} {$val['name']}:
+        <?php 
+        $vallist = explode(",",$val['value']);
+        foreach ($vallist as $k => $val1) {             
+                $arr = explode("=",$val1);
+                //$vallist[$k]['value']=$arr[0]; 
+                //$vallist[$k]['text']=$arr[1]; 
+        ?>
+        <input type="radio" name="{$val['inputname']}" id="{$val['inputname']}" value="{$arr[0]}" 
+        {if $registercolumn[$val[ 'inputname']]==$arr[0]} checked="checked" {/if} /> {$arr[1]}
+        <?php } ?>
+        {/if}
+    </p>
+    <p>
+        {if $val['type']=="checkbox"} {$val['name']}:
+        <?php 
+        $vallist = explode(",",$val['value']);
+        foreach ($vallist as $k => $val1) { 
+                $arr = explode("=",$val1);
+                //$vallist[$k]['value']=$arr[0]; 
+                //$vallist[$k]['text']=$arr[1]; 
+        ?>
+        <input type="checkbox" name="{$val['inputname']}[]" id="{$val['inputname']}" value="{$arr[0]}" {if in_array($arr[0],$registercolumn[$val[ 'inputname']]) } checked="checked" {/if} /> {$arr[1]}
+    </p>
+    <p>
+        <?php } ?>
+        {/if} 
+        {if $val['type']=="select"} {$val['name']}:
+        <select name="{$val['inputname']}" id="{$val['inputname']}">
+        <?php 
+        $vallist = explode(",",$val['value']);
+        foreach ($vallist as $k => $val1) {
+            $arr = explode("=",$val1);
+            //$vallist[$k]['value']=$arr[0]; 
+            //$vallist[$k]['text']=$arr[1];  
+        ?>
+        <option value="{$arr[0]}" {if $registercolumn[$val[ 'inputname']]==$arr[0]} selected{/if}>{$arr[1]}</option>
+        <?php } ?>
+        </select>
+        {/if}
+    </p>
+    <p>
+        {if $val['type']=="textarea"} {$val['name']}:
+        <textarea name="{$val['inputname']}" id="{$val['inputname']}">{$registercolumn[$val['inputname']]}</textarea>
+        {/if}
+    </p>
+    {/loop}
+    <input type="hidden" name="token" value="{$_W['token']}" />
+    <input type="submit" name="submit" value="提交" />
+</form>
+{template 'common/footer'}

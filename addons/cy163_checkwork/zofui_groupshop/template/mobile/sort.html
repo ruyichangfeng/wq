@@ -1,0 +1,79 @@
+{template 'common/myheader'}
+	{if $this->module['config']['sorttype'] <= 1 || $_GPC['op'] == 'detail' }
+	    <div id="page_sort" class="page page-current">
+			<div class="content infinite-scroll native-scroll insertHtmlStr" data-distance="50">
+				{template 'common/search'}
+				{template 'common/select'}
+				{template 'common/pagebox'}	
+			
+			</div>
+		</div>
+	{else}
+		<div id="page_sort" class="page_sort twoclasssort page page-current">
+			<div class="content">
+				<div class="sort_search">
+					<form class="item_cell_box">
+						<input type="hidden" name='i' value="{$_W['uniacid']}"/>
+						<input type="hidden" name='c' value='entry'/>
+						<input type="hidden" name='m' value='zofui_groupshop'/>
+						<input type="hidden" name='do' value='sort'/>
+						<input type="hidden" name='op' value='detail'/>
+						<li class="sort_search_back"></li>
+						<li class="item_cell_flex sort_search_input">
+							<input type="search" name="for" class="weui_search_input" id="search_input" value="{$_GPC['for']}" placeholder="输入商品标题"/>
+							<a href="javascript:" class="weui_icon_clear" id="search_clear" {if !empty($_GPC['for'])}style="display:block;"{/if}></a>
+						</li>
+						<li class="sort_search_btn">
+							<input type="submit" class="" value="搜索"/>
+						</li>
+					</form>
+				</div>
+				<div class="sortbody">
+					<div class="sortleft">
+						{loop $allsort $item}
+							{if $item['class'] == 1}
+								{php $i++}
+								<li class="sortleft_one {if $i == 1}activity{/if}" data-index="{$item['id']}" >{$item['name']}</li>
+							{/if}
+						{/loop}
+					</div>
+					<div class="sortright">	
+						<!-- <ul class="sortright_one" id="sortitem_0" style="display:block;">
+							<a href="{php echo $this->createMobileUrl('sort',array('op'=>'detail','sortid'=>''))}">
+								<li class="sortright_two" data-id="">
+									<img src="{php echo tomedia($this->module['config']['sharepic'])}">
+									<span>全部分类</span>
+								</li>
+							</a>
+						</ul> -->						
+						{loop $allsort $item}
+							{if $item['class'] == 1}
+								{php $k++ }
+								<ul class="sortright_one" id="sortitem_{$item['id']}" {if $k ==1}style="display:block"{/if}>
+									<p class="allsort_ahref">
+										<a href="{php echo $this->createMobileUrl('sort',array('op'=>'detail','sortid'=>''))}">
+										全部商品<span class="ti-angle-right"></span>
+										</a>
+									</p>
+									<section class="router sortlist" >
+									{loop $allsort $in}
+										{if $in['parentid'] == $item['id']}
+											<a href="{php echo $this->createMobileUrl('sort',array('op'=>'detail','sortid'=>$in['id']))}">
+												<li class="sortright_two" data-id="{$in['id']}">
+													<img data-src="{php echo tomedia($in['pic'])}">	
+													<span>{$in['name']}</span>
+												</li>
+											</a>
+										{/if}
+									{/loop}
+									</section>
+								</ul>
+							{/if}
+						{/loop}
+					</div>
+				</div>
+			</div>
+		</div>	
+	{/if}	 
+	
+{template 'common/myfooter'}

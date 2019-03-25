@@ -1,0 +1,337 @@
+{template 'head2'}
+
+<title>{$title}</title>
+<style>
+    .classify_box
+    {
+        margin-bottom: 10px;
+    }
+    .classify_box li {
+        float: left;
+        width: 25%;
+        text-align: center;
+        color: #333;
+        margin-top: 10px;
+    }
+    .clear{
+        clear: both;
+    }
+
+    .classify_box li img {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 6px;
+    }
+    .classify_box li p{
+        width: 50%;
+        overflow: hidden;
+        margin: 0 auto;
+        padding-bottom: 4px;
+    }
+    .li-active
+    {
+        border-bottom: 1px solid red;
+    }
+</style>
+<script>
+    wx.ready(function () {
+
+        sharedata = {
+
+            title: "{$config['mobile_card_sharetitle']}",
+
+            desc: "{$config['mobile_card_sharedesc']}",
+
+            link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('Carddis',array('parent'=>$openid)))}",
+
+            imgUrl: "{php echo tomedia($config['mobile_card_shareimg'])}",
+
+            type: '', // 分享类型,music、video或link，不填默认为link
+
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+
+            success: function () {
+
+            },
+
+            cancel: function () {
+
+            }
+
+        };
+
+
+
+        wx.onMenuShareAppMessage(sharedata);
+
+        wx.onMenuShareTimeline(sharedata);
+
+        wx.onMenuShareQQ(sharedata);
+
+        wx.onMenuShareWeibo(sharedata);
+
+        wx.onMenuShareQZone(sharedata);
+
+    });
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+    <div class="box">
+
+        <div class="banner">
+
+            <!-- Swiper -->
+
+            <div class="swiper-container">
+
+                <div class="swiper-wrapper">
+
+                    {loop $advcont_list $key $item}
+
+                    <div class="swiper-slide">
+
+                        {if $item['advcont_url']!=''}
+
+                        <a href="{$item['advcont_url']}">
+
+                            <img src="{php echo tomedia($item['advcont_thumb'])}">
+
+                        </a>
+
+                        {else}
+
+                        <img src="{php echo tomedia($item['advcont_thumb'])}"> {/if}
+
+                    </div>
+
+                    {/loop}
+
+                </div>
+
+                <!-- Add Pagination -->
+
+                <div class="swiper-pagination"></div>
+
+                <!-- Add Arrows -->
+
+                <!--<div class="swiper-button-next"></div>
+
+            <div class="swiper-button-prev"></div>-->
+
+            </div>
+
+
+
+            <!-- Swiper JS -->
+
+            <script src="{RES}public/discount/js/swiper.min.js"></script>
+
+
+
+            <!-- Initialize Swiper -->
+
+            <script>
+                var swiper = new Swiper('.swiper-container', {
+
+                    pagination: '.swiper-pagination',
+
+                    nextButton: '.swiper-button-next',
+
+                    prevButton: '.swiper-button-prev',
+
+                    paginationClickable: true,
+
+                    spaceBetween: 30,
+
+                    centeredSlides: true,
+
+                    autoplay: 2500,
+
+                    autoplayDisableOnInteraction: false
+
+                });
+            </script>
+
+        </div>
+
+        <div class="classify_box">
+            {loop $types $key $item}
+            <a href="{php echo $this->createMobileUrl('CardType', array('op' => 'display', 'type_id' => $item['storetype_id']))}">
+                <li >
+                    <img src="{php echo tomedia($item['storetype_pic'])}">
+                    <p class="{if $item['storetype_id'] == $type_id}li-active{/if}">{$item['storetype_name']}</p>
+                </li>
+            </a>
+            {/loop}
+            <div class="clear"></div>
+        </div>
+
+        <div class="cont-box">
+
+            <ul class="cont">
+
+                {loop $store_array $key1 $item1}
+
+                <li id="cont1">
+
+                    <div class="cont-t">
+
+                        <div class="cont-image01">
+
+                            <a href="{php echo $this->createMobileUrl('storecon',array('store_id'=>$item1['store_id']));}">
+
+                                <img src="{php echo tomedia($item1['store_thumb'])}">
+
+                            </a>
+
+                        </div>
+
+                        <div class="cont-image">
+
+                            <img class="cont-image02" id="img_2_{$item1['store_id']}" onClick="javascript:_show(this,{$item1['store_id']},2)" src="{RES}public/discount/images/xin03.png"
+                                style="display:{if $item1['collect_gzzt']==1} none{else}block{/if};">
+                            <img class="cont-image03" id="img_3_{$item1['store_id']}" onClick="javascript:_show(this,{$item1['store_id']},3)" src="{RES}public/discount/images/xin02.png"
+                                style="display:{if $item1['collect_gzzt']==1}block{else}none{/if};">
+                        </div>
+                    </div>
+                    <div class="cont-c">
+                        <a href="{php echo $this->createMobileUrl('storecon',array('store_id'=>$item1['store_id']));}" class="cont-text01">{$item1['store_title']}</a>
+                    </div>
+                    <ul class="cont-b" id="collectid{$item1['store_id']}">
+                        {loop $item1['collect_list'] $key2 $item2}
+                        <li id="avatar{$item1['store_id']}{$item2['collect_id']}">
+                            <a href="#">
+                                <img src="{if $item2['collect_avatar']}{$item2['collect_avatar']}{else}{RES}images/noavatar.gif{/if}" class="img-circle">
+                            </a>
+                        </li>
+                        {/loop}
+                        <a href="{php echo $this->createMobileUrl('storecon',array('store_id'=>$item1['store_id']));}" class="cont-text02">等
+                            <span id="count{$item1['store_id']}">{$item1['store_amountcollect']}</span>人想去</a>
+
+                    </ul>
+
+                </li>
+
+                {/loop}
+
+
+
+            </ul>
+
+            <script>
+                function _show(t, storeid, i2)
+
+                {
+
+                    t.style.display = "none";
+
+
+
+                    if (i2 == 2)
+
+                    {
+
+                        addordelcollect(storeid, 1);
+
+                        dg("img_2_" + storeid).style.display = "none";
+
+                        dg("img_3_" + storeid).style.display = "block";
+
+                    } else
+
+                    {
+
+                        addordelcollect(storeid, 2);
+
+                        dg("img_2_" + storeid).style.display = "block";
+
+                        dg("img_3_" + storeid).style.display = "none";
+
+                    }
+
+                }
+
+                function dg(id)
+
+                {
+
+                    return document.getElementById(id);
+
+                }
+
+
+
+                function addordelcollect(storeid, state)
+
+                {
+
+                    $.ajax({
+
+                        type: "POST",
+
+                        url: "{php echo $this->createMobileUrl('ajaxcollect');}",
+
+                        data: {
+                            store_id: storeid,
+                            collect_state: state
+                        },
+
+                        dataType: "json",
+
+                        async: false,
+
+                        success: function (data) {
+
+                            if (data.result == 'success')
+
+                            {
+
+                                if (data.type == 1)
+
+                                {
+
+                                    var sss = '';
+
+                                    sss = "<li id='avatar" + storeid + data.content.id + "'><a href='#'/>";
+
+                                    sss += "<img src='" + data.content.avatar + "' class='img-circle'>";
+
+                                    sss += '</li>';
+
+                                    $("#collectid" + storeid).prepend(sss);
+
+
+
+                                } else {
+
+                                    $("#avatar" + storeid + data.content.id).remove();
+
+                                }
+
+                                $('#count' + storeid).text(data.count);
+
+                            } else {
+
+                                alert(data.rs);
+
+                            }
+
+                        }
+
+                    });
+
+                }
+            </script>
+
+
+
+        </div>
+
+        {template 'foot-nav'}

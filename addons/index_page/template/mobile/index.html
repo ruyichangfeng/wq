@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link rel="stylesheet" href="{CSS_PATH}swiper.min.css" />
+    <script src="{JS_PATH}swiper.min.js"></script>
+    <script src="{JS_PATH}zepto.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    window.onload=function(){
+        function rem(size){
+            var clientW=document.documentElement.clientWidth;
+            var bili=clientW/size;
+            var fontSize=bili*100;
+            document.getElementsByTagName("html")[0].style.fontSize=fontSize+"px"
+        }
+        rem(720)
+        
+        var mySwiper = new Swiper('.swiper-container',{
+        	pagination : '.swiper-pagination',
+        })
+         
+    };
+      	
+    </script>
+    <style>
+    	body,html{
+    		width: 100%;height: 100%;margin: 0;padding: 0;
+    	}
+    	.swiper-container{
+    		width: 100%;height: 100%;
+    	}
+    	.swiper-wrapper{
+    		width: 100%;height: 100%;
+    	}
+    	.swiper-slide{
+    		position: relative;
+    	}
+    	.swiper-slide a{
+    		display: block;position: absolute;left: 0;right: 0;margin: auto;
+    		width: 100%;height: 100%;background: none;
+    	}
+    	.swiper-slide a:visited { 
+			text-decoration: none;
+			background: none;
+		} 
+		.swiper-slide a:hover { 
+			text-decoration: underline;  
+			background: none;
+		} 
+    	.swiper-slide img{
+    		width: 100%;height: 100%;
+    	}
+    </style>
+</head>
+{if $wx['share']==1}
+{template 'common/wxshare'}
+<script>
+        //微信分享
+        var title = "{php echo $wx['share_title']}";
+        var imgUrl = "{php echo tomedia($wx['share_image'])}";
+        var desc = "{php echo $wx['share_desc']}";
+        
+        wx.ready(function(){
+            wx.onMenuShareTimeline({
+                title: title, // 分享标题
+                imgUrl: imgUrl, // 分享图标
+            success: function () { 
+            // 用户确认分享后执行的回调函数
+                alert('分享成功');
+             },
+            cancel: function () { 
+            // 用户取消分享后执行的回调函数
+                 alert("分享失败");
+            }
+    });
+
+    //分享给好友
+        wx.onMenuShareAppMessage({
+                title: title, // 分享标题
+                 desc: desc, // 分享描述
+                imgUrl: imgUrl, // 分享图标
+            success: function () { 
+            // 用户确认分享后执行的回调函数
+                alert('分享成功');
+            },  
+            cancel: function () { 
+            // 用户取消分享后执行的回调函数
+                 alert('分享失败');
+            }
+        });
+    });
+</script>
+{/if}
+<body>
+	<div class="swiper-container">
+  		<div class="swiper-wrapper">
+        <?php for($i=0;$i<$count;$i++){ ?>
+    		<div class="swiper-slide">
+    			{if $i==$count-1}<a href="{$settings['url']}" id="aa">{/if}<img src="{php echo tomedia($images[$i]);}" alt="" />{if $i==$count}</a>{/if}
+
+    		</div>
+          <?php } ?>
+  		</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+    var startPosition, endPosition, deltaX, deltaY, moveLength;  
+    $("#aa").bind('touchstart', function(e){  
+        var touch = e.touches[0];  
+        startPosition = {  
+            x: touch.pageX,  
+            y: touch.pageY  
+        }  
+    }) .bind('touchmove', function(e){  
+        var touch = e.touches[0];  
+        endPosition = {  
+            x: touch.pageX,  
+            y: touch.pageY  
+        };  
+
+        deltaX = endPosition.x - startPosition.x;  
+        deltaY = endPosition.y - startPosition.y;  
+        moveLength = Math.sqrt(Math.pow(Math.abs(deltaX), 2) + Math.pow(Math.abs(deltaY), 2));  
+    }).bind('touchend', function(e){  
+        if(deltaX < 0) { // 向左划动  
+            window.location.href = "{$settings['url']}";
+        } else if (deltaX > 0) { 
+        }  
+    });  
+</script>
+
+</html>

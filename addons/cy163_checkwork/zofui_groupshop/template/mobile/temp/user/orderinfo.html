@@ -1,0 +1,350 @@
+<div id="page_orderinfo" class="page page-current  page_orderinfo page_orderinfo">
+	<div class="content" >
+		<div class="order_detail_top {if in_array($datainfo['ostatus'],array(2,7,8)) }repair_order_top{/if}" >
+
+			{if $datainfo['ostatus'] == 2}
+				订单已取消
+			{elseif  $datainfo['ostatus'] == 7}
+				已退款		
+			{elseif in_array($datainfo['ostatus'],array(1,3,4,5,6))}  <!-- 正常流程 -->
+				<ul class="line">
+					<li class="order_lined">
+						<span>下单</span>
+						{if $datainfo['ostatus'] == 1}
+							<span class="ti-check"></span>
+							<img src="../addons/zofui_groupshop/public/images/bag.png" />
+						{else}
+							<span class="takedflag"></span>
+						{/if}
+					</li>
+					<li {if 1 < $datainfo['ostatus']}class="order_lined"{/if} >
+						<span>付款</span>
+						{if $datainfo['ostatus'] == 3}
+							<span class="ti-check"></span>
+							<img src="../addons/zofui_groupshop/public/images/bag.png" />
+						{else}
+							<span {if 1 < $datainfo['ostatus']}class="takedflag"{/if}></span>
+						{/if}
+					
+					</li>
+					<li {if 3 < $datainfo['ostatus']}class="order_lined"{/if} >
+						<span>发货</span>
+						{if $datainfo['ostatus'] == 4}
+							<span class="ti-check"></span>
+							<img src="../addons/zofui_groupshop/public/images/bag.png" />
+						{else}
+							<span {if 3 < $datainfo['ostatus']}class="takedflag"{/if}></span>
+						{/if}
+					</li>
+					
+					<li {if 4 < $datainfo['ostatus']}class="order_lined"{/if}>
+						<span>签收</span>
+						<span {if 4 < $datainfo['ostatus']}class="takedflag"{/if}></span>
+					</li>
+					<li {if 4 < $datainfo['ostatus']}class="order_lined"{/if}>
+						<span>完成</span>
+						{if $datainfo['ostatus'] == 5 || $datainfo['ostatus'] == 6}
+							<span class="ti-check"></span>
+							<img src="../addons/zofui_groupshop/public/images/bag.png" />
+						{else}
+							<span {if 4 < $datainfo['ostatus']}class="takedflag"{/if}></span>
+						{/if}
+					</li>							
+				</ul>
+			{elseif $datainfo['ostatus'] == 8}
+				已申请退款
+			{/if}
+			{if $datainfo['ostatus'] == 1 || $datainfo['ostatus'] == 4}
+			<div class="order_detail_lasttime lasttime" data-time="{if $datainfo['ostatus'] == 1}{php echo $datainfo['createtime'] + $this->module['config']['autocancelordertime']*60}{elseif $datainfo['ostatus'] == 4}{php echo $datainfo['sendtime'] + $this->module['config']['autofinishordertime']*60}{/if}">
+				<span class='day'>00</span>天
+				<span class='hour'>00</span>时
+				<span class='minite'>00</span>分
+				<span class='second'>00</span>秒后自动{if $datainfo['ostatus'] == 1}取消{elseif $datainfo['ostatus'] == 4}完成{/if}
+			</div>
+			{/if}
+		</div>
+		{if $datainfo['sendtype'] == 0}
+		<div class="order_detail_address detail_in item_cell_box">
+			<div><span class="ti-location-pin"></span></div>
+			<div class="item_cell_flex order_address_detail">
+				<p><span>{$datainfo['name']}</span> <span>{$datainfo['tel']}</span></p>
+				<p class="font_13px_999">{$datainfo['address']}</p>						
+			</div>
+		</div>
+		{elseif $datainfo['sendtype'] == 1}
+		<div class="order_detail_address detail_in item_cell_box">
+			<div>提货门店</div>
+			<div class="item_cell_flex order_address_detail">
+				<p>
+					<span>{php echo $this->module['config']['shopname']}</span>
+					<a href="tel:{php echo $this->module['config']['shoptel']}" style="color:#0894ec;">{php echo $this->module['config']['shoptel']}</a>
+				</p>
+				<p class="font_13px_999">{php echo $this->module['config']['shopaddress']}</p>						
+			</div>
+		</div>
+		{/if}
+		{loop $orderinfo $item}
+			{loop $item $in}
+			<div class="order_detail_good detail_in item_cell_box">
+				<div class="order_good_left">
+					<img src="{php echo tomedia($in['pic'])}">
+				</div>
+				<div class="order_good_right item_cell_flex">
+					<a href="javascript:;" data-router="1">
+						<div class="order_good_title good_title">{$in['title']}</div>
+					</a>
+					<div class="order_good_rule font_13px_999">金额：{$in['buymoney']}元 
+						{if $in['buyexpressmoney'] > 0}
+							(含邮费:{$in['buyexpressmoney']})
+						{else}
+							(包邮)
+						{/if}
+					</div>
+					<div class="order_good_rule font_13px_999">规格：{$in['rule']}</div>				
+					<div class="order_good_rule font_13px_999">数量：{$in['buynum']}</div>
+				</div>
+			</div>
+			{/loop}
+		{/loop}
+		<div class="order_detail_price detail_in">
+			<span class="font_13px_999">共<span class="font_ff5f27">{$datainfo['totalnum']}</span>件,</span>
+			<span class="font_13px_999">合计: <span class="font_ff5f27">{$datainfo['totalmoney']}</span>元</span>
+			{if $datainfo['totalexpress'] > 0}
+				<span class="express_money">(含{$datainfo['totalexpress']}邮费)</span>
+			{else}
+				<span class="express_money">(包邮)</span>
+			{/if}
+		</div>
+		<div class="detail_in order_detail_connect shadow_box item_cell_box">
+			<li class="item_cell_flex">
+				<a href="tel:{php echo $this->module['config']['adminmobile']}">
+					<span class="ti-tablet"> 致电卖家</span>
+				</a>
+			</li>
+			<li>
+			
+			<a href="{if $this->module['config']['kefutype'] == 1}{php echo $this->module['config']['baidubridge']}{elseif $this->module['config']['kefutype'] == 2}http://wpa.qq.com/msgrd?v=3&uin={php echo $this->module['config']['qqkefu']}&site=cjrm&menu=yes{/if}">
+				<span class="ti-themify-favicon"> 联系卖家</span>
+			</a>
+			</li>
+		</div>
+		
+		<div class="order_detail_activity detail_in margin_top_10px shadow_box">
+			<span class="order_detail_type">
+				{if $datainfo['ordertype'] == 1}
+					普通订单
+				{elseif $datainfo['ordertype'] == 2}
+					参团订单
+				{elseif $datainfo['ordertype'] == 3}
+					建团订单
+				{/if}
+			</span>
+			<li class="item_cell_box font_13px_999">
+				<p>订单编号:</p>
+				<p class="item_cell_flex">{$datainfo['orderid']}</p>
+			</li>
+			<li class="item_cell_box font_13px_999 buyer_remark">
+				<p>买家备注:</p>
+				<p class="item_cell_flex">{$datainfo['message']}</p>
+			</li>			
+			<li class="item_cell_box font_13px_999">
+				<p>首单优惠:</p>
+				<p class="item_cell_flex">
+					{if $datainfo['firstcutmoney'] > 0}
+					优惠<span class="font_ff5f27"> {$datainfo['firstcutmoney']} </span>元
+					{else}
+						无
+					{/if}
+				</p>
+			</li>
+			<li class="item_cell_box font_13px_999">
+				<p>卡券优惠:</p>
+				<p class="item_cell_flex">
+					{if $datainfo['cardcutmoney'] > 0}
+					优惠<span class="font_ff5f27"> {$datainfo['cardcutmoney']} </span>元
+					{else}
+						无
+					{/if}
+				</p>
+			</li>			
+			<li class="item_cell_box font_13px_999">
+				<p>积分抵扣:</p>
+				<p class="item_cell_flex">
+					{if $datainfo['creditcut'] > 0}
+					优惠<span class="font_ff5f27"> {$datainfo['creditcut']} </span>元
+					{else}
+						无
+					{/if}				
+				</p>
+			</li>						
+			<li class="item_cell_box font_13px_999">
+				<p>满额包邮:</p>
+				<p class="item_cell_flex">
+					{if $datainfo['totalfreeexpress'] > 0}
+					优惠<span class="font_ff5f27"> {$datainfo['totalfreeexpress']} </span>元
+					{else}
+						无
+					{/if}				
+				</p>
+			</li>
+			{if $datainfo['sendtype'] == 1}
+			<li class="item_cell_box font_13px_999 buyer_remark">
+				<p>二维码图:</p>
+				<p class="item_cell_flex">
+					<img src="{$img}" width="140px" height="140px">
+				</p>
+			</li>
+			{/if}
+		</div>
+		{if empty($_GPC['isadmin'])}
+			<div class="order_detail_log detail_in margin_top_10px shadow_box">
+				<span class="log_title">订单日志</span>
+				<li class="item_cell_box font_13px_999 order_log_item">
+					<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['createtime'])}</p>
+					<p class="item_cell_flex">您成功下单，等待您支付订单</p>
+				</li>
+				{if $datainfo['paytime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['paytime'])}</p>
+						{if $datainfo['sendtype'] == 0}
+							<p class="item_cell_flex">您支付订单，等待卖家发货</p>
+						{elseif $datainfo['sendtype'] == 1}	
+							<p class="item_cell_flex">您支付订单</p>
+						{/if}
+					</li>
+				{/if}
+				{if $datainfo['canceltime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['canceltime'])}</p>
+						<p class="item_cell_flex">订单未支付，被取消</p>
+					</li>
+				{/if}
+				{if $datainfo['applyrefundtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['applyrefundtime'])}</p>
+						<p class="item_cell_flex">您申请退款，等待卖家处理申请</p>
+					</li>
+				{/if}
+				{if $datainfo['cancelrefundtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['cancelrefundtime'])}</p>
+						<p class="item_cell_flex">您取消退款申请，订单恢复正常</p>
+					</li>
+				{/if}		
+				{if $datainfo['refundtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['refundtime'])}</p>
+						<p class="item_cell_flex">卖家给您退款，退款<span class="font_ff5f27">{$datainfo['refundmoney']}</span>元，资金已原路退回</p>
+					</li>
+				{/if} 
+				
+				{if $datainfo['refuserefundtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['refuserefundtime'])}</p>
+						<p class="item_cell_flex">卖家拒绝了您的退款申请</p>
+					</li>
+				{/if}
+				
+				{if $datainfo['sendtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['sendtime'])}</p>
+						<p class="item_cell_flex">卖家发货，等待您收货</p>
+					</li>
+				{/if}			
+				{if $datainfo['confirmtime'] > 0}
+					<li class="item_cell_box font_13px_999 order_log_item">
+						<p class="order_log_time">{php echo date('Y-m-d H:i',$datainfo['confirmtime'])}</p>
+						<p class="item_cell_flex">货物成功送达，订单完成</p>
+					</li>
+				{/if}
+				
+			</div>
+		{/if}
+		{if !empty($datainfo['expressnumber'])}
+			<div class="order_detail_express detail_in margin_top_10px">
+				<span class="log_title">快递信息</span>
+				<div class="express_top">
+					<li>快递名称：{$datainfo['expressname']}</li>
+					<li>快递单号：{$datainfo['expressnumber']}</li>
+				</div>
+				<li class="select_express_btn ti-angle-down" data-num="{$datainfo['expressnumber']}" data-name="{$datainfo['expressname']}">查询快递信息</li>
+				<div class="express_body">
+					<!-- <ul class="timeline">
+						<li class="time-label"></li>
+						<li>
+							<i class="ti-truck ti nowclass"></i>
+							<div class="timeline-item">
+								<span class="time"><i class="fa fa-clock-o"></i> <font class="font_13px_999">2018-12-12 12:12</font></span>
+								<div class="timeline-body font_13px_999">
+									我去141241414221
+								</div>
+							</div>
+						</li>						
+					</ul>				
+					 -->
+				</div>
+				
+			</div>
+		{/if}
+		
+	</div>
+	{if empty($_GPC['isadmin'])}
+		<div class="orderinfo_bottom fixed_bottom item_cell_box {if $_W['isajax']}router{/if}">
+			{if $_W['isajax']}
+				<ul id="gotoback"><a href="javascript:;"><span class="ti-angle-left">返回</span></a></ul>
+			{else}
+				<ul><a href="{php echo $this->createMobileUrl('user',array('op'=>'order'))}"><span class="ti-angle-left">返回</span></a></ul>
+			{/if}
+			<ul class="item_cell_flex orderinfo_bottom_btn" data-id="{$datainfo['id']}">
+				{if $datainfo['status'] == 1}
+					<li class="input_li">
+						<form action="{php echo $this->createMobileUrl('pay')}" method="post">
+							<input name="orderid" type="hidden" value="{$datainfo['id']}">
+							<input name="resetpay" type="submit" class="topay_btn" value="支付订单">
+							<input name="token" type="hidden" value="{$_W['token']}" />
+						</form>
+					</li>
+					<li class="back_gray order_btn_deal" data-type="cancel">
+						<span>取消订单</span>
+					</li>
+				{/if}
+				{if $datainfo['status'] == 4}			
+					<li class="back_ff5f27 order_btn_deal" data-type="confirm">
+						<span>确认收货</span>
+					</li>
+				{/if}
+				{if $datainfo['status'] == 5}
+					<li class="back_ff5f27" id="comment_good">
+						<span>评价商品</span>
+					</li>				
+				{/if}
+				{if $datainfo['status'] == 3 && $datainfo['refundstatus'] == 0}
+					{if $datainfo['ordertype'] == 1}
+						{if $this->module['config']['iscanrefund'] == 1}
+							<li class="back_ff5f27 order_btn_deal" data-type="refund">
+								<span>申请退款</span>
+							</li>
+						{/if}
+					{else}
+						<a href="{php echo $this->createMobileUrl('group',array('groupid'=>$datainfo['groupid']))}">
+							<li class="back_ff5f27">
+								<span>查看团详情</span>
+							</li>
+						</a>
+					{/if}
+				{/if}
+				{if $datainfo['refundstatus'] == 1}
+					<li class="back_ff5f27 order_btn_deal"  data-type="cancelrefund">
+						<span>取消退款</span>
+					</li>				
+				{/if}			
+			</ul>
+		</div>
+	{/if}
+		
+	
+{if $datainfo['status'] == 5}
+	{template 'common/comment'}
+{/if}
+	
+</div>

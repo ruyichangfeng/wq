@@ -1,0 +1,214 @@
+{template 'common/header'}
+<style type="text/css">
+	table#user-table thead tr th, table#user-table tbody tr td{
+		text-align: left;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+	</ul>
+	<div class="panel panel-info">
+		<div class="panel-heading">条件筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal form" role="form">
+				<input type="hidden" name="c" value="site">
+				<input type="hidden" name="a" value="entry">
+				<input type="hidden" name="do" value="UserManage">
+				<input type="hidden" name="m" value="lonaking_new_gift_shop">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">关注时间</label>
+					<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+						{php echo tpl_form_field_daterange('create_time', array('start' => date('Y-m-d', $start), 'end' => date('Y-m-d', $end),));}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">昵称/openid</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="nickname" value="{$_GPC['nickname']}" placeholder="请输入用户名称或openid，支持模糊查询"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">积分排序</label>
+					<div class="col-sm-8">
+						<label class="radio-inline"> <input type="radio" name="score_orderby" value="" {if $_GPC['score_orderby'] == null || $_GPC['score_orderby']==''}checked="checked"{/if}>
+							默认
+						</label>
+						<label class="radio-inline"> <input type="radio" name="score_orderby" value="desc" {if $_GPC['score_orderby'] == 'desc'}checked="checked"{/if}>
+							顺序
+						</label>
+						<label class="radio-inline"> <input type="radio" name="score_orderby" value="asc" {if $_GPC['score_orderby'] == 'asc'}checked="checked"{/if}>
+							倒序
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">邀请用户关注排序</label>
+					<div class="col-sm-8">
+						<label class="radio-inline"> <input type="radio" name="invite_count_orderby" value="" {if $_GPC['invite_count_orderby'] == null || $_GPC['invite_count_orderby']==''}checked="checked"{/if}>
+							默认
+						</label>
+						<label class="radio-inline"> <input type="radio" name="invite_count_orderby" value="desc" {if $_GPC['invite_count_orderby'] == 'desc'}checked="checked"{/if}>
+							顺序
+						</label>
+						<label class="radio-inline"> <input type="radio" name="invite_count_orderby" value="asc" {if $_GPC['invite_count_orderby'] == 'asc'}checked="checked"{/if}>
+							倒序
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">海报卡死</label>
+					<div class="col-sm-8">
+						<label class="radio-inline"> <input type="radio" name="in_posting" value="" {if $_GPC['in_posting'] == null || $_GPC['in_posting']==''}checked="checked"{/if}>
+							全部
+						</label>
+						<label class="radio-inline"> <input type="radio" name="in_posting" value="1" {if $_GPC['in_posting'] == '1'}checked="checked"{/if}>
+							卡死
+						</label>
+						<label class="radio-inline"> <input type="radio" name="in_posting" value="0" {if $_GPC['in_posting'] == '0'}checked="checked"{/if}>
+							正常
+						</label>
+					</div>
+				</div>
+				<input name="token" type="hidden" value="{$_W['token']}" />
+
+				<input
+					type="submit" class="btn btn-primary pull-right" name="submit" value="搜索" />
+				<a href="{php echo $this->createWebUrl('DirtyUserRepair')}" class="btn btn-success ">修复用户数据(用户管理出现异常数据点击此处)</a>
+			</form>
+		</div>
+
+	</div>
+
+	<div class="panel panel-default">
+		<div class="table-responsive panel-body">
+			<div class="" style="padding 15px">
+				<form action="" method="post">
+					<table class="table table-hover" id="user-table">
+						<thead class="navbar-inner">
+							<tr>
+								<th width="100px">#/uid</th>
+								<th width="80px">头像</th>
+								<th>昵称(openid)</th>
+								<th width="200px">海报状态</th>
+								<th>邀请人</th>
+								<th width="200px">邀请、积分状况</th>
+								<th>创建时间</th>
+								<th width="200px">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $page['data'] $d}
+								<tr style="text-align: left" data-openid="{$d['openid']}" data-borrow-openid="{$d['borrow_openid']}">
+									<td><p>{$d['id']}</p>
+									<p>{$d['uid']}</p></td>
+									<td><img data-openid="{$d['openid']}" class="img-circle" src="{php echo tomedia($d['avatar'])}" width="40px" height="40px"></td>
+									<td>
+										<p>{$d['nickname']}</p>
+										<p>
+											{if $d['follow'] == 1}
+											<span class="label label-success">已关注</span>
+											{else}<span class="label label-danger">取消关注</span>
+											{/if}
+										</p>
+										<p>
+
+											{if $d['black'] == 1}
+											<span class="label label-danger" style="background: #000">黑名单</span>
+											{/if}
+										</p>
+									</td>
+									<td>
+										<p>
+										{if $d['in_posting'] == 1}
+										<span class="label label-success">生成中{$d['poster_times']}</span>
+										{else}
+										<span class="label label-primary">缺省{$d['poster_times']}</span>
+										{/if}
+										</p>
+										<p style="color: #999999;font-size: 12px;">
+											更新时间:<span style="color: #ce643f;">{php echo date("Y-m-d H:i:s",$d['poster_update_time'])}</span>
+										</p>
+									</td>
+									<td>
+										{if $d['invite_user']}
+										<p><img class="img-circle" src="{php echo tomedia($d['invite_user']['avatar'])}" width="40px" height="40px"></p>
+										<p>{$d['invite_user']['nickname']}</p>
+										{else}
+										无
+										{/if}
+									</td>
+									<td>
+										<p>1/2/3级关注：<span class="label label-success">{$d['invite_count']}</span>&nbsp;<span class="label label-warning">{$d['second_invite_count']}</span>&nbsp;<span class="label label-primary">{$d['third_invite_count']}</span></p>
+										<p>1/2/3级取消：<span class="label label-success">{$d['invite_cancel_count']}</span>&nbsp;<span class="label label-warning">{$d['second_invite_cancel_count']}</span>&nbsp;<span class="label label-primary">{$d['third_invite_cancel_count']}</span></p>
+										<p>邀请总积分/余额：<span class="label label-success">{$d['total_invite_score']}</span>&nbsp;<span class="label label-primary">{$d['total_invite_money']}</span></p>
+
+									</td>
+									<td>{php echo date("m-d H:i",$d['create_time'])}</td>
+									<td>
+										<div class="btn-group">
+											<a href="javascript:void(0);" title="拉黑" class="btn btn-default black-user" data-user-id="{$d['id']}" data-status="1">拉黑</a>
+											<a href="javascript:void(0);" class="btn btn-warning black-user" data-user-id="{$d['id']}" data-status="0">解除</a>
+											<a href="javascript:void(0);" data-url="{php echo $this->createWebUrl('HardRemove',array('opt'=>'user','id'=>$d['id']));}"  class="btn btn-danger del-button">删除</a>
+										</div>
+									</td>
+								</tr>
+							{/loop}
+						</tbody>
+					</table>
+				</form>
+				{$page['pager']}
+			</div>
+		</div>
+	</div>
+</div>
+{php $this->userService->checkRegister($this->module);}
+<script type="text/javascript">
+	var BLACK_USER_API = "{php echo $this->createWebUrl('BlackUser');}";
+	$(function(){
+		$(".del-button").on("click",function(){
+			var btn = $(this);
+			var url = btn.data('url')
+			var tr = btn.parents("tr");
+			$.post(url,function(result){
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					alert(json.message);
+					return false;
+				}else{
+					//移除dom
+					tr.remove();
+				}
+			});
+
+		});
+
+		$(".black-user").click(function (e) {
+			var userId = $(this).data("user-id");
+			var status = $(this).data("status");
+			var message = status=='1' ? "拉黑后，用户将不能兑换礼品、生成海报，邀请下级不奖励" : "解除后，用户可以继续享受正常用户的所有奖励";
+			var r=confirm(message);
+			if(r){
+				$.ajax({
+					url : BLACK_USER_API,
+					data : {
+						user_id : userId,
+						status : status
+					},
+					dataType : 'json',
+					success : function (json) {
+						if(json.status == 200){
+							window.location.reload();
+						}else{
+							alert(json.message);
+						}
+					},
+					error : function () {
+						alert("出错请重试");
+					}
+				})
+			}
+		})
+	});
+</script>
+{template 'common/footer'}

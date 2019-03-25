@@ -1,0 +1,95 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >优惠券</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('coupon.listview');?>" method="post" id="keyform">
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" value="<?php echo $name; ?>" placeholder="请输入优惠券名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			        <a href="javascript:void(0);" class="btn btn-default" style="display: inline-block;" onclick="couponEdit(0)">添加优惠券</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 200px;">优惠券名称</th> 
+					<th style="width: 100px;">类型</th> 
+					<th style="width: 200px;">使用效果</th>    
+					<th style="width: 200px;">使用期限</th>   
+					<th style="">状态</th> 
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $coupons $index $item}
+				<tr> 
+					<td>
+						 {$item['name']}</td> 
+					<td><?php if(intval($item['type'])==1){
+						echo "满减";
+					}else if(intval($item['type'])==2){
+					echo "打折";
+				}?></td>  
+					<td>满{$item['limit_money']}减{$item['reduce']}</td>
+					<td>{$item['limit_start']}<br/>至<br/>{$item['limit_stop']}</td>  
+					<td><?php if($item['status']=="1"){ ?>
+						<span class="label-green">启用</span>
+					<?php }else { ?>
+					<span class="label-gray">禁用</span>
+					<?php } ?>
+					</td> 
+					<td>  
+							<a href="javascript:void(0);" class="linkbtn" onclick="couponEdit({$item['id']},'{$item['name']}')">编辑</a>
+						 
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+				</tr>
+				 
+				{/loop}
+				 <tr>
+				 	<td colspan="6" align="center">
+				 		{template "public/pagenation"}
+				 	</td>
+				 </tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+ 
+	function couponEdit(id){ 
+		 window.location.href="<?php echo $this->routeUrl('coupon.editview');?>&cid="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除 "+text+" ?",function(){
+		window.location.href="<?php echo $this->routeUrl('coupon.delcoupon');?>&cid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

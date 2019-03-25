@@ -1,0 +1,163 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op== 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl($filename)}">粉丝图片管理</a></li>
+  <li {if $op== 'post' && empty($id)}class="active"{/if}><a href="{php echo $this->createWebUrl($filename,array('op'=>'post'))}">新建粉丝图片</a></li>
+  {if !empty($id)}<li class="active"><a>编辑粉丝图片</a></li> {/if}
+</ul>
+{if $op=='display'}
+<form action="./index.php" id="form1" method="get" class="form-horizontal" role="form">
+<div class="panel panel-info">
+  <div class="panel-heading">筛选</div>
+  <div class="panel-body">
+      <input type="hidden" name="c" value="site" />
+      <input type="hidden" name="a" value="entry" />
+      <input type="hidden" name="m" value="{php echo $this->modulename}" />
+      <input type="hidden" name="do" value="{$filename}" />
+      
+      <div class="form-group">
+        <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">昵称</label>
+        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-4">
+          <input class="form-control" name="nickname" id="" type="text" value="{$_GPC['nickname']}" placeholder="">
+        </div>
+      </div>
+      
+      
+         <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">审核状态</label>
+                    <div class="col-xs-12 col-sm-8 col-lg-5">
+                        <select name="status" class="form-control">
+                            <option value="">全部</option>
+                            <option value="0" {if $_GPC['status']==='0'}selected{/if}>否</option>
+                            <option value="1" {if $_GPC['status']==1}selected{/if}>是</option>
+              
+                        </select>
+                    </div>
+               </div>	
+                
+      
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-3 col-md-2 control-label">
+          <button class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+        </div>
+      </div>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">粉丝图片列表    (共<i style="color:red">{$total}</i>条记录)</div>
+  <div class="panel-body table-responsive" style="overflow: visible;">
+    <table class="table table-hover">
+      <thead class="navbar-inner">
+        <tr>
+          <th style="width: 5%;">选择</th>
+          <th style="width: 10%;">微信id</th>
+          <th style="width: 10%;">头像</th>
+          <th style="width: 10%;">昵称</th>
+          <th style="width: 25%;">粉丝图片</th>       
+          <th style="width: 10%;">审核状态</th>       
+          <th style="width: 10%;">时间</th>
+          <th style="width: 15%;">操作</th>
+        </tr>
+      <tbody id="main">
+        {loop $list $row}
+        <tr>
+          <td><input type="checkbox" name="id[]" value="{$row['id']}" class=""></td>
+          <td style="white-space: normal; word-break: break-all">{$row['openid']}</td>
+          <td style="white-space: normal; word-break: break-all">{if ($row['headimgurl'])}<img style="width:80px" src="{php echo tomedia($row['headimgurl'])}">{/if}</td>
+          <td style="white-space: normal; word-break: break-all">{$row['nickname']}</td>
+          <td style="white-space: normal; word-break: break-all"><a href="{php echo tomedia($row['pic'])}" target="_blank"><img style="width:80px" src="{php echo tomedia($row['pic'])}"></a></td>
+          <td style="white-space: normal; word-break: break-all">{if empty($row['status'])}<span class="label label-default ">提交</span>{else if $row['status']==1}<span class="label label-success">通过</span>{else if $row['status']==2}<span class="label label-danger">拒绝</span>{/if}</td>        
+          <td style="white-space: normal; word-break: break-all">{php echo date('Y-m-d H:i:s', $row['createtime'])}</td>
+          <td style="white-space: normal; word-break: break-all; overflow: visible;">
+            <a href="{php echo $this->CreateWebUrl($filename,array('op'=>'post','id'=>$row['id']))}" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-edit" ></i></a>
+            <a onclick="if(!confirm('确定删除，删除后数据不可恢复?')) return false;" href="{php echo $this->CreateWebUrl($filename,array('op'=>'delete','id'=>$row['id']))}" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+            <a onclick="if(!confirm('确定审核通过?')) return false;" href="{php echo $this->CreateWebUrl($filename,array('op'=>'audit','id'=>$row['id']))}" class="btn btn-info" data-toggle="tooltip" data-placement="top" title="审核">审核</a>
+          </td>
+        </tr>
+        {/loop}
+        <tr>
+          <td>
+            <input type="checkbox" name="" onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+          </td>
+          <td colspan="13">
+            <input type="hidden" id="op" name="op"/>
+            <a href="javascript:batch_del();" class="btn btn-default 
+btn-primary" data-toggle="tooltip" data-placement="top" title="批量删除"><i class="fa fa-times"></i>批量删除</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </form>
+  </div>
+  {$pager}
+</div>
+</form>
+<script type="text/javascript">
+function delete_all() {
+  if (confirm('确认删除所有信息吗,删除完不可恢复?')) {
+    location.href = "{php echo $this->createWebUrl($filename, array('op' => 'delete_all'))}";
+  }
+}
+function batch_del() {
+  if (!confirm('确定批量删除吗?')){
+    return false;
+  }else {
+    $('#op').val('batch_del');
+    $('#form1').submit();
+  }
+}
+</script>
+{/if}
+{if $op=='post'}
+<div class="main">
+  <form action="" method="post" class="form-horizontal form" id="form">
+    <div class="panel panel-default">
+      <div class="panel-heading">支付信息</div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>微信id</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[openid]" value="{$page_data['openid']}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>头像</label>
+          <div class="col-xs-12 col-sm-8">
+            {php echo tpl_form_field_image("page_data[headimgurl]", $page_data['headimgurl']);}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span style="color:red">*</span>昵称</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[nickname]" value="{$page_data['nickname']}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">粉丝图片</label>
+          <div class="col-xs-12 col-sm-8">
+            {php echo tpl_form_field_image("page_data[pic]", $page_data['pic']);}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">审核状态</label>
+          <div class="col-xs-12 col-sm-8">
+            <label class="radio-inline">
+            	<input type="radio" value="0" name="page_data[status]" {if empty($page_data['status'])}checked{/if}/>未审
+            </label>
+            <label class="radio-inline">
+            	<input type="radio" value="1" name="page_data[status]" {if $page_data['status']==1}checked{/if}/>审核
+            </label>
+          
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+            <input type="hidden" name="id" value="{$id}" />
+            <input name="submit" type="submit" value="提交" class="btn btn-primary" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{/if}

@@ -1,0 +1,165 @@
+{php define(MUI, true);}
+{template 'common/header_base'}
+<header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">规则充次</h1>
+    </header>
+<div class="mui-content">
+        <div style="text-align: center;margin-top: 10%">
+            <img alt="" src="{HLMMS_MOBILE_ICOS}chongci.png"/>
+            <div class="mui-content-padded">
+                <h3>规则充次</h3>
+            </div>
+            <div class="mui-card" id="hidde_card" >
+                <div class="mui-card-header"  style="text-align: left">项目名称：<b id="textheader"></b></div>
+                <div class="mui-card-content">
+                    <div class="mui-card-content-inner"  style="text-align: left;padding-left: 5px;padding-right: 5px;" >
+                        规则描述：<p style="color: black;font-size: 14px; font-weight: bold;" id="textcontent"></p>
+                    </div>
+                </div>
+                <div class="mui-card-footer"  style="text-align: left">总价格： <b  id="textfooter"></b></div>
+            </div>
+            <div class="mui-content-padded" align="center">
+                <select class="mui-btn mui-btn-block" id="hidden_goodsid">
+                    <option>请选择充次规则</option>
+                    {loop $goodsOrServicelist $goodsOrServiceitem}
+                    <option  value="{$goodsOrServiceitem['id']}">{$goodsOrServiceitem['grc_goodsName']}</option>
+                    {/loop}
+                </select>
+            </div>
+            <div class="mui-content-padded" align="center">
+                <button name="grccountadd"  id="pay_ajaxbutton" type="button"  class="mui-btn mui-btn-success mui-btn-block" style="padding: 5px 20px;font-size: 20px;height: 50px;">支  付  充  次</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <input type="hidden" name="goodsrechargecountid" id="goodsrechargecountid" />
+                <input type="hidden" name="memberid" id="memberid" value="{$memberid}" />
+                <input type="hidden" name="openid" id="openid" value="{$openid}" />
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    $("#hidde_card").hide();
+
+    $("#hidden_goodsid").change(function(){
+        var goodsid  = $("#hidden_goodsid").val();
+        var url ='{php echo $this->createMobileUrl('modifypassword',array('op' => 'returndetailed'))}';
+        mui.ajax(url,{
+            data:{
+                goodsid:goodsid,
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+
+                $("#textheader").html(data['message']['newgrcgoodsName']);
+                $("#textfooter").html(data['message']['newgrctotalPrice']+' 元');
+                $("#textcontent").html(data['message']['newgrcrechargeRuleDescription']);
+                $("#goodsrechargecountid").val(data['message']['goodsrechargecountid']);
+                $("#hidde_card").show();
+
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('失败');
+            }
+        });
+
+    });
+
+    $("#pay_ajaxbutton").on('click', function () {
+        var goodsrechargecountid = $("#goodsrechargecountid").val();
+        var memberid = $("#memberid").val();
+        var PayUrl ="{php echo $this->createMobileUrl('common',array('op' => 'memberrechargecount'))}";
+        var PayParams = {
+            goodsrechargecountid:goodsrechargecountid,
+            memberid:memberid,
+            payStoreid:{$storeid}
+        };
+        $.ajax({
+            url: PayUrl,
+            data: PayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['status'] == 0 ) {
+                    //alert(packageid);
+                    jsApiWechatCall(data['message']['data'],data['message']['out_trade_no'],data['message']['paymoney'],goodsrechargecountid);
+                }
+                else if(data['message']['status'] == 3){
+
+                    mui.alert('您的会员未激活！');
+                }
+                else {
+                    mui.alert('支付异常！');
+                }
+            }
+        });
+    });
+    //调用微信JS api 支付
+    function jsApiWechatCall(jsApiParameters,out_trade_no,paymoney,goodsrechargecountid) {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', jsApiParameters,
+            function(res){
+                if(res.err_msg =='get_brand_wcpay_request:ok'){
+                    PayResultQuery(out_trade_no,paymoney,goodsrechargecountid);
+                }else{
+                    mui.openWindow({
+                        url:"{php echo util::app_url('PaymentError')}",
+                        waiting:{
+                            autoShow:true,//自动显示等待框，默认为true
+                            title:'正在加载...',//等待对话框上显示的提示内容
+                            options:{
+                                width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                            }
+                        }
+                    });
+                }
+            });
+    }
+    //订单查询结果
+    function PayResultQuery(out_trade_no,paymoney,goodsrechargecountid){
+        var PayQueryUrl = "{php echo $this->createMobileUrl('doMemberRechargeCountWechatPubPayQuery', array())}";
+        var memberid = $("#memberid").val();
+        var PayParams = {
+            'out_trade_no': out_trade_no,
+            'paymoney': paymoney,
+            'goodsrechargecountid': goodsrechargecountid,
+            'memberid':memberid,
+            'payStoreid':{$storeid}
+        };
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+                    mui.openWindow({
+                        url:"{php echo util::app_url('PaymentSuccess')}&paymoney="+paymoney,
+                        waiting:{
+                            autoShow:true,//自动显示等待框，默认为true
+                            title:'正在加载...',//等待对话框上显示的提示内容
+                            options:{
+                                width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                            }
+                        }
+                    });
+                }else{
+                    setTimeout("PayResultQuery('"+out_trade_no+"','"+paymoney+"','"+goodsrechargecountid+"')",2000);
+                }
+            }
+        });
+    }
+    function moneryisnum(monery){
+        var reg = new RegExp("^[0-9]+(.[0-9]{1,2})?$");
+        if(!reg.test(monery)){
+            return true;
+        }
+        return false;
+    }
+
+</script>
+
+{template 'common/footer_base'}

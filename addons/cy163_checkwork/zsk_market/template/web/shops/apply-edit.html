@@ -1,0 +1,164 @@
+{template 'public/header'}
+<style type="text/css">
+	.notice{display: block;color:orange;}
+	.layui-input-block{line-height: 36px;}
+</style>
+
+<div class="panel panel-info">
+	<div class="panel-heading"  >
+		<ol class="crumb">
+			<li><a href="<?php echo $this->routeUrl('shops.applylist');?>">入驻申请</a></li>
+
+			<li class="active">{$_GPC['name']}</li>
+		</ol>
+	</div>
+	<div class="panel-body">
+		<form class="layui-form" style="width: 500px;margin-left: 100px;" method="post" id="memForm"  action="<?php echo $this->routeUrl('applys.saveapply');?>">
+
+			<input type="hidden" name="sid" value="{$_GPC['sid']}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">店铺名称</label>
+				<div class="layui-input-block">
+					{$apply['shopname']}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系人</label>
+				<div class="layui-input-block">
+					{$apply['truename']}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系电话</label>
+				<div class="layui-input-block">
+					{$apply['mobile']}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">店铺类型</label>
+				<div class="layui-input-block">
+					<?php foreach($shopcate as $k => $v){ ?>
+						<?php  if($k == $apply['cateid']){ echo $v['name']; } ?>
+					<?php } ?>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系地址</label>
+				<div class="layui-input-block">
+					{$apply['address']}
+				</div>
+			</div>
+
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">补充说明</label>
+				<div class="layui-input-block">
+					{$apply['remark']}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">上次回复</label>
+				<div class="layui-input-block">
+					{$apply['reply']}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">状态</label>
+				<div class="layui-input-block">
+					<?php if($apply['status']=="1"){ ?>
+					<span class="label-green">已通过</span>
+					<?php }?>
+					<?php if($apply['status']=="0"){ ?>
+					<span class="label-green">待审核</span>
+					<?php }?>
+					<?php if($apply['status']=="-1"){ ?>
+					<span class="label-green">已拒绝</span>
+					<?php }?>
+				</div>
+			</div>
+			<?php if(intval($apply['status'])<1){?>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" onclick="passed()" type="button">同意，并分配账号</button>
+					<button type="button" onclick="refuse()" class="layui-btn layui-btn-danger">拒绝</button>
+				</div>
+			</div>
+			<?php }?>
+		</form>
+	</div>
+</div>
+<div id="rep" style="display: none;">
+	<TABLE style="width: 300px;margin: 0 auto;">
+		<tr style="height: 60px;">
+			<td>拒绝理由</td>
+			<td>
+				<input type="text" placeholder="100字以内" name="reply" class="form-control" style="width: 240px;">
+				<input type="hidden" name="aid" value="{$apply['id']}" readonly>
+			</td>
+		</tr>
+	</TABLE>
+</div>
+<div id="acc" style="display: none;">
+	<TABLE style="width: 320px;margin: 0 auto;">
+		<tr style="height: 60px;">
+			<td align="right">店铺有效期</td>
+			<td>
+				<input type="date" placeholder="入驻有效期" name="limitdate" class="form-control" style="width: 240px;">
+				<div style="font-size: 12px;">账号有限期跟随店铺有效期</div>
+			</td>
+		</tr>
+		<tr style="height: 60px;">
+			<td align="right">用户名</td>
+			<td>
+				<input type="text" placeholder="输入用户名" name="username" class="form-control" style="width: 240px;">
+				<input type="hidden" name="aid" value="{$apply['id']}" readonly>
+			</td>
+		</tr>
+		<tr style="height: 60px;">
+			<td align="right">密码</td>
+			<td>
+				<input type="text" placeholder="输入密码" name="password" class="form-control" style="width: 240px;">
+
+			</td>
+		</tr>
+		<tr style="height: 60px;">
+			<td align="right">账号备注</td>
+			<td>
+				<input type="text" placeholder="账号备注" name="remark" class="form-control" style="width: 240px;">
+			</td>
+		</tr>
+		<tr style="height: 60px;display: none;">
+			<td align="right">申请回复</td>
+			<td>
+				<input type="text" placeholder="申请回复,100字以内" value="您的入驻申请通过！" name="reply" class="form-control" style="width: 240px;">
+
+			</td>
+		</tr>
+	</TABLE>
+</div>
+<script type="text/javascript">
+	function refuse(){
+		var html="<form id='sform' action='<?php echo $this->routeUrl('shops.refuse');?>' method='post'>";
+		html+=$("#rep").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#sform").submit();
+		})
+	}
+	function passed(){
+		var html="<form id='pform' action='<?php echo $this->routeUrl('shops.applyPass');?>' method='post'>";
+		html+=$("#acc").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#pform").submit();
+		})
+	}
+
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+	layui.use('form', function(){
+		var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+		form.render();
+	});
+</script>

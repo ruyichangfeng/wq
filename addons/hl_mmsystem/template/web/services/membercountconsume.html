@@ -1,0 +1,289 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12" style="padding-left: 0px;padding-right: 5px;">
+            <div class="ibox float-e-margins" style="margin-bottom: 0px;" >
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <form role="form"   class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return check(this);" >
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="addmembercount" />
+                        <input type="hidden" name="op" value="saveAddMemberCountData" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <table class="table table-bordered table-hover"  id="MemberConsumeCountDataTable"  style=" margin-bottom: 5px;" data-mobile-responsive="true"></table>
+                        <div class="hr-line-dashed" style="margin-top: 3px; margin-bottom: 0px;"></div>
+                        <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;z-index: 10;">
+                            <ul class="todo-list m-t" style=" margin-top: 5px;">
+                                <li>
+                                    <span class="m-l-xs">可用总次数：</span>
+                                    <small class="label label-info" style="font-size:x-large" id="availableMemberTotalCount"><i class="fa fa-database"></i> 999次</small>
+                                    <button class="btn btn-warning " type="button"  onclick="btn_showReadCard()"><i class="fa fa-search-plus"></i>&nbsp;读&nbsp;卡&nbsp;</button>
+                                </li>
+                            </ul>
+                        </div>
+                        {template 'web/common/panel-member-card-info'}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+        //读卡
+        btn_showReadCard();
+    });
+
+
+    //读卡操作
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: false,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('membercountconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert(data['message']['code']);
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        } else {
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+
+                            swal({
+                                    title: "读卡成功！",
+                                    text: "会员卡号是：" + memberCardNumstr,
+                                    type: "success"
+                                });
+
+                            init_DeductMemberCountData(memberCardNumstr);
+                            init_MemberAvailableCountData(memberCardNumstr);
+                        }
+                    }
+
+                });
+            });
+
+    }
+
+    function init_DeductMemberCountData(memberCardStr) {
+        /****右侧侧商品明细列表----start  **/
+        $("#MemberConsumeCountDataTable").bootstrapTable('destroy');
+        var memberCardStr = memberCardStr;
+        var editRowUrl = "{php echo $this->createWebUrl('membercountconsume', array('op' => 'ajaxUpdateRowData'))}";
+        var editUrl = "{php echo $this->createWebUrl('goods', array('op' => 'getMemberConsumeCountList'))}&memberCardStr=" + memberCardStr ;
+        /****充次项目数据列表----start  **/
+        $('#MemberConsumeCountDataTable').bootstrapTable({
+            url: editUrl,
+            method: "post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache: false,  //是否使用缓存
+            search: false, //显示搜索框
+            showPaginationSwitch: false,//是否显示数据条数选择框
+            striped: true,//隔行变色
+            queryParamsType: '',
+            queryParams: queryParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            height: 350,
+            selectItemName: "id",
+            clickToSelect: true,
+            uniqueId: "id",
+            columns: [{
+                field: 'id',
+                title: '项目ID',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_goodsName',
+                title: '消费项目',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_count',
+                title: '可用次数',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_deductcount',
+                title: '扣除次数',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    placement:'bottom',
+                    title: '请输入扣除次数',
+                    validate: function (v) {
+                        if (!v) return '次数不能为空';
+                        if (isNaN(v)) return '次数必须是数字';
+                        var count = parseInt(v);
+                        if (count <= 0) return '次数必须是正整数';
+                    }, display: function(value) {
+                        $(this).text('点击扣次,最近扣了'+value+'次');
+                    }
+                }
+            },{
+                field: 'mrc_specifiedEndTime',
+                title: '有效期',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'goods_id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionViewConsumeCountFormatter
+            },],
+            onEditableSave: function (field, row, oldValue, $el) {
+                var memberId = $("#memberId").val();
+                $.ajax({
+                    type: "post",
+                    url: editRowUrl,
+                    data: {row: row,member_id: memberId},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            $("#MemberConsumeCountDataTable").bootstrapTable('refresh');
+                            $('#availableMemberTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalAvailableCount'] + ' 次');
+                            swal("操作成功！", "可用继续进行扣次操作。","success");
+                        }
+                        else if (data['message']['code'] == 1) {
+                            swal("操作有误！", data['message']['msg'],"error");
+                            return;
+                        }
+                        else if (data['message']['code'] == 4) {
+                            swal("操作有误！", "扣次数量超出库存数量。","error");
+                            return;
+                        }
+                        else {
+                            swal("操作有误！", "请刷新页面重新操作。","error");
+                            return;
+                        }
+                    }
+                });
+            }
+        });
+
+        //得到查询的参数
+        function queryParamspage(params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            return temp;
+        };
+
+        //操作按钮渲染设置
+        function actionViewConsumeCountFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            var result = "<button type='button'  class='btn btn-outline btn-sm btn-primary' onclick=\"ViewByGoods(" + id + ")\" title='查看商品详情'><i class='fa fa-eye'></i></button>";
+            return result;
+        }
+    }
+    //查看商品详情
+    function ViewByGoods(goodsid){
+        var url = "{php echo $this->createWebUrl('goodspackage', array('op' => 'viewpackagedetail'))}&id=" + goodsid;
+        parent.layer.open({
+            type: 2,
+            title: '商品详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['800px' , '600px'],
+            content: url
+        });
+    }
+    function init_MemberAvailableCountData(memberCardStr) {
+        var memberCardNumstr =memberCardStr;
+        var getCountUrl = "{php echo $this->createWebUrl('membercountconsume', array('op' => 'ajaxGetMemberAvailableCountData'))}";
+        $.ajax({
+            type: "post",
+            url: getCountUrl,
+            data: {memberCardStr: memberCardNumstr},
+            dataType: 'JSON',
+            success: function (data) {
+                if (data['message']['code'] != 0) {
+                    swal({
+                        title: "操作有误",
+                        text: data['message']['msg'],
+                        type: "error",
+                    });
+                    return;
+                } else {
+                    var a = data['message']['totalAvailableCount'];
+                    if(a==null||a==undefined||a==""){
+                        $('#availableMemberTotalCount').html('<i class="fa fa-database"></i> 0 次');
+                    }else{
+                        $('#availableMemberTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalAvailableCount'] + ' 次');
+                    }
+                }
+
+            }
+
+        });
+    }
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+</script>
+{template 'web/common/footer'}

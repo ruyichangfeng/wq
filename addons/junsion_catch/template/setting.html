@@ -1,0 +1,177 @@
+{template 'common/header'}
+<form action="" method="post" class="form form-horizontal">
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="input-group" >
+			 <div class="input-group-addon">公众号引导关注链接：</div>
+			<input type="text" class="form-control" name="describeurl" value="{$settings['describeurl']}">
+		</div>	
+	</div>
+</div>
+<div class="panel panel-default">
+            <div class="panel-heading">
+                商家设置<a target="_blank" href="{php echo '../app/'.$this->createMobileUrl('map')}">(前端地图预览)</a>
+            </div>
+            <div class="panel-body">
+            <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商家名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="name" id="name" value="{$settings['name']}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商家简介</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="desc" id="desc" value="{$settings['desc']}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="address" id="address" value="{$settings['address']}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商家所在地区</label>
+
+                        <div class="col-sm-3">
+                            <select name="location_p" id="location_p" class="location form-control"></select>
+                        </div>
+                            <div class="col-sm-3">
+                        <select name="location_c" id="location_c" class="location form-control"></select>
+                            </div>
+                                <div class="col-sm-3">
+                        <select name="location_a" id="location_a" class="location form-control"></select>
+                                </div>
+                        <script type="text/javascript" src="../addons/niuka/template/js/region_select.js"></script>
+                        <script type="text/javascript">
+                            var location_p = "{if !empty($settings['location_p'])}{$settings['location_p']}{else}广东省{/if}";
+                            var location_c = "{if !empty($settings['location_c'])}{$settings['location_c']}{else}汕头市{/if}";
+                            var location_a = "{if !empty($settings['location_a'])}{$settings['location_a']}{else}龙湖区{/if}";
+                            new PCAS("location_p", "location_c", "location_a", location_p, location_c, location_a);
+                        </script>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">经纬度</label>
+                    <div class="col-sm-9">
+                        <div class="input-append">
+                            <input type="text" id="place" class="form-control" style="width: 200px;display: inline" name="place" value="{if empty($settings)}汕头市龙湖区长平路127号{else}{$settings['place']}{/if}" data-rule-required="true">
+                            <button class="btn" type="button" id="positioning" onclick="bmap.searchMapByAddress($('#place').val())">搜索</button>
+                        </div>
+                        <span class="maroon" style="color: #f30;margin-left: 5px;">注意：这个只是模糊定位，准确位置请地图上标注!</span>
+                        <div id="l-map" style="overflow: hidden; position: relative; z-index: 0; background-image: url(http://api.map.baidu.com/images/bg.png);width: 500px; height: 300px;margin-top: 10px; color: rgb(0, 0, 0); text-align: left;"></div>
+                        <div id="r-result">
+                            <input type="text" id="lat" name="lat" class="form-control" style="width:200px;display: inline;" /> <input type="text" id="lng" name="lng" style="width:200px;display: inline;" class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<button class="btn btn-primary" type="submit" name="submit" value="提交">提交</button>
+<input type="hidden" name="token" value="{$_W['token']}">
+</form>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.4"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=1.4&ak=&services=&t=20140102035142"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".location").change(function () {
+            bmap.searchMapByPCD();
+        });
+    });
+    new PCAS("location_p", "location_c", "location_a", location_p, location_c, location_a);
+    var bmap = {
+        'option': {
+            'lock': false,
+            'container': 'l-map',
+            'infoWindow': {'width': 250, 'height': 100, 'title': ''},
+            'point': {'lng': "{if $settings['lng']!='0.0000000000' && !empty($settings['lng'])}{$settings['lng']}{else}116.735049{/if}", 'lat': "{if $settings['lat']!='0.0000000000' && !empty($settings['lat'])}{$settings['lat']}{else}23.367896{/if}"}
+        },
+        'init': function (option) {
+            var $this = this;
+            $this.option = $.extend({}, $this.option, option);
+
+            $this.option.defaultPoint = new BMap.Point($this.option.point.lng, $this.option.point.lat);
+            $this.bgeo = new BMap.Geocoder();
+            $this.bmap = new BMap.Map($this.option.container);
+            $this.bmap.centerAndZoom($this.option.defaultPoint, 15);
+            $this.bmap.enableScrollWheelZoom();
+            $this.bmap.enableDragging();
+            $this.bmap.enableContinuousZoom();
+            $this.bmap.addControl(new BMap.NavigationControl());
+            $this.bmap.addControl(new BMap.OverviewMapControl());
+            //添加标注
+            $this.marker = new BMap.Marker($this.option.defaultPoint);
+            $this.marker.setLabel(new BMap.Label('请您移动此标记，选择您的坐标！', {'offset': new BMap.Size(10, -20)}));
+            $this.marker.enableDragging();
+            $this.bmap.addOverlay($this.marker);
+            //$this.marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+            $this.showPointValue($this.marker.getPosition());
+            //拖动地图事件
+            $this.bmap.addEventListener("dragging", function () {
+                $this.setMarkerCenter();
+                $this.option.lock = false;
+            });
+            //缩入地图事件
+            $this.bmap.addEventListener("zoomend", function () {
+                $this.setMarkerCenter();
+                $this.option.lock = false;
+            });
+            //拖动标记事件
+            $this.marker.addEventListener("dragend", function (e) {
+                $this.showPointValue();
+                $this.showAddress();
+                $this.bmap.panTo(new BMap.Point(e.point.lng, e.point.lat));
+                $this.option.lock = false;
+                $this.marker.setAnimation(null);
+            });
+        },
+        'searchMapByAddress': function (address) {
+            var $this = this;
+            $this.bgeo.getPoint(address, function (point) {
+                if (point) {
+                    $this.showPointValue();
+                    $this.showAddress();
+                    $this.bmap.panTo(point);
+                    $this.setMarkerCenter();
+                }
+            });
+        },
+        'searchMapByPCD': function (address) {
+            //alert($('#location_p').val()+$('#location_c').val()+$('#location_a').val());
+            var $this = this;
+            $this.option.lock = true;
+            $this.searchMapByAddress($('#location_p').val() + $('#location_c').val() + $('#location_a').val());
+        },
+        'setMarkerCenter': function () {
+            var $this = this;
+            var center = $this.bmap.getCenter();
+            $this.marker.setPosition(new BMap.Point(center.lng, center.lat));
+            $this.showPointValue();
+            $this.showAddress();
+        },
+        'showPointValue': function () {
+            var $this = this;
+            var point = $this.marker.getPosition();
+            $('#lng').val(point.lng);
+            $('#lat').val(point.lat);
+        },
+        'showAddress': function () {
+            var $this = this;
+            var point = $this.marker.getPosition();
+            $this.bgeo.getLocation(point, function (s) {
+                if (s) {
+                    $('#place').val(s.address);
+                    if (!$this.option.lock) {
+                        //cascdeInit(s.addressComponents.province,s.addressComponents.city,s.addressComponents.district);
+                        new PCAS("location_p", "location_c", "location_a", s.addressComponents.province, s.addressComponents.city, s.addressComponents.district);
+                    }
+                }
+            });
+        }
+    };
+    $(function () {
+        var option = {};
+        bmap.init(option);
+    });
+</script>
+{template 'common/footer'}

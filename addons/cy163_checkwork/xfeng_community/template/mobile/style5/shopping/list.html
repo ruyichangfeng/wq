@@ -1,0 +1,144 @@
+{template 'style5/header'}
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/jquery.fly.min.js" charset="utf-8"></script>
+<body class="max-width bg-f2">
+<div class="page">
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" href="#" onclick="window.location.href='{php echo $this->createMobileUrl('home')}'"></a>
+        <div class="bar more-list-bar">
+            <div class="searchbar">
+                <a class="searchbar-cancel">确定</a>
+                <div class="search-input">
+                    <label class="icon icon-search" for="search"></label>
+                    <input type="search" id='search' placeholder='找你想要的'/>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="content">
+        {if $slides}
+        <div class="banner bg-f2">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    {loop $slides $row}
+                    <div class="swiper-slide">
+                        <img src="{$_W['attachurl']}{$row['thumb']}">
+                    </div>
+                    {/loop}
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        {/if}
+            <div class="buttons-tab" style="margin-top: -5px;width: 100%" >
+                <!--<a href="#tab0" class="tab-link active button" style="font-size: 12px;margin-left: 2px;">所有</a>-->
+                {loop $categories $key $category}
+                {if $key%4 ==0 && $key !=0}
+                </div>
+                <div class="buttons-tab" style="margin-top: -5px;width: 100%" >
+                {/if}
+                <a href="#tab{$category['id']}" class="tab-link button" style="padding: 0.2rem;" onclick="xqshop({$category['id']})" >{$category['name']}</a>
+                {/loop}
+            </div>
+            <div class="content-block" style="padding: 0px;margin:0px">
+                <div class="tabs">
+                    <div id="tab0" class="tab active">
+                        <div class="list-block media-list mt0 more-list-block" >
+                            <ul id="data-list-0">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <a class="shop-total-cart" href="{php echo $this->createMobileUrl('shopping',array('op' => 'mycart'))}"><span class="icon icon-cart"></span><span class="badge">{$carttotal}</span></a>
+    </div>
+    <script type="text/html" id="xq_list">
+        {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+        <li>
+            <a class="item-content">
+                <div class="item-media" onclick="location.href='{{ d.list[i].url }}'">
+                    <img src="{{ d.list[i].thumb }}" class="thumb_{{ d.list[i].id }}" style="width:4rem;height: 3rem;">
+                </div> <div class="item-inner">
+                <div class="item-title-row" onclick="location.href='{{ d.list[i].url }}'">
+                    <div class="item-title"  style="font-size: 14px;">{{ d.list[i].title }}</div>
+                </div>
+                <div class="item-subtitle">
+                    <span class="shop-grid-price" onclick="location.href='{{ d.list[i].url }}'">{{ d.list[i].marketprice }}</span>
+                    <s class="shop-yuanjia">{{ d.list[i].productprice }}</s>
+                </div>
+            </div>
+            </a>
+            <a class="shop-card">
+                <span class="icon icon-shop-cart" id="cart_{{ d.list[i].id }}" onclick="addtocart({{ d.list[i].id }})">
+
+                </span>
+            </a>
+        </li>
+        {{# } }}
+
+    </script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="utf-8"></script>
+<script>
+    $(document).ready(function() {
+        var keywords ="{$_GPC['keywords']}";
+        loaddata("{php echo $this->createMobileUrl('shopping',array('op' => 'list'))}&keywords="+keywords, $("#data-list-0"),'xq_list' ,true);
+    });
+    $('.searchbar-cancel').click(function () {
+        window.location.href = "{php echo $this->createMobileUrl('shopping',array('op' => 'list'))}" + "&keywords=" + $("#search").val();
+    });
+</script>
+<script>
+    function xqshop(id) {
+        var id = id;
+        $.post("{php echo $this->createMobileUrl('shopping',array('op'=> 'list'))}",{pcate:id},function (data) {
+            var content = "<div id='tab"+id+"' class='tab'> <div class='list-block media-list mt0 more-list-block'><ul>";
+            var dat = data.list;
+            for(var o in dat){
+                content +="<li><a class='item-content'> <div class='item-media' onclick=\"location.href='"+dat[o].url+"'\"> <img src='"+dat[o].thumb+"' class='thumb_"+dat[o].id+"' style='width:4rem;height: 3rem;'> </div> <div class='item-inner'> <div class='item-title-row' onclick=\"location.href='"+dat[o].url+"'\"> <div class='item-title'  style=\"font-size: 14px;\">"+dat[o].title+"</div> </div> <div class='item-subtitle'> <span class='shop-grid-price' onclick=\"location.href='"+dat[o].url+"'\">"+dat[o].marketprice+"</span> <s class='shop-yuanjia'>"+dat[o].productprice+"</s> </div> </div> </a> <a class='shop-card'><span class='icon icon-shop-cart' id='cart_"+dat[o].id+"' onclick='addtocart("+dat[o].id+")'></span></a> </li>";
+            }
+            content +="</ul></div></div>";
+            $(".tabs").append(content);
+
+        },'json')
+    }
+</script>
+    <script type="text/javascript">
+        //添加到购物车
+        function addtocart(id) {
+            var id = id;
+            var st = $('#cart_'+id).offset();
+            var offset = $('.icon-cart').offset();
+            var img = $('.thumb_'+id).attr('src');
+            var flyer = $('<img class="u-flyer" src="'+img+'">');
+            var height = $(window).height();
+            var width = $(window).width() / 2;
+            flyer.fly({
+                start: {
+                    left: st.left, //抛物体起点横坐标
+                    top: st.top - $(document).scrollTop()////抛物体起点纵坐标
+                },
+                end: {
+                    left: offset.left, //抛物体终点横坐标
+                    top: offset.top, //抛物体终点纵坐标
+                    //抛物线完成后留在页面上的图片大小
+                    width: 0,
+                    height: 0
+                },
+                onEnd: function(){ //结束回调
+                    var url = "{php echo $this->createMobileUrl('shopping',array('op' => 'mycart','operation' =>'add','type' => 1),'',true)}&id="+id ;
+                    $.getJSON(url, function(s) {
+                        if (s.result == 0) {
+                            $.toast("库存不足，无法购买。");return false;
+                        } else {
+                            $('.badge').text(s.total);
+                            $.toast("添加成功,在购物车等亲~");
+
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+{template 'style5/footer'}

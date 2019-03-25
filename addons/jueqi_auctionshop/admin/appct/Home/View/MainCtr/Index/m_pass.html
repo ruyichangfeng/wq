@@ -1,0 +1,72 @@
+<include file="Public/header.html" />
+<style type="text/css">
+	.layui-form-label{width: 90px;}
+	.layui-input-block{margin-left: 120px;}
+	.layui-input{width: 85%;}
+</style>
+</head>
+<body>
+	<div class="x-body">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="x-red">*</span>旧密码:</label>
+				<div class="layui-input-block">
+					<input type="password" lay-verify="required" name="old_pass" value="" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="x-red">*</span>新密码：</label>
+				<div class="layui-input-block">
+					<input type="password" lay-verify="required" name="new_pass" class="layui-input" value=""/>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="x-red">*</span>确定新密码：</label>
+				<div class="layui-input-block">
+					<input type="password" lay-verify="required" name="qnew_pass" class="layui-input" value=""/>
+				</div>
+			</div>
+			<div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+                <button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+           	</div>
+           	<input type="hidden" name="flag" value="{$flag}" />
+		</form>
+	</div>
+	<include file="Public/footer.html" />
+	<script>
+		layui.use(['form', 'layer'], function() {
+			$ = layui.jquery;
+			var form = layui.form;
+			var layer = layui.layer;
+			form.on('submit(save)', function(data) {
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Index/m_pass')}",
+					data: data.field,
+					dataType: 'text',
+					success: function(data) {
+						if(data == '1') {
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.msg('提交成功', {icon: 1,offset: '40%',time: 2000,shade: 0.3}, function() {
+								parent.layer.close(index);
+								parent.location.href="{:U('Home/MainCtr/Login/login')}";
+							})
+						}else if(data == '2') {
+							layer.msg('提交失败', {icon: 2,offset: '40%',time: 2000,shade: 0.3});
+						}else if(data == '3') {
+							var index = parent.layer.getFrameIndex(window.name);
+							layer.msg('提交成功', {icon: 1,offset: '40%',time: 2000,shade: 0.3}, function() {
+								parent.layer.close(index);
+							})	
+						}else{
+							layer.msg(data, {icon: 2,offset: '40%',time: 2000,shade: 0.3});
+						}
+					}
+				});
+				return false;
+			});
+		});
+	</script>
+</body>
+</html>

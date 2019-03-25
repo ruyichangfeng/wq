@@ -1,0 +1,107 @@
+{template 'web/common/header'}
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content p-xl">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <address>
+                            <strong>{php echo $setStoreData['set_storeName']}</strong><br>
+                            {php echo $setStoreData['set_storeDetailAdress']}<br> <abbr title="Phone">总机：</abbr>
+                            {php echo $setStoreData['set_storeContactTel']}
+                        </address>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <h4 class="text-navy">单据编号：{$item['gii_InventoryInCode']}</h4>
+                        <address>
+                            <strong>单据类型：{if $item['gii_inventorytype'] == 1}<span class="badge badge-primary">采购入库</span>{else}<span class="badge badge-danger">退货</span>{/if}<br>供应商：{php echo util::getGoodsSupplier($item['goodssupplier_id']);}</strong><br>
+                            {php echo util::getGoodsSupplierAddress($item['goodssupplier_id']);} <br>
+                            公司编号： {php echo util::getGoodsSupplierNumber($item['goodssupplier_id']);}<br>
+                            <span><strong>日期：</strong> {php echo date('Y-m-d', $item[gii_addTime]);}</span>
+                        </address>
+                    </div>
+                </div>
+                <div class="table-responsive m-t">
+                    <table class="table invoice-table">
+                        <thead>
+                        <tr>
+                            <th>商品名称</th>
+                            <th>商品单位</th>
+                            <th>入库数量</th>
+                            <th>进价（单位：元）</th>
+                            <th>折扣率（单位：%）</th>
+                            <th>折扣额（单位：元）</th>
+                            <th>小计金额（单位：元）</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $iteminventoryin $list}
+                        <tr>
+                            <td>{php echo util::getGoodsNameOne($list['goods_id']);}</td>
+                            <td>{$list['giid_goodsUnitid']}</td>
+                            <td>{$list['giid_goodsNumber']}</td>
+                            <td>{$list['giid_goodsUnitPrice']}</td>
+                            <td>{$list['giid_goodsDiscountRate']}</td>
+                            <td>{$list['giid_goodsFoldAmount']}</td>
+                            <td>{$list['giid_goodsCashAmount']}</td>
+                            <td>{$list['giid_goodsNote']}</td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /table-responsive -->
+
+                <table class="table invoice-total">
+                    <tbody>
+                    <tr>
+                        <td><strong>本次付款</strong>
+                        </td>
+                        <td>&yen;{$item['gii_primarySupplement']} 元</td>
+                    </tr>
+                    <tr>
+                        <td><strong>本次欠款</strong>
+                        </td>
+                        <td>&yen;{$item['gii_foldClause']} 元</td>
+                    </tr>
+                    <tr>
+                        <td><strong>折扣率</strong>
+                        </td>
+                        <td>{$item['gii_discountRate']} 折</td>
+                    </tr>
+                    <tr>
+                        <td><strong>折扣额</strong>
+                        </td>
+                        <td>&yen;{$item['gii_foldAmount']} 元</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>总金额</strong>
+                        </td>
+                        <td>&yen;{$item['gii_total']} 元</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="well m-t"><strong>入货备注：</strong> {$item['gii_note']}
+                </div>
+                <div class="text-right">
+
+                    <button class="btn btn-primary" id="printnow" onclick="printdata()"><i class="fa fa-print" aria-hidden="true"></i> 打印</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function printdata(){
+        $("#printnow").hide();
+        $("#return").hide();
+        window.print();
+    }
+</script>
+{template 'web/common/footer'}

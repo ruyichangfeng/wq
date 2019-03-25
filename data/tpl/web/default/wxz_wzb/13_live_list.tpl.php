@@ -1,0 +1,68 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+
+
+<!--参与粉丝/中奖名单-->
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="<?php  echo $this->createWebUrl('liveList');?>">直播间管理</a></li>
+		<li><a href="./index.php?c=platform&a=reply&do=post&m=wxz_wzb">添加直播间</a></li>
+	</ul>
+
+	<div class="panel panel-default"> 
+	<form method="post" class="form-horizontal" id="form1">
+	<div style="position:relative">
+		<div class="panel-body table-responsive">
+			<table class="table table-hover" style="position:relative">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:25%;">直播间标题</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php  if(is_array($list)) { foreach($list as $row) { ?>
+				<tr>
+					<td><?php  echo $row['title'];?></td>
+					<td>
+						<div>
+						<a class="btn btn-default" href="index.php?c=platform&a=reply&do=post&m=wxz_wzb&rid=<?php  echo $row['rid'];?>">基础设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('liveSetting',array('rid' =>$row['rid']));?>">直播间设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('livePic',array('rid'=>$row['rid']))?>">图文直播</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('comment',array('rid'=>$row['rid']))?>">观众评论</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('redpacketlivesetting',array('rid'=>$row['rid']))?>">红包设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('users',array('rid'=>$row['rid']))?>">观众列表</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('pay',array('rid'=>$row['rid']))?>">付费列表</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('ds',array('rid'=>$row['rid']))?>">打赏详情</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('ds_edit',array('rid' =>$row['rid']));?>">打赏设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('resetnum',array('rid'=>$row['rid']))?>">人数重置</a>
+							<a class="btn btn-default" href="<?php  echo $this->createWebUrl('sendgiftlist',array('rid' =>$row['rid']));?>">送礼物列表</a>
+						</div>
+						<div>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('gift_list',array('rid' =>$row['rid']));?>">礼物列表</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('live_menu',array('rid' =>$row['rid']));?>">导航栏管理</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('video_type_edit',array('rid' =>$row['rid']));?>">播放器设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('spread_adv_edit',array('rid' =>$row['rid']));?>">开屏广告</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('area_edit',array('rid' =>$row['rid']));?>">区域限制</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('limit_edit',array('rid' =>$row['rid']));?>">观看限制</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('share_edit',array('rid' =>$row['rid']));?>">分享设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('noticelist',array('rid' =>$row['rid']));?>">消息通知</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('invitation',array('rid' =>$row['rid']));?>">邀请卡设置</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('zanpic',array('rid' =>$row['rid']));?>">点赞图片</a>
+						<a class="btn btn-default" href="<?php  echo $this->createWebUrl('accredit',array('rid' =>$row['rid']));?>">授权中心</a>
+						<a class="btn btn-default" title="删除" href="<?php  echo $this->createWebUrl('del',array('id' =>$row['id'],'rid' =>$row['rid']))?>" onclick="return confirm('删除将删除该直播间的所有信息且无法恢复，确认吗？');return false;">删除</a>
+						</div>
+						
+						
+					</td>
+				</tr>
+				<?php  } } ?>
+
+			</tbody>
+		</table>
+	</div>
+</div>
+</form>
+</div>
+<div style="text-align:center;"><?php  echo $pager;?></div>
+</div>
+<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

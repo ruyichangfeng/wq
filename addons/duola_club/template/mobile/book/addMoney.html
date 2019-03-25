@@ -1,0 +1,132 @@
+<!--正文导航-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+        .weui-navbar__item span{
+            display: block;
+        }
+        .tt a{display: inline-block;height:20px;padding: 0 0 0 15px;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<div class="page" style="padding-bottom: 20px;">
+    <div class="page__hd" style="padding-bottom: 65px;">
+        <div class="weui-tab">
+            <div class="weui-navbar" style="position: fixed;z-index: 10000">
+                <div class="weui-navbar__item" style="color: #FFF;background-color: #1071b7;">
+                    <a href="#">
+                        <span>我的闲书库</span>
+                        <span>{$data['userAccount']['onSaleAmount']}</span>
+                    </a>
+                </div>
+                <div class="weui-navbar__item" style="color: #FFF;background-color: #1071b7;">
+                    <a href="#">
+                        <span style="display: inline-block">我的闲书币</span>
+                        <span>{$data['balance']}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page__bd" style="margin-top: 20px;">
+        <div class="weui-panel" style="text-align: center;background-color: #dd8a37" onclick="window.location.href='./index.php?i=9&c=entry&do=index&m=jing_cash&schoolid={$data['schoolid']}'">
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_text">
+                    <h4 class="weui-media-box__title" style="color: #fff">押金增额</h4>
+                    <p class="weui-media-box__desc" style="color: #333">每1元押金兑换3个币，依此类推。</p>
+                </div>
+            </div>
+        </div>
+        <!--<div class="weui-panel" style="text-align: center;background-color: #dd8a37" onclick="goLocation('./index.php?i={$data['weid']}&c=entry&id=2&do=index&issub=1&m=jy_reads','集赞增额')">-->
+            <!--<div class="weui-panel__bd">-->
+                <!--<div class="weui-media-box weui-media-box_text">-->
+                    <!--<h4 class="weui-media-box__title" style="color: #fff">集赞增额</h4>-->
+                    <!--<p class="weui-media-box__desc" style="color: #333">50个赞获20币，满100个获40币。</p>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="weui-panel" style="text-align: center;background-color: #dd8a37" onclick="goLocation('./index.php?i={$data['weid']}&schoolid={$data['schoolid']}&c=entry&do=index&sid=1&m=mon_sign','签到增额')">-->
+            <!--<div class="weui-panel__bd">-->
+                <!--<div class="weui-media-box weui-media-box_text">-->
+                    <!--<h4 class="weui-media-box__title" style="color: #fff">签到增额</h4>-->
+                    <!--<p class="weui-media-box__desc" style="color: #333">签到1天获1币，连续10天加赠3币。</p>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+
+<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    $("#closed").on('click',function(){
+        $("#bookCart").hide();
+    });
+    //闲书下架
+    function unSaleBook(obj,id){
+        var submitData = {
+            schoolid : "{$schoolid}",
+            weid     : "{$_W['uniacid']}",
+            openid   : "{$openid}",
+            id       : id,
+        };
+        Weui.confirm({"title":"确定下架?","content":'',"cancelCallback":function(e){
+        },"sureCallback":function(e){
+            $.post("{php echo $this->createMobileUrl('myonsalebook',array('op'=>'unsale'))}", submitData, function (data) {
+                if (data.result) {
+                    Weui.alert(data.msg);
+                    window.location.href = "{php echo $this->createMobileUrl('myonsalebook', array('schoolid' => $schoolid,'status' => 2), true)}";
+                } else {
+                    Weui.alert(data.msg);
+                }
+            }, 'json');
+        }
+        });
+    }
+</script>
+{php include $this->template('comad');}
+{php include $this->template('footer');}
+<script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script>
+<script>
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height());
+        $.jAlert('attach');
+    });
+    function goLocation(url,msg) {
+       var mz = "{$data['userAccount']['couponAmount']}";
+        if(mz != null && mz > 0){
+            window.location.href=url;
+        }else{
+            Weui.alert("您需上架满200元的书后才能参与"+msg);
+            return;
+        }
+    }
+</script>
+</body>
+</html>

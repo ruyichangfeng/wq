@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrom=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>店铺列表</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/store.css" rel="stylesheet">
+    <style>
+    /* 触发按钮 */
+    .alert-click {
+        display: block;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6) none repeat scroll 0 0;
+        color: #fff;
+        line-height: 3rem;
+        text-align: center;
+        font-size: 1.2rem;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        position: fixed;
+        right: 20px;
+        bottom: 140px;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    .alert-click .icon {
+        font-size: 28px;
+    }
+
+    @media screen and (min-width:640px) {
+        .alert-click {
+            right: auto !important;
+            margin-left: 580px;
+        }
+    }
+
+    /*遮罩*/
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        max-width: 640px;
+        height: 100%;
+        background: rgba(0, 0, 0, .6);
+        z-index: 100;
+    }
+
+    /* 二维码层 */
+    .board {
+        position: fixed;
+        background-color: #fff;
+        top: 25%;
+        left: 20%;
+        width: 60%;
+        height: 310px;
+        z-index: 999;
+        display: none;
+    }
+
+    .board .logo span {
+        display: block;
+        height: 44px;
+        color: #000;
+        font-size: 20px;
+        line-height: 44px;
+        padding-top: 4px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .board .qrcode {
+        position: relative;
+        width: 80%;
+        margin-left: 10%;
+    }
+
+    .board .qrcode img {
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .board .heart {
+        text-align: center;
+    }
+
+    .board .heart .icon {
+        display: inline-block;
+        font-size: 20px;
+        color: #cc0000;
+        line-height: 32px;
+        font-weight: 700;
+        text-align: center;
+        vertical-align: bottom;
+    }
+
+    .board .heart span {
+        display: inline-block;
+        margin: 0 auto;
+        font-size: 18px;
+        color: #cc0000;
+        line-height: 32px;
+        font-weight: 700;
+        vertical-align: bottom;
+        margin-left: 6px;
+    }
+
+    .board .text {
+        position: relative;
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 2%;
+        padding-bottom: 8px;
+        text-align: center;
+        color: #666;
+    }
+
+    /*引导二维码关注*/
+
+    .list-nav {
+        position: relative;
+        z-index: 300;
+        background-color: #fff;
+        max-width: 640px;
+    }
+
+    .list-nav.list-nav-fixed{
+        position: fixed;
+        width: 100%;
+    }
+
+    .border-bottom-new {
+        background-image: linear-gradient(90deg, #e1e1e1, #e1e1e1 50%, transparent 50%);
+        background-position: 100% 100%;
+        background-size: 100% 1px;
+        background-repeat: no-repeat;
+    }
+
+    .list-nav .cat {
+        padding: 10px 0;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .Fix::after {
+        display: block;
+        content: '';
+        height: 0;
+        clear: both;
+    }
+
+    .list-nav .cat .item {
+        width: 33%;
+        box-sizing: border-box;
+        background-position: top right;
+        background-size: 1px 100%;
+        float: left;
+        text-align: center;
+        color: #646464;
+        font-size: 13px;
+        overflow: hidden;
+        height: 20px;
+        line-height: 20px;
+        position: relative;
+
+    }
+
+    .list-nav .cat .item .drop {
+        display: inline-block;
+        width: 13px;
+        height: 17px;
+        font-size: 17px;
+        margin-left: 5px;
+        transition: transfrom .3s;
+        -webkit-transition: -webkit-transform .3s;
+    }
+
+    .list-nav .selector {
+        position: absolute;
+        left: 0;
+        top: 41px;
+        color: #323232;
+        width: 100%;
+        height: 244px;
+        font-size: 15px;
+        overflow-y: hidden;
+        background-color: #fff;
+    }
+
+    .Hide {
+        display: none!important;
+    }
+
+    .list-nav .selector .province-change {
+        height: 44px;
+        padding: 8px 15px;
+        padding-left: 100px;
+        font-size: 13px;
+        border-bottom: 1px solid #dcdcdc;
+        position: relative;
+    }
+
+    .list-nav .selector .province-change .title {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100px;
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+    }
+
+    .list-nav .selector .province-change .content {
+        width: 100%;
+        display: inline;
+        white-space: nowrap;
+        overflow-x: scroll;
+        float: left;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        /*避免ios滑动卡顿*/
+    }
+
+    .list-nav .selector .province-change .city-item {
+        display: inline-block;
+        line-height: 25px;
+        padding: 0 12px;
+        font-size: 13px;
+        margin-right: 12px;
+        border: 1px solid #dcdcdc;
+    }
+
+    .list-nav .selector .province-change .city-item.on {
+        border-color: #ff8400;
+        color: #ff8400;
+    }
+
+    .list-nav .selector .second-nav {
+        font-size: 16px;
+        font-weight: 300;
+        color: #333;
+        line-height: 45px;
+        display: -webkit-box;
+    }
+
+    .list-nav .selector .second-nav .on {
+        border-bottom: 2px solid #ff8400;
+    }
+
+    .list-nav .selector .second-nav .item {
+        text-align: center;
+        -webkit-box-flex: 1;
+    }
+
+    .list-nav .selector .item {
+        display: block;
+        height: 40px;
+        line-height: 40px;
+        color: #323232;
+        overflow: hidden;
+        padding-left: 12px;
+        font-size: 13px;
+    }
+
+    .area-nav .second-nav .item {
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .list-nav .selector .main .item.on {
+        background-color: #fff;
+    }
+
+    .list-nav .selector .second-selector {
+        height: 270px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .list-nav .selector .menu .content {
+        transition-timing-function: cubic-bezier(0.1, 0.57, 0.1, 1);
+        transition-duration: 0ms;
+        transform: translate(0px, 0px) translateZ(0px);
+        height: 200px;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        /*避免ios滑动卡顿*/
+    }
+
+    .list-nav .selector .menu {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        float: left;
+    }
+
+    .list-nav .selector .main.menu {
+        width: 48%;
+        background: #f5f5f5;
+    }
+
+    .list-nav .selector .main.full {
+        width: 100%;
+        background-color: #FFF;
+    }
+
+    .list-nav .selector .main .item.on {
+        background-color: #fff;
+    }
+
+    .list-nav .selector .sub {
+        position: absolute;
+        left: 52%;
+        top: 0;
+        width: 48%;
+        box-sizing: border-box;
+    }
+
+    .list-nav .selector .sub .item{
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .list-nav .selector .main.full .on,
+    .list-nav .selector .sub .item.on {
+        border-bottom: solid 1px #f63;
+        color: #f63;
+    }
+    /*不显示滚动条*/
+
+     ::-webkit-scrollbar {
+        display: none;
+    }
+    /*遮罩*/
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        max-width: 640px;
+        height: 100%;
+        background: rgba(0, 0, 0, .6);
+        z-index: 100;
+    }
+    </style>
+</head>
+
+<body>
+    {php echo register_jssdk();}
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">店铺列表</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 顶部导航 -->
+        <nav class="list-nav border-bottom-new {if $boss['showstorenav'] == 0}Hide{/if}" >
+            <div class="cat Fix" id="listNavCat"><a href="javascript:void(0)" class="item"><span id="navHtml1">区域</span><i class="drop fa fa-angle-down"></i></a><a href="javascript:void(0)" class="item" style="border-right:1px solid #dcdcdc;border-left:1px solid #dcdcdc;"><span id="navHtml2">分类</span><i class="drop fa fa-angle-down"></i></a><a href="javascript:void(0)" class="item"><span id="navHtml3">排序</span><i class="drop fa fa-angle-down"></i></a></div>
+            <section class="selector Hide area-nav">
+                <div class="second-selector">
+                    <div class="province-change">
+                        <span class="title">切换城市：</span>
+                        <ul class="content">
+                        </ul>
+                    </div>
+                    <div class="menu main city-change">
+                        <div class="content">
+                        </div>
+                    </div>
+                    <div class="menu sub area-change" style="top:44px;">
+                        <div class="content">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="selector Hide category-nav">
+                <div class="menu main category-first">
+                    <div class="content">
+                        <p data-id="全部" data-pid="0" class="item on Fix">全部分类</p>
+                        {loop $listLevelOne $key $value}
+                            <p data-id="{$value['id']}" class="item Fix">{$value['name']}</p>
+                        {/loop}
+                    </div>
+                </div>
+                <div class="menu sub category-second">
+                    <div class="content">
+                        <p data-id="全部" data-pid="" data-pname="" class="item Hide on Fix">全部子类</p>
+                        {loop $listLevelTwo $key $value}
+                            <p data-id="{$value['id']}" data-pid="{$value['pid']}" data-pname="{$value['pname']}" class="item Fix Hide">{$value['name']}</p>
+                        {/loop}
+                    </div>
+                </div>
+            </section>
+            <section class="selector Hide order-nav">
+                <div class="menu main full order-change">
+                    <div class="content">
+                        <p class="item Fix on" data-val="1">智能排序</p>
+                        <p class="item Fix" data-val="2">距离优先</p>
+                    </div>
+                </div>
+            </section>
+            <input type="hidden" name="navContent1" data-type="">
+            <input type="hidden" name="navContent2" data-id="" data-type="">
+            <input type="hidden" name="navContent3" data-val="">
+        </nav>
+        <div class="overlay"></div>
+        <!-- 顶部导航 -->
+        <!-- 头部模块 -->
+        <div class="store-list">
+            <ul class="list">
+                {loop $list $key $item}
+                <li>
+                    <div class="left">
+                        <a href="{php echo $this->createMobileUrl('storelist',array('op'=>'info','id'=>$item['id']))}" class="img lazyload" data-original="{$item['thumb']}"></a>
+                    </div>
+                    <div class="right">
+                        <a href="{php echo $this->createMobileUrl('storelist',array('op'=>'info','id'=>$item['id']))}">
+                            <p class="title">{$item['title']}</p>
+                            <p class="content" style="margin-bottom: 5px;font-size: 12px;color: #666;"><?php $arr = explode('|',$item['cities']); echo $arr[1];?>&nbsp;<?php $arr = explode('|',$item['areas']); echo $arr[1];?>&nbsp;</p>
+                            <p class="content" style="width: 70%;color: #fff;">
+                                <span class="label">
+                                {if $item['labelArray']}
+                                {loop $item['labelArray'] $key $value}
+                                    <span class="span_xiao">{$value}&nbsp;</span>
+                                {/loop}
+                                {else}
+                                    <span class="span_xiao">门店</span>
+                                {/if}
+                                </span>
+                            </p>
+                            <div class="distance" data-lng="{$item['lng']}" data-lat="{$item['lat']}">{php echo $this->getDistance($item['lat'],$item['lng'], $lat, $lng)."km"}</div>
+                            <p class="bottom"><span class="category">电话:{$item['mobile']}</span><span class="time">{if $item['category_name']}{$item['category_name']}{else}门店{/if}</span></p>
+                        </a>
+                    </div>
+                </li>
+                {/loop}
+            </ul>
+            {if empty($list) || count($list)<1} 
+                <div class="no-content" style="line-height: 100px; height: 100px;">无数据</div>
+            {/if}
+            <div class="morelist"></div>
+    </div>
+    <!-- 引导关注 -->
+    <!-- 触发按钮 -->
+    <div class="alert-click" id="alert-click" {if $issub == 1}style="display:none;"{/if}><i class="icon fa fa-qrcode"></i></div>
+    <div class='board'>
+        <div class="logo"><span>{$_W['account']['name']}</span></div>
+        <div class='qrcode'><img src='{$ermsrc}'></div>
+        <div class="heart"><i class="icon fa fa-heart fa-4x"></i><span>关注</span></div>
+        <div class='text'>{if $boss['subsrcmsg']}{$boss['subsrcmsg']}{else}长按二维码关注公众号{/if}</div>
+    </div>
+    <!-- 引导关注 -->
+    <!-- 返回顶部 -->
+    <div id="goTop"><a href="javascript:void(0);" class="fa fa-angle-double-up fa-lg"></a></div>
+    <!-- 返回顶部 -->
+    <!-- 底部导航 -->
+    {template 'footerindex'}
+    <!-- 底部导航 -->
+    </div>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/lazyload/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/web/js/areadata.js"></script>
+    {if intval($isposition) == 0}
+        <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=F51571495f717ff1194de02366bb8da9&s=1"></script>
+        <script type="text/javascript" src="../addons/hy_supstore/template/mobile/public/position/position.js?v=3"></script>
+    {/if}
+    <script>
+    (function() {
+        //懒加载
+        $(".lazyload").lazyload({
+            threshold: 200, // 设置阀值
+            effect: "fadeIn" // 设置图片渐入特效
+        });
+        goScrollTop();
+        //返回顶部的火箭
+        function goScrollTop() {
+            if ($('#goTop>a')[0]) {
+                var gotop = $('#goTop>a')[0];
+                var leader = 0,
+                    target = 0,
+                    timer = 0;
+                $(window).scrollTop() > 0 ? show(gotop) : hide(gotop);
+                window.onscroll = function() {
+                    leader = $(window).scrollTop();
+                    leader > 0 ? show(gotop) : hide(gotop);
+                    gotop.onclick = function() {
+                        $(window).scrollTop(0);
+                    }
+                };
+
+                function show(obj) {
+                    $(obj).parent().fadeIn('100');
+                }
+
+                function hide(obj) {
+                    $(obj).parent().fadeOut('100');
+                }
+            }
+        }
+        
+        //引导关注
+        $("#alert-click").click(function(){
+            if($('.board').is(':hidden')){
+                $('.overlay').css('display','block');
+                $('.board').css('display','block');
+            }else{
+                $('.overlay').css('display','none');
+                $('.board').css('display','none');
+            }
+        });
+        $('.overlay').click(function(){
+            $('.overlay').css('display','none');
+            $('.board').css('display','none');
+        });
+        
+        //调用百度定位插件
+        if({php echo intval($isposition)} == 0){
+            $(window).baiduPosition({callback:function(e){
+                if({php echo intval($isShowNav)} == 1){
+                    //展示顶部导航
+                    window.location.href = "{php echo $this->createMobileurl('storelist')}" + '&lat=' + e.lat + '&lng=' + e.lng + '&provinces='+e.province+'&isposition=' + 1;
+                }
+            }});
+        }
+
+        //一级导航切换
+        $('#listNavCat>.item').on('click', function() {
+            if ($('.selector').eq($(this).index()).is(':hidden')) {
+                $('#listNavCat>a>i').attr('class', 'drop fa fa-angle-down');
+                $(this).find('i').attr('class', 'drop fa fa-angle-up');
+                $('.selector').addClass('Hide').eq($(this).index()).removeClass('Hide');
+                $('.overlay').show();
+                $('.list-nav').addClass('list-nav-fixed');
+            } else {
+                if ($(this).find('i').hasClass('drop fa fa-angle-up')) {
+                    $(this).find('i').attr('class', 'drop fa fa-angle-down');
+                    $('.selector').eq($(this).index()).addClass('Hide');
+                    $('.overlay').hide();
+                    $('.list-nav').removeClass('list-nav-fixed');
+                } else {
+                    $('#listNavCat>a>i').attr('class', 'drop fa fa-angle-down');
+                    $(this).find('i').attr('class', 'drop fa fa-angle-up');
+                    $('.selector').addClass('Hide').eq($(this).index()).removeClass('Hide');
+                }
+            }
+        });
+        
+        //初始省列表渲染
+        var provincesArr = [];//要渲染的省列表
+        {loop $provincesList $key $value}
+            provincesArr.push("{$value}");
+        {/loop}
+
+        //省市区切换
+        var provinceStr = ''; //省渲染dom
+        var provinceVal = ''; //当前省key值
+        var cityStr = ''; //城市渲染dom
+        var cityVal = ''; //当前城市key值
+        var areaStr = ''; //区渲染dom
+        var areaVal = ''; //当前区key值
+
+        var nowProvince = "<?php echo $provinces?$provinces:"";?>";
+        nowProvince = "";
+        var isShowNav = "<?php echo $isShowNav?$isShowNav:"";?>";
+
+        AddProvinceList();
+        //增加切换省列表
+        function AddProvinceList() {
+            //渲染切换省列表
+            if(nowProvince){
+                provinceStr += '<li class="city-item" data-val="all">全部城市</li>';
+            }else{
+                provinceStr += '<li class="city-item on" data-val="all">全部城市</li>';
+                // provinceVal = '北京';
+                // $('input[name="province"]').val(provinceVal); //存值
+            }
+            for (var key in threeSelectData) {
+                if(provincesArr .indexOf(key) != -1){
+                    if(provinceVal){
+                        provinceStr += '<li class="city-item" data-val="' + threeSelectData[key].val + '">' + key + '</li>';
+                    }else{
+                        if(key == nowProvince){
+                            provinceStr += '<li class="city-item on" data-val="' + threeSelectData[key].val + '">' + key + '</li>';
+                            provinceVal = key;
+                            $('input[name="province"]').val(provinceVal); //存值
+                            $('input[name="navContent1"]').val(provinceVal);
+                            var nav1 = $('input[name="navContent1"]').val();
+                            $('#navHtml1').html(nav1);
+                        }else{
+                            provinceStr += '<li class="city-item" data-val="' + threeSelectData[key].val + '">' + key + '</li>';
+                        }
+                    }
+                }
+            }
+            $('.province-change .content').html(provinceStr);
+        }
+         
+        if(provinceVal)AddCityList(provinceVal);
+        //添加切换市列表
+        function AddCityList(province, callback) {
+            //渲染切换城市列表
+            cityStr = "";
+            cityVal = "";
+            var jsonCity = threeSelectData[province].items;
+            for (var key in jsonCity) {
+                if (cityVal) {
+                    cityStr += '<div data-val="' + jsonCity[key].val + '"><p class="item Fix">' + key + '</p></div>';
+                } else {
+                    cityStr += '<div data-val="' + jsonCity[key].val + '"><p class="item on Fix">' + key + '</p></div>';
+                    cityVal = key;
+                }
+            }
+            $('.city-change .content').html(cityStr);
+
+            //切换市列表特效
+            $('.city-change .item').on('click', function() {
+                $('.city-change .item').removeClass('on');
+                $(this).addClass('on');
+                cityVal = $(this).html();
+                AddAreaList(provinceVal, cityVal);
+            });
+            callback && callback(cityVal);
+        }
+
+        if(provinceVal)AddAreaList(provinceVal, cityVal);
+        //添加切换区列表
+        function AddAreaList(province, city) {
+            //渲染切换区列表
+            areaStr = "";
+            areaVal = "";
+            var jsonArea = threeSelectData[province].items[city].items;
+            areaStr += '<div data-val="all"><p class="item Fix">全部区</p></div>';
+            for (var key in jsonArea) {
+                if (areaVal) {
+                    areaStr += '<div data-val="' + jsonArea[key] + '"><p class="item Fix">' + key + '</p></div>';
+                } else {
+                    areaStr += '<div data-val="' + jsonArea[key] + '"><p class="item Fix">' + key + '</p></div>';
+                    areaVal = key;
+                }
+            }
+            $('.area-change .content').html(areaStr);
+
+            //切换区列表特效
+            $('.area-change .item').on('click', function() {
+                $('.area-change .item').removeClass('on');
+                $(this).addClass('on');
+                areaVal = $(this).html();
+                if (areaVal == "全部区") {
+                    $('input[name="navContent1"]').val(cityVal).attr('data-type','cities');
+                } else {
+                    $('input[name="navContent1"]').val(areaVal).attr('data-type','areas');
+                }
+                closeNav(2);
+            });
+        }
+
+        //切换省列表特效
+        $('.province-change .city-item').on('click', function() {
+            var that = this;
+            if ($(this).html() != "全部城市") {
+                $('.province-change .city-item').removeClass('on');
+                $(this).addClass('on');
+                provinceVal = $(that).html();
+                AddCityList($(that).html(), function(val) {
+                    AddAreaList($(that).html(), val);
+                    areaVal = val;
+                });
+            }else{
+                $('.province-change .city-item').removeClass('on');
+                $(this).addClass('on');
+                $('input[name="navContent1"]').val('全部城市');
+                closeNav(2);
+            }
+        });
+
+        //附近距离切换
+        $('.distance-change .item').on('click', function() {
+            $('.distance-change .item').removeClass('on');
+            $(this).addClass('on');
+            $('input[name="navContent1"]').val($(this).html());
+            closeNav(2);
+        });
+
+        //分类的切换
+        $('.category-first .item').on('click', function() {
+            $('.category-first .item').removeClass('on');
+            $(this).addClass('on');
+            var id = $(this).attr('data-id');
+            if (id == "全部") {
+                $('input[name="navContent2"]').val('全部分类').attr('data-id','全部分类');
+                $('.category-second .item').addClass('Hide');
+                closeNav(2);
+            } else {
+                var pname = $(this).html();
+                $('.category-second .item').addClass('Hide').eq(0).attr({ 'data-pid': id, 'data-pname': pname });
+                $('.category-second .item').each(function(index, ele) {
+                    if (id == $(ele).attr('data-pid') || $(ele).attr('data-id') == '全部') {
+                        $(ele).removeClass('Hide');
+                    }
+                });
+            }
+        });
+
+        $('.category-second .item').on('click', function() {
+            $('.category-second .item').removeClass('on');
+            $(this).addClass('on');
+            if ($(this).html() == "全部子类") {
+                $('input[name="navContent2"]').val($(this).attr('data-pname')).attr('data-id',$(this).attr('data-pid')).attr('data-type',1);
+            } else {
+                $('input[name="navContent2"]').val($(this).html()).attr('data-id',$(this).attr('data-id')).attr('data-type',2);
+            }
+            closeNav(2);
+        });
+
+        //排序分类切换
+        $('.order-change .item').on('click', function() {
+            $('.order-change .item').removeClass('on');
+            $(this).addClass('on');
+            $('input[name="navContent3"]').val($(this).html()).attr('data-val',$(this).attr('data-val'));
+
+            closeNav(2);
+			return;
+			window.location.href = "{php echo $this->createMobileurl('storelist', array('isposition' => 1), true)}" + '&sortid=' + id + '&lat=' + curlat + '&lng=' + curlng;
+			
+        });
+        
+        //点击遮罩关闭弹窗
+        $('.overlay').on('click',function(){
+            closeNav(1);
+        })
+
+        //关闭导航并赋值
+        function closeNav(type) {
+            $('#listNavCat>a>i').attr('class', 'drop fa fa-angle-down');
+            $('.selector').addClass('Hide');
+            $('.overlay').hide();
+            if($('.list-nav').hasClass('list-nav-fixed'))$('.list-nav').removeClass('list-nav-fixed');
+
+            var nav1 = $('input[name="navContent1"]').val();
+            var nav2 = $('input[name="navContent2"]').val();
+            var nav3 = $('input[name="navContent3"]').val();
+
+            if (nav1) $('#navHtml1').html(nav1);
+            if (nav2) $('#navHtml2').html(nav2);
+            if (nav3) $('#navHtml3').html(nav3);
+
+            if(type == 2)createList();
+        }
+
+        //重新渲染列表
+        function createList(){
+            var data = {};
+            data.categoryId = $('input[name="navContent2"]').attr('data-id');
+            data.categoryType = $('input[name="navContent2"]').attr('data-type');
+            data.areaType = $('input[name="navContent1"]').attr('data-type');
+            data.areaContent = $('input[name="navContent1"]').val();
+            data.orderVal = $('input[name="navContent3"]').attr('data-val');
+
+            $.post('{php echo $this->createMobileUrl("Storelist",array("op"=>"select"))}',data,function(data){
+                var listStr = '';
+                data = JSON.parse(data);
+                if(data && data.length>0){
+                    listStr += '<ul class="list">';
+                    for (var i = 0; i < data.length; i++) {
+                        listStr += '<li>';
+                            listStr += '<div class="left">';
+                                listStr += '<a href="./index.php?i=8&c=entry&op=info&id='+data[i].id+'&do=storelist&m=hy_supstore" class="img" style="background-image:url('+data[i].thumb+');"></a>';
+                            listStr += '</div>';
+                            listStr += '<div class="right">';
+                                listStr += '<p class="title">'+data[i].title+'</p>';
+                                listStr += '<p class="content" style="margin-bottom: 5px;">位置：'+data[i].cities+'&nbsp;'+data[i].areas+'&nbsp;</p>';
+                                listStr += '<p class="content">';
+                                    if(data[i].labelArray){
+                                        for (var j = 0; j < data[i].labelArray.length; j++) {
+                                            listStr += '<span class="span_xiao">'+data[i].labelArray[j]+'</span>&nbsp;';
+                                        }
+                                    }else{
+                                        listStr += '<span class="span_xiao">门店</span>&nbsp;';
+                                    }
+                                listStr += '</p>';
+                                listStr += '<div class="distance" data-lng="'+data[i].lng+'" data-lat="'+data[i].lat+'">'+data[i].distance+'km</div>';
+                                listStr += '<p class="bottom"><span class="category">电话:'+data[i].mobile+'</span><span class="time">'+data[i].category_name+'</span></p>';
+                            listStr += '</div>';
+                        listStr += '</li>';
+                    }
+                    listStr += '</ul>';
+                    $('.store-list').html(listStr);
+                    
+                }else{
+                    $('.store-list').html('');
+                }
+            });
+        }
+
+        //关注分享
+        var shareTitle = "{$sharetitle}";
+        var shareContent = "{$sharecontent}";
+        var shareLink = "{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=storelist&m=hy_supstore";
+        var imgurl = "{php echo $shareimage}";
+
+        wx.ready(function() {
+            var shareData = {
+                title: shareTitle,
+                desc: shareContent,
+                link: shareLink,
+                imgUrl: imgurl,
+                trigger: function(res) {},
+                complete: function(res) {},
+                success: function(res) {},
+                cancel: function(res) {},
+                fail: function(res) {}
+            };
+            wx.onMenuShareTimeline(shareData);
+            wx.onMenuShareAppMessage(shareData);
+            wx.onMenuShareQQ(shareData);
+            wx.onMenuShareWeibo(shareData);
+            wx.onMenuShareQZone(shareData);
+        });
+    })()
+	
+	
+    </script>
+</body>
+
+</html>

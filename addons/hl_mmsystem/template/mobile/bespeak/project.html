@@ -1,0 +1,251 @@
+{template 'common/header'}
+<style>
+    html,
+    body,
+    .mui-content {
+        height: 0px;
+        margin: 0px;
+        background-color: #efeff4;
+    }
+    h5.mui-content-padded {
+        margin-left: 3px;
+        margin-top: 20px !important;
+    }
+    h5.mui-content-padded:first-child {
+        margin-top: 12px !important;
+    }
+    .mui-btn {
+        font-size: 16px;
+        padding: 8px;
+        margin: 3px;
+    }
+    .ui-alert {
+        text-align: center;
+        padding: 20px 10px;
+        font-size: 16px;
+    }
+    * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+    }
+    .mui-content {
+        height: 0px;
+        margin: 0px;
+        background-color: #efeff4;
+    }
+    h5.mui-content-padded {
+        margin-left: 0px !important;
+        margin-top: 20px !important;
+    }
+    /*.mui-card {*/
+    /*margin: 0px;*/
+    /*}*/
+    .mui-bar .mui-pull-left .mui-icon {
+        padding-right: 5px;
+        font-size: 28px;
+    }
+
+    .mui-bar .mui-btn {
+        font-weight: normal;
+        font-size: 17px;
+    }
+
+    .mui-bar .mui-btn-link {
+        top: 1px;
+    }
+
+    .mui-content img{
+        width: 100%;
+    }
+    .hm-description{
+        margin: 15px;
+    }
+
+    .hm-description>li {
+        font-size: 14px;
+        color: #8f8f94;
+    }
+
+</style>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">预约服务</h1>
+</header>
+<div class="mui-content">
+    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+        <div class="mui-card">
+            <div class="mui-card-header mui-card-media" style="height:40vw;background-image:url({php echo tomedia($activity['ra_picture'])})"></div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner">
+                    <ul class="mui-table-view">
+                        <li class="mui-table-view-cell">
+                            <img class="mui-content-padded" src="{php echo tomedia($item['ra_picture'])}">
+                            <p style="color: black;font-size: 17px;text-align: center">{$activity['ra_title']}</p>
+                            <p>
+                                {$activity['ra_interpretation']}
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+                {if $activity['ra_timesettingtype'] == 1}
+                <li class="mui-table-view-cell" style="list-style-type:none;">
+                    <div class="mui-content-padded">
+                        <button id='demo1' data-options='{}' class="btn mui-btn mui-btn-block">开始时间</button>
+                        <input name="limitStart" id='result1' class="mui-input-row" style="border:none; text-align:center;" readonly/>
+                        <button id='demo2' data-options='{}' class="btn1 mui-btn mui-btn-block">结束时间</button>
+                        <input name="limitEed" id='result2'   class="mui-input-row" style="border:none; text-align:center;" readonly/>
+
+                    </div>
+                </li>
+                {else if  $activity['ra_timesettingtype'] == 2}
+                <li class="mui-table-view-cell">
+                    <div class="mui-content-padded" style="text-align: center;">
+                        {loop $bak_cactivity $timelimititem}
+                        {if $timelimititem['timeid'] == $timeid}
+                        <a href="{php echo $this->createMobileUrl('bespeak',array('op' => 'detail','activityid' =>$activity['id']))}"  class="mui-badge mui-badge-primary">{$timelimititem['Start']}--{$timelimititem['Eed']}</a>
+                        <input type="hidden" name="limitStart" value="{$timelimititem['Start']}"/>
+                        <input type="hidden" name="limitEed" value="{$timelimititem['Eed']}"/>
+                        {/if}
+                        {/loop}
+                    </div>
+                </li>
+                {else if  $activity['ra_timesettingtype'] == 3}
+                {/if}
+                {if $customfixedlist['xmname'] != null}
+                <li class="mui-table-view-cell" style="list-style-type:none;">
+                    <div class="mui-input-row">
+                        <label>数量</label>
+                        <div class="mui-numbox" data-numbox-min='1'>
+                            <button class="mui-btn mui-btn-numbox-minus" type="button">-</button>
+                            <input class="mui-input-numbox" type="text" name="numberreservation" />
+                            <button class="mui-btn mui-btn-numbox-plus" type="button">+</button>
+                        </div>
+                    </div>
+                </li>
+                {/if}
+                {loop $customizefields $customizefieldsitem}
+                <div class="mui-input-row">
+                    <label>{$customizefieldsitem['title']}</label>
+                    <input type="hidden" name="customizetitlearray[]" value="{$customizefieldsitem['title']}">
+                    <input  type="{$customizefieldsitem['type']}" name="customizearray[]" {if $customizefieldsitem['essential'] == 1}{else} required="required" {/if}>
+                </div>
+                {/loop}
+                </ul>
+            </div>
+            <div class="mui-card-footer">
+                <input type="submit" name="submitreservation" class="mui-btn mui-btn-primary mui-btn-block" value="提交"/>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+<script>
+    (function($) {
+        $.init();
+        var result1 = $('#result1')[0];
+        var btns = $('.btn');
+        btns.each(function(i, btn) {
+            btn.addEventListener('tap', function() {
+                var _self = this;
+                if(_self.picker) {
+                    _self.picker.show(function (rs) {
+                        result1.value = rs.text;
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                } else {
+                    var optionsJson = this.getAttribute('data-options') || '{}';
+                    var options = JSON.parse(optionsJson);
+                    var id = this.getAttribute('id');
+                    /*
+                     * 首次显示时实例化组件
+                     * 示例为了简洁，将 options 放在了按钮的 dom 上
+                     * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+                     */
+                    _self.picker = new $.DtPicker(options);
+                    _self.picker.show(function(rs) {
+                        /*
+                         * rs.value 拼合后的 value
+                         * rs.text 拼合后的 text
+                         * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+                         * rs.m 月，用法同年
+                         * rs.d 日，用法同年
+                         * rs.h 时，用法同年
+                         * rs.i 分（minutes 的第二个字母），用法同年
+                         */
+                        result1.value =  rs.text;
+                        /*
+                         * 返回 false 可以阻止选择框的关闭
+                         * return false;
+                         */
+                        /*
+                         * 释放组件资源，释放后将将不能再操作组件
+                         * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+                         * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+                         * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+                         */
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                }
+
+            }, false);
+        });
+    })(mui);
+    (function($) {
+        $.init();
+        var result2 = $('#result2')[0];
+        var btns = $('.btn1');
+        btns.each(function(i, btn) {
+            btn.addEventListener('tap', function() {
+                var _self = this;
+                if(_self.picker) {
+                    _self.picker.show(function (rs) {
+                        result2.value = rs.text;
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                } else {
+                    var optionsJson = this.getAttribute('data-options') || '{}';
+                    var options = JSON.parse(optionsJson);
+                    var id = this.getAttribute('id');
+                    /*
+                     * 首次显示时实例化组件
+                     * 示例为了简洁，将 options 放在了按钮的 dom 上
+                     * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+                     */
+                    _self.picker = new $.DtPicker(options);
+                    _self.picker.show(function(rs) {
+                        /*
+                         * rs.value 拼合后的 value
+                         * rs.text 拼合后的 text
+                         * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+                         * rs.m 月，用法同年
+                         * rs.d 日，用法同年
+                         * rs.h 时，用法同年
+                         * rs.i 分（minutes 的第二个字母），用法同年
+                         */
+                        result2.value = rs.text;
+
+                        /*
+                         * 返回 false 可以阻止选择框的关闭
+                         * return false;
+                         */
+                        /*
+                         * 释放组件资源，释放后将将不能再操作组件
+                         * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+                         * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+                         * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+                         */
+                        _self.picker.dispose();
+                        _self.picker = null;
+                    });
+                }
+
+            }, false);
+        });
+    })(mui);
+</script>

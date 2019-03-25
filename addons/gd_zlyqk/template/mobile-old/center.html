@@ -1,0 +1,66 @@
+{template "header"}
+<style>
+    .txt{margin-bottom: 3px;font-size:13px !important;}
+    {if $appInfo['menu']==0}
+    .page3{margin-top:50px}
+    {/if}
+</style>
+<div class="wrap page3" style="padding-bottom: 41px;">
+    {template "link"}
+    {loop $msgList $msg}
+    <div class="item" style="margin-top:8px;padding-top:10px;">
+        <div class="txt">应用 : {$msg['app_name']}</div>
+        <div class="txt">单号 : {$msg['gd_sn']} <font style="font-size: 12px;font-weight: 800;color: red">{$msg['property']}</font></div>
+        {if $msg['mobile']!=" " }
+        <div class="txt">电话 : {$msg['mobile']}</div>
+        {/if}
+        <div class="txt">提交时间 : {php echo date("Y-m-d H:i:s",$msg['create_time'])}</div>
+        {if $msg['staff_name']}
+        <div class="txt">最近处理人 : {$msg['staff_name']}</div>
+        {/if}
+        {if $msg['mark_time']}
+        <div class="txt">处理时间 : {php echo date("Y-m-d H:i:s",$msg['mark_time'])}</div>
+        {/if}
+        {if $msg['end_time']}
+        <div class="txt">完成时间 : {php echo date("Y-m-d H:i:s",$msg['end_time'])}</div>
+        {/if}
+        <div class="tags">
+            <span class="on">{$msg['node_name']}</span>
+            <span>{if $msg['node_name_status']} {$msg['node_name_status']}{else} 待处理{/if}</span>
+        </div>
+        <div class="btm" style="padding-left: 0 !important;">
+            <div class="voice-box" >
+                <span style="width: 30%;padding-right: .3rem"> {$msg['use_time']}</span>
+            </div>
+            {if $msg['need_pay']}
+            <a href='{php echo $this->createMobileUrl("pay",array("order_id"=>$msg["order_id"]))}' class="btn btn-details" style="right: 57px;background: #e22f42">支付</a>
+            {/if}
+            <a href="{php echo $this->createMobileUrl('detail',array('id'=>$msg['recorder_id'],'app_id'=>$msg['app_id']))}" class="btn btn-details">详情</a>
+        </div>
+    </div>
+    {/loop}
+</div>
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/swiper.jquery.min.js"></script>
+{if $appInfo['menu']==1}
+{template "menu"}
+{/if}
+<script>
+    $(".remark").click(function(){
+        var id =$(this).attr('data-id');
+        $.post("{php echo $this->createMobileUrl('remark')}&id="+id,{},function(response){
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },"json");
+    });
+</script>
+</body>
+</html>

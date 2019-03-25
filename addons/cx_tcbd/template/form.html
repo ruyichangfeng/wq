@@ -1,0 +1,225 @@
+
+<input type="hidden" name="reply_id" value="{$reply['id']}" />
+<div class="panel panel-default">
+    <div class="panel-heading">
+        活动设置
+    </div>
+    <div class="panel-body">
+		{if !empty($reply['rid'])}
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'></span> 访问路径</label>
+            <div class="col-sm-5 col-xs-6">
+               	<label>{php echo murl('entry',array('rid'=>$reply['rid'],'do'=>'index','op'=>'display','m'=>$this->module['name']),true,true)}</label>
+            </div>
+        </div>
+		{/if}
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 活动名称</label>
+            <div class="col-sm-5 col-xs-6">
+               	<input type="text" id="form_theme" class="form-control" required placeholder="" name="form_theme" value="{$reply['form_theme']}">
+            </div>
+        </div>
+ 		<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 活动图片</label>
+            <div class="col-sm-5 col-xs-6">
+               	{php echo tpl_form_field_image('form_pic',$reply['form_pic']);}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-6 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 活动时间</label>
+            <div class="col-sm-9 col-xs-12">
+               	{php echo tpl_form_field_daterange('datelimit', array('starttime'=>date('Y-m-d',$reply['valid_time_start']),'endtime'=>date('Y-m-d',$reply['valid_time_end'])))}
+            </div>
+        </div>	
+        <div class="form-group">
+            <label class="col-xs-6 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 联系电话</label>
+            <div class="col-sm-5 col-xs-6">
+               	<input type="text" id='tel' name="phone" class="form-control" required value="{$reply['phone']}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-6 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 成功提示</label>
+            <div class="col-sm-5 col-xs-6">
+               	<input type="text" id="success_prompt" class="form-control" required placeholder="" name="success_prompt" value="{$reply['success_prompt']}">
+            </div>
+        </div>		
+        <div class="form-group hide">
+            <label class="col-xs-6 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 失败提示</label>
+            <div class="col-sm-5 col-xs-6">
+               	<input type="text" id="error_prompt" class="form-control" notrequired placeholder="" name="error_prompt" value="{$reply['error_prompt']}">
+            </div>
+        </div>			
+     	<div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">提交次数</label>
+            <div class="col-sm-5 col-xs-6">
+               	<div class="input-group">
+					<input class="form-control" name="submit_times" type="number" value="{$reply['submit_times']}" />
+					<span class="input-group-addon">次</span>
+				</div>
+				<div class="help-block">提交次数限制,0为不限制</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span> 活动规则</label>
+            <div class="col-sm-5 col-xs-6">
+                {php echo tpl_ueditor('details', $reply['details']);}
+            </div>
+        </div>     
+
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        提交数据
+    </div>
+    <div class="panel-body">
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive">
+				<table class="table">
+					<thead>
+						<tr><th>显示名称</th>
+						<th>填写说明</th>
+						<th>填写类型</th>
+						<th>验证类型</th>
+						<th style="width:200px;">原型效果</th>
+						<th>是否必填</th>
+						<th>显示顺序</th>
+						<th>错误提示</th>
+						<th>操作</th></tr>
+					</thead>
+					<tbody id="bctbody">
+					</tbody>
+				</table>
+			</div>
+			
+		</div>
+		<a href="javascript:;" class="btn btn-primary editinput" >增加输入项</a>
+    </div>
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" 
+               aria-hidden="true">×
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               <strong>填写项目设置</strong>
+            </h4>
+         </div>
+         <div class="modal-body">
+
+			<input type="hidden" name="key" value="-1">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示名称</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="inputtitle" value="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示顺序</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="1" name="sortnumber" value="">
+				</div>
+			</div>				
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">填写说明</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="desc" value="">
+				</div>
+			</div>	
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+				  <div class="checkbox">
+					<label>
+					  <input type="checkbox" name="isneed"> 是否必填
+					</label>
+				  </div>
+				</div>
+			</div>					
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">填写类型</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio1" value="1" checked> 单行文本
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio2" value="2"> 多行文本
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio3" value="3"> 单项选择
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio4" value="4"> 多项选择
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio5" value="5"> 日期
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio6" value="6"> 时间
+					</label>
+					<label class="radio-inline hide">
+					  <input type="radio" name="inputtype" id="inlineRadio7" value="7"> 富文本输入框
+					</label>
+					<label class="radio-inline hide">
+					  <input type="radio" name="inputtype" id="inlineRadio8" value="8"> 车牌
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="inputtype" id="inlineRadio7" value="9"> 图片
+					</label>					
+				</div>
+			</div>		
+			<div class="form-group" id="optiongroup">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">可选项</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<textarea class="form-control" rows="3" name="options"></textarea>
+					<span class="help-block" style="margin-bottom: 0px;">不同的选项以;符号隔开，例如“男;女”</span>
+				</div>
+			</div>
+	
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">验证类型</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio1" value="0" checked="true"> 不验证
+					</label>				
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio1" value="1"> 手机号码
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="checktype" id="inlineRadio2" value="2"> 身份证号码
+					</label>			
+				</div>
+			</div>
+
+			<div class="form-group hide">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">错误提示</label>
+				<div class="col-sm-6 col-md-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="errormsg" value="">
+				</div>
+			</div>	
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary span3" id="saveinput"><span class='glyphicon glyphicon-ok'></span>&nbsp;确定</button>
+         </div>
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<input type="hidden" name="forms" value="{$reply['fields']}" id="forms">
+<script type="text/javascript" src="{MODULE_URL}/static/js/bc_zhbd.js"></script>
+
+<script language='javascript'>
+require(['jquery'], function($, u){
+	$(document).ready(function(){
+		$("a[href='./index.php?c=platform&a=reply&m=bc_zhbd']").attr("href","{$manageurl}");
+		//添加校验标志
+		$("input[name='form_pic']").attr("required",1);
+		//$("input[name='form_pic']").attr("readonly",1);
+		$("textarea[name='details']").attr("required",1);
+	});
+});
+</script>
+

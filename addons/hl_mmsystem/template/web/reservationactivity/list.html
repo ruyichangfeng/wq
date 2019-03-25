@@ -1,0 +1,211 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>预约管理</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('reservationactivity')}"></a></h5>
+
+
+                </div>
+                <div class="ibox-content">
+                    <div class="col-sm-4">
+
+                        <a href="javascript:;" id="parentIframe" class="btn btn-primary">
+                            <i class="fa fa-plus"></i> 新增预约</a>
+                        <a href="{php echo $this->createWebUrl('reservationtype')}"  class="btn btn-warning">
+                            <i class="fa fa-plus"></i> 预约分类管理</a>
+                    </div>
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"></label>
+                                    </div></th>
+                                <th>封面图</th>
+                                <th>标题</th>
+                                <th>分类</th>
+                                <th>预约时间类型</th>
+
+                                <!--<th>操作员</th>-->
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}" value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td><P style="line-height:25px; width: 300px; white-space:normal;"><img src="{php echo tomedia($item['ra_picture'])}" width=50px height=50px align=left alt="" style="margin-right: 5px">{$item['pp_name']}</P>
+
+                                <td>
+                                    {$item['ra_title']}
+                                </td>
+                                <td>
+                                    {php echo util::getReservationType($item['ra_typeid'])}
+                                </td>
+
+
+                                <td>
+                                    {if $item['ra_timesettingtype'] == 1}
+                                    <span class="badge badge-primary">普通时间</span>
+                                    {else if $item['ra_timesettingtype'] == 2}
+                                    <span class="badge badge-primary">限制时间段</span>
+                                    {else}
+                                    <span class="badge badge-primary">关闭时间限制</span>
+                                    {/if}
+                                </td>
+                                <td>
+
+                                        <span>
+                                 <button style="display:none;" type="button" onclick="Modify_Reservationactivity({$item['id']})"  class="btn btn-warning" data-toggle="tooltip" data-placement="top"  title="编辑">编辑</button>
+                           <a onclick="deletereservationactivity ({$item['id']})"  title="删除"  class="btn btn-default btn-sm" id="deletereservationactivity">删除</a>
+                                <button  onclick="View_Record({$item['id']})" type="button"  class="btn btn-sm btn-success">查看记录</button>
+                                </span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <button type="submit" name="deleteall" id="deleteall" class="btn btn-danger" >批量删除</button>
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#parentIframe').on('click', function(){
+        var index = parent.layer.open({
+            type: 2,
+            title: '新增预约',
+            shadeClose: true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['1200px' , '700px'],
+            content: '{php echo $this->createWebUrl('reservationactivity',array('op' => 'add'))}'
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+        parent.layer.full(index);
+    });
+
+    function Modify_Reservationactivity(id){
+        var url = "{php echo $this->createWebUrl('reservationactivity', array('op' => 'add'))}&id="+id;
+        var index = parent.layer.open({
+            type: 2,
+            title: '修改',
+            shadeClose: true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['1200px' , '700px'],
+            content:url
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+        parent.layer.full(index);
+    }
+
+    function View_Record(id){
+        var url = "{php echo $this->createWebUrl('reservationactivity', array('op' => 'viewrecord'))}&id="+id;
+        parent.layer.open({
+            type: 2,
+            title: '查看记录',
+            shadeClose:true, //点击遮罩关闭层
+            //time: 1000,
+            area : ['1200px' , '700px'],
+            content:url
+            //content: '{php echo $_W['siteurl'].'&op=add'}'
+        });
+       // parent.layer.full(index);
+    }
+
+    function deletereservationactivity (id){
+        swal({
+                title: "确定删除吗？",
+                text: "你将无法恢复！",
+                type: "warning",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                closeOnConfirm: false
+            },
+            function(){
+                var url = "{php echo $this->createWebUrl('reservationactivity', array('op' => 'delete'))}";
+                $.post(
+                    url,
+                    {id:id},
+                    function(data){
+                        swal({
+                            title: "操作成功！",
+                            text: data.error,
+                            timer: 1000,
+                            type:"success",
+                            showConfirmButton: false
+                        },function(){
+                            location.reload();
+                        });
+                    },'json'
+                );
+
+            });
+
+
+    }
+
+    $("button[name=deleteall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要删除的商品！","error");
+            return false;
+        }
+        if(confirm("确认要删除选择的商品?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('reservationactivity', array('op' => 'deleteall'))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+                },'json'
+            );
+        }
+    });
+
+
+</script>
+
+
+{template 'web/common/footer'}

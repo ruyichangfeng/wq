@@ -1,0 +1,148 @@
+{template 'common/header'}
+{template 'web/nav'}
+<ul class="nav nav-tabs">
+	<li {if $status == '0'}class="active"{/if}><a href="{php echo $this->createWebUrl('tk', array('status' => '0'))}">未处理</a></li>
+	<li {if $status == '2'}class="active"{/if}><a href="{php echo $this->createWebUrl('tk', array('status' => '2'))}">处理中</a></li>
+	<li {if $status == '1'}class="active"{/if}><a href="{php echo $this->createWebUrl('tk', array('status' => '1'))}">完成退款</a></li>
+	<li {if $status == '3'}class="active"{/if}><a href="{php echo $this->createWebUrl('tk', array('status' => '3'))}">退款失败</a></li>
+	<li {if $status == '4'}class="active"{/if}><a href="{php echo $this->createWebUrl('tk', array('status' => '4'))}">拒绝退款</a></li>
+</ul>
+
+	<div class="panel panel-default">
+
+		<div class="panel-heading">退款用户详细数据  |  总数:{$total}  </div>
+
+		<div class="panel-body table-responsive">
+
+		    <form action="" method="post" onsubmit="">
+
+			<table class="table table-hover">
+
+				<thead class="navbar-inner">
+
+					<tr>
+
+						<th style="width:30px;" class="row-first">选择</td>
+
+						<th style="width:80px;">昵称</th>
+
+						<th style="width:100px;">头像</th>
+
+						<th style="width:100px;">手机</th>
+
+						<th style="width:100px;">提现金额</th>
+
+						<th style="width:100px;">报名活动</th>
+
+						<th style="width:300px;">报名信息</th>
+
+						<th style="width:100px;">报名时间</th>
+
+						<th style="width:200px;">商户订单号</th>
+
+						<th style="width:100px;">申请时间</th>
+
+					</tr>
+
+				</thead>
+
+				<tbody id="main">
+
+					{loop $member $row}
+
+					<tr>
+
+					    <td><input class="cbox" type="checkbox" name="select[]" value="{$row['id']}" /></td>
+
+					    <td style="white-space:normal;word-break:break-all">{$row['nicheng']}</td>
+
+						<td><img style="width:70px" src="{php echo tomedia($row['avatar'])}"></td>
+
+						<td>{$row['mobile']}</td>
+
+						<td>{$row['fee']} 元</td>
+
+						<td>{$row['hdname']}</td>
+
+						<td style="white-space:normal;word-break:break-all">
+							{if !empty($row['zl'])}
+								{php $i=1;}
+								{loop $row['zl'] $item}
+								<div style="white-space:normal">{$i}、{$item['name']} : {$item['zhi']}</div>
+								{php $i++}
+								{/loop}
+							{else}
+								<div style="color:orange">未填写资料</div>
+							{/if}
+						</td>
+
+						<td>{php echo date('m-d H:i', $row['cytime']);}</td>
+
+						<td>{$row['uniontid']}</td>
+
+						<td>{php echo date('m-d H:i', $row['createtime']);}</td>
+
+					</tr>
+
+
+					{/loop}
+
+					{if $status==0}
+						<tr>
+							<td></td><td></td>
+							<td colspan="8">
+								<input name="submit" type="submit" class="btn btn-primary" value="导出数据">
+								<input type="hidden" name="token" value="{$_W['token']}" />
+							</td>
+						</tr>
+					{/if}
+					{if $status==2}
+						<tr>
+							<td></td>
+							<td colspan="2">
+								<input name="submit4" type="submit" class="btn btn-danger" value="拒绝转账">
+								<input type="hidden" name="token" value="{$_W['token']}" />
+							</td>
+							<td colspan="2">
+								<input name="submit3" type="submit" class="btn btn-danger" value="转账失败">
+								<input type="hidden" name="token" value="{$_W['token']}" />
+							</td>
+							<td colspan="2">
+								<input name="submit2" type="submit" class="btn btn-info" value="转账成功">
+								<input type="hidden" name="token" value="{$_W['token']}" />
+							</td>
+
+							<td colspan="3">
+							</td>
+						</tr>
+					{/if}
+
+				</tbody>
+
+			</table>
+
+
+			</form>
+
+	    </div>
+
+	</div>
+
+	{$pager}
+
+</div>
+
+
+<script>
+
+$(function(){
+
+    $(".check_all").click(function(){
+       var checked = $(this).get(0).checked;
+       $("input[type=checkbox]").attr("checked",checked);
+    });
+
+});
+</script>
+
+{template 'common/footer'}

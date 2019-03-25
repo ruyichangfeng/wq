@@ -1,0 +1,217 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content">
+                <ul class="nav nav-tabs">
+                    <li>
+                        <a style="color: #1ab394" href="{php echo $this->createWebUrl('member', array('op' => 'list', 'storeid' => $storeid))}"><i class="fa fa-lg  fa-users" style="color: #ed8902"></i>会员列表</a>
+                    </li>
+                    <li class="active">
+                        <a href="{php echo $this->createWebUrl('member', array('op' => 'memberrecyclelist', 'storeid' => $storeid))}"><i class="fa fa-lg fa-recycle" style="color: #e10c14"></i>会员回收站</a>
+                    </li>
+                    <li >
+                        <a href="{php echo $this->createWebUrl('member', array('op' => 'inactivemember', 'storeid' => $storeid))}"><i class="fa fa-street-view" style="color: #e10c14"></i>未激活会员</a>
+                    </li>
+                </ul>
+                <div class="panel panel-default">
+                    <div class="panel-body" style="margin-top: 10px;margin-bottom:0px;padding-top: 5px;padding-bottom: 5px;">
+                        <form action="./index.php" method="get" class="form-horizontal" role="form">
+                            <input type="hidden" name="c" value="site" />
+                            <input type="hidden" name="a" value="entry" />
+                            <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                            <input type="hidden" name="do" value="member" />
+                            <input type="hidden" name="op" value="list" />
+                            <div class="form-group">
+                                <label class="col-sm-1 control-label" style="width: 5%;padding-left: 5px;padding-right: 5px;">卡号</label>
+                                <div class="col-sm-1"  style="width: 15%;padding-left: 5px;padding-right: 5px;">
+                                    <input class="form-control" name="membercardnum" id="" type="text" value="{$_GPC['membercardnum']}">
+                                </div>
+                                <label class="col-sm-1 control-label"  style="width: 5%;padding-left: 5px;padding-right: 5px;">姓名</label>
+                                <div class="col-sm-1" style="width: 10%;padding-left: 5px;padding-right: 5px;">
+                                    <input class="form-control" name="membername" id="" type="text" value="{$_GPC['membername']}">
+                                </div>
+                                <label class="col-sm-1 control-label"  style="width: 5%;padding-left: 5px;padding-right: 5px;">手机号</label>
+                                <div class="col-sm-1" style="width: 15%;padding-left: 5px;padding-right: 5px;">
+                                    <input class="form-control" name="membermobile" id="" type="text" value="{$_GPC['membermobile']}">
+                                </div>
+                                <label class="col-sm-1 control-label"  style="width: 5%;padding-left: 5px;padding-right: 5px;">级别</label>
+                                <div class="col-sm-1"  style="width: 20%;padding-left: 5px;padding-right: 5px;">
+                                    <select style="margin-right:15px;" name="membercardlevel_id" class="form-control">
+                                        <option value="0">请选择会员卡级别</option>
+                                        {loop $membersql $row}
+                                        <option value="{$row['id']}" {if $row['id'] == $_GPC['membercardlevel_id']} selected="selected"{/if}>{$row['mcl_levelName']}</option>
+                                        {/loop}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2" style="width: 10%;padding-left: 5px;padding-right: 5px;">
+                                    <button class="btn btn-outline btn-primary" type="submit"><i class="fa fa-search"></i> 搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </div>
+                                <div class="col-sm-2" style="width: 10%;padding-left: 5px;padding-right: 5px;">
+                                    <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('member', array('op' => 'memberrecyclelist', 'storeid' => $storeid))}" >
+                                        <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <form class="form-horizontal form" method="post" >
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="2%">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"></label>
+                                    </div>
+                                </th>
+                                <th>卡号</th>
+                                <th>级别</th>
+                                <th>手机号</th>
+                                <th>姓名</th>
+                                <th>性别</th>
+                                <th>身份证号码</th>
+                                <th>储值总金额</th>
+                                <th>总次数</th>
+                                <th>总积分</th>
+                                <th>加入时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['mem_memberCardNum']}</td>
+                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                <td>{$item['mem_memberMobile']}</td>
+                                <td>{$item['mem_memberName']}</td>
+                                <td>{if $item['mem_memberSex'] == 0}
+                                    <span class="badge badge-primary">未知</span>
+                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                    {/if}
+                                </td>
+                                </td>
+                                <td>{$item['mem_memberIdentityNum']}</td>
+                                <td>
+                                    {if $item['mem_memberMoneyCount'] == NULL}
+                                    <span >0</span>
+                                    {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if $item['mem_memberNumberCount'] == NULL}
+                                    <span >0</span>
+                                    {elseif $item['mem_memberNumberCount'] == !NULL} <span>{$item['mem_memberNumberCount']}</span>
+                                    {/if}
+                                </td>
+                                <td>{if $item['mem_memberPointsCount'] == NULL}
+                                    <span >0</span>
+                                    {elseif $item['mem_memberPointsCount'] == !NULL} <span>{$item['mem_memberPointsCount']}</span>
+                                    {/if}
+                                </td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+
+                            <td>&nbsp;
+                                <a class="btn btn-primary btn-sm" href="{php echo $this->createWebUrl('member',array('op' => 'add','id' => $item['id']))}">修改</a>&nbsp;&nbsp;
+                                <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('member',array('op' => 'del','id' => $item['id']))}">删除</a>
+                            </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                            <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                                <thead>
+                                {if $list}
+                                <tr>
+                                    <td colspan="14">
+                                        <input name="token" type="hidden" value="{$_W['token']}" />
+                                        <button class="btn btn-warning " type="button" name="recycledeleteall" ><i class="fa fa-trash"></i> 批量删除</button>
+                                        <button class="btn btn-warning " type="button" name="btnupall" ><i class="fa fa-mail-reply-all"></i> 批量恢复</button>
+                                    </td>
+                                </tr>
+                                {else}
+                                <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                                {/if}
+                                </thead>
+                            </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("button[name=recycledeleteall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要删除的会员！","error");
+            return false;
+        }
+        if(confirm("确认要删除选择的会员?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('member', array('op' => 'recycledeleteall', 'storeid' => $storeid))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+                },'json'
+            );
+        }
+    });
+    $("button[name=btnupall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要恢复的商品！","error");
+            return false;
+        }
+        if(confirm("确认要恢复选择的商品?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('member', array('op' => 'upall', 'storeid' => $storeid))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+
+                },'json'
+            );
+        }
+    });
+</script>
+{template 'web/common/footer'}

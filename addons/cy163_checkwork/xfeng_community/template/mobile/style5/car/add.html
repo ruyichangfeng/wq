@@ -1,0 +1,202 @@
+{template 'style5/header'}
+<body class="max-width bg-f5">
+<div class="page">
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" onclick="window.location.href='{php echo $this->createMobileUrl('car')}'"></a>
+        <h1 class="title txt-fff">我要拼车</h1>
+    </header>
+    <div class="content">
+        <div class="buttons-row  houselease-publish">
+            <a class="tab-link  button {if $_GPC['type'] == 1 || empty($_GPC['type'])}active{/if}" onclick="window.location.href='{php echo $this->createMobileUrl('car',array('op'=> 'add','type'=> 1))}'">我是司机</a>
+            <a class="tab-link button {if $_GPC['type'] == 2}active{/if}" onclick="window.location.href='{php echo $this->createMobileUrl('car',array('op'=> 'add','type'=> 2))}'">我是乘客</a>
+        </div>
+        <div class="tabs " style="margin-top: -10px">
+            <div id="tab1" class="tab active">
+                <input type="hidden" value="{$item['id']}" id="cid">
+                <div class="list-block houselease-pu-block mt10">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">标题：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="请输入标题" id="title" value="{$item['title']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">出发地：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="请输入出发地" id="start_position" value="{$item['start_position']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">目的地：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="请输入目的地" id="end_position" value="{$item['end_position']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">出发时间：</div>
+                                    <div class="item-input">
+                                        <input type="text" id="gotime" value="{if $item['gotime']}{else}{php echo date('Y-m-d H:i',TIMESTAMP)}{/if}" >
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">返回时间:</div>
+                                    <div class="item-input">
+                                        <input type="text" id="backtime" value="{if $item['backtime']}{else}{php echo date('Y-m-d H:i',TIMESTAMP)}{/if}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">单价：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="（元）" id="sprice" value="{$item['sprice']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">{if $_GPC['type'] == 1}提供座位{else}需要座位{/if}：</div>
+                                    <div class="item-input">
+                                        <input type="text" placeholder="（个）" id="seat" value="{$item['seat']}">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">姓名：</div>
+                                    <div class="item-input">
+                                        <input type="text" value="{$member['realname']}" id="contact">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title label">手机：</div>
+                                    <div class="item-input">
+                                        <input type="text" value="{$member['mobile']}" id="mobile" >
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                    <div class="content-block" style="margin-top: 0.5rem">
+                        <a href="#" class="button button-big button-fill button-success" id="showToast">提交信息</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>$.config = {autoInit: true}</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="UTF-8"></script>
+<script>
+    $("#gotime").datetimePicker({
+        toolbarTemplate: '<header class="bar bar-nav">\
+    <button class="button button-link pull-right close-picker">确定</button>\
+    <h1 class="title">选择出发时间</h1>\
+    </header>'
+    });
+    $("#backtime").datetimePicker({
+        toolbarTemplate: '<header class="bar bar-nav">\
+    <button class="button button-link pull-right close-picker">确定</button>\
+    <h1 class="title">选择返回时间</h1>\
+    </header>'
+    });
+</script>
+<script type="text/javascript">
+
+    $(function() {
+        $("#showToast").click(function(event) {
+            var title = $("#title").val();
+            if (title == '') {
+                alert('标题不能为空！');
+                return false
+            };
+            var end_position = $("#end_position").val();
+            if (end_position == '') {
+                alert('目的地必填！');
+                return false
+            };
+            var sprice = $("#sprice").val();
+            if (sprice == '') {
+                alert('单价必填！');
+                return false
+            };
+            var seat = $("#seat").val();
+            if (seat == '') {
+                alert('座位必填！');
+                return false
+            };
+            var id = $("#cid").val();
+            var type = "{$_GPC['type']}";
+            var start_position = $("#start_position").val();
+            var gotime = $("#gotime").val();
+            var backtime = $("#backtime").val();
+            var contact = $("#contact").val();
+            var mobile = $("#mobile").val();
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('car',array('op' => 'add'))}",
+                dataType: 'json',
+                data: {
+                    title: title,
+                    end_position: end_position,
+                    sprice: sprice,
+                    seat: seat,
+                    type: type,
+                    start_position: start_position,
+                    gotime: gotime,
+                    backtime:backtime,
+                    contact:contact,
+                    mobile:mobile,
+                    id : id
+                },
+                success: function(s) {
+                    if (s.status == 1) {
+                        $.toast("提交成功");
+                        setTimeout(function() {
+
+                            window.location.href="{php echo $this->createMobileUrl('car',array('op' => 'list'))}";
+                        }, 3000);
+                    };
+                    if(s.status == 2){
+                        $.toast(s.content);
+                    }
+                }
+            })
+
+
+        });
+    })
+</script>
+{template 'style5/footer'}

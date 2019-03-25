@@ -1,0 +1,298 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>订单管理</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Speak/speak_list')}"  method="post" style="width:95%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="开始日" value="{$s_createtime}" name="s_createtime" id="s_createtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="截止日" value="{$e_createtime}"  name="e_createtime" id="e_createtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="nickname" value="{$nickname}"  placeholder="请输入用户昵称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="goodsname" value="{$goodsname}"  placeholder="请输入商品名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+                
+              </div>
+            </div> 
+        </form>
+        <xblock>       	
+        	<button class="layui-btn layui-btn-danger" onclick="speak_del('0')"><i class="layui-icon">&#xe640;</i>删除</button>   
+        	<button class="layui-btn" onclick="speak_add('添加晒单','{:U('Home/MainCtr/Speak/speak_edit')}','600','565')"><i class="layui-icon">&#xe640;</i>添加</button>
+        	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+       </xblock>
+       <form id="delform" class="layui-form">
+	      <table class="layui-table">
+	            <thead>
+	                <tr>
+	                    <th id="checkbox-reverse"><input  type="checkbox"  lay-filter="allChoose" id="allChoose"  lay-skin="primary" value=""></th>
+	                    <th>用户id</th>
+	                    <th>商品id</th>
+	                    <th>用户昵称</th>
+	                    <th>商品名称</th>
+	                    <th>星级</th>
+	                    <th>内容</th>
+	                    <th>状态</th>
+	                    <th>创建时间</th>
+	                    <th>操作</th>
+	                </tr>
+	            </thead>
+	            <tbody id="formdata">
+	              <volist name="list" id="v">	
+	                <tr>
+	                    <td><input type="checkbox"  value="{$v['id']}"  filter="choose" lay-skin="primary"  name="delete[]" ></td>
+	                    <td>{$v.mid}</td>
+	                    <td>{$v.goodsid}</td>
+	                    <td>{$v.nickname}</td>
+	                    <td>{$v.goodsname}</td>
+	                    <td>{$v.star}</td>
+	                    <td><?php 
+	                    			echo mb_substr($v['content'],0,25,'utf-8').'..';?></td>
+	                    <td class="td-status" style="cursor:pointer;" onclick="speak_change('{$v['id']}','{$v['status']}');">
+	                    	<?php 
+	                    		if($v['status'] == '1'){ 
+	                    		    echo '<span class="layui-badge layui-bg-green">已审核</span>';
+	                    		}else {
+	                    			echo '<span class="layui-badge ">未审核</span>';
+	                    	    }
+	                    	 ?>
+	                    </td>
+	                    <td><?php echo  date('Y-m-d H:i:s', $v['createtime']); ?></td>
+	                    <td class="td-manage">
+	                        <a title="编辑" href="javascript:;" onclick="speak_add('编辑','{:U('Home/MainCtr/Speak/speak_edit',array('id'=>$v['id']))}','600','565')"  class="ml-5" style="text-decoration:none">
+	                        	<i class="layui-icon">&#xe642;</i>
+	                        </a>
+	                        <a title ="删除" href="javascript:;" onclick="speak_del({$v.id})"  style="text-decoration:none">
+	                            <i class="layui-icon">&#xe640;</i>
+	                        </a>
+	                    </td>
+	                </tr>
+	              </volist>  
+	            </tbody>
+	        </table>
+		</form>
+        <div id="page"></div>
+    </div>
+     <include file="Public/footer.html"/>
+     
+     <script>
+        layui.use(['form','laydate','element','laypage','layer'], function(){
+          laydate = layui.laydate;//日期插件
+          laypage = layui.laypage;//分页
+          layer = layui.layer;//弹出层
+          form = layui.form;
+          $ = layui.jquery;
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page},
+		   jump: function(obj, first){
+			   if(!first){
+			    var $purl = "{:U('Home/MainCtr/Speak/speak_list',array('page'=>'pageval','s_createtime'=>$s_createtime,'e_createtime'=>$e_createtime,'nickname'=>$nickname,'goodsname'=>$goodsname))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);
+			   }
+			}
+		  });
+          //时间选择器
+		  laydate.render({
+		    elem: '#s_createtime'
+		    ,type: 'datetime'
+		  });
+		   laydate.render({
+		    elem: '#e_createtime'
+		    ,type: 'datetime'
+		  });
+		  
+		   	form.on('checkbox(allChoose)', function(data){
+				var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"])');
+				child.each(function(index, item){
+					item.checked = data.elem.checked;
+				});
+				form.render('checkbox');
+			});
+          
+        });
+
+        //批量删除提交
+        function delAll () {
+            layer.confirm('确认要删除吗？',function(index){
+                layer.msg('删除成功', {icon: 1});
+            });
+         }
+        
+        function speak_add(title,url,w,h){
+            if (title == null || title == '') {
+				title=false;
+			};
+			if (url == null || url == '') {
+				url="404.html";
+			};
+			if (w == null || w == '') {
+				w=800;
+			};
+			if (h == null || h == '') {
+				h=($(window).height() - 50);
+			};
+			var index = layer.open({
+				id:'ch',
+				type: 2,
+				area: [w+'px',h +'px'],
+				fix: false, //不固定
+				maxmin: true,
+				shadeClose: true,
+				shade:0.4,
+				title: title,
+				content: url,
+				btn: ['提交'] ,
+				yes: function(index, layero){
+				  	var body = layer.getChildFrame('body', index);
+			      	body.find("#submitBtn").click();
+				  	return false;
+		  		}
+			});
+        }
+        
+        /*用户-查看*/
+        function speak_show(title,url,w,h){
+            x_admin_show(title,url,w,h);
+        }
+        
+        // 改变状态
+        function speak_change (id,curstatus) {
+           if(curstatus==1){
+           		curstatus = 0;
+           }else{
+           		curstatus = 1;
+           }
+           var par = {"id":id,"curstatus":curstatus};
+           layer.confirm('确认要更改状态吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Speak/speak_change')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('更改成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('更改失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+        
+        /*用户-删除*/
+        function speak_del(id){
+           var par = {"id":id};
+		   if( id=='0' ){
+			  if($(":checkbox[name='delete[]']:checked").size() == 0){
+		           layer.msg('请选择要删除的用户', {icon: 2,offset: '40%',time:1500,shade: 0.3});
+		           return false;
+		        }
+			  par = $("#delform").serialize();
+			}
+			layer.confirm('确认要删除吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Speak/speak_del')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('删除成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('删除失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+        
+        function m_show(title,url,w,h){
+        	if (title == null || title == '') {
+				title=false;
+			};
+			if (url == null || url == '') {
+				url="404.html";
+			};
+			if (w == null || w == '') {
+				w=800;
+			};
+			if (h == null || h == '') {
+				h=($(window).height() - 50);
+			};
+			m = layer.open({
+				type: 2,
+				area: [w+'px',h +'px'],
+				fix: false, //不固定
+				maxmin: true,
+				shadeClose: true,
+				shade:0.4,
+				title: title,
+				content: url
+			});
+        }
+        
+        function g_show(title,url,w,h){
+        	if (title == null || title == '') {
+				title=false;
+			};
+			if (url == null || url == '') {
+				url="404.html";
+			};
+			if (w == null || w == '') {
+				w=800;
+			};
+			if (h == null || h == '') {
+				h=($(window).height() - 50);
+			};
+			g = layer.open({
+				type: 2,
+				area: [w+'px',h +'px'],
+				fix: false, //不固定
+				maxmin: true,
+				shadeClose: true,
+				shade:0.4,
+				title: title,
+				content: url
+			});
+        }
+        
+        function m_post(id,name,phone){        	
+        	var bob = $("#ch").find('iframe').contents();
+			bob.find("#mid").val(id);
+			bob.find("#nickname").val(name);
+			layer.close(m);  	
+       	}
+        
+        function g_post(id,title){        	
+        	var bob = $("#ch").find('iframe').contents();
+			bob.find("#goodsid").val(id);
+			bob.find("#goodsname").val(title);
+			layer.close(g);  	
+       	}
+        
+ </script>
+   
+</body>

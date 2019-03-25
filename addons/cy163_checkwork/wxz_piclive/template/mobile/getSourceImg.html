@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+<title>原图下载</title>
+<link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/template/mobile/css/swiper.css" />
+<link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/template/mobile/css/style.css" />
+<link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/css/font-awesome.min.css" />
+<script type="text/javascript" src="../addons/wxz_piclive/template/mobile/js/jquery.js"></script>
+<script type="text/javascript" src="../addons/wxz_piclive/template/mobile/js/common.js"></script>
+<script type="text/javascript" src="../addons/wxz_piclive/template/mobile/js/swiper.js"></script>
+<script type="text/javascript" src="../addons/wxz_piclive/template/mobile/js/vue.js"></script>
+<script type="text/javascript" src="../addons/wxz_piclive/template/mobile/js/index.js"></script>
+<script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript">
+ //yyyy-MM-dd
+ var getDateFormat = function(options){
+  options = options || {};
+  options.sign = options.sign || 'yyyy-MM-dd HH:mm:ss';
+  var _complete = function(n){
+   return (n>9) ? n : '0' + n;
+  }
+  var d = new Date();
+  var year = d.getFullYear();
+  var month = _complete(d.getMonth()+1);
+  var day = _complete(d.getDate());
+  var hours = _complete(d.getHours());
+  var minutes = _complete(d.getMinutes());
+  var second = _complete(d.getSeconds());
+  var result = options.sign;
+  result = result.replace('yyyy', year);
+  result = result.replace('MM', month);
+  result = result.replace('dd', day);
+  result = result.replace('HH', hours);
+  result = result.replace('mm', minutes);
+  result = result.replace('ss', second);
+  return result;
+ }
+</script>
+<script>
+    wx.config({
+        debug: false,
+        appId: "{$_W['account']['jssdkconfig']['appId']}",
+        timestamp: "{$_W['account']['jssdkconfig']['timestamp']}",
+        nonceStr: "{$_W['account']['jssdkconfig']['nonceStr']}",
+        signature: "{$_W['account']['jssdkconfig']['signature']}",
+        jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline", "onMenuShareQQ"]
+    });
+    wx.ready(function () {
+        sharedata = {
+            title: "{php echo $live['live_name']}",
+            desc: "{php echo $live['live_brief']}",
+            link:"{php echo $_W['siteroot'].str_replace('./','app/',$this->createMobileurl('index',array('i' => $_W['weid'],'lid'=>$live['id'],'share_uid'=>$_W['member']['uid'])))}",
+            imgUrl: "{php echo tomedia($live['original_img'])}",
+            success: function () {
+                //alert(111);
+            },
+            cancel: function () {
+                //alert('分享取消');
+            }
+        };
+        wx.onMenuShareTimeline(sharedata);
+        wx.onMenuShareAppMessage(sharedata);
+	wx.onMenuShareQQ(sharedata);
+    });
+</script>
+</head>
+<body class="bgcolor" style="background:#000;">
+<div id="app" style="width:100%;min-height:100%;">
+
+    <div class="swiper-container swiper1" id="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img src="{php echo tomedia($item['picpath'])}" />
+                </div>
+            </div>
+        </div>
+</div>
+<a href="javascript:;" class="album-bigImageLayer-btn album-bigImageLayer-download" style="position:relative;top:-0.5rem;left:0.2rem;"><i class="iconfont icon-download"></i>长按下载
+</body>
+</html>

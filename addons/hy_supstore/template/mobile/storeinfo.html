@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrom=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>店铺列表</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/store.css" rel="stylesheet">
+    <style>
+    /* 触发按钮 */
+    .alert-click {
+        display: block;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6) none repeat scroll 0 0;
+        color: #fff;
+        line-height: 3rem;
+        text-align: center;
+        font-size: 1.2rem;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        position: fixed;
+        right: 20px;
+        bottom: 140px;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    .alert-click .icon {
+        font-size: 28px;
+    }
+
+    @media screen and (min-width:640px) {
+        .alert-click {
+            right: auto !important;
+            margin-left: 580px;
+        }
+    }
+
+    /*遮罩*/
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        max-width: 640px;
+        height: 100%;
+        background: rgba(0, 0, 0, .6);
+        z-index: 100;
+    }
+
+    /* 二维码层 */
+    .board {
+        position: fixed;
+        background-color: #fff;
+        top: 25%;
+        left: 20%;
+        width: 60%;
+        height: 310px;
+        z-index: 999;
+        display: none;
+    }
+
+    .board .logo span {
+        display: block;
+        height: 44px;
+        color: #000;
+        font-size: 20px;
+        line-height: 44px;
+        padding-top: 4px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .board .qrcode {
+        position: relative;
+        width: 80%;
+        margin-left: 10%;
+    }
+
+    .board .qrcode img {
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .board .heart {
+        text-align: center;
+    }
+
+    .board .heart .icon {
+        display: inline-block;
+        font-size: 20px;
+        color: #cc0000;
+        line-height: 32px;
+        font-weight: 700;
+        text-align: center;
+        vertical-align: bottom;
+    }
+
+    .board .heart span {
+        display: inline-block;
+        margin: 0 auto;
+        font-size: 18px;
+        color: #cc0000;
+        line-height: 32px;
+        font-weight: 700;
+        vertical-align: bottom;
+        margin-left: 6px;
+    }
+
+    .board .text {
+        position: relative;
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 2%;
+        padding-bottom: 8px;
+        text-align: center;
+        color: #666;
+    }
+
+    /*引导二维码关注*/
+    </style>
+</head>
+
+<body>
+	{php echo register_jssdk();}
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">店铺详情</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 头部模块 -->
+        <div class="store-info">
+            <div class="top">
+                <div class="left">
+                    <div class="img" style="background: url({$row['thumb']});"></div>
+                </div>
+                <div class="right">
+                    <p class="title">{$row['title']}</p>
+                </div>
+            </div>
+            <ul class="list">
+                <li>
+                    <label>店铺分类: </label>
+                    <div class="info">{if $row['category_name']}{$row['category_name']}{else}门店{/if}</div>
+                </li>
+                <li>
+                    <label>店铺标签: </label>
+                    <div class="info">
+                    {loop $row['labelArray'] $key $value}
+                        {$value}
+                    {/loop}
+                    </div>
+                </li>
+                <li>
+                    <label>店铺位置: </label>
+                    <div class="info"><?php $arr = explode('|',$row['provinces']); echo $arr[1];?>&nbsp;<?php $arr = explode('|',$row['cities']); echo $arr[1];?>&nbsp;<?php $arr = explode('|',$row['areas']); echo $arr[1];?>&nbsp;</div>
+                </li>
+                <li>
+                    <label>详细地址: </label>
+                    <div class="info">{$row['address']}</div>
+                </li>
+                <li>
+                    <label>店铺电话: </label>
+                    <div class="info">{$row['mobile']}</div>
+                </li>
+                <li>
+                    <label>店铺负责人: </label>
+                    <div class="info">
+                    {if isset($row['uidsArr']) && $row['uidsArr']}
+                    {loop $row['uidsArr'] $ky $val}
+                    {$val['name']}&nbsp
+                    {/loop}
+                    {else}暂无
+                    {/if}
+                    </div>
+                </li>
+                <li>
+                    <label style="width: 100%">店铺简介: </label>
+                    <div class="info text" style="width: 100%;">{if $row['fdesc']}{$row['fdesc']}{else}暂无信息{/if}</div>
+                </li>
+            </ul>
+        </div>
+        <!-- 引导关注 -->
+        <!-- 触发按钮 -->
+        <div class="alert-click" id="alert-click" {if $issub == 1}style="display:none;"{/if}><i class="icon fa fa-qrcode"></i></div>
+        <div class='board'>
+            <div class="logo"><span>{$_W['account']['name']}</span></div>
+            <div class='qrcode'><img src='{$ermsrc}'></div>
+            <div class="heart"><i class="icon fa fa-heart fa-4x"></i><span>关注</span></div>
+            <div class='text'>{if $boss['subsrcmsg']}{$boss['subsrcmsg']}{else}长按二维码关注公众号{/if}</div>
+        </div>
+        <div class="overlay"></div>
+        <!-- 引导关注 -->
+        <!-- 返回顶部 -->
+        <div id="goTop"><a href="javascript:void(0);" class="fa fa-angle-double-up fa-lg"></a></div>
+        <!-- 返回顶部 -->
+        <!-- 底部导航 -->
+        {template 'footerindex'}
+        <!-- 底部导航 -->
+    </div>
+    
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script>
+
+        goScrollTop();
+        //返回顶部的火箭
+        function goScrollTop() {
+            if ($('#goTop>a')[0]) {
+                var gotop = $('#goTop>a')[0];
+                var leader = 0,
+                    target = 0,
+                    timer = 0;
+                $(window).scrollTop() > 0 ? show(gotop) : hide(gotop);
+                window.onscroll = function() {
+                    leader = $(window).scrollTop();
+                    leader > 0 ? show(gotop) : hide(gotop);
+                    gotop.onclick = function() {
+                        $(window).scrollTop(0);
+                    }
+                };
+
+                function show(obj) {
+                    $(obj).parent().fadeIn('100');
+                }
+
+                function hide(obj) {
+                    $(obj).parent().fadeOut('100');
+                }
+            }
+        }
+        
+        //引导关注
+        $("#alert-click").click(function(){
+            if($('.board').is(':hidden')){
+                $('.overlay').css('display','block');
+                $('.board').css('display','block');
+            }else{
+                $('.overlay').css('display','none');
+                $('.board').css('display','none');
+            }
+        });
+        $('.overlay').click(function(){
+            $('.overlay').css('display','none');
+            $('.board').css('display','none');
+        });
+
+    	var shareTitle  =    "{$sharetitle}";
+    	var shareContent  =    "{$sharecontent}";
+    	var shareLink  =    "{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=storelist&m=hy_supstore&id={$id}&op=info";
+    	var imgurl  =    "{php echo $shareimage}";
+
+    	wx.ready(function(){
+    		var shareData = {
+    		title: shareTitle,
+    		desc: shareContent,
+    		link: shareLink,
+    		imgUrl: imgurl,
+    		trigger: function (res) {},
+    		complete: function (res) {},
+    		success: function (res) {},
+    		cancel: function (res) {},
+    		fail: function (res) {}
+
+    	};
+    		wx.onMenuShareTimeline(shareData);
+    		wx.onMenuShareAppMessage(shareData);
+    		wx.onMenuShareQQ(shareData);
+    		wx.onMenuShareWeibo(shareData);
+    		wx.onMenuShareQZone(shareData);
+    	});
+    </script>
+</body>
+
+</html>

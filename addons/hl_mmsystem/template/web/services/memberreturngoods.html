@@ -1,0 +1,529 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-5" style="padding-left: 5px;padding-right: 5px;">
+            <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                <div class="panel-body" id="searchInvoiceToolBar"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                    <form  class="form-horizontal" role="form" id="search_invoiceListForm" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="memberreturngoods" />
+                        <input type="hidden" name="op" value="goodslistdata" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <div class="form-group"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                            <div class="input-group">
+                                <span class="input-group-btn"><button type="button" class="btn btn-primary">单据编号</button> </span>
+                                <input class="form-control" name="search_invoiceKeyword"  id="search_invoiceKeyword" type="text" value="{$_GPC['search_invoiceKeyword']}" placeholder="请输入单据编号">
+                                <span class="input-group-btn"><button class="btn btn-outline btn-primary" type="button" onclick="btnSerachInvoice()" id="btn_searchinvoicesubmit"><i class="fa fa-search"></i> 搜索</button></span>
+                                <span class="input-group-btn"><button class="btn btn-warning btn-xs" type="button" style="margin-left: 10px;"><i class="fa fa-question-circle-o"></i> 双击单据添加到右侧进行退货</button></span>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <table id="consumeInvoiceTableData" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+        <div class="col-sm-7" style="padding-left: 0px;padding-right: 5px;">
+            <div class="ibox float-e-margins" style="margin-bottom: 0px;" >
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <form role="form"   class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return check(this);" >
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="addmembercount" />
+                        <input type="hidden" name="op" value="saveAddMemberCountData" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <table class="table table-bordered table-hover"  id="MemberReturnConsumeDataTable"  style=" margin-bottom: 5px;" data-mobile-responsive="true"></table>
+                        <div class="hr-line-dashed" style="margin-top: 3px; margin-bottom: 0px;"></div>
+                        <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;z-index: 10;">
+                            <ul class="todo-list m-t" style=" margin-top: 5px;">
+                                <li>
+                                    <span class="m-l-xs">退货总数量：</span>
+                                    <small class="label label-info" style="font-size:large" id="statistics_consumeReturnNumber"><i class="fa fa-database"></i> 0</small>
+                                    <span class="m-l-xs">退货总金额：</span>
+                                    <small class="label label-info" style="font-size: large" id="statistics_consumeReturnMoneyTotal"><i class="fa fa-rmb"></i> 0元</small>
+                                    <span class="m-l-xs">扣除总积分：</span>
+                                    <small class="label label-info" style="font-size:large" id="statistics_consumeReturnPointTotal"><i class="fa fa-gift"></i> 0积分</small>
+                                </li>
+                            </ul>
+                        </div>
+                        {template 'web/common/panel-member-card-info'}
+                        <div class="shop-preview col-xs-12 col-sm-12 col-lg-12" >
+                            <div class="text-center alert alert-info alert-dismissable" style="margin-bottom: 0px;">
+                                <button aria-hidden="true" id="hideconsumecontrolpanel" class="close" type="button" onclick="btnHideConsumeSubmit()">×</button>
+                                <button class="btn btn-lg btn-primary " type="button"  onclick="btn_showReadCard()"><i class="fa fa-search-plus"></i>&nbsp;读&nbsp;卡&nbsp;</button>
+                                <button class="btn btn-lg btn-info" type="button" id="btn_clearMemberReturnConsumeData" ><i class="fa fa-trash-o"></i>&nbsp;清&nbsp;空&nbsp;</button>
+                                <button type="button" class="btn btn-lg btn-default" data-toggle="tooltip" data-placement="top" title="" data-original-title="(1)、当前操作店面开启了积分、储值受限;(2)、该笔消费有赠送优惠券或者核销了优惠券;(3)、该商品包含在套餐中;(4)该单据使会员升级
+符合以上任何一个条件将不支持部分退货">&nbsp;提  示&nbsp; </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .shop-preview {
+        position: fixed;
+        padding: 0 0;
+        bottom: 0;
+        right: 0;
+        z-index: 100;
+        width: 59%;
+    }
+    .shop-preview div {
+        filter:alpha(opacity=20);
+        /*background: rgba(255, 254, 220, 0.8);*/
+    }
+</style>
+<script>
+
+    $(document).ready(function(){
+        /****左侧商品列表----start  **/
+        $('#consumeInvoiceTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('goods', array('op' => 'consumeInvoiceListData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            toolbar: '#searchInvoiceToolBar',
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: queryInvoiceParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 80],
+            pagination: true,
+            height: 700,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'sc_invoiceCode',
+                title: '单据编号',
+                align: "left",
+                valign: "middle"
+            },{
+                field: 'store_id',
+                title: '商家名称',
+                align: "center",
+                valign: "middle",
+                formatter:storeNameFormatter
+            },{
+                field: 'sc_addTime',
+                title: '消费时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },{
+                field: 'sc_realMoneyCount',
+                title: '实付金额',
+                align: "center",
+                valign: "middle",
+                formatter:realPayMoneyFormatter
+            },{
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function queryInvoiceParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchInvoiceNamestr: $("#search_invoiceKeyword").val(),//后台请求传的查询参数
+            };
+            return temp;
+        };
+
+        //单据字段类型渲染设置
+        function storeNameFormatter(value, row, index) {
+            var result = "";
+            result += "<span class='label label-info' > {php echo $setStoreData['set_storeName']} </span>";
+            return result;
+        }
+        function realPayMoneyFormatter(value, row, index) {
+            var result = "";
+            result += "<span class='badge badge-danger'><i class='fa fa-rmb'></i>"+ value +"元</span>";
+            return result;
+        }
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "<button type='button'  class='btn btn-outline btn-sm btn-primary' onclick=\"ViewByInvoice(" + id + ")\" title='查看单据详情'><i class='fa fa-eye'></i></button>";
+            return result;
+        }
+        /****左侧商品套餐列表----end  **/
+
+        //添加左侧商品到右侧
+        $('#consumeInvoiceTableData').on("dbl-click-row.bs.table",function(e, row, $element) {
+            var invoice_id= row.id;
+            var memberId = parseInt($("#memberId").val());
+            $.ajax({
+                type: "post",
+                url: "{php echo $this->createWebUrl('memberreturngoods', array('op' => 'memberCompared'))}",
+                data: {invoice_id: invoice_id},
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal({
+                            title: "非会员消费",
+                            text: "非会员消费",
+                            type: "warning",
+                        });
+                        init_AddMemberReturnConsumeData(invoice_id,memberId);
+
+                    }
+                    else {
+                        //btn_showReadCard();
+                        init_AddMemberReturnConsumeData(invoice_id,memberId);
+
+                    }
+                    getReturnStatistics(invoice_id);
+                }
+            });
+
+        });
+    });
+    //商品列表查询按钮事件
+    function btnSerachInvoice() {
+        $("#consumeInvoiceTableData").bootstrapTable('refresh');
+    }
+    //查看商品详情
+    function ViewByInvoice(invoiceid){
+        var url = "{php echo $this->createWebUrl('goods', array('op' => 'viewinvoicedetail'))}&invoiceid=" + invoiceid;
+        parent.layer.open({
+            type: 2,
+            title: '单据详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['900px' , '600px'],
+            content: url
+        });
+    }
+
+    //消费商品操作列表
+    //删除消费项目与清空购物车
+    $("#btn_clearMemberReturnConsumeData").on('click', function () {
+        swal({
+                title: "确定清空吗？",
+                text: "你将无法对当前单据明细操作！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false
+            },
+            function(){
+                $('#addMemberRechargeCountDataTable').bootstrapTable('removeAll');
+                getReturnStatistics(-1);
+                btn_clearMemberInfo();
+            });
+    });
+
+    //读卡操作
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                showCancelButton: false,
+                closeOnConfirm: true,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }else{
+
+                }
+                var memberCardNum = inputCardValue;
+                var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "读卡失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        } else {
+
+                            var memberIdstr = data['message']['back_MemberId'];
+                            var memberCardNumstr = data['message']['back_MemberCardNum'];
+                            var memberNamestr = data['message']['back_MemberName'];
+                            var membercardlevelstr = data['message']['back_Membercardlevel'];
+                            var memberMobilestr = data['message']['back_MemberMobile'];
+                            var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                            var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                            var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                            var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                            $("#memberId").attr("value",memberIdstr);
+                            $("#memberCardNum").attr("value",memberCardNumstr);
+                            $("#memberName").attr("value",memberNamestr);
+                            $("#membercardlevel").attr("value",membercardlevelstr);
+                            $("#memberMobile").attr("value",memberMobilestr);
+                            $("#memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                            $("#memberNote").attr("value",memberConsumeNotestr);
+                            init_AddMemberReturnConsumeData(invoiceid,memberIdstr)
+                            swal("读卡成功！", "会员卡：" + inputCardValue,"success");
+                        }
+                    }
+
+                });
+            });
+
+    }
+    function init_AddMemberReturnConsumeData(invoiceid,memberid) {
+        /****右侧侧商品明细列表----start  **/
+        var invoiceid = invoiceid;
+        var memberid = memberid;
+        var editRowUrl ='';
+        editRowUrl = "{php echo $this->createWebUrl('memberreturngoods', array('op' => 'ajaxUpdateRowData'))}&memberid=" + memberid +"&invoiceid=" + invoiceid ;
+
+        var editUrl = "{php echo $this->createWebUrl('goods', array('op' => 'getMemberReturnConsumeList'))}&invoiceid=" + invoiceid ;
+
+        /****退货项目数据列表----**/
+        $('#MemberReturnConsumeDataTable').bootstrapTable({
+            url: editUrl,
+            method: "post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache: false,  //是否使用缓存
+            search: false, //显示搜索框
+            showPaginationSwitch: false,//是否显示数据条数选择框
+            striped: true,//隔行变色
+            queryParamsType: '',
+            queryParams: queryParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            height: 420,
+            selectItemName: "id",
+            uniqueId: "id",
+            columns: [{
+                field: 'goods_id',
+                title: 'ID',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_goo_name',
+                title: '消费项目',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_goo_price',
+                title: '单价(元)',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_consumeNumber',
+                title: '数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_goo_bargainPrice',
+                title: '折后金额',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_consumeReturnNumber',
+                title: '退货数量',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    placement:'bottom',
+                    title: '请输入退货数量',
+                    validate: function (v) {
+                        if (isNaN(v)) return '数量必须是数字';
+                        var count = parseInt(v);
+                        if (count <= 0) return '数量必须是正整数';
+                    }, display: function(value) {
+                        if(value){
+                            $(this).text('点击退货,已退货['+value+']件');
+                        }else{
+                            $(this).text('点击退货');
+                        }
+
+                    }
+                }
+            },{
+                field: 'cid_consumeReturnMoneyTotal',
+                title: '退款金额',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_consumeReturnPointTotal',
+                title: '扣除积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_note',
+                title: '备注',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'textarea',
+                    placement:'bottom',
+                    emptytext:'请输入备注',
+                    title: '请输入备注',
+                    rows: 2
+                }
+            },],onLoadSuccess:function(){
+
+                getReturnStatistics(invoiceid);
+            },
+            onEditableSave: function (field, row, oldValue, $el) {
+                $.ajax({
+                    type: "post",
+                    url: editRowUrl,
+                    data: {row: row,},
+                    dataType: 'JSON',
+                    success: function (data) {
+                        if (data['message']['code'] == 0) {
+                            swal({
+                                title: "操作有误",
+                                text: data['message']['msg'],
+                                type: "error",
+                            });
+                            return;
+                        }else if (data['message']['code'] == 1) {
+                            swal({
+                                title: "操作有误",
+                                text: data['message']['msg'],
+                                type: "error",
+                            });
+                            return;
+                        }else if (data['message']['code'] == 2) {
+                            swal({
+                                title: "操作有误",
+                                text: data['message']['msg'],
+                                type: "error",
+                            });
+                            return;
+                        } else {
+                            //alert(invoiceid);
+                            getReturnStatistics(invoiceid);
+                            $("#memberMoneyCount").attr("value",data['message']['new_memberMoneyCount']);
+                            $("#memberPointsCount").attr("value",data['message']['new_memberPointsCount']);
+                            $("#MemberReturnConsumeDataTable").bootstrapTable('refresh');
+                            //alert(data['message']['msg']);
+                            swal({
+                                title: "操作成功",
+                                text: data['message']['msg'],
+                                type: "success",
+                            });
+                            $(window).resize(function () {
+                                $('#MemberReturnConsumeDataTable').bootstrapTable('resetView');
+                            });
+                        }
+
+                    }
+
+                });
+            }
+        });
+        //得到查询的参数
+        function queryParamspage(params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            return temp;
+        };
+        /****右侧侧商品明细列表----end  **/
+    }
+    //清空会员信息
+    function btn_clearMemberInfo() {
+        $("#memberId").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#memberNote").attr("value","");
+        window.location.reload();
+    }
+    //统计当前退货数据
+    function getReturnStatistics(invoiceid) {
+        var getStatisticsUrl = "{php echo $this->createWebUrl('memberreturngoods', array('op' => 'getReturnStatistics'))}";
+        $.ajax({
+            type: "post",
+            url: getStatisticsUrl,
+            data:{invoiceid:invoiceid},
+            dataType: 'JSON',
+            success: function (data) {
+                //alert(data['message']['msg']);
+                if (data['message']['code'] != 0) {
+                    swal({
+                        title: "操作有误！",
+                        text: "数据获取失败。",
+                        type: "error",
+                    });
+                    return;
+                }else {
+                    var back_ReturnNumber =data['message']['back_ReturnNumber'];
+                    var back_ReturnMoneyTotal =data['message']['back_ReturnMoneyTotal'];
+                    var back_ReturnPointTotal =data['message']['back_ReturnPointTotal'];
+                    if(back_ReturnNumber==null||back_ReturnNumber==undefined||back_ReturnNumber==""){
+                        $('#statistics_consumeReturnNumber').html('<i class="fa fa-database"></i> 0');
+                        $('#statistics_consumeReturnMoneyTotal').html('<i class="fa fa-rmb"></i>  0 元');
+                        $('#statistics_consumeReturnPointTotal').html('<i class="fa fa-gift"></i>  0 积分');
+                    }else{
+                        $('#statistics_consumeReturnNumber').html('<i class="fa fa-database"></i>  ' + back_ReturnNumber);
+                        $('#statistics_consumeReturnMoneyTotal').html('<i class="fa fa-rmb"></i>  ' + back_ReturnMoneyTotal + ' 元');
+                        $('#statistics_consumeReturnPointTotal').html('<i class="fa fa-gift"></i>  ' + back_ReturnPointTotal + ' 积分');
+                    }
+                }
+            }
+
+        });
+    }
+    //时间转换
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+</script>
+{template 'web/common/footer'}

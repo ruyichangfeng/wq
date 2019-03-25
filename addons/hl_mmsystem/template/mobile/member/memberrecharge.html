@@ -1,0 +1,281 @@
+{php define(MUI, true);}
+{template 'common/header'}
+<style>
+    body{
+        background-color: #f5fafe;
+    }
+    .mui-content {
+        background-color: #f5fafe;
+    }
+    .import {
+        margin-right: 55px;
+        margin-left: 55px;
+        margin-top: 50px;
+    }
+
+    #topPopover {
+        position: fixed;
+        top: 16px;
+        right: 6px;
+    }
+    #topPopover .mui-popover-arrow {
+        left: auto;
+        right: 6px;
+    }
+    p {
+        text-indent: 22px;
+    }
+    span.mui-icon {
+        font-size: 14px;
+        color: #007aff;
+        margin-left: -15px;
+        padding-right: 10px;
+    }
+    .mui-popover {
+        height: 60%;
+        width: 90%;
+    }
+    .mui-content {
+        padding: 10px;
+    }
+</style>
+<form class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">会员充值</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mui-card" style="margin-top: 10%">
+            <div style="text-align: center;margin-top: 40px;">
+                <img src="{HLMMS_MOBILE_ICOS}Recharge.png"/>
+                <h3>会员充值</h3>
+                <div class="import">
+                    <div class="mui-content-padded" align="center" id="packagmiddle">
+                        <a  href="#Packagepayment"  class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined" >选择充值套餐</a>
+                    </div>
+
+                    <div class="mui-card" id="hidde_cardbody">
+                        <div class="mui-card-header">套餐名称：<p  id="textheader"></p></div>
+                        <input type="hidden" name="hidden_packagid" id="hidden_packagid" value="" />
+                        <div class="mui-card-content">
+                            <div class="mui-card-content-inner" style="text-align: left;" >
+                                套餐详细：<p style="color: black;font-size: 14px; font-weight: bold;" id="textcontent"></p>
+                            </div>
+                        </div>
+                        <div class="mui-card-footer" >套餐结束时间：<p id="textfooter"></p></div>
+                    </div>
+
+                    <div class="mui-content-padded" align="center">
+                    <button type="button" id="clearmiddle"  class="mui-btn mui-btn-primary mui-btn-outlined">
+                        清除数据
+                    </button>
+                    </div>
+                    <div id="hidde_Recharge">
+
+                    <div class="mui-input-row m-b-xl">
+                        <input type="hidden" name="memberid" id="memberid" value="{$memberid}">
+                        <input type="text" name="RechargeAmount" id="RechargeAmount" placeholder="请输入金额">
+                    </div>
+                    <div class="mui-content" style="text-align: center;margin-top: 5%;background-color: white">
+                        <button type="button" id="cashpayment" class="mui-btn mui-btn-success mui-btn-outlined" style="width: 40%;height: 40px;margin-bottom: 10%">
+                        现金收款
+                        </button>
+                        <button type="button" id="cloudpayment" class="mui-btn mui-btn-warning mui-btn-outlined" style="width: 40%;height: 40px;margin-bottom: 10%">
+                        一码付
+                        </button>
+                    </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Packagepayment" class="mui-popover">
+        <div class="mui-popover-arrow"></div>
+        <div class="mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <ul class="mui-table-view mui-table-view-chevron">
+                    {loop $memberrechargepackageslist $memberrechargepackagesitem}
+                    <li class="mui-table-view-cell mui-collapse">
+                        <a class="mui-navigate-right" href="#">套餐名称：{$memberrechargepackagesitem['mrp_packagesName']} </a>
+                        <ul class="mui-table-view mui-table-view-chevron">
+                            <li class="mui-table-view-cell">充值金额：<span class="mui-badge-primary mui-badge-inverted">{$memberrechargepackagesitem['mrp_rechargeMoney']}元</span>
+                            </li>
+                            <li class="mui-table-view-cell">赠送金额：<span class="mui-badge-success mui-badge-inverted">{$memberrechargepackagesitem['mrp_giveMoney']}元</span>
+                            </li>
+                            <li class="mui-table-view-cell">赠送积分：<span class="mui-badge-royal mui-badge-inverted">{$memberrechargepackagesitem['mrp_givePoints']}积分</span>
+                            </li>
+                            <li class="mui-table-view-cell" style="text-align: center">
+                                <button type="button"  onclick="showmemberrechargepackage({$memberrechargepackagesitem['id']})">
+                                    选择套餐
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    {/loop}
+                </ul>
+                {$pager}
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+
+
+    $(function(){
+        $("#hidde_cardbody").hide();
+        $("#clearmiddle").hide();
+
+        document.getElementById("cashpayment").addEventListener('tap', function() {
+            var paymoney = mui("#RechargeAmount")[0].value;
+            var memberid = mui("#memberid")[0].value;
+            var hidden_packagid = mui("#hidden_packagid")[0].value;
+
+            if(paymoney){
+                var moneyformatX=paymoney.substr(paymoney.length-1,1);
+                if(paymoney=='' || paymoney=='0' || paymoney=='0.0' || paymoney=='0.00'){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if(moneyformatX=='.'){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if(moneryisnum(paymoney)){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if((paymoney==null||paymoney==undefined)) {
+                    mui.alert('支付金额有误！');
+                    return false;
+                }
+            }
+                var url ="{php echo $this->createMobileUrl('member',array('op' => 'check_cashpayment'))}";
+                mui.ajax(url,{
+                    data:{
+                        paymoney:paymoney,
+                        memberid:memberid,
+                        hidden_packagid:hidden_packagid
+                    },
+                    dataType:'json',//服务器返回json格式数据
+                    type:'post',//HTTP请求类型
+                    success:function(data){
+                        var code1 = data['message']['status'];
+                        if(code1 == 1){
+                            mui.alert("充值失败!");
+                        }else{
+                            mui.alert('充值', '充值成功', function() {
+                                var activeUrl = "{php echo $this->createMobileUrl('member',array('op' => 'indexoperating'))}&memberid="+memberid;
+                                mui.openWindow({
+                                    url:activeUrl,
+                                    waiting:{
+                                        autoShow:true,//自动显示等待框，默认为true
+                                        title:'正在加载...',//等待对话框上显示的提示内容
+                                        options:{
+                                            width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                            height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    error:function(xhr,type,errorThrown){
+                        mui.toast('发起失败！');
+                    }
+                });
+        });
+        document.getElementById("cloudpayment").addEventListener('tap', function() {
+            var paymoney = mui("#RechargeAmount")[0].value;
+            var memberid = mui("#memberid")[0].value;
+            var hidden_packagid = mui("#hidden_packagid")[0].value;
+
+            if(paymoney){
+                var moneyformatX=paymoney.substr(paymoney.length-1,1);
+                if(paymoney=='' || paymoney=='0' || paymoney=='0.0' || paymoney=='0.00'){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if(moneyformatX=='.'){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if(moneryisnum(paymoney)){
+                    mui.alert('金额格式有误！');
+                    return false;
+                }
+                if((paymoney==null||paymoney==undefined)) {
+                    mui.alert('支付金额有误！');
+                    return false;
+                }
+                var QrPayUrl = "{php echo $this->createMobileUrl('member',array('op' => 'rechargeQRcode'))}&AmountMoney="+paymoney+"&memberid="+memberid;
+            }
+            else if(hidden_packagid != null || hidden_packagid != 0 || hidden_packagid != ''){
+                var QrPayUrl = "{php echo $this->createMobileUrl('member',array('op' => 'rechargeQRcode'))}&memberid="+memberid+"&packagid="+hidden_packagid;
+            }
+            else{
+                mui.alert('请确认充值金额！');
+                return false;
+            }
+
+            mui.openWindow({
+                url:QrPayUrl,
+                waiting:{
+                    autoShow:true,//自动显示等待框，默认为true
+                    title:'正在加载...',//等待对话框上显示的提示内容
+                    options:{
+                        width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                        height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                    }
+                }
+            });
+        });
+        document.getElementById("clearmiddle").addEventListener('tap', function() {
+            $("#RechargeAmount").show();
+            $("#hidde_cardbody").hide();
+            $("#packagmiddle").show();
+            $("#clearmiddle").hide();
+            $("#hidden_packagid").attr("value", 0);
+            $("#memmemberMoneyCount").show();
+        });
+
+        function moneryisnum(monery){
+            var reg = new RegExp("^[0-9]+(.[0-9]{1,2})?$");
+            if(!reg.test(monery)){
+                return true;
+            }
+            return false;
+        }
+    });
+
+    function  showmemberrechargepackage(packagid) {
+
+        var packagid  = packagid;
+        var url ="{php echo $this->createMobileUrl('common',array('op' => 'memberrechargepackagedetailed'))}";
+        mui.ajax(url,{
+            data:{
+                packagid:packagid,
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+                $("#textheader").html(data['message']['returnpackagesName']);
+                $("#textfooter").html(data['message']['dateEnddetailed']);
+                $("#textcontent").html(data['message']['returnpackagdetailed']);
+                $("#hidden_packagid").attr("value", packagid);
+                mui('#Packagepayment').popover('hide');
+                $("#hidde_cardbody").show();
+                $("#RechargeAmount").hide();
+                $("#packagmiddle").hide();
+                $("#clearmiddle").show();
+                $("#memmemberMoneyCount").val('');
+                $("#memmemberMoneyCount").hide();
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('失败');
+            }
+        });
+    }
+
+</script>

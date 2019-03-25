@@ -1,0 +1,81 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>{$title}</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp"/>
+  <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/app.css">
+</head>
+<body>
+<script src="{MODULE_URL}template/mobile/js/jquery.min.js"></script>
+{php include $this->template('_header');}
+<div class="jd_ad">
+<div class="jd-nickname">用户：{$nickname}</div>
+<ul class="tongji">
+    <li class="tongji-m">
+    文章总数<br/>
+	{if empty($mcount)}0{else}{php echo intval($mcount['mcount']);}{/if}
+
+    </li>
+  <li class="tongji-r">
+    总访问量<br/>
+    {if empty($shareinfo['rcount'])}0{else}{php echo intval($shareinfo['rcount']);}{/if}
+  </li>
+  <li class="tongji-s">
+    总分享数<br/>
+    {if empty($shareinfo['scount'])}0{else}{$shareinfo['scount']}{/if}
+  </li>
+  <li class="tongji-a">
+    广告点击<br/>
+    {if empty($shareinfo['acount'])}0{else}{$shareinfo['acount']}{/if}
+  </li>
+  </ul>
+
+
+    <div class="jd_form">
+      <label for="doc-ta-1">输入要贴入广告的文章网址（必须以<b>http</b>开头）</label>
+      <textarea name="url" rows="5" id="txturl"></textarea>
+	  <input type="hidden" name="rid" id="rid" value="{$rid}"></input>
+    </div>
+    <p align="center">
+      <span class="jd_submit">立即发布</span>
+    </p>
+  </div>
+{php include $this->template('_navbar');}
+<script>
+  $(".jd_submit").click(function(){
+	
+	var url= $("#txturl").val();
+	var rid= $("#rid").val();
+	if(url == ''){
+		alert("请输入url地址！");
+		return false;
+	}
+    url = encodeURIComponent(url);
+    var submiturl = "{php echo $this->createMobileUrl('submit', array(), true)}" + '&url=' + url + '&rid=' + rid;
+    location.href = submiturl;
+  });
+</script>
+
+{php echo register_jssdk(false);}
+<script>
+  wx.ready(function () {
+    sharedata = {
+      title: '{$shares["share_title"]}',
+      desc: '{$shares["share_desc"]}',
+      link: '{$shares["share_url"]}',
+      imgUrl: '{$shares["share_image"]}',
+      success: function(){
+      },
+      cancel: function(){
+      }
+    };
+    wx.onMenuShareAppMessage(sharedata);
+    wx.onMenuShareTimeline(sharedata);
+  });
+</script>
+</body>
+</html>

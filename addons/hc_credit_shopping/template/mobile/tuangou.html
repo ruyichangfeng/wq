@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>小区团购</title>
+<link href="../addons/hc_credit_shopping/assets/css/theme.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+  <div class="mheader">
+  <div class="pull-right"><a href="./index.php?i=4&j=4&c=entry&do=Home&m=hc_community">我的记录</a> </div>
+   <span class="icon icon_logo"></span> 嗨啦社区
+  </div>
+   <div  class="hb1"></div>
+</header>
+<section>
+  <div class="container1">
+    <ul class="menuli">
+     <li><a href="{php echo $this->createMobileUrl('list2',array('istime'=>1))}" class="active">进行中</a></li>
+     <li><a href="{php echo $this->createMobileUrl('tuangousae',array('istime'=>'1','type'=>'start'))}">即将开始</a></li>
+     <li><a href="{php echo $this->createMobileUrl('tuangousae',array('istime'=>'1','type'=>'end'))}"  >已结束</a></li>
+    </ul>
+    <div class='swipe'>
+      <div class='swipe-wrap'>
+        <div><a href="#"><img src="../addons/hc_credit_shopping/assets/images/slide_ad1.png"/></a></div>
+        <div><a href="#"><img src="../addons/hc_credit_shopping/assets/images/slide_ad1.png"/></a></div>
+        <div><a href="#"><img src="../addons/hc_credit_shopping/assets/images/slide_ad1.png"/></a></div>
+      </div>
+      <div class="swipe-indicators"> <span class="active">1</span><span>2</span><span>3</span></div>
+    </div>
+    <ul class="goodsli">
+	{loop $rlist $item}
+      <li>
+        <div><a href="{php echo $this->createMobileUrl('detail', array('id' => $item['id']))}"><img src="{php echo tomedia($item['thumb']);}" /></a>
+          <div class="title">{$item['title']}</div>
+          <div class="text-nowrap"><span class="pull-right"><small>{if $item['istime']==1}
+			<span style='text-align: center;margin-left:10px;margin-right:10px;color:rgb(251, 110, 83);;font-size:11px;' class='label label-danger' id="time_{$item['id']}">
+			{if $item['timelast'] < 0}
+				时间到了
+			{else}
+				{$item['timelaststr']}
+				<script language='javascript'>
+					var total_time_{$item['id']} = {$item['timelast']};  
+					var int_time_{$item['id']}  = setInterval(function(){
+						d({$item['id']});
+					},1000);
+				</script>
+			{/if}
+			</span>
+		 {/if}</small></span> <span class="price text-primary">￥{$item['marketprice']}</span> <a href="{php echo $this->createMobileUrl('detail', array('id' => $item['id']))}" class="btn">抢购</a> </div>
+        </div>
+      </li>
+	  {/loop}
+    </ul>
+  </div>
+</section>
+<div class="footer_padding"></div>
+<footer>
+  <div class="hb3"></div>
+  <div class="row text-center">
+    <div class="col-md4"><a href="./index.php?i=4&j=4&c=entry&do=Index&m=hc_community"><span class="ico_home"></span><small>主页</small></a></div>
+    <div class="col-md4"><a href="{php echo $this->createMobileUrl('myorder')}"><span class="ico_cart"></span><small>订单</small></a></div>
+    <div class="col-md4"><a href="#"><span class="ico_msg"></span><small>消息</small></a></div>
+    <div class="col-md4"><a href="./index.php?i=4&j=4&c=entry&do=Home&m=hc_community"><span class="ico_user"></span><small>我</small></a></div>
+  </div>
+</footer>
+<script type="text/javascript">
+function loadPage(pindex, container) {
+	pindex = parseInt(pindex) + 1;
+	$('#pager').html('正在加载数据...');
+	$.get(location.href, {'page' : pindex}, function(html){
+		if (html.indexOf('list-item') > -1) {
+			$('#'+container).append(html);
+			$('#pager').get(0).onclick = function(){
+				loadPage(pindex, container);
+			}
+			$('#pager').html("浏览更多商品");
+		} else {
+			$('#pager').html('已经显示全部商品');
+		}
+	});
+}
+
+function d(id){
+	eval("total_time_" + id+"--");
+	var total_time = eval("total_time_" + id);
+	var days = parseInt(total_time/86400)
+	var remain = parseInt(total_time%86400);
+	var hours = parseInt(remain/3600)
+	var remain = parseInt(remain%3600);
+	var mins = parseInt(remain/60);
+	var secs = parseInt(remain%60);
+	if (total_time <= 0) {
+		$("#time_" + id).html( "时间到了");
+		var int_time =  eval("int_time_" + id);
+		window.clearInterval(int_time);
+	} else {
+		var ret = "";
+		if(days>0){
+			days = days+"";
+			if(days.length<=1) { days="0"+days;}
+			ret+=days+" 天 ";
+		}
+		if(hours>0){
+			hours = hours+"";
+			if(hours.length<=1) { hours="0"+hours;}
+			ret+=hours+":";
+		}
+		if(mins>0){
+			mins = mins+"";
+			if(mins.length<=1) { mins="0"+mins;}
+			ret+=mins+":";
+		}
+		secs = secs+"";
+		if(secs.length<=1) { secs="0"+secs;}
+		ret+=secs;
+		$("#time_" + id).html( "倒计时 " +ret);
+	}
+}
+</script>
+
+
+
+<script src="../addons/hc_credit_shopping/assets/js/zepto.min.js"></script> 
+<script src="../addons/hc_credit_shopping/assets/js/swipe.js"></script> 
+<script src="../addons/hc_credit_shopping/assets/js/main.js"></script> 
+</body>
+</html>

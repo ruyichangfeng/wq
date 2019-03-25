@@ -1,0 +1,94 @@
+{template 'common/header'}
+	<ul class="nav nav-tabs">
+		<li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('prize', array('op'=>'display'));}">兑换码列表</a></li>
+		<li {if $op=='edit'}class="active"{/if}><a href="{php echo $this->createWebUrl('prize', array('op'=>'edit'));}">添加兑换码</a></li>
+	</ul>
+{if $op == 'edit'}
+<style type='text/css'>
+	.tab-pane {padding:20px 0 20px 0;}
+</style>
+<div class="main">
+
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+				<div class="form-group">
+		          <label class="col-xs-12 col-sm-3 col-md-2 control-label">兑换码</label>
+		          <div class="col-sm-9">
+		            <input class="form-control" type请输入="text" value="{$jiangpin['code']}" class="span2" name="code">
+		            <div class="help-block">请输入兑换码</div>
+		          </div>
+		        </div>
+
+				<div class="form-group">
+
+					<div class="form-group col-sm-12">
+						<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+	</form>
+</div>
+{elseif $op == 'display'}
+
+	<div class="main">
+	<!--
+	<div class="panel panel-info">
+
+	<div class="panel-heading">导入兑换码</div>
+	<div class="panel-body">
+		<form action="{php echo $this->createWebUrl('enter')}" method="post" class="form-horizontal" enctype="multipart/form-data" >
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label"></label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<input type="file" name="upfile">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12 col-sm-2 col-lg-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i>导入</button>
+				</div>
+			</div>
+			<div class="form-group">
+			</div>
+		</form>
+	</div>
+</div>
+-->
+	<div class="clearfix">
+		<h1>兑换码总数：{$total}</h1>
+		<form action="{php echo url('wechat/location/list');}" method="post" id="form2">
+			<input type="hidden" name="acid" value="{$acid}">
+			<div class="panel panel-default">
+				<div class="panel-body table-responsive">
+					<table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+						<thead class="navbar-inner">
+						<tr>
+							<th width="150">编号</th>
+							<th width="180">兑换码</th>
+							<th width="150">兑换码状态</th>
+							<th width="160">添加时间</th>
+							<th width="160">更新时间</th>
+							<th>操作</th>
+						</tr>
+						</thead>
+						<tbody>
+							{loop $list $li}
+								<tr>
+									<td>{$li['id']}</td>
+									<td>{$li['code']}</td>
+									<td>{if $li['state']}已领取{else}未被领{/if}</td>
+									<td>{php echo date('Y-m-d H:i',$li['createtime']);}</td>
+									<td>{if $li['lasttime']}{php echo date('Y-m-d H:i',$li['lasttime']);}{/if}</td>
+									<td>
+										<a href="{php echo $this->createWebUrl('prize', array('op'=>'del','id'=>$li['id']));}" class="btn btn-default" title="详情">删除</a>
+									</td>
+								</tr>
+							{/loop}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			{$pager}
+		</form>
+	</div>
+{/if}
+{template 'common/footer'}

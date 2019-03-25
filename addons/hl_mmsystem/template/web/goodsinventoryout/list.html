@@ -1,0 +1,213 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>库存数量</h5>
+                    <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goodsinventoryout')}" >
+                        <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+
+                </div>
+                <div class="ibox-content">
+                    <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="goodsinventoryout" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-5">
+                            <a href="javascript:;"id="parentIframe" class="btn btn-primary">
+                                <i class="fa fa-calculator"></i>采购单</a>
+                            <!--<a href="javascript:;"id="parentIframe1" class="btn btn-success">-->
+                                <!--<i class="fa fa-calculator"></i>调拨单</a>-->
+                            <a href="javascript:;"id="parentIframe2" class="btn btn-warning">
+                                <i class="fa fa-calculator"></i>盘点单</a>
+                            <a type="submit" href="{php echo $this->createWebUrl('StockExport');}"  name="out_put" value="导出" class="btn btn-primary" >
+                                <i class="fa fa-share"></i>批量导出</a>
+                        </div>
+                            <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">商品编码</label>
+                            <div class="col-sm-2 col-lg-1">
+                                <input class="form-control" name="codekeyword" id="codekeyword" type="text" value="{$_GPC['codekeyword']}">
+                            </div>
+                            <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width: 100px;">商品名称</label>
+                            <div class="col-sm-2 col-lg-2">
+                                <input class="form-control" name="keyword" id="keyword" type="text" value="{$_GPC['keyword']}">
+                            </div>
+                            <div class="col-sm-2 col-lg-2">
+                                <button class="btn btn-outline btn-primary" type="submit"><i class="fa fa-search"></i> 搜索</button>
+                            </div>
+                    </form>
+
+                    <form class="form-horizontal form" method="post" >
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">Id</th>
+                                <th>商品编码</th>
+                                <th>商品名称</th>
+                                <th>库存数量</th>
+                                <th width="10%">预警值</th>
+                                <th>总采购数</th>
+                                <th>已售数量</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    {$item['id']}
+                                </td>
+                                <td>{$item['goo_code']}</td>
+                                <td>{$item['goo_name']}</td>
+                                <td>{if $item['goo_number'] <= $item['goo_countWarning']}
+                                    <span class="badge badge-danger" title="超出预警值{$item['goo_countWarning']}" data-toggle="tooltip" data-placement="top">{$item['goo_number']}</span>
+
+                                    {elseif $item['goo_goodsOrService']==1 && $item['goo_size']!=1 }
+
+                                    <span class="label label-info">{$item['goo_number']}</span></td><!--入库库存-->
+
+                                {elseif $item['goo_goodsOrService']==1 && $item['goo_size']==1}
+                                <button type="button" class="btn btn-w-m btn-default hiddenall" id="specificationInfohidde_{$item['id']}" onclick="hiddenspecificationInfo({$item['id']})"><i class="fa fa-eye-slash"></i>总库存：{$item['goo_number']}</button>
+
+                                <button type="button" class="btn btn-w-m btn-info" id="specificationInfoshow_{$item['id']}" onclick="specificationInfo({$item['id']})"><i class="fa fa-eye"></i>总库存：{$item['goo_number']}</button>
+                                <div id="treeview_{$item['id']}" class="test"></div>
+
+                                {/if}</td>
+                                <td><input type="text" class="form-control" name="countwarning[{$item['id']}]" value="{$item['goo_countWarning']}"></td>
+                                <td>{php echo util::getGoodsInventoryInAll($item['id']);}</td>
+                                <td>{php echo util::getGoodsConsumeCount($item['id']);}</td>
+                                <td>
+                            <span onclick="parent.layer.open({type: 2,title: '详细记录',maxmin: true,shadeClose: true,area: ['1200px', '700px'],content: '{php echo $this->createWebUrl('goodsinventoryout',array('op' => 'detail','id' => $item['id']))}'});"  class="btn btn-primary btn-sm">查看记录</span>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                <input name="token" type="hidden" value="{$_W['token']}" />
+                                <input type="submit" class="btn btn-danger" name="submit" value="批量预警" />
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(document).ready(function(){
+        $(".hiddenall").hide();
+    });
+
+    function specificationInfo(goodsid) {
+
+        var goodsid = goodsid;
+        var url =  "{php echo $this->createWebUrl('goods', array('op' => 'ajaxspecificationjson'))}";
+
+        var params = {
+            'goodsid': goodsid,
+        };
+
+
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 0) {
+                    var  goo_specificationjson = data['message']['goo_specificationjson'];
+                    $("#treeview_"+goodsid).treeview({
+                        expandIcon: "glyphicon glyphicon-stop",
+                        color: "#428bca",
+                        showTags: true,
+                        data:goo_specificationjson
+                    });
+                    $("#specificationInfoshow_"+goodsid).hide();
+                    $("#specificationInfohidde_"+goodsid).show();
+                    $("#treeview_"+goodsid).show();
+                }
+                else{
+                    swal({
+                        title: "没有规格",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+
+                }
+            },
+            error:function () {
+                swal({
+                    title: "没有规格",
+                    confirmButtonText: "确定",
+                    type: "error",
+                });
+
+            }
+        });
+
+
+
+    }
+    function hiddenspecificationInfo(goodsid) {
+        var goodsid = goodsid;
+        $("#treeview_"+goodsid).hide();
+        $("#specificationInfoshow_"+goodsid).show();
+        $("#specificationInfohidde_"+goodsid).hide();
+    }
+
+
+
+    $('#parentIframe').on('click', function(){
+        var index = parent.layer.open({
+            type: 2,
+            title: '采购单',
+            shadeClose: true, //点击遮罩关闭层
+            area : ['1300px' , '700px'],
+            content: '{php echo $this->createWebUrl('goodsinventoryin',array('op' => 'list'))}'
+        });
+        parent.layer.full(index);
+    });
+</script>
+<script>
+    $('#parentIframe1').on('click', function(){
+        parent.layer.open({
+            type: 2,
+            title: '调拨单',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['1300px' , '700px'],
+            content: '{php echo $this->createWebUrl('goodsinventorytransfer',array('op' => 'list'))}'
+        });
+    });
+</script>
+<script>
+    $('#parentIframe2').on('click', function(){
+        var index = parent.layer.open({
+            type: 2,
+            title: '盘点单',
+            shadeClose: true, //点击遮罩关闭层
+            area : ['1300px' , '700px'],
+            content: '{php echo $this->createWebUrl('goodsinventorychange',array('op' => 'list'))}'
+        });
+        parent.layer.full(index);
+    });
+</script>
+
+
+    {template 'web/common/footer'}

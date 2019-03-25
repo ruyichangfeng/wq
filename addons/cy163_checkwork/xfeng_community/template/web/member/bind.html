@@ -1,0 +1,87 @@
+{template 'web/common/header'}
+<ul class="nav nav-tabs">
+    <li><a href="{php echo $this->createWebUrl('member', array('op' => 'list'));}">业主管理</a></li>
+    <li><a href="{php echo $this->createWebUrl('member', array('op' => 'visit','type' => 1));}">游客管理</a></li>
+    <li class="active"><a href="{php echo $this->createWebUrl('member', array('op' => 'bind'));}">其他绑定房号</a></li>
+</ul>
+<div class="panel panel-info">
+    <div class="panel-body">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <p>业主绑定的其他房号信息</p>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="width:50px">ID</th>
+                <th style="width:150px">小区名称</th>
+                <th style="width:60px">姓名</th>
+                <th style="width:100px">手机</th>
+                <th style="width:120px">地址</th>
+                <th style="width:100px">注册时间</th>
+                <th style="width:60px">状态</th>
+                <th class="col-sm-3">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $members $item}
+            <tr>
+                <td>{$item['id']}</td>
+                <td>{$item['regiontitle']}</td>
+                <td>{$item['realname']}</td>
+                <td>{php echo substr_replace($item['mobile'],'****',3,4)}</td>
+                <td>{$item['address']}</td>
+                <td>{php echo date('Y-m-d',$item['createtime'])}</td>
+                <td>
+                    <label data="{$item['status']}" class='label  label-default {if $item['status']==1}label-info{/if}' onclick="verify(this,{$item['id']},'status')">{if $item['status']==1}通过{else}禁止{/if}</label>
+                </td>
+                <td>
+                    <a href="{php echo $this->createWebUrl('member', array('op'=>'add', 'id' => $item['id']));}" class="btn btn-default btn-sm"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top"></i>查看</a>
+                    <a href="{php echo $this->createWebUrl('member', array('op'=>'delete', 'id' => $item['id']));}" class="btn btn-default btn-sm"><i class="fa fa-times"></i>删除</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+    <script type="text/javascript">
+        function verify(obj, id, type) {
+            $(obj).html($(obj).html() + "...");
+            $.post("{php echo $this->createWebUrl('member',array('op' => 'verify'))}", {
+                id: id,
+                type: type,
+                data: obj.getAttribute("data")
+            }, function(d) {
+                $(obj).html($(obj).html().replace("...", ""));
+                if (type == 'status') {
+                    $(obj).html(d.data == '1' ? '通过' : '禁止');
+                }
+                if (type == 'open_status') {
+                    $(obj).html(d.data == '1' ? '开启' : '关闭');
+                }
+                $(obj).attr("data", d.data);
+                if (d.result == 1) {
+                    $(obj).toggleClass("label-info");
+                }
+            }, "json");
+        }
+        $(function() {
+            $("#checkAll").click(function() {
+
+                var checked = $(this).get(0).checked;
+                var group = $(this).data('group');
+                $("#regionid[data-group='" + group + "']").each(function() {
+                    $(this).get(0).checked = checked;
+                })
+
+            });
+        });
+    </script>
+
+
+    {template 'web/common/footer'}

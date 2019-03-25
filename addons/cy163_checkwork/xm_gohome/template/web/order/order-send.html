@@ -1,0 +1,145 @@
+{template 'common/header-base'}
+
+<link rel="stylesheet" href="{MODULE_URL}static/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="{MODULE_URL}static/css/font-awesome.min.css" type="text/css" />
+<link href="{MODULE_URL}static/js/artDialog/skins/idialog.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/plugins/iframeTools.js"></script>
+<script type="text/javascript" src="{MODULE_URL}static/js/jquery_min.js"></script>
+<div class="clearfix"> 
+    <div class="search">
+        <form action="index.php" method="get">
+        <input type="hidden" name="c" value="site" />
+        <input type="hidden" name="a" value="entry" />
+        <input type="hidden" name="do" value="order" />
+        <input type="hidden" name="foo" value="send" />
+        <input type="hidden" name="m" value="xm_gohome" />
+        <input type="hidden" name="serve_type" value="{$serve_type}" />
+        <input type="hidden" name="order_id" value="{$order_id}" />
+        <table width="861" class="table table-bordered tb">
+            <tbody>
+                <tr>
+                	<td>
+                		关键字<input name="key_word" id="key_word" type="text" class="form-control" >
+                    </td>
+                    <td>
+                		手机号码<input name="staff_mobile" id="staff_mobile" type="text" class="form-control" >
+                    </td>
+                </tr>
+                    
+                <tr class="search-submit">
+                	<td colspan="2">
+                		<button class="btn pull-right span2"><i class="icon-search icon-large"></i> 搜索</button>
+                	</td>
+                </tr>
+            </tbody>
+        </table>
+        </form>
+    </div> 
+        
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <table class="table table-hover">
+            	<thead>
+                	<tr class="active">
+                    	<td width="100">ID编号</td>
+                        <td width="100">姓名</td>
+                        <td width="100">性别</td>
+                        <td width="100">手机号码</td>
+						<td width="100">操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                	{if $list[0][id] == ''}
+                		<div class="tx-c">暂无数据</div>
+                	{else}
+	                	{loop $list $val}
+	                	<tr>
+	                    	<td>{$val[id]}</td>
+	                        <td>{$val[staff_name]}</td>
+	                        <td>{php echo $this->getSex($val[sex])}</td>
+							<td>{$val[staff_mobile]}</td>
+	                        <td style="overflow:visible;">
+	                        	<div class="btn-group btn-group-sm">
+	                            	<div onclick="paiok({$val[id]},{$order_id})" class="btn btn-default"><i class="fa fa-edit"></i>指派</div>
+	                            </div>
+	                        </td>
+	                    </tr>
+	                    {/loop}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="panel-body text-center">
+            {$pager}
+        </div>
+        
+    </div>
+</div>
+
+<script type="text/javascript">
+	function paiok(id,order_id){
+		artDialog.fn.shake = function (){
+		    var style = this.DOM.wrap[0].style,
+		        p = [4, 8, 4, 0, -4, -8, -4, 0],
+		        fx = function () {
+		            style.marginLeft = p.shift() + 'px';
+		            if (p.length <= 0) {
+		                style.marginLeft = 0;
+		                clearInterval(timerId);
+		            };
+		        };
+		    p = p.concat(p.concat(p));
+		    timerId = setInterval(fx, 13);
+		    return this;
+		};
+
+		var dialog = art.dialog({
+		    content: '<p>你确定指派该服务人员?为了安全，建议给服务人员电话确认！</p>'
+		    	+ '成交价格:<input id="suremoney" style="width:15em; padding:4px" />',
+		    fixed: true,
+		    id: 'Fm7',
+		    //icon: 'question',
+		    okVal: '确定',
+		    ok: function () {
+		    	var input = document.getElementById('suremoney');
+		        
+		    	if (input.value == '') {
+		            this.shake && this.shake();// 调用抖动接口
+		            input.select();
+		            input.focus();
+		            return false;
+		        } else {
+		        	$.ajax({
+						url: "{php echo $this->createWebUrl('order', array('foo'=>'paiok'));}",
+						type:"POST",
+						data:{"id":id,"order_id":order_id,"suremoney":input.value},
+						dataType:"json",
+						success: function(res){
+							if(res == 1){
+								//var api=art.dialog.open.api;
+								//api&&api.close();
+								window.location.reload();
+							}
+							if(res == 0){
+								art.dialog({
+									time: 1,
+									content: '派单失败！'
+								});
+							}
+							if(res == 2){
+								art.dialog({
+									time: 1,
+									content: '已派单！'
+								});
+							}
+						}
+					});	
+		        };
+		    },
+		    cancel: true
+		});
+	
+		dialog.shake && dialog.shake();// 调用抖动接口
+	}
+</script>

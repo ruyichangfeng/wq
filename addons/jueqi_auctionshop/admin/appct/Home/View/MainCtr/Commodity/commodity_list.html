@@ -1,0 +1,151 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>商品管理</cite></a>
+          <a><cite>商品管理</cite></a>
+        </span>
+       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    
+    <div class="x-body">
+    	
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Commodity/commodity_list')}"  method="post"  style="width:90%;margin-left: 5%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+  
+                <div class="layui-input-inline">
+                  <input type="text" name="title" value="{$title}"  placeholder="请输入商品标题	" autocomplete="off" class="layui-input">
+                </div>
+                
+                <div class="layui-input-inline">
+                  <input type="text" name="classifyname" value="{$classifyname}"  placeholder="请输入所属分类" autocomplete="off" class="layui-input">
+                </div>
+                
+                <div class="layui-input-inline">
+			      	 <select name="state" lay-filter="aihao">
+			      	 	 <option value="" >全部</option>
+					     <option <?php if($state==2){ echo 'selected'; } ?> value="2" >竞拍中</option>
+					     <option <?php if($state==3){ echo 'selected'; } ?> value="3" >竞拍结束</option>
+					 </select>
+                </div>
+                
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>
+      	
+      	<form id="delform" class="layui-form">
+      	 	
+      	 	<table class="layui-table">
+      	 		
+            <thead>
+                <tr>                 
+                    <th>ID</th>
+                    <th width="200px">商品标题</th>  
+                    <th>商品图片</th>
+                    <th>市场价</th>
+                    <th>当前价格</th>
+                    <th>累计竞拍虚拟币</th> 
+                    <th>累计竞拍金额</th> 
+   					<th>当前盈利情况</th>   					 					
+                    <th>所属分类</th>  
+                    <th>状态</th>   
+                    <th>开始/结束时间</th>                   
+                    <th>操作</th>
+                </tr>
+            </thead>
+          
+            <tbody id="formdata">
+              <volist name="list" id="v">	
+                 <tr>                 
+                    <td>{$v.id}</td>
+                    <td>{$v.title}</td>
+                    <td><img width="200px" <?php echo 'src="__ROOT__/Uploads/'.$v['goods_img'].'"'?>/></td>
+                    <td>{$v.market_price}</td>
+                    <td>{$v.discount_price}</td>
+                    <td>{$v.xhxnb}</td>
+                    <td>{$v.xhmoney}</td>
+					<td>{$v.money}</td>					
+                   	<td class="td-status"><span class="layui-badge layui-bg-green">{$v.classifyname}</span></td>
+                    <td class="td-status">
+                    	<?php 
+							if($v['state'] == 2) {
+                    			echo '<span class="layui-badge layui-bg-green">竞拍中</span>';
+                    	    }elseif($v['state'] == 3) {
+                    			echo '<span class="layui-badge">竞拍结束</span>';
+                    	    }
+                    	?>
+                    </td>
+                    <td>
+                    	<?php  if( !empty($v['start_time']) ){ echo  '开始时间：'.date('Y-m-d H:i:s', $v['start_time']); } ?>
+                    	<?php  if( !empty($v['end_time']) ){ echo  '<br>结束时间：'.date('Y-m-d H:i:s', $v['start_time']); } ?>
+                    </td>                
+                    <td class="td-manage">
+                    	<?php if($v['state'] == 2) { ?>
+                      	<span class="layui-btn layui-btn-xs layui-btn-danger" onclick="end('{$v.id}','{$v.state}');">终止竞拍</span>
+                      	<?php } ?>
+                    </td>
+                </tr>
+              </volist>  
+            </tbody>
+             </table>
+          </form> 
+       	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+        <div id="page"></div>
+    </div>
+     <include file="Public/footer.html"/>
+     <script>    	
+        layui.use(['form','element','laypage','layer'], function(){
+          var laypage = layui.laypage;//分页
+          var layer = layui.layer;//弹出层
+          var form = layui.form;
+          $ = layui.jquery; 
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page}, 
+		   jump: function(obj, first){
+			   if(!first){ 
+			    var $purl = "{:U('Home/MainCtr/Commodity/commodity_list',array('page'=>'pageval','classifyname'=>$classifyname,'title'=>$title,'state'=>$state))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);  			
+			   }
+			}
+		  });
+		  
+        });
+        
+        function end(id,state){
+        	if(state==3){  		
+        		layer.msg('该商品已经终止竞拍！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+        		return false;
+        	}
+        	layer.confirm('确定终止当前商品竞拍，并且由最后出价人获得购买资格?', {icon: 3, title:'提示'}, function(index){
+			  	$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Commodity/docommodity')}",
+					data: {'id':id},
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('终止成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('终止失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}else{
+							layer.msg(data, {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	 
+			});
+        }  
+ </script>
+   
+</body>
+</html>

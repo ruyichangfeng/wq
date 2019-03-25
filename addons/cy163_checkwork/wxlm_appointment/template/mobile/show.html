@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{php echo $this->config['system_name']}</title>
+    {template 'head'}
+</head>
+<style>
+    .lw-tab-title{
+        width: 100%;
+        text-align: center;
+        color: #bfa965;
+        border-bottom: 1px solid #bfa965;
+        line-height: 40px;
+    }
+    .lw-swiper{
+        text-align: center;
+        line-height: 50px;
+    }
+    .swiper-slide-add a{
+        color: #bfa965;
+    }
+    .swiper-slide-add{
+        border-bottom: 1px solid #bfa965 !important;
+    }
+    .lw-tab-imglist
+    {
+
+    }
+    .lw-tab-imglist img{
+        width: 100%;
+        margin-top: 10px;
+    }
+    .load
+    {
+        line-height: 40px;
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+
+</style>
+<body>
+<div class="lw-tab-title">
+    作品
+</div>
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide lw-swiper {if empty($type_id)}swiper-slide-add{/if}"><a href="{php echo $this->createMobileUrl('show')}">全部</a></div>
+        {loop $showtypes $key $item}
+        <div class="swiper-slide lw-swiper {if $type_id == $item['showtype_id']}swiper-slide-add{/if}"><a href="{php echo $this->createMobileUrl('show', array('type_id'=>$item['showtype_id']))}">{$item['showtype_title']}</a></div>
+        {/loop}
+
+    </div>
+</div>
+<div class="lw-tab-imglist">
+    {loop $shows $key $item}
+    <a href="{$item['show_url']}"><img src="{php echo tomedia($item['show_pic'])}" alt=""></a>
+    {/loop}
+</div>
+{if $page > 0}
+<a class="load" href="javascript:load()">加载更多</a>
+{/if}
+<div style="height: 60px"></div>
+<ul class="footer">
+    {if $_SESSION['index'] == 2}
+    <li class="{if $this->config['show_state'] == 2}col-xs-4{else}col-xs-6{/if} ">
+        <a href="{php echo $this->createMobileUrl('other', array())}">
+            <img src="{RES}mobile/images/icon01.png">
+            <span>首页</span>
+        </a>
+    </li>
+    {else}
+    <li class="{if $this->config['show_state'] == 2}col-xs-4{else}col-xs-6{/if} ">
+        <a href="{php echo $this->createMobileUrl('index', array())}">
+            <img src="{RES}mobile/images/icon01.png">
+            <span>首页</span>
+        </a>
+    </li>
+    {/if}
+    <li class="col-xs-4">
+        <a href="{php echo $this->createMobileUrl('mine', array())}">
+            <img src="{RES}mobile/images/icon02.png">
+            <span>个人中心</span>
+        </a>
+    </li>
+    <li class="col-xs-4 dq">
+        <a href="{php echo $this->createMobileUrl('show', array())}">
+            <img src="{RES}mobile/images/icon003.png">
+            <span>作品</span>
+        </a>
+    </li>
+</ul>
+</body>
+
+<script>
+
+    var page = "{$page}";
+
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 5,
+        paginationClickable: true,
+        spaceBetween: 0,
+        freeMode: true
+    });
+    // 高亮位置
+    var lwcunum=$(".swiper-wrapper  .swiper-slide-add").index()+1;
+    //tab个数
+    var lwnum=$(".swiper-slide").length;
+
+    // tab宽度
+    var slidewidth=$(".swiper-slide").width();
+    // 满足总数大于5，高亮不在后两个且不在前三个
+    var slideleft1=(lwcunum-3)*slidewidth*-1;
+    // 高亮在后两个
+    var slideleft2=(lwnum-5)*slidewidth*-1;
+    console.log(slideleft1);
+    console.log(slideleft1);
+    if(lwnum>5){
+        if(lwcunum+1<lwnum&&lwcunum>3){
+            $(".swiper-wrapper").css("transform",'translate3d('+slideleft1+'px, 0px, 0px)');
+        }
+        if(lwcunum+1>=lwnum){
+            $(".swiper-wrapper").css("transform",'translate3d('+slideleft2+'px, 0px, 0px)');
+        }
+    }
+
+    function load() {
+
+        if (page == 0)
+        {
+            $('.load').html('已经到最底部');
+
+            return false;
+
+        } else
+        {
+            page++;
+
+            $.ajax({
+
+                url:"{php echo $this->createMobileUrl('LoadShow')}" + "&page=" + page + '&type='+"{$type_id}",
+                type:"get",
+                success:function (data) {
+
+                    if (data == '')
+                    {
+                        page = 0;
+                        $('.load').html('已经到最底部');
+
+                    } else
+                    {
+                        $('.lw-tab-imglist').append(data);
+                    }
+
+                }
+            })
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+	<meta content="telephone=no" name="format-detection" /> 
+	<meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+	<title>{$school['title']}</title>
+	{php echo register_jssdk();}
+	<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+	<link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+	<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+	<script src="{OSSURL}public/mobile/js/tx.js"></script>
+	<script type="text/javascript" src="{OSSURL}public/mobile/js/swipe.js"></script>
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+</head>
+<body>
+<style>
+body > a:first-child,body > a:first-child img{width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+body{padding-bottom: 0 !important;}
+#wrap.user_list .user > a::before{ content: ""; display: inline-block; float: left; height: 29px;width:29px; margin:5px 10px 10px 10px; vertical-align: middle; background-image: url({OSSURL}public/mobile/img/user_icon.png); background-size:  auto 35px;}
+#wrap.user_list .my_order::before{ background-color:#fe6c27;background-position: 0 0;}
+#wrap.user_list .my_inf::before{   background-color:#ffba00;background-position: -13px -3px;}
+#wrap.user_list .my_count::before{ background-color:#47ace9;background-position: -50px -3px;}
+#wrap.user_list .my_score::before{ background-color:#ed4f2b;background-position: -85px -3px;}
+#wrap.user_list .my_lianxi::before{ background-color:#53ccb9;background-position: -124px -3px;}
+#wrap.user_list .jiankong::before{ background-color:#0d43bf;background-position: -159px -3px;}
+#wrap.user_list .bjphoto::before{ background-color:#9853cc;background-position: -194px -3px;}
+#wrap.user_list .liuyan::before{ background-color:#e31a47;background-position: -230px -3px;}
+#wrap.user_list .qingjia::before{ background-color:#cf5f0e;background-position: -263px -3px;}
+#wrap.user_list .checklog::before{ background-color:#fb793a;background-position: -300px -3px;}
+#wrap.user_list .check::before{ background-color:#0da43c;background-position: -338px -3px;}
+#wrap.user_list .yijian::before{ background-color:#0e7ecf;background-position: -372px -3px;}
+
+#wrap.user_list .head .pdetail{height:100px;padding:10px 0 0 20px;-webkit-box-sizing:border-box;}
+#wrap.user_list .head .pdetail .img-circle{float:left; width:66px; height:86px; overflow:hidden; margin-right:10px;}
+#wrap.user_list .head .pdetail .img-circle span{font-size:14px;line-height:10px;padding-left: 5px;color: #E8ECF1;font-weight: bolder;}
+#wrap.user_list .head .pdetail .img-circle img{border-radius:50%;width:66px;height:66px;}
+#wrap.user_list .head .pdetail .pull-left span{display:block; color:#FFF; line-height:20px;}
+#wrap.user_list .head .pdetail .pull-left span.name{font-size:20px; display:inline-block; max-width:150px; height:25px; line-height:25px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; word-break:keep-all;padding: 25px;}
+#wrap.user_list .head .pdetail .pull-left span.type{font-size:14px;}
+#wrap.user_list .head .head-nav{height:50px; line-height:20px; padding-top:7px; background:rgba(0,0,0,0.2);}
+#wrap.user_list .head .head-nav .head-nav-list{display:inline-block; float:left; text-decoration:none; color:#FFF;  width:50%; text-align:center; font-size:16px; background:-webkit-gradient(linear, 0 0, 0 100, from(rgba(255,255,255,0.5)), to(rgba(255,255,255,0.5)) ) no-repeat left center; -webkit-background-size:1px 75%;}
+#wrap.user_list .head .head-nav .head-nav-list:first-child{background:none;}
+#wrap.user_list .head .head-nav .head-nav-list > span{font-weight:bold; display:block; font-size:14px;}
+</style>
+    <div id="wrap" class="user_list" style="padding-bottom:55px;">
+	    <div id="bg"></div>
+        <!-- 修改开始 -->
+        <div class="head">
+			<a class="ptool" id="Changesf" style="width: 60px;">切换孩子</a>
+			<div class="pdetail">
+				<input type="hidden" id="bigImage" name="bigImage"/>
+				<div class="img-circle" onclick="uploadImg(this);">
+					<img src="{if !empty($students['icon'])}{php echo tomedia($students['icon'])}{else}{php echo tomedia($_W['fans']['tag']['avatar']);}{/if}">
+					<span class="type">修改头像</span>
+				</div>
+				<div class="pull-left">
+					<span class="name">{$parents['name']}</span>
+					<!--<span class="type">身份:家长</span>-->
+					<!--<span class="type">姓名:{if !empty($parents['name'])}{$parents['name']}{else}未录入{/if}</span>-->
+				</div>
+			</div>
+			<div class="head-nav">
+				<a class="head-nav-list">当前孩子<span>{$students['s_name']}</span></a>
+				<a class="head-nav-list" href="{php echo $this->createMobileUrl('addchild', array('schoolid' => $schoolid), true)}">添加孩子<span><i class="fa fa-plus"></i></span></a>
+			</div>
+	   </div>
+        <section class="user" style="margin-top:0px;">
+            <ul class="order" style="padding-top:0px;">
+                <li class="order_li"><a href="{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid, 'op' => 'all_g'), true)}">全部</a></li>
+                <li class="order_li"><a href="{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid, 'op' => 'no_g'), true)}" {if $rest != 0}value = "{$rest}"{/if}>待缴费</a></li>
+                <li class="order_li"><a href="{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid, 'op' => 'yes_g'), true)}">已缴费</a></li>
+                <li class="order_li"><a href="{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid, 'op' => 'cancel_g'), true)}">已退费</a></li>
+            </ul>		
+        </section>
+		<div class="user_menu">
+			<ul>
+				<li class="li_share" style="width: 25%;"><a style="width: 100%;height: 20px;background: url({OSSURL}public/mobile/img/teacher.png) no-repeat center center;background-size: 18px 20px;position: absolute;top: 12px;left: 0px;" href="{php echo $this->createMobileUrl('mytecher', array('schoolid' => $schoolid, 'bj_id' => $students['bj_id'], 'xq_id' => $students['xq_id']), true)}"><p>老师</p></a></li>
+				<li class="li_gg" style="width: 25%;"><a style="width: 100%;height: 20px;background: url({OSSURL}public/mobile/img/new.png) no-repeat center center;background-size: 20px 20px;position: absolute;top: 12px;left: 0px;" href="{php echo $this->createMobileUrl('snoticelist', array('schoolid' => $schoolid), true)}"><p>通知</p></a></li>
+				<li class="li_rank" style="width: 25%;"><a style="width: 100%;height: 20px;background: url({OSSURL}public/mobile/img/rank.png) no-repeat center center;background-size: 20px 20px;position: absolute;top: 12px;left: 0px;" href="{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid), true)}" id="rank"><p>缴费</p></a></li>
+				<!--<li class="li_qq"><a style="width: 100%;height: 20px;background: url({OSSURL}public/mobile/img/qq.png) no-repeat center center;background-size: 22px 20px;position: absolute;top: 12px;left: 0px;" href="{if !empty($category[$students['bj_id']])}{$category[$students['bj_id']]['qun']}{else}#{/if}" id="A1"><p>Q群</p></a></li>-->
+				<li class="li_weixin" style="width: 25%;"><a style="width: 100%;height: 20px;background: url({OSSURL}public/mobile/img/weixin.png) no-repeat center center;background-size: 22px 22px;position: absolute;top: 12px;left: 0px;" href="{php echo $this->createMobileUrl('szuoyelist', array('schoolid' => $schoolid), true)}"><p>作业</p></a></li>
+			</ul>
+        </div>
+        <section class="user">	
+            <a href="{php echo $this->createMobileUrl('myinfo', array('schoolid' => $schoolid, 'sid' => $students['id']), true)}" class="my_inf">学生信息</a>
+            <a href="{php echo $this->createMobileUrl('myclass', array('schoolid' => $schoolid, 'bj_id' => $students['bj_id'], 'xq_id' => $students['xq_id']), true)}" class="my_count">在读课程</a>
+            <a href="{php echo $this->createMobileUrl('chaxun', array('schoolid' => $schoolid), true)}" class="my_score">考评成绩</a>
+            <a class="my_lianxi" id="scroll">联系方式</a>
+			
+            <!--<a href="{php echo $this->createMobileUrl('sxclist', array('schoolid' => $schoolid), true)}" class="bjphoto" id="bjphoto">班级相册</a>-->
+			{if $school['is_video'] == 1}
+				<a href="{php echo $this->createMobileUrl('video', array('schoolid' => $schoolid), true)}" class="jiankong">课程监控</a>
+			{/if}
+			{if $school['is_recordmac'] == 1}
+				<a href="{php echo $this->createMobileUrl('checklog', array('schoolid' => $schoolid), true)}" class="checklog">打卡记录</a>
+				<!-- <a class="check" id="bangding">绑定考勤卡</a> -->
+				<!--<a href="{php echo $this->createMobileUrl('checkcard', array('schoolid' => $schoolid), true)}" class="check">我的考勤卡</a>-->
+			{/if}
+			<a href="{php echo $this->createMobileUrl('jiaoliu', array('schoolid' => $schoolid), true)}" class="liuyan">给老师留言</a>
+
+			<a href="{php echo $this->createMobileUrl('xsqj', array('schoolid' => $schoolid), true)}" class="qingjia">向老师请假</a>
+
+            <a href="#" class="yijian" id="feedback">意见与反馈</a>
+			<a href="{php echo $this->createMobileUrl('timetable', array('schoolid' => $schoolid), true)}" class="timetable"> </a>
+        </section>
+    </div>
+	<div class="selectList" id="selectList" style="z-index:100000;display:none;">
+		<div class="single" style="z-index:100000;">
+			<ul>
+				<span style="color:#444;">切换学生</span>
+			{loop $user $row}
+				<li onclick="isSelect({$row['id']},{$row['schoolid']});"><span class="ri" style="float: none">{$row['s_name']}</span></li>
+			{/loop}	
+			</ul>
+			<span id="closeChild">×</span>
+		</div>
+	</div>	
+    <div class="user_info" id="user_info" style="display:none;">
+	   <div>
+			<ul>
+				<p>联系方式</p>
+				<li class="user_name">
+				真实姓名
+					<input type="text" placeholder="请输入您的姓名" name ="name" id="name" value="{if !empty($parents['name'])}{$parents['name']}{/if}">
+					
+				</li>
+				<li class="user_name">
+				  手机号
+					<input type="text" placeholder="请输入您的手机号" name ="mobile" id="mobile" value="{if !empty($parents['mobile'])}{$parents['mobile']}{/if}">
+				  
+				</li>						
+				<div class="btn" id="btn">提交</div>
+			</ul>
+			<span id="close">×</span>
+	   </div>
+    </div>
+	<div class="suggestion" id="suggestion" style="display:none;">
+	   <div>
+			<ul>
+				<h1>意见反馈</h1>
+				<li class="sugges">
+					<input type="text" placeholder="输入您的宝贵意见！50字以内！" name ="suggesd" id="suggesd" value="">
+				</li>				
+				<div class="btn" id="sugbtn">提交</div>
+			</ul>
+			<span id="closed">×</span>
+	   </div>
+    </div>	
+   {php include $this->template('footer');} 
+</body>
+<script type="text/javascript">
+var PB = new PromptBox();
+function isSelect(userid,schoolid){
+	location.href = "{php echo $this->createMobileUrl('user')}"+ '&userid=' + userid + '&schoolid=' + schoolid;
+	location.href = reload();
+}
+WeixinJSHideAllNonBaseMenuItem();
+/**微信隐藏工具条**/
+function WeixinJSHideAllNonBaseMenuItem(){
+	if (typeof wx != "undefined"){
+		wx.ready(function () {
+			
+			wx.hideAllNonBaseMenuItem();
+		});
+	}
+}
+$(function ($) {
+	
+	//弹出
+	$("#scroll").on('click', function () {
+		$('#user_info').show();
+	});
+	$("#close").on('click', function () {
+		$('#user_info').hide();
+	});	
+	$("#feedback").on('click', function () {
+		$('#suggestion').show();
+	});
+	$("#closed").on('click', function () {
+		$('#suggestion').hide();
+	});	
+	$("#bangding").on('click', function () {
+		$('#user_info1').show();
+	});
+	$("#clos").on('click', function () {
+		$('#user_info1').hide();
+	});			
+	$("#Changesf").on('click', function () {
+		$('#selectList').show();
+	});
+	$("#closeChild").on('click', function () {
+		$('#selectList').hide();
+	});
+	//文本框不允许为空---按钮触发
+	$("#btn").on('click', function () {
+		var userid =  $("#userid").val(); 
+		var name = $("#name").val();
+		var mobile = $("#mobile").val();
+		var truthBeTold = window.confirm('确认要修改吗?'); 
+		 data = {
+			schoolid:"{$schoolid}",
+			name:name,
+			mobile:mobile,
+			userid:"{$it['id']}",
+			parentid:"{$parents['id']}",
+			'json':''
+		}
+
+		reg=/^(0|86|17951)?(13[0-9]|15[012356789]|17[0-9]|18[0-9]|14[57])[0-9]{8}$/;	
+		if (name == "" || name == undefined || name == null) {
+		alert('请输入您的姓名！');
+		return false;
+		}
+		else {
+			if (mobile == "" || mobile == undefined || mobile == null || !reg.test(mobile)) {
+		alert('手机号有误或为空！');
+		return false;
+			}
+		}
+		if (truthBeTold) {
+
+		$.post("{php echo $this->createMobileUrl('indexajax',array('op'=>'useredit'))}",data,
+			function(data){
+				if(data.result){
+					alert(data.msg);
+					location.reload();
+				}else{
+					alert(data.msg);
+				}
+			},'json');	
+		} else $('#user_info').hide();	
+	});
+	$("#sugbtn").on('click', function () {
+	
+		var suggesd = $("#suggesd").val();
+		var name = $("#name").val();
+		var truth = window.confirm('确定提交吗?');
+		 data = {
+		schoolid:"{$schoolid}",
+		sid:"{$it['sid']}",
+		userid:"{$it['id']}",
+		pard:"{$it['pard']}",
+		suggesd:suggesd,
+		mobile:mobile,
+		'json':''
+		}
+
+		if (name == "" || name == undefined || name == null) {
+		alert('请先设置您的联系方式哦！');
+		return false;
+		}
+		else {
+		if (suggesd == "" || suggesd == undefined || suggesd == null) {
+		alert('内容不能为空哦，说点什么吧！');
+		return false;
+		}
+		}
+		if (truth) {
+		alert('您的意见已经提交,谢谢您的支持！');
+		$('#suggestion').hide();	
+		} else $('#suggestion').hide();	
+	});	
+});
+var images = {
+	    localId: [],
+	    serverId: []
+};
+
+function uploadImg(){
+
+	wxChooseImage();
+}
+
+/**
+ * 微信选择图片
+ */
+function wxChooseImage(){
+	wx.chooseImage({
+		success: function (res) {
+			images.localId = res.localIds;
+			var obj=new Image();
+			obj.src=res.localIds[0];
+			imagesUploadWx();
+		}
+	});
+};
+
+function imagesUploadWx() {
+	      wx.uploadImage({
+	        localId: images.localId[0],
+	        isShowProgressTips:1,//// 默认为1，显示进度提示
+	        success: function (res) {
+	        	$("#bigImage").val(res.serverId);
+				saveImage();
+	        },
+	        fail: function (res) {
+	          alert(JSON.stringify(res));
+	        }
+	      });
+};
+
+function saveImage() {
+	PB.prompt("头像上传中，请稍等~","forever");
+	var url = "{php echo $this->createMobileUrl('indexajax',array('op'=>'changeimg'))}";
+	var submitData = {
+			bigImage:$("#bigImage").val(),
+			sid:"{$it['sid']}",
+	};
+	$.post(url, submitData, function(data) {
+		if (data.result) {
+			PB.prompt(data.msg);
+			location.reload();
+		} else {
+			PB.prompt(data.msg);
+		}
+	},'json');
+}
+</script>
+</html>

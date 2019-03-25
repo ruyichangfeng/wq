@@ -1,0 +1,114 @@
+{template 'style5/header'}
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=77E9802d7cfbcde01b5ea17f1388f35d"></script>
+<body class="max-width">
+<header class="bar bar-nav bg-green">
+    <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+    <h1 class="title txt-fff">小区列表</h1>
+</header>
+<div class="content">
+    {if $qhregions}
+    <div class="card">
+        <div class="card-header">切换记录</div>
+        <div class="card-content">
+            <div class="list-block media-list">
+                <ul>
+                    {loop $qhregions $region}
+                    <li class="item-content" onclick="change({$region['id']})">
+                        {if $region['thumb']}
+                        <div class="item-media">
+                            <img src="{php echo tomedia($region['thumb'])}" width="44">
+                        </div>
+                        {/if}
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{$region['title']}</div>
+                            </div>
+                            <div class="item-subtitle" style="font-size: 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:200px;">{$region['dist']}{$region['address']}</div>
+                        </div>
+                        {if $region['enable']}
+                        <div style="font-size: 14px;color:red;float:right;width: 80px;">已选择</div>
+                        {/if}
+                    </li>
+                    {/loop}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {/if}
+    <div class="card">
+        <div class="card-header">周边小区</div>
+        <div class="card-content">
+            <div class="list-block media-list">
+                <ul id="xqlist">
+
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <p><a href="#" class="button button-success" style="width: 50%;margin: 0 auto" id="gdregion">加载更多..</a></p>
+</div>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <li class="item-content" onclick="location.href='{{ d.list[i].url }}'">
+        {{# if(d.list[i].thumb){ }}
+        <div class="item-media">
+            <img src="{{d.list[i].thumb}}" width="44">
+        </div>
+        {{# } }}
+        <div class="item-inner">
+            <div class="item-title-row">
+                <div class="item-title">{{d.list[i].title}}</div>
+                {{# if(d.list[i].juli){ }}
+                <span>{{d.list[i].juli}}km</span>
+                {{#  } }}
+            </div>
+            <div class="item-subtitle" style="font-size: 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:200px;">{{d.list[i].dist}}{{d.list[i].address}}</div>
+        </div>
+    </li>
+    {{# } }}
+</script>
+<script>
+    $(document).ready(function() {
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function(r){
+            if(this.getStatus() == BMAP_STATUS_SUCCESS){
+                var mk = new BMap.Marker(r.point);
+                var lng = r.point.lng;
+                var lat = r.point.lat;
+                loaddata("{php echo $this->createMobileUrl('register',array('op' => 'getaround','keyword' => $_GPC['keyword']))}&lng="+lng+"&lat="+lat, $("#xqlist"),'xq_list', true);
+                var page = 1;
+                $("#gdregion").click(function () {
+                    page++;
+                    link = "{php echo $this->createMobileUrl('register',array('op' => 'getaround'))}&lng="+lng+"&lat="+lat+"&page="+page;
+                    $.get(link, function (data) {
+                        if (data.list.length > 0) {
+                            var gettpl = document.getElementById('xq_list').innerHTML;
+                            laytpl(gettpl).render(data, function(html){
+                                $("#xqlist").append(html);
+                            });
+                        }else{
+                            $("#gdregion").html('全部数据加载完毕');
+                        }
+
+                    }, 'json');
+                })
+            }else {
+                alert('获取当前位置失败,请确认是否开启定位服务');
+            }
+        },{enableHighAccuracy: true})
+
+    });
+
+
+    function change(id) {
+        $.post("{php echo $this->createMobileUrl('member',array('op'=> 'ajax'))}",{mid:id},function(s){
+            if(s.status == 1){
+                window.location.href="{php echo $this->createMobileUrl('home')}";
+            }
+        },'json')
+    }
+</script>
+</body>
+</html>

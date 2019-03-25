@@ -1,0 +1,83 @@
+{template 'common/header-base'}  
+{template 'common_header'}     
+<div class="main">
+	    <div class="panel panel-info"> 
+				<div class="panel-body">
+				         <div class="form-group"> 
+									<div class="col-xs-12 col-sm-12">
+												 <table  width="100%" border="0"  cellpadding="3" class="table table-hover" >
+											     <thead class="navbar-inner">  
+												        <tr class="text-c">
+														        <th style="width:100px;">参数值</th> 
+														        <th style="">参数显示值</th> 
+													          	<th style="width:160px;">操作</th>
+												        </tr> 
+											       </thead> 
+											       <tbody id="options">
+											       			  {loop $options $k_opt $opt} 
+														           <tr class="text-c">
+														           	   		<td class="text-l"><input type="text" class="form-control value_id" name="value_id[]" value="{$k_opt}"/></td>
+														           	   		<td class="text-l"><input type="text" class="form-control value_name" name="value_name[]" value="{$opt}"/></td>
+														           	   		<td class="btn_min"  >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up  fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down  fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>
+														           </tr> 
+													           {/loop}
+											       </tbody> 
+											  </table>  
+											  <div style="margin-top:10px">
+											     		<input type="button"   value="添加选项值"  class="btn btn-success radius col-lg-2"  onclick="addOption()"  />
+											  </div>  
+									</div>
+					  	  </div> 	   
+				</div>
+       </div> 
+</div>  
+ <div style="text-align: center; position: fixed; bottom: 0px; background: #F0F0F0; left: 0; right: 0; border-top: 1px solid #C4C4C4; height: 40px; line-height: 40px; "><button class="btn btn-primary" onclick="saveMsg()">确定</button></div>
+ <script type="text/javascript">  
+	    var rowid = "{$rowid}"; 
+	    function addOption(){
+	        var str="";
+		     str +='<tr>';
+		     	 str +='<td class="text-l"><input type="text" class="form-control value_id" name="value_id[]" value=""/></td>';
+		     	 str +='<td class="text-l"><input type="text" class="form-control value_name" name="value_name[]" value=""/></td>'; 
+		     	 str +='<td class="btn_min text-c" align="center" >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>';
+		     str +='</tr>';
+		    $("#options").append(str);
+				bindEvent();
+				return false;
+	    }
+	    function bindEvent() {
+					  $(".icon-arrow-down").off();
+					  $(".icon-arrow-up").off();
+					  $(".icon-remove").off();  
+					  $(".icon-arrow-down").on("click",function() {
+					    var current_tr = $(this).parents("tr");
+					    current_tr.insertAfter(current_tr.next());
+					  });
+					    $(".icon-arrow-up").on("click",function() {
+					    var current_tr = $(this).parents("tr");
+					    if(current_tr.prev().prev().html()!=null)current_tr.insertBefore(current_tr.prev());
+					  });
+					    $(".icon-remove").on("click",function(){ 
+					      $(this).parents("tr").remove(); 
+					    });
+			}
+			 //改变行数的类型 
+		 bindEvent();		
+		function saveMsg(){ 
+				   num = 0;
+				   var tem = ""; 
+				   $("#options tr").each(function() { 
+								var val_id = $(this).find(".value_id").val(); 
+								var val_name = $(this).find(".value_name").val();
+								if(val_id=="" || val_name==""){
+										 alert('选项值与选项显示值不能为空');
+										return false;
+								} 
+								num++;
+						  		tem += val_id+","+val_name+"|"; 
+					});  
+					if(tem!='') tem = tem.slice(0,-1); 
+					var index = parent.layer.getFrameIndex(window.name);  
+			        parent.set_option(rowid,tem,num,index);  
+		 } 
+	</script>

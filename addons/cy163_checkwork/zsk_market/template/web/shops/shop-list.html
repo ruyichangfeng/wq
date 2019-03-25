@@ -1,0 +1,124 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}js/util.js"></script>
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+	.sortab td{vertical-align: middle !important;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >店铺管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('shops.listview');?>" method="post" id="keyform">
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" value="<?php echo $name ? $name : ''; ?>" name="name" placeholder="请输入店铺名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			        <a href="<?php echo $this->routeUrl('shops.editView');?>" class="btn btn-default" style="display: inline-block;"  >添加店铺</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 100px;">店铺ID</th> 
+					<th style="width: 250px;">店铺名称</th> 
+					<th style="width: 100px;">店铺logo</th> 
+					<th style="width: 100px;">账号</th>
+					<th style="width: 120px;">电话</th> 
+					<th style="width: 120px;">可提现余额</th> 
+					<th style="width: 120px;">到期时间</th>    
+					<th style="">状态</th> 
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $shops $index $item}
+				<tr> 
+					<td>{$item['id']}</td> 
+					<td>{$item['name']}
+						<?php if(intval($item['isdefault'])>0){ ?>
+						<span class="label-green">默认店铺</span>
+						<?php } ?></td> 
+					<td><img src="{$_W['attachurl']}{$item['logo']}" style="widows:50px;height: 50px;"/> </td>
+					<td>	 
+						<span class="label-green">{$item['account']}</span>
+					</td>  
+					<td>{$item['phone']} </td>  
+					<td>{$item['balance']} </td>  
+					<td>{$item['limitdate']} </td>  
+					<td><?php if($item['status']=='1'){ ?>
+						<span class="label-green">正常</span>
+					<?php }else{ ?>
+					<span class="label-gray">关闭</span>
+				<?php }?></td>  
+					<td>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="editShop({$item['id']},'{$item['name']}')">编辑</a> 
+						<a href="<?php echo $this->routeUrl('shops.tomanage');?>&shopid={$item['id']}" class="linkbtn" >店铺管理</a> 
+						<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="remove0({$item['id']},'{$item['name']}')">删除</a> 
+					</td>
+				</tr>
+				 
+				{/loop}
+				<tr>
+					<td colspan="8">
+					{template 'public/pagenation'}	
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+ 	 
+<script type="text/javascript">
+	function editAccount(id,acc,shop){
+		$("#shopname").text(shop);
+		 
+		if(acc.length>0){
+			$("#newacc").val("0");
+			$(".pswd").css("display","none");
+		}else{
+			$("#newacc").val("1");
+			$(".pswd").css("display","block");
+		}
+		var html='<form action="<?php echo $this->routeUrl('shops.saveAccount');?>" method="post" id="sform">';
+		html+=$("#accountab").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#sform").submit();
+		})
+	}
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function addCate(id,name){ 
+	 window.location.href="<?php echo $this->routeUrl('cate.addview');?>&pid="+id+"&name="+name;
+	}
+	function editShop(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('shops.editview');?>&sid="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("<span style='color:#ff4444;'>是否删除"+text+"，此操作不可恢复，请谨慎操作?</span>",function(){
+		window.location.href="<?php echo $this->routeUrl('shops.delShop');?>&shopid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

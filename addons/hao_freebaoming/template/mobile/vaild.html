@@ -1,0 +1,121 @@
+{template 'common/header'}
+<link rel="stylesheet" href="../addons/hao_freebaoming/template/images/style.css">
+<script type="text/javascript"> 
+var countdown=60; 
+function settime(obj) { 
+    if (countdown == 0) { 
+        obj.removeAttribute("disabled");    
+        obj.value="免费获取验证码"; 
+        countdown = 60; 
+        return;
+    } else { 
+        obj.setAttribute("disabled", true); 
+        obj.value="重新发送(" + countdown + ")"; 
+        countdown--; 
+    } 
+setTimeout(function() { 
+    settime(obj) }
+    ,1000) 
+}
+</script>
+<header>
+    <div class="header-wrapper">
+	    <div class="header-inner">
+	      <div class="dashboard">
+	        <div class="number">
+	          <span>活动报名</span>
+	        </div>
+	        <div class="tip" style="color:#00a5e0;"><h4></h4></div>
+	      </div>
+	      <div class="waves">
+	        <div class="w1"></div>
+	        <div class="w2"></div>
+	      </div>
+	    </div>
+    </div>
+</header>
+<!-- <form action="{php echo $this->createMobileUrl('Form')}" method="post" > -->
+<div class="panel panel-default">
+  <div class="panel-heading">
+  	 <h3 class="panel-title">短信验证</h3>
+  </div>
+  <div class="panel-body">
+      <div class="col-lg-6">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button">中国+86</button>
+          </span>
+          <input type="number" id="phone" class="form-control" placeholder="手机号码">
+        </div>
+      </div>
+      <div style="height:15px;"></div>
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input type="number" id="number" class="form-control" placeholder="请输入正确的验证码">
+          <span class="input-group-btn">
+            <input class="btn btn-default" type="button" id="btn" value="免费获取验证码" onclick="settime(this)" />            
+          </span>
+        </div>
+      </div>
+  </div>
+</div>
+<button style="width:100%;color:#fff;" type="submit" onclick="valid();" class="btn btn-primary btn-lg">提交</button>
+<!-- </form> -->
+
+<script type="text/javascript">
+function valid(){
+  $phone = $('#phone').val();
+  $number = $('#number').val();
+  if($phone == ''){
+     alert('请输入手机号码');
+     return false;
+  }
+  if(!/^1[358]{1}[0-9]{9}/.test($phone)){
+    alert('请输入正确的手机号');
+    return false;
+  }
+  if($number == ''){
+    alert('请输入验证码');
+    return false;
+  }
+  $.post("{php echo $this->createMobileUrl('Vaild')}", {
+      number: $number,
+      phone: $phone
+  }, function (data) {
+      if (data) {
+          alert('注册成功！');
+          window.location.href = "{php echo $this->createMobileUrl('Form')}";      
+      }else{
+          alert('请输入正确的验证码！');
+      }
+   });
+}
+
+$('#btn').click(function(){
+  $phone = $('#phone').val();
+  if($phone == ''){
+     alert('请输入手机号码');
+     return false;
+  }
+  if(!/^1[358]{1}[0-9]{9}/.test($phone)){
+    alert('请输入正确的手机号');
+    return false;
+  }
+  $.post("{php echo $this->createMobileUrl('Number')}", {
+      phone: $phone
+  }, function (data) {
+      if (data) {
+          alert('发送成功！');      
+      } else {
+          alert('发送失败,请稍候重发！');
+      }
+   });
+});
+</script>
+{template 'common/footer'}
+<script type="text/javascript">
+    $(function(){
+	    $('.footer a').attr('style','display:none');
+	    document.getElementsByTagName('title')[0].innerHTML =  "短信验证";
+	});
+</script>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <script src="{MODULE_URL}template/mobile/style1/js/swipe.js"></script>
+    <style type="text/css">
+        #tagnav{z-index: 5;}
+        .weui-navigator-list li{margin:0 2px;line-height: 40px;}
+        .weui-navigator-list li a{color: #888;}
+        .weui-navigator-list li.weui-state-active a{color: #f66216;}
+        .weui-navigator-list li.weui-state-active a:after{background-color: #f66216;}
+        
+        .list a{position: relative;color: #333;display: block;background-color: #fff;margin-bottom: 10px;padding:10px;}
+        .list .task_status{position: absolute;z-index: 2;width: 60px;right: 0;top: 0;}
+        .list .title{font-size: 15px;padding-bottom:5px;color: #666;}
+        .list .title span{color: #efeff4;background-color: #ef4f4f;font-size: 12px;padding: 2px 5px;border-radius: 3px;}
+        .list .weui_media_box:before{left:0;}
+        .list .weui_media_box.weui_media_appmsg{padding:5px 0;}
+        .list .weui_media_box.weui_media_appmsg .weui_media_hd{width: 100px;height: 100px;}
+        .list .weui_media_box.weui_media_appmsg .weui_media_hd img{width: 100px;height: 100px;}
+        .list .info .desc{height:75px;overflow: hidden;font-size: 13px;line-height: 25px;}
+        .list .points{height: 25px;overflow: hidden;}
+        .list .points span{font-size: 12px;color: #f66216;}
+        .list .points .icon{padding:3px;margin-right:3px;font-size: 12px;background-color: #f66216;color:#fff;border-radius: 2px;}
+        .list .type{height:25px;overflow: hidden;}
+        .list .type span{font-size: 12px;color: #fff;background-color: #0894ec;padding: 3px;margin-right: 3px;border-radius: 3px;}
+        .list .type .time{background-color: #fff;color: #333;font-size: 14px;}
+        .list .type .receive{background-color: #fff;color: #F66216;font-size: 14px;float: right;}
+        
+        .empty{margin-top: 100px;text-align: center;}
+        .empty i:before{color: #dedede;font-size: 5em;}
+        .empty p{text-align: center;color: #999;line-height: 30px;font-size: 14px;}
+
+        .pager{margin-bottom: 10px;}
+        .pager .pager-left{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-right{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-left .pager-pre{width: 60%;background-color: #fff;border-radius: 3px;}
+        .pager .pager-right .pager-next{width: 60%;background-color: #fff;border-radius: 3px;border:none;}
+        
+    </style>
+    
+</head>
+<body ontouchstart  class="page-bg">
+    {template 'style1/follow'}
+    {if !empty($adlist)}
+    <div class="slide" id="slide2">
+        <ul>
+            {loop $adlist $v}
+            <li>
+                <a href="{$v['link']}"><img src="{media $v['image']}" alt="{$v['title']}"></a>
+            </li>
+            {/loop}
+        </ul>
+        <div class="dot">
+            {loop $adlist $v}
+            <span></span>
+            {/loop}
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('#slide2').swipeSlide({
+            autoSwipe:true,//自动切换默认是
+            speed:4000,//速度默认4000
+            continuousScroll:true,//默认否
+            transitionType:'cubic-bezier(0.22, 0.69, 0.72, 0.88)',//过渡动画linear/ease/ease-in/ease-out/ease-in-out/cubic-bezier
+            lazyLoad:true,//懒加载默认否
+            firstCallback : function(i,sum,me){
+                        me.find('.dot').children().first().addClass('cur');
+                    },
+                    callback : function(i,sum,me){
+                        me.find('.dot').children().eq(i).addClass('cur').siblings().removeClass('cur');
+                    }
+            });
+    </script>
+    {/if}
+    <script src="{MODULE_URL}template/mobile/style1/js/iscroll.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        TagNav('#tagnav',{
+            type: 'scrollToFirst',
+        });
+    });
+    </script>
+    <div id="tagnav" class="weui-navigator weui-navigator-wrapper">
+        <ul class="weui-navigator-list">
+            <li {if empty($nav_id)}class="weui-state-active"{/if}><a href="{php echo $this->createMobileUrl('task', array(), true)}">全部</a></li>
+            {loop $navlist $v}
+            <li {if $nav_id == $v['id']}class="weui-state-active"{/if}><a href="{php echo $this->createMobileUrl('task', array('nav_id'=>$v['id']), true)}">{$v['title']}</a></li>
+            {/loop}
+        </ul>
+    </div>
+    <div class="h42" style="height: 0;"></div>
+    <div class="searchbar_wrap"></div> 
+
+    <div class="list">
+        {loop $tasklist $i $v}
+        <a href="{php echo $this->createMobileUrl('task', array('op'=>'taskinfo','id'=>$v['id']), true)}">
+            <img class="task_status" src="{MODULE_URL}template/mobile/style1/images/tasksta{if time()<$v['starttime']}2{elseif time()>$v['endtime']}3{else}1{/if}.png"/>
+            <div class="title">{$v['task_title']} 
+                {if !$v['is_receive']}
+                <span>无法领取</span>
+                {/if}
+            </div>
+            <div class="weui_media_box weui_media_appmsg info">
+                <div class="weui_media_hd"><img src="{if $v['task_image']}{media $v['task_image']}{else}{media $setting['task_image']}{/if}"></div>
+                <div class="weui_media_bd">
+                    <div class="desc">{$v['task_desc']}</div>
+                    <div class="points">
+                        <span class="icon">领</span>
+                        {if $v['task_exp'] == 0}<span>免费</span>{else}<span class="">{$v['task_exp']}{$setting['points_name']}</span>{/if}
+                        <span class="icon" style="margin-left: 8px;">奖</span>
+                        {if $v['task_points'] == 0}<span>无奖励</span>{else}<span class="">{$v['task_points']}{$setting['points_name']}</span>{/if}
+                    </div>
+                </div>
+            </div>
+            <div class="type">
+                <span class="task_type">{$v['navtitle']}</span>
+                <span class="catetitle">{$v['catetitle']}</span>
+                <span class="time">
+                {if time()<$v['starttime']}
+                    <?php if(date('Y',$v['starttime'])!=date('Y',time())){echo date('Y-m-d',$v['starttime']);}else{echo date('m-d H:s',$v['starttime']);}?> 开始
+                {elseif time()>$v['endtime']}
+                    已结束
+                {else}
+                    <?php if(date('Y',$v['endtime'])!=date('Y',time())){echo date('Y-m-d',$v['endtime']);}else{echo date('m-d H:s',$v['endtime']);} ?> 结束
+                {/if}
+                </span>
+                <span class="receive">{$v['receive']}/{if $v['task_receive'] == 0 || $v['task_receive'] > 999}999+{else}{$v['task_receive']}{/if}</span>
+            </div>
+        </a>
+        {/loop}
+    </div>
+    {if empty($tasklist)}
+    <div class="empty">
+        <i class="weui_icon_msg weui_icon_info"></i>
+        <p>没有数据，先浏览其他项目吧</p>
+    </div>
+    {/if}
+    <div class="page-bd-15">
+        <div class='pager'>
+            <div class="pager-left">
+                {if $prevPage}<div class="pager-pre"><a class="pager-nav" href="{$prevPage}">上一页</a></div>{/if}
+            </div>
+            {if $allpage}<div class="pager-cen">{$page}/{$allpage}</div>{/if}
+            <div class="pager-right">
+                {if $nextPage}<div class="pager-next"><a class="pager-nav" href="{$nextPage}">下一页</a></div>{/if}
+            </div>
+        </div> 
+    </div>
+    {template 'style1/footer'}
+    <script type="text/javascript">
+        $('.searchbar_wrap').searchBar({
+            cancelText:"取消",
+            searchText:"{if $_GPC['key']}{$_GPC['key']}{else}关键字{/if}",
+            onsubmit:function(value){
+                window.location.href="{php echo $this->createMobileUrl('task', array(), true)}&key="+value;
+            }
+        });
+        //顶部导航悬浮
+        $(function() {  
+            var elm = $('#tagnav');
+            var h42 = $('.h42');
+            var startPos = $(elm).offset().top;  
+            $.event.add(window, "scroll", function() {  
+                var p = $(window).scrollTop();  
+                $(elm).css('position',((p) > startPos) ? 'fixed' : 'relative'); //如果当前页面的顶部位置大于目标元素的顶部位置，那么目标元素的position属性为fixed，否则为absolute  
+                $(elm).css('top',((p) > startPos) ? '0px' : '');
+                $(h42).css('height',((p) > startPos) ? '42px' : '0') 
+            });  
+        }); 
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('staff', array('op'=>'display'));}">服务员工管理</a></li>
+    <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('staff', array('op'=>'create'));}">添加服务员工</a></li>
+    <li style="float: right"><a class="btn btn-info" href="{php echo $this->createWebUrl('scomment');}">员工点评</a></li>
+</ul>
+<div class="main">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="display:block;color:#FFF;">
+                搜索条件 ↓  （点击可展开）
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >员工姓名</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[staff_name]" value="{$search['staff_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">员工电话</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[staff_tel]" value="{$search['staff_tel']}"  class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >员工openID</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[staff_openid]" value="{$search['staff_openid']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">所属商家</label>
+                            <div class="col-sm-3">
+                                <select name="search[staff_businessid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $business $key $item}
+                                    <option value="{$item['business_id']}" {if $search['staff_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                            <input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:100px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:100px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">服务员工列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:50px;">编号</th>
+                        <th style="width:80px;">姓名</th>
+                        <th style="width:80px;">头像</th>
+                        <th style="width:100px;">手机</th>
+                        <th style="width:100px;">所属商家</th>
+                        <th style="width:160px;">openID</th>
+                        <th style="width:130px;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {php $i = 1;}
+                    {loop $staffs $key $item}
+
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['staff_name']}</td>
+                        <td>
+                            <img src="{php echo tomedia($item['staff_avatar'])}" alt="" width="30">
+                        </td>
+                        <td>{$item['staff_tel']}</td>
+                        <td>{$item['business_name']}</td>
+                        <td>{$item['staff_openid']}</td>
+                        <td>
+                            <a href="{php echo $this->createWebUrl('staff', array('op'=>'modify', 'id'=>$item['staff_id']));}" class="btn btn-primary">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" href="{php echo $this->createWebUrl('staff', array('op'=>'delete', 'id'=>$item['staff_id']));}" class="btn btn-default btn-danger">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if empty($staffs)}
+                    <tr>
+                        <td colspan="7">
+                            尚未添加服务员工
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+</script>
+{template 'common/footer'}

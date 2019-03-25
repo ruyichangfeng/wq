@@ -1,0 +1,94 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('basesetting')}"></a>（商家）公众平台模板消息所在行业选择为： IT科技/互联网|电子商务</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('storenotice')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" method="post" class="form-horizontal form">
+                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                            <thead>
+                            <tr>
+                                <td class="col-md-2">消息提醒设置</td>
+                                <td class="col-md-3">公众平台模板库编号</td>
+                                <td class="col-md-4">模板消息</td>
+                                <td class="col-md-3">是否启用</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="title">新会员加入通知</td>
+                                <td>OPENTM202967310</td>
+                                <td>
+                                    <input type="text" class="form-control" name="tpl[t100]" value="{$set['t100']['value']}"/>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="t101" class="js-switch_1" {if $set['t101']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">收款成功通知</td>
+                                <td>OPENTM408727351</td>
+                                <td>
+                                    <input type="text" class="form-control" name="tpl[t102]" value="{$set['t102']['value']}"/>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="t103" class="js-switch_2" {if $set['t103']['value']}checked='checked'{/if}/>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label"></label>
+                            <div class="col-sm-7">
+                                <button type="submit" class="btn btn-w-m btn-primary" name="submit" value="提交">提交</button>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            var agaxurl = "{php echo $this->createWebUrl('updatekey')}";
+            var dataparam = {
+                'hlsetkey': hlsetkey,
+                'status': status,
+            };
+            $.ajax({
+                url: agaxurl,
+                data: dataparam,
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal("更新成功！", "","success");
+                    } else {
+                        swal("新增成功！", "","success");
+                    }
+                }
+            });
+
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+</script>
+{template 'web/common/footer'}

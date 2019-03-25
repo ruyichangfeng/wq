@@ -1,0 +1,501 @@
+{if $active == 'list'}
+<style>
+.layui-table td {
+    text-align: center
+}
+a.get-num:hover{
+    color: green;
+}
+</style>
+<fieldset class="layui-elem-field">
+    <legend>优惠券列表</legend>
+    <div class="layui-field-box">
+        <table class="layui-table">
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>名称</th>
+                    <th>面值</th>
+                    <th>每人最大领取数</th>
+                    <th>启用时间</th>
+                    <th>截止时间</th>
+                    <th>领取数量</th>
+                    <th>剩余张数</th>
+                    <th>是否过期</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $tag}
+                <tr>
+                    <td>{$tag['id']}</td>
+                    <td>{$tag['title']}</td>
+                    <td>{if floor($tag['value']) == $tag['value']}{php echo floor($tag['value'])}{else}{$tag['value']}{/if}</td>
+                    <td>{if $tag['limit_num']}{$tag['limit_num']}{else}0{/if}</td>
+                    <td>{php echo date('Y-m-d H:i:s', $tag['addtime'])}</td>
+                    <td>{php echo date("Y-m-d H:i:s",$tag['expire_time'])}</td>
+                    <td><a class="get-num" href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'record','storeid'=>$storeinfo['id'],'couponid' =>$tag['id']))}">{$tag['usercouponnum']}</a></td>
+                    <td>{php echo $tag['total_num'] - $tag['usercouponnum'];}</td>
+                    <th>{if $tag['expire_time'] < time()}<red>已过期</red>{else}<green>未过期</green>{/if}</th>
+                    <td>{if $tag['status']==1}
+                        <green>启用</green>{else}
+                        <red>停用</red>{/if}</td>
+                    <td>
+                    {if $tag['type'] == 'single'}
+                        <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'update','storeid'=>$storeinfo['id'],'id'=>$tag['id']))}">编辑</a> 
+                        {if $tag['isdefault']==0}
+                        <a class="layui-btn layui-btn-sm layui-btn-danger item-action-delete" href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'delete','storeid'=>$storeinfo['id'],'id'=>$tag['id']))}">删除</a> 
+                        {/if}
+                    {else}
+                        <a class="layui-btn layui-btn-sm layui-btn-disabled" href="javascript:void(0);">编辑</a> 
+                        {if $tag['isdefault']==0}
+                        <a class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled" href="javascript:void(0);">删除</a> 
+                        {/if}
+                    {/if}
+                    </td>
+                </tr>
+                {/loop}
+                {if empty($list)}
+                <tr>
+                    <td colspan="12" style="color: red;text-align: center;line-height: 50px;font-weight: bold;margin-top: 10px;border:1px solid #d2d2d2;">暂无信息</td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</fieldset>
+<script>
+layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element;
+    //删除按钮
+    $('.item-action-delete').click(function() {
+        var href = $(this).attr('href');
+        layer.confirm('该操作不可逆，请确认是否删除？', function() {
+            layer.closeAll();
+            $.get(href,function(data){
+                if(data == true){
+                    layer.msg('删除优惠券成功',function(){
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('删除优惠券失败');
+                }
+            })
+        })
+        return false;
+    });
+});
+</script>
+{elseif $active == 'update'}
+<fieldset class="layui-elem-field">
+    <legend>修改优惠券</legend>
+    <div class="layui-field-box">
+        <form action="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'update','storeid'=>$storeinfo['id']))}" method="post" id="formUpdate" class="layui-form" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{$item['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 名称：</label>
+                <div class="layui-input-inline" style="width: 400px;">
+                    <input class="layui-input" type="text" name="title" id="title" required lay-verify="required" value="{$item['title']}" placeholder="请输入名称">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 面值：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="value" id="value" step="0.1" required lay-verify="required" value="{$item['value']}" placeholder="请输入面值">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 每人最大领取数：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="limitNum" id="limitNum" value="{$item['limit_num']}" placeholder="请输入每人最大领取数">
+                </div>
+                <div class="layui-form-mid layui-word-aux">最大领取数为0,则无法领取优惠券 默认为0</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 启用金额：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="condition" id="condition" step="0.1" required lay-verify="required" value="{$item['condition']}" placeholder="请输入启用金额">
+                </div>
+                <div class="layui-form-mid layui-word-aux">留空或填0则无限制</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 总张数：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="totalNum" required lay-verify="required" value="{$item['total_num']}" placeholder="请输入总张数">
+                </div>
+                <div class="layui-form-mid layui-word-aux">如果总张数为0,则无法领取优惠券 默认为0</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 已发放数量：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <div class="layui-input">{$user_couponnum}</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 启用时间：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input dateTime" type="text" name="addtime" id="addtime" required lay-verify="required" value="{php echo date('Y-m-d H:i:s', $item['addtime'])}">
+                </div>
+                <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 截止时间：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input dateTime" type="text" name="expire_time" id="endtime" required lay-verify="required" value="{php echo date('Y-m-d H:i:s', $item['expire_time'])}">
+                </div>
+                <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label"> 说明：</label>
+                <div class="layui-input-inline" style="width:400px;">
+                    <textarea name="content" placeholder="请输入说明内容" class="layui-textarea">{$item['content']}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 状态：</label>
+                <div class="layui-input-block">
+                    <input name="status" value="1" title="启用" {if $item[ 'status']==1}checked="" {/if} type="radio">
+                    <input name="status" value="0" title="停用" {if $item[ 'status']==0}checked="" {/if} type="radio">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" value="提交" lay-submit lay-filter="formSubmit">提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element,
+        laydate = layui.laydate;
+
+    laydate.render({
+        elem: '#addtime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        type: 'datetime',
+        done: function(value, date, endDate){
+            var starttime = value;
+            var endtime = $('#endtime').val();
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+            }
+        }
+    });
+
+    laydate.render({
+        elem: '#endtime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        type: 'datetime',
+        done: function(value, date, endDate){
+            var starttime = $('#addtime').val();
+            var endtime = value;
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+            }
+        }
+    });
+
+    $('#addtime,#endtime').attr("readOnly","true");
+    
+    //比较时间 返回错误值
+    function dateCompare(starttime,endtime){
+        var arys= new Array(); 
+        if(starttime != null && endtime != null) {
+            arys=starttime.replace(" ",":").replace(/\:/g,"-").split("-");
+            var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2],arys[3],arys[4],arys[5]);
+            arys=endtime.replace(" ",":").replace(/\:/g,"-").split("-");
+            var enddate=new Date(arys[0],parseInt(arys[1]-1),arys[2],arys[3],arys[4],arys[5]-1);
+            if(startdate > enddate) { 
+                return '开始日期不能大于等于结束日期'; 
+            }else{
+                return true;
+            }
+        }
+    }
+
+    //监听提交
+    form.on('submit(formSubmit)', function(data) {
+
+        //监听开始时间和结束时间
+        var starttime = $('#addtime').val();
+        var endtime = $('#endtime').val();
+        if(starttime != null && endtime != null) {
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+                return false;
+            }
+        }
+        //监听面值和启用金额
+        if(parseFloat($('#value').val())>parseFloat($('#condition').val())){
+            layer.msg('启用金额必须大于面值');
+            return false;
+        }
+
+        $('#formUpdate').submit();
+    });
+});
+</script>
+{elseif $active == 'add'}
+<fieldset class="layui-elem-field">
+    <legend>添加优惠券</legend>
+    <div class="layui-field-box">
+        <form action="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'add','storeid'=>$storeinfo['id']))}" method="post" id="formAdd" class="layui-form" enctype="multipart/form-data">
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 名称：</label>
+                <div class="layui-input-inline" style="width: 400px;">
+                    <input class="layui-input" type="text" name="title" id="title" required lay-verify="required" placeholder="请输入名称">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 面值：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="value" id="value" step="0.1" required lay-verify="required" placeholder="请输入面值">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> * 每人最大领取数：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="limitNum" id="limitNum" placeholder="请输入每人最大领取数">
+                </div>
+                <div class="layui-form-mid layui-word-aux">最大领取数为0,则无法领取优惠券 默认为0</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 启用金额：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="condition" step="0.1" required lay-verify="required" value="{$item['condition']}" placeholder="请输入启用金额">
+                </div>
+                <div class="layui-form-mid layui-word-aux">留空或填0则无限制</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 总张数：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input" type="number" name="totalNum" placeholder="请输入总张数">
+                </div>
+                <div class="layui-form-mid layui-word-aux">如果总张数为0,则无法领取优惠券 默认为0</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 启用时间：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input class="layui-input dateTime" type="text" placeholder="请输入启用时间" id="addtime" required lay-verify="required" name="addtime" lay-key="1">
+                </div>
+                <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 截止时间：</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                     <input class="layui-input dateTime" type="text" placeholder="请输入截止时间" id="endtime" required lay-verify="required" name="expire_time" lay-key="2">
+                </div>
+                <div class="layui-form-mid layui-word-aux">格式：2018-01-01 00:00:00</div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label"> 说明：</label>
+                <div class="layui-input-inline" style="width:400px;">
+                    <textarea name="content" placeholder="请输入说明内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"> 状态：</label>
+                <div class="layui-input-block">
+                    <input name="status" value="1" title="启用" type="radio" checked>
+                    <input name="status" value="0" title="停用" type="radio">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" value="提交" lay-submit lay-filter="formSubmit">立即生成</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['laydate', 'form', 'layer', 'element'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element,
+        laydate = layui.laydate;
+
+    laydate.render({
+        elem: '#addtime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        type: 'datetime',
+        done: function(value, date, endDate){
+            var starttime = value;
+            var endtime = $('#endtime').val();
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+            }
+        }
+    });
+
+    laydate.render({
+        elem: '#endtime',
+        format: 'yyyy-MM-dd HH:mm:ss',
+        type: 'datetime',
+        done: function(value, date, endDate){
+            var starttime = $('#addtime').val();
+            var endtime = value;
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+            }
+        }
+    });
+
+    $('#addtime,#endtime').attr("readOnly","true");
+    
+    //比较时间 返回错误值
+    function dateCompare(starttime,endtime){
+        var arys= new Array(); 
+        if(starttime != null && endtime != null) {
+            arys=starttime.replace(" ",":").replace(/\:/g,"-").split("-");
+            var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2],arys[3],arys[4],arys[5]);
+            arys=endtime.replace(" ",":").replace(/\:/g,"-").split("-");
+            var enddate=new Date(arys[0],parseInt(arys[1]-1),arys[2],arys[3],arys[4],arys[5]-1);
+            if(startdate > enddate) { 
+                return '开始日期不能大于等于结束日期';
+            }else{
+                return true;
+            }
+        }
+    }
+
+    //监听提交
+    form.on('submit(formSubmit)', function(data) {
+        //监听开始时间和结束时间
+        var starttime = $('#addtime').val();
+        var endtime = $('#endtime').val();
+        if(starttime != null && endtime != null) {
+            var callback = dateCompare(starttime,endtime);
+            if( callback != true){
+                layer.msg(callback);
+                return false;
+            }
+        }
+        //监听面值和启用金额
+        if(parseFloat($('#value').val())>parseFloat($('#condition').val())){
+            layer.msg('启用金额必须大于面值');
+            return false;
+        }
+
+        $('#formAdd').submit();
+    });
+});
+</script>
+{elseif $active == 'record'}
+<!-- 内容主体区域 -->
+<div class="layui-elem-quote layui-quote-nm" style="line-height: 30px;">
+    <a href="javascript:void(0);">优惠券领取记录</a>
+    <a href="javascript:void(0);">总共{php echo intval($total);}条</a>
+    <a class="layui-btn layui-btn-normal  layui-btn-sm right" href="{php echo $this->createWebUrl('storemanage',array('op'=>'coupon','active'=>'record','type'=>'coupon','recordtype'=>'excel','storeid'=>$storeinfo['id'],'couponid'=>$_GPC['couponid']))}">导出</a>
+</div>
+<style>
+.layui-table td {
+    text-align: center;
+}
+.select-pane .layui-inline{
+    margin: 0;
+}
+</style>
+<div class="layui-form-item select-pane">
+    <form action="" method="post" class="layui-form layui-form-pane">
+        <div class="layui-inline" style="margin-bottom: -10px;">
+            <div class="layui-inline">
+                <label class="layui-form-label">会员名称</label>
+                <div class="layui-input-inline mb5 w150">
+                    <input type="text" name="nickname" class="layui-input" value="{$_GPC['nickname']}" placeholder="请输入会员名称">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-inline mb5 w150">
+                    <select name="status">
+                        <option value="all"{if $_GPC['status']=="all"}selected{/if}>所有类型</option>
+                        <option value="1" {if $_GPC['status']==1}selected{/if}>正常</option>
+                        <option value="none" {if $_GPC['status']=="none"}selected{/if}>过期</option>
+                        <option value="2" {if $_GPC['status']==2}selected{/if}>已使用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline mb5 w120">
+                    <button class="layui-btn">搜索</button>
+                </div>
+            </div>
+            <input type="hidden" name="c" value="site">
+            <input type="hidden" name="a" value="entry">
+            <input type="hidden" name="m" value="hy_supstore">
+            <input type="hidden" name="do" value="storemanage" />
+            <input type="hidden" name="op" value="coupon" />
+            <input type="hidden" name="type" value="coupon" />
+            <input type="hidden" name="active" value="record" />
+            <input type="hidden" name="storeid" value="{$storeinfo['id']}" />
+            <input type="hidden" name="page" value="1">
+        </div>
+    </form>
+</div>
+<form action="" method="post" class="form">
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th width="80">会员名称</th>
+                <th width="50">优惠券名称</th>
+                <th width="60">面值</th>
+                <th width="80">启用金额</th>
+                <th width="80">获得时间</th>
+                <th width="80">截止时间</th>
+                <th width="60">状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $item}
+            <tr>
+                <td><img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style="height:38px; border-radius:50%;">
+                    <br>
+                    <a href="javascript:void(0);">{$item['nickname']}</a></td>
+                <td>{$item['title']}</td>
+                <td>{$item['value']}</td>
+                <td>{$item['condition']}</td>
+                <td>{$item['addtime']}</td>
+                <td>{$item['expirytime']}</td>
+                <td>{if $item['status']==1}正常{elseif $item['status']==0}过期{else}已使用{/if}</td>
+            </tr>
+            {/loop} {if empty($list)}
+            <tr>
+                <td colspan="7" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+            </tr>
+            {/if}
+            <tr>
+                <td colspan="20" class="fenye">{$pager}</td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+layui.use(['laydate','form', 'layer','element'], function() {
+var $ = layui.jquery,
+    form = layui.form,
+    layer = layui.layer,
+    laydate = layui.laydate,
+    element = layui.element;
+});
+</script>
+{/if}

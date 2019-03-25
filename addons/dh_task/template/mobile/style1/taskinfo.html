@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <style type="text/css">
+        .taskinfo{position: relative;}
+        .taskinfo .image{width: 100%}
+        .taskinfo .image img{width: 100%}
+        .content{padding:10px;margin-bottom: 10px;background-color: #fff}
+        .content .task_title{color: #333;}
+        .content .receive{font-size: 14px;color: #f66216;line-height: 26px;}
+        .content .receive span{font-size: 12px;background-color: #f66216;color: #fff;padding:2px;border-radius: 2px;margin-right: 3px;margin-left: 5px;}
+        .content .receive .one{margin-left: 0}
+        .content .task_desc{font-size: 14px;color: #888;}
+        .list{padding: 0 10px;}
+        .list div{font-size: 14px;line-height:34px;color: #333;border-top: 1px solid #f8f8f8;}
+        .content .task_time{border-top: none;}
+        .content .noreceive p{font-size: 14px;color: red;}
+        .content .noreceive .so{color: #333;}
+        .content .hide_content{border:1px solid #f66216;padding:8px;}
+        .content .userrec{font-size: 14px;color: #666;padding-bottom: 5px;border-bottom: 1px dotted #f8f8f8;}
+        .content .userrec .more{float: right;}
+        .content .userhead{padding-top:8px;height: 47px;overflow: hidden;}
+        .content .userhead span{margin-right: 3px;}
+        .content .userhead .userhead_no{display: block;margin: 0 auto;font-size: 14px;color: #888;line-height: 47px;text-align: center;}
+        .content .userhead img{width: 40px;border-radius: 20px;}
+        .footer{position: fixed;border: 0;bottom: 0;width: 100%;height: 50px;text-align:center;line-height: 50px;background-color: #fff;}
+        .footer .task_exp{width: 60%;float: left;font-size: 14px;color: #666;height: 19px;border-top: 1px solid #fafafa;height: 49px;line-height: 22px;text-align: left;padding-left: 5%;padding-top: 3px;}
+        .footer .task_r{width: 35%;float: right;background-color: #f66216;color: #fff;font-size: 18px;}
+        .footer .task_r.no{background-color: #ccc;color: #fff;}
+
+        .field{display:none;position: fixed;top: 0;width: 100%;z-index: 12;background-color: rgba(0,0,0,.6);height: 100%}
+        .field .info{text-align: center;font-size: 14px;color: #333;margin-bottom: 10px;}
+        .field .weui_cells{width: 70%;margin: 0 auto;margin-top: 20%;padding: 15px;border-radius: 5px;max-height: 60%;overflow: overlay;}
+        .field .weui_cell_hd{width: 80px;}
+        .field .weui_cell_hd label{color: #888;font-size: 14px;}
+        input.weui_input{font-size: 14px;color: #333;}
+        .weui_select{font-size: 14px;color: #333;}
+        .field .weui_btn{width: auto;margin:10px auto;}
+        .field .weui_cell:before{border:0;}
+    </style>
+    
+</head>
+<body ontouchstart  class="page-bg">
+    {template 'style1/follow'}
+    <div class="taskinfo">
+        <!-- <div class="image">
+            <img src="{if $taskinfo['task_image']}{media $taskinfo['task_image']}{else}{media $setting['task_image']}{/if}">
+        </div> -->
+        <div class="content">
+            <div class="task_title">{$taskinfo['task_title']}</div>
+            <div class="receive">
+                <span class="one">领</span>{$taskinfo['receive']}
+                <span>剩</span>{if $taskinfo['task_receive'] == 0 || $taskinfo['task_receive'] > 999}999+{else}{php echo ($taskinfo['task_receive'] - $taskinfo['receive'])}{/if}
+                {if $taskinfo['user_receive'] != 0}<span>限</span>{$taskinfo['user_receive']}{/if}
+                <span>我</span>{$total}
+            </div>
+            <div class="task_desc">{$taskinfo['task_desc']}</div>
+        </div>
+        <div class="content list">
+            <div class="task_time">任务标签：{$taskinfo['catetitle']}{if $taskinfo['is_open']}(开放领取){/if}</div>
+            <div>导航分类：{$taskinfo['navtitle']}</div>
+            <div>领取时间：
+            <?php if(date('Y',$taskinfo['starttime'])!=date('Y',time())){echo date('Y-m-d',$taskinfo['starttime']);}else{echo date('m-d H:s',$taskinfo['starttime']);}?>
+            -
+            <?php if(date('Y',$taskinfo['endtime'])!=date('Y',time())){echo date('Y-m-d',$taskinfo['endtime']);}else{echo date('m-d H:s',$taskinfo['endtime']);} ?>
+                
+            </div>
+            <div>领取等级：{$receive_level}</div>
+            <div>完成时间：{$taskinfo['task_do_time']}</div>
+            <div>审核人：{if $taskinfo['reviewuser']}{$taskinfo['reviewuser']}{else}这个任务不需要审核{/if}</div>
+        </div>
+        {if !$is_receive}
+        <div class="content">
+            <div class="noreceive">
+                <p class="so">由于以下原因,你无法领取此任务</p>
+                {if !$is_level}<p>你的等级不满足该任务要求</p>{/if}
+                {if !$is_cate}<p>你的标签和该任务不一致</p>{/if}
+                {if !$is_total}<p>你的领取次数已经超过该任务限制</p>{/if}
+                {if !$is_task_receive}<p>任务被领完了</p>{/if}
+                {if !$is_starttime}<p>任务还没有开始</p>{/if}
+                {if !$is_endtime}<p>任务已结束</p>{/if}
+            </div>
+        </div>
+        {/if}
+
+        {if $taskinfo['task_content']}
+        <div class="content">
+            {if $taskinfo['hide_content'] && $total>0}
+            <div style="font-size: 14px;color:#666;">隐藏内容</div>
+            <div class="hide_content">{$taskinfo['hide_content']}</div>
+            {/if}
+            <div class="task_content">{$taskinfo['task_content']}</div>
+        </div>
+        {/if}
+        <div class="content">
+            <div class="userrec"><span>他们领取了此任务</span>{if $receivelist}<a href="{php echo $this->createMobileUrl('task', array('op'=>'taskreceive','id'=>$taskinfo['id']), true)}"><span class="more">more+</span></a>{/if}</div>
+            <div class="userhead">
+                {if $receivelist}
+                {loop $receivelist $i $v}
+                <span><img src="{$v['headimgurl']}"></span>
+                {/loop}
+                {else}
+                <span class="userhead_no">还没有任何人领取过这个任务</span>
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div style="height: 50px;"></div>
+    <div class="footer">
+        <div class="task_exp">
+        {if $taskinfo['task_exp'] == 0}免费领取{else}领取需消费{$taskinfo['task_exp']}{$setting['points_name']}{/if}
+        <br>
+        {if $taskinfo['task_points'] == 0}无奖励{else}完成可获得{$taskinfo['task_points']}{$setting['points_name']}{/if}
+        {if $taskinfo['user_level']>0} 升{$taskinfo['user_level']}级{/if}
+        </div>
+        <div class="task_r {if !$is_receive}no{/if}">{$receiveinfo}</div>
+    </div>
+    {if !empty($filed)}
+    <div class="field">
+        <div class="weui_cells weui_cells_form">
+            <form action="" id="form">
+                <p class="info">请填写以下信息</p>
+                {loop $filed $i $v}
+                {if $v['type'] == 1}
+                <div class="weui_cell">
+                    <div class="weui_cell_hd"><label class="weui_label">{$v['name']}</label></div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <input class="weui_input" type="text" name="val{$i}" value=""  {if $v['verify']}required emptytips="{$v['name']}不能为空"{/if} {if $v['verify'] == 3}pattern="^1{1}\d{10}$"{/if} {if $v['verify'] == 2}pattern="^[1-9]\d*$"{/if} {if $v['verify']}notmatchtips="{$v['name']}格式错误"{/if} placeholder="请输入{$v['name']}"/>
+                    </div>
+                </div>
+                {elseif $v['type'] == 2}
+                <div class="weui_cell weui_cell_select weui_select_after">
+                    <div class="weui_cell_hd">
+                        <label for="" class="weui_label">{$v['name']}</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <select class="weui_select" name="val{$i}">
+                            {loop $v['list'] $i1 $v1}
+                            <option value="{$v1}">{$v1}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                {/if}
+                {/loop}
+                <a class="weui_btn weui_btn_plain_default" id="formSubmitBtn">领取任务</a>
+            </form>
+        </div>
+    </div>
+    {/if}
+    <script type="text/javascript">
+        var is_receive = {$is_receive};
+        $(".task_r").click(function(){
+            if(is_receive){
+                {if !empty($filed)}
+                $(".field").show();
+                return false;
+                {/if}
+                taskreceive();
+            }
+            
+        });
+        $(".field").click(function(){
+            $('.field').hide();
+        });
+        $(".weui_cells").click(function(e){
+            e.stopPropagation();
+        });
+        
+        var $form = $("#form");
+        $form.form();
+        $("#formSubmitBtn").on("click", function(){
+            $form.validate(function(error){
+                if(error){
+
+                }else{
+                    form = $('#form').serializeArray();
+                    $('.field').hide();
+                    taskreceive(form);
+                }
+            });
+        });
+        function taskreceive(par){
+            $.confirm("{if $taskinfo['task_exp'] == 0}免费领取此任务{else}消费{$taskinfo['task_exp']}{$setting['points_name']}{/if}", "领取此任务", function() {
+                    $.showLoading('请稍候');
+                    $.ajax({
+                        url:"{php echo $this->createMobileUrl('task', array('op'=>'taskreceive','id'=>$taskinfo['id']), true)}",
+                        type:"post",
+                        data:par,
+                        dataType: 'json',
+                        success:function(data){
+                            $.hideLoading();
+                            if(data.par == 1){
+                                $.toast(data.info, "forbidden")
+                                setTimeout(function(){
+                                    window.location.href="{php echo $this->createMobileUrl('legalize', array(), true)}";
+                                },2000);
+                                return false;
+                            }
+                            if(data.status == 1){
+                                $.confirm("立即查看我的任务","领取成功",function(){
+                                    window.location.href="{php echo $this->createMobileUrl('me', array('op'=>'metask'), true)}";//跳转到我的任务列表
+                                },function(){
+                                    location.reload();
+                                });
+                            }else{
+                                $.toast(data.info,"forbidden");
+                            }
+                        },
+                        error:function(){
+                            $.hideLoading();
+                            $.toast('网络错误',"forbidden");
+                        }
+                    });
+                }, function() {
+                //取消操作
+                });
+        }
+    </script>
+    {php echo register_jssdk(false);}
+    <script type="text/javascript">
+        wx.ready(function () {
+            sharedata = {
+                title: '{$setting["share_title"]}',
+                desc: '{$setting["share_desc"]}',
+                link: '{$setting["share_link"]}',
+                imgUrl: '{media $setting["share_image"]}',
+                success: function(){
+
+                },
+                cancel: function(){
+
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata);
+        });
+    </script>
+</body>
+</html>

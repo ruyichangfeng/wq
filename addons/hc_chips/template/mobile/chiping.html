@@ -1,0 +1,160 @@
+{template 'common/header'}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" type="text/css" href="../addons/hc_chips/style/css/main.css" media="all">
+<title>{$chip['title']}</title>
+<style type="text/css">
+	body { 
+		background: #f3f3f3;
+		color: #333;
+	}
+	.btn { padding: 13px 0;
+		background-color: #ff9900; 
+		color: #ffffff; 
+	}
+</style>
+</head>
+<body>
+<div class="top">
+   	<img src="{$_W['attachurl']}{$chip['picture']}" style='width:100%;' />
+	<div class="timer" id="timer" data-diff="{php echo $chip['endtime']-time()}">开始倒计时...</div>        
+</div>
+<div class="middle">
+	<div class="content">{$chip['description']}</div>
+	<div class="activity clearfix">
+		<div class='block white'>
+			<input type='text' id="mobile" placeholder="手机号" name='mobile' value="{$member['mobile']}"/>
+		</div>   
+		<a onclick="startchips();" class='block btn btn-join' {if $isjoin == 1 || $flag == 0 || $flag == 2}style="background-color:gray;"{/if}>{if $flag==0}活动未开始{elseif $flag==2}活动已结束{else}开始众筹{/if}</a>
+		<a onclick="history.go(-1);" class='block btn btn-join'>返回</a>
+	</div>        
+</div>
+<div style="position:absolute; left:20%; top:30%; width:60%; height:100px; background:#FDEEF3; display:none;">
+	
+</div>
+<script type="text/javascript" src="../addons/hc_chips/style/js/jquery.countdown.js"></script>
+<script language="javascript">
+//alert('vv',10000,true);	  
+$("#timer").countdown({
+	tmpl : '活动倒计时：<span style="margin-left:0;">%{d}</span>天<span>%{h}</span>时<span>%{m}</span>分<span>%{s}</span>秒',
+	end : '活动时间已结束'
+});
+
+function startchips(){
+	if({$flag}==0){
+		alert('活动未开始！');
+		return;
+	}
+	if({$flag}==2){
+		alert('活动已结束！');
+		return;
+	}
+	if({$isjoin}==1){
+		alert('你已经参与该众筹，请勿重复参加！');
+		return;
+	}
+	var reg = /^1[3458]\d{9}$/;
+	var mobile = $('#mobile').val();
+	if(mobile==''){
+		alert('请输入手机号码！');
+		return;
+	}
+	if(!reg.test(mobile)){
+		alert('手机格式不正确！');
+		return;
+	}
+	if({$chip['chipmoney']}!=''){
+		if(confirm('确认输入'+{$chip['chipmoney']}+'元吗？')){
+			var joinmoney = parseInt({$chip['chipmoney']});
+		} else {
+			return;
+		}
+	} else {
+		var joinmoney = prompt("请输入众筹金额:","1");
+		if(joinmoney == null){
+			return;
+		}
+		if(isNaN(joinmoney)){
+			alert('输入不合法哦！');
+			return;
+		} 
+		if (joinmoney < 1){
+			alert('请输入大于0的整数！');
+			return;
+		}
+	}
+	$.ajax({
+		type: "POST",
+		url: "{php echo $this->createMobileurl('chip',array('id'=>$chip['id'], 'op'=>'chiping'))}",
+		data: {joinmoney: joinmoney, mobile: mobile},
+		dataType: "json",
+		
+		success: function (d) {
+			if(d>=1){
+				if(confirm('众筹成功！是否马上付款？')){
+					window.location.href = "{php echo $this->createMobileUrl('chip', array('op'=>'pay'), true);}&id="+d;
+				} else {
+					location.reload();
+				}
+			}
+			if(d==0){
+				alert('你还没输入参与金额哦！');
+			}
+			if(d==-1){
+				alert('请输入大于0的金额！');
+			}
+			if(d==-2){
+				alert('输入不合法哦！');
+			}
+			if(d==-3){
+				alert('活动未开始！');
+			}
+			if(d==-4){
+				alert('活动已结束！');
+			}
+		},
+		
+		error: function (xml, text, thrown){
+			alert("出错啦!");
+		}
+	});
+}
+</script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{php $signPackage=$_W['account']['jssdkconfig'];}	
+<script>
+wx.config({
+	debug: false,   
+	appId: '<?php echo $signPackage["appId"];?>',
+	timestamp: '<?php echo $signPackage["timestamp"];?>',
+	nonceStr: '<?php echo $signPackage["nonceStr"];?>',
+	signature: '<?php echo $signPackage["signature"];?>',
+	jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+});
+
+wx.ready(function () {
+	var shareData = {
+		title: "{$rule['title']}",
+		desc: "{$rule['description']}",
+		link: "{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('index')}",
+		imgUrl: "{$_W['attachurl']}{$rule['picture']}",
+		trigger: function (res) {},
+		complete: function (res) {},
+		success: function (res) {},
+		cancel: function (res) {},
+		fail: function (res) {}
+	};
+	wx.onMenuShareAppMessage(shareData);
+	wx.onMenuShareQQ(shareData);
+	wx.onMenuShareWeibo(shareData);
+	wx.onMenuShareTimeline(shareData);
+});
+</script>
+</body>
+</html>

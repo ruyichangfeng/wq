@@ -1,0 +1,89 @@
+{php define(MUI, true);}
+{template 'common/header_base'}
+<style>
+	body{
+		background-color: white;
+	}
+	.mui-content {
+		background-color: white;
+	}
+	.import {
+		margin-right: 55px;
+		margin-left: 55px;
+		margin-top: 50px;
+	}
+
+</style>
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">兑换核销</h1>
+</header>
+<div class="mui-content">
+	<div style="text-align: center;margin-top: 40px;">
+
+		<img src="{HLMMS_MOBILE_ICOS}dingdanhao.png" height="128px;" />
+		<h3>兑换核销</h3>
+		<div class="mui-content-padded" style="text-align: center;margin-top: 30px;">
+			<input type="text" name="orderCodeInvoice" id="orderCodeInvoice" value="" style="width: 90%;height: 50px;"  />
+		</div>
+
+		<div class="mui-content-padded" style="text-align: center">
+			<button type="button" id="scanqrcode" class="mui-btn mui-btn-warning mui-btn-outlined"  style="width: 90%;height: 50px;text-align: center;" ><img src="{HLMMS_MOBILE_ICOS}qr_ico.png"/> 扫 一 扫 </button>
+		</div>
+		<div class="mui-content-padded"  style="text-align: center">
+			<button  name="submit" type="button"  id="button_submit" class="mui-btn mui-btn-success"  style="width: 90%;height: 50px;text-align: center;font-size:x-large"><img src="{HLMMS_MOBILE_ICOS}duigou_ico.png" width="32"/> 核 销</button>
+		</div>
+
+	</div>
+</div>
+<script>
+    document.querySelector('#scanqrcode').onclick = function () {
+        wx.scanQRCode({
+            needResult: 1,
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            desc: 'scanQRCode desc',
+            success: function (res) {
+                var result = res.resultStr;
+                var serial = result.split(",");
+                result = serial[serial.length-1];
+                $("#orderCodeInvoice").val(result);
+            }
+        });
+    };
+    document.querySelector("#button_submit").addEventListener('tap', function() {
+        var orderCodeInvoice = $("#orderCodeInvoice").val();
+        if((orderCodeInvoice==null||orderCodeInvoice==undefined||orderCodeInvoice=="")){
+            mui.alert('请输入核销码！');
+            return false;
+        }
+        else {
+            var url ="{php echo $this->createMobileUrl('common',array('op' => 'changeconsume'))}";
+            mui.ajax(url,{
+                data:{
+                    orderCodeInvoice:orderCodeInvoice,
+                },
+                dataType:'json',//服务器返回json格式数据
+                type:'post',//HTTP请求类型
+                success:function(data){
+                    var codeValue = data['message']['code'];
+                    if(codeValue == 1){
+                        mui.alert( '核销失败！已核销或订单失效！', function() {
+                            $("#orderCodeInvoice").val('')
+                        });
+                    }else{
+                        mui.alert( '核销成功！', function() {
+                            var openUrl = "{php echo util::app_url('Sellerhome')}" ;
+                            mui.openWindow({
+                                url:openUrl,
+                            });
+                        });
+                    }
+                },
+                error:function(xhr,type,errorThrown){
+                    mui.toast('核销失败！');
+                }
+            });
+        }
+    });
+</script>
+{template 'common/footer_base'}

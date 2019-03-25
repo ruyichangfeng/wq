@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <title>选择位置</title>
+    <style type="text/css">
+        *{
+            margin:0px;
+            padding:0px;
+        }
+        body, button, input, select, textarea {
+            font: 12px/16px Verdana, Helvetica, Arial, sans-serif;
+        }
+        p{
+            width:603px;
+            padding-top:3px;
+            margin-top:10px;
+            overflow:hidden;
+        }
+        #container {
+            min-width:603px;
+            min-height:400px;
+        }
+        input {height: 30px;line-height: 30px;border: 1px solid #ccc;width: 150px;margin-top:5px;margin-left:10px;}
+        .sz input,.sz button {margin-bottom: 5px;}
+        button{height: 33px;border: 0;width: 70px;background: #cc006a;color:white}
+        #address{width: 316px;}
+    </style>
+    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=VY3BZ-WRWWQ-WUP5C-GKZ6R-WNOSV-G3BZR"></script>
+    <script>
+        var geocoder,map,marker = null;
+        var init = function() {
+            var center = new qq.maps.LatLng(39.916527,116.397128);
+            map = new qq.maps.Map(document.getElementById('container'),{
+                center: center,
+                zoom: 15
+            });
+            qq.maps.event.addListener(map, 'click', function(event) {
+                var marker=new qq.maps.Marker({
+                    position:event.latLng,
+                    map:map
+                });
+                $("#lc").val(event.latLng);
+                qq.maps.event.addListener(map, 'click', function(event) {
+                    marker.setMap(null);
+                });
+            });
+            //调用地址解析类
+            geocoder = new qq.maps.Geocoder({
+                complete : function(result){
+                    map.setCenter(result.detail.location);
+                    var marker = new qq.maps.Marker({
+                        map:map,
+                        position: result.detail.location
+                    });
+                }
+            });
+        }
+        function codeAddress() {
+            var address = document.getElementById("address").value;
+            //通过getLocation();方法获取位置信息值
+            geocoder.getLocation(address);
+        }
+    </script>
+</head>
+<body onload="init()">
+<div>
+    <input id="address" type="text" placeholder="输入地址查询" value="">
+    <button onclick="codeAddress()">搜索</button>
+</div>
+<div class="sz">
+    <input type="text" readonly placeholder="位置坐标" value="" id="lc">
+    <input type="text" placeholder="位置名称,自己填写" value="" id="ms">
+    <button id="save">确认选择</button>
+</div>
+<div id="container"></div>
+<script>
+    $(function(){
+        $("#save").click(function(){
+            var wz =$("#lc").val();
+            if(wz==""){
+                alert("请选择位置");
+                return false;
+            }
+            var sm=$("#ms").val();
+            if(sm==""){
+                alert("请填写具体位置");
+                return false;
+            }
+            parent.selectLct(wz,sm);
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        });
+    });
+</script>
+</body>
+</html>

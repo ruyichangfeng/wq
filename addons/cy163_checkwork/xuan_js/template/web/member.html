@@ -1,0 +1,156 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $op=="display"}class="active"{/if}><a href="{php echo $this->createWebUrl('member', array('op' => 'display'))}">会员列表</a></li>
+	<!--<li {if $op=="dianyuan"}class="active"{/if}><a href="{php echo $this->createWebUrl('member', array('op' => 'dianyuan'))}">店员列表</a></li>-->
+</ul>
+{if $op=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form" id="form">
+			<input type="hidden" name="c" value="site" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="xuan_js" />
+            <input type="hidden" name="do" value="member" />
+            <input type="hidden" name="op" value="{if $_GPC['op']=='display'}display{/if}{if $_GPC['op']=='dianyuan'}dianyuan{/if}" />
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字类型</label>
+				<div class="col-sm-8 col-xs-12">
+					<select name="type" class="form-control">
+						<option value="2" {if $_GPC['type'] == 2}selected{/if}>手机号</option>
+						<option value="4" {if $_GPC['type'] == 4}selected{/if}>真实姓名</option>
+						<option value="3" {if $_GPC['type'] == 3}selected{/if}>昵称</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字</label>
+				<div class="col-md-8">
+					<input type="text" class="form-control" name="keyword" id="keyword" value="{$_GPC['keyword']}" />
+				</div>
+				<div class="pull-right col-md-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="panel panel-default">
+    <table class="table">
+        <thead class="navbar-inner">
+			<tr>
+				<th style="width:50px;">头像</th>
+				<th style="width:100px;">昵称</th>
+				<th style="width:110px;">手机</th>
+				<th style="width:100px;">真实姓名</th>
+				<th style="width:100px;">积分</th>
+				<th style="width:100px;">余额</th>
+				<th style="width:240px;" class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{loop $members $li}
+			<tr>
+				<td><image src="{php echo tomedia($li['avatar']);}" style="max-width: 48px; max-height: 48px; border: 1px dotted gray"></td>
+				<td>{$li['nickname']}</td>
+				<td>{$li['mobile']}</td>
+				<td>{$li['realname']}</td>
+				<td id="credit1{$li['uid']}"><span class="label label-warning">积分：{$li['credit1']}</span></td>
+				<td id="credit2{$li['uid']}"><span class="label label-primary">余额：{$li['credit2']}</span></td>
+				<td>
+					<div class="btn-group">
+						<a href="javascript:;" title="积分" class="btn btn-default modal-trade-credit1" data-type="credit1" data-uid="{$li['uid']}">积分</a>
+						<a href="javascript:;" title="余额" class="btn btn-default modal-trade-credit2" data-type="credit2" data-uid="{$li['uid']}">余额</a>
+						<a href="{php echo url('mc/member/credit_stat',array('uid' => $li['uid'], 'type' => 1))}" title="日志" class="btn btn-success">日志</a>
+						<!--<a href="{php echo $this->createWebUrl('member',array('op'=>'dianyuan','id'=>$li['mid']))}" title="店员" class="btn btn-success">设置店员</a>-->
+					</div>
+				</td>
+			</tr>
+		{/loop}
+        </tbody>
+    </table>
+</div>
+{$pager}
+<script>
+	require(['trade', 'bootstrap'], function(trade){
+		trade.init();
+	});
+</script>
+{/if}
+
+{if $op=='dianyuan'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form" id="form">
+			<input type="hidden" name="c" value="site" />
+            <input type="hidden" name="a" value="entry" />
+            <input type="hidden" name="m" value="xuan_miaosha" />
+            <input type="hidden" name="do" value="member" />
+            <input type="hidden" name="op" value="{if $_GPC['op']=='display'}display{/if}{if $_GPC['op']=='dianyuan'}dianyuan{/if}" />
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字类型</label>
+				<div class="col-sm-8 col-xs-12">
+					<select name="type" class="form-control">
+						<option value="2" {if $_GPC['type'] == 2}selected{/if}>手机号</option>
+						<option value="4" {if $_GPC['type'] == 4}selected{/if}>真实姓名</option>
+						<option value="3" {if $_GPC['type'] == 3}selected{/if}>昵称</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">关键字</label>
+				<div class="col-md-8">
+					<input type="text" class="form-control" name="keyword" id="keyword" value="{$_GPC['keyword']}" />
+				</div>
+				<div class="pull-right col-md-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="panel panel-default">
+    <table class="table">
+        <thead class="navbar-inner">
+			<tr>
+				<th style="width:50px;">头像</th>
+				<th style="width:100px;">昵称</th>
+				<th style="width:110px;">手机</th>
+				<th style="width:100px;">真实姓名</th>
+				<th style="width:100px;">积分</th>
+				<th style="width:100px;">余额</th>
+				<th style="width:240px;" class="text-center">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{loop $members $li}
+			<tr>
+				<td><image src="{php echo tomedia($li['avatar']);}" style="max-width: 48px; max-height: 48px; border: 1px dotted gray"></td>
+				<td>{$li['nickname']}</td>
+				<td>{$li['mobile']}</td>
+				<td>{$li['realname']}</td>
+				<td id="credit1{$li['uid']}"><span class="label label-warning">积分：{$li['credit1']}</span></td>
+				<td id="credit2{$li['uid']}"><span class="label label-primary">余额：{$li['credit2']}</span></td>
+				<td>
+					<div class="btn-group">
+						<a href="javascript:;" title="积分" class="btn btn-default modal-trade-credit1" data-type="credit1" data-uid="{$li['uid']}">积分</a>
+						<a href="javascript:;" title="余额" class="btn btn-default modal-trade-credit2" data-type="credit2" data-uid="{$li['uid']}">余额</a>
+						<a href="{php echo url('mc/member/credit_stat',array('uid' => $li['uid'], 'type' => 1))}" title="日志" class="btn btn-success">日志</a>
+						<a href="{php echo $this->createWebUrl('member',array('op'=>'deldy','mid'=>$li['mid']))}" title="取消店员" class="btn btn-warning">取消店员</a>
+					</div>
+				</td>
+			</tr>
+		{/loop}
+        </tbody>
+    </table>
+</div>
+{$pager}
+<script>
+	require(['trade', 'bootstrap'], function(trade){
+		trade.init();
+	});
+</script>
+{/if}
+
+{template 'common/footer'}

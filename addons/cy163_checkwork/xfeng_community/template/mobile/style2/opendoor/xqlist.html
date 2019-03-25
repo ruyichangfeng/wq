@@ -1,0 +1,50 @@
+{template 'style5/header'}
+<style>
+    .button{
+        height:40px;
+        line-height: 40px;
+    }
+</style>
+<body class="max-width">
+<header class="bar bar-nav bg-green">
+    <a class="icon icon-left pull-left txt-fff" onclick="window.location.href='{php echo $this->createMobileUrl('home')}'"></a>
+    <h1 class="title txt-fff">手机开门</h1>
+</header>
+<div class="content page">
+    <div class="content-block">
+        <div class="buttons-row theme-green">
+            {loop $doors $key $door}
+            {if $key%4 == 0}
+            </div>
+            <div class="buttons-row theme-green">
+            {/if}
+            <a href="#" class="button" onclick="xqopen({$door['id']})">{$door['title']}</a>
+            {/loop}
+        </div>
+    </div>
+    <div class="tabs theme-green" id="content">
+    </div>
+</div>
+<script>
+    function xqopen(id) {
+        var id =id;
+        $.post("{php echo $this->createMobileUrl('opendoor',array('op' => 'xqdoor'))}",{id:id},function (result) {
+            if(result.status == 3){
+                var content = "<div class='tab active'><div class='content-block'>";
+                $.each(result.content,function(name,val) {
+                    content +="<p> <a href='#' class='button' onclick='xqdoor("+val['id']+")'>"+val['title']+val['unit']+"</a> </p>";
+                });
+                content +="</div></div>";
+                $("#content").html(content);
+            }
+        },'json');
+    }
+    function xqdoor(id){
+        var id = id;
+        window.location.href = "{php echo $this->createMobileUrl('lock')}&id="+id+"&type=1";
+    }
+</script>
+<script>$.config = {autoInit: true}</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="utf-8"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7-swiper.min.js" charset="utf-8"></script>
+{template 'style5/footer'}

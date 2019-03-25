@@ -1,0 +1,451 @@
+<script type="text/javascript">
+	var _imgCdn='{MODULE_URL}publish/images/';
+</script>
+{template 'common/header'}
+<style type="text/css">
+	html{
+		overflow:visible;
+		position:relative;
+	}
+	.tabs{
+		position:fixed;
+	}
+	.center{
+		text-align:left;
+		padding:10px 20px;
+	}
+	.top_date{
+		padding-left:20px;
+	}
+	.top_date span{
+		margin-right:20px;
+	}
+	.top_date span:last-child{
+		color:#33cd5f;
+	}
+	.news_content{
+		padding:10px 20px;
+	}
+	.news_content img{
+		width:100%;
+	}
+	.news_footer{
+		padding-left:20px;
+		padding-bottom:20px;
+	}
+	.news_footer .count{
+		color:red;
+
+	}
+	textarea,input{
+	    font-family: "Microsoft YaHei", "SimSun", Verdana, Arial, Helvetica, sans-serif;
+	    font-size: 100%;
+	    margin: 0;
+		color:black;
+	    -webkit-appearance: none;
+	    -moz-appearance: none;
+	    appearance: none;
+		-webkit-tap-highlight-color: transparent;
+		outline:none;
+	}
+	.news_footer .zan_icon{
+		margin:0 10px;
+	}
+	.ion-thumbsup:before {
+	    content: "\f251";
+	    font-size: 18px;
+	}
+	
+	/*评论弹窗*/
+	.button_1 { font-size: 18px; color: #ffffff; line-height: 20px; text-align: center; border: 1px solid #666666; background-color: #ff6600; padding: 10px 0; }
+	.button_1:active { background-color: #d55500; }
+	.button_1_disabled { font-size: 18px; color: #eeeeee; line-height: 20px; text-align: center; border: 1px solid #666666; background-color: #ff6600; padding: 10px 0; }
+	#dt_review_box { display: none; position: fixed; left: 0; bottom: -500px; z-index: 2000; width: 100%; background-color: #dddddd; padding-bottom: 500px; }
+	#dt_review_box_main { position: relative; margin: 9px 8px 8px; }
+	#dt_review_box_emo_button, #dt_review_box_emo_button_active { position: absolute; left: 0; top: 0; width: 34px; overflow: hidden; }
+	#dt_review_box_emo_button { background-color: #dddddd; }
+	#dt_review_box_emo_button img, #dt_review_box_emo_button_active img { width: 30px; height: 30px; margin-top: 6px; }
+	#dt_review_box_emo_button:active { filter: alpha(opacity=0); -moz-opacity: 0; opacity: 0; }
+	#dt_review_box_input { margin: 0 70px 0 38px; border: 1px solid #ccc; background-color: #FFF; padding: 8px 3px 8px; border-radius: 5px; }
+	#dt_review_box_input input { width: 100%; overflow: hidden; border: 1px solid #FFF; height: 22px; }
+	#dt_review_box_button { position: absolute; right: 0; top: 0; width: 68px; text-align: right; }
+	#dt_review_box_button button { margin-top: 1px; width: 60px; height: 38px; overflow: hidden; font-size: 14px; background-color: #0099e9; border-radius: 5px; color: #FFF; cursor: pointer; border: none; float: right; }
+	#dt_review_box_button button:active { background-color: #0082c6; }
+	#dt_review_box_emo { display: none; padding-top: 8px; }
+	.emo { float: left; padding: 12px; }
+	.emo:active { border: 1px solid #999999; padding: 11px; background-color: #FFF; }
+	.emo img { width: 24px; height: 24px; }
+	.dt_emo { width: 24px; height: 24px; }
+	#cover2 {
+	  background-color: #333333;
+	  display: none;
+	  left: 0;
+	  opacity: 0.8;
+	  position: absolute;
+	  top: 0;
+	  z-index: 1000;
+	  bottom:0;
+	  right:0;
+	}
+	/*详情-评论*/
+.dt_review { overflow: hidden; padding: 20px 10px 0 10px; background-color: #FFF;margin-bottom:50px; }
+.dt_review_top { overflow: hidden; height: 43px; background-color: #f8f8f8;}
+.dt_review_top .dt_review_topL { display: block; color: #888; float: left; margin-left: 8px; font-size: 14px; line-height:43px; }
+.dt_review_top .dt_review_topR { display: inline-block; float: right; margin-right: 8px; margin-top: 10px; overflow: hidden; }
+.dt_review_top .dt_review_topR a { overflow: hidden; width: 16px; height: 16px; display: inline-block; margin-top: 4px; position: relative; }
+.dt_review_top .dt_review_topR a img { position: absolute; width: 16px; height: 32px; top: 0; left: 0; }
+.dt_review_top .dt_review_topR:active a img { top: -16px; }
+.dt_review_top .dt_review_topR span { display: inline-block; float: right; margin-left: 5px; margin-top: 3px; color: #0099e9; font-size: 14px; }
+.dt_review_top .dt_review_topR:active span { color: #0082c6; }
+ul.dt_review_main { overflow: hidden;border-top: 1px solid #e7e7e7; }
+ul.dt_review_main li { overflow: hidden; background-color: #f8f8f8; cursor: pointer; }
+ul.dt_review_main li .dt_review_main_K { margin-left: 8px; border-top: 1px solid #e7e7e7;position:relative;}
+ul.dt_review_main li:active { background-color: #d9d9d9;}
+ul.dt_review_main li:active .dt_review_main_K {border-top: 1px solid #d9d9d9;}
+ul.dt_review_main>:first-child .dt_review_main_K,
+ul.dt_review_main>:first-child:active .dt_review_main_K {border:none;}
+ul.dt_review_main li .dt_review_icon { overflow: hidden; float: left; margin: 9px 6px 0 0;position:absolute;top:0;left:0;}
+ul.dt_review_main li .dt_review_icon a { display: inline-block; }
+ul.dt_review_main li .dt_review_icon a img { display: inline-block; width: 35px; height: 35px; }
+ul.dt_review_main li .dt_review_title { display: inline-block; float: left; white-space: nowrap; text-overflow: ellipsis; -o-text-overflow: ellipsis; overflow: hidden; margin: 7px 0 3px 42px; text-align: left; line-height: 19px; }
+ul.dt_review_main li .dt_review_title a { color: #0099e9; font-size: 14px; line-height:19px;}
+ul.dt_review_main li .dt_review_title a:active { color: #0082c6; }
+ul.dt_review_main li .dt_review_time { color: #999; display: inline-block; float: right; margin: 7px 8px 0 0; font-size: 12px; line-height: 19px; }
+ul.dt_review_main li:active .dt_review_icon a img { filter: alpha(opacity=0.8); -moz-opacity: 0.8; -khtml-opacity: 0.8; opacity: 0.8; }
+.dt_review_body { clear: both; padding: 0 10px 7px 42px; color: #000; text-align: left; font-size: 14px; line-height: 18px; }
+.dt_review_body img.dt_emo { display: inline; width: 16px; height: 16px; }
+.dt_review_body a { color: #0099e9; }
+.dt_review_body a:active { color: #0082c6; }
+.dt_review_more { overflow: hidden; background-color: #f8f8f8; text-align: center; }
+.dt_review_more:active { background-color: #d9d9d9; }
+.dt_review_more .moreBtn { display: inline-block; width: 100%;font-size: 14px; }
+.dt_review_more .moreBtn span { display: inline-block; background: url(http://img1.hudongba.com/static_v4/images/detail/form_more2x2.png) no-repeat right; padding-right: 20px; background-size: 12px 12px; margin: 12px auto; color: #0099e9; font-size: 14px;height:19px;line-height:19px; }
+.dt_review_more .upAll { display: inline-block; margin: 12px auto; color: #999;font-size: 14px; }
+.clear{
+	clear:both;
+}
+/*loading 加载弹窗*/
+.loadingDiv { width: 120px; height: 120px; background-image: url(http://img1.hudongba.com/static_v4/images/other/loadingBj.png); display:none; z-index:1001; }
+.loadingDiv .pImg { padding-top: 30px; padding-bottom: 20px; text-align: center; }
+.loadingDiv .pImg img { width: 30px; height: 30px; margin: 0 auto; }
+.loadingDiv .pTxt { text-align: center; font-size: 12px; color: #FFF; }
+/**赞过**/
+.loadingDiv1{
+    width: 150px;
+    height: 60px;
+    background-image: url(http://img1.hudongba.com/static_v4/images/other/loadingBj.png);
+    display: none;
+    z-index: 1001;
+    background-size: 100% 100%;
+}
+.loadingDiv1 .pTxt1{
+	height: 60px;
+    line-height: 60px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+}
+.title{
+	color:{if $setting_result['setting_bar_color']}{$setting_result['setting_bar_color']}{else}#fff{/if};
+}
+.bar-setting{
+	background-color:{if $setting_result['setting_bar_bg']}{$setting_result['setting_bar_bg']}{else}#33cd5f{/if};
+}
+
+</style>
+
+ <script>
+// 自定义分享数据的调用
+	var link = "<?php echo $_W['siteurl'] ?>";
+	var image_url ="<?php echo tomedia($news_results['share_thumbnail'])?>" ;
+	if(image_url==''){
+		image_url ="<?php echo tomedia($news_results['news_thumbnail'])?>" ;
+	}
+	var title = '<?php echo $news_results["share_title"] ?>';
+	if(title==''){
+		title = '<?php echo $news_results["news_title"] ?>';
+	}
+	var desc = '<?php echo $news_results["share_desc"] ?>';
+	wx.ready(function () {
+		sharedata = {
+			title: title,
+			desc: desc,
+			link: link,
+			imgUrl: image_url,
+			success: function(){
+				alert('分享成功！');
+			},
+			cancel: function(){
+				alert('分享取消！');
+			}
+		};
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareQZone(sharedata);
+	});
+
+	</script>
+
+<div class="bar bar-header bar-setting">
+	<h3 class="title">{if $setting_result['setting_title']}{$setting_result['setting_title']}{else}推荐{/if}</h3>
+</div>
+	<div class="content has-header has-footer">
+		<h3 class="center">{$news_results['news_title']}</h3>
+		<div class="top_date"><span>{$news_results['news_date']}</span><span>{$news_results['news_author']}</span></div>
+		<div class="news_content" data-id="{$news_results['news_id']}">
+		{$news_results[news_content]}
+		</div>
+		<div class="news_footer">
+			<span>阅读：</span>
+			<span class="count">{$news_results['news_count']}</span>
+			<i class="zan_icon icon ion-thumbsup"></i>
+			<span class="count zan_count">{$news_results['news_zan']}</span>
+		</div>
+		{if $news_results['news_comment_open']==0}
+		<div class="dt_review" id="dt_review">
+	    <div class="dt_review_top">
+	      <p id="dt_review_count" class="dt_review_topL">
+	      	<span id="review_total">{$comment_total}</span>条评论
+	      </p>
+	      <p class="dt_review_topR" ontouchstart="">
+		    <span ontouchstart="">写评论</span>
+		    <a>
+		      <img src="http://cdn.hudongba.com/static_v4/images/detail/dt_review.png" title="评论">
+		    </a>
+	      </p>
+	      <a id="plWei" name="plWei"></a>
+	    </div>
+	    <ul class="dt_review_main" id="dt_review_main">
+	    	{loop $comment_results $result}
+	    	<li id="dt_review_item_2047839" class="dt_review_main">
+			    <div class="dt_review_main_K">
+			    	<div class="dt_review_icon">
+			    		<a>
+			    			<img class="default_img" src="{php echo $result['comment_thumbnail']}">
+			   			 </a>
+			    	</div>
+			    	<div class="dt_review_title dt_loadNew">
+			    		<a>{$result['comment_username']}</a>
+			   		 </div>
+			    	<p class="dt_review_time">{$result['comment_date']}</p>
+			    	<div class="dt_review_body">{php echo html_entity_decode($result['comment_content'])}   
+			    	</div>
+			    </div>
+	    	</li>
+	    	{/loop}
+	    </ul>
+	    <div class="dt_review_more" id="review_loading" style="display: block;"><a class="moreBtn" ontouchstart=""><span>展开更多评论</span></a></div>
+	  	</div>
+	  	{/if}
+	</div>
+</div>
+<div id="dt_review_box">
+    <div id="dt_review_box_main">
+      	<div id="dt_review_box_input">
+      		<input type="text" placeholder="评论：" id="dt_review_form_content" class="input" maxlength="200">
+      	</div>  
+	    <div id="dt_review_box_emo_button_active">
+	      	<img src="http://cdn.hudongba.com/static_v4/images/other/i-emo.fw_on.png">
+	    </div>
+        <div id="dt_review_box_emo_button" ontouchstart="" onclick="_reviewBox._showEmo()">
+        <img src="http://cdn.hudongba.com/static_v4/images/other/i-emo.fw.png"></div>
+        <div id="dt_review_box_button">
+        	<button id="dt_review_form_post" class="button_1_disabled">发送</button>
+    	</div>
+   	 	<div style="display: none;" id="dt_review_box_emo"></div>
+     	<div class="clear"></div>
+    </div>
+</div>
+<div id="cover2"></div>
+<div class="loadingDiv" id="loadingDiv">
+	<p class="pImg">
+		<img src="http://cdn.hudongba.com/static_v4/images/other/loading2.gif">
+	</p>
+	<p class="pTxt">请稍候</p>
+</div>
+<div class="loadingDiv1" id="loadingDiv">
+	<p class="pTxt1">你已经赞过了！</p>
+</div>
+<div class="tabs tabs-icon-top">
+	{if $news_results['news_comment_open']==0}
+	<a class=" comment tab-item"><i class="icon ion-ios-compose-outline"></i>
+    评论
+  	</a>
+  	{/if}
+  	<a class="tab-item"><i class="icon ion-ios-star-outline"></i>
+    收藏
+  	</a>
+  	<a class="tab-item"><i class="icon ion-ios-book-outline"></i>
+    分享
+ 	 </a>
+ </div>
+ <script type="text/javascript">
+   $(function(){
+   	 $('.comment').click(function(){
+   	 	document.body.scrollTop = document.body.scrollHeight;
+   	 	$('#cover2').show();
+   	 	$('#dt_review_box').show();
+   	 })
+   	 $('.dt_review_topR').click(function(){
+   	 	$('#cover2').show();
+   	 	$('#dt_review_box').show();
+   	 })
+   	 $('#cover2').click(function(){
+   	 	$(this).hide();
+   	 	$('#dt_review_box').hide();
+   	 })
+   	 $('#cover2').bind('touchmove',function(e){
+   	 	e.preventDefault();
+   	 })
+   	 var u = navigator.userAgent;
+	 var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+	 var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+	 if(isAndroid){
+	 	$('.content').css('margin-bottom','60px');
+	 }else if(isiOS){
+	 	$('.content').css('margin-bottom','100px');
+	 }
+   	 //发送消息
+   	 var html= '';
+   	 var username = "<?php echo $_W['fans']['nickname']; ?>";
+   	 var thumbnail = "<?php echo $_W['fans']['avatar']; ?>"
+   	 var id = $('.news_content').data('id');
+   	 var i = core.querystring('i');
+	 var j = core.querystring('j');
+	 var url = './index.php?i='+i+'&j='+j+'&c=entry&do=comment'+'&m=server_news';
+
+	 var zan_url = './index.php?i='+i+'&j='+j+'&c=entry&do=news_zan'+'&m=server_news';
+	 var zan_more_url = './index.php?i='+i+'&j='+j+'&c=entry&do=get_more_comment'+'&m=server_news';
+	 var count = 0;
+   	 $('#dt_review_box_button').click(function(){
+   	 	if($('#dt_review_form_content').val() == '' || $('#dt_review_form_content').val().replace(/(^\s*)|(\s*$)/g, "") == ""){
+   	 		alert('评论内容不能为空!');
+   	 		return;
+   	 	};
+   	 	++count;
+   	 	$('#dt_review_box').hide();
+		var add_content = $('#dt_review_form_content').val();
+		$('#cover2').hide();
+		var a = _emo._toCode(add_content);
+		b = a.replace(/\[(.+?)\]/g, '<img src="' + _imgCdn + 'face$1.png" border="0" class="dt_emo"/>');
+		html = '<li class="dt_review_main"><div class="dt_review_main_K"><div class="dt_review_icon"><a><img class="default_img" src=" '+ thumbnail + '"></a></div><div class="dt_review_title dt_loadNew"><a>'+ username +'</a></div><p class="dt_review_time">' + show()+ '</p><div class="dt_review_body">' + b + '</div></div></li>';
+		
+		// onerror="this.src='http://cdn.hudongba.com/static_v4/images/other/face_default_200.png'"
+		$.ajax({
+				url:url,
+				dataType:'json',
+				async:true,
+				data:{"id":id,"username":username,"thumbnail":thumbnail,"content":b},
+				type:'POST',
+				beforeSend:function(){
+					//弹出框居中
+					center($('#loadingDiv'));
+					$('#loadingDiv').show();
+					$('#cover2').show();
+				},  
+				success:function(data){
+					$('#review_total').html(parseInt($('#review_total').html())+1);
+					$('#loadingDiv').hide();
+					$('#cover2').hide();
+					$('#dt_review_main').prepend(html);
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					alert(textStatus);
+					alert(errorThrown);
+       			}
+			})
+			// $.get(url,{'id':id},function(data){
+			// 	alert(data);
+			// })
+			$('#dt_review_form_content').val('');
+		});
+		$('#dt_review_form_content').focus(function(){
+			
+			$('#dt_review_box_emo').hide();
+		})
+		//赞更新
+		$('.news_footer .zan_icon').click(function(){
+			var zan_count = $('.zan_count').html();
+			
+			$.ajax({
+				url:zan_url,
+				dataType:'json',
+				async:true,
+				data:{"id":id},
+				type:'POST',
+				beforeSend:function(){
+					center($('#loadingDiv'));
+					$('#loadingDiv').show();
+					// $('#cover2').show();
+					//弹出框居中
+
+					
+				},
+				success:function(data){
+					$('#loadingDiv').hide();
+					if(data.status == 1){
+						zan_count = parseInt(zan_count) + 1;
+						$('.zan_count').html(zan_count);
+					}else if(data.status == 2){
+						center($('.loadingDiv1'));
+						$('.loadingDiv1').show();
+						setTimeout(function(){
+							$('.loadingDiv1').hide();
+						},700);
+					}
+					       
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					alert(textStatus);
+					alert(errorThrown);
+       			}
+			});
+
+		})
+		var page = 2;
+		$('.moreBtn').click(function(){
+			var _this = $(this);
+			$.ajax({
+				url:zan_more_url,
+				dataType:'json',
+				async:true,
+				data:{"page":page,"id":id,'count':count},
+				type:'POST',   
+				success:function(data){
+
+					page++;
+					var html = '';
+					if(data.length < 5){    
+						_this.remove();
+					}
+					for(i=0;i<data.length;i++){
+					html += '<li class="dt_review_main"><div class="dt_review_main_K"><div class="dt_review_icon"><a><img class="default_img" src=" '+ data[i]['comment_thumbnail'] + '"></a></div><div class="dt_review_title dt_loadNew"><a>'+ data[i]['comment_username'] +'</a></div><p class="dt_review_time">' + data[i]['comment_date']+ '</p><div class="dt_review_body">' +  data[i]['comment_content'] + '</div></div></li>';
+				};
+				$('#dt_review_main').append(html);
+			},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					alert(textStatus);
+					alert(errorThrown);
+       			}
+			});
+		});
+		function center(obj){
+			var height = obj.height();
+			var width =obj.width();
+			obj.css({
+				'position':'absolute',
+				'top':(document.body.clientHeight-height)/2+document.body.scrollTop ,
+				'left':($(window).width()-width)/2
+			});
+		}
+   })   
+	function show(){
+	   var mydate = new Date();
+	   var str = "" + mydate.getFullYear() + "年";
+	   str += (mydate.getMonth()+1) + "月";
+	   str += mydate.getDate() + "日";
+	   return str;
+  	};
+ </script>
+{template 'common/footer'}

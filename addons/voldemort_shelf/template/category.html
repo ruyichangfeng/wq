@@ -1,0 +1,109 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'post'} class="active"{/if}><a href="{php echo $this->createWebUrl('category', array('op'=>'post'))}">添加</a></li>
+	<li {if $operation == 'display'} class="active"{/if}><a href="{php echo $this->createWebUrl(category, array('op' => 'display','type'=>'1'))}">列表</a></li>
+</ul>
+
+{if $operation == 'post'}
+	
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				添加分类
+			</div>
+			<div class="panel-body">
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>分类名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="category[title]" required="required" class="form-control" {if !empty($category)}value="{php echo $category->title;}"{/if}/>
+					</div>
+				</div>
+				
+				
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			{if !empty($category)}
+				<input type="hidden" name="category[id]" value="{php echo $category->id;}"></input>
+				<input type="submit" name="update" value="提交" class="btn btn-primary col-lg-1" />
+			{else}
+				<input type="submit" name="add_new" value="提交" class="btn btn-primary col-lg-1" />
+			{/if}
+			<input type="hidden" name="token" value="{$_W['token']}" />
+			
+		</div>
+	</form>
+</div>
+{elseif $operation == 'display'}
+	
+<div class="main">
+	<div class="panel panel-default">
+		<!-- <div class="panel-heading">
+		</div> -->
+		{if !empty($catsObj_array)}
+		<div class="panel-body">
+			{loop $catsObj_array $key $catObj}
+			<a href="{php echo $this->createWebUrl('category', array('op'=>'display', 'cat'=>$catObj->id));}" class="btn {if $_GPC['cat'] == $catObj->id}btn-primary {else}btn-default{/if}">{php echo $catObj->title;}</a>
+			{/loop}
+			<a style="float: right;" href="{php echo $this->createWebUrl('category', array('op' => 'delete', 'id' => $cur_catsObj->id))}" onclick="return confirm('确认删除此分类吗？');return false;" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i>删除当前分类</a>
+		</div>
+		{/if}
+
+		<div class="panel-body table-responsive">
+
+			<form action="" method="post" onsubmit="return formcheck(this)">
+
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th style="width:80px;">序号</th>
+									<th style="width:500px;">文章</th>
+								</tr>
+							</thead>
+							<tbody>
+							{if empty($catsObj_array)}
+								<tr>
+									<td></td>
+									<td colspan="4">
+										<div class="jumbotron" style="text-align:center;"><h3>暂无分类</h3></span>
+									</td>
+								</tr>
+							{else}
+									{loop $cur_catsObj->mediaId $key $mediaId}
+									<tr>
+										<td>{php echo $key+1;}</td>
+										<td>
+										{php $news = news_mediaid($mediaId);}
+										<div class="content" style="margin-bottom: 10px;">
+											<img style="width:100px;height: 100px;float: left;" src="{php echo mediaId2local($news[0]['thumb_media_id']);}" title="图文图片">
+											<div class="content_abstract">
+												{loop $news $key $new}
+													{if count($news) > 1}
+													<p><a target="_blank" href="{$new['url']}">{php echo ($key+1).'.';}{$new['title']}</a></p>
+													{else}
+													<p><a target="_blank" href="{$new['url']}">{$new['title']}</a></p>
+													{/if}
+
+												{/loop}
+											</div>
+											<div style="clear: both;"></div>
+										</div>
+										</td>
+										
+									</tr>
+								{/loop}
+							{/if}
+							
+							
+							</tbody>
+						</table>
+					
+			</form>
+		</div>
+	</div>
+</div>
+
+{/if}
+{template 'common/footer'}

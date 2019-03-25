@@ -1,0 +1,459 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基础设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('basesetting')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-lg fa-sitemap" style="color: #ed8902"></i>商家信息</a>
+                                    </li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"><i class="fa fa-lg fa-print" style="color: #e10c14"></i>单据设置</a>
+                                    </li>
+                                    <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false"><i class="fa fa-lg fa-lock" style="color:black"></i>密码设置</a>
+                                    </li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('storenotice')}" ><i class="fa fa-lg fa-wechat" style="color:#0abc89"></i>模板消息</a>
+                                    </li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('consumesetting')}" ><i class="fa fa-lg fa-bandcamp" style="color:magenta"></i>消费设置</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <form action="" id="basesetting" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                                <input type="hidden" name="id" value="{$item['id']}">
+                                                <div class="form-group">
+                                                    <label for="storeName" class="col-sm-1 control-label">商家名称</label>
+                                                    <div class="col-sm-5">
+                                                        <input type="text" name="storeName" class="form-control" value="{$item['set_storeName']}" id='storeName' placeholder="请输入商家名称" required/>
+                                                    </div>
+                                                    <label for="storeName" class="col-sm-1 control-label">选择模版</label>
+                                                    <div class="col-sm-3">
+                                                    <select class="form-control m-b" name="skinId" id="skinId">
+                                                        <option value="1" {if $item['set_skinId'] == 1} selected ='selected'{/if}>普通模版</option>
+                                                        <option value="2" {if $item['set_skinId'] == 2} selected ='selected'{/if}>win10桌面版</option>
+                                                    </select>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="storeContactMan" class="col-sm-1 control-label">联系人</label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" name="storeContactMan" class="form-control" value="{$item['set_storeContactMan']}" id='storeContactMan' placeholder="请输入商家联系人"/>
+                                                    </div>
+                                                    <label for="storeContactTel" class="col-sm-1 control-label">联系电话</label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" name="storeContactTel" class="form-control" value="{$item['set_storeContactTel']}" id='storeContactTel' placeholder="请输入商家联系座机电话"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="storeStatus" class="col-sm-1 control-label">商家营运状态</label>
+                                                    <div class="col-sm-4">
+                                                        <div class="radio radio-info radio-inline">
+                                                            <input type="radio" name="storeStatus" id="status1" value="1" {if $item['set_storeStatus']==1 || empty($item['set_storeStatus'])}checked="checked" {/if}>
+                                                            <label for="status1"> 开启 </label>
+                                                        </div>
+                                                        <div class="radio radio-inline radio-danger">
+                                                            <input type="radio" name="storeStatus" id="status2" value="2" {if $item['set_storeStatus']==2 }checked="checked" {/if}>
+                                                            <label for="status2"> 关闭 </label>
+                                                        </div>
+                                                    </div>
+                                                    <label for="storeContactMoblie" class="col-sm-1 control-label">联系人手机号</label>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" name="storeContactMoblie" class="form-control" value="{$item['set_storeContactMoblie']}" id='storeContactMoblie' placeholder="请输入商家联系人手机号码"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="storeDetailAdress" class="col-sm-1 control-label">联系地址</label>
+                                                    <div class="col-sm-4">
+                                                        {php echo tpl_form_field_district('reside',array('province' => $item['set_storeProvince'],'city' => $item['set_storeCity'],'district' => $item['set_storeDistrict']));}
+                                                    </div>
+
+                                                    <div class="col-sm-5">
+                                                        <input type="text" name="storeDetailAdress" class="form-control" value="{$item['set_storeDetailAdress']}" id='storeDetailAdress' placeholder="请输入商家详细地址"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">商家形象LOGO：</label>
+                                                    <div class="col-sm-5">
+                                                        {php echo tpl_form_field_image('logo', $item['set_storeLogo'])}
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-1 control-label">商家简介：</label>
+                                                    <div class="col-sm-9">
+                                                        {php echo tpl_ueditor('content',$item['set_storeDescription']);}
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-5 control-label"></label>
+                                                    <div class="col-sm-7">
+                                                        <input name="storeinfosubmit" type="submit" value="保  存" class="btn btn-primary btn-w-m">
+                                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div id="tab-2" class="tab-pane">
+                                        <div class="panel-body">
+                                            <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                                <input type="hidden" name="id" value="{$item['id']}">
+                                                <div class="form-group">
+                                                    <label for="invoiceAddCountPrefix" class="col-sm-2 control-label">增加计次单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceAddCountPrefix" class="form-control" value="{$item['set_invoiceAddCountPrefix']}" id='invoiceAddCountPrefix' placeholder="例如：ZC"/>
+                                                    </div>
+                                                    <label for="invoiceConsumeCountPrefix" class="col-sm-2 control-label">计次消费单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceConsumeCountPrefix" class="form-control" value="{$item['set_invoiceConsumeCountPrefix']}" id='invoiceConsumeCountPrefix' placeholder="例如：JC"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="invoiceMemberConsumePrefix" class="col-sm-2 control-label">会员消费单据号前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberConsumePrefix" class="form-control" value="{$item['set_invoiceMemberConsumePrefix']}" id='invoiceMemberConsumePrefix' placeholder="例如：XF"/>
+                                                    </div>
+                                                    <label for="invoiceMemberAddRechargePrefix" class="col-sm-2 control-label">增加储值单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberAddRechargePrefix" class="form-control" value="{$item['set_invoiceMemberAddRechargePrefix']}" id='invoiceMemberAddRechargePrefix' placeholder="例如：CZ"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="invoicePointsReturnPrefix" class="col-sm-2 control-label">积分兑换单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoicePointsReturnPrefix" class="form-control" value="{$item['set_invoicePointsReturnPrefix']}" id='invoicePointsReturnPrefix' placeholder="例如：DH"/>
+                                                    </div>
+                                                    <label for="invoiceMemberReturnGoodsPrefix" class="col-sm-2 control-label">会员退货单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberReturnGoodsPrefix" class="form-control" value="{$item['set_invoiceMemberReturnGoodsPrefix']}" id='invoiceMemberReturnGoodsPrefix' placeholder="例如：TH"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="invoiceMemberRechargeConsumePrefix" class="col-sm-2 control-label">储值扣费单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberRechargeConsumePrefix" class="form-control" value="{$item['set_invoiceMemberRechargeConsumePrefix']}" id='invoiceMemberRechargeConsumePrefix' placeholder="例如：KZ"/>
+                                                    </div>
+                                                    <label for="invoiceBottomContent" class="col-sm-2 control-label">单据底部自定义内容</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceBottomContent" class="form-control" value="{$item['set_invoiceBottomContent']}" id='invoiceBottomContent' placeholder="例如：请妥善保管好购物凭证"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="inventoryInCodePrefix" class="col-sm-2 control-label">入库采购单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="inventoryInCodePrefix" class="form-control" value="{$item['set_inventoryInCodePrefix']}" id='inventoryInCodePrefix' placeholder="例如：CG"/>
+                                                    </div>
+                                                    <label for="inventoryChangeCodePrefix" class="col-sm-2 control-label">库存盘点单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="inventoryChangeCodePrefix" class="form-control" value="{$item['set_inventoryChangeCodePrefix']}" id='inventoryChangeCodePrefix' placeholder="例如：PD"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="inventoryTransferCodePrefix" class="col-sm-2 control-label">库存调拨单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="inventoryTransferCodePrefix" class="form-control" value="{$item['set_inventoryTransferCodePrefix']}" id='inventoryTransferCodePrefix' placeholder="例如：DB"/>
+                                                    </div>
+                                                    <label for="inventoryConsumeHangUpPrefix" class="col-sm-2 control-label">消费挂单单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="inventoryConsumeHangUpPrefix" class="form-control" value="{$item['set_inventoryConsumeHangUpPrefix']}" id='inventoryConsumeHangUpPrefix' placeholder="例如：GD"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="inventoryTransferCodePrefix" class="col-sm-2 control-label">积分扣除单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberPointsConsumePrefix" class="form-control" value="{$item['set_invoiceMemberPointsConsumePrefix']}" id='invoiceMemberPointsConsumePrefix' placeholder="例如：KC"/>
+                                                    </div>
+                                                    <label for="inventoryConsumeHangUpPrefix" class="col-sm-2 control-label">积分增加单据前缀</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" name="invoiceMemberPointsInsertPrefix" class="form-control" value="{$item['set_invoiceMemberPointsInsertPrefix']}"  id='invoiceMemberPointsInsertPrefix' placeholder="例如：ZJ"/>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="invoiceQrcodePic" class="col-sm-2 control-label">小票二维码</label>
+                                                    <div class="col-sm-3">
+                                                        {php echo tpl_form_field_image('invoiceQrcodePic', $item['set_invoiceQrcodePic'])}
+                                                        <span class="help-block">建议比例:200像素 * 200像素<span style="color: red"></span></span>
+                                                    </div>
+                                                    <label for="invoiceLogoPic" class="col-sm-2 control-label">小票logo</label>
+                                                    <div class="col-sm-3">
+                                                        {php echo tpl_form_field_image('invoiceLogoPic', $item['set_invoiceLogoPic'])}
+                                                        <span class="help-block">建议比例:200像素 * 200像素<span style="color: red"></span></span>
+                                                    </div>
+                                                </div>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-5 control-label"></label>
+                                                    <div class="col-sm-7">
+                                                        <input name="invoiceinfosubmit" type="submit" value="保  存" class="btn btn-primary btn-w-m">
+                                                        <input type="hidden" name="token" value="{$_W['token']}" />
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div id="tab-3" class="tab-pane">
+                                        <div class="panel-body">
+                                            <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);"id="passwordsttting">
+                                                <input type="hidden" name="id" value="{$item['id']}">
+                                                <table class="footable table table-stripped toggle-arrow-tiny footable-loaded phone breakpoint">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="col-sm-2">设置参数</th>
+                                                        <th class="col-sm-3">说明</td>
+                                                        <th class="col-sm-4"></th>
+                                                        <th class="col-sm-3">是否启用</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="title">会员卡初始密码</td>
+                                                        <td>设置电子会员卡，IC卡等的初始密码。如：88888888</td>
+                                                        <td>
+                                                            <input type="text" name="memberSetPassword" id='' class="form-control" value="{$item['set_memberSetPassword']}"/>
+                                                        </td>
+                                                        <td>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title">同步系统积分</td>
+                                                        <td>
+                                                            开启后会员可以使用系统的积分与云会员卡积分总额。
+                                                        </td>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+
+                                                            <input type="checkbox" name="we7Credit1Set"  id="p5" class="js-switch_5" {if $item['set_we7Credit1Set']==1}checked{/if}/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title">同步系统余额</td>
+                                                        <td>
+                                                            开启后会员可以使用系统的余额与云会员卡储值总额。
+                                                        </td>
+                                                        <td>
+                                                        </td>
+                                                        <td>
+
+                                                            <input type="checkbox" name="we7Credit2Set"  id="p6" class="js-switch_6" {if $item['set_we7Credit2Set']==1}checked{/if}/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title">微信访问</td>
+                                                        <td>
+                                                            开启后，必须在微信中才能使用，默认是微信和WAP都可以使用。
+                                                        </td>
+                                                        <td>
+
+                                                        </td>
+                                                        <td>
+
+                                                            <input type="checkbox" name="ifWechatVisit"  id="p7" class="js-switch_7" {if $item['set_ifWechatVisit']==1}checked{/if}/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <td class="title">注册是否开启短信验证</td>
+                                                        <td>
+                                                            开启后，会员注册必须通过短信验证码才能注册。
+                                                        </td>
+                                                        <td></td>
+                                                        <td>
+                                                            <input type="checkbox" name="SmsVerification"  id="p8" class="js-switch_8" {if $item['set_smsVerification']==1}checked{/if}/>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!--<tr>-->
+                                                        <!--<td class="title">APP推送</td>-->
+                                                        <!--<td>-->
+                                                            <!--使用app时，需要开启app推送开关 。-->
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                            <!--<input type="checkbox" name="ifAppPush"  id="p8" class="js-switch_8" {if $item['set_ifAppPush']==1}checked{/if}/>-->
+                                                        <!--</td>-->
+                                                    <!--</tr>-->
+                                                    <!--<tr>-->
+                                                        <!--<td class="title">积分兑换是否需要密码</td>-->
+                                                        <!--<td>-->
+                                                            <!--开启后会员积分兑换礼品需要会员验证密码。-->
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+                                                            <!--<input type="checkbox" name="pointsReturnSetPassword" class="js-switch_1" id="p1" {if $item['set_pointsReturnSetPassword']==1}checked{/if}/>-->
+                                                        <!--</td>-->
+                                                    <!--</tr>-->
+                                                    <!--<tr>-->
+                                                        <!--<td class="title">计次消费是否需要密码</td>-->
+                                                        <!--<td>-->
+                                                            <!--开启后会员计次消费需要会员验证密码。-->
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+                                                            <!--<input type="checkbox" name="rechargeConsumeSetPassword" id="p2" class="js-switch_2" {if $item['set_rechargeConsumeSetPassword']==1}checked{/if}/>-->
+
+                                                        <!--</td>-->
+                                                    <!--</tr>-->
+                                                    <!--<tr>-->
+                                                        <!--<td class="title">积分消费是否需要密码</td>-->
+                                                        <!--<td>-->
+                                                            <!--开启后会员积分消费需要会员验证密码。-->
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+                                                            <!--<input type="checkbox" name="pointsConsumeSetPassword" id="p3" class="js-switch_3" {if $item['set_pointsConsumeSetPassword']==1}checked{/if}/>-->
+
+                                                        <!--</td>-->
+                                                    <!--</tr>-->
+                                                    <!--<tr>-->
+                                                        <!--<td class="title">优惠券使用是否需要密码</td>-->
+                                                        <!--<td>-->
+                                                            <!--开启后会员使用优惠券需要会员验证密码。-->
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                        <!--</td>-->
+                                                        <!--<td>-->
+
+                                                            <!--<input type="checkbox" name="couponConsumeSetPassword" id="p4" class="js-switch_4" {if $item['set_couponConsumeSetPassword']==1}checked{/if}/>-->
+                                                        <!--</td>-->
+                                                    <!--</tr>-->
+                                                    </tbody>
+                                                </table>
+                                                <div class="hr-line-dashed"></div>
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-2 control-label"></label>
+                                                    <div class="col-sm-5">
+                                                        <button type="submit" class="btn btn-w-m btn-primary" name="passwordsubmit" value="保  存">保  存</button>
+                                                        <input type="hidden" name="token" value="{$_W['token']}"/>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var xqkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+        });
+    });
+
+</script>
+<script>
+    $("#basesetting").validate({
+        rules: {
+            storeName: {
+                required: true,
+                maxlength:20,
+            },
+            storeContactMan: {
+                required:true,
+                maxlength:7,
+                storeContactMan1:true,
+            },
+            storeContactTel: {
+                required:true,
+                storeContactTel1:true,
+            },
+            storeContactMoblie: {
+                required:true,
+                storeContactMoblie1:true,
+            },
+            storeDetailAdress: {
+                required:true,
+            },
+            logo: {
+                url:false,
+            },
+        },
+        messages: {
+            storeName: {
+                required: "请填写商家名称",
+                maxlength:"不能大于20个字符",
+            },
+            storeContactMan: {
+                required: "请输入联系人（中文）",
+                maxlength:"不能大于7个字符",
+
+            },
+            storeContactTel: {
+                required:"请输入电话",
+            },
+            storeContactMoblie: {
+                required:"请输入手机号",
+            },
+            storeDetailAdress: {
+                required:"地址不能为空",
+            },
+        }
+    });
+    jQuery.validator.addMethod("storeContactTel1", function (value, element) {
+        var phone = /^0\d{2,3}-\d{7,8}$/;
+        return this.optional(element) || (phone.test(value));
+    }, "电话格式如：0471-2525636");
+    jQuery.validator.addMethod("storeContactMoblie1", function (value, element) {
+        var mobile = /^1[3|4|5|7|8]\d{9}$/;
+        return this.optional(element) || (mobile.test(value));
+    }, "手机格式不对");
+    jQuery.validator.addMethod("storeContactMan1", function (value, element) {
+        var mobile = /^[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*$/;
+        return this.optional(element) || (mobile.test(value));
+    }, "请填写正确的姓名(中文)");
+
+    $("#passwordsttting").validate({
+        rules: {
+            memberSetPassword: {
+                digits:true,
+                minlength:8
+            },
+        },
+        messages: {
+            memberSetPassword: {
+                digits:"必须是整数",
+                minlength:"不能小于8位数",
+            },
+        }
+    });
+
+</script>
+{template 'web/common/footer'}

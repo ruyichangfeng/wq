@@ -1,0 +1,173 @@
+<style>
+    .paylist{
+        display:none;
+    }
+</style>
+<div class="modal inmodal fade" id="consumeOrderData" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h1 class="modal-title" style="font-size:x-large; font-weight: bold;"> 收 银 结 账  <small class="font-bold">支持付款方式：<img src="{HLMMS_IMG}wechat.png"> <img src="{HLMMS_IMG}alipay.png"> <img src="{HLMMS_IMG}bank.png"> <img src="{HLMMS_IMG}rmb.png"> <img src="{HLMMS_IMG}usercard.png"> <img src="{HLMMS_IMG}point.png"> <img src="{HLMMS_IMG}quan.png"></small> </h1>
+            </div>
+            <div class="modal-body"  style="background-color:#ffffff;padding-left: 10px;padding-right: 10px;padding-top: 0px; padding-bottom: 0px; min-height: 500px;max-height: 550px;">
+                <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">应付金额</button> </span>
+                            <input type="text" name="handleMoneyCount" id="handleMoneyCount" readonly  class="form-control" style="font-size: x-large; color: #e10c14 !important">
+                            <span class="input-group-btn"> <button type="button" class="btn btn-info btn-outline" >元</button> </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">收款优惠</button> </span>
+                            <input type="text" name="preferentialMoney" id="preferentialMoney" class="form-control"  style="font-size: x-large; color: #e10c14 !important" >
+                            <span class="input-group-btn"> <button type="button" class="btn btn-info btn-outline">元</button> </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">实付金额</button> </span>
+                            <input type="text" name="realMoneyCount" id="realMoneyCount" readonly class="form-control"  style="font-size: x-large; color: #e10c14 !important">
+                            <span class="input-group-btn"> <button type="button" class="btn btn-info btn-outline">元</button> </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed" style="margin-top: 3px; margin-bottom: 3px;"></div>
+                <div class="form-group" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 20px;padding-right: 5px;">
+                    <div class="checkbox checkbox-success checkbox-inline ifTrue_CouponPayCheckbox">
+                        <input type="hidden" id="hidden_Cuuponid" name="hidden_Cuuponid"  >
+                        <input type="checkbox" name="CouponPayCheckbox" id="CouponPayCheckbox" value="1" onclick="btn_checkcoupon()">
+                        <label for="CouponPayCheckbox"><i class="fa fa-money" aria-hidden="true" style="color:#3CB371"></i> 优惠券 </label>
+                    </div>
+                    <div class="checkbox checkbox-warning checkbox-inline ifTrue_RechargePayCheckbox">
+                        <input type="checkbox" id="RechargePayCheckbox"  name="RechargePayCheckbox"  value="2" onclick="btn_checkMemberRechargeIsTrue()" >
+                        <label for="RechargePayCheckbox"><i class="fa fa-vcard" aria-hidden="true"  style="color:#f0ad4e"></i> 储值支付  <span class="label label-danger" id="span_validPayRecharge" style="font-size: 14px; font-weight: bold">可用储值 0元</span></label>
+                    </div>
+                    <div class="checkbox checkbox-info checkbox-inline ifTrue_PointsPayCheckbox">
+                        <input type="checkbox" id="PointsPayCheckbox" name="PointsPayCheckbox" value="3"  onclick="btn_checkMemberPointsIsTrue()">
+                        <label for="PointsPayCheckbox"><i class="fa fa-gift" aria-hidden="true"  style="color: #48D1CC"></i> 积分抵现  <span class="label label-danger" id="span_validPayPoints" style="font-size: 14px; font-weight: bold">可用积分为 0 </span></label>
+                    </div>
+
+                </div>
+                <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group ifTrue_CouponPayCheckbox"><span class="input-group-btn  rechargeGoodsName_Id">
+                                                          <button type="button" class="btn btn-default"   id="rechargeGoodsName_Id" >选择卡券</button> </span>
+                            <span class="input-group-btn"><button type="button" class="btn btn-outline btn-warning"> - 优惠了</button> </span>
+                            <input type="text" name="get_PreferentialNumber" id="get_PreferentialNumber"  class="form-control"  style="font-size: x-large; color: #e10c14 !important" readonly>
+                            <span class="input-group-btn"> <button type="button" class="btn btn-outline btn-info">元</button> </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 ifTrue_RechargePayCheckbox" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-outline btn-default">储值支付</button> </span>
+                            <input type="text" name="get_memberMoneyCount" value="0.00" id="get_memberMoneyCount" class="form-control disabled-PreferentialNumber"  style="font-size: x-large; color: #e10c14 !important">
+                            <span class="input-group-btn"> <button type="button" class="btn btn-outline btn-warning">元</button> </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 ifTrue_PointsPayCheckbox" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-outline btn-info">积分抵现</button> </span>
+                            <input type="text" name="get_memberPointsCount"  value="0.00" id="get_memberPointsCount" class="form-control  disabled-PointsCount"  data-toggle="tooltip" data-placement="bottom" title="{php echo $setStoreData['set_pointsAsMoney']}积分=1元"  style="font-size: x-large; color: #e10c14 !important">
+                            <span class="input-group-btn"> <button type="button" class="btn btn-outline btn-info">元</button> </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed" style="margin-top: 5px; margin-bottom: 10px;"></div>
+                <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <style>
+                        .main-right-top{padding:15px;border-bottom:1px solid #e5e5e5;}
+                        .main-right-top-1{background-repeat:no-repeat;float:left;margin:0 3px;}
+                        .main-right-top-active{background-image:url("{HLMMS_IMG}pay_bg.png");}
+                    </style>
+                    <div class="col-sm-4" style="padding-left: 5px;padding-right: 5px;">
+
+                        <div class="col-sm-12" style="padding-left:20%;text-align: center;">
+                            <div onclick="payStyle_Check(1)"  id="payStyle_Check1"  class="main-right-top-1">
+                                <img src="{HLMMS_IMG}zhi2.png">
+                                <input type="radio" name="radio_consumePayStyle" id="radio_consumePayStyle1" value="1"  hidden="hidden">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" style="padding-left:20%;text-align: center;">
+                            <div onclick="payStyle_Check(2)"  id="payStyle_Check2"  class="main-right-top-1 main-right-top-active">
+                                <img src="{HLMMS_IMG}zhi4.png">
+                                <input type="radio" name="radio_consumePayStyle"  id="radio_consumePayStyle2" value="2" checked="checked"  hidden="hidden">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" style="padding-left:20%;text-align: center;">
+                            <div onclick="payStyle_Check(3)"  id="payStyle_Check3"  class="main-right-top-1">
+                                <img src="{HLMMS_IMG}zhi6.png">
+                                <input type="radio" name="radio_consumePayStyle"  id="radio_consumePayStyle3" value="3"  hidden="hidden">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8" style="padding-left: 5px;padding-right: 5px;">
+                        <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-primary">还需支付</button> </span>
+                            <input type="text" name="hidden_realMoneyCount" id="hidden_realMoneyCount" readonly class="form-control"  style="font-size: x-large; color: #e10c14 !important">
+                            <span class="input-group-btn"> <button type="button" class="btn btn-info btn-outline">元</button> </span>
+                        </div>
+                        <div class="hr-line-dashed" style="margin-top: 2px; margin-bottom: 2px;"></div>
+                        <div class="form-group">
+
+                            <div class="col-sm-12 paylist"  id="div_payResultShowOrHide1" style="text-align: center; margin-top: 5px; margin-bottom: 5px;">
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <h4  id="payresult1-1">结果区域</h4>
+                                    <div class="hr-line-dashed" style="margin-top: 2px; margin-bottom: 2px;"></div>
+                                    <img id="payresult1" src="{HLMMS_IMG}ma.gif">
+                                </div>
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <div class="hr-line-dashed" style="margin-top: 10px; margin-bottom: 10px;"></div>
+                                    <button type="button" style="width: 60%;margin-left: 20%;margin-right: 20%;" class="btn btn-block btn-primary"   id="yiMaFuPayhidden"  onclick="cashPay()"><i class="fa fa-check-square-o"></i>结 账 </button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 paylist"  id="div_payResultShowOrHide2" style="text-align: center; margin-top: 5px; margin-bottom: 5px; display: block">
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <div class="input-group">
+                                        <span class="input-group-btn"><button type="button" class="btn btn-primary">付款码</button> </span>
+                                        <input type="text" name="hidden_TextPayCode2" id="hidden_TextPayCode2" onkeydown="if(event.keyCode==13){$('#btn_SaveConsumeOrderData2').focus()}"  placeholder="请扫描客户微信或支付宝付款码" class="form-control"  style="font-size: x-large; color: #e10c14 !important">
+                                    </div>
+                                    <div class="hr-line-dashed" style="margin-top: 2px; margin-bottom: 2px;"></div>
+                                    <img id="payresult2" src="{HLMMS_IMG}ma.gif">
+                                </div>
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <div class="hr-line-dashed" style="margin-top: 10px; margin-bottom: 10px;"></div>
+                                    <button type="button" style="width: 60%;margin-left: 20%;margin-right: 20%;" class="btn btn-block btn-primary" id="btn_SaveConsumeOrderData2" name="btn_SaveConsumeOrderData2" onclick="ShuaKaPay()"><i class="fa fa-check-square-o"></i>结 账 </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 paylist"  id="div_payResultShowOrHide3" style="text-align: center; margin-top: 5px; margin-bottom: 5px;">
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <h4  id="payresult3-3">结果区域</h4>
+                                    <div class="hr-line-dashed" style="margin-top: 2px; margin-bottom: 2px;"></div>
+                                    <img id="payresult3" src="{HLMMS_IMG}ma.gif">
+                                </div>
+                                <div class="col-sm-12" style="margin: 0px;padding: 0px;">
+                                    <div class="hr-line-dashed" style="margin-top: 10px; margin-bottom: 10px;"></div>
+                                    <button type="button" style="width: 60%;margin-left: 20%;margin-right: 20%;" class="btn btn-block btn-primary"  id="cashPayhidden" onclick="cashPay()"><i class="fa fa-check-square-o"></i>结 账 </button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="hr-line-dashed" style="margin-top: 2px; margin-bottom: 2px;"></div>
+                                <div class="col-sm-4" style="margin: 0px;padding: 0px;">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="PrintOrderInvoiceCheckbox" value="1" checked>
+                                        <label for="PrintOrderInvoiceCheckbox"><i class="fa fa-print" style="color: #0abc89"></i> 打印小票</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8" style="margin: 0px;padding: 0px;">
+                                    <div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-outline btn-default">备注</button> </span>
+                                        <input type="text" name="txt_PayNote" id="txt_PayNote" class="form-control" placeholder="最多输入200字">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="btn_CloseConsumeOrderData"> 取 消 </button>
+            </div>
+        </div>
+    </div>
+</div>

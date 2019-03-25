@@ -1,0 +1,607 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>会员属性设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('membervirtue')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-address-card-o" style="color:#0abc89"></i>设置会员属性</a>
+                                    </li>
+                                    <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="true"><i class="fa fa-sun-o" style="color:#0abc89"></i>会员信息自定义字段</a>
+                                    </li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"></i><i class="fa fa-list"  style="color: #e10c14"></i>用户列表</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="clearfix" ng-controller="membervirtue" id="membervirtue">
+                                            <form action="" method="post" class="form-horizontal">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label class="col-xs-12 col-sm-3 col-md-4 control-label">新用户{php echo $MemberProperties}</label>
+                                                            <div class="col-sm-3 col-xs-12">
+                                                                <select ng-model="newmember" class="form-control">
+                                                                    <option value="{{num}}" ng-repeat="num in nums" ng-bind="num" ng-hide="oldmember <= num"></option>
+                                                                </select>
+                                                                <span class="help-block">单位为月，成为会员不超过该月，并且只消费过一次或没消费的用户。</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-xs-12 col-sm-3 col-md-4 control-label">老用户</label>
+                                                            <div class="col-sm-3 col-xs-12">
+                                                                <select ng-model="oldmember" class="form-control">
+                                                                    <option value="{{num}}" ng-repeat="num in nums" ng-bind="num" ng-hide="newmember >= num"></option>
+                                                                </select>
+                                                                <span class="help-block">单位为月，成为会员超过该月的用户。</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-xs-12 col-sm-3 col-md-4 control-label">沉寂用户</label>
+                                                            <div class="col-sm-3 col-xs-12">
+                                                                <select ng-model="activitymember" class="form-control">
+                                                                    <option value="{{num}}" ng-repeat="num in nums" ng-bind="num"></option>
+                                                                </select>
+                                                                <span class="help-block">单位为月，在月份内没有消费的用户。</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-xs-12 col-sm-3 col-md-4 control-label">活跃用户</label>
+                                                            <div class="col-sm-3 col-xs-12">
+                                                                <select ng-model="quietmember" class="form-control">
+                                                                    <option value="{{num}}" ng-repeat="num in nums" ng-bind="num"></option>
+                                                                </select>
+                                                                <span class="help-block">单位为月，在月份内消费超过2次的用户。</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-4">
+                                                                <input type="button" name="submit" value="提交" class="btn btn-primary" ng-click="submit()"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div id="tab-2" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="panel-heading">
+                                                <div class="panel-options">
+                                                    <ul class="nav nav-tabs">
+                                                        <li class="active"><a data-toggle="tab" href="tabs_panels.html#tab-4"><i class="fa fa-laptop"></i>新用户</a>
+                                                        </li>
+                                                        <li class=""><a data-toggle="tab" href="tabs_panels.html#tab-5"><i class="fa fa-desktop"></i>老用户</a>
+                                                        </li>
+                                                        <li class=""><a data-toggle="tab" href="tabs_panels.html#tab-6"><i class="fa fa-signal"></i>活跃用户</a>
+                                                        </li>
+                                                        <li class=""><a data-toggle="tab" href="tabs_panels.html#tab-7"><i class="fa fa-bar-chart-o"></i>沉寂用户</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <div class="panel-body">
+                                                <div class="tab-content">
+                                                    <div id="tab-4" class="tab-pane active">
+                                                        <span class="help-block help">用户人数 ： {php echo count($MemberPropertiesNewTime)}</span>
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="5%">id</th>
+                                                                <th>卡号</th>
+                                                                <th>级别</th>
+                                                                <th>手机号</th>
+                                                                <th>姓名</th>
+                                                                <th>性别</th>
+                                                                <th>身份证号码</th>
+                                                                <!--<th>会员是否可用</th>-->
+                                                                <th>储值总金额</th>
+                                                                <th>总次数</th>
+                                                                <th>总积分</th>
+                                                                <th>加入时间</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $arraydatanewtime $item}
+                                                            <tr>
+                                                               <td>{$item['id']}</td>
+                                                                <td>{$item['mem_memberCardNum']}</td>
+                                                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                                                <td>{$item['mem_memberMobile']}</td>
+                                                                <td>{$item['mem_memberName']}</td>
+                                                                <td>{if $item['mem_memberSex'] == 0}
+                                                                    <span class="badge badge-primary">未知</span>
+                                                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                                    {/if}
+                                                                </td>
+                                                                </td>
+                                                                <td>{$item['mem_memberIdentityNum']}</td>
+                                                                <!--<td><input type="checkbox" name="status" data="{$item['mem_memberStatus']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['mem_memberStatus'] == 1 }checked="checked"{/if}></td>-->
+                                                                <td>
+                                                                    {if $item['mem_memberMoneyCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>
+                                                                    {if $item['mem_memberNumberCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberNumberCount'] == !NULL} <span>{$item['mem_memberNumberCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberPointsCount'] == !NULL} <span>{$item['mem_memberPointsCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div id="tab-5" class="tab-pane">
+                                                        <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesOldTime);}</span>
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="5%">id</th>
+                                                                <th>卡号</th>
+                                                                <th>级别</th>
+                                                                <th>手机号</th>
+                                                                <th>姓名</th>
+                                                                <th>性别</th>
+                                                                <th>身份证号码</th>
+                                                                <!--<th>会员是否可用</th>-->
+                                                                <th>储值总金额</th>
+                                                                <th>总次数</th>
+                                                                <th>总积分</th>
+                                                                <th>加入时间</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $arraydataoldtime $item}
+                                                            <tr>
+                                                                <td>{$item['id']}</td>
+                                                                <td>{$item['mem_memberCardNum']}</td>
+                                                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                                                <td>{$item['mem_memberMobile']}</td>
+                                                                <td>{$item['mem_memberName']}</td>
+                                                                <td>{if $item['mem_memberSex'] == 0}
+                                                                    <span class="badge badge-primary">未知</span>
+                                                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                                    {/if}
+                                                                </td>
+                                                                </td>
+                                                                <td>{$item['mem_memberIdentityNum']}</td>
+                                                                <!--<td><input type="checkbox" name="status" data="{$item['mem_memberStatus']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['mem_memberStatus'] == 1 }checked="checked"{/if}></td>-->
+                                                                <td>
+                                                                    {if $item['mem_memberMoneyCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>
+                                                                    {if $item['mem_memberNumberCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberNumberCount'] == !NULL} <span>{$item['mem_memberNumberCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberPointsCount'] == !NULL} <span>{$item['mem_memberPointsCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div id="tab-7" class="tab-pane">
+                                                        <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesQuietTime);}</span>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="5%">id</th>
+                                                                <th>卡号</th>
+                                                                <th>级别</th>
+                                                                <th>手机号</th>
+                                                                <th>姓名</th>
+                                                                <th>性别</th>
+                                                                <th>身份证号码</th>
+                                                                <!--<th>会员是否可用</th>-->
+                                                                <th>储值总金额</th>
+                                                                <th>总次数</th>
+                                                                <th>总积分</th>
+                                                                <th>加入时间</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $arraydataquiettime $item}
+                                                            <tr>
+                                                                <td>{$item['id']}</td>
+                                                                <td>{$item['mem_memberCardNum']}</td>
+                                                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                                                <td>{$item['mem_memberMobile']}</td>
+                                                                <td>{$item['mem_memberName']}</td>
+                                                                <td>{if $item['mem_memberSex'] == 0}
+                                                                    <span class="badge badge-primary">未知</span>
+                                                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                                    {/if}
+                                                                </td>
+                                                                </td>
+                                                                <td>{$item['mem_memberIdentityNum']}</td>
+                                                                <!--<td><input type="checkbox" name="status" data="{$item['mem_memberStatus']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['mem_memberStatus'] == 1 }checked="checked"{/if}></td>-->
+                                                                <td>
+                                                                    {if $item['mem_memberMoneyCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>
+                                                                    {if $item['mem_memberNumberCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberNumberCount'] == !NULL} <span>{$item['mem_memberNumberCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberPointsCount'] == !NULL} <span>{$item['mem_memberPointsCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div id="tab-6" class="tab-pane">
+                                                        <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesActivitTime)}</span>
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="5%">id</th>
+                                                                <th>卡号</th>
+                                                                <th>级别</th>
+                                                                <th>手机号</th>
+                                                                <th>姓名</th>
+                                                                <th>性别</th>
+                                                                <th>身份证号码</th>
+                                                                <!--<th>会员是否可用</th>-->
+                                                                <th>储值总金额</th>
+                                                                <th>总次数</th>
+                                                                <th>总积分</th>
+                                                                <th>加入时间</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {loop $arraydataactivittime $item}
+                                                            <tr>
+                                                                <td>{$item['id']}</td>
+                                                                <td>{$item['mem_memberCardNum']}</td>
+                                                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                                                <td>{$item['mem_memberMobile']}</td>
+                                                                <td>{$item['mem_memberName']}</td>
+                                                                <td>{if $item['mem_memberSex'] == 0}
+                                                                    <span class="badge badge-primary">未知</span>
+                                                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                                                    {/if}
+                                                                </td>
+                                                                </td>
+                                                                <td>{$item['mem_memberIdentityNum']}</td>
+                                                                <!--<td><input type="checkbox" name="status" data="{$item['mem_memberStatus']}" data-id="{$item['id']}" class="js-switch_{$item['id']}" {if $item['mem_memberStatus'] == 1 }checked="checked"{/if}></td>-->
+                                                                <td>
+                                                                    {if $item['mem_memberMoneyCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberMoneyCount'] == !NUll} <span>{$item['mem_memberMoneyCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>
+                                                                    {if $item['mem_memberNumberCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberNumberCount'] == !NULL} <span>{$item['mem_memberNumberCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{if $item['mem_memberPointsCount'] == NULL}
+                                                                    <span >0</span>
+                                                                    {elseif $item['mem_memberPointsCount'] == !NULL} <span>{$item['mem_memberPointsCount']}</span>
+                                                                    {/if}
+                                                                </td>
+                                                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+                                            <!--<table id="memberTableData" data-mobile-responsive="true"></table>-->
+                                        </div>
+                                    </div>
+                                    <div id="tab-3" class="tab-pane">
+                                        <form action="" id="goodsform" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                            <div class="panel-body">
+                                                <div class="help-block">
+                                                    {if $hasData}
+                                                    <a href="{php echo $this->createWebUrl('manage', array('id' => $reid));}" target="_blank">已经存在预约数据, 不能修改预约条目信息</a>
+                                                    {else}
+                                                    <a href="javascript:;" class="btn btn-success" onclick="addItem();"><i class="fa fa-plus" title="添加自定义字段"></i> 添加自定义字段</a>
+                                                    {/if}
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="alert-new">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th style="width:45%;">自定义字段</th>
+                                                                <th style="width:10%;text-align:center;">排序</th>
+                                                                <th style="width:10%;text-align:center;">是否必填</th>
+                                                                <th style="width:25%;">类型</th>
+                                                                <th style="width:10%;color:red">操作</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody id="re-items">
+                                                            {loop $membercustomizealllist $membercustomizeallitem}
+                                                            <tr>
+                                                                <input name="customizefield[]" id="customizefield[]" type="hidden" value="{$membercustomizeallitem['mc_fields']}"/>
+
+
+                                                                <td><input name="fieldstitle[]" type="text" class="form-control" value="{$membercustomizeallitem['mc_title']}"/></td>
+                                                                <td><input type="text" name="fieldsdisplayorder[]" class="form-control" value="{$membercustomizeallitem['mc_displayorder']}" /></td>
+                                                                <td style="text-align:center;">
+                                                                    <div class="checkbox checkbox-success checkbox-inline">
+                                                                        <input type="checkbox" id="fieldsessential_mc_required" name="fieldsessential[]" title="必填项" value="1" {if  $membercustomizeallitem['mc_required'] == 1} checked {/if}>
+                                                                        <label for="fieldsessential_mc_required"></label>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="fieldstype[]" class="form-control">
+                                                                        {loop $types $k $v}
+                                                                        <option value="{$k}"{if $k == $membercustomizeallitem['mc_type']} selected="selected"{/if}>{$v}</option>
+                                                                        {/loop}
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    {if !$hasData}
+                                                                    <a href="{php echo $this->createWebUrl('membervirtue', array('op' => deletedata,'membercustomizeid'=>$membercustomizeallitem[id]));}" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></a>
+                                                                    {/if}
+                                                                </td>
+                                                            </tr>
+                                                            {/loop}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <input name="submitcustomize" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-success alert-dismissable" style="display: none;">
+                                                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                                                目前自定义字段只支持这几项类型，单选类型只支持增加一个！！！
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+<script>
+    //属性
+    var nums = '{php echo $nums}';
+    var property = '{php echo $property}';
+    property = $.parseJSON(property);
+    nums = $.parseJSON(nums);
+    require(['angular'], function(angular){
+        angular.module('app', []).controller('membervirtue', function($scope, $http){
+            $scope.nums = nums;
+            $scope.newmember = property.newmember;
+            $scope.oldmember = property.oldmember;
+            $scope.activitymember = property.activitymember;
+            $scope.quietmember = property.quietmember;
+            $scope.submit = function() {
+                if (!$scope.newmember || !$scope.oldmember || !$scope.activitymember || !$scope.quietmember) {
+                    util.message('请填写完整信息');
+                    return;
+                }
+                $http.post(location.href, {newmember : $scope.newmember, oldmember : $scope.oldmember, activitymember : $scope.activitymember, quietmember : $scope.quietmember})
+                    .success(function(data) {
+                        swal({
+                            title: "更改成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },function(){
+                                window.location.reload();
+                        }
+                        );
+
+                } );
+            }
+        });
+        angular.bootstrap($('#membervirtue')[0], ['app']);
+    });
+
+// 列表
+    $(document).ready(function(){
+        $('#memberTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('member', array('op' => 'getWechatConsumTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querypayParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 11,                       //每页的记录行数（*）
+            pageList: [11, 22, 44, 88],
+            pagination: true,
+            height: 700,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'wpi_Out_trade_no',
+                title: '单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'member_id',
+                title: '会员卡号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'wpi_PayType',
+                title: '支付方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'wpi_ConsumeType',
+                title: '消费方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'wpi_PayStatus',
+                title: '支付状态',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'wpi_MoneyTotalFee',
+                title: '总金额(元)',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'wpi_AddTime',
+                title: '支付时间',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'store_id',
+                title: '支付商家',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'id',
+                title: '操作',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        function querypayParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+
+            };
+            return temp;
+        }
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-primary' onclick=\"ViewCashRegister(" + id + ")\" title='查看明细'><i class='fa fa-eye'></i></button>";
+            result += "<button type=\"button\" class='btn btn-xs btn-warning' onclick=\"ViewCashRegisterPrint('" + id + "')\" title='打印'><span class='fa fa-print'></span></button>";
+            return result;
+        }
+    });
+
+
+    function deletedata(){
+        var membercustomizeid = $("#membercustomizeid").val();
+        var  url = "{php echo $this->createWebUrl('membervirtue', array('op' => 'deletedata'))}";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: {membercustomizeid:membercustomizeid},
+            dataType: 'json',
+            success: function (data) {
+
+                swal({
+                    title: "延期失败",
+                    text: "会员卡延期异常，请重新读卡操作！",
+                    confirmButtonText: "确定",
+                    type: "error",
+                });
+
+
+                if (data['message']['code'] == 0) {
+                    swal({
+                        title: "延期失败",
+                        text: "会员卡延期异常，请重新读卡操作！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }else{
+                    swal({
+                        title: "提交成功",
+                        text: "您的会员卡延期成功",
+                        confirmButtonText: "确定",
+                        type: "success",
+                    })
+                }
+            }
+        });
+
+    }
+</script>
+
+<script type="text/javascript">
+
+    function addItem() {
+        var html = '' +
+            '<tr>' +'   <input name="customizefield[]" id="customizefield[]" type="hidden" value="{$membercustomizeallitem[\'mc_fields\']}"/>'+
+            '<td><input name="fieldstitle[]" type="text"   class="form-control" /></td>' +
+            '<td><input type="text" name="fieldsdisplayorder[]" class="form-control" /></td>' +
+            '<td style="text-align:center;"><input name="fieldsessential[]" checked type="checkbox" value="1" title="必填项"/></td>' +
+            '<td>' +
+            '<select name="fieldstype[]" class="form-control">' +
+            {loop $types $k $v}'<option value="{$k}">{$v}</option>' + {/loop}
+        '</select>' +
+        '</td>' +
+        '<td>' +
+        '<a href="javascript:;" data-toggle="tooltip" data-placement="bottom" class="btn btn-default btn-sm" onclick="deleteItem(this)"  title="删除此条目"><i class="fa fa-times"></i></a>' +
+        '</td>' +
+        '</tr>';
+        $('#re-items').append(html);
+    }
+        function deleteItem(o) {
+            $(o).parent().parent().remove();
+        }
+
+
+
+</script>
+{template 'web/common/footer'}

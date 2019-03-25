@@ -1,0 +1,208 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('memberrechargepackages', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;编辑充值套餐</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('memberrechargepackages',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" id="memberrechargerform" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                        <input type="hidden" name="id" value="{$item['id']}">
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">充值套餐名称</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="packagesName" id='packagesName' class="form-control" value="{$item['mrp_packagesName']}" placeholder="请输入充值套餐名称"/>
+                            </div>
+                            <label  class="col-sm-2 control-label">充值金额</label>
+                            <div class="col-xs-2">
+                                <div class="input-group m-b">
+                                <input type="text" name="rechargeMoney" id='rechargeMoney' class="form-control keyup_realMoneyCount" value="{$item['mrp_rechargeMoney']}" placeholder="请输入充值金额" style="font-weight: bold; color: #e10c14 !important;"/>
+                                <span class="input-group-addon">元</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">赠送金额</label>
+                            <div class="col-xs-2">
+                                <div class="input-group m-b">
+                                <input type="text" name="giveMoney" id='giveMoney' class="form-control keyup_realMoneyCount" value="{$item['mrp_giveMoney']}" placeholder="不输入为0元" style="font-weight: bold; color: #e10c14 !important;"/>
+                                <span class="input-group-addon">元</span>
+                            </div>
+                            </div>
+                            <label  class="col-sm-2 control-label">赠送积分</label>
+                            <div class="col-xs-2">
+                                <div class="input-group m-b">
+                                <input type="text" name="givePoints" id='givePoints' class="form-control" value="{$item['mrp_givePoints']}" placeholder="不输入为自动计算" style="font-weight: bold; color: #e10c14 !important;"/>
+                                    <span class="input-group-addon">积分</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">套餐起始日期</label>
+                            <div class="col-xs-2">
+                                {php echo tpl_form_field_daterange('membercardleveldate', array('starttime' => date('Y-m-d',empty($item['mrp_packagesStartDate']) ? TIMESTAMP : $item['mrp_packagesStartDate']),'endtime' => date('Y-m-d',empty($item['mrp_packagesEndDate']) ? TIMESTAMP : $item['mrp_packagesEndDate'])));}
+                            </div>
+                            <label class="col-sm-2 control-label div_resultMoneyCount">合计金额</label>
+                            <div class="col-sm-6">
+                                <div class="input-group div_resultMoneyCount">
+                                    <span class="label" id="span_resultMoneyCount" style="font-size: large; color: #e10c14 !important;"></span>
+                                    <input type="hidden" name="hidden_resultMoneyCount"  id="hidden_resultMoneyCount" />
+                                    <input type="hidden" name="hidden_resultPointsCount"  id="hidden_resultPointsCount" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-4 control-label"></label>
+                            <div class="col-sm-8">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $(".div_resultMoneyCount").hide();
+// 在键盘按下并释放及提交后验证提交表单
+        $("#memberrechargerform").validate({
+            rules: {
+                packagesName: {
+                    required: true,
+                    maxlength:20
+                },
+                rechargeMoney:{
+                    required: true,    //要求输入不能为空
+                    number: true,     //输入必须是数字
+                    min: 0.01,          //输入的数字最小值为0.01，不能为0或者负数
+                    minNumber: $("#rechargeMoney").val()    //调用自定义验证
+                },
+                giveMoney:{
+                    number: true,     //输入必须是数字
+                    min: 0.01,          //输入的数字最小值为0.01，不能为0或者负数
+                    minNumber: $("#giveMoney").val()    //调用自定义验证
+                },
+                givePoints:{
+                    number: true,     //输入必须是数字
+                    min: 0.01,          //输入的数字最小值为0.01，不能为0或者负数
+                    minNumber: $("#rechargeMoney").val()    //调用自定义验证
+                }
+            },
+            messages: {
+                packagesName: {
+                    required: "请输入套餐名称",
+                    maxlength:"最多不能超过20个字符（汉字算一个字符）"
+                },
+                rechargeMoney: {
+                    required: "请填写充值金额",
+                    number: "请正确输入金额",
+                    min: "输入最小金额为0.01",
+                    length: "输入数字最多小数点后两位"
+
+                },
+                giveMoney:{
+                    required:"请输入赠送金额",
+                    number: "请正确输入金额",
+                    min: "输入最小金额为0.01",
+                    length: "输入数字最多小数点后两位"
+                },
+                givePoints:{
+                    required:"请输入赠送积分",
+                    number: "请正确输入积分",
+                    min: "输入最小积分为0.01",
+                    length: "输入数字最多小数点后两位"
+                }
+            }
+        });
+        jQuery.validator.addMethod("minNumber",function(value, element){
+            var returnVal = true;
+            inputZ=value;
+            var ArrMen= inputZ.split(".");    //截取字符串
+            if(ArrMen.length==2){
+                if(ArrMen[1].length>2){    //判断小数点后面的字符串长度
+                    returnVal = false;
+                    return false;
+                }
+            }
+            return returnVal;
+        },"小数点后最多为两位");         //验证错误信息
+
+        $(".keyup_realMoneyCount").on('keyup', function (){
+            var cmpsetdata=0;
+            var cmpdata = "{php echo util::set('cmp312',$setdata)}";
+            var cmpstatedata = "{php echo util::set('cmp313',$setdata)}";
+            $(".div_resultMoneyCount").show();
+            if(parseInt(cmpstatedata)==1){
+                cmpsetdata = cmpdata;
+            }else{
+                cmpsetdata = 0;
+            }
+            var resultMoneyCount = 0;
+            var resultGivePointsCount = 0;
+            var realMoneyCount = parseFloat($("#rechargeMoney").val());
+            var giveMoneyCount = parseFloat($("#giveMoney").val());
+            if(giveMoneyCount > 0){
+                resultMoneyCount = realMoneyCount + giveMoneyCount;
+                resultGivePointsCount = resultMoneyCount * cmpsetdata;
+                $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+                $("#givePoints").attr("value",resultGivePointsCount);
+                $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                $("#hidden_resultMoneyCount").attr("value",resultMoneyCount);
+            }else{
+                resultMoneyCount = realMoneyCount;
+                resultGivePointsCount = resultMoneyCount * cmpsetdata;
+                $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+                $("#givePoints").attr("value",resultGivePointsCount);
+                $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+                $("#hidden_resultMoneyCount").attr("value",resultMoneyCount);
+            }
+        });
+        $("#givePoints").on('keyup', function (){
+            $(".div_resultMoneyCount").show();
+            var resultMoneyCount = 0;
+            var resultGivePointsCount = 0;
+            var realMoneyCount = parseFloat($("#rechargeMoney").val());
+            var giveMoneyCount = parseFloat($("#giveMoney").val());
+            resultGivePointsCount = parseFloat($("#givePoints").val());
+            resultMoneyCount = realMoneyCount + giveMoneyCount;
+            $("#span_resultMoneyCount").html(resultMoneyCount+" 元 , 赠送积分 "+ resultGivePointsCount);
+            $("#hidden_resultPointsCount").attr("value",resultGivePointsCount);
+            $("#hidden_resultMoneyCount").attr("value",resultMoneyCount);
+        });
+    });
+    var start = {
+        elem: '#start',
+        format: 'YYYY/MM/DD hh:mm:ss',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2999-06-16 23:59:59', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#end',
+        format: 'YYYY/MM/DD hh:mm:ss',
+        min: laydate.now(),
+        max: '2999-06-16 23:59:59',
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+        }
+    };
+    laydate(start);
+    laydate(end);
+
+</script>
+{template 'web/common/footer'}

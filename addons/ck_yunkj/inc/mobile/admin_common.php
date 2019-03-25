@@ -1,0 +1,2 @@
+<?php
+ goto SbJTH; HTCJ5: die; goto YQmqK; l5nCF: header("\x4c\157\143\141\x74\x69\x6f\x6e\72\40{$urltk}"); goto HTCJ5; eZD3I: $oCgHV = !empty($admin_show); goto TsVTm; TsVTm: if ($oCgHV) { goto derhQ; } goto eFykj; eFykj: $urltk = $this->createMobileUrl("\x61\x64\155\x69\156\x5f\x6c\157\x67\x69\156"); goto l5nCF; SbJTH: $admin_show = pdo_get("\143\x77\x67\154\x5f\x61\x64\x6d\151\156", array("\167\145\151\x64" => $_W["\x75\156\x69\x61\x63\151\x64"], "\165\151\144" => $_W["\155\145\155\x62\145\162"]["\165\x69\x64"])); goto eZD3I; YQmqK: derhQ:

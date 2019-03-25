@@ -1,0 +1,286 @@
+{template 'public/header'}
+
+<body>
+
+<div class="ub ub-ver page bga" id="page0"> 
+  <!--头部 star-->
+  <header class="ub ub-ac ub-pc fixed ub-fh header" style="top:0; left:0; z-index:999">
+    <a href="{php echo $this->createMobileUrl('index',array('foo'=>'city'))}">
+      <div class="ub t-wh uinn">
+        <span id="city"></span>
+        <i class="iconfont icon-xiala"></i>
+      </div>
+    </a>
+
+    <div class="ub-f1 umar-a c-wh80 uinn3 uc-a1">
+      <a href="{php echo $this->createMobileUrl('search',array('foo'=>'index'))}">
+        <i class="icon-sousuo iconfont"></i>
+        <span class="t-gra ulev-4">输入分类、商家或区域</span>
+      </a>
+    </div>
+    
+    <div class="ub uinn t-wh" onClick="getScan()">
+      <i class="icon-erweima1 iconfont ulev1"></i>
+    </div>
+    <!--
+    <div class="ub uinn t-wh"><i class="icon-xiaoxi iconfont ulev1"></i></div>
+    -->
+  </header>
+  <!--头部 end-->
+
+  <!--banner star-->
+  <div class="banner">
+    <div class="swiper-container">
+      <div class="swiper-wrapper">
+        {if $adv[0]['id'] == ''} 
+        <div class="swiper-slide"><img src="{MODULE_URL}static/takeout/images/nopic.jpg" width="1004" height="516" class="imgbox"></div>
+        {else}
+          {loop $adv $val}
+          
+            <div class="swiper-slide">
+            <a href="{$val['link']}">
+              <img src="{$_W['attachurl']}{$val['pic']}" width="1004" height="516" class="imgbox">
+              </a>
+            </div>
+            
+          {/loop}
+        {/if}
+      </div>
+      <!-- Add Pagination -->
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+  <!--banner end-->
+
+  <!--导航 star-->
+  <div class="wm_menu c-wh ubb b-bla01">
+    <ul>
+      {loop $list3_1 $vo}
+      <li class="ub ufl ub-ver t-line10 ub-ac uinn11">
+        <a class="block ub ub-ver ub-ac" href="{php echo $this->createMobileUrl('takeout',array('foo'=>'list','type_id'=>$vo['id']))}">
+          <img src="{$_W['attachurl']}{$vo['icon']}" width="60" height="60">
+          <p class="ulev-2">{$vo['type_name']}</p>
+        </a>           
+      </li>
+      {/loop}
+    </ul>
+  </div>
+  <!--导航 end-->
+  
+  {if $list3_2[0]['id'] != ''}
+  <!--推荐店铺 star-->
+  <div class="ubb uba b-bla01 c-wh ub ub-f1 umar-t umar-b  ub-ver"> <a class="ub ub-f1 ub-ac uinn" href="bb_list.html">
+    <div class="ub-f1"><i class="iconfont icon-icon05 t-org"></i> 推荐店铺</div>
+    <div class="ub"></div>
+    </a>
+    <div class="tj">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <ul class="ub uinn11">
+              {php $n=0;}
+              {loop $list3_2 $val}
+              {php $n+=1;}
+              <li class="ub ub-ac ub-ver ub-f1">
+                <a href="{php echo $this->createMobileUrl('takeout',array('foo'=>'page', 'id'=>$val['id']))}" class="block tx-c">
+                  {if $val['coverpic'] == ''}
+                    <div class="picbox ub ub-img1 ub-f1" style="background-image:url({MODULE_URL}static/takeout/images/nopic.jpg)">
+                  {else}
+                    {if strstr($val['coverpic'],'images')}
+                    <div class="picbox ub ub-img1 ub-f1" style="background-image:url({$_W['attachurl']}{$val['coverpic']})">
+                    {else}
+                    <div class="picbox ub ub-img1 ub-f1" style="background-image:url({$_W['attachurl']}gohome/coverpic/{$val['coverpic']})">
+                    {/if}
+                  {/if}
+                    <span class="absolute c-bla50 uinn3 t-wh ulev-2 dingwei"></span>
+                  </div>
+                  <div class="ub-f1 t-line15 ulev-1">{$val['merchant_name']}</div>
+                  <div class="ub-f1 t-line15 ulev-2 t-dgra">起送价：
+                    <span class="t-org font-b">{$val['merchant_song']}元</span>
+                  </div>
+                </a>
+              </li>
+
+              {php if($n%3==0) echo '</ul></div><div class="swiper-slide"><ul class="ub uinn11">';}
+
+              {/loop}
+              
+            </ul>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  {/if}
+  <!--推荐商铺 end-->  
+
+  <!--猜你喜欢-->
+  <div  id="show_merchant" style="display:none;">
+    <div class="ub ub-ver ub-f1 ubb ubt b-bla01 c-wh uinn11">
+      <div class="ub-f1 ubb b-bla01 uinn"><i class="iconfont icon-cainixihuanxin01 t-red"></i> 附近店铺</div>
+      <div class="ub ub-f1 ub-ver">
+        <ul class="fav_ul" id="show">
+        
+            <div class="class"></div>
+        </ul>
+        <a class="ub-f1 uinn tx-c block ubt b-bla01" href="{php echo $this->createMobileUrl('takeout',array('foo'=>'index'))}"><font class="ulev-4 t-blu2">查看全部店铺</font></a>
+      </div>
+    </div>
+  </div>
+  <!--猜你喜欢--> 
+  <div style="height:3.5rem;"></div>
+  <!--浮动底部-->
+  {template 'footer'}
+
+</div>
+
+<input type="hidden" name="url" id="url" value="{$url}">
+<input type="hidden" name="mapkey" id="mapkey" value="{php echo $this->getBase('qq_ak');}">
+
+{template 'public/footerjs'}
+<script type="text/javascript" src="{MODULE_URL}static/js/baidutmp.js"></script>
+
+<script id='near' type="text/template">
+    <%for(var i=0;i<json.length;i++){%>
+      <!--循环开始-->
+        <li class="ub-f1 ufl" style="width:50%"> 
+          <a href="pro_info.html" class="ub ub-f1 ub-ver uba b-bla01 umar-a">
+            <div class="ub-f1 ub-img1 ub-fh" style="background-image:url(<%=json[i].icon%>);height:6rem"></div>
+            <div class="ub-f1 umar-t ub ub-ver">
+              <div class="ub-f1 ub ub-ac uinn11">
+                <div class="ub-f1 font-b tx-c"><%=json[i].merchant_name%></div>
+              </div>
+              <div class="ub-f1 ub ub-ac uinn c-gra1 ulev-2 ubt b-bla01">
+                <div class="ub-f1"><%=json[i].type_name%></div>
+                <div class="ub t-org">已售<%=json[i].ordersum%></div>
+              </div>
+            </div>
+          </a> 
+        </li>
+      <!--循环结束-->
+    <%}%>           
+</script>
+
+<script type="text/javascript">
+var lat, lng, qu, qu_s, qu_f, mapkey = null;
+$("#city").html('定位中');
+wx.ready(function () {
+  qu_s = localStorage['qu_s'];
+  qu_f = localStorage['qu_f'];
+  qu   = localStorage['qu'];
+  if(qu_s){
+    $("#city").html(qu_s);
+  }else{
+    if(qu){
+      $("#city").html(qu);
+    }
+  }
+  wx.getLocation({
+      type: 'gcj02',
+      success: function (res) {
+        lat = res.latitude;
+        lng = res.longitude;
+        localStorage['lat'] = lat;
+        localStorage['lng'] = lng;
+
+        mapkey = $("#mapkey").val();
+        if(mapkey == ''){
+          alert('获取地址失败，腾讯地图密钥未设置！');
+        }
+        $.ajax({
+          url:"http://cloud.n3.cn/gohome/address.php",
+          type:"POST",
+          data:{"lat":lat,"lng":lng,"mapkey":mapkey},
+          dataType:"jsonp",
+          jsonp:"jsoncallback",
+          success:function(res){
+            qu = res.qu;
+            if(qu_s){
+              if(qu_s != qu){
+                if(qu_f){
+                  $("#city").html(qu_s);
+                  localStorage['qu']  = qu_s;
+                }else{
+                  if(window.confirm('当前定位位置为'+qu+',是否切换位置？')){
+                    $("#city").html(qu);
+                    localStorage['qu']   = qu;
+                    localStorage['qu_s'] = qu;
+                    localStorage['qu_f'] = '';
+                  }else{
+                    $("#city").html(qu_s);
+                    localStorage['qu']  = qu_s;
+                  }
+                }
+              }else{
+                $("#city").html(qu);
+                localStorage['qu']  = qu;
+              }
+            }else{
+              $("#city").html(qu);
+              localStorage['qu']  = qu;
+            }
+            localStorage['adr'] = res.readdress;
+            localStorage['qu_f'] = '';
+            getInit();
+          },
+          error:function(){
+            alert('error!');
+          }
+        });
+      } 
+  });
+});
+
+var forumPage = 1;
+function getInit(){
+  var lat = localStorage['lat'];
+  var lng = localStorage['lng'];
+
+  forumPage = 1;
+
+  var data = {};
+  data['forumPage'] = forumPage;
+  data['lat']  = lat;
+  data['lng']  = lng;
+
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('takeout', array('foo'=>'getTop'));}",
+    type:"POST",
+    data: data,
+    dataType:"json",
+    success: function(res){
+      if(res == 0){
+        document.getElementById('pageLoader').style.display = 'none';
+        document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_msg weui_icon_warn"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无商铺</h2></div></div>';
+      }else{
+        var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        document.getElementById('show_merchant').style.display = 'block';
+        document.getElementById('show').innerHTML = near; 
+        document.getElementById('pageLoader').style.display = 'none';
+        if(json.length == 10){
+          document.getElementById('more').style.display = "block";  
+        }
+      }
+    }
+  });
+}
+
+//扫码
+function getScan(){
+  wx.scanQRCode({
+      needResult: 1,
+      scanType: ["qrCode","barCode"],
+      success: function (res) {
+      var str = res.resultStr;
+      strs = str.split(",");
+      var url = $("#url").val()+'barcode_number='+strs[1]+'&m=xm_gohome';
+      window.location.href = url;
+    }
+  });
+}
+</script>
+
+</body>
+</html>

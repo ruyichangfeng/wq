@@ -1,0 +1,165 @@
+{template 'public/header'}
+{template 'public/comhead'}
+<input type="hidden" name="schoolid" value="{$schoolid}" />
+<div class="panel panel-info">
+    <div class="panel-body">
+        {php echo $this -> set_tabbar7($modelName, $schoolid);}
+    </div>
+</div>
+<style>
+    .cLine {
+        overflow: hidden;
+        padding: 5px 0;
+        color:#000000;
+    }
+    .alert {
+        padding: 8px 35px 0 10px;
+        text-shadow: none;
+        -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        background-color: #f9edbe;
+        border: 1px solid #f0c36d;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        color: #333333;
+        margin-top: 5px;
+    }
+    .alert p {
+        margin: 0 0 10px;
+        display: block;
+    }
+    .alert .bold{
+        font-weight:bold;
+    }
+</style>
+<!--<div class="cLine">-->
+<!--<div class="alert">-->
+<!--<p><span class="bold">说明：</span>-->
+<!--此处的公告会出现在首页端，校长端发送公告并不会出现在这里，也不会出现在前端，此处的公告仅仅面向社会<br/>-->
+<!--<strong><font color='red'>特别提醒: 此处公告可设置顺序显示或是否显示</font></strong>-->
+<!--</p>-->
+<!--</div>-->
+<!--</div>-->
+{if $operation == 'post'}
+<div class="panel panel-info">
+    <div class="panel-heading"><a class="btn btn-primary" onclick="javascript :history.back(-1);"><i class="fa fa-tasks"></i> 返回列表</a></div>
+</div>
+<div class="clearfix">
+    <form class="form-horizontal form" action="" method="post" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">充值管理</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">名称</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control" placeholder="" name="name" value="{$book_cz['name']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">押金数额</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="number" class="form-control" placeholder="请输入数字" name="amount" value="{$book_cz['amount']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">兑换比例</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="number" class="form-control" placeholder="请输入数字" name="couponAmount" value="{$book_cz['couponAmount']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">最大押金数额</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="number" class="form-control" placeholder="请输入数字" name="maxAmount" value="{$book_cz['maxAmount']}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <input name="submit" type="submit" value="提交" class="btn btn-primary col-lg-1">
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var category = {php echo json_encode($children)};
+    $('#credit1').click(function(){
+        $('#credit-status1').show();
+    });
+    $('#credit0').click(function(){
+        $('#credit-status1').hide();
+    });
+</script>
+{elseif $operation == 'display'}
+<div class="panel panel-info">
+    <div class="panel-heading">筛选</div>
+    <div class="panel-body">
+        <div class="form-group">
+            <a class="btn btn-primary btn-sm" href="{php echo $this->createWebUrl('book_cz', array('op' => 'post', 'schoolid' => $schoolid))}">添加押金</a>
+            <div class="form-group inline-form" style="display: inline-block;">
+                <form accept-charset="UTF-8" action="./index.php" class="form-inline" id="diandanbao/table_search" method="get" role="form">
+                    <div style="margin:0;padding:0;display:inline">
+                        <input name="utf8" type="hidden" value="✓"></div>
+                    <input type="hidden" name="c" value="site" />
+                    <input type="hidden" name="a" value="entry" />
+                    <input type="hidden" name="m" value="fk_cs" />
+                    <input type="hidden" name="do" value="book_cz" />
+                    <input type="hidden" name="schoolid" value="{$schoolid}" />
+                    <div class="form-group">
+                        <label class="sr-only" for="q_name">标题(标题关键字)</label>
+                        <input class="form-control" id="keyword" name="keyword" placeholder="标题(标题关键字)" type="search">
+                    </div>
+                    <input class="btn btn-sm btn-success" name="commit" type="submit" value="搜索">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="table-responsive panel-body">
+        <table class="table">
+            <thead>
+            <tr>
+                <th style="width:50px">排序</th>
+                <th>名称</th>
+                <th>押金金额</th>
+                <th>可兑换闲币额度</th>
+                <th>押金上限</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $book_cz $item}
+            <tr>
+                <td><span>{$item['ssort']}</span></td>
+                <td>
+                    <span class="label label-info"><i class="fa fa-list-alt"></i></span>&nbsp;{$item['name']}
+                </td>
+                <td>
+                    <span class="label label-info"><i class="fa fa-list-alt"></i></span>&nbsp;{$item['amount']}
+                </td>
+                <td>
+                    <span class="label label-info"><i class="fa fa-list-alt"></i></span>&nbsp;{$item['couponAmount']}
+                </td>
+                <td>
+                    <span class="label label-info"><i class="fa fa-list-alt"></i></span>&nbsp;{if $item['maxAmount'] > 0}{$item['maxAmount']}{else}无{/if}
+                </td>
+                <td>
+                    <a href="{php echo $this->createWebUrl('book_cz', array('op' => 'post', 'id' => $item['id'], 'schoolid' => $schoolid))}" title="编辑">编辑</a>&nbsp;&nbsp;
+                    <a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('book_cz', array('op' => 'delete', 'id' => $item['id'], 'schoolid' => $schoolid))}" title="删除">删除</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+    </div>
+</div>
+{$pager}
+{/if}
+{template 'common/footer'}

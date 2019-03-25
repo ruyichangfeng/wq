@@ -1,0 +1,59 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}template/css/back.css" type="text/css"/>
+<ol class="breadcrumb">
+    <li><a href="{php echo $this->createWebUrl('vote',array())}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;投票列表</a></li>
+    <li class="active">参与者列表</li>
+</ol>
+<div class="tabbable">
+	<ul class="nav nav-tabs">
+		<li {php echo ($tabindex == 0) ? "class='active'" : ""}><a href="{php echo $this->createWebUrl('join',array('voteid'=>$voteid))}">全部&nbsp;{$qbtgtotal}</a></li>
+		<li {php echo ($tabindex == 1) ? "class='active'" : ""}><a href="{php echo $this->createWebUrl('join',array('voteid'=>$voteid,'checkstate'=>1))}">待审核&nbsp;{$dshtotal}</a></li>
+		<li {php echo ($tabindex == 2) ? "class='active'" : ""}><a href="{php echo $this->createWebUrl('join',array('voteid'=>$voteid,'checkstate'=>2))}">通过&nbsp;{$tgtotal}</a></li>
+		<li {php echo ($tabindex == 3) ? "class='active'" : ""}><a href="{php echo $this->createWebUrl('join',array('voteid'=>$voteid,'checkstate'=>3))}">未通过&nbsp;{$wtgtotal}</a></li>
+	</ul>
+	<div class="tab-content">
+		<table class="table table-hover table-responsive">
+			<thead>
+				<tr style="background-color:#f5f5f5">
+					<th>图片</th>
+					<th>昵称</th>
+					<th>参与时间</th>
+					<th>来源IP</th>
+					<th>获得票数</th>
+					<th>审核状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $listdata $item}
+				<tr>
+					<td>
+						<img src="{php echo tomedia($item['image'])}" class="img-thumbnail" style="width:100px;height:100px;">
+					</td>
+					<td>{$item['username']}</td>
+					<td>{php echo substr($item['create_time'],0,16)}</td>
+					<td>{$item['ip']}</td>
+					<td>{$item['poll_count']}</td>
+					<td>
+						{if $item['check_state'] == 1} 待审核 {else if $item['check_state'] == 2} 已通过 {else if $item['check_state'] == 3} 未通过 {/if}
+					</td>
+					<td>
+						<div class="btn-group" role="group">
+							<a class="btn btn-default" role="button" href="{php echo $this->createWebUrl('join',array('id'=>$item['id'],'op'=>'update','voteid'=>$voteid))}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 修改记录</a>
+							<a class="btn btn-default" role="button" href="{php echo $this->createWebUrl('voterecord',array('joinid'=>$item['id'],'voteid'=>$voteid))}"><span class="glyphicon glyphicon-open" aria-hidden="true"></span> 查看投票记录</a>
+						</div>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+		<div class="form-group">
+			<hr width="100%">
+			<a class="btn btn-primary" href="{php echo $this->createWebUrl('join',array('op'=>'add','voteid'=>$voteid))}" role="button">新增参与用户</a>
+		</div>
+		<nav aria-label="Page navigation">
+			{php echo pagination($total, $currPage, $pageSize);}
+		</nav>
+	</div>
+</div>
+{template 'common/footer'}

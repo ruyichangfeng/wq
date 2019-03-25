@@ -1,0 +1,264 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+<style>
+	th,td{ text-align: center; }
+</style>
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+	  <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('orders', array('action' => ''));}">订单列表</a>
+      </li>
+		<li {if $_GPC['action'] == 'view'}class="active"{/if}>
+		<a href="#">订单详情</a>
+		</li>
+    </ul>
+
+	{if $_GPC['action'] == ''}
+	<div class="panel panel-default">
+		<header class="panel-heading">
+			筛选
+		</header>
+		<div class="panel-body">
+			<form id="filter" action="" method="get">
+
+				<div class="col-lg-6">
+					<label for="">商品关键字（支持模糊查询）</label>
+					<input type="text" name="goodsname" value="{if $_GPC['goodsname']}{$_GPC['goodsname']}{/if}" class="form-control" placeholder="请输入商品关键字" />
+				</div>
+				<div class="col-lg-6">
+					<label for="">订单号</label>
+					<input type="text" name="orderid" value="{if $_GPC['orderid']}{$_GPC['orderid']}{/if}" class="form-control" placeholder="请输入订单号" />
+				</div>
+				<div class="col-lg-6">
+					<label for="">用户姓名</label>
+					<input type="text" name="username" value="{if $_GPC['username']}{$_GPC['username']}{/if}" class="form-control" placeholder="请输入用户姓名" />
+				</div>
+				<div class="col-lg-6">
+					<label for="">组团号</label>
+					<input type="text" name="groupid" value="{if $_GPC['groupid']}{$_GPC['groupid']}{/if}" class="form-control" placeholder="请输入组团号"/>
+				</div>
+				<div class="col-lg-6">
+					<label>创建时间</label><br />
+					{if isset($_GPC['section'])}
+					{php echo tpl_form_field_daterange('section', array('start' => $_GPC['section']['start'], 'end' => $_GPC['section']['end']), true);}
+					{else}
+					{php echo tpl_form_field_daterange('section', null, true);}
+					{/if}
+				</div>
+				<div class="col-lg-6">
+					<label for="">订单类型</label>
+					<select name="ordertype" class="form-control">
+						<option value="0">全部</option>
+						<option value="single" {if $_GPC['ordertype'] == 'single'}selected{/if}>单买</option>
+						<option value="groups" {if $_GPC['ordertype'] == 'groups'}selected{/if}>组团买</option>
+					</select>
+				</div>
+				<div class="col-lg-6">
+					<label for="">订单状态</label>
+					<select name="orderstatus" class="form-control">
+						<option value="all">全部</option>
+						<option value="3" {if $_GPC['orderstatus'] == 3}selected{/if}>已完成</option>
+						<option value="2" {if $_GPC['orderstatus'] == 2}selected{/if}>已发货</option>
+						<option value="1" {if $_GPC['orderstatus'] == 1}selected{/if}>已支付</option>
+						<option value="10" {if $_GPC['orderstatus'] == 10}selected{/if}>未支付</option>
+						<option value="-3" {if $_GPC['orderstatus'] == -3}selected{/if}>已退款</option>
+						<option value="-2" {if $_GPC['orderstatus'] == -2}selected{/if}>待退款</option>
+						<option value="-1" {if $_GPC['orderstatus'] == -1}selected{/if}>已取消</option>
+					</select>
+				</div>
+
+				<div class="col-lg-12" style="margin-top: 10px;">
+					<input type="button" onclick="location.href = '{php echo $this->createWebUrl('orders')}&' + $('#filter').serialize();" value="筛选" class="btn btn-primary" />
+					<input type="button" onclick="location.href = '{php echo $this->createWebUrl('orders')}';" value="取消筛选" class="btn btn-primary" />
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			{if $_GPC['action'] ==''}
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+				<tr>
+					<th>#</th>
+					<th>订单号</th>
+					<th>商品信息</th>
+					<th>组团ID</th>
+					<th>用户信息</th>
+					<th>总价</th>
+					<th>数量</th>
+					<th>运费</th>
+					<th>购买方式</th>
+					<th>支付方式</th>
+					<th>订单状态</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{loop $result $res}
+				<tr>
+					<td>{$res['uid']}</td>
+					<td>{$res['orderid']}</td>
+					<td class="text-center">
+						<img src="{$_W['attachurl']}{$res['goodslogo']}" width="60" height="60" alt=""><br />
+						{$res['goodsname']}
+					</td>
+					<td><span class="label label-info">组团号：{$res['groupid']}</span></td>
+					<td class="text-center">
+						{$res['username']}<br />
+						{$res['mobile']}
+					</td>
+					<td>{$res['fee']} 元</td>
+					<td>{$res['goodsnums']} 件</td>
+					<td>{$res['usd']} 元</td>
+					<td>
+						{if $res['buyway'] == 'single'}<span class="label label-warning">单买</span>
+						{else}<span class="label label-success">组团</span>{/if}
+					</td>
+					<td>
+						<span class="label label-success">微信</span>
+					</td>
+					<td>
+						<span class="label label-info">{php echo status2string($res['status'])}</span>
+					</td>
+					<td>{php echo date('Y-m-d H:i', $res['create_at'])}</td>
+					<td>
+						<a class="btn btn-sm btn-warning" href="{php echo $this->createWebUrl('orders', array('action' => 'view', 'uid' => $res['uid']))}">查看</a>
+						<a class="btn btn-sm btn-danger" href="{php echo $this->createWebUrl('orders', array('action' => 'refund', 'uid' => $res['uid']))}">退款</a>
+					</td>
+				</tr>
+				{/loop}
+				</tbody>
+			</table>
+
+			<div class="col-xs-12">
+				{php echo $pager}
+			</div>
+			{/if}
+		</div>
+	</div>
+	{/if}
+
+	{if $_GPC['action'] == 'view'}
+	<div class="panel panel-default">
+		<header class="panel-heading">
+			订单详情
+		</header>
+		<div class="panel-body" style="padding-left: 200px;line-height: 40px;">
+			<div class="col-lg-12">组团号：<span class="label label-warning">{$order['groupid']} 号</span></div>
+			<div class="col-lg-12">
+				购买类型：
+				{if $order['buyway'] == 'groups'}<span class="label label-success">组团</span>
+				{else}<span class="label label-info">单买</span>{/if}
+			</div>
+			<div class="col-lg-12">
+				订购数量：{$order['goodsnums']} 件
+			</div>
+			<div class="col-lg-12">
+				物流：{$order['usd']} 元
+			</div>
+			<div class="col-lg-12">
+				总价：{$order['fee']} 元
+			</div>
+			<div class="col-lg-12">
+				订单号：{$order['orderid']}
+			</div>
+			<div class="col-lg-12">
+				支付方式：<span class="label label-success">微信支付</span>
+			</div>
+			<div class="col-lg-12">
+				订单状态：<span class="label label-info">{php echo status2string($order['status'])}</span>
+			</div>
+			<div class="col-lg-12">
+				下单时间：{php echo date('Y-m-d H:i', $order['create_at']);}
+			</div>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<header class="panel-heading">
+			用户信息
+		</header>
+		<div class="panel-body" style="padding-left: 200px;line-height: 40px;">
+			<div class="col-lg-12">
+				姓名：{$order['username']}
+			</div>
+			<div class="col-lg-12">
+				手机：{$order['mobile']}
+			</div>
+			<div class="col-lg-12">
+				地址：{$order['province']}{$order['city']}{$order['county']}{$order['address']}
+			</div>
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<header class="panel-heading">
+			物流信息
+		</header>
+		<div class="panel-body" style="padding-left: 200px;line-height: 40px;">
+			<div class="col-lg-12">
+				快递：{$order['express']}
+			</div>
+			<div class="col-lg-12">
+				快递单号：{$order['expressid']}
+			</div>
+			{if $order['status'] == 1}
+			<div class="col-lg-12">
+				<form id="form" method="post" action="">
+					<input type="hidden" name="uid" value="{$order['uid']}">
+					<div class="col-lg-12">
+						<input type="text" name="express" class="form-control" placeholder="请输入快递" />
+					</div>
+					<div class="col-lg-12">
+						<input type="text" name="expressid" class="form-control" placeholder="请输入快递单号" />
+					</div>
+					<div class="col-lg-12">
+						<input type="submit" value="立即发货" class="btn btn-warning" name="deliver"/>
+					</div>
+				</form>
+			</div>
+			{/if}
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<header class="panel-heading">
+			商品信息
+		</header>
+		<div class="panel-body">
+			<table class="table">
+				<thead>
+				<tr>
+					<th>商品名</th>
+					<th>LOGO</th>
+					<th>库存</th>
+					<th>销量</th>
+					<th>市场价</th>
+					<th>单买价</th>
+					<th>组团价</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>{$order['goodsname']}</td>
+					<td><img src="{$_W['attachurl']}{$order['goodslogo']}" width="60" height="60"/></td>
+					<td>{$order['stock']} 件</td>
+					<td>{$order['sales']} 件</td>
+					<td>{$order['mprice']} 元</td>
+					<td>{$order['sprice']} 元</td>
+					<td>{$order['gprice']} 元</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	{/if}
+
+</div>
+
+{template 'common/footer'}

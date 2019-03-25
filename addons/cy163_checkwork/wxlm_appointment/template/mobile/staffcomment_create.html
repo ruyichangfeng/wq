@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>员工评价</title>
+    {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+    <link rel="stylesheet" href="{RES}mobile/css/starability-all.min.css">
+    <style>
+        .fg2-imgbox .article {
+           
+            position: absolute;
+            background: white;
+            padding: 4px;
+        }
+        .fg2-imgbox{
+            position: relative;
+            overflow: hidden;
+            width: 92%;
+            margin: 0 auto;
+        }
+
+        .file {
+            position: relative;
+            display: inline-block;
+            background: #000000;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #fff;
+            text-decoration: none;
+            text-indent: 0;
+            line-height: 20px;
+            margin-left: 5%;
+        }
+
+        .file input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        #filediv {
+            margin-top: 10px;
+        }
+
+        .file:hover {
+            background: #000000;
+            border-color: #000000;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .staff_deletebtn {
+            float: left;
+            width: 80px;
+            height: 30px;
+            background-color: #cccccc;
+            text-align: center;
+            color: #fff;
+            line-height: 30px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        #filediv .file {
+            float: left !important;
+            margin-left: 5%;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dz-filehead">
+        员工评价
+    </div>
+    <div class="dz-headimg dz-app-head">
+        <div class="dz-app-left">
+            <img src="{php echo tomedia($staff['staff_avatar'])}">
+        </div>
+        <div class="dz-app-right">
+            <p>员工:
+                <span>{$staff['staff_name']}</span>
+            </p>
+            <p>电话:
+                <span>{$staff['staff_tel']}</span>
+            </p>
+        </div>
+    </div>
+    <form class="app-form" action="{php echo $this->createMobileUrl('staffComment', array('op' => 'create'))}" method="post" id="form" enctype="multipart/form-data">
+        <p class="dz-app-title">为他打分</p>
+        <fieldset class="starability-grow">
+            <input type="radio" id="rate5-3" name="scomment[scomment_level]" value="5" />
+            <label for="rate5-3" title="Amazing">5 stars</label>
+            <input type="radio" id="rate4-3" name="scomment[scomment_level]" value="4" />
+            <label for="rate4-3" title="Very good">4 stars</label>
+            <input type="radio" id="rate3-3" name="scomment[scomment_level]" value="3" />
+            <label for="rate3-3" title="Average">3 stars</label>
+            <input type="radio" id="rate2-3" name="scomment[scomment_level]" value="2" />
+            <label for="rate2-3" title="Not good">2 stars</label>
+            <input type="radio" id="rate1-3" name="scomment[scomment_level]" value="1" />
+            <label for="rate1-3" title="Terrible">1 star</label>
+        </fieldset>
+        <div class="dz-comment-btn">
+            {loop $tags $row}
+            <span data-checkid="{$row['scommenttag_id']}" onclick="detatab(this)">{$row['scommenttag_title']}</span>
+            <input id="check_{$row['scommenttag_id']}" type="checkbox" name="scomment[scomment_tag][]" hidden value="{$row['scommenttag_id']}"
+                {if in_array($row[ 'scommenttag_id'], $scomment[ 'scomment_tag'])}checked{/if}> {/loop}
+            <li class="clear"></li>
+        </div>
+        <textarea name="scomment[scomment_content]" id="app-text" cols="30" rows="6" placeholder="说说哪里满意,帮大家选择"></textarea>
+
+        <div class="fg2-imgbox" id="fg2-imgbox">
+
+        </div>
+        <div id="filediv">
+            <a href="javascript:;" class="file" id="file_1">选择图片
+                <input type="file" name="file[]" id="doc_1" multiple="multiple" style="width:80%;" onchange="javascript:setImagePreviews(1);"
+                    accept="image/*" />
+            </a>
+            <div class="staff_deletebtn"> 清空</div>
+        </div>
+
+
+
+
+        <input type="hidden" name="token" value="{$_W['token']}">
+        <input type="hidden" name="orderid" value="{$order_id}" />
+        <input type="hidden" name="scomment[scomment_staffid]" value="{$staff['staff_id']}">
+        <input type="submit" name="submit" id="dz-edit-sub2" value="提交评价">
+    </form>
+    <div class="dz-fixed" id="message">
+
+    </div>
+    <script src="{RES}mobile/js/pinterest_grid.js"></script>
+    <script>
+        $(function () {
+            $("#fg2-imgbox").pinterest_grid({
+                // no_columns: 10,
+                padding_x: 0,
+                padding_y: 0,
+                margin_bottom: 0,
+                single_column_breakpoint: 200
+            });
+        });
+    </script>
+    <script>
+        function detatab(that) {
+            if ($(that).hasClass("dz-this-span")) {
+                $(that).removeClass("dz-this-span");
+                var id = $(that).data('checkid');
+                $('#check_' + id).attr('checked', false);
+
+            } else {
+                $(that).addClass("dz-this-span");
+                var id = $(that).data('checkid');
+                $('#check_' + id).attr('checked', true);
+            }
+        }
+
+        function message(text) {
+
+            $('#message').html(text);
+            $('#message').show();
+
+            var timerid = setInterval(function () {
+
+                $('#message').hide();
+                clearInterval(timerid);
+
+            }, 2000);
+        }
+
+        $('#form').submit(function () {
+
+
+            if ($('input:radio[name="scomment[scomment_level]"]:checked').val() == undefined) {
+                message('请为服务员工打分!');
+                return false;
+            }
+            return true;
+        })
+
+
+
+
+        var $li = $("<li></li>");
+
+        function setImagePreviews(id) {
+            var docObj = document.getElementById("doc_" + id);
+            var dd = document.getElementById("fg2-imgbox");
+             dd.innerHTML = "";
+            var fileList = docObj.files;
+            for (var i = 0; i < fileList.length; i++) {
+                dd.innerHTML += "<div  class='article' style='float:left'> <img id='img_" + id + '_' + i +
+                    "'  /> </div>";
+                var imgObjPreview = document.getElementById("img_" + id + '_' + i);
+                if (docObj.files && docObj.files[i]) {
+                    //火狐下，直接设img属性
+                    imgObjPreview.style.display = 'block';
+                    imgObjPreview.style.width = '100%';
+                    // imgObjPreview.style.height = '180px';
+                    //imgObjPreview.src = docObj.files[0].getAsDataURL();
+                    //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
+                    imgObjPreview.src = window.URL.createObjectURL(docObj.files[i]);
+                }
+            }
+//            $("#file_" + id).css("display", "none");
+//            var newid = id + 1;
+//            var str = '<a href="javascript:;" class="file" id="file_' + newid +
+//                '">选择图片 <input type="file"  name="file[]" id="doc_' + newid +
+//                '" multiple="multiple"  style="width:80%;" onchange="javascript:setImagePreviews(' + newid +
+//                ');" accept="image/*" /></a>     <div class="staff_deletebtn"> 清空</div>';
+//            $("#filediv").html(str);
+
+            return true;
+        }
+
+        $('.staff_deletebtn').click(function () {
+            var dd = document.getElementById("fg2-imgbox");
+            dd.innerHTML = "";
+            $(".file input").val("");
+        })
+    </script>
+</body>
+
+</html>

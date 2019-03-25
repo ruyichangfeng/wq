@@ -1,0 +1,268 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('spending', array('op'=>'display'));}">消费类型管理</a></li>
+    <li class="active">{if isset($spending_list[spending_id])}<a href="javascript:;">编辑消费类型</a>{else}<a href="{php echo $this->createWebUrl('spending', array('op'=>'create'));}">添加消费类型{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" >
+			<div class="panel-heading">{if isset($spending[spending_id])}编辑消费类型{else}添加消费类型{/if}</div>
+			<div class="panel-body" >
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-1 col-lg-1 control-label"></label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<p>应用添加分销功能，如想开启分销功能：<a href="{php echo $this->createWebUrl('syssetup', array('systype'=>'1'));}" style="color:red;">点击进入</a> 营销参数设置下方,开启分销功能</p>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body" style="padding-top: 0px;">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="spending[spending_id]" id="spending_id" class="form-control" value="{$spending_list['spending_id']}" />
+					</div>
+				</div>
+
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>消费类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="spending[spending_title]" class="form-control" value="{$spending_list['spending_title']}" maxlength="25" maxlength="20" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>奖励类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_type]" id="spending_type" value="1" {if $spending_list['spending_type'] == 1||$spending_list['spending_type'] == ''} checked="checked"{/if} onClick="genggaileixing(1)"> 积分
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_type]" id="spending_type" value="2" {if $spending_list['spending_type'] == 2} checked="checked"{/if} onClick="genggaileixing(2)"> 余额
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>奖励比例</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8 " >
+						<div class="input-group">
+						  	<input type="number" class="form-control" id="spending_number" name="spending[spending_number]" value="{$spending_list['spending_number']}" aria-describedby="basic-addon2" step="0.01">
+						  	<span class="input-group-addon" id="basic-addon2">元赠 1积分</span>
+
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>支付状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_paystate]" id="spending_paystate" value="1" {if $spending_list['spending_paystate'] == 1} checked="checked"{/if} onClick="paystate(1)"> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_paystate]" id="spending_paystate" value="2" {if $spending_list['spending_paystate'] == 2||$spending_list['spending_paystate'] == ''} checked="checked"{/if} onClick="paystate(2)"> 关闭
+						</label>
+						<span class="help-block">支付状态开启时，当前的消费类型在发放奖励的时候，首先要支付金额，再发放奖励。</span>	
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_state]" id="spending_state" value="1" {if $spending_list['spending_state'] == 1} checked="checked"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_state]" id="spending_state" value="2" {if $spending_list['spending_state'] == 2||$spending_list['spending_state'] == ''} checked="checked"{/if}> 关闭
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="spending[spending_order]" class="form-control" value="{$spending_list['spending_order']}" maxlength="100" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>默认首选</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_firststate]" id="spending_firststate" value="1" {if $spending_list['spending_firststate'] == 1} checked="checked"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_firststate]" id="spending_firststate" value="2" {if $spending_list['spending_firststate'] == 2||$spending_list['spending_firststate'] == ''} checked="checked"{/if}> 关闭
+						</label>
+					</div>
+				</div>
+			{if $config['distribution_scale']!=0&&$config['distribution_scale']!=''}
+			</div>
+		</div>
+		<div class="panel panel-info" >
+			<div class="panel-heading">分销设置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>是否参与分销</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_joinstate]" id="spending_joinstate" value="1" {if $spending_list['spending_joinstate'] == 1} checked="checked"{/if} onClick="joinstate(1)"> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="spending[spending_joinstate]" id="spending_joinstate" value="2" {if $spending_list['spending_joinstate'] == 2||$spending_list['spending_joinstate'] == ''} checked="checked"{/if} onClick="joinstate(2)"> 关闭
+						</label>
+					</div>
+				</div>
+				<div class="form-group spending_newsrule hide" >
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>独立规则</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="checkbox">
+						  <label>
+						    <input type="checkbox" name="spending[spending_newsrule]" value="1" {if $spending_list['spending_newsrule']==1}checked{/if} onClick="spending_newsrule()">
+						    是否独立佣金比例
+						  </label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group spending_scale hide">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span></label>
+					
+					<div class="col-xs-12 col-sm-7 col-md-3 col-lg-3 {if $config['distribution_scale']!=0}show{else}hide{/if}" >
+						<div class="input-group "  >
+						  	<span class="input-group-addon">一级佣金</span>
+						  	<input type="number" class="form-control" name="spending[spending_scale1]" value="{$spending_list['spending_scale1']}" step="0.01">
+						  	<span class="input-group-addon">%</span>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-7 col-md-3 col-lg-3 {if $config['distribution_scale']==2||$config['distribution_scale']==3}show{else}hide{/if}" >
+						<div class="input-group" >
+						  	<span class="input-group-addon">二级佣金</span>
+						  	<input type="number" class="form-control" name="spending[spending_scale2]" value="{$spending_list['spending_scale2']}" step="0.01">
+						  	<span class="input-group-addon">%</span>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-7 col-md-3 col-lg-3 {if $config['distribution_scale']==3}show{else}hide{/if}" >
+						<div class="input-group">
+						  	<span class="input-group-addon">三级佣金</span>
+						  	<input type="number" class="form-control" name="spending[spending_scale3]" value="{$spending_list['spending_scale3']}" step="0.01">
+						  	<span class="input-group-addon">%</span>
+						</div>
+					</div>
+					
+				</div>
+				{/if}
+
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="backspending()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="spending[spending_title]"]').val() == ''){
+				util.message('请填写消费类型');
+				return false;
+			}
+			if($('input:radio[name="spending[spending_type]"]:checked').val()==undefined){
+				util.message('请选择奖励类型');
+				return false;
+			}	
+			if($('input[name="spending[spending_number]"]').val() == ''){
+				util.message('请填写奖励比例');
+				return false;
+			}
+			if($('input:radio[name="spending[spending_paystate]"]:checked').val()==undefined)
+			{
+				util.message('请选择支付状态');
+				return false;
+			}
+			if($('input:radio[name="spending[spending_state]"]:checked').val()==undefined){
+				util.message('请选择状态');
+				return false;
+			}
+			if($('input[name="spending[spending_order]"]').val() == ''){
+				util.message('请填写排序');
+				return false;
+			}
+			return true;
+		});
+		var type=$('input:radio[name="spending[spending_type]"]:checked').val();
+		var type2=$('input:radio[name="spending[spending_joinstate]"]').val();
+		genggaileixing(type);
+		spending_newsrule();
+		joinstate(type2);
+	});
+});
+function backspending(){
+	window.location.href="{php echo $this->createWebUrl('spending', array('op'=>'display'));}";
+}
+
+
+function genggaileixing(type){
+	var id=$('#spending_id').val(),
+		number='';
+		oldtype="";
+	if(id!="")
+	{
+		oldtype="{$spending_list['spending_type']}";
+	}
+
+	if(type==1)
+	{
+		$('#basic-addon2').html('元赠 1积分');
+		if(id!="")
+		{
+			if(oldtype==type)
+			{
+				number="{$spending_list['spending_number']}";
+			}else{
+				number="{$config['admin_credit1_scale']}";
+			}
+		}else{
+			number="{$config['admin_credit1_scale']}";
+		}
+	}else{
+		$('#basic-addon1').html('元赠 1余额');
+		if(id!="")
+		{
+			if(oldtype==type)
+			{
+				number="{$spending_list['spending_number']}";
+			}else{
+				number="{$config['admin_credit2_scale']}";
+			}
+			
+		}else{
+			number="{$config['admin_credit2_scale']}";
+		}
+	}
+	$('#spending_number').val(number);
+}
+function spending_newsrule()
+{
+	
+	if($('input:checkbox[name="spending[spending_newsrule]"]:checked').val()==1)
+	{
+		$('.spending_scale').addClass('show');
+		$('.spending_scale').removeClass('hide');
+	}else{
+		$('.spending_scale').addClass('hide');
+		$('.spending_scale').removeClass('show');
+	}
+}
+function joinstate(num)
+{
+	if(num==1)
+	{
+		$('.spending_newsrule').addClass('show');
+		$('.spending_newsrule').removeClass('hide');
+	}else{
+		$('.spending_newsrule').addClass('hide');
+		$('.spending_newsrule').removeClass('show');
+	}
+}
+</script>
+{template 'common/footer'}

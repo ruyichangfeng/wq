@@ -1,0 +1,285 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+	  <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('groups', array('action' => ''));}">组团列表</a>
+      </li>
+      <li {if $_GPC['action'] == 'add'}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('groups', array('action' => 'add'));}">添加组团</a>
+      </li>
+      <li {if $_GPC['action'] == 'update'}class="active"{/if}>
+        <a>编辑组团</a>
+      </li>
+        <li {if $_GPC['action'] == 'view'}class="active"{/if}>
+            <a href="#">团信息</a>
+        </li>
+    </ul>
+
+	{if $_GPC['action'] == 'add'}
+    <form class="form-horizontal form" action="" method="post">       
+        <div class="form-group" >
+            <input type="hidden" name="sid" value="{$_W['uniacid']}">
+            <div class="col-sm-9 col-xs-12"> 
+			       <label for="gid">选择商品：</label>
+                   <select name="gid" id="gid" class="form-control">
+                       {loop $goodses $goods}
+                       <option value="{$goods['uid']}">{$goods['name']}</option>
+                       {/loop}
+                   </select>
+				   <label for="needpeople">需要组团人数：</label>
+                   <input type="text" name="needpeople" class="form-control" value="" placeholder="" />
+				   <label for="donepeople">已组团人数：</label>
+                   <input type="text" name="donepeople" class="form-control" value="0" placeholder="" /><br/>
+				   <label for="create_at" >开团时间：</label>
+				   {php echo tpl_form_field_date('create_at', '', true);}<br/>
+				   <label for="end_at" >结束时间：</label>
+				   {php echo tpl_form_field_date('end_at', '', true);}<br/>
+                   <label for="">定金</label>
+                   <input type="text" name="deposit" class="form-control" />
+				   <label for="intro" >组团介绍：</label>
+				   {php echo tpl_ueditor('intro', '');}
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+                    <i class="fa fa-check-circle"></i> 提交
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+    
+    {if $_GPC['action'] == 'update'}
+    <form class="form-horizontal form" action="" method="post">
+        <input type="hidden" name="uid" value="{$old_date['uid']}" />
+        <div class="form-group" >
+            <div class="col-sm-9 col-xs-12">
+                <input type="hidden" name="uid" value="{$old_data['uid']}">
+                <label for="gid">商品ID：</label>
+                <select name="gid" class="form-control">
+                    {loop $goodses $goods}
+                    <option value="{$goods['uid']}" {if $goods['uid'] == $old_data['gid']}selected{/if}>{$goods['name']}</option>
+                    {/loop}
+                </select>
+                <label for="needpeople">需要组团人数：</label>
+                <input type="text" name="needpeople" class="form-control" value="{$old_data['needpeople']}" placeholder="" />
+                <label for="donepeople">已组团人数：</label>
+                <input type="text" name="donepeople" class="form-control" value="{$old_data['donepeople']}" placeholder="" />
+                <label for="create_at" >开团时间：</label>
+                {php echo tpl_form_field_date('create_at',date('Y-m-d H:i:s', $old_data['create_at']), true);}<br/>
+                <label for="end_at" >结束时间：</label>
+                {php echo tpl_form_field_date('end_at', date('Y-m-d H:i:s', $old_data['end_at']), true);}<br/>
+                <label for="">定金</label>
+                <input type="text" name="deposit" value="{$old_data['deposit']}" class="form-control" />
+                <label for="intro" >组团介绍：</label>
+                {php echo tpl_ueditor('intro', $old_data['intro']);}<br/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="update" value="编辑">
+                    <i class="fa fa-check-circle"></i> 提交修改
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+
+    {if $_GPC['action'] ==''}
+    <div class="panel panel-primary">
+        <header class="panel-heading">
+            筛选条件
+        </header>
+        <div class="panel-body">
+            <form id="filter" action="{php echo $this->createMobileUrl('groups')}" method="get">
+                <input type="hidden" name="filter" value="1">
+                <div class="col-lg-6 from-group">
+                    <label>组团号</label>
+                    <input type="text" name="groupid" class="form-control" value="{if $_GPC['groupid'] != ''}{$_GPC['groupid']}{/if}" placeholder="请输入组团号"/>
+                </div>
+                <div class="col-lg-6 from-group">
+                    <label>商品标题(支持模糊查询)</label>
+                    <input type="text" name="goodsname" class="form-control" value="{if $_GPC['goodsname'] != ''}{$_GPC['goodsname']}{/if}" placeholder="请输入标题"/>
+                </div>
+                <div class="form-group col-lg-6">
+                    <label>组团状态：</label>
+                    <select name="status" class="form-control">
+                        <option value="" {if $_GPC['status'] == ''}selected{/if}>全部</option>
+                        <option value="0" {if $_GPC['status'] == 0}selected{/if}>正常</option>
+                        <option value="-1" {if $_GPC['status'] == -1}selected{/if}>失败</option>
+                        <option value="1" {if $_GPC['status'] == 1}selected{/if}>成功</option>
+                    </select>
+                </div>
+                <div class="col-lg-6 form-group">
+                    <label>开团时间</label><br />
+                    {if isset($_GPC['section'])}
+                    {php echo tpl_form_field_daterange('section', array('start' => $_GPC['section']['start'], 'end' => $_GPC['section']['end']), true);}
+                    {else}
+                    {php echo tpl_form_field_daterange('section', null, true);}
+                    {/if}
+                </div>
+                <input type="button" onclick="location.href = '{php echo $this->createWebUrl('groups')}&' + $('#filter').serialize();" value="筛选" class="btn btn-primary" />
+                <input type="button" onclick="location.href = '{php echo $this->createWebUrl('groups')}';" value="取消筛选" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th>ID</th>
+                    <th>商品</th>
+                    <th>已组团/需组团</th>
+                    <th>开团时间</th>
+                    <th>结束时间</th>
+                    <th>状态</th>
+                    <th>定金</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $result $res}
+                <tr>
+                    <td>{$res['uid']}</td>
+                    <td>{$res['goodsname']}</td>
+                    <td>{$res['donepeople']} / {$res['needpeople']} 人</td>
+                    <td>{php echo date('Y-m-d H:i:s', $res['create_at'])}</td>
+                    <td>{php echo date('Y-m-d H:i:s', $res['end_at'])}</td>
+                    <td>
+                        {if $res['status'] == 0}<span class="label-warning label">正常</span>
+                        {elseif $res['status'] == -1}<span class="label-default label">失败</span>
+                        {else}<span class="label-success label">成功</span>{/if}</td>
+                    <td>{$res['deposit']} 元</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="{php echo $this->createWebUrl('groups',array('action'=>'view', 'uid' => $res['uid']));}">查看</a>
+                        <a class="btn btn-sm btn-warning" href="{php echo $this->createWebUrl('groups',array('action'=>'update', 'uid' => $res['uid']));}">编辑</a>
+                    <td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+
+            <div class="col-xs-12">
+                {php echo $pager}
+            </div>
+        </div>
+    </div>
+    {/if}
+
+
+    {if $_GPC['action'] == 'view'}
+    <div class="panel-default panel">
+        <header class="panel-heading">
+            组团信息
+        </header>
+        <div class="panel-body">
+            <div class="col-lg-6" style="text-align: center; line-height: 30px;">
+                <p>团ID：{$group['uid']}</p>
+                <p>需要人数：{$group['needpeople']} 人次</p>
+                <p>已组团人数：{$group['donepeople']} 人次</p>
+                <p>组团状态：
+                    {if $group['status'] == 0}<span class="label label-info">组团中</span>
+                    {elseif $group['status'] == -1}<span class="label-default label">失败</span>
+                    {else}<span class="label-success label">成功</span>
+                    {/if}
+                </p>
+            </div>
+            <div class="col-lg-6"></div>
+        </div>
+    </div>
+
+    <div class="panel-default panel">
+        <header class="panel-heading">
+            组团人员
+        </header>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>姓名</th>
+                    <th>手机</th>
+                    <th>支付</th>
+                    <th>订单状态</th>
+                    <th>运费</th>
+                    <th>数量</th>
+                    <th>总价</th>
+                    <th>下单时间</th>
+                    <th>地址</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $groupusers $val}
+                <tr>
+                    <td>{$val['orderid']}</td>
+                    <td>{$val['truename']}</td>
+                    <td>{$val['mobile']}</td>
+                    <td>{php echo status2string($val['status']);}</td>
+                    <td>{$val['usd']}</td>
+                    <td>{$val['goodsnums']}</td>
+                    <td>{$val['fee']}</td>
+                    <td>{php echo date('Y-m-d H:i', $val['create_at'])}</td>
+                    <td>{$val['province']}{$val['city']}{$val['county']}{$val['address']}</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" href="{php echo $this->createWebUrl('orders', array('action' => 'view', 'uid' => $val['uid']))}">查看</a>
+                        {if $val['status'] == -2}
+                        <a class="btn btn-sm btn-danger" href="{php echo $this->createWebUrl('orders', array('action' => 'refund', 'uid' => $val['uid']))}">退款</a>
+                        {/if}
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-default panel">
+        <header class="panel-heading">
+            商品信息
+        </header>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品LOGO</th>
+                    <th>市场价</th>
+                    <th>单买价</th>
+                    <th>组团价</th>
+                    <th>库存</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{$group['goodsid']}</td>
+                    <td><img src="{$_W['attachurl']}{$group['goodslogo']}" width="60" height="60" alt=""></td>
+                    <td>{$group['mprice']} 元</td>
+                    <td>{$group['sprice']} 元</td>
+                    <td>{$group['gprice']} 元</td>
+                    <td>{$group['stock']} 件</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {/if}
+
+</div>
+
+
+{template 'common/footer'}

@@ -1,0 +1,244 @@
+
+<link href="{ZSK_STATIC}bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="{ZSK_STATIC}layui/css/layui.css" rel="stylesheet">
+<script language='javascript' src="/addons/zsk_market/static/js/jquery.min.js"></script>
+
+<script language='javascript' src="/addons/zsk_market/static/js/vue.js"></script>
+<script language='javascript' src="/addons/zsk_market/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+<script language='javascript' src="/addons/zsk_market/static/dsg/js/downloadtp.js"></script>
+<script language='javascript' src="/addons/zsk_market/static/layui/layui.all.js"></script>
+
+<style type='text/css'>
+#container {border: 1px solid #ccc;position: relative; background: #fff; overflow: hidden;width:300px;}
+.items label {width: 120px; margin: 0; float: left;}
+#container .bg {position: absolute; width: 100%; z-index: 0;}
+#container .drag {position: absolute; min-width: 120px; min-height: 25px;z-index: 1; top: 10px; left: 100px;cursor: move;}
+.downloadleft {width:20%;float:left;}
+.downloadright {width:80%;float:left}
+.layui-layer{top:100px !important;}
+.form-group{margin-top: 9px;height: 30px;}
+</style>
+<div id="example-1">
+<div class="panel panel-info">
+	<div class="panel-heading" >海报打印</div>
+	<div class="panel-body" style="position:absolute;z-index:20;background-color: #ffffff;width:100%;height:100%">
+		<table class="layui-table">
+			{loop $ay $y $x}
+			{if $x==1}
+			<div style="font-size:15px;padding:4px 0px;margin-left:30px">店铺名片</div>
+			{/if}
+			{if $x==2}
+			<div style="font-size:15px;padding:4px 0px;margin-left:30px">商品二维码</div>
+			{/if}
+			{if $x==3}
+			<div style="font-size:15px;padding:4px 0px;margin-left:30px">价格标签</div>
+			{/if}
+			{if $x==4}
+			<div style="font-size:15px;padding:4px 0px;margin-left:30px">出货单</div>
+			{/if}
+			{loop $tplist $index $item}
+			{if $item['type']==$x&&$item['datas']}
+
+			<div style="width:300px;height: 450px;float:left;margin-left:30px">
+			<div style="height:400px; border: 1px solid #e5e6e7;"  id="container">
+        <img id="bgimg" src="{$item['bg']} " {if empty($item['bg'])} style="display: none;"{/if} /> 
+        {loop $item['datas'] $k $d}
+            <div class="drag" cate="{$d['cate']}" index="{$k}" items="{$d['items']}" item-string="{$d['string']}" item-font="{$d['font']}" 
+                item-size="{$d['size']}" item-color="{$d['color']}" item-bold="{$d['bold']}" item-pre="{$d['pre']}" item-last="{$d['last']}" item-align="{$d['align']}"
+                style="font-size:{$d['size']}pt; z-index:{$k};left:{$d['left']};top:{$d['top']};width:{$d['width']};height:{$d['height']}; text-align:{if $d['align']=='' || $d['align']==1}left{elseif $d['align']==2}center{elseif $d['align']==3}right{/if}" item-virtual="{$d['virtual']}" cate="$d['cate']">
+                
+                {if $d['cate']==1}
+                    <div class="text" style="{if !empty($d['font'])}font-family: {$d['font']};{/if} font-size:{if !empty($d['size'])}{$d['size']}{else}10{/if}pt;{if !empty($d['color'])}color: {$d['color']};{/if}{if !empty($d['bold'])}font-weight:bold;{/if}">
+                        {$d['pre']}{$d['string']}{$d['last']}
+                    </div>
+                {else if $d['cate']==2}
+                    <div class="text-table" style="padding: 10px; {if !empty($d['font'])}font-family: {$d['font']};{/if} font-size:{if !empty($d['size'])}{$d['size']}{else}10{/if}pt; {if !empty($d['color'])}color: {$d['color']};{/if}"> 
+                        <?php 
+                            $items = explode(',',$d['items']); 
+                            $strings = explode(',',$d['string']); 
+                            $virtuals = explode(',',$d['virtual']); 
+                            $stringsnum = count($strings);
+                        ?>
+                        <table border="1" style="width:100%">
+                            <tr style="font-weight: bold;">
+                                {loop $strings $i $s}
+                                    <td>
+                                    {$s}
+                                    </td>
+                                {/loop}
+                            </tr>
+                            <?php 
+                                for ($x=1; $x<5; $x++) {
+                            ?>
+                                <tr>
+                                    {loop $virtuals $i $v}
+                                        <td>
+                                            {if $v!==''}
+                                                {if $v=='number'}
+                                                    {$x}
+                                                {else}
+                                                    {$v}{$i}
+                                                {/if}
+                                            {else}
+                                                {$v}
+                                            {/if}
+                                        </td> 
+                                    {/loop}
+                                </tr>
+                            <?php } ?>
+                            <tr>
+                                {loop $items $i $s}
+                                    <td>
+                                        {if $s=="total"}总计:11{/if}
+                                        {if $s=="productprice"}总计:11{/if}
+                                        {if $s=="marketprice"}总计:11{/if}
+                                        {if $s=="realprice"}总计:11{/if}
+                                        {if $s=="allprice"}总计:11{/if}
+                                    </td> 
+                                {/loop}
+                            </tr>
+                        </table>
+                    </div>
+                {/if}
+            </div>
+            
+        {/loop}
+    </div>
+    <div style="clear:both;width:100%;font-size:11px">
+            	<div style="width:50%;text-align: left;float:left;">{$item['name']}</div>
+            	<div style="width:50%;text-align: right;float:left;color:#3F6EA4" v-on:click="downloadshoptp({$index})">下载</div>
+    </div>
+	</div>
+    {/if}
+			{/loop}
+			 <div style="clear:both;"></div>
+			{/loop}
+		</table>
+	</div>
+	<!-- 模板界面 -->
+<!-- <script  id="examplecontainerrr" type="text/html"> -->
+ <div style="height: {if !empty($item['height'])}{$item['height']}{else}130{/if}mm; width: 100%; border: 1px solid #e5e6e7;position:relative;top:3000px;z-index:1" id="example-container">
+        <img id="bgimg" :src="dwtpdata['bg']" v-if="dwtpdata['bg']"/> 
+       <template v-for="(d,index) in dwtpdata['datas']" >
+            <div class="drag" 
+                :style='"font-size:"+d.size+"pt; z-index:"+index+";left:"+d.left+";top:"+d.top+";width:"+d.width+";height:"+d.height+"; text-align:"' style="position: absolute;" :id='"drag"+index'>
+                <template v-if="d['cate']==1">
+                    <div class="text" :style='"font-family: "+d.font+";font-size:"+d.size+"pt;color: "+d.color+";{if !empty($d['bold'])}font-weight:bold;{/if}"'>
+                        {{d['pre']}}
+                        {{d.string}}
+                        {{d['last']}}
+                    </div>
+                </template>
+            </div>
+       </template>
+    </div>
+</div>
+</div>
+<!-- </script> -->
+</div> 
+
+<!-- 下载界面 -->
+<div id="example-2">
+<script id="contentr2" type="text/html">
+	<div class="form-group">
+		<div class="downloadleft">尺寸</div>
+		<div class="downloadright"></div>
+	</div>
+</script>
+<script id="contentr" type="text/html">
+	<div class="form-group">
+		<div class="col-sm-2">
+		尺寸
+		</div>
+		<div class="col-sm-9">
+			<div class="col-sm-4">
+				 <button type="button" class="btn btn-info" style="padding:5px 40px;">大</button>
+				 <p class="help-block" >1080*1920</p>
+		    </div>
+			<div class="col-sm-4">
+				<button type="button" class="btn btn-info" style="padding:5px 40px;">中</button>
+				<p class="help-block" >750*1334</p>
+			</div>
+			<div class="col-sm-4">
+				<button type="button" class="btn btn-info" style="padding:5px 40px;">小</button>
+				<p class="help-block">350*750</p>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-2">
+		尺寸
+		</div>
+		<div class="col-sm-9">
+			<form class="form-inline">
+		 <div class="form-group">
+			    <label for="exampleInputName2">宽度</label>
+			    <input type="text" class="form-control" id="exampleInputName2" style="width:100px">
+		 </div>
+		 <div class="form-group">
+			    <label for="exampleInputEmail2">高度</label>
+			    <input type="email" class="form-control" id="exampleInputEmail2" style="width:100px">
+		 </div>
+		  <div class="form-group" style="line-height: 40px">
+			    <div style="font-size: 9px">宽高自动匹配</div>
+		 </div>
+		   </form>
+		</div>
+	</div>
+</script>
+
+<script type="text/javascript">
+	var  empt= new Vue({
+  el: '#example-1',
+  data: {
+    name: 'Vue.js',
+    shop:"",
+    dwtpdata:[],
+    itemdata:"",
+    tplist:[]
+  },
+  methods: {
+    shopmatching: function () {
+        var that=this
+        //匹配真实数据
+    	 //that.dwtpdata=datamatching(that.shop,that.dwtpdata);
+    	picture("example-container","jpg",this.shop.name);
+    },
+     downloadshoptp: function (index) {
+     	var that=this
+         alert("444");
+  //    	var data=JSON.parse(that.tplist);
+  //    	var itemdata=data[index]
+  //    	that.dwtpdata=itemdata
+
+  //    	var index=layer.open({
+		// 	  title: '下载'
+		// 	  ,content: $("#contentr").html()
+		// 	  ,btn: ['生成下载']
+		// 	  ,shade: 0
+		// 	  ,area: ['600px', '300px']
+		// 	  ,yes: function(index, layero){
+		// 	  	for (var i = itemdata['datas'].length - 1; i >= 0; i--) {
+  //                   if(itemdata['datas'][i]['string']){
+  //                   if(itemdata['datas'][i]['string'].indexOf("img")>=0){
+		//      		var htmldata= itemdata['datas'][i]['string'].replace("\"","").replace("\"","");
+  //                      }
+  //                  }
+		//      		$("#example-container #drag"+i+" .text").html(htmldata)
+  //    			}
+		// 	  	that.itemdata=itemdata
+
+		// 	  	//empt.shopmatching()
+		// 		}
+		// });
+    },
+  },
+ created() {
+    console.log("33");
+ 	this.shop=<?php echo son_encode($shop);?>
+ 	this.tplist=<?php echo json_encode($tplist2);?>
+  }
+})
+
+</script>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_fans_title']}</title>
+{template 'head'}
+<script type="text/javascript">
+window.onload = function() { 
+	wx.ready(function () {
+		sharedata = {
+			title: "{$extension_one['extension_sharetitle']}",
+			desc: "{$extension_one['extension_sharedesc']}",
+			link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('fansbyrecommend', array('op'=>'create','extension_id'=>$extension_one['extension_id'],'parentid'=>$line_fans_list['fans_id'],'extension_type'=>1)))}",
+			imgUrl: "{php echo tomedia($extension_one['extension_shareimg'])}",
+			type: '', // 分享类型,music、video或link，不填默认为link
+			dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+			success: function(){
+				getsharered();
+			},
+			cancel: function(){
+			}
+		};
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+		wx.onMenuShareQZone(sharedata);
+	});	
+}
+
+</script>
+</head>
+
+<body>
+	<iframe id="iframepage" onLoad="iFrameHeight()" name="iframepage" src="{$extension_one['extension_taskredurl']}" frameborder="0" width="100%"
+		height="1000px" scrolling="yes" marginheight="0px" marginwidth="0px" seamless></iframe>
+</body>
+<script type="text/javascript">
+	function iFrameHeight() {
+		var ifm= document.getElementById("iframepage");
+		var subWeb = document.frames ? document.frames["iframepage"].document : ifm.contentDocument;
+		if(ifm != null && subWeb != null) {
+			ifm.height = subWeb.body.scrollHeight;
+		}
+	}
+	function getsharered(){
+		var extension_id={$extension_one['extension_id']};
+		$.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('fansbyrecommend',array('op'=>'sharesuccess'));}",
+          data:{extension_id:extension_id},
+          dataType:"json",
+          async:false,
+          success:function(data){
+
+            //清空联动数据
+            alert(data);
+        }
+      });
+	}
+</script>
+</html>

@@ -1,0 +1,507 @@
+
+<link href="{ZSK_STATIC}bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="{ZSK_STATIC}layui/css/layui.css" rel="stylesheet">
+<script language='javascript' src="{ZSK_STATIC}js/jquery.min.js"></script>
+<script language='javascript' src="{ZSK_STATIC}layui/layui.all.js"></script>
+<script language='javascript' src="{ZSK_STATIC}js/vue.js"></script>
+
+<script language='javascript' src="{ZSK_STATIC}bootstrap/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+<script language='javascript' src="{ZSK_STATIC}dsg/js/jszip.min.js"></script>
+<!-- <script language='javascript' src="/addons/zsk_market/static/dsg/js/jszip.js"></script> -->
+<script language='javascript' src="{ZSK_STATIC}dsg/js/downloadtp.js"></script>
+<script language='javascript' src="{ZSK_STATIC}dsg/js/FileSaver.js"></script>
+<script language='javascript' src="{ZSK_STATIC}dsg/js/layer.js"></script>
+
+
+<style type='text/css'>
+#container {position: relative;  overflow: hidden;width:300px;}
+.items label {width: 120px; margin: 0; float: left;}
+#container .bg {position: absolute; width: 100%; z-index: 0;}
+#container .drag {position: absolute; min-width: 120px; min-height: 25px;z-index: 1; top: 10px; left: 100px;cursor: move;}
+.downloadleft {width:20%;float:left;}
+.downloadright {width:80%;float:left}
+.layui-layer{top:100px !important;}
+.form-group{margin-top: 9px;height: 30px;}
+.cate{width:100%;border-top:1px solid #f2f2f2;}
+.cate .leftsc{
+        overflow-x: hidden;
+        overflow-y: scroll;
+    }
+.cate .leftsc::-webkit-scrollbar {
+        display: none;
+    }
+.cate0 {width: 100%; line-height:16px;padding:17px 0px; font-size:14px;text-align: center;border-bottom:1px solid #f2f2f2;background-color:#FFF;font-size: 10px}
+.cate0-active{width: 100%;line-height:16px;padding:17px 0px;font-size:15px;text-align: center;border-right: 1px solid #eee;color:#ff4444;font-weight:700;border-bottom:1px solid #f2f2f2;background-color:#f2f2f2;}
+.cate .left{float: left;width:19%;height: 100%;border-right: 1px solid #f2f2f2 ;background-color:#ffffff;text-align: center;font-size: 14px;}
+.cate .index{float: left;width: 26%;height: 100%;border-right: 1px solid #f2f2f2 ;background-color:#FFFFFF;text-align: center;font-size: 17px;}
+.cate .right{float:left;width:80%;height: 100%; overflow-x: hidden;overflow-y: scroll;}
+.cate .right::-webkit-scrollbar {
+        display: none;
+    }
+.goods{
+  width: 100%;float:left;padding: 5px 0px;height: 40px;position: relative;  
+}
+.goods-pic{width:50px;height:50px;float: left;padding:5px 5px;margin-left:5px;margin-top:4px}
+.goods-name{padding-top:6px;font-size:16px;}
+.goods-price{color:#ff4444;}
+.goods-pic .pic{width:30px;height:30px;border-radius:3px;}
+.goodsright{float:left;height:100%; word-break:break-all;}
+.checkboxs{float:left;margin-top: 10px; width: 20px;margin-left:10px;}
+.tanchu{position: absolute;top:0px;z-index:200;}
+.btn-info{font-size: 10px}
+p{font-size: 10px}
+.layui-layer{top:25px !important;}
+.form-control{height: 25px;font-size: 10px}
+</style>
+<div id="example-1">
+<div class="panel panel-info" style="background-color:#ffffff;border:0px">
+    <div class="panel-heading" >海报下载</div>
+    <div class="panel-body" :style="'position:absolute;z-index:20;background-color: #ffffff;width:100%;height:'+sizeheightr">
+        <table class="layui-table">
+            {loop $ay $y $x}
+            {if $x==1}
+            <div style="font-size:15px;padding:4px 0px;margin-left:30px">店铺名片</div>
+            {/if}
+            {if $x==2}
+            <div style="font-size:15px;padding:4px 0px;margin-left:30px">商品二维码</div>
+            {/if}
+            {if $x==3}
+            <div style="font-size:15px;padding:4px 0px;margin-left:30px">价格标签</div>
+            {/if}
+            {loop $tplist $index $item}
+            {if $item['type']==$x&&$item}
+
+            <div style="width:{$item['widthr']};float:left;margin-left:30px;">
+            <div style="width:{$item['widthr']};height:{$item['heightr']};border: 1px solid #e5e6e7;float:left;box-shadow: 0.1px 0.1px 9px #ccc;"  id="container">
+        <img id="bgimg{$index}" src="{$item['bg']} " {if empty($item['bg'])} style="display: none;"{/if} /> 
+        {loop $item['datas'] $k $d}
+            <div class="drag" cate="{$d['cate']}" index="{$k}" items="{$d['items']}" item-string="{$d['string']}" item-font="{$d['font']}" 
+                item-size="{$d['size']}" item-color="{$d['color']}" item-bold="{$d['bold']}" item-pre="{$d['pre']}" item-last="{$d['last']}" item-align="{$d['align']}"
+                style="font-size:{$d['size']}pt; z-index:{$k};left:{$d['left']};top:{$d['top']};width:{$d['width']};height:{$d['height']}; text-align:{if $d['align']=='' || $d['align']==1}left{elseif $d['align']==2}center{elseif $d['align']==3}right{/if}" item-virtual="{$d['virtual']}" cate="$d['cate']">
+                
+                {if $d['cate']==1}
+                    <div class="text" style="{if !empty($d['font'])}font-family: {$d['font']};{/if} font-size:{if !empty($d['size'])}{$d['size']}{else}4{/if}pt;{if !empty($d['color'])}color: {$d['color']};{/if}{if !empty($d['bold'])}font-weight:bold;{/if}">
+                        {$d['pre']}{$d['string']}{$d['last']}
+                    </div>
+                {else if $d['cate']==2}
+                    <div class="text-table" style="padding: 10px; {if !empty($d['font'])}font-family: {$d['font']};{/if} font-size:{if !empty($d['size'])}{$d['size']}{else}4{/if}pt; {if !empty($d['color'])}color: {$d['color']};{/if}"> 
+                        <?php 
+                            $items = explode(',',$d['items']); 
+                            $strings = explode(',',$d['string']); 
+                            $virtuals = explode(',',$d['virtual']); 
+                            $stringsnum = count($strings);
+                        ?>
+                        <table border="1" style="width:100%">
+                            <tr style="font-weight: bold;">
+                                {loop $strings $i $s}
+                                    <td>
+                                    {$s}
+                                    </td>
+                                {/loop}
+                            </tr>
+                            <?php 
+                                for ($x=1; $x<5; $x++) {
+                            ?>
+                                <tr>
+                                    {loop $virtuals $i $v}
+                                        <td>
+                                            {if $v!==''}
+                                                {if $v=='number'}
+                                                    {$x}
+                                                {else}
+                                                    {$v}{$i}
+                                                {/if}
+                                            {else}
+                                                {$v}
+                                            {/if}
+                                        </td> 
+                                    {/loop}
+                                </tr>
+                            <?php } ?>
+                            <tr>
+                                {loop $items $i $s}
+                                    <td>
+                                        {if $s=="total"}总计:11{/if}
+                                        {if $s=="productprice"}总计:11{/if}
+                                        {if $s=="marketprice"}总计:11{/if}
+                                        {if $s=="realprice"}总计:11{/if}
+                                        {if $s=="allprice"}总计:11{/if}
+                                    </td> 
+                                {/loop}
+                            </tr>
+                        </table>
+                    </div>
+                {/if}
+            </div>
+            
+        {/loop}
+    </div>
+    <div style="clear:both;"></div>
+    <div style="clear:both;width:100%;font-size:11px;margin-top:15px">
+                <div style="width:50%;text-align: left;float:left;">{$item['name']}</div>
+                <div style="width:50%;text-align: right;float:left;color:#3F6EA4" v-on:click="downloadshoptp({$index},{$item['type']})">下载</div>
+    </div>
+    </div>
+    {/if}
+            {/loop}
+             <div style="clear:both;height: 50px"></div>
+            {/loop}
+        </table>
+    </div>
+    <!-- 模板界面 -->
+<!-- <script  id="examplecontainerrr" type="text/html"> -->
+ <div :style="'height:'+sizeheightr+'; width:'+sizewidthr+'; position:relative;top:0px;z-index:1;background-color:#fff;'" id="example-container">
+        <img id="bgimg" :src="dwtpdata['bg']" v-if="dwtpdata['bg']"/> 
+       <template v-for="(d,index) in dwtpdata['datas']" >
+            <div class="drag" 
+                :style='"font-size:"+d.size+"pt; z-index:"+index+";left:"+d.left+";top:"+d.top+";width:"+d.width+";height:"+d.height+"; text-align:"' style="position: absolute;" :id='"drag"+index'>
+                <template v-if="d['cate']==1">
+                        <div class="text" :style='"font-family: "+d.font+";font-size:"+d.size+"pt;color: "+d.color+";font-weight:bold;"' v-if="d.bold">
+
+                        {{d['pre']}}
+                        <div v-html="d['string']"></div>
+                        {{d['last']}}
+                    </div>
+                        <div class="text" :style='"font-family: "+d.font+";font-size:"+d.size+"pt;color: "+d.color+";"' v-else>
+
+                        {{d['pre']}}
+                        <div v-html="d['string']"></div>
+                        {{d['last']}}
+                    </div>
+                </template>
+            </div>
+       </template>
+    </div>
+</div>
+ <!-- </script> -->
+ <div class="layui-layer-move" style="cursor: move; display: none;"></div><div class="layui-layer-shade" id="layui-layer-shade100002" times="100002" style="z-index: 19991015; background-color: rgb(0, 0, 0); opacity: 0.6;" v-if="displaystatus==1"></div>
+<div class="layui-layer layui-layer-page" id="layui-layer100002" type="page" times="100002" showtime="0" contype="string" :style="tancuwidth+'z-index: 19991016;top:20px ! important '" v-if="displaystatus==1">
+
+    <div class="layui-layer-title" style="cursor: move;">下载</div>
+    <div id="" class="layui-layer-content" :style="tancucontent">
+
+<!-- <div id="contentr2" :style="displaystatus" class="tanchu"> -->
+    <div class='cate' style='height:50%' v-if="type!=1">
+    <div  class='left' id='left' style='overflow:hidden;'  >
+        <div style='width:100%;height:100%;'   class="leftsc">
+                  <template v-for="(item,index) in goodscates" >
+                    <div     class="cate0" v-on:click="onclickcate(item.childcateid)"> 
+                    <!--  <div   class="cate0" onclick="onclickcate('{{item.id}}')"> -->
+                         {{item.name}}
+                    </div>
+                   </template>
+                    <div style='width:100%;height:70px;background-color:#ffffff'></div> 
+        </div>
+    </div>
+<div class='right' style='height:100%' >
+<div  style='width:100%;height:100%' >
+   <template v-for="(item,index) in goodslist" >
+     <!--  <div class="goods" v-if="item.cateid==cateid"> -->
+         <div class="goods" v-if="cateid.indexOf(','+item.cateid+',')>=0">
+                <div class="checkboxs">
+                    <input id="id" type="checkbox" :value="item.id" v-on:click="checkboxset(item.id)" checked="true" v-if="parseFloat(stid.indexOf(item.id))>=0">
+                    <input id="id" type="checkbox" :value="item.id" v-on:click="checkboxset(item.id)" v-if="parseFloat(stid.indexOf(item.id))<0">
+                </div>
+                 <div class='goods-pic' >
+                    <image class='pic'   mode="aspectFill" :src="attachurl+item.picture"></image>
+                 </div>
+                  <div class='goodsright' style='width:80%'>
+                  <div class='goods-name' style='float:left;width:100%;word-break:break-all;text-overflow: ellipsis;white-space: nowrap;font-size: 10px'>
+                     {{item.name}}
+                  </div>
+                </div>
+        </div>
+    </template>
+       <div style='width: 100%;height:70px; clear:both;'></div> 
+ </div>
+</div>
+</div>
+<div >
+    <div style="clear:both;height: 5px"></div>
+    <div class="form-group">
+        <div class="col-sm-2" style="font-size: 10px">
+        尺寸
+        </div>
+        <div class="col-sm-9">
+            <div class="col-sm-4">
+                 <button type="button" class="btn btn-info" style="padding:0px 20px;" v-on:click="sizeslt(sizewidthr*2,sizeheightr*2)">大</button>
+                 <p class="help-block" >{{sizewidthr*2}}*{{sizeheightr*2}}</p>
+            </div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-info" style="padding:0px 20px;" v-on:click="sizeslt(sizewidthr,sizeheightr)">中</button>
+                <p class="help-block"  >{{sizewidthr}}*{{sizeheightr}}</p>
+            </div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-info" style="padding:0px 20px;" v-on:click="sizeslt(sizewidthr/2,sizeheightr/2)">小</button>
+                <p class="help-block"  >{{sizewidthr/2}}*{{sizeheightr/2}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2" style="font-size: 10px">
+        尺寸
+        </div>
+        <div class="col-sm-9">
+            <form class="form-inline">
+         <div class="form-group">
+                <label for="exampleInputName2" style="font-size: 10px">宽度</label>
+                <input type="text" class="form-control" id="inputvaluewidth" style="width:100px" :value="sizewidth" v-on:input="onchangew()">
+         </div>
+         <div class="form-group">
+                <label for="exampleInputEmail2" style="font-size: 10px">高度</label>
+                <input type="email" class="form-control" id="inputvalueheight" style="width:100px" :value="sizeheight" v-on:input="onchangeh()">
+         </div>
+          <div class="form-group" style="line-height: 40px">
+                <div style="font-size: 9px">宽高自动匹配</div>
+         </div>
+           </form>
+        </div>
+    </div>
+  </div>
+
+</div>
+  <span class="layui-layer-setwin" v-on:click="closetancu()"><a class="layui-layer-ico layui-layer-close layui-layer-close1" href="javascript:;"></a></span>
+  <div class="layui-layer-btn layui-layer-btn-" style="background-color: #ffffff"><a class="layui-layer-btn0" v-on:click="downloadshoptpto(indexr,type)">生成下载</a></div>
+<!-- </div> -->
+</div>
+<!-- </script> -->
+</div>
+</div> 
+<!-- 下载界面 -->
+
+<script type="text/javascript">
+    var  empt= new Vue({
+  el: '#example-1',
+  data: {
+    name: 'Vue.js',
+    shop:"",
+    dwtpdata:[],
+    dwtpdatark:[],
+    itemdata:"",
+    tplist:[],
+    tplistr:[],
+    attachurl:"",
+    goodscates:[],
+    goodslist:[],
+    goodsselectid:[],
+    savepictureall:[],
+    savepictureallname:[],
+    type:2,
+    cateid:"",
+    displaystatus:0,
+    sizewidthr:600,
+    sizeheightr:900,
+    sizewidth:600,
+    sizeheight:900,
+    tancuwidth:"",
+    tancucontent:"",
+    indexr:"",
+    goodsdata:[],
+    stid:[],
+  },
+  methods: {
+    onchangew:function (){
+        var type=this.type
+        var width=$('#inputvaluewidth').val();
+         if(type==1||type==2){
+            //2:3
+         this.sizewidth=width
+         this.sizeheight= width*3/2
+        }
+        else{
+             //3:2
+         this.sizewidth=width
+         this.sizeheight= width*2/3
+        }
+    },
+     onchangeh:function (){
+        var type=this.type
+        var height=$('#inputvalueheight').val();
+        if(type==1||type==2){
+            //2:3
+         this.sizewidth=height*2/3
+         this.sizeheight= height
+        }
+        else{
+             //3:2
+         this.sizewidth=height*3/2
+         this.sizeheight= height
+        }
+    },
+    closetancu: function (){
+      this.displaystatus=0
+
+    },
+    onclickcate: function (id){
+      this.cateid=id
+      console.log(this.cateid);
+  },
+  sizeslt: function (width,height){
+    this.sizewidth=width
+    this.sizeheight=height
+  },
+    shopmatching: function (index,type,datar,datar2,kl) {
+        var that=this
+        if(type==1){
+        picture("example-container","jpg",this.shop.name,empt);
+        }
+         if(type==2||type==3){
+        pictureallr("example-container","jpg",datar['name'],empt,function(res){
+            if(res==400){
+                kl=kl+1
+                empt.pictureall(kl,index,type,datar2,that);
+            }
+
+        });
+        }
+    },
+    downloadshoptpto: function (indexr,type) {
+      var that=this
+      var data=that.tplist;
+      var itemdata=data[indexr]
+        that.dwtpdata=itemdata
+        that.dwtpdatark=that.tplistr[indexr]
+        that.savepictureall=[]
+        that.savepictureallname=[]
+              if(type==1){
+              datamatching(that.shop,that.dwtpdatark,that,function(res){
+                     if(res==400){
+                empt.shopmatching(indexr,type,that.shop)
+            }
+                });
+          }
+          // 商品二维码,价格标签
+          if(type==2||type==3){
+            var goodslist= that.goodslist
+            var a=[];
+            for (var i = goodslist.length - 1; i >= 0; i--) {
+                if(that.goodsselectid.indexOf(goodslist[i].id)>=0){
+                    a.push(goodslist[i]);
+                }
+            }
+            that.goodsdata=a
+            //获取商品二维码
+             $.ajax({
+                    url:"<?php echo $this->routeUrl('printerupdate.selectgoodscode');?>",
+                    type:"Post",
+                    data:{
+                        goods:JSON.stringify(a)
+                    },
+                    dataType:"json",
+                    success:function(res){
+                        a=res.goods
+                        that.savepictureall=[];
+                        empt.pictureall(0,indexr,type,a,that);
+                    }
+                });
+           
+          }
+        that.displaystatus=0
+        layer.msg("正在生成图片....!");
+             
+            
+    },
+     downloadshoptp: function (indexr,type) {
+        var that=this
+         that.type=type
+         that.indexr=indexr
+         that.stid=[]
+        var tancuwidth=$(document.body).width()/5;
+        if(type!=1){
+        that.tancuwidth="left:"+tancuwidth+"px;width:600px;height:400px;"
+        that.tancucontent=""
+        }
+        else{
+        that.tancuwidth="left:"+tancuwidth+"px;width:500px;height:250px;"
+        that.tancucontent=""
+        }
+        if(type==1||type==2){
+        that.sizewidth="600"
+        that.sizeheight="900"
+        that.sizewidthr="600"
+        that.sizeheightr="900"
+        }
+        else{
+        that.sizewidth="900"
+        that.sizeheight="600"
+         that.sizewidthr="900"
+        that.sizeheightr="600"
+        }
+        that.displaystatus=1
+    },
+
+    pictureall:function (i,indexr,type,a,that) {
+         if (i<a.length) {
+                         datamatching(a[i],that.dwtpdatark,that,function(res){
+                            if(res==400){
+                          empt.shopmatching(indexr,type,a[i],a,i)
+                            }
+                          });
+            }
+
+    },
+     picturezip: function () {
+        var imgBase64=this.savepictureall
+        var imgBase64name=this.savepictureallname
+        if(imgBase64.length==this.goodsdata.length){
+            var zip = new JSZip();
+            var img = zip.folder("images");
+            for(var i=0;i<imgBase64.length;i++){
+              img.file(imgBase64name[i]+'.jpg', imgBase64[i], {base64: true});
+            }
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                  saveAs(content, "imagesshop.zip");
+            });
+        }
+        
+     },
+     checkboxset: function (id) {
+        var that=this
+        var a=that.stid;
+        var index=a.indexOf(id)
+        if(a.indexOf(id)<0){
+        a.push(id)
+        }
+        else{
+        a.splice(index, 1);
+        }
+          console.log(a);
+          that.goodsselectid=a
+
+     }
+  },
+ created() {
+    var that=this
+    var data="<?php echo $tplist;?>"
+     for (var i = data.length - 1; i >= 0; i--) {
+             var w=$("#bgimg"+i).width()/3; 
+             var h=$("#bgimg"+i).height()/3; 
+             console.log(w);
+             $("#bgimg"+i).css("width",w);
+             $("#bgimg"+i).css("height",h);
+      }
+    $.ajax({
+        url:"<?php echo $this->routeUrl('printerupdate.printerjson');?>",
+        type:"Post",
+        dataType:"json",
+        success:function(res){
+             console.log(res);
+            that.shop=res.shop
+            that.tplist=res.tplist2
+            that.tplistr=res.tplist2
+
+            that.attachurl=res.attachurl
+            that.goodscates=res.goodscates
+            that.cateid=res.goodscates[0].childcateid
+            that.goodslist=res.goodslist
+            
+        }
+    });
+    setInterval(function() {
+
+       }, 100);
+  }
+
+})
+</script>

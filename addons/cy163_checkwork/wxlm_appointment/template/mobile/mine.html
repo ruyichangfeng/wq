@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+    {template 'head'}
+    <title>{php echo $this->config['system_name']}</title>
+
+</head>
+<style>
+.center-con01 .col-xs-8{
+        position: relative;
+}
+.center-con01-a img{
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right:20px;
+    top:20px;
+}
+
+    .dianzan img
+    {
+        width: 20px;
+        height: 20px;
+    }
+
+</style>
+
+<body>
+<div class="box ">
+	<div class="cont" style="margin-bottom: 60px;">
+		<div class="center-con">
+        	<div class="center-con01">
+            	<div class="col-xs-4 center-image">
+                	<img class="img-circle" src="{php echo tomedia($fans['avatar'])}">
+                </div>
+                <div class="col-xs-8">
+                	<div class="center-text01">{if !empty($archive)}{$archive['archive_name']}{else if !empty($fans['realname'])}{$fans['realname']}{else}{$fans['nickname']}{/if}</div>
+                    <div class="center-text02">手机号：{if !empty($archive)}{$archive['archive_tel']}{else}{$fans['mobile']}{/if}</div>
+                    <a href="{php echo $this->createMobileUrl('collection')}" class="center-con01-a"><img src="{RES}mobile/images/xing01.png" alt=""></a>
+                </div>
+            </div>
+            <div class="center-con02">
+                <div class="center-con02-b">
+                	<a class="center-con02-b01" href="{php echo $this->createMobileUrl('mine', array('op'=>'all'))}">
+                    	<img src="{RES}mobile/images/btn01.png">
+                        <div class="center-text04">全部预约</div>
+                    </a>
+                    <a class="center-con02-b01" href="{php echo $this->createMobileUrl('mine', array('op'=>'payok'))}">
+                    	<img src="{RES}mobile/images/btn02.png">
+                        <div class="center-text04">已支付</div>
+                    </a>
+                    <a class="center-con02-b01" href="{php echo $this->createMobileUrl('mine', array('op'=>'payno'))}">
+                    	<img src="{RES}mobile/images/btn03.png">
+                        <div class="center-text04">待支付</div>
+                    </a>
+                    <a class="center-con02-b01" href="{php echo $this->createMobileUrl('mine', array('op'=>'refund'))}">
+                    	<img src="{RES}mobile/images/btn04.png">
+                        <div class="center-text04">待退款</div>
+                    </a>
+                    <a class="center-con02-b01" href="{php echo $this->createMobileUrl('mine', array('op'=>'finish'))}">
+                    	<img src="{RES}mobile/images/btn05.png">
+                        <div class="center-text04">已完成</div>
+                    </a>
+                </div>
+            </div>
+            {loop $orders $key $item}
+            <div class="center-con03">
+            	<div class="center-con03-t">
+                	<div class="center-text05">订单编号：{$item['order_number']}</div>
+                    <div class="center-text06">{if $item['order_state'] == 1}待付款{else if $item['order_state'] == 2 && empty($item['orderrefund_id'])}已付款{else if $item['order_state'] == 2 && !empty($item['orderrefund_id'])}退款中{else if $item['order_state'] == 3}已完成{else if $item['order_state'] == 4}已关闭{/if}</div>
+                </div>
+                <div class="center-con03-c">
+                	<div class="col-xs-4">
+                    	<img src="{php echo tomedia($item['store_pic'])}" width="100%">
+                        <!--<div>{$item['store_name']}</div>-->
+                    </div>
+                    <div class="col-xs-8">
+                    	<div class="center-text07">{$item['project_name']} {if $item['order_state'] == 3}<div class="dianzan" style="float: right;">
+                            <img   id="dianzan_1_{$item['order_id']}"  onclick="dianZan('{$item['order_id']}')" src="{RES}mobile/images/xin03.png" {if $item['fabulous'] == 2}style="display: none" {/if} >
+                            <img  id="dianzan_2_{$item['order_id']}"   src="{RES}mobile/images/xin02.png" {if $item['fabulous'] == 1}style="display: none" {/if}>
+                        </div>
+                            {/if}</div>
+                    	<div class="center-text08">下单时间：{$item['order_time_add']}</div>
+                    </div>
+                </div>
+                <div class="center-con03-b">
+                	<div class="center-con03-b01">
+                        {if $item['order_state'] == 1}
+                        <a  class="btn btn-success" href="{php echo $this->createMobileUrl('pay', array('order_number'=>$item['order_number']))}">立即支付</a>
+                        {/if}
+                        {if $item['order_state'] < 3}
+                        <a class="btn btn-default" href="tel://{$item['store_tel']}">联系客服</a>
+                        {/if}
+                        {if $item['order_state'] == 2&& $item['order_refund'] == 1 && empty($item['orderrefund_id'])}
+                        <a class="btn btn-warning"href="{php echo $this->createMobileUrl('Refund', array('order_id'=>$item['order_id']))}">申请退款</a>
+                        {/if}
+                        {if $item['order_state'] < 4}
+                        <a class="btn btn-primary" href="{php echo $this->createMobileUrl('orderInfo', array('order_id'=>$item['order_id']))}">订单详情</a>
+                        {/if}
+                        {if $item['order_state'] ==5}
+                        <a class="btn btn-danger" href="{php echo $this->createMobileUrl('orderInfo', array('order_id'=>$item['order_id']))}">失效订单</a>
+                        {/if}
+					</div>
+                </div>
+            </div>
+            {/loop}
+            {if !empty($page)}
+            <div style="text-align:center">
+                {$page}
+            </div>
+            {/if}
+        </div>
+    </div>
+    <ul class="footer">
+        {if $_SESSION['index'] == 2}
+        <li class="{if $this->config['show_state'] == 2}col-xs-4{else}col-xs-6{/if} ">
+            <a href="{php echo $this->createMobileUrl('other', array())}">
+                <img src="{RES}mobile/images/icon01.png">
+                <span>首页</span>
+            </a>
+        </li>
+        {else}
+        <li class="{if $this->config['show_state'] == 2}col-xs-4{else}col-xs-6{/if} ">
+            <a href="{php echo $this->createMobileUrl('index', array())}">
+                <img src="{RES}mobile/images/icon01.png">
+                <span>首页</span>
+            </a>
+        </li>
+        {/if}
+        <li class="{if $this->config['show_state'] == 2}col-xs-4{else}col-xs-6{/if} dq">
+            <a href="{php echo $this->createMobileUrl('mine', array())}">
+                <img src="{RES}mobile/images/icon002.png">
+                <span>个人中心</span>
+            </a>
+        </li>
+        {if $this->config['show_state'] == 2}
+        <li class="col-xs-4">
+            <a href="{php echo $this->createMobileUrl('show', array())}">
+                <img src="{RES}mobile/images/icon03.png">
+                <span>作品</span>
+            </a>
+        </li>
+        {/if}
+    </ul>
+</div>
+</body>
+<script>
+    function dianZan(id) {
+
+        if (id == '')
+        {
+            return false;
+        }
+
+        $.ajax({
+
+            url:"{php echo $this->createMobileUrl('dianZan')}" + "&orderid=" + id,
+            type:"get",
+            success:function (data) {
+
+
+                if (data == 1)
+                {
+                  $('#dianzan_1_'+id).css('display', 'none');
+                  $('#dianzan_2_'+id).css('display', 'block');
+
+                } else if (data == 3)
+                {
+                    alert('您已为其点赞, 不可重复点赞!')
+
+                } else if (data == 2)
+                {
+                    alert('点赞失败, 请稍后再试');
+                }
+            }
+        })
+    }
+</script>
+</html>

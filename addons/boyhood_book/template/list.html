@@ -1,0 +1,309 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li><a href="./index.php?c=platform&a=reply&do=post&m={php echo $this->modulename}">新建活动</a></li>
+    <li {if !$op} class="active" {/if}><a href="{php echo $this->createWebUrl('manage')}">预约活动</a></li>
+    <li  {if $op == 'post'}class="active" {/if}><a href="{php echo $this->createWebUrl('manage',array('op'=>'post'))}">新增业务</a></li>
+    <li {if $op == 'display'}class="active" {/if}><a href="{php echo $this->createWebUrl('manage',array('op'=>'display'))}">预约业务</a></li>
+    {if $op == 'record'}<li class="active" ><a>预约记录</a></li>{/if}
+</ul>
+<style>
+th{
+	text-align: center !important;
+}
+
+td{
+	text-align: center !important;
+	white-space: normal !important;
+	word-break: break-all !important;
+}
+ .cate_edit{
+	 float: right;
+	margin-top: 12px;
+	margin-right: 50px;
+	cursor: pointer;
+	font-size: 1.3em;
+ }
+ 
+ .cate_label{
+ 	padding: 5px;
+	font-size: 1.2em;
+	background-color: green;
+ }
+</style>
+{if $op == 'display'}
+<div class="panel panel-default">
+	<div class="panel-heading"><label>业务类型</label>
+		<select id='cate_select' style='margin-top:10px;width: auto;display: inline;' class="form-control" onchange='selectCate(this)'>
+			<option value="0">全部</option>
+			{loop $cates $c}
+			<option {if $cid == $c['id']}selected="selected"{/if} value="{$c['title']}" data-cid="{$c['id']}">{$c['title']}</option>
+			{/loop}
+		</select>
+		<span id="addCate" style="margin-top:15px;display:none">
+			<input placeholder='业务类型' class='span2 form-control' id='new_cate'  style="width: auto;display: inline;">
+				<a class='btn btn-primary' onclick='eidtCate(0)' style='margin-top:0;margin-left:10px'>添加</a>
+				<a class='btn btn-primary' onclick='$("#addCate").hide();' style='margin-top:0;'>取消</a>
+			</span> 
+			<a class='icon-plus-sign-alt' style='margin-left:10px;cursor:pointer'>添加业务类型</a>
+			<a class='cate_edit'>编辑业务类型</a>
+			<div style='clear:both'></div>
+			<div id="newsEdit" style="border-top: 1px solid thistle;padding-top: 10px;margin-top: 10px;display: none">
+				<span style='margin:10%;padding: 30px;'>
+					<a class='label cate_label'>业务类型名字</a>
+						<input id='cate_name' class='span2 margin_bottom form-control' style="margin-left: 5px;width: auto;display: inline;" >
+					<a class='btn btn-primary margin_bottom' onclick='eidtCate(1)'>修改</a>
+					<input type='hidden' id='old_cate'>
+					<a class='btn btn-danger margin_bottom' onclick='eidtCate(2)'>删除</a>
+				</span>
+			</div>
+	</div>
+	<div class="panel-body" style="text-align: center;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr>
+                	<th style="width: 50px;">排序</th>		
+                    <th>图片</th>		
+                    <th>标题</th>			
+                    <th>原价</th>
+                    <th>现价</th>
+                    <th>业务属性</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="table_content">
+                {loop $list $l}
+                <tr>
+                    <td>{$l['displayorder']}</td>
+                    <td><img src="{php echo toimage($l['thumb'])}" style="width: 80px;height: 80px;"></td>
+                    <td>{$l['title']}</td>
+                    <td>{$l['oprice']}</td>
+                    <td>{$l['nprice']}</td>
+                     <td><pre>{$l['content']}</pre></td>
+                    <td>
+                    	<a style="margin-bottom: 5px;" href='{php echo $this->createWebUrl("manage",array("op"=>"record","lid"=>$l["id"]))}' class="btn btn-info btn-sm">预约记录({$l['count']})</a><br>
+                    	<a href='{php echo $this->createWebUrl("manage",array("op"=>"post","id"=>$l["id"]))}' class="btn btn-default btn-sm">编辑</a>
+                    	<a href='{php echo $this->createWebUrl("manage",array("op"=>"delete","id"=>$l["id"]))}' onclick="return confirm('删除后将不可恢复，确定删除吗？')" class="btn btn-danger btn-sm">删除</a>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</div>
+<script>
+	$('.icon-plus-sign-alt').click(function(){
+		$('#addCate').show();
+	});
+	
+	$('.cate_edit').click(function(){
+		if($('#cate_select').val() != 0){
+			$("#newsEdit").toggle();
+			$('#old_cate').val($('#cate_select').val());
+			$('#cate_name').val($('#cate_select').val());
+		}
+	});
+	function deleteconfirm(){
+		return confirm("删除后将无法找回数据，确定删除吗");
+	}
+	
+	function eidtCate(type){
+		var data = {type:type,cid:$('#cate_select option:selected').attr('data-cid')};
+		if(type == 0){ //添加业务类型
+			if($('#new_cate').val() == ''){
+				alert('请输入业务类型名字');
+				return;
+			}
+			data['new_cate'] = $('#new_cate').val();
+		}else if(type == 1){ //修改业务类型
+			if($('#cate_name').val() == ''){
+				alert('请输入业务类型名字');
+				return;
+			}
+			data['new_cate'] = $('#cate_name').val();
+			data['old_cate'] = $('#old_cate').val();
+		}else if(type == 2){ //删除业务类型
+			if(confirm('删除业务类型，将删除该业务类型下的所有数据，且数据将不能找回，确认删除吗？')){
+				data['new_cate'] = $('#cate_name').val();
+			}else return;
+		}
+		$.ajax({
+			url:'{php echo $this->createWebUrl("editcate");}',
+			type: "POST",
+			data:data,
+			dataType: "json",
+			error : function(msg) {
+				alert("发送请求失败，请重试");
+			},
+			success : function(msg) {
+				if(msg > 0){
+					if(type == 0){
+						alert("添加业务类型成功");
+						$('#cate_select').append('<option data-cid="'+msg+'" selected="selected">'+$('#new_cate').val()+'</option>');
+						$('#table_content').empty();
+						$('#addCate').hide();
+					}else if(type == 1){
+						alert("修改业务类型成功");
+						$('#cate_select').find("option:selected").text($('#cate_name').val());
+						$("#newsEdit").toggle();
+					}else if(type == 2){
+						alert("删除业务类型成功");
+						window.location.reload();
+					}
+				}else if(msg == -1){
+					alert("该业务类型已存在");
+				}else alert("编辑业务类型失败");
+			}
+		});
+	}
+	
+	function selectCate(obj){
+		var cate = '&cate='+$('#cate_select option:selected').attr('data-cid');
+		if($(obj).val() == '0')
+			cate = '';
+		location.href = "{php echo $this->createWebUrl('manage',array('op'=>'display'))}"+cate;
+	}
+</script>
+{elseif $op == 'post'}
+<form action="" method="post" class="form form-horizontal" onsubmit="return checksubmit()">
+	<input type="hidden" name="op" value="{$op}">
+	<input type="hidden" name="id" value="{$item['id']}">
+<div class="panel panel-default">
+	<div class="panel-body">
+		<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">业务类型</label>
+					<div class="col-sm-2 col-xs-12">
+						<select style='width: auto;display: inline;' class="form-control" name="cate">
+							{loop $cates $cate}
+							<option {if $item['cate'] == $cate['id']}selected="selected"{/if} value='{$cate["id"]}'>{$cate['title']}</option>
+							{/loop}
+						</select>
+					</div>
+				</div>
+		<div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label"><font color="red">*</font>业务标题</label>
+             <div class="col-sm-9">
+              <input type="text" class="form-control" name="title" value="{$item['title']}">
+             </div>
+       </div>
+       <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">业务缩略图</label>
+             <div class="col-sm-9">
+             {php load()->func('tpl')}
+              {php echo tpl_form_field_image('thumb',$item['thumb']);}
+             </div>
+       </div>
+       <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">原价</label>
+             <div class="col-sm-9">
+              <input type="text" class="form-control" name="oprice" value="{$item['oprice']}">
+             </div>
+       </div>
+       <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">现价</label>
+             <div class="col-sm-9">
+              <input type="text" class="form-control" name="nprice" value="{$item['nprice']}">
+             </div>
+       </div>
+       <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">业务属性</label>
+             <div class="col-sm-9">
+              <textarea class="form-control" name="content" style="height: 100px;">{$item['content']}</textarea>
+              <div class="help-block">不同属性请以换行隔开</div>
+             </div>
+       </div>
+       <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+             <div class="col-sm-9">
+              <input type="number" class="form-control" name="displayorder" value="{$item['displayorder']}">
+             </div>
+       </div>
+        <div class="form-group">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+             <div class="col-sm-9">
+             	<button class="btn btn-primary" type="submit" name="submit" value="提交">提交</button>
+             	<input type="hidden" name="token" value="{$_W['token']}">
+             </div>
+       </div>
+	</div>
+</div>
+</form>
+<script>
+function checksubmit(){
+	if($.trim($('input[name="title"]').val()) == ''){
+		alert('业务标题必须填写！');
+		return false;
+	}
+}
+</script>
+{else}
+<div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" class="form-horizontal">
+            	<input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="{php echo $this->modulename}" />
+                <input type="hidden" name="do" value="manage" />
+                <input type="hidden" name="op" value="{$op}" />
+                 <input type="hidden" name="rid" value="{$rid}" />
+                 <input type="hidden" name="lid" value="{$lid}" />
+                <div class="form-group">
+                   <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">姓名</label>
+                    <div class="col-sm-2 col-lg-3">
+	                    <input type="text" name="name" value="{$name}" class="form-control" style="display: inline-block;">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">业务项目</label>
+                    <div class="col-sm-2 col-lg-3">
+	                    <input type="text" name="title" value="{$title}" class="form-control" style="display: inline-block;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">手机号码</label>
+                    <div class="col-sm-2 col-lg-3">
+	                    <input type="text" name="mobile" value="{$mobile}" class="form-control" style="display: inline-block;">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">到访时间</label>
+                     <div class="col-sm-2 col-lg-3">
+	                    {php load()->func('tpl');}
+	                         {php echo tpl_form_field_daterange('date', $date,true)}
+	                    </div>
+                    <div class="col-sm-3 col-lg-2"><button class="btn btn-default" type="submit"><i class="fa fa-search"></i> 搜索</button></div>
+                    <button class="btn btn-primary" type="submit" name="export" value="1">导出预约记录</button>
+                </div>
+            </form>
+        </div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-body" style="text-align: center;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr>
+                    <th>业务项目</th>		
+                    <th>预约人</th>			
+                    <th>联系电话</th>
+                    <th>预约人数</th>
+                    <th>到访时间</th>
+                    <th>预约时间</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="table_content">
+                {loop $list $l}
+                <tr>
+                     <td>{$l['title']}</td>
+                    <td>{$l['realname']}</td>
+                    <td>{$l['mobile']}</td>
+                    <td>{$l['num']}</td>
+                    <td>{php echo date('Y-m-d H:i',$l['visitetime'])}</td>
+                     <td>{php echo date('Y-m-d H:i:s',$l['createtime'])}</td>
+                     <td>{if $l['status']}<label class="label label-success">已处理</label>{else}<a class="btn btn-primary btn-sm" onclick="return confirm('确定已处理了吗？')" href="{php echo $this->createWebUrl('manage',array('op'=>'status','id'=>$l['id']))}">处理</a>{/if}</td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</div>
+{/if}
+{template 'common/footer'}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>{$cfg['title']} -- 用户中心首页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet"  href="{MODULE_URL}template/mobile/css/app.css" />
+		<style>
+			.vips{width:70px;height:25px;line-height:25px;font-size:12px;;margin:0 auto;background:#7EC0EE;text-align:center;
+			margin-top:10px;color:#fff;border-radius:5px;}
+			.vips a{color:#fff;}
+			
+		</style>
+	</head>
+
+	<body style="background:#fff;">				
+			<div class="mui-card" style="width:100%;margin:0px;border-radius:0px;background:#{$bgcolor};">
+				<div class="mui-card-header mui-card-media" style="">
+					<div class="navtar" style="width:80px;height:80px;overflow:hidden;"><img src="{$avatar}" style="border-radius:180px;width:80px;height:80px;margin-bottom:15px;"></div>
+					{if $isvip == 0}
+					<div class="vips" ><a href="{php echo $this->createMobileurl('upvip',array('aid'=>$cfg['aid'],'op'=>'index'))}">升级VIP</a></div>
+					<div class="agent_user_title" style="font-size:14px;margin-top:5px;">欢迎普通用户：{$nickname}</div>
+					{else}				
+					<div class="agent_user_title" style="font-size:14px;margin-top:5px;">欢迎VIP用户：{$nickname}</div>
+					{/if}
+					
+				</div>				
+			</div>
+			
+			<div class="mui-content" style="margin-bottom:10px;">
+		        <ul class="mui-table-view mui-grid-view mui-grid-9"  style="margin-top:0px;">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6" style="background:#fff;height:80px;">
+		                <div class="dtips">总消费</div>
+						<div class="dtips_n">
+						{if $count_money == ""}
+						0.00
+						{else}
+						{$count_money}
+						{/if}
+						元</div>
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6" style="background:#fff;height:80px;">
+		                <div class="dtips">余　额</div>
+						<div class="dtips_n">{$user['money']}元</div>
+					</li>				
+		        </ul> 
+			</div>
+			
+			<div class="mui-content" style="margin-top:0px;">
+			<ul class="mui-table-view mui-grid-view mui-grid-9"  style="background:#fff;margin-top:0px;">
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="
+					{php echo $this->createMobileurl('mnetwork',array('aid'=>$cfg['aid']))}	">
+		                <div class="mui-icon mui-icon-map" style="display:block;"></div>
+						<span style="font-size:14px;">网点分布</span></a>
+					</li>
+					<li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="{php echo $this->createMobileurl('recharge',array('aid'=>$cfg['aid']))}">
+		                <span class="mui-icon mui-icon-flag"  style="display:block;"></span>
+						<span style="font-size:14px;">在线充值</span></a>
+					</li>
+					<li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="#"  id="scanQRCode2">
+		                <span class="mui-icon mui-icon-spinner-cycle mui-spin"  style="display:block;"></span>
+						<span style="font-size:14px;">扫码支付</span></a>
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="{php echo $this->createMobileurl('mpaylog',array('aid'=>$cfg['aid']))}">
+		                <span class="mui-icon mui-icon-redo"  style="display:block;"></span>
+						<span style="font-size:14px;">财务记录</span></a>
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="{php echo $this->createMobileurl('muserinfo',array('op'=>'index','aid'=>$cfg['aid']))}">
+						<span class="mui-icon mui-icon-gear"  style="display:block;"></span>
+						<span style="font-size:14px;">我的资料</span></a>	
+					</li>
+		            <li class="mui-table-view-cell mui-media mui-col-xs-6"><a class="mui-navigate" href="javascript::"> 
+		               <span class="mui-icon mui-icon-help"   onclick="isClose()" style="display:block;"></span>
+						<span style="font-size:14px;">安全退出</span></a>
+					</li>
+				
+		        </ul> 
+				
+
+			</div>			
+		
+		<script src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+		<script src="{MODULE_URL}template/mobile/js/jquery-3.2.1.min.js"></script>
+		<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	</body>
+
+</html>
+
+<script>
+	function isClose() {		
+		//document.addEventListener('WeixinJSBridgeReady', function(){ WeixinJSBridge.call('closeWindow'); }, false);
+		WeixinJSBridge.call('closeWindow');
+    } 	
+</script>
+<script>
+	$(function(){
+		wx.config({
+		debug: false,
+		appId: '{$getSign["appId"]}',
+		timestamp: '{$getSign["timestamp"]}',
+		nonceStr: '{$getSign["nonceStr"]}',
+		signature: '{$getSign["signature"]}',
+		jsApiList: [
+			'scanQRCode',        		
+		]
+	  });
+	 // wx.ready(function () {
+		document.addEventListener('WeixinJSBridgeReady', function(){
+		//WeixinJSBridge.call('closeWindow'); 	
+		
+		  $("#scanQRCode2").click(function(){
+			wx.scanQRCode({
+			  needResult: 0,
+			  desc: 'scanQRCode desc',
+			  success: function (res) {
+				
+			  }
+			});
+		  });
+		
+		}, false);	
+		  
+	  //});	  
+	  $('#scanQRCode2').trigger('click'); 	
+	});
+</script>

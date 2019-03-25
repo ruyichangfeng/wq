@@ -1,0 +1,105 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('visittpl', array('op'=>'display'));}">回访内容</a></li>
+        <li ><a href="{php echo $this->createWebUrl('visittpl', array('op'=>'create'));}">添加回访内容</a></li>
+        <li style="float: right"><a class="btn btn-info" href="{php echo $this->createWebUrl('visittype', array('op'=>'display'));}">回访分类管理</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" >分类</label>
+                            <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                <select name="search[visittpl_typeid]" class="form-control">
+                                    <option value="">全部</option>
+                                    {loop $types $key $item}
+                                    <option value="{$item['visittype_id']}" {if $item['visittype_id'] == $search['visittpl_typeid']}selected{/if}>{$item['visittype_title']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">回访列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" >
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width: 10%">序号</th>
+                        <th style="width: 10%">分类</th>
+                        <th style="width: 40%">内容</th>
+                        <th style="width: 20%">添加时间</th>
+                        <th style="width: 20%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = ($pindex - 1) * $psize + 1;}
+                    {loop $visittpls $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['visittype_title']}</td>
+                        <td><p style="line-height: 20px; height: 40px; overflow-y: hidden">{$item['visittpl_content']}</p></td>
+                        <td>{$item['visittpl_time_add']}</td>
+                        <td>
+                            <a class="btn btn-primary" href="{php echo $this->createWebUrl('visittpl', array('op'=>'create', 'visittpl_id'=>$item['visittpl_id']))}">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('visittpl', array('op'=>'delete', 'id'=>$item['visittpl_id']))}">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($visittpls)}
+                    <tr>
+                        <td colspan="5">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="5">
+                            暂无回访内容
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+</script>
+{template 'common/footer'}

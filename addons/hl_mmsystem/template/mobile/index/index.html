@@ -1,0 +1,476 @@
+{template 'common/header'}
+<!-- IonRangeSlider -->
+<link href="{HLMMS_CSS}plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
+<link href="{HLMMS_CSS}plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">
+<!-- IonRangeSlider -->
+<script src="{HLMMS_JS}plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
+<style>
+    body {
+        background-color: white;
+    }
+    .chart {
+        height: 200px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 0px;
+    }
+    h5 {
+        margin-top: 30px;
+        font-weight: bold;
+    }
+    h5:first-child {
+        margin-top: 15px;
+    }
+    .title{
+        margin: 20px 15px 10px;
+        color: #6d6d72;
+        font-size: 15px;
+    }
+
+    .oa-contact-cell.mui-table .mui-table-cell {
+        padding: 11px 0;
+        vertical-align: middle;
+    }
+
+    .oa-contact-cell {
+        position: relative;
+        margin: -11px 0;
+    }
+
+    .oa-contact-avatar {
+        width: 75px;
+    }
+    .oa-contact-avatar img {
+        border-radius: 50%;
+    }
+    .oa-contact-content {
+        width: 100%;
+    }
+    .oa-contact-name {
+        margin-right: 20px;
+    }
+    .oa-contact-name, oa-contact-position {
+        float: left;
+    }
+    .mui-slider-indicator {
+        bottom: 0;
+    }
+
+    .mui-table-view.mui-grid-9{
+        background-color: white;
+    }
+    .mui-content-padded{
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .h4fontcss{
+        text-align: center;
+        color: #000000;
+    }
+    .mui-content{
+        background-color: white;
+    }
+
+    .message {
+        background-color: #fff;
+        z-index: 99;
+        box-shadow: 0px -5px 5px 0px rgba(150, 150, 150, .2);
+    }
+
+    .message.bottom {
+        position: fixed;
+        padding: 15px;
+        bottom: 0;
+        left: 0px;
+        right: 0px;
+    }
+
+    .message .icon {
+        width: 42px;
+        height: 42px;
+        float: left;
+        text-align: center;
+    }
+
+    .message .content {
+        padding-left: 55px;
+        font-size: 13px;
+    }
+
+    .icon .mui-icon {
+        font-weight: 28px;
+        font-weight: 700;
+        line-height: 42px;
+        color: #007AFF;
+    }
+
+    .action {
+        text-align: right;
+        padding-right: 2px;
+        margin-top: 18px;
+    }
+    #div {
+        width: 0px;
+        height: 0px;
+        background: red;
+        position: fixed;
+        top: 70%;
+        left: 50%;
+    }
+    /*移除底部或顶部三角,需要在删除此代码*/
+    .mui-popover .mui-popover-arrow:after {
+        width: 0px;
+    }
+</style>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <h1 class="mui-title">会员中心</h1>
+</header>
+<div class="mui-content">
+    <div class="mui-card">
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" style="background-image:url('{HLMMS_MOBILE_ICOS}bg.jpg');background-size:100% 100%;height: 100%">
+            <li class="mui-table-view-cell">
+                <div class="mui-slider-cell">
+                    <div class="oa-contact-cell mui-table">
+                        <div class="oa-contact-avatar mui-table-cell">
+                            {if $mobilememberinfo['mem_memberPicture']}
+                            <img src="{php echo tomedia($mobilememberinfo['mem_memberPicture'])}" width="60px" height="60px" />
+                            {else}
+                            <img src="{HLMMS_MOBILE_IMG}touxiang_logo.jpg" width="60px" height="60px" />
+                            {/if}
+                        </div>
+                        <div class="oa-contact-content mui-table-cell">
+                            <div class="mui-clearfix">
+                                <a href="{php echo $this->createMobileUrl('bindMemberInfo',array('op'=>'memberlevellist','memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                                <h4 class="oa-contact-name" style="margin-top: 26%;float: left;">{$mobilememberinfo['mem_memberName']}
+                                    <p >
+                                        {if $mobilememberinfo['membercardlevel_id'] == 0}
+                                        <span class="oa-contact-position mui-h6" style="float: left;padding-top: 10%"><span class="mui-icon mui-icon-weixin" style="color: #0bb20c;font-size: 15px"></span> 普通微信会员</span>
+                                        {else}
+                                        <span class="oa-contact-position mui-h6" style="float: left;padding-top: 10%"><span class="mui-icon mui-icon-spinner mui-spin"  style="color:red;font-size: 15px"></span> {php echo util::getMemberCardLevelOne($mobilememberinfo['membercardlevel_id']);}</span>
+                                        {/if}
+                                        {if $memberUpLevelPoints < 0}
+                                        <span class="oa-contact-position mui-h6 mui-badge mui-badge-danger" style="float: left;">会员等级已升至最高，查看规则<span class="mui-icon mui-icon-help"></span></span>
+                                        {else}
+                                        <span class="oa-contact-position mui-h6 mui-badge mui-badge-danger" style="float: left;">还差{$memberUpLevelPoints}积分升级，查看规则<span class="mui-icon mui-icon-help"></span></span>
+                                        {/if}
+                                    </p>
+                                </h4>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="mui-card-footer">
+            <h4>
+                卡号：{$back_memberMobile}
+            </h4>
+            <a class="mui-card-link" href="{php echo $this->createMobileUrl('bindMemberInfo',array('op'=>'displayQRcode','memberid'=>$mobilememberinfo['id']))}"><img class="mui-icon" style="width: 32px; height:32px;" src="{HLMMS_MOBILE_ICOS}member_tiaoma.png" /></a>
+        </div>
+    </div>
+    <div class="mui-card" style="padding-left: 8px;padding-right: 8px;padding-bottom: 8px;">
+        <input type="text" class="js-range-slider-member" />
+    </div>
+    <div class="mui-card">
+        <div class="mui-card-content">
+            <ul class="mui-table-view" >
+                <div class="mui-row" style="width: 100%;">
+                    <div class="mui-col-sm-4 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            余额：<span class="mui-badge mui-badge-primary">{$back_MemberMoneyCount} 元</span>
+                        </li>
+                    </div>
+                    <div class="mui-col-sm-4 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            积分：<span class="mui-badge mui-badge-success">{$back_MemberPointsCount} 积分</span>
+                        </li>
+                    </div>
+                    <div class="mui-col-sm-4 mui-col-xs-12">
+                        <li class="mui-table-view-cell">
+                            次数：<span class="mui-badge mui-badge-danger">{$mobilememberinfo['mem_memberNumberCount']} 次</span>
+                        </li>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <div class="mui-card">
+        <div class="mui-card-content">
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell">
+                    {if $mobilememberinfo[mem_specifiedEndTime] == 2147483647}
+                    <a>会员卡有效期<span class="mui-badge mui-badge-danger">永久有效</span></a>
+                    {else}
+                    <a>会员卡有效期<span class="mui-pull-right">{php echo date('Y-m-d H:i:s', $mobilememberinfo[mem_specifiedEndTime]);}</span></a>
+                    {/if}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="mui-slider" style="margin-top:10px;">
+        <div class="mui-slider-group">
+            <div class="mui-slider-item">
+                <ul class="mui-table-view mui-grid-view mui-grid-9">
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="recharge">
+                        <a href="{php echo $this->createMobileUrl('recharge',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height:32px;" src="{HLMMS_MOBILE_ICOS}chongzhi.png" />
+                            <div class="mui-media-body">充值</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('count',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}chongci.png" />
+                            <div class="mui-media-body">充次</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('recording',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}xiaofeijilu.png" />
+                            <div class="mui-media-body">消费记录</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('stored',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}chuzhijilu.png" />
+                            <div class="mui-media-body">储值记录</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('charging',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}chongcijilu.png" />
+                            <div class="mui-media-body">充次记录</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('secondarycard',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}jicika.png" />
+                            <div class="mui-media-body">次卡详情</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="tradelist">
+                        <a href="{php echo $this->createMobileUrl('integral',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}jifenjilu.png" />
+                            <div class="mui-media-body">积分记录</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('membercountcoupon',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}youhuiquan.png" />
+                            <div class="mui-media-body">优惠券</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="PointsMall">
+                        <a href="{php echo $this->createMobileUrl('pointsmall',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}jifengshangcheng.png" />
+                            <div class="mui-media-body">积分商城</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mui-slider-item">
+                <ul class="mui-table-view mui-grid-view mui-grid-9">
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="wechatmall">
+                        <a href="{php echo $this->createMobileUrl('wechatmall',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}wechatshop.png" />
+                            <div class="mui-media-body">微信商城</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="reservation">
+                        <a href="{php echo $this->createMobileUrl('bespeak',array('op' => 'list', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}yijianyuyue.png" />
+                            <div class="mui-media-body">一键预约</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="upgradelevel">
+                        <a href="{php echo $this->createMobileUrl('UpgradeLevel',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}upgrade.png" />
+                            <div class="mui-media-body">自助升级</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+
+
+                        <a href="{php echo $this->createMobileUrl('shopnotice',array('storeid'=>$storeid))}">
+                            <span class="mui-icon mui-icon-chat" style="color: darkgreen;width: 32px; height: 32px;"><span class="mui-badge mui-badge-danger">{$shopnoticenum}</span></span>
+                            <!--<img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}shangjiagonggao.png" />-->
+                            <div class="mui-media-body">商家公告</div>
+                        </a>
+                    </li>
+
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('commission',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}fenyongzhongxin.png" />
+                            <div class="mui-media-body">分佣中心</div>
+                        </a>
+                    </li>
+                    {if $administrator != 1}
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('Sellerhome',array('storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}shangjia.png" />
+                            <div class="mui-media-body">商家入口</div>
+                        </a>
+                    </li>
+
+                    {/if}
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('persona',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}gerenziliao.png" />
+                            <div class="mui-media-body">个人资料</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('modifypassword',array('op' => 'detail', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}xiugaimima.png" />
+                            <div class="mui-media-body">修改密码</div>
+                        </a>
+                    </li>
+
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a  href="{php echo $this->createMobileUrl('completeMemberInfo',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}wanshanxinxi.png" />
+                            <div class="mui-media-body">完善信息</div>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+                        <a href="{php echo $this->createMobileUrl('businessphone',array('storeid'=>$storeid))}">
+                            <img class="mui-icon" style="width: 32px; height: 32px;" src="{HLMMS_MOBILE_ICOS}shangjiadianhua.png" />
+                            <div class="mui-media-body">商家电话</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="mui-slider-indicator">
+            <div class="mui-indicator mui-active"></div>
+            <div class="mui-indicator"></div>
+        </div>
+    </div>
+</div>
+{if ($wechatcardreceive == null || $wechatcardreceive == '' || $wechatcardreceive == undefined) && $wcps1statedata == 1}
+<div id="div"></div>
+<div id="popover" class="mui-popover" style="height: 285px;">
+    <div class="mui-popover-arrow"></div>
+    <div>
+        <a class="mui-card-link" href="{php echo $getCardPackageSetting['cpi_registeredurl']}">
+            <img src="{php echo tomedia($wcps8statedata)}" width="100%">
+        </a>
+    </div>
+    <button type="button" id="mui-popover-close-div" class="mui-btn mui-btn-success" style="float: right;"><span class="mui-icon mui-icon-close"></span>关闭</button>
+</div>
+{/if}
+{if $cmd401statedata==1 && ($cmd403statedata==1 || $cmd405statedata==1)}
+<div class="message bottom mui-hidden">
+    <div class="icon">
+        <span class="mui-icon mui-icon-info"></span>
+    </div>
+    <p class="content">{$cmd400data}</p>
+    <div class="action">
+        <button type="button" class="mui-btn mui-btn-blue mui-btn-link">暂不完善</button>
+        <button id="completeMemberInfo" type="button" class="mui-btn mui-btn-blue">立即完善</button>
+    </div>
+</div>
+{/if}
+
+
+<script>
+    $(function(){
+
+        var memberIdentityNum = "{php echo $memberIdentityNum}";
+        var memberDistrict = "{php echo $memberDistrict}";
+        var memberBirthdayDay = "{php echo $memberBirthdayDay}";
+        var hidden_mem_memberMobile = "{php echo $back_memberMobile}";
+        var wechatcardreceive = "{php echo $wechatcardreceive}";
+        memberSliderValue();
+        if(hidden_mem_memberMobile==""){
+            confirmMemberMobile("{$mobilememberinfo['mem_memberName']}");
+        }
+        if(memberIdentityNum=='' || memberDistrict=='' || memberBirthdayDay=='' || memberBirthdayDay==0){
+            document.querySelector(".message").classList.remove("mui-hidden");
+            mui(".action").on("tap",".mui-btn",function () {
+                //关闭消息框
+                document.querySelector(".message").classList.add("mui-hidden");
+                var id = this.getAttribute("id");
+                if(id && id=="completeMemberInfo"){
+                    mui.openWindow({
+                        url: "{php echo $this->createMobileUrl('completeMemberInfo',array('memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}",
+                        preload: true,
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+                }
+            });
+        }
+        if(wechatcardreceive==''){
+            //调用隐藏/显示弹出层
+            mui("#popover").popover('toggle', document.getElementById("div"));
+        }
+    });
+    document.getElementById("mui-popover-close-div").addEventListener('tap', function() {
+        mui('#popover').popover('hide');
+    });
+    function memberSliderValue() {
+        var values = {php echo json_encode($memberLevelPointsArray)};
+        var values_p = {php echo json_encode($memberLevelNameArray)};
+        var values_f = {php echo $memberlevelIndex};
+        $(".js-range-slider-member").ionRangeSlider({
+            type: "single",
+            from: values_f,
+            grid: true,
+            values: values,
+            prettify: function (n) {
+                var ind = values.indexOf(n);
+                return values_p[ind];
+            }
+        });
+    }
+    function confirmMemberMobile(textmemberName) {
+        var Card_url = '{php echo $getCardPackageSetting['cpi_registeredurl']}';
+        var url = '';
+        var Lordopenid = '{php echo $Lordopenid}';
+        // if(Card_url==null|| Card_url==undefined|| Card_url=="" || Lordopenid != ""){
+
+        url = '{php echo $this->createMobileUrl('bindMemberInfo',array('memberid'=>$mobilememberinfo['id'],'Lordopenid'=>$Lordopenid,'storeid'=>$storeid))}';
+        //
+        // }else{
+        //
+        //     url = '{php echo $getCardPackageSetting['cpi_registeredurl']}';
+        //
+        // }
+
+        var txtTitle = "欢迎您"+ textmemberName;
+        var btnArray = ['否', '是'];
+        mui.confirm('现在开始绑定手机号，激活会员卡？', txtTitle, btnArray, function(e) {
+            if (e.index == 1) {
+                mui.openWindow({
+                    //  url: "{php echo $this->createMobileUrl('bindMemberInfo',array('id'=>$mobilememberinfo['id']))}&Lordopenid={$_GPC['Lordopenid']}&type={$_GPC['type']}",
+                    url:url,
+                    preload: true,
+                    show: {
+                        aniShow: 'pop-in'
+                    },
+                    styles: {
+                        popGesture: 'hide'
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+            } else {
+                mui.toast('不激活会员卡，无法使用我们超强功能哦！');
+            }
+        })
+    }
+</script>
+{$SystemAlert}
+</body>
+</html>

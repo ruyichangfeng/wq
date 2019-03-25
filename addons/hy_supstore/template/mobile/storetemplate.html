@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+    <script src="../addons/hy_supstore/template/web/js/jquery.qrcode.min.js"></script>
+    <style>
+    .layui-card:last-child {
+        margin-bottom: 0px;
+    }
+
+    .layui-card {
+        margin-bottom: 15px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: rgba(0, 0, 0, 0.0470588) 0px 1px 2px 0px;
+        border-radius: 2px;
+    }
+    .layui-card-header {
+        position: relative;
+    }
+    .layui-card-header {
+        height: 42px;
+        line-height: 42px;
+        color: rgb(51, 51, 51);
+        font-size: 14px;
+        padding: 0px 15px;
+        border-bottom: 1px solid rgb(246, 246, 246);
+        border-radius: 2px 2px 0px 0px;
+    }
+
+    /*样式*/
+    .layui-card-body {
+        display: block !important;
+        text-align: center;
+        height: 200px;
+        line-height: 24px;
+        padding: 10px 15px;
+    }
+    .layui-card .layui-card-header .title{
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .layui-card .layui-card-header .user{
+        display: inline-block;
+    }
+    .icon-right {
+        position: absolute;
+        bottom: 0;
+        right: 15px;
+        width: 100%;
+        text-align: right;
+    }
+
+    .icon-right span{
+        vertical-align: middle;
+    }
+
+    .icon-right a {
+        float: right;
+        margin-left: 10px;
+        position: relative;
+    }
+
+    .icon-right a>div {
+        border: 1px solid #ddd;
+        position: absolute;
+        top: -120px;
+        left: -60px;
+        display: none;
+        background: #fff;
+        z-index: 999;
+        line-height: 0;
+    }
+
+    .icon-right a>div canvas,
+    .icon-right a>div img {
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+    }
+
+    .icon-right a:hover>div {
+        display: block;
+    }
+
+    .icon-right a>img {
+        width: 15px;
+    }
+    .layui-card-body>.top{
+        width: 100%;
+        height: 159px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .layui-card-body .content-left{
+        float: left;
+    }
+    .layui-card-body .content-left .img-box{
+        width: 160px;
+        height: 110px;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: cover !important;
+        background-color: #f5f5f5 !important;
+    }
+    .layui-card-body .bottom{
+        width: 100%;
+        padding: 6px 0;
+        text-align: left;
+    }
+    .layui-card-body .bottom>a{
+        display: inline-block;
+        margin-right: 10px;
+    }
+    </style>
+</head>
+
+<body style="background-color: #f5f5f5;">
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('store')}">店面管理</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('store', array('op' => 'post'))}">添加店面</a>
+    </div>
+    <script>
+    function createcode($id, $ermurl) {
+        $('#erm' + $id).qrcode({
+            render: "canvas",
+            width: 100,
+            height: 100,
+            text: $ermurl
+        });
+    }
+    </script>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th width="200">店面名称</th>
+                <th>负责人</th>
+                <th width="100">会员数</th>
+                <th width="150">充值总额</th>
+                <th width="150">消费总额</th>
+                <th width="150">添加时间</th>
+                <th width="110">人脸识别+扫码枪</th>
+                <th width="100">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $tag}
+            <tr>
+                <td style="position:relative">{if $tag["thumb"]}<img src="{php echo tomedia($tag['thumb'])}" style="max-height:40px; margin-right:6px;">{/if}<span style="font-size:14px;">{$tag["title"]}</span>
+                    <br>
+                    <div class="kkeijs">
+                        <a title="付款二维码" href="javascript:;"><img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                            <div id="erm{$tag['id']}">
+                                <script>
+                                createcode("{$tag['id']}","{$tag['ermurl']}");
+                                </script>
+                            </div>
+                        </a>
+                        <a title="关注二维码" href="javascript:;">
+                            <img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                            <div><img src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={$tag['ticket']}"></div>
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <div class="layui-store-user">
+                        {loop $tag['user'] $index $user} 
+                        {if $index < 5} 
+                            <p><img src="{if !empty($user['avatar'])}{$user['avatar']}{else}resource/images/noavatar_middle.gif{/if}"><br/>{$user['name']}</p>
+                        {elseif $index == 5}
+                            <p style="height: 58px;line-height: 58px; vertical-align: middle;">...</p>
+                            {/if} 
+                        {/loop}
+                    </div>
+                </td>
+                <td style="text-align:center;">{$tag["usercount"]}个</td>
+                <td style="text-align:center;">实际金额：{$tag["rechargeamount"]}元
+                    <br>
+                    <hr>充值金额：{$tag["creditamount2"]}元
+                    <br>赠送金额：{$tag["creditamount3"]}元</td>
+                <td style="text-align:center;">{$tag["amount"]}元</td>
+                <td style="text-align:center;">{$tag["createtime"]}</td>
+                <td style="text-align:center;">
+                    <a class="layui-btn layui-btn-sm layui-btn-warm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'recharge','storeid' => $tag['id']))}','快速充值');" href="javascript:;">快速充值</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'consum','storeid' => $tag['id']))}','快速消费');" href="javascript:;">快速消费</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('face', array('op' => 'oncecardconsum','storeid' => $tag['id']))}','次卡消费');" href="javascript:;">次卡消费</a>
+                </td>
+                <td style="text-align:center;">
+                    <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('store', array('op' => 'post','id' => $tag['id']))}">修改店面</a>
+                    <a href="{php echo $this->createWebUrl('store', array('op' => 'delete','id' => $tag['id']))}" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete">删除店面</a>
+                </td>
+            </tr>
+            {/loop} 
+            {if empty($list)}
+            <tr>
+                <td colspan="10" style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+    <div class="fenye">{$pager}</div>
+    <div class="layui-row layui-col-space10" style="margin-left: 5px;margin-right: 5px;">
+        {loop $list $tag}
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6 layui-col-lg4">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <div class="title"><i class="layui-icon">&#xe68e;</i>&nbsp;{$tag["title"]}</div>
+                    <div class="user"><i class="layui-icon">&#xe770;</i>&nbsp;{$tag["usercount"]}个</div>
+                    <div class="icon-right float-right">
+                        <span>二维码</span>
+                        <a title="付款二维码" href="javascript:;"><img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                            <div id="erm{$tag['id']}">
+                                <script>
+                                createcode("{$tag['id']}","{$tag['ermurl']}");
+                                </script>
+                            </div>
+                        </a>
+                        <a title="关注二维码" href="javascript:;">
+                            <img src="../addons/hy_supstore/template/web/css/erweima.svg">
+                            <div><img src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={$tag['ticket']}"></div>
+                        </a>
+                    </div>
+                </div>
+                <div class="layui-card-body">
+                    <div class="top">
+                        <div class="content-left">
+                            <div class="img-box" style="background:url('{php echo tomedia($tag['thumb'])}')"></div>
+                        </div>
+                        <div class="content-right"></div>
+                    </div>
+                    <div class="bottom">
+                        <a class="layui-btn layui-btn-sm" href="{php echo $this->createWebUrl('store', array('op' => 'post','id' => $tag['id']))}">修改店面</a>
+                        <a href="{php echo $this->createWebUrl('store', array('op' => 'delete','id' => $tag['id']))}" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete">删除店面</a>
+                        <div class="time float-right">
+                        {$tag["createtime"]}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/loop} 
+        {if empty($list)}
+        <tr>
+            <div style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</div>
+        </tr>
+        {/if}
+    </div>
+    <style>
+    .kkeijs {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        text-align: right;
+    }
+
+    .kkeijs a {
+        float: right;
+        margin: 5px;
+        position: relative;
+    }
+
+    .kkeijs a>div {
+        border: 1px solid #ddd;
+        position: absolute;
+        top: -120px;
+        left: -60px;
+        display: none;
+        background: #fff;
+        z-index: 999;
+        line-height: 0;
+    }
+
+    .kkeijs a>div canvas,
+    .kkeijs a>div img {
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+    }
+
+    .kkeijs a:hover>div {
+        display: block;
+    }
+
+    .kkeijs a>img {
+        width: 15px;
+    }
+
+    .layui-btn {
+        margin: 0 0 5px 0 !important;
+    }
+    </style>
+    <script>
+    layui.use(['layer', 'element'], function() {
+        var $ = layui.jquery,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        $('.item-action-delete').click(function() {
+            var href = $(this).attr('href');
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+            return false;
+        })
+    });
+
+    function openview(url, title) {
+        layer.open({
+            type: 2,
+            title: title,
+            closeBtn: 1,
+            maxmin: true,
+            moveOut: true,
+            scrollbar: false,
+            shade: 0,
+            shadeClose: true, //点击遮罩关闭层
+            area: ['800px', '95%'],
+            content: url,
+            zIndex: layer.zIndex, //重点1
+            success: function(layero) {
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
+    //关闭弹窗
+
+    function select_entry(message, jumpUrl, index) {
+        layer.close(index); //先关闭弹窗，在操作   
+        layer.msg(message, function() {
+            //关闭后的操作
+            if (jumpUrl) {
+                window.location.href = jumpUrl;
+            } else {
+                window.location.reload();
+            }
+        });
+    }
+    </script>
+</body>
+
+</html>

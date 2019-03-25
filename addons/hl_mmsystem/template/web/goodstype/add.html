@@ -1,0 +1,122 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('goodstype', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;编辑商品分类</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goodstype',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                        <input type="hidden" name="id" value="{$item['id']}">
+
+
+                        <div class="form-group">
+                            <label for="title" class="col-sm-1 control-label">分类排序</label>
+                            <div class="col-sm-1">
+                                <input type="text" name="displayorder" id='displayorder' class="form-control" value="{$item['gt_displayOrder']}" placeholder="排序" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                        <label for="title" class="col-sm-1 control-label">分类名称</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="title" class="form-control" value="{$item['gt_name']}" id='title1' placeholder="请输入分类名称"required aria-required="true"/>
+                        </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                                <label for="title" class="col-sm-1 control-label">是否套餐商品</label>
+                                <div class="col-xs-2">
+                                    <div class="radio radio-info radio-inline">
+                                        <input type="radio" name="ifIsPackage" id="ifIsPackage1" value="1" {if $item['gt_ifIsPackage']==1 || empty($item['gt_ifIsPackage'])}checked="checked" {/if}>
+                                        <label for="ifIsPackage1"> 是 </label>
+                                    </div>
+                                    <div class="radio radio-inline radio-danger">
+                                        <input type="radio" name="ifIsPackage" id="ifIsPackage2" value="2" {if $item['gt_ifIsPackage']==2 }checked="checked" {/if}>
+                                        <label for="ifIsPackage2"> 否 </label>
+                                    </div>
+
+                                </div>
+                                <label for="title" class="col-sm-1 control-label">是否店铺可用</label>
+                               <div class="col-xs-2">
+
+                                    <div class="radio radio-info radio-inline">
+                                            <input type="radio" class="ifSet" name="ifSetStore" id="ifSetStore1" value="1" {if $item['gt_ifSetStore']==1 || empty($item['gt_ifSetStore'])}checked="checked" {/if}>
+                                        <label for="ifSetStore1"> 是 </label>
+                                    </div>
+
+                                    <div class="radio radio-inline radio-danger">
+                                        <input type="radio" class="ifSet1" name="ifSetStore" id="ifSetStore2" value="2" {if $item['gt_ifSetStore']==2 }checked="checked" {/if}>
+                                        <label for="ifSetStore2"> 否 </label>
+                                    </div>
+
+                                </div>
+
+
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="title" class="col-sm-1 control-label">分类图片</label>
+                            <div class="col-sm-5" name="pictureUrl" id="pictureUrl" >
+                                {php echo tpl_form_field_image('pictureUrl', $item['gt_pictureUrl'])}(比例1:1)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="col-sm-1 control-label">分类描述</label>
+                            <div class="col-sm-5">
+                                <input type="text" name="description" class="form-control" required aria-required="true" value="{$item['gt_description']}" id='title' placeholder="请输入描述"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" style="padding-left: 10%">
+                            <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var id = $this.attr('data-id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('goodstype')}",{id:id,status:status},function () {
+            })
+        });
+    });
+    $(document).ready(function(){
+        $(".store").show();
+    });
+
+    $(".ifSet").click(function(){
+        $(".store").show();
+    });
+
+    $(".ifSet1").click(function(){
+        $(".store").hide();
+    });
+</script>
+<script src="{MODULE_URL}statics/js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+    });
+
+    var storeids='{$item['gt_setStoreIdCount']}';
+    var storeid= storeids.split(',');
+    for(var i=0;i<storeid.length;i++){
+        $('#ids_'+storeid[i]).attr("checked", true);
+    }
+
+</script>
+{template 'web/common/footer'}

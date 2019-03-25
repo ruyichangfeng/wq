@@ -1,0 +1,112 @@
+{template 'header'}
+<div id="editzn">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">管理子女</h1>
+        <button id="but" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">保存</button>
+    </div>
+    <div class="mui-content">
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>姓名</label>
+                <input type="text" name="name" class="mui-input-clear" value="{$children['fullname']}" placeholder="请输入孩子真实姓名">
+            </div>
+            <div class="mui-input-row">
+                <label>年龄</label>
+                <input type="number" name="age" class="mui-input-clear" value="{$children['age']}" placeholder="请输入孩子真实年龄">
+            </div>
+            <div class="mui-input-row head">
+                <label>上传头像</label>
+                <div class="mui-pull-right"><img src="{$children['avatar']}" class="edit-header" /><span class="mui-icon mui-icon-plus add-header"></span><p class="uploadsrc" style="display: none;"></p></div>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>性别</label>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>男</label>
+                <input name="sex" value="1" type="radio" {if $children['gender'] == '1' } checked {/if}>
+            </div>
+            <div class="mui-input-row mui-radio">
+                <label>女</label>
+                <input name="sex" value="0" type="radio" {if $children['gender'] == '0' } checked {/if}>
+            </div>
+
+            <input type="hidden" name="id" value="{$children['id']}" />
+        </form>
+        <script type="application/javascript">
+            $("#but").click(function () {
+                var name = $("input[name='name']").val();
+                var age = $("input[name='age']").val();
+                var id = $("input[name='id']").val();
+                var sex = $("input[name='sex']:checked").val();
+                var loadsrc=$(".uploadsrc").text();
+                if (name == "")
+                {
+                    mui.alert("请输入您儿女的真实姓名"); return;
+                }
+                if (age == "")
+                {
+                    mui.alert("请输入您儿女的真实年龄"); return;
+                }
+                if (sex == "")
+                {
+                    mui.alert("请选择您儿女的真是性别"); return;
+                }
+                if (id == "")
+                {
+                    mui.alert('非法操作', function () {
+                        window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'children_add')) ?>";
+                    });
+                }
+
+                $('#but').attr("disabled",'disabled');
+                $.post("<?php echo $this->createMobileUrl('parent', array('action' => 'children_edit')) ?>", {
+                    name: name,
+                    age: age,
+                    sex: sex,
+                    id: id,
+                    loadsrc:loadsrc
+                }, function (response) {
+                    if (response.status == 'success')
+                    {
+                        mui.alert('修改成功', function () {
+                            window.location.href = "<?php echo $this->createMobileUrl('parent', array('page' => 'editzn', 'children' => $children['id'])) ?>";
+                        });
+                    }
+                    else
+                    {
+                        mui.alert('修改失败,请重试!');
+                        $('#but').removeAttr("disabled");
+                    }
+                }, "json");
+            });
+        </script>
+    </div>
+</div>
+{php echo register_jssdk(false);}
+<script>
+    wx.ready(function(){
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+    });
+    $(".add-header").click(function(){
+        var ttt = $(this).parent().find(".edit-header");
+        wx.chooseImage({
+            count: 1, // 默认9
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                ttt.attr('src',localIds);
+                localIds = localIds.toString();
+                wx.uploadImage({
+                    localId: localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
+                    success: function (res) {
+                        var serverId = res.serverId; // 返回图片的服务器端ID
+                        $(".uploadsrc").text(serverId);
+                    }
+                });
+            }
+        });
+    })
+    </script>
+{template 'footer'}

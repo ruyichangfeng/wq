@@ -1,0 +1,177 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('refund', array('op'=>'display'));}">退款申请记录</a></li>
+
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >商户订单号</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[order_paynumber]" value="{$search['order_paynumber']}"  class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2  control-label" >预约人</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[order_username]" value="{$search['order_username']}" placeholder="可模糊搜索" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">项目</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_projectid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $projects $key $item}
+                                    <option value="{$item['project_id']}" {if $search['order_projectid'] == $item['project_id']}selected{/if}>{$item['project_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">员工</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_staffid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $staffs $key $item}
+                                    <option value="{$item['staff_id']}" {if $search['order_staffid'] == $item['staff_id']}selected{/if}>{$item['staff_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">状态</label>
+                            <div class="col-sm-3">
+                                <select name="search[order_state]" class="form-control">
+                                    <option value="" selected>请选择</option>
+                                    <option value="1" {if $search['order_state'] == 1}selected{/if}>未支付</option>
+                                    <option value="2" {if $search['order_state'] == 2}selected{/if}>已支付</option>
+                                    <option value="3" {if $search['order_state'] == 3}selected{/if}>已完成</option>
+                                    <option value="4" {if $search['order_state'] == 4}selected{/if}>已关闭</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input  type="button" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;" onclick="searchOrder(0)"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;margin-right: 30px;" onclick="formreset()"/>
+                            <input  type="button" value="导出excel" class="btn btn-success" style="width:120px;" onclick="searchOrder(1)"/>
+                            <input type="hidden" id="excel" name="excel" value="0" />
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">预约记录</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="">商户订单号</th>
+                        <th style="">商家</th>
+                        <th style="">门店</th>
+                        <th style="">项目</th>
+                        <th style="">员工</th>
+                        <th style="">预约人</th>
+                        <th style="">支付方式</th>
+                        <th style="">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $orders $key $item}
+                    <tr>
+                        <td>{$item['order_paynumber']}</td>
+                        <td>{$item['order_businessid']}</td>
+                        <td>{$item['order_storeid']}</td>
+                        <td>{$item['order_projectid']}</td>
+                        <td>{$item['order_staffid']}</td>
+                        <td>{$item['order_username']}</td>
+                        <td>{if $item['order_pay_state']==1}微信支付{else if $item['order_pay_state']==2}平安支付{else if $item['order_pay_state']==3}天宫支付{/if}</td>
+                        <td>
+                            {if $item['orderrefund_state']==1}
+                            <a href="javascript:changepaystate({$item['orderrefund_id']},{$item['order_pay_state']});" class="btn btn-primary" >申请退款</a>
+                            {else}
+                            <a  class="btn btn-success" href="#">退款申请通过√</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($orders)}
+                    <tr>
+                        <td colspan="9">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="9">
+                            暂无预约记录
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+    function searchOrder(state) {
+
+        $('#excel').val(state);
+        $('#form').submit();
+    }
+    function changepaystate(id,state){
+        var url="{php echo $this->createWebUrl('refund', array('op'=>'changestate'))}";
+        var str='';
+        if(state==1)
+        {
+            str="是否已进入微信商户平台，进行了该订单的退款操作？";
+        }else if(state==2)
+        {
+            str="确定通过退款申请？";
+        }else if(state==3)
+        {
+           str="确定通过退款申请？";
+        }   
+        if(confirm(str))
+        {
+             window.location.href=url+"&id="+id;
+        } 
+        
+    }
+</script>
+{template 'common/footer'}

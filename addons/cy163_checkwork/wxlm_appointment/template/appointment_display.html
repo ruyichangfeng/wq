@@ -1,0 +1,143 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('appointment', array('op'=>'display'));}">预约管理</a></li>
+        <li ><a href="{php echo $this->createWebUrl('appointment', array('op'=>'create'));}">添加预约</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2 control-label">商家</label>
+                            <div class="col-sm-3">
+                                <select name="search[dating_businessid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $business $key $item}
+                                    <option value="{$item['business_id']}" {if $search['dating_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">门店</label>
+                            <div class="col-sm-3">
+                                <select name="search[dating_storeid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $stores $key $item}
+                                    <option value="{$item['store_id']}" {if $search['dating_storeid'] == $item['store_id']}selected{/if}>{$item['store_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <div>
+                            <label class="col-sm-2 control-label">店员</label>
+                            <div class="col-sm-3">
+                                <select name="search[dating_staffid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $staffs $key $item}
+                                    <option value="{$item['staff_id']}" {if $search['dating_staffid'] == $item['staff_id']}selected{/if}>{$item['staff_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">项目</label>
+                            <div class="col-sm-3">
+                                <select name="search[dating_projectid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $projects $key $item}
+                                    <option value="{$item['project_id']}" {if $search['dating_projectid'] == $item['project_id']}selected{/if}>{$item['project_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">分类列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="">序号</th>
+                        <th style="">商家</th>
+                        <th style="">门店</th>
+                        <th style="">店员</th>
+                        <th style="">项目</th>
+                        <th style="">支付</th>
+                        <th style="min-width: 50px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $datines $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['business_name']}</td>
+                        <td>{$item['store_name']}</td>
+                        <td>{$item['staff_name']}</td>
+                        <td>{$item['project_name']}</td>
+                        <td>{if $item['dating_pay_state'] == 1}免支付{else if $item['dating_pay_state'] == 2}在线支付{else}会员卡{/if}</td>
+                        <td>
+                            <a class="btn btn-primary" href="{php echo $this->createWebUrl('appointment', array('op'=>'modify', 'id'=>$item['dating_id']))}">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('appointment', array('op'=>'delete', 'id'=>$item['dating_id']))}">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($business)}
+                    <tr>
+                        <td colspan="7">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="7">
+                            暂无预约设置
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+</script>
+{template 'common/footer'}

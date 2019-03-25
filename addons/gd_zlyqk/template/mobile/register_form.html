@@ -1,0 +1,60 @@
+{template "o_header"}
+{template "new_header"}
+<style>
+    .form_submit{margin-bottom: 30px !important;}
+    .weui-label{color:#999999 !important;}
+    .weui-select{color:#999999 !important;}
+    .weui-input{color:#999999 !important;}
+</style>
+{template "thems"}
+<header class="ui-header">
+    <div class="ui-icon-left">
+        <a href="javascript:void(0)" class="ui-icon icon-back"></a>
+    </div>
+    <div class="ui-title">信息管理</div>
+</header>
+{template "notice"}
+<div class="weui-tab" style="margin-top:50px;">
+    <div class="weui-navbar">
+        <div class="weui-navbar__item">
+            <a href="{php echo $this->createMobileUrl('memberInfo')}" style="color: #999999">基本信息</a>
+        </div>
+        {loop $stepList $step}
+        <div class="weui-navbar__item {if $step['sort']==$sort } weui-bar__item_on {/if}">
+            <a href="{php echo $this->createMobileUrl('SaveStep')}&sort={$step['sort']}" style="color: #999999">{$step['name']}</a>
+        </div>
+        {/loop}
+    </div>
+    <div class="weui-tab__panel m_sig">
+        <form method="post" id="form" action="{php echo $this->createMobileUrl('StepSave')}">
+            <div class="page__bd" style="padding-bottom: 40px;" >
+                <input type="hidden" name="sort" value="{$sort}">
+                <div class="weui-cells weui-cells_form">
+                    {$html}
+                </div>
+                {$submit}
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var url="{php echo $this->createMobileUrl('regData')}&sort={$sort}";
+    $(document).ready(function(){
+        //获取数据内容
+        $.post(url,{},function(response){
+           if(response.data){
+               for(var x in response.data){
+                   var obj = $("input[name='"+x+"']");
+                   if(obj.length>0){
+                       obj.val(response.data[x]);
+                   }
+                   var obj = $("textarea[name='"+x+"']");
+                   if(obj.length>0){
+                       obj.val(response.data[x]);
+                   }
+               }
+           }
+        },"json");
+    });
+</script>
+{template "o_footer"}

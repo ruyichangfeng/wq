@@ -1,0 +1,399 @@
+<?php $nowe7=true;?>
+{template 'public/header'}  
+<style type="text/css">
+	td{padding: 5px 10px;}
+	.td1{width: 15%;text-align: right;padding: 12px 12px !important;}
+	.td2{width: 35%;padding: 12px 12px !important;}
+	.td3{width: 50%;text-align: left;} 
+	.td4{text-align:right;}
+	.td5{text-align:left;}
+	.radio{margin-right: 10px;}
+	.inline{display: inline-block;vertical-align: top}
+	.avatar{width: 50px;height: 50px;border-radius: 50%;border:1px solid #f5f5f5;background-color: #f5f5f5}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('order.listview');?>">订单管理</a></li>
+		  
+		  <li class="active">订单详细</li>
+		  <li class="active">{$order['order_no']}</li>
+		</ol></div>
+	<div class="panel-body">
+		<form class="form-inline layui-form" id="stsForm" action="<?php echo $this->routeUrl('order.chgsts');?>&oid={$order['id']}" method="post">
+		<input type="hidden" name="order_no" value="{$order['order_no']}" readonly>
+		<table style="width: 96%;margin:10px auto;;" class="table table-bordered" >
+			<tr>
+				<td class="td1">订单编号</td>
+				<td class="td2">{$order['order_no']}</td>
+				<td class="td3" colspan="2" rowspan="13" style="vertical-align: top;"> 
+					<?php 
+						if( $express['Success']!=true){ ?>
+						<p style="color:#FF4444">快递鸟接口数据获取失败 ：</p>
+						<p style="color:#FF4444">1、订单还没有发货；</p>
+						<p style="color:#FF4444">2、接口配置不正确或超出限制</p>
+					<?php }
+					if(count($express['Traces'])<1){ ?>
+						<p style="color:orange;">{$express['Reason']}</p> 
+					<?php }else{ ?>
+						<table style="width: 100%;" class="table table-bordered" >
+						 <?php 
+		    			foreach($express['Traces'] as $key=>$val){?>
+						<tr>
+							<td class="td4"><?php echo $val['AcceptTime'];?></td>
+							<td class="td5" align="left"><?php echo $val['AcceptStation'];?></td>
+						</tr>
+						<?php }?>
+					</table>
+				   <?php } ?>
+					
+				 </td>
+			</tr> 
+			<tr>
+				<td class="td1">微信支付单号</td>
+				<td class="td2">{$order['wxpay_no']}</td> 
+			</tr> 
+			<tr>
+				<td class="td1">下单时间</td>
+				<td class="td2">{$order['date']}</td> 
+			</tr>
+			<tr>
+				<td class="td1">发货时间</td>
+				<td class="td2">{$order['sendtime']}</td>
+			</tr>
+			<tr>
+				<td class="td1">配送方式</td>
+				<td class="td2">
+					<?php
+					if($order['pay_way']==1){ 
+							switch($order['send_way']){
+								case "0":
+									echo "快递配送";
+									break;
+								case "1":
+									echo "到店自提";
+									break;
+							}
+					}
+					if($order['pay_way']==2){ 
+					echo "无需物流";
+					}
+					?>
+						
+				</td>
+			</tr>
+			<tr>
+				<td class="td1">快递类型</td>
+				<td class="td2"><?php foreach($explist0 as $key=>$val){
+				    	if($val['code']==$order['expresstype']){echo $val['name'];}
+				    }?>
+				    </td>
+			</tr>
+			<tr>
+				<td class="td1">快递单号</td>
+				<td class="td2">{$order['expressno']}</td>
+			</tr>
+				<tr>
+				<td class="td1">微信</td>
+				<td class="td2">
+					<img src="{$member['avatar']}" class="inline avatar" />
+					<div class="inline" style="margin-left: 8px;">
+						<div style="margin-top:5px;font-weight: 600;">{$member['nickname']}</div>
+						<div style="font-size: 12px;color:#999;margin-top: 5px;">{$member['city']}</div>
+					</div>
+					
+				</td> 
+			</tr>
+			<tr>
+				<td class="td1">收货人信息</td>
+				<td class="td2">{$order['contact']}</td> 
+			</tr>
+			<tr>
+				<td class="td1">联系电话</td>
+				<td class="td2">{$order['mobile']}</td> 
+			</tr>
+			<tr>
+				<td class="td1" style="vertical-align: top;">收货地址</td>
+				<td class="td2" style="vertical-align: top;">{$order['province']}{$order['city']}{$order['county']}{$order['street']}</td>
+				 
+			</tr>
+			<tr>
+				<td class="td1">支付方式</td>
+				<td class="td2"><?php 
+					switch($order['pay_way']){
+						case "1":
+							echo "微信支付";
+							break;
+						case "2":
+							echo "货到付款";
+							break;
+					}
+					switch($order['pay_status']){
+						case "1":
+							echo "（已支付）";
+							break;
+						case "-1":
+							echo "（已退款）";
+							break;
+						default:
+							echo "";
+							break;
+					}
+					?></td> 
+			</tr>
+			<tr>
+				<td class="td1">支付状态</td>
+				<td class="td2">
+					<div class="layui-input-block" style="margin-left: 0px !important;">
+						<?php if(intval($order['pay_status'])==1&&intval($order['pay_way'])==1){ ?>
+						<span class="linkbtn linkbtn-green" title="微信支付订单不允许直接修改支付状态">已支付</span>
+						<?php }?>
+						<?php if(intval($order['pay_status'])==-1&&intval($order['pay_way'])==1){ ?>
+						<span class="linkbtn linkbtn-green" title="微信支付订单不允许直接修改支付状态">已退款</span>
+						<?php }?>
+						<?php if(intval($order['pay_status'])==0&&intval($order['pay_way'])==1){ ?>
+						<span class="linkbtn linkbtn-green" title="微信支付订单不允许直接修改支付状态">未支付</span>
+						<?php }?>
+						<!-- 货到付款 -->
+						<?php if(intval($order['pay_way'])==2){ ?>
+						<span class="linkbtn linkbtn-green" title="微信支付订单不允许直接修改支付状态">货到付款</span>
+						<?php }?>
+						<!--<input type="radio" name="paysts" value="0" title="未支付" <?php if($order['pay_status']=="0"){echo "checked";}?>  form="stsForm">-->
+						<!--<input type="radio" name="paysts" value="1" title="已支付" <?php if($order['pay_status']=="1"){echo "checked";}?>  form="stsForm"> -->
+						<!--<input type="radio" name="paysts" value="-1" title="已退款" <?php if($order['pay_status']=="-1"){echo "checked";}?>  form="stsForm">-->
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="td1">订单总价</td>
+				<td class="td2" colspan="4">{$order['money']}</td>
+				 
+			</tr>
+			<tr>
+				<td class="td1">实际支付</td>
+				<td class="td2" colspan="4">{$order['money_pay']}
+
+					<!--<?php if($order['status'] < "1" && $order['status'] != -2 ){ ?>-->
+					<!--<a href="javascript:void(0);" style="color: #ff4444;font-size: 13px;margin-left: 10px;" onclick="changePayMoney()">改价</a>-->
+					<!--<?php } ?>-->
+				</td>
+				 
+			</tr>
+			<tr>
+				<td class="td1">邮费</td>
+				<td class="td2" colspan="4">{$order['money_express']}</td>
+			</tr>
+			<tr>
+				<td class="td1">优惠金额</td>
+				<td class="td2">{$order['reduce_money']}</td> 
+				<td class="td1">优惠摘要</td>
+				<td class="td2">{$order['reduce_desc']}</td> 
+			</tr>
+			<tr>
+				<td class="td1">其他信息</td>
+				<td class="td2" colspan="3">
+					<?php if(floatval($order['money_platform'])>0 ){ ?>
+					平台提成：<span class="price">￥{$order['money_platform']}</span>
+					<?php } ?>&nbsp;
+					<?php if(floatval($order['money_agentbuy'])>0 ){ ?>
+					分销商购买返现：<span class="price">￥{$order['money_agentbuy']}</span>
+					<?php } ?>&nbsp;
+					<?php if(floatval($order['money_agent0'])>0 ){ ?>
+					一级分销提成：<span class="price">￥{$order['money_agent0']}</span>
+					<?php } ?>&nbsp;
+					<?php if(floatval($order['money_agent1'])>0 ){ ?>
+					二级分销提成：<span class="price">￥{$order['money_agent1']}</span>
+					<?php } ?>&nbsp;
+					<?php if(floatval($order['money_agent2'])>0 ){ ?>
+					三级分销提成：<span class="price">￥{$order['money_agent2']}</span>
+					<?php } ?>
+
+				</td> 
+			</tr>
+			<tr>
+				<td class="td1" style="vertical-align: top;">买家备注</td>
+				<td class="td2" style="vertical-align: top;" colspan="4">{$order['remark']}</td>
+			</tr>
+			<?php if(intval($order['status'])<-1){?> 
+			<tr>
+				<td class="td1" >申请退款时间</td>
+				<td class="td2" >{$order['refund_date']}</td> 
+				<td class="td1" >退款原因</td>
+				<td class="td2" >{$order['refund_reason']}</td> 
+			</tr>
+			<?php } ?>
+			<tr>
+				<td class="td1"><p  >订单状态</p> </td>
+				<td class="td2" colspan="4">
+					<div class="layui-input-block" style="margin-left: 0px !important;">
+						<?php if($order['status']=="0"){echo "<span>待付款</span>";}?>
+						<?php if($order['status']=="1"){echo "<span>待发货</span>";}?>
+						<?php if($order['status']=="2"){echo "<span>已发货</span>";}?>
+						<?php if($order['status']=="3"){echo "<span>已收货</span>";}?>
+						<?php if($order['status']=="4"){echo "<span>已完成</span>";}?>
+						<?php if($order['status']=="-1"){echo "<span>已取消</span>";}?>
+						<?php if($order['status']=="-2"){echo "<span>申请退款</span>";}?>
+						<!-- <input type="radio" name="ordersts" value="1" title="已下单" <?php if($order['status']=="1"){echo "checked";}?> form="stsForm"> -->
+				      <!--<input type="radio" name="ordersts" value="2" title="已发货" <?php if($order['status']=="2"){echo "checked";}?> form="stsForm">-->
+				      <!--<input type="radio" name="ordersts" value="3" title="已收货" <?php if($order['status']=="3"){echo "checked";}?> form="stsForm">  -->
+				      <!--<input type="radio" name="ordersts" value="4" title="已完成" <?php if($order['status']=="4"){echo "checked";}?> form="stsForm"> -->
+				      <!--<input type="radio" name="ordersts" value="-1" title="已取消" <?php if($order['status']=="-1"){echo "checked";}?> form="stsForm"> -->
+				       <!--<input type="radio" name="ordersts" value="-2" title="申请退款" <?php if(intval($order['status'])<-1){echo "checked";}?> form="stsForm"> -->
+				    </div>
+				</td> 
+
+			</tr>
+		 	<tr>
+		 		<td colspan="4" style="text-align: center;"> 
+		 			<a href="<?php echo $this->routeUrl('order.listview');?>" type="button"  class="mybtn"     />返回</a>
+		 			<a href="javascript:history.go(0);" type="button"  class="mybtn"     />刷新</a>
+		 			 <!--<a href="javascript:void(0);" type="button"  class="mybtn" onclick="changeSts()"   />修改状态</a>-->
+					<?php if($order['pay_way'] == 2 || $order['status']>0){ ?>
+					<a href="javascript:void(0);" type="button"  class="mybtn"  <?php if($order['expressno']){  echo "disabled='disabled'"; }?>  onclick="express()"  />发货</a>
+					<?php } ?>
+					<a  href="javascript:void(0);" type="button"  class="mybtn" onclick="priter()" />电子面单发货</a>
+					<?php if(($order['status']==1||$order['status']==2||$order['status']=="-2")&&$order['pay_way']!=2){ ?>
+
+				    <a href="javascript:void(0);" type="button" onclick="refund()"   class="mybtn"    />退款</a>  
+
+		  			<?php } ?>
+				</td>
+		 	</tr>
+		</table>  
+		</form>
+	</div>
+</div>
+<div class="panel panel-info">
+	<div class="panel-heading">包含商品</div>
+	<div class="panel-body">
+	<table  class="table table-bordered">
+		<tr>
+			<th  style="width:20%;word-break: break-all;">商品图片</th>
+			<th  style="width:40%;word-break: break-all;">商品摘要</th>
+			<th style="width: 20%;word-break: break-all;">所选规格</th> 
+			<th style="width:20%">数量 </th>
+		</tr>
+		{loop $detlist $index $item}
+		<tr>
+			<td><img src="{$_W['attachurl']}{$item['catalog']}{$item['picture']}" style="width: 60px;height: 60px;"></td>
+			<td>{$item['goodsname']} </td>
+			<td>{$item['casename']} </td> 
+			<td>{$item['count']}</td>  
+		</tr>
+		{/loop}
+	</table>
+	</div>
+</div>
+ 
+<script type="text/javascript">
+	var layer;
+	function changeSts(){
+		 modalDlg("是否修改订单状态",function(){
+		 	$("#stsForm").submit();
+		 });
+	}
+	function priter(){
+		var url="<?php echo $this->routeUrl('priter.order');?>&order={$order['order_no']}";
+		$("#priterFrame").attr("src",url);
+		$("#priterFrame").attr("dispaly",'black');
+	}
+	function refund(){
+		var html="<form action='<?php echo $this->routeUrl('order.refundOrder');?>&oid={$order['id']}' method='post' id='moneyForm'><input type='hidden' name='order_no' value='{$order['order_no']}' /><input type='number' name='money' step='0.01' placeholder='请输入退款金额  最多：{$order['money_pay']}' id='money_refund' class='form-control'/></form>";
+		modalDlg("<span style='color:#ff4444;'>是否退款？</span>",function(){
+			window.location.href="<?php echo $this->routeUrl('order.refundOrder');?>&order={$order['order_no']}";
+			// if(parseFloat($("#money_refund").val())<0.01||parseFloat($("#money_refund").val())>{$order['money_pay']}){
+			// 	return false;
+			// }
+			// var s=confirm("是否退款  "+$("#money_refund").val()+" ？");
+			// if(s){
+			// 	$("#moneyForm").submit();
+			// }
+			
+		});
+		//window.location.href="<?php echo $this->routeUrl('order.refund');?>&order_no={$order['order_no']}"
+	}
+	function changePayMoney(){
+		var html="<form action='<?php echo $this->routeUrl('order.changePayMoney');?>&oid={$order['id']}' method='post' id='moneyForm'><input type='hidden' name='order_no' value='{$order['order_no']}' /><input type='number' name='money' value='{$order['money_pay']}' step='0.01' placeholder='请输入修改后的价格' id='money_pay' class='form-control'/></form>";
+		modalDlg(html,function(){
+			var s=confirm("是否修改订单支付价格为 "+$("#money_pay").val()+" ？");
+			if(s){
+				$("#moneyForm").submit();
+			}
+			
+		});
+
+	}
+	function express(){
+		<?php 
+		
+		if(intval($setting['kdniao_id'])<100){//非快递发货  ?>
+			var express='<input type="hidden" name="noexp" id="noexp" value="1" /><input type="hidden" value="{$order["order_no"]}" name="oid" readonly="readonly" /><span style="color:#ff4444">订单状态将变更为 “ 配送中 ” ，是否继续？</span>';
+		<?php }else{//快递发货 ?>
+		var express="<select name='expresstype' id='expresstype' class='form-control' style='width:120px;display:inline-block;'>"; 
+		<?php foreach($explist as $key=>$val){  ?>
+	 		express+='<option value="<?php echo $val['code'];?>" <?php if($val['status']=="2"){ echo 'selected="true"';}?>><?php echo $val['name'];?></option>';
+		<?php } ?> 
+		express+='<option value="wx" >无需物流</option>';
+		express+='</select><input type="hidden" value="{$order["order_no"]}" name="oid" readonly="readonly" /><div id="tanchu" style="display:inline-block"><input type="text" class="form-control" placeholder="请输入快递编号" name="express" id="express" style="width: 200px;margin:auto 15px;display: inline-block;"></div>';
+		<?php } ?>
+		var html='<form action="<?php echo $this->routeUrl("order.sendExpress").'&oid='.$order["id"];?>" method="post" id="exform">'+express+'</form>';
+
+		modalDlg(html,function(){
+			var expressxr=$("#expresstype").val();
+			var noexp=parseInt($("#noexp").val());
+			var express=$("#express").val();
+			if(noexp==1){
+				$("#exform").submit();
+			} else {
+				if(expressxr=='wx'){
+					$("#exform").submit();
+				}
+				else{
+					if(express.length>5){
+						$("#exform").submit();
+					}
+				}
+			} 
+		});
+		$("#expresstype").change(function(){
+		    var opt=$("#expresstype").val();
+		    if(opt=='wx'){
+		    $("#tanchu").html("");
+		    }
+		    else{
+		    	$("#tanchu").html("");
+		    	var htmlr='<input type="text" class="form-control" placeholder="请输入快递编号" name="express" id="express" style="width: 200px;margin:auto 15px;display: inline-block;">';
+		    	$("#tanchu").html(htmlr);
+		    }
+		});
+	}
+	/*function refund(){
+		modalDlg("是否进行退单操作?退单后钱将会退还给用户",function(){
+			modalDlgClose();
+ 			$.ajax({
+ 				url:'<?php echo $this->routeUrl("order.refund");?>',
+ 				type:"post",
+ 				data:{oid:<?php echo $order["id"];?>},
+ 				success:function(d){
+ 					if(d.sts==1||d.sts=="1"){
+ 						modalMsg("退单成功，到账时间可能会有延迟");
+ 					}else{
+ 						modalMsg("退单失败");
+ 					} 
+ 				},
+ 				error:function(){
+ 					modalMsg("退单失败");
+ 				}
+ 			});
+		});
+	}*/
+</script>
+<iframe src="" id="priterFrame" style="width: 500px;height: 500px;display: none;" ></iframe>
+{template 'public/footer'}
+<script type="text/javascript">
+	
+	layui.use(['form', 'layer'], function(){
+  var form = layui.form;
+  		layer=layui.layer;
+	});
+</script>

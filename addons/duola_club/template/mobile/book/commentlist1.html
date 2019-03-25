@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta charset="utf-8">
+    <title>{$school['title']}</title>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/layer.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="http://res.layui.com/layui/src/css/layui.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="http://res.layui.com/lay/lib/layer/src/skin/layer.css">-->
+    <style>
+        .userimg
+        img { width:40px; height:40px;}
+        .img1
+        img {width:300px; height:230px;}
+        .content {border-bottom:1px solid #CCCCCC;}
+        .userimg1
+        img { width:80px; height:80px;}
+        .fatie
+        img{
+            position: fixed;
+            bottom: 20px;
+            right: 15px;
+            z-index: 100;
+            width: 72px;
+            height: 72px;
+
+        }
+    </style>
+</head>
+<body style="margin: 0px;padding: 0px;">
+<!--顶部图片-->
+<div class="header" style="width:100%; height:230px;">
+    <div clss="img1" style="width:100%; height:200px;">
+
+        <img src="{php echo $_W['siteroot'].'attachment/'.$site['banner']}" width="100%" height="200px;" >
+    </div>
+    <div class="img2" style="position:relative; width:75px; height:75px; margin-top:-50px; margin-left:68%; border: 3px solid #FFFFFF;">
+        <img src="{php echo tomedia($userInfo['avatar'])}" width="75px;" height="75px;" >
+    </div>
+</div>
+<!--帖子栏目-->
+<!--<div style="width: 50%;height: 35px;border: solid 1px aqua;margin: auto">
+    <a href="{php echo $fabu_url}"><input type="text" style="width: 100%;height: 36px;border: solid 1px aqua;color: #09BB07" value="发布留言!"></a>
+</div>-->
+
+{loop $data $index $val}
+<div id="ajax_add">
+    <div class="content" style="width:100%; margin-top:20px;" onClick="show_info('{$val['openid']}',{$val['id']})">
+        <div class="userimg" style="margin-top:10px; width:40px; height:40px; margin-left:10px; border: 1px solid #336699;">
+            <img src="{php echo tomedia($val['userData']['userImg'])}" width="30px;" height="30px;" >
+
+        </div>
+        <div class="username" style="margin-left:60px; margin-top:-58px; color:#666666;">
+            <p style="font-size:0.9em;"><strong>{$val['userData']['nickname']}</strong></p>
+        </div>
+
+        <div class="time1" style="margin-left:60px; margin-top:-12px; color:#999999;">
+            <p style="font-size:0.8em;">{$val['createDate']}</p>
+        </div>
+
+        <div class="usercontent" style="margin-left:60px; margin-top:-10px; color: #333333; margin-right:5px;">
+            <p style="font-size:0.9em;">{$val['remark']}</p>
+        </div>
+        <div class="userimg1" style="margin-left:60px; margin-top:-10px; margin-right:5px; margin-bottom:15px;" >
+
+            {loop $val['img'] $k $v}
+            {if $v['name'] != ""}
+
+            <img src="{$v['name']}" alt="">
+            {/if}
+            {/loop}
+
+        </div>
+    </div>
+</div>
+
+{/loop}
+
+<div id="html_append">
+
+</div>
+<!--<div id="loading" pageindex="2" style="width:100px;margin: auto;margin-top: 10px">
+    <span id="load_text">加载更多...</span>
+</div>
+-->
+
+<!--底部栏目-->
+<div class="fatie" style="margin-top:-50px;">
+    <a href="{php echo $fabu_url}"><img src="http://pub.idqqimg.com/qqun/xiaoqu/mobile/img/../img/publish-detail-icon.png?6427bee5)"></a>
+</div>
+
+<div style="margin-top:60px; margin-bottom:10px; font-size:0.8em; color:#333333;">
+    <div align="center"><span><b>{php echo $site['copy']}</b></span>
+    </div>
+</div>
+
+<div id="fbform" style="width: 400px;height: 300px;border: solid 1px aqua;margin: auto;position: relative;display: none">
+
+</div>
+<input type="hidden" id="pageindex" value="2">
+</body>
+<script>
+    $(document).ready(function () {
+        $("#fabu").on('click',function () {
+            $("#fbform").show();
+        });
+
+    });
+
+    function show_info(uid,lid) {
+        window.location.href = "{php echo $this->createMobileUrl('bookCenter',array('schoolid' => $schoolid))}"+"&ownerOpenId="+uid;
+    }
+
+
+</script>
+
+<script>
+    var winH = $(window).height();
+    $(window).scroll(function () {
+        var pageH = $(document.body).height(); //页面总高度
+        var scrollT = $(window).scrollTop(); //滚动条top
+        var aa = (pageH-winH-scrollT)/winH;
+        var pageindex = $("#pageindex").val();
+        if(aa<0.02){
+            // $.ajax({
+            //     url : "{php echo $this->createMobileUrl('Index')}",
+            //     //dataType:'json',
+            //     type:'post',
+            //     data:{
+            //         dos : 'ajax_get',
+            //         page : pageindex,
+            //     },
+            //     success:function(res)
+            //     {
+            //         $("#pageindex").attr("value",parseInt(pageindex)+1);
+            //         var obj1 = eval(res);
+            //         alert(1);
+
+            //     }
+
+            // });
+            $.post("{php echo $this->createMobileUrl('Pages')}",{
+                dos : 'ajax_get',
+                page : pageindex,
+            },function(res){
+                $("#pageindex").attr("value",parseInt(pageindex)+1);
+                var data = $.parseJSON(res);
+                var html = "";
+                $.each(data,function(k,v){
+                    var img = "";
+                    $.each(v.img,function(k,v){
+                        img += '<img src="'+v.name+'" alt="">';
+                    });
+
+                    html = '<div class="content" style="width:100%; margin-top:20px;" onClick="show_info('+v.uid+','+v.id+')"><div class="userimg" style="margin-top:10px; width:40px; height:40px; margin-left:10px; border: 1px solid #336699;"><img src="'+v.headimg+'" width="30px;" height="30px;" ></div><div class="username" style="margin-left:60px; margin-top:-58px; color:#666666;"><p style="font-size:0.9em;"><strong>'+v.user+'</strong></p></div>    <div class="time1" style="margin-left:60px; margin-top:-12px; color:#999999;"><p style="font-size:0.8em;">'+v.time+'</p></div><div class="usercontent" style="margin-left:60px; margin-top:-10px; color: #333333; margin-right:5px;"><p style="font-size:0.9em;">'+v.info+'</p></div><div class="userimg1" style="margin-left:60px; margin-top:-10px; margin-bottom:15px;">'+img;
+
+                    $("#html_append").append(html);
+                });
+            });
+        }
+
+    });
+
+</script>
+
+
+</html>

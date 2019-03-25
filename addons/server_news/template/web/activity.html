@@ -1,0 +1,167 @@
+
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li class="{if $op=='display'}active{/if}" data-son=".nav_list" data-title="分类列表">
+		<a href="{php echo $this->createWebUrl('activity', array('op'=>'display','page'=>max(intval($_GPC['page']), 1)));}">分类列表</a>
+
+	</li>
+	<li class="{if $op=='add'}active{/if}" data-son=".add_nav" data-title="新增列表">
+		<a href="{php echo $this->createWebUrl('activity', array('op'=>'add','page'=>max(intval($_GPC['page']), 1)));}">新增分类</a>
+
+	</li>
+	{if $op=='update'}
+	<li class="{if $op=='update'}active{/if}" data-son=".update_nav" data-title="修改分类">
+		<a href="{php echo $this->createWebUrl('activity', array('op'=>'update','page'=>max(intval($_GPC['page']), 1)));}">修改分类</a>
+
+	</li>
+	{/if}
+</ul>
+<div class="panel panel-default ng-scope">
+	<div class="panel-heading" id="panel-heading">
+		{if $op=='display'}分类列表{elseif $op=='add'}新增导航{elseif $op=='update'}更新导航{/if}
+		
+	</div>
+	<div class="panel-body">
+		{if $op=="display"}
+		<div class="nav_list">
+			<table st-table="items" class="table table-striped">
+				<thead>
+					<tr>
+						<th style="width:50px;">分类编号</th>
+						<th style="width:200px;">分类名称</th>
+						<th style="width:200px;">简介</th>
+						<th style="width:200px;">排序</th>
+						<th style="width:80px;">状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $nav_list $nav}
+					<tr>
+						<td class="ng-binding">
+							{$nav['nav_id']}
+						</td>
+						<td>
+							<a href="#" editable-text="item.title" onbeforesave="updatetitle(item,$data)" class="ng-scope ng-binding editable editable-click">{$nav['nav_title']}</a>
+						</td>
+						<td>
+							<a href="#" editable-text="item.desc" onbeforesave="updatedesc(item,$data)" class="ng-scope ng-binding editable editable-click">{$nav['nav_detail']}</a>
+						</td>
+						<td>
+							<a href="#" class="ng-scope ng-binding editable editable-click">{$nav['nav_sort']}</a>
+						</td>
+						<td>
+							<label for="" ng-click="status(item)" class="label label-info">{if $nav['nav_status']==0}显示{elseif $nav['nav_status']==1}不显示{/if}</label>
+						</td>
+						<td>
+							<a class="btn btn-default" onclick="return confirm_r();" title="删除表单" href="{php echo $this->createWebUrl('activity', array('op'=>'delete', 'id'=>$nav['nav_id']));}">
+								<i class="fa fa-times"></i>
+							</a>
+							<a class="btn btn-default" title="修改" href="{php echo $this->createWebUrl('activity', array('op'=>'update', 'id'=>$nav['nav_id']));}">
+								<i class="fa  fa-check-square"></i>
+							</a>
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+		</div>
+		
+		{elseif $op=="add"}
+		<div class="add_nav">
+		<form method="post" action="{php echo $this->createWebUrl('activity', array('op'=>'add'));}" onsubmit="return checkvalid();" name="nav">
+			  <div class="form-group">
+			    <label>分类名称</label>
+			    <input type="text" name ="title" id="nav_name" class="form-control" placeholder="分类名称">
+			  </div>
+			  <div class="form-group">
+			    <label>分类简介</label>
+			    <input type="text" name="detail" id="nav_detail" class="form-control"  placeholder="分类简介">
+			  </div>
+			  <div class="form-group">
+			    <label>排序</label>
+			    <input type="text" name="sort" class="form-control"  placeholder="排序">
+			  </div>
+			  <div class="form-group">
+				    <label>是否显示</label>
+				    <select class="form-control" name="status">
+					  <option value="0">显示</option>
+					  <option value="1">不显示</option>
+					</select>
+			  </div>
+			   
+			  <div class="panel-footer">
+			  		<input type="hidden" value="{$_W['token']}" name="token" />
+					<input type="submit" name="join" class="btn btn-sm btn-success" value="新增" />			
+			  </div>
+			 
+			</form>
+		</div>
+		
+		{elseif $op=='update'}
+		<div class="update_nav">
+			<form method="post" action="{php echo $this->createWebUrl('activity', array('op'=>'update'));}" onsubmit="return checkvalid();">
+			  <div class="form-group">
+			    <label>分类名称</label>
+			    <input type="text" name ="title" id="nav_name" value="{$results['nav_title']}" class="form-control" placeholder="分类名称">
+			  </div>
+			  <div class="form-group">
+			    <label>分类简介</label>
+			    <input type="text" name="detail" id="nav_detail" value="{$results['nav_detail']}" class="form-control"  placeholder="分类简介">
+			  </div>
+			  <div class="form-group">
+			    <label>排序</label>
+			    <input type="text" name="sort" value="{$results['nav_sort']}" class="form-control"  placeholder="排序">
+			  </div>
+			  <div class="form-group">
+				    <label>是否显示</label>
+				    <select class="form-control" name="status">
+					  <option "{if $results['nav_status'] ==0 } selected=selected{/if}" value="0">显示</option>
+					  <option "{if $results['nav_status']==1} selected=selected{/if}" value="1">不显示</option>
+					</select>
+			  </div>
+			   
+			  <div class="panel-footer">
+			  		<input type="hidden" value="{$_W['token']}" name="token" />
+			  		<input type="hidden" name="id" value="<?php echo $results['nav_id'];?>">
+					<input type="submit" name="submit" class="btn btn-sm btn-success" value="修改" />			
+			  </div>
+			 
+			</form>
+		</div>
+		{/if}
+</div>
+</div>
+<script type="text/javascript">
+	// $(function(){
+	// 	$('.nav li').click(function(){
+		
+	// 		$('.nav li').removeClass('active');
+	// 		$(this).addClass('active');
+	// 		$('.panel-body').children('div').hide();
+	// 		var show_class=$(this).data('son');
+	// 		$(show_class).show();
+	// 		$('#panel-heading').html($(this).data('title'));
+	// 	})
+		
+	// })
+
+	function checkvalid(){
+		if ($('#nav_name').val()==''){
+			util.message('标题不能为空','','error');
+			return false;
+		}
+		return true;	
+	};
+	function confirm_r(){
+		var r=confirm("确定要删除吗!");
+		if(r==true){
+			return true;
+		}else{
+			return false;
+		}
+	}
+</script>
+{template 'common/footer'}
+      

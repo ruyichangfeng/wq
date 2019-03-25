@@ -1,0 +1,355 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('closurelog', array('op'=>'display'));}">粉丝核销记录</a></li>
+</ul>
+
+<div class="main">
+    <div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">店员</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+					      	<input type="text" name="search[closurelog_memberopenid]" readonly class="form-control" value="{$data['search']['closurelog_memberopenid']}" id="member_openid">
+					      	<span class="input-group-btn">
+					      	  <button class="btn btn-default" type="button" onclick="searchShow(1)" >选择店员</button>
+					      	</span>
+					    </div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">粉丝</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+					      	<input type="text" name="search[closurelog_fansopenid]" readonly class="form-control" value="{$data['search']['closurelog_fansopenid']}" id="fans_openid">
+					      	<span class="input-group-btn">
+					      	  <button class="btn btn-default" type="button" onclick="searchShow(2)" >选择粉丝</button>
+					      	</span>
+					    </div>
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">充值类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[closurelog_credittype]" id="store_state_0"  value="" {if $data['search']['closurelog_credittype']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[closurelog_credittype]"  value="1" {if $data['search']['closurelog_credittype']=='1'} checked="checked"{/if} > 积分
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[closurelog_credittype]"  value="2" {if $data['search']['closurelog_credittype']=='2'} checked="checked"{/if} > 余额
+                        </label>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <input type="hidden" name="searchflag" value="1" />
+					</div>
+				</div>
+                </form>
+            </div>
+            </div>
+        </div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">粉丝核销记录</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:10%;">序号</th>
+								<th style="width:15%;">店员昵称</th>
+                                <th style="width:15%;">粉丝昵称</th>
+                                <th style="width:15%;">奖励类型</th>
+                                <th style="width:15%;">奖励数值</th>  
+                                <th style="width:15%;">发放时间</th>
+                                <th style="width:15%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{if !empty($data["records"])}
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['closurelog_membernickname']}
+								</td>
+								 <td>
+                                    {$item['closurelog_fansnickname']}
+								</td>
+								<td>
+                                    {if $item['closurelog_credittype']==1}积分{else}余额{/if}
+								</td>
+
+								<td>
+                                    {$item['closurelog_number']}
+								</td>
+								<td>
+                                    {$item['closurelog_addtime']}
+								</td>
+								<td>
+                                    <a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('closurelog', array('op'=>'delete', 'closurelog_id'=>$item['closurelog_id']));}" class="btn btn-danger">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							
+							<!-- <tr>
+								<td colspan="3">
+									合计
+								</td>
+								<td colspan="1">
+									 积分/余额
+								</td>
+								<td colspan="3">
+									 100/200
+								</td>
+							</tr>
+							{/if} -->
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+						
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="tanchukuang1">
+  		<div class="modal-dialog modal-lg" role="document">
+	    <div class="modal-content" style="padding: 2em;">
+	      	<div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="fansform">
+	                <div class="form-group">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control"  placeholder="店员姓名/店员电话/店员编号" id="search_info1">
+                                    <span class="input-group-btn">
+        								<button class="btn btn-default" onclick="searchStaff1()" type="button">搜索</button>
+     								</span>
+                                </div>
+                            </div>
+					</div>
+                </form>
+            </div>
+        </div>	
+		<div class="panel panel-primary">
+			<div class="panel-heading">店员信息</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:15%;">店员姓名</th>
+								<th style="width:15%;">店员电话</th>
+								<th style="width:30%;">店员编号</th>
+                                <th style="width:20%;">注册时间</th> 
+								<th style="width:10%;">操作</th>
+							</tr>
+						</thead>
+						<tbody id="memberlist">
+							<tr>
+								<td colspan="9">
+									请填写筛选条件！
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	    </div>
+  </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="tanchukuang2">
+  		<div class="modal-dialog modal-lg" role="document">
+	    <div class="modal-content" style="padding: 2em;">
+	      	<div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="fansform">
+	                <div class="form-group">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="昵称/openID" id="search_info2">
+                                    <span class="input-group-btn">
+        								<button class="btn btn-default" onclick="searchStaff2()" type="button">搜索</button>
+     								</span>
+                                </div>
+                            </div>
+					</div>
+                </form>
+            </div>
+        </div>	
+		<div class="panel panel-primary">
+			<div class="panel-heading">粉丝信息</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:10%;">粉丝编号</th>
+								<th style="width:15%;">粉丝昵称</th>
+								<th style="width:30%;">openid</th>
+                                <th style="width:20%;">注册时间</th>  
+								<th style="width:10%;">操作</th>
+							</tr>
+						</thead>
+						<tbody id="fanslist">
+							<tr>
+								<td colspan="9">
+									请填写筛选条件！
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	    </div>
+  </div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#store_state_0").prop("checked",'checked')
+}
+
+
+function searchShow(num) {
+    $('#tanchukuang'+num).modal('show');
+}
+
+
+function checkedlist1(openid)
+{
+	$('#member_openid').val(openid);
+
+	$("#tanchukuang1").modal('hide');
+}
+function searchStaff1()
+{
+	if($('#search_info1').val()!="")
+	{
+		$.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxlinemember');}",
+        data:{search:$('#search_info1').val()},
+        dataType:"json",
+        async:false,
+        success: function(data){
+        	$("#memberlist").empty();
+        	if(data.rs.length>0)
+        	{
+        		var op="";
+        		for(var i=0; i<data.rs.length; i++){ 
+             		
+             		op+="<tr>";
+             		op+="<td>"+data.rs[i].member_name+"</td>";
+             		op+="<td>"+data.rs[i].member_tel+"</td>";
+             		op+="<td>"+data.rs[i].member_openid+"</td>";
+             		op+="<td>"+data.rs[i].addtime+"</td>";
+             		op+="<td><button type='button' class='btn btn-info  memberorder-cancel ' style='color:white;' onClick=\"checkedlist1('"+data.rs[i].member_openid+"')\">选中</button></td>";
+                 		op+="</tr>";
+                }
+                	$("#memberlist").append(op);
+            	}else
+            	{
+                 	op="<tr>";
+                 	op+="<td colspan='9'>信息不存在！</td>";
+                 	$("#memberlist").append(op);
+            	}
+           	}
+        });
+	}else{
+		alert('请填写筛选条件！');
+	}	
+}
+
+
+function searchStaff2()
+{
+	if($('#search_info2').val()!="")
+	{
+		$.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxlinefans');}",
+        data:{search:$('#search_info2').val()},
+        dataType:"json",
+        // dataType:"text",
+        async:false,
+        success: function(data){
+        	$("#fanslist").empty();
+        	if(data.rs.length>0)
+        	{
+        		var op="";
+        		for(var i=0; i<data.rs.length; i++){ 
+             		
+             		op+="<tr>";
+             		op+="<td>"+data.rs[i].fans_id+"</td>";
+             		op+="<td>"+data.rs[i].fans_nickname+"</td>";
+             		op+="<td>"+data.rs[i].fans_openid+"</td>";
+             		op+="<td>"+data.rs[i].fans_addtime+"</td>";
+             		op+="<td><button type='button' class='btn btn-info  memberorder-cancel ' style='color:white;' onClick=\"checkedlist2('"+data.rs[i].fans_openid+"')\">选中</button></td>";
+                 		op+="</tr>";
+                	}
+                	$("#fanslist").append(op);
+            	}else
+            	{
+                 	op="<tr>";
+                 	op+="<td colspan='9'>信息不存在！</td>";
+                 	$("#fanslist").append(op);
+            	}
+           	}
+        });
+	}else{
+		alert('请填写筛选条件！');
+	}	
+}
+function checkedlist2(openid)
+{
+	$('#fans_openid').val(openid);
+
+	$("#tanchukuang2").modal('hide');
+}
+
+</script>
+
+{template 'common/footer'}

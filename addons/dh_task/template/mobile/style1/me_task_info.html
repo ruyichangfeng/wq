@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <style type="text/css">
+        .taskinfo{position: relative;}
+        .taskinfo .image{width: 100%}
+        .taskinfo .image img{width: 100%}
+        .content{padding:10px;margin-bottom: 10px;background-color: #fff}
+        .content .task_title{color: #333;}
+        .content .task_desc{font-size: 14px;color: #888;}
+        .content .prove{font-size: 14px;color: #333;line-height: 25px;margin-bottom: 5px;}
+        .content .prove span{display: block;}
+        .content .prove img{max-width: 48%;margin: 0 1% 5px 0;}
+        .content .evaluate{font-size: 14px;color: #333;line-height: 25px;padding-top: 5px;border-top: 1px solid #f8f8f8;}
+        .content .evaluate span{display: block;}
+        .content .hide_content{border:1px solid #f66216;padding:8px;}
+        .list{padding: 0 10px;}
+        .list div{font-size: 14px;line-height:34px;color: #333;border-top: 1px solid #f8f8f8;}
+        .content .task_time{border-top: none;}
+        .footer{position: fixed;border: 0;bottom: 0;width: 100%;height: 50px;text-align:center;line-height: 50px;background-color: #fff;}
+        .footer .task_exp{width: 60%;float: left;font-size: 14px;color: #666;height: 19px;border-top: 1px solid #fafafa;height: 49px;line-height: 44px;text-align: left;padding-left: 5%;padding-top: 3px;}
+        .footer .task_r{width: 35%;float: right;background-color: #f66216;color: #fff;font-size: 18px;}
+        .footer .task_r.no{background-color: #ccc;color: #fff;}
+
+        .review{display:none;position: fixed;top: 0;z-index: 12;width: 100%;height: 100%;background-color: rgba(0,0,0,.3);}
+        .review .con{background-color: #fff;width: 70%;margin: 0 auto;margin-top:20%;padding:15px;border-radius: 3px;text-align: center;max-height: 60%;overflow: overlay;}
+        .review .con p{color: #ccc;font-size: 14px;}
+        .review .con textarea{width:96%;height:60px;padding:5px 2%;border-radius: 3px;margin:5px 0;border-color: #f0f0f0;resize: none;}
+        .review .con .tijiao{display: block;padding: 5px 10px;background: #18b4ed;border-radius: 3px;color: #fff;margin-top: 5px;}
+        .review .con .exit{margin-top:20px;color: #ccc;}
+        .review .con .upfile{float: left;position: relative;margin-right: 9px;margin-bottom: 9px;width: 77px;height: 77px;border: 1px solid #d9d9d9;}
+        .review .con .upfile img{width: 77px;height: 77px;}
+        .weui_uploader_bd a{float: left;position: relative;margin-right: 9px;margin-bottom: 9px;}
+        .weui_uploader_bd a img{width: 77px;height: 77px;}
+    </style>
+    <script type="text/javascript" src="{$_W['siteroot']}/web/resource/js/app/util.js?v=20161011"></script>
+</head>
+<body ontouchstart  class="page-bg">
+    {template 'style1/follow'}
+    <div class="taskinfo">
+        <!-- <div class="image">
+            <img src="{if $taskinfo['task_image']}{media $taskinfo['task_image']}{else}{media $setting['task_image']}{/if}">
+        </div> -->
+        <div class="content">
+            <div class="task_title">{$taskinfo['task_title']}</div>
+            <div class="task_desc">{$taskinfo['task_desc']}</div>
+        </div>
+        {if $taskinfo['field']}
+        <div class="content">
+            <div class="prove"><span>我的资料:</span>
+            {loop $taskinfo['field'] $i $v}
+            <span>{$v['name']}：{$v['value']}</span>
+            {/loop}
+            </div>
+        </div>
+        {/if}
+        {if $taskinfo['r_status'] != 0 && $taskinfo['is_review'] == 1}
+        <div class="content">
+            {if $taskinfo['r_status']!=0}
+                <div class="prove"><span>我的凭证:</span><span>{if $taskinfo['prove']}{$taskinfo['prove']}{else}无{/if}</span>
+                {if $taskinfo['image']}
+                    {loop $taskinfo['image'] $v}
+                        <img src="{media $v}">
+                    {/loop}
+                {/if}
+                </div>
+            {/if}
+            {if $taskinfo['r_status']==2||$taskinfo['r_status']==1}<div class="evaluate"><span>考核评语:</span><span>{if $taskinfo['evaluate']}{$taskinfo['evaluate']}{else}无{/if}</span></div>{/if}
+        </div>
+        {/if}
+        
+        <div class="content list">
+            <div class="task_time">任务标签：{$taskinfo['title']}</div>
+            <div>任务分类：{$taskinfo['navtitle']}</div>
+            <div>完成时间：{$taskinfo['task_do_time']}</div>
+            <div>审核人：{if $taskinfo['reviewuser']}{$taskinfo['reviewuser']}{else}这个任务不需要审核{/if}</div>
+        </div>
+        {if $taskinfo['task_content']}
+        <div class="content">
+            {if $taskinfo['hide_content']}
+            <div style="font-size: 14px;color:#666;">隐藏内容</div>
+            <div class="hide_content">{$taskinfo['hide_content']}</div>
+            {/if}
+            <div class="task_content">{$taskinfo['task_content']}</div>
+        </div>
+        {/if}
+    </div>
+    <div style="height: 50px;"></div>
+    <div class="footer">
+        <div class="task_exp">
+        {if $taskinfo['task_points'] == 0}无奖励{else}完成可获得{$taskinfo['task_points']}{$setting['points_name']}{/if}
+        {if $taskinfo['task_type'] == 2} 升一级{/if}
+        </div>
+        <div class="task_r {if $taskinfo['r_status'] != 0 && $taskinfo['r_status'] != 2}no{/if}">{if $taskinfo['r_status'] == 0}提交审核{elseif $taskinfo['r_status'] == 3}审核中{elseif $taskinfo['r_status'] == 1}已完成{elseif $taskinfo['r_status'] == 2}重新提交{elseif $taskinfo['r_status'] == 4}已放弃{/if}</div>
+    </div>
+    <div class="review">
+        <div class="con">
+            <form>
+                <textarea name="prove" placeholder="填写审核说明"></textarea>
+                <p style="text-align: left;">上传任务凭证(最多9张)</p>
+                <div class="weui_uploader_bd">
+                    <div class="weui_uploader_input_wrp upfile">
+                        <span class="weui_uploader_input upimage"></span>
+                    </div>
+                </div>
+            </form>
+            <a class="tijiao" href="javascript:subreview();">提交</a>
+            {if $taskinfo['r_status'] == 0}<p class="exit">放弃任务</p>{/if}
+        </div>
+    </div>
+    {php echo register_jssdk(false);}
+    <script type="text/javascript">
+        var status = {$taskinfo['r_status']};
+        $(".task_r").click(function(){
+            if(status == 0 || status == 2){
+                $(".review").show();
+            }
+        });
+        $(".review").click(function(){
+            $(".review").hide();
+        });
+        $(".con").click(function(e){
+            e.stopPropagation();
+        });
+        function subreview(){
+            var data = $("form").serialize();
+            $(".review").hide();
+            //var data = {prove:prove,image:image}
+            $.showLoading('请稍候');
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('me', array('op'=>'subreview','id'=>$taskinfo['rid']), true)}",
+                type:"post",
+                data:data,
+                dataType: 'json',
+                success:function(data){
+                    $.hideLoading();
+                    if(data.status == 1){
+                        $.toast("提交成功");
+                        setTimeout("location.reload()",1500);
+                    }else{
+                        $.toast(data.info,"forbidden");
+                    }
+                },
+                error:function(){
+                    $.hideLoading();
+                    $.toast('网络错误',"forbidden");
+                }
+            });
+        }
+        $(".exit").click(function(){
+            $(".review").hide();
+            $.confirm("放弃任务不会退回{$setting['points_name']}", "放弃任务", function() {
+                    $.showLoading('请稍候');
+                    $.ajax({
+                        url:"{php echo $this->createMobileUrl('me', array('op'=>'exittask','id'=>$taskinfo['rid']), true)}",
+                        type:"GET",
+                        dataType: 'json',
+                        success:function(data){
+                            $.hideLoading();
+                            if(data.status == 1){
+                                $.toast('你已经放弃了该任务');
+                                setTimeout(function(){
+                                    location.reload();
+                                },1500);
+                            }else{
+                                $.toast(data.info,"forbidden");
+                            }
+                        },
+                        error:function(){
+                            $.hideLoading();
+                            $.toast('网络错误',"forbidden");
+                        }
+                    });
+                }, function() {
+                //取消操作
+                });
+        });
+        $(".upimage").click(function(){
+            wx.chooseImage({
+                count: 9, // 默认9
+                sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    //必须做一下mediaId的设定，否则将会无法在安卓端得到微信上传功能的触发
+                    localId = localIds.toString();
+                    var length = $('.weui_uploader_bd').children('a').length;
+                    $.each(res.localIds,function(i,e){
+                        if(length+i>=9){
+                            $(".upfile").hide();
+                            return false;
+                        }
+                        wx.uploadImage({
+                             localId: e, // 需要上传的图片的本地ID，由chooseImage接口获得
+                             isShowProgressTips: 1, // 默认为1，显示进度提示
+                             success: function (res) {
+                                 var serverId = res.serverId; // 返回图片的服务器端ID 
+                                 $.showLoading('请稍后');
+                                 $.ajax({
+                                     url:"{php echo $this->createMobileUrl('me', array('op'=>'upimage'), true)}",
+                                     type:'post',
+                                     data:{
+                                         media_id:serverId,
+                                     },
+                                     dataType:'json',
+                                     success:function(data){
+                                         $.hideLoading();
+                                         if(data.status == 1){
+                                            var image = '<a onclick="delimage(this)">'
+                                                +'<img src="'+data.imgurl+'">'
+                                                +'<input name="image[]" type="hidden" value="'+data.realimgurl+'">'
+                                                +'</a>'
+                                            $(".upfile").before(image);
+                                         }else{
+                                            $.toast(data.info);
+                                         }
+                                     },
+                                     error: function(request) {
+                                         $.hideLoading();
+                                         $.toast("网络错误");
+                                     },
+                                 });
+     
+                             },
+                             fail:function(res){
+                                 
+                             }
+                         }); 
+                    });
+                    
+                }
+            });
+        });
+        function delimage(e){
+            e.remove();
+            var length = $('.weui_uploader_bd').children('a').length;
+            if(length<9){
+                $(".upfile").show();
+            }
+        }
+    </script>
+</body>
+</html>

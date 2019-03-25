@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <style type="text/css">
+        .list{background-color: #fff;margin-bottom: 10px;}
+        .list .userinfo{height:78px;border-bottom: 1px solid #f8f8f8;padding: 10px;overflow: hidden;}
+        .list .userinfo .info1{width: 40%;float: left;}
+        .list .userinfo .info2{width: 40%;float: left;}
+        .list .userinfo .review{width: 20%;float: right;text-align: center;line-height: 78px;}
+        .list .userinfo .review span{background-color: #f66216;color: #fff;padding: 5px 8px;border-radius: 3px;}
+        .list .userinfo p{font-size: 14px;color: #333;line-height: 26px;}
+        
+        .empty{margin-top: 100px;text-align: center;}
+        .empty i:before{color: #dedede;font-size: 5em;}
+        .empty p{text-align: center;color: #999;line-height: 30px;font-size: 14px;}
+
+        .pager{margin-bottom: 10px;}
+        .pager .pager-left{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-right{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-left .pager-pre{width: 60%;background-color: #fff;border-radius: 3px;}
+        .pager .pager-right .pager-next{width: 60%;background-color: #fff;border-radius: 3px;border:none;}
+    </style>
+    
+</head>
+<body ontouchstart  class="page-bg">
+    <div class="searchbar_wrap"></div> 
+    <div class="list">
+        {loop $fanslist $i $v}
+        <div class="userinfo">
+            <div class="info1">
+                <p>昵称:{$v['nickname']}</p>
+                <p>姓名:{$v['username']}</p>
+                <p>手机:{$v['mobile']}</p>
+            </div>
+            <div class="info2">
+                <p>分类:{$v['title']}</p>
+                <p>性别:{if $v['sex'] == 1}男{elseif $v['sex'] == 2}女{else}未知{/if}</p>
+            </div>
+            <div class="review"><span onclick="review({$v['id']})">审核</span></div>
+        </div>
+        {/loop}
+    </div>
+    {if empty($fanslist)}
+    <div class="empty">
+        <i class="weui_icon_msg weui_icon_info"></i>
+        <p>没有数据，先浏览其他项目吧</p>
+    </div>
+    {/if}
+    <div class="page-bd-15">
+        <div class='pager'>
+            <div class="pager-left">
+                {if $prevPage}<div class="pager-pre"><a class="pager-nav" href="{$prevPage}">上一页</a></div>{/if}
+            </div>
+            {if $allpage}<div class="pager-cen">{$page}/{$allpage}</div>{/if}
+            <div class="pager-right">
+                {if $nextPage}<div class="pager-next"><a class="pager-nav" href="{$nextPage}">下一页</a></div>{/if}
+            </div>
+        </div> 
+    </div>
+    {template 'style1/footer'}
+    <script type="text/javascript">
+        $('.searchbar_wrap').searchBar({
+            cancelText:"取消",
+            searchText:"{if $_GPC['key']}{$_GPC['key']}{else}关键字{/if}",
+            onsubmit:function(value){
+                window.location.href="{php echo $this->createMobileUrl('me', array('op'=>'reviewuser'), true)}&key="+value;
+            }
+        });
+        function review(id){
+            $.modal({
+                title: "审核",
+                text: "选择审核",
+                buttons: [
+                    { text: "取消", className: "default"},
+                    { text: "重填", onClick: function(){getreview(id,0); } },
+                    { text: "通过", onClick: function(){getreview(id,1); } },
+                ]
+            });
+        }
+        function getreview(id,type){
+            $.showLoading();
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('me', array('op'=>'getreview'), true)}&type="+type+"&id="+id,
+                type:"get",
+                dataType: 'json',
+                success:function(data){
+                    $.hideLoading();
+                    if(data.status){
+                        $.toast("操作成功");
+                        setTimeout(function(){
+                            location.reload();
+                        },2000);
+                    }else{
+                        $.toast(data.info,"forbidden");
+                    }
+                },
+                error:function(){
+                    $.hideLoading();
+                    $.toast("网络错误","forbidden");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<?php defined('IN_IA') or exit('Access Denied');?>
+<?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('staff/header', TEMPLATE_INCLUDEPATH)) : (include template('staff/header', TEMPLATE_INCLUDEPATH));?>
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+    <?php  if($check == 1) { ?>
+    <div class="ub ub-ver ub-ac ub-pc" style=" padding:5rem 0rem 3rem 0rem ">
+    	<div><i class="iconfont icon-zhengque32pt t-red" style="font-size:5rem"></i> </div>
+        <a href="" class="umar-t ulev1 t-gra">你已申请商铺</a>
+        <div class="absolute tx-c ulev-4" style="left:0; bottom:0;width:100%; 
+
+padding:0.5rem 0">请等待管理员审核</div>
+    </div>
+    <?php  } else { ?>
+    <div class="c-gre3 ub ub-ver ub-ac ub-pc" style=" padding:2rem 0rem 3rem 0rem ">
+    	<div><i class="iconfont icon-zhongjiangjilu t-yel" style="font-size:5rem"></i> </div>
+        
+        <div class="umar-t ulev1 t-yel">商铺申请</div>
+    </div>
+    <div class="ub-f1">
+        <form class="form-horizontal" id="form1" action="<?php  echo $this->createMobileUrl('staffreg',array('foo'=>'merchantRegOk'))?>" method="post" onSubmit="return submit1()">
+        <input type="hidden" name="staff_id" id="staff_id" value="<?php  echo $id;?>">
+
+        <div class="uinn8 umar-t1">
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        商铺名称
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="merchant_name" id="merchant_name" placeholder="" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        所属地区
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <select name="adr_id" id="adr_id" class="uinn ulev0 ub-f1 block">
+                                <option value="">选择所属地区</option>
+                                <?php  if(is_array($list1)) { foreach($list1 as $vo1) { ?>
+                                <option value="<?php  echo $vo1['id'];?>"><?php  echo $vo1['adr_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        所属商圈
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <select name="lido_id" id="lido_id" class="uinn ulev0 ub-f1 block">
+                                <option value="">选择所属商圈</option>
+                                <option value="0">无商圈</option>
+                                <?php  if(is_array($list2)) { foreach($list2 as $vo2) { ?>
+                                <option value="<?php  echo $vo2['id'];?>"><?php  echo $vo2['lido_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        行业类别
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <select name="type_id" id="type_id" class="uinn ulev0 ub-f1 block">
+                                <option value="">选择行业类别</option>
+                                <?php  if(is_array($list3)) { foreach($list3 as $vo3) { ?>
+                                <option value="<?php  echo $vo3['id'];?>"><?php  echo $vo3['type_name'];?></option>
+                                <?php  } } ?>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+                
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                        <i class="iconfont icon-shangchuanzhuanzhangpingzheng ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <img id="img1" src="" style="height:4rem;">
+                        </div>
+                    </div>
+                    <div class="uinn uba b-gre1 uc-a15 ulev-4 umar-r t-gre1" onClick="open_pic()">上传Logo</div>
+                </li>
+            </ul>
+            <input type="hidden" name="coverpic" id="coverpic" value="">
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        商铺地址
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <textarea class="uinn ulev0 ub-f1 block" name="text_" id="text_" placeholder="[点击右侧搜索]" readonly onClick="openPe()"></textarea>
+                        </div>
+                            
+                        <div onClick="openPe()" id="adr_1" class="uc-a1 block btnn t-gre1"><i class="iconfont icon-sousuo15 ulev3"></i></div>
+                    </div>
+                </li>
+            </ul>
+            <input type="hidden" name="jw" id="jw" placeholder="经纬度" class="uinn ulev0 ub-f1 block"  />
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        手机号码
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="merchant_mobile" id="merchant_mobile" placeholder="" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        联系电话
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="merchant_phone" id="merchant_phone" placeholder="" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                            启动外链
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="kk-check t-gra" style="padding:0.5rem 0.5rem 0.1rem 0.5rem ">
+                            <input name="chao" type="radio" id="bb1" value="1" <?php  if($item['chao'] == 1) { ?> checked="" <?php  } ?>>
+                            <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="bb1">是<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                            <input name="chao" type="radio" id="bb2" value="0" <?php  if($item['chao'] == 1) { ?> checked="" <?php  } ?>>
+                            <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="bb2">否<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+           
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        外链地址
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="chao_url" id="chao_url" value="<?php  echo $item['chao_url'];?>" placeholder="" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem" class="tx-r">
+                        配送时间
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="merchant_time" id="merchant_time" placeholder="" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+                <ul class="userlist c-wh uc-a15 umar-b">
+                    <li class="ub ub-ac">
+                        <div style="width:4.5rem" class="tx-r">
+                            起送价格
+                        </div>
+                        <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                            <div class="ub ulev0 ub-f1 ">
+                                <input type="tel" name="merchant_price" id="merchant_price" placeholder="" class="uinn ulev0 ub-f1 block" />
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="userlist c-wh uc-a15 umar-b">
+                    <li class="ub ub-ac">
+                        <div style="width:4.5rem" class="tx-r">
+                            配送费
+                        </div>
+                        <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                            <div class="ub ulev0 ub-f1 ">
+                                <input type="tel" name="merchant_song" id="merchant_song" placeholder="" class="uinn ulev0 ub-f1 block" />
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="userlist c-wh uc-a15 umar-b">
+                    <li class="ub ub-ac">
+                        <div style="width:4.5rem" class="tx-r">
+                                宵夜
+                        </div>
+                        <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                            <div class="kk-check t-gra" style="padding:0.5rem 0.5rem 0.1rem 0.5rem ">
+                                <input name="night" type="radio" id="aa1" value="1" checked>
+                                <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="aa1">有<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                                <input name="night" type="radio" id="aa2" value="0">
+                                <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" for="aa2">没有<i class="iconfont icon-dagouxuanzhong ulev0 t-org"></i></label>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+          
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                      执照号码
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="license" id="license" placeholder="执照号或信用码"  class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                        <i class="iconfont icon-shangchuanzhuanzhangpingzheng ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <img id="img2" src="" style="height:4rem;">
+                        </div>
+                    </div>
+                    <div class="uinn uba b-gre1 uc-a15 ulev-4 umar-r t-gre1" onClick="open_pic1()">上传证照</div>
+                </li>
+            </ul>
+            <input type="hidden" name="license_pic" id="license_pic" value="">
+
+		</div>
+
+        <div class="uinn8 ub">
+            <input name="submit" type="submit" value="下一步" class="c-gre3 ub-f1 uc-a1 btnn block tx-c t-wh" style="margin-bottom:0.5em; padding:0.75rem 3rem;" />
+			<!--
+            <input type="hidden" name="token" value="<?php  echo $_W['token'];?>" /> 
+			-->
+    	</div>
+        </form>
+    </div>
+    <?php  } ?>
+</div>
+<div style="height:3.125rem"></div>
+
+<div class="loginmask c-bla80"><!--map open-->
+	<div class="ub mban ub-ver" style="width:100%; height:100%; top:1500px">
+    	<div class="closealert ub-f1"></div>
+        <div class="ub ub-ac">
+            <div class="ulev-1 tx-c uinn5 c-wh ub-f1">请拖动地图选定您需要服务的位置</div>
+            <div class="closealert c-gra ub uinn5 ulev-1">确定</div>
+        </div>
+        <div class="c-org uinn t-wh tx-c ubb b-wh" id="centerDiv_1"></div>
+        <div class="c-org uinn t-wh tx-c" id="centerDiv_2"></div>
+        <div class="c-wh"  id="container_1" style="height:60%; "></div>
+    </div>
+</div>
+    
+<div class="c-blu" id="container" style="display:none;">
+</div>
+
+<?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('public/footerjs', TEMPLATE_INCLUDEPATH)) : (include template('public/footerjs', TEMPLATE_INCLUDEPATH));?>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp&libraries=convertor"></script>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+<script type="text/javascript">
+function getLocation(){
+	//判断是否支持 获取本地位置
+	if(navigator.geolocation)
+	{
+		navigator.geolocation.getCurrentPosition(showPosition);
+    }else{
+		x.innerHTML="浏览器不支持定位.";
+	}
+}
+
+function showPosition(position) {
+	var lat_1 =position.coords.latitude; 
+	var lng_1 =position.coords.longitude;
+	//div容器
+	var container_1 = document.getElementById("container_1");
+	var centerDiv = document.getElementById("centerDiv_1");
+	var centerDiv2 = document.getElementById("centerDiv_2");
+	//初始化地图
+	var map = new qq.maps.Map(container_1, {
+		// 地图的中心地理坐标
+		//center: new qq.maps.LatLng(39.916527, 116.397128),
+		center: new qq.maps.LatLng(lat_1,lng_1),
+		zoom: 16
+	});
+  //创建自定义控件
+   
+   var middleControl = document.createElement("div");
+	middleControl.style.left="50%";
+	middleControl.style.top="50%";
+	middleControl.style.position="relative";
+	middleControl.style.width="40px";
+	middleControl.style.height="40px";
+	middleControl.style.margin="-40px 0 0 -20px";
+	middleControl.style.zIndex="100000";
+    //middleControl.innerHTML ='<img src="https://www.cdlhome.com.sg/mobile_assets/images/icon-location.png" />';
+	middleControl.innerHTML ='<img style="height:40px;"  src="<?php echo MODULE_URL;?>static/takeout/images/dddw.png" />';
+    document.getElementById("container_1").appendChild(middleControl);
+	//返回地图当前中心点地理坐标
+		centerDiv_1.innerHTML = "坐标:" + map.getCenter();
+		var geocoder = new qq.maps.Geocoder();
+		var latLng = new qq.maps.LatLng(map.getCenter().getLat(), map.getCenter().getLng());
+        geocoder.getAddress(latLng);
+		geocoder.setComplete(function(result) {
+			centerDiv_2.innerHTML = "位置:" + result.detail.address;
+        	//document.getElementById('jw').value = map.getCenter().getLng()+','+map.getCenter().getLat();
+			//document.getElementById('text_').value = result.detail.address;
+        });
+	//当地图中心属性更改时触发事件
+	qq.maps.event.addListener(map, 'center_changed', function() {
+		centerDiv_1.innerHTML = "坐标:" + map.getCenter();
+		var geocoder = new qq.maps.Geocoder();
+		var latLng = new qq.maps.LatLng(map.getCenter().getLat(), map.getCenter().getLng());
+        geocoder.getAddress(latLng);
+		geocoder.setComplete(function(result) {
+			centerDiv_2.innerHTML = "位置:" + result.detail.address;
+        	document.getElementById('jw').value = map.getCenter().getLng()+','+map.getCenter().getLat();
+			document.getElementById('text_').value = result.detail.address;
+        });
+	});
+	
+}
+
+//弹出地图层
+$(".closealert").click(function() {
+	 $(".mban").animate({top:'1500px'})
+	 $(".loginmask").fadeOut(500);
+});
+function openPe(){
+	$(".loginmask").fadeIn(500), $(".mban").animate({top:'0px'});
+};
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	 getLocation();
+     //var chao = $('#input[name="chao"]:checked ').val();
+     //alert(chao);
+});
+</script>
+
+<script type="text/javascript">
+	jssdkconfig = <?php  echo json_encode($_W['account']['jssdkconfig']);?> || {};
+	
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'openLocation',
+		'getLocation',
+	];
+	
+	wx.config(jssdkconfig);
+	
+	wx.ready(function () {
+		
+	});
+	
+	//添加图片
+	function open_pic(){
+		wx.chooseImage({
+			count: 1, // 默认9
+			sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+			sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+			success: function (res) {
+				var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+				wx.uploadImage({
+					localId: ''+localIds+'', // 需要上传的图片的本地ID，由chooseImage接口获得
+					isShowProgressTips: 1, // 默认为1，显示进度提示
+					success: function (res) {
+						var serverId = res.serverId; // 返回图片的服务器端ID
+						//var pic_url = "";
+						document.getElementById('coverpic').value = serverId;
+						document.getElementById("img1").src = localIds;
+					}
+				});
+			}
+		});
+	}
+
+    //添加图片
+    function open_pic1(){
+        wx.chooseImage({
+            count: 1, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                wx.uploadImage({
+                    localId: ''+localIds+'', // 需要上传的图片的本地ID，由chooseImage接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                    success: function (res) {
+                        var serverId = res.serverId; // 返回图片的服务器端ID
+                        //var pic_url = "";
+                        document.getElementById('license_pic').value = serverId;
+                        document.getElementById("img2").src = localIds;
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript">
+function submit1(){
+    var merchant_name = $("#merchant_name").val();
+    var adr_id        = $("#adr_id").val();
+    var type_id       = $("#type_id").val();
+    var address       = $("#text_").val();
+    var merchant_phone= $("#merchant_phone").val();
+    var merchant_time = $("#merchant_time").val();
+	var merchant_price= $("#merchant_price").val();
+    var merchant_song = $("#merchant_song").val();
+
+	if(merchant_name == ''){
+		alert("请输入商铺名称");
+		return false;
+	}
+	if(adr_id == ''){
+		alert("请选择所属地区");
+		return false;
+	}
+    if(type_id == ''){
+        alert("请选择行业类别");
+        return false;
+    }
+    if(address == ''){
+        alert("商铺地址不能为空");
+        return false;
+    }
+    if(merchant_phone == ''){
+        alert("联系电话不能为空");
+        return false;
+    }
+    if(merchant_time == ''){
+        alert("配送时间不能为空");
+        return false;
+    }
+    if(merchant_price == ''){
+        alert("起送价格不能为空");
+        return false;
+    }
+    /*
+    if(merchant_song == ''){
+        alert("配送费不能为空");
+        return false;
+    }
+    */
+}
+</script>
+
+<script>;</script><script type="text/javascript" src="http://simplife.cc/app/index.php?i=14&c=utility&a=visit&do=showjs&m=xm_gohome"></script></body>
+</html>

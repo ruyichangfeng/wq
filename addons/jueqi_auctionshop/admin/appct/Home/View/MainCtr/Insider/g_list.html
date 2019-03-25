@@ -1,0 +1,132 @@
+<include file="Public/header.html"/>
+</head>
+<body>   
+    <div class="x-body">    	
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Insider/g_list')}"  method="post"  style="width:95%;margin-left: 15%;">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">开始时间</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="开始日" value="{$s_jtime}" name="s_jtime" id="s_jtime">
+                </div>
+                
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="截止日" value="{$e_jtime}"  name="e_jtime" id="e_jtime">
+                </div>   
+                <div class="layui-input-inline">
+                  <input type="text" name="title" value="{$title}"  placeholder="请输入商品标题	" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>
+      	<form id="delform" class="layui-form">     	 	
+      	 	<table class="layui-table">     	 		
+            <thead>
+                <tr>                
+                    <th>ID</th>
+                    <th width="200px">商品标题</th>  
+                    <th>市场价</th>
+                    <th>当前价格</th>
+                    <th>最高出价人</th>   
+                    <th>状态</th>   
+                    <th>开始时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+          
+            <tbody id="formdata">
+              	<volist name="list" id="v">	
+                 <tr>                
+                    <td>{$v.id}</td>
+                    <td>{$v.title}</td>
+                    <td>{$v.market_price}</td>
+                    <td>{$v.discount_price}</td>
+                    <td>{$v.highest_price}</td>
+                    <td class="td-status">
+                    	<?php 
+                    		if($v['state'] == 1){ 
+                    		    echo '<span class="layui-badge layui-bg-orange">待上架 </span>';
+                    		}elseif($v['state'] == 2) {
+                    			echo '<span class="layui-badge layui-bg-green">竞拍中</span>';
+                    	    }elseif($v['state'] == 3) {
+                    			echo '<span class="layui-badge">竞价关闭</span>';
+                    	    }elseif($v['state'] == 2) {
+                    			echo '<span class="layui-badge">竞价结束</span>';
+                    	    }
+                    	 ?>
+                    </td>
+                    <td><?php  if( !empty($v['start_time']) ){ echo  date('Y-m-d H:i:s', $v['start_time']); } ?></td>
+                    <td class="td-manage">
+                        <a title="选定" href="javascript:;" onclick="g_post('{$v.id}','{$v.title}')"  class="ml-5" style="text-decoration:none">
+                        	<i class="layui-icon">&#xe618;</i>
+                        </a>
+                    </td>
+                </tr>
+              </volist>  
+            </tbody>
+             </table>
+          </form> 
+       	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+        <div id="page"></div>
+    </div>
+     <include file="Public/footer.html"/>
+     <script>    	
+        layui.use(['form','laydate','element','laypage','layer'], function(){
+          var laydate = layui.laydate;//日期插件
+          var laypage = layui.laypage;//分页
+          var layer = layui.layer;//弹出层
+          var form = layui.form;
+          $ = layui.jquery; 
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page}, 
+		   jump: function(obj, first){
+			   if(!first){ 
+			    var $purl = "{:U('Home/MainCtr/Insider/g_list',array('page'=>'pageval','s_jtime'=>$s_jtime,'e_jtime'=>$e_jtime,'title'=>$title,'flag'=>$flag))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);  			
+			   }
+			}
+		  });
+		  
+          //时间选择器
+		  laydate.render({
+		    elem: '#s_jtime'
+		    ,type: 'datetime'
+		  });
+		  
+		  laydate.render({
+		    elem: '#e_jtime'
+		    ,type: 'datetime'
+		  });
+
+        });
+        
+        function g_post(id,title) { 
+        	var flag = "{$flag}";
+        	if(flag=='speak'){
+        		parent.g_post(id,title);
+        	}else{
+        		$.ajax({
+			        url: "{:U('Home/MainCtr/Insider/checkgoods')}",
+			        type : "POST",
+			        data :{'id':id},  
+			        dataType:"text",
+			        success:function(data){	
+	                  	if (data == '1') {	                  	
+		                  	layer.msg('该商品已锁定！', {icon: 2,offset: '40%',time: 1000,shade: 0.3});
+		                }else if (data == '2') {
+		                    parent.g_post(id,title);
+		                } 
+		            }
+			    }); 
+        	}      	        
+        }  
+</script>  
+</body>
+</html>

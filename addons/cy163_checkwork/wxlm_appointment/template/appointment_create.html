@@ -1,0 +1,374 @@
+{template 'common/header'}
+<style>
+    .stress_red {
+        color: red;
+    }
+</style>
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('appointment', array('op'=>'display'));}">预约管理</a></li>
+    <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('appointment', array('op'=>'create'));}">添加预约</a></li>
+    {if $op == 'modify'}
+    <li {if $op == 'modify'}class="active"{/if}><a href="#">编辑预约</a></li>
+    {/if}
+</ul>
+
+<div class="main">
+    <form action="{php echo $this->createWebUrl('appointment', array('op'=>create));}" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-primary">
+            <div class="panel-heading">预约信息</div>
+            <div class="panel-body">
+                <div class="form-group" style="display:none;">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="dating[dating_id]" class="form-control" value="{$dating['dating_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>商家</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="dating[dating_businessid]" class="form-control" id="business">
+                            <option value="" selected>请选择</option>
+                            {loop $business $key $item}
+                            <option value="{$item['business_id']}" {if $dating['dating_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>门店</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="dating[dating_storeid]" class="form-control" id="store">
+                            <option value="" selected>请选择</option>
+                            {loop $stores $key $item}
+                            <option value="{$item['store_id']}" {if $dating['dating_storeid'] == $item['store_id']}selected{/if}>{$item['store_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>店员</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="dating[dating_staffid]" class="form-control" id="staff">
+                            <option value="" selected>请选择</option>
+                            {loop $staffs $key $item}
+                            <option value="{$item['staff_id']}" {if $dating['dating_staffid'] == $item['staff_id']}selected{/if}>{$item['staff_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>项目</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="dating[dating_projectid]" class="form-control" id="project">
+                            <option value="" selected>请选择</option>
+                            {loop $projects $key $item}
+                            <option value="{$item['project_id']}" {if $dating['dating_projectid'] == $item['project_id']}selected{/if}>{$item['project_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>设置为默认门店</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="dating[dating_default_store]" class="form-control" >
+                            <option value="1" {if $dating['dating_default_store'] == 1 || empty($dating['dating_default_store'])}selected{/if}>否</option>
+                            <option value="2" {if $dating['dating_default_store'] == 2}selected{/if}>是</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">星期</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="week-1" class="checkbox-inline">
+                            <input id="week-1" type="checkbox" value="1" name="dating[dating_week][]" {if  in_array('1', $dating['dating_week'])}checked{/if}>星期一
+                        </label>
+                        <label for="week-2" class="checkbox-inline">
+                            <input id="week-2" type="checkbox" value="2" name="dating[dating_week][]" {if  in_array('2', $dating['dating_week'])}checked{/if}>星期二
+                        </label>
+                        <label for="week-3" class="checkbox-inline">
+                            <input id="week-3" type="checkbox" value="3" name="dating[dating_week][]" {if  in_array('3', $dating['dating_week'])}checked{/if}>星期三
+                        </label>
+                        <label for="week-4" class="checkbox-inline">
+                            <input id="week-4" type="checkbox" value="4" name="dating[dating_week][]" {if  in_array('4', $dating['dating_week'])}checked{/if}>星期四
+                        </label>
+                        <label for="week-5" class="checkbox-inline">
+                            <input id="week-5" type="checkbox" value="5" name="dating[dating_week][]" {if  in_array('5', $dating['dating_week'])}checked{/if}>星期五
+                        </label>
+                        <label for="week-6" class="checkbox-inline">
+                            <input id="week-6" type="checkbox" value="6" name="dating[dating_week][]" {if  in_array('6', $dating['dating_week'])}checked{/if}>星期六
+                        </label>
+                        <label for="week-7" class="checkbox-inline">
+                            <input id="week-7" type="checkbox" value="0" name="dating[dating_week][]" {if  in_array('0', $dating['dating_week'])}checked{/if}>星期日
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>支付方式</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="pay-state1" class="radio-inline">
+                            <input id="pay-state1" type="radio" value="1" name="dating[dating_pay_state]" {if $dating['dating_pay_state'] == 1 || empty($dating['dating_pay_state'])}checked{/if}>免支付
+                        </label>
+                        <label  for="pay-state2" class="radio-inline">
+                            <input id="pay-state2" type="radio" value="2" name="dating[dating_pay_state]" {if $dating['dating_pay_state'] == 2}checked{/if}>在线支付
+                        </label>
+                        {if !empty($card)}
+                        <label  for="pay-state3" class="radio-inline">
+                            <input id="pay-state3" type="radio" value="3" name="dating[dating_pay_state]" {if $dating['dating_pay_state'] == 3}checked{/if}>会员卡
+                        </label>
+                        {/if}
+                    </div>
+                </div>
+                <div class="form-group" id="pay-money">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>支付金额</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="dating[dating_pay_money]" class="form-control" value="{$dating['dating_pay_money']}" />
+                    </div>
+                </div>
+                <div class="form-group" id="notice">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>通知时间</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="pay-notice1" class="radio-inline">
+                            <input id="pay-notice1" type="radio" value="1" name="dating[dating_notice_time]" {if $dating['dating_notice_time'] == 1 || empty($dating['dating_notice_time'])}checked{/if}>下单通知
+                        </label>
+                        <label for="pay-notice2" class="radio-inline">
+                            <input id="pay-notice2" type="radio" value="2" name="dating[dating_notice_time]" {if $dating['dating_notice_time'] == 2}checked{/if}>付款通知
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="add_pay">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>会员身份识别</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="add1" class="radio-inline">
+                            <input id="add1" type="radio" value="1" name="dating[dating_add_pay]" {if $dating['dating_add_pay'] == 1 || empty($dating['dating_add_pay'])}checked{/if}>关闭
+                        </label>
+                        <label for="add2" class="radio-inline">
+                            <input id="add2" type="radio" value="2" name="dating[dating_add_pay]" {if $dating['dating_add_pay'] == 2}checked{/if}>开启
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>预约时间设置</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <div id="time-div" style="width: 85%">
+                            {php $i = 1}
+                            {loop $dating['dating_time'] $key $item}
+                            <div id="div_{$i}" class="input-group" style="margin-bottom: 10px">
+                                <span class="input-group-addon" >时段</span>
+                                <input type="time" name="dating[dating_time][{$i}][start]" class="form-control" value="{$item['start']}" aria-describedby="basic-addon2">
+                                <span class="input-group-addon" >-</span>
+                                <input type="time" name="dating[dating_time][{$i}][end]" class="form-control" value="{$item['end']}" aria-describedby="basic-addon2">
+                                <span class="input-group-addon" >可预约</span>
+                                <input type="number" min="1" name="dating[dating_time][{$i}][count]" class="form-control" value="{$item['count']}" aria-describedby="basic-addon2">
+                                <span class="input-group-addon" >人</span>
+                                <span style="color: white" class="input-group-addon btn btn-danger" id="basic-addon5" onclick="deleteDiv('{$i}')">删除</span>
+                            </div>
+                            {php $i++;}
+                            {/loop}
+                        </div>
+                        <button onclick="addTime()" class="btn btn-default" type="button">添加预约时间</button>
+                        <div class="help-block">结束时间需大于起始时间, 如未填写其中一个时间则自动删除. 预约人数最小为1, 如果不填默认为1.</div>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>预约延迟</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <div  class="input-group">
+                            <input type="number" name="dating[dating_delay]" class="form-control" value="{$dating['dating_delay']}" >
+                            <span class="input-group-addon" >分钟</span>
+                        </div>
+                        <div class="help-block">用户需要提前设置的时间预约</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            <!--<div class="panel-heading">预约时间设置</div>-->
+            <!--<div class="panel-body">-->
+
+                <!--<div class="table-responsive panel-body">-->
+                    <!--<table class="table table-hover table-responsive" style="min-width: 200px;">-->
+                        <!--<thead class="navbar-inner">-->
+                        <!--<tr>-->
+                            <!--<th>序号</th>-->
+                            <!--<th style="width: 150px">开启时间</th>-->
+                            <!--<th></th>-->
+                            <!--<th style="width: 150px">结束时间</th>-->
+                            <!--<th>操作</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody id="time-tbody">-->
+                        <!--{php $i = 1}-->
+                        <!--{loop $dating['dating_time'] $key $item}-->
+                        <!--<tr id="tr_{$i}">-->
+                            <!--<td name="time_number">{$i}</td>-->
+                            <!--<td><input name="dating[dating_time]['{$i}'][start]" type="time" class="form-control" value="{$item['start']}"></td>-->
+                            <!--<td style="text-align: center">———</td>-->
+                            <!--<td><input name="dating[dating_time]['{$i}'][end]" type="time" class="form-control" value="{$item['end']}"></td>-->
+                            <!--<td><a id="{$i}" onclick="deleteTr(this.id)" href="javascript:void (0)" class="btn btn-default btn-danger">删除</a></td>-->
+                        <!--</tr>-->
+                        <!--{php $i++;}-->
+                        <!--{/loop}-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                    <!--<button onclick="addTime()" class="btn btn-default" type="button">添加预约时间</button>-->
+                <!--</div>-->
+               <!---->
+            <!--</div>-->
+
+        </div>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    var i = "{$i}";
+
+   $(function () {
+
+       payMoney();
+
+   })
+
+   $('input[name="dating[dating_pay_state]"]').change(function () {
+
+
+       payMoney();
+
+   })
+
+   function payMoney() {
+
+       var paystate =  $('input[name="dating[dating_pay_state]"]:checked').val();
+
+
+       if (paystate == 2)
+       {
+           $('#pay-money').show();
+           $('#notice').show();
+       } else
+       {
+           $('#pay-money').hide();
+           $('#notice').hide();
+       }
+   }
+
+   function addTime() {
+
+       var time_div = document.getElementById('time-div');
+
+       var newdiv = document.createElement('div');
+
+       newdiv.setAttribute('id', 'div_'+ i);
+       newdiv.setAttribute("class", "input-group");
+       newdiv.style.marginBottom = '10px';
+
+       var content = '<span class="input-group-addon" >时段</span>';
+       content += '<input type="time" name="dating[dating_time]['+i+'][start]" class="form-control" value="" aria-describedby="basic-addon2">';
+       content += ' <span class="input-group-addon" >-</span>';
+       content += ' <input type="time" name="dating[dating_time]['+i+'][end]" class="form-control" value="" aria-describedby="basic-addon2">';
+       content += '<span class="input-group-addon" >可预约</span>';
+       content += ' <input type="number" min="1" name="dating[dating_time]['+i+'][count]" class="form-control" value="" aria-describedby="basic-addon2">';
+       content += ' <span class="input-group-addon" >人</span>';
+       content += ' <span style="color: white" class="input-group-addon btn btn-danger" id="basic-addon5" onclick="deleteDiv('+i+')">删除</span>';
+
+       newdiv.innerHTML = content;
+       time_div.appendChild(newdiv);
+        i++;
+
+
+
+   }
+
+   function deleteDiv(id) {
+
+       if(!confirm('删除后不可恢复,确定删除吗?')) return false;
+       var div_id = '#div_' + id;
+       $(div_id).remove();
+   }
+
+   function deleteTr(id) {
+
+       if(!confirm('删除后不可恢复,确定删除吗?')) return false;
+
+       var tr_id = '#tr_' + id;
+       $(tr_id).remove();
+       var td_nums = document.getElementsByName('time_number');
+       var tbody = document.getElementById('time-tbody');
+       var trs = tbody.getElementsByTagName('tr');
+       var as = tbody.getElementsByTagName('a');
+       for(var i = 0; i < td_nums.length; i++)
+       {
+           td_nums[i].innerHTML = i + 1;
+           trs[i].setAttribute('id', 'tr_' + i);
+           as[i].setAttribute('id', i);
+
+       }
+   }
+
+   $('#business').change(function () {
+
+      var businessid = $(this).val();
+
+      $.ajax({
+          type:"get",
+          url:"{php echo $this->createWebUrl('getDatingInfo', array())}"+"&businessid="+businessid,
+          dataType:"json",
+          success:function (data) {
+
+                $('#store').html(data.store);
+                $('#staff').html(data.staff);
+                $('#project').html(data.project);
+          }
+
+      })
+
+   })
+
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#form').submit(function(){
+
+                 if($('select[name="dating[dating_businessid]"]').val() == ''){
+                     util.message('未选择商家.');
+                     return false;
+                 }
+                 if($('select[name="dating[dating_storeid]"]').val() == ''){
+                     util.message('未选择门店.');
+                     return false;
+                 }
+                 if($('select[name="dating[dating_staffid]"]').val() == ''){
+                     util.message('未选择员工.');
+                     return false;
+                 }
+                 if($('select[name="dating[dating_projectid]"]').val() == ''){
+                     util.message('未选择项目.');
+                     return false;
+                 }
+
+                 if($('input[name="order[order_pay_state]"]').val() == '' ){
+                     util.message('未选择支付方式.');
+                     return false;
+                 }
+                 if($('input[name="order[order_pay_state]"]').val() == 2){
+
+                     if($('input[name="order[order_pay_money]"]').val() == ''){
+                         util.message('未填写订单金额.');
+                         return false;
+                     }
+                 }
+
+
+                return true;
+            });
+        });
+    });
+</script>
+
+
+{template 'common/footer'}

@@ -1,0 +1,474 @@
+{template "header"}
+<style>
+    .txt{margin-bottom: 3px;font-size:13px !important;}
+    .notice_img{margin-top:10px;}
+    .notice_img .img{
+        display:-moz-inline-box;
+        display:inline-block;
+        width:73%
+    }
+    .notice_img .other{
+        display:-moz-inline-box;
+        display:inline-block;
+        min-width: 70px;
+        width: 25%;
+    }
+    .img img{width: 40px;height: 40px;}
+    .other img{width: 30px;height: 30px;}
+    {if $appInfo['menu']==0}
+        .page2{margin-top:50px}
+    {/if}
+</style>
+<div class="wrap page2" style="padding-top:0;padding-bottom: 50px;">
+    {loop $msgList $index $msg}
+    <div class="item item{$index}">
+        <div class="swiper-container">
+            {if $labPhoto[$index] }
+            <div class="swiper-wrapper">
+                {loop $labPhoto[$index] $photo}
+                <div class="swiper-slide"><img src="{$setting['niu_url']}/{$photo}?imageView2/1/w/386/h/179" alt="" data-id="{$setting['niu_url']}/{$photo}"></div>
+                {/loop}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next swiper-button-white"></div>
+            <div class="swiper-button-prev swiper-button-white"></div>
+            {/if}
+        </div>
+        {if $labSig[$index]}
+        {loop $labSig[$index] $area}
+        <div class="txt">{$area['name']} : {$area['val']}</div>
+        {/loop}
+        {/if}
+        {if $labInput[$index]}
+        {loop $labInput[$index] $input}
+        <div class="txt">{$input['name']} : {$input['val']}</div>
+        {/loop}
+        {/if}
+        <div class="txt">单号 : {$gdSn} <font style="font-size: 12px;font-weight: 800;color:red">{$prop}</font></div>
+        {if $labArea[$index]}
+        {loop $labArea[$index] $area}
+        <div class="txt">{$area['name']} : {$area['val']}</div>
+        {/loop}
+        {/if}
+        {if $labChild[$index]}
+        {loop $labChild[$index] $child}
+        <div class="txt" style="font-weight: 800;margin-top:5px;">{$child['name']}</div>
+        {loop $child['val'] $chd}
+            <div class="txt">{$chd['key']} : {$chd['value']}</div>
+        {/loop}
+        {/loop}
+        {/if}
+        <div class="tags">
+            {if $labCom[$index]['node_name']}
+            <span class="on">{$labCom[$index]['node_name']}</span>
+            {/if}
+            <span style="padding-left: 6px;padding-right:6px;">{if $labCom[$index]['status_name'] }{$labCom[$index]['status_name']}{else}待处理{/if}</span>
+            {if $msg['who']==1}
+            {if $labCom[$index]['is_end']==0}
+            {if $msg['is_abort']==0}
+            {if $canFp}
+            {if $msg['is_remark']==0}
+            {if $appInfo['mods']==0}
+                <span style="float: right;margin-right:10px;" class="btn-fp">分配</span>
+            {/if}
+            {/if}
+            {/if}
+            {/if}
+            {/if}
+            {/if}
+        </div>
+        <div class="btm fk" style="{if !$msg['lat']} style='padding-left:.9rem' {/if} ">
+            {if $labCom[$index]['lc_lat']}
+            <img  src="{MODULE_URL}/static/mobile/images/icon15.png"  alt="" data-lat="{$labCom[$index]['lc_lat']}" data-lnt="{$labCom[$index]['lc_lnt']}" class="icon show_address">
+            {/if}
+            {if $labVoice[$index]}
+            <div class="voice-box" >
+                <span style="width:32%;background-image: url({MODULE_URL}/static/mobile/css/images/vioce2.png );background-size:13px 17px;" class="pl plb_{$index}"  onclick="play('{$setting['niu_url']}/{$labVoice[$index]}','plb_{$index}')">{$labCom[$index]['voice_time']}</span>
+            </div>
+            {/if}
+            {if $labCom[$index]['is_end']==0}
+            {if $show}
+            {if $msg['is_abort']==0}
+            <div class="tags" style="position: absolute;right:2px;top:4px;">
+                {if $msg['who']==1}
+                    {if $msg['is_remark']==0}
+                        {if $appInfo['mods']==0}
+                        <span style="height: 30px;line-height: 30px;"><a class="remark" data-id="{$msg['pool_id']}" href="javascript:" style="color: white">标记</a></span>
+                        {/if}
+                    {else}
+                        {if $isAdmin['id']==$msg['mark_admin']}
+                        {loop $nodeStatus $status}
+                            <span style="height: 30px;line-height: 30px;"><a href="{php echo $this->createMobileUrl('acForm')}&node_id={$status['node_id']}&line_id={$status['id']}&rd={$_GPC['id']}&app={$appInfo['id']}" style="color: white">{$status['name']}</a></span>
+                        {/loop}
+                        {/if}
+                    {/if}
+                {else}
+                    {loop $nodeStatus $status}
+                            <span style="height: 30px;line-height: 30px;"><a href="{php echo $this->createMobileUrl('acForm')}&node_id={$status['node_id']}&line_id={$status['id']}&rd={$_GPC['id']}&app={$appInfo['id']}" style="color: white">{$status['name']}</a></span>
+                    {/loop}
+                    {if $isCancel}
+                        <span style="height: 30px;line-height: 30px;"><a class="cancel" data-id="{$msg['pool_id']}" href="javascript:" style="color: white">取消</a></span>
+                    {/if}
+                {/if}
+            </div>
+            {/if}
+            {/if}
+            {/if}
+        </div>
+    </div>
+    {/loop}
+    {$menu}
+    <div class="step" >
+        <i class="c0"></i>
+        {php $len=count($noticeList)-1}
+        {loop $noticeList $idx $nts}
+        <div class="step-item" style="margin-bottom: 20px;">
+            <div class="con">
+                {if $idx==0}
+                <i class="c2"></i>
+                {else}
+                <i class="c1"></i>
+                {/if}
+                <i class="arrow"></i>
+                <h3>
+                    <img src="{MODULE_URL}/static/weui/images/remind.png" style="width: 20px;float: left;margin-right:3px;">
+                    <span style="font-weight: 500;display: inline-block;color:#8a8a8a">{$labComAc[$idx]['node_name']} {if $labComAc[$idx]['status_name']}| {$labComAc[$idx]['status_name']} {/if}</span>
+                </h3>
+                {loop $labSigAc[$idx] $ms}
+                <p style="margin-left:4px;">{$ms['name']} : {$ms['val']}</p>
+                {/loop}
+                {loop $labInputAc[$idx] $ms}
+                <p style="margin-left:4px;">{$ms['name']} : {$ms['val']}</p>
+                {/loop}
+                {loop $labAreaAc[$idx] $ms}
+                <p style="margin-left:4px;">{$ms['name']} : {$ms['val']}</p>
+                {/loop}
+                {loop $labChildAc[$idx] $child}
+                <p style="margin-left:4px;font-weight: 800;margin-top:5px;">{$child['name']}</p>
+                {loop $child['val'] $chd}
+                <p style="margin-left:4px;">{$chd['key']} : {$chd['value']}</p>
+                {/loop}
+                {/loop}
+                <p style="margin-left:4px;">
+                    操作时间 : {$labComAc[$idx]['create_time']}
+                </p>
+                <p style="font-weight: 800;margin-top:7px;">
+                    <div><img src="{MODULE_URL}/static/weui/images/people.png" style="width: 20px;float: left;margin-right:3px;"><span style="color:#8a8a8a">{$labComAc[$idx]['member_name']}</span></div>
+                </p>
+
+                {if $labComAc[$idx]['photo'] || $labComAc[$idx]['address'] || $labComAc[$idx]['voice']}
+                <div class="notice_img">
+                    {if $labComAc[$idx]['photo']}
+                    <span class="img">
+                        {loop $labComAc[$idx]['photo']['url'] $ul}
+                        <img src="{$setting['niu_url']}/{$ul}?imageView2/1/w/40/h/40" data-id="{$setting['niu_url']}/{$ul}">
+                        {/loop}
+                    </span>
+                    {/if}
+                    <span class="other">
+                        {if $labComAc[$idx]['voice']}
+                        <img src="{MODULE_URL}/static/mobile/images/voice.png" onclick="hidPlay('{$setting['niu_url']}/{$labComAc[$idx]['voice']['url']}')">
+                        {/if}
+                        {if $labComAc[$idx]['address']}
+                        <img src="{MODULE_URL}/static/mobile/images/lc.png" data-lat="{$labComAc[$idx]['address']['lat']}" class="notice_lc" data-lnt="{$labComAc[$idx]['address']['lnt']}"  data-name="{$labComAc[$idx]['address']['value']}">
+                        {/if}
+                    </span>
+                </div>
+                {/if}
+            </div>
+        </div>
+        {/loop}
+        <div class="step-item">
+            <div class="con">
+                <i class="c1"></i>
+                <i class="arrow"></i>
+                <h3>
+                    <img src="{MODULE_URL}/static/weui/images/remind.png" style="width: 20px;float: left;margin-right:3px;">
+                    <span style="font-weight: 500;display: inline-block;color:#8a8a8a">开始</span>
+                </h3>
+                <p style="margin-left:4px;">
+                    操作时间 : {php echo date("Y-m-d H:i:s",$labCom[$index]['create_time'])}
+                </p>
+                <p style="font-weight: 800;margin-top:7px;">
+                <div><img src="{MODULE_URL}/static/weui/images/people.png" style="width: 20px;float: left;margin-right:3px;"><span style="color:#8a8a8a">{$labCom[$index]['member_name']}</span></div>
+                </p>
+            </div>
+        </div>
+    </div>
+    <audio id="audio" style="display: none" src="#"></audio>
+</div>
+<div class="alert alert-allot">
+    <div class="box">
+        <div class="title">分配</div>
+        <div class="search">
+            <input type="text" class="searchs" placeholder="搜索">
+            <input type="submit" value="">
+        </div>
+        <ul class="list admin_list">
+        </ul>
+        <div class="operate">
+            <a href="javascript:" style="width: 50%;float: left;" class="btn btn-blue fp">分配</a>
+            <a href="javascript:" style="width: 50%;float: left;background: #cccccc" class="btn btn-blue js_btn-cancle">取消</a>
+        </div>
+    </div>
+</div>
+{template "wx_js"}
+{if $appInfo['menu']==1}
+{template "menu"}
+{/if}
+<script src="{MODULE_URL}/static/mobile/js/slide.js"></script>
+<script src="{MODULE_URL}/static/mobile/js/swiper.jquery.min.js"></script>
+<script>
+    //操作数据
+    var post = new Object();
+    post.md=0;
+    post.rd=0;
+    post.td=0;
+    post.remark="";
+
+    var bg=2;
+    var timeInt;
+    var isPlay=false;
+    playBtn=$(".pl");
+    var body =$("body");
+    var audio = document.getElementById('audio');
+
+    $("document").ready(function(){
+        // 弹出：人员分配
+        $("body").on('click', '.btn-fp', function() {
+            //初始化员工数据
+            $(".alert-allot").fadeIn(300);
+            addAdminList("");
+        });
+        var ctt=$(".fk").text().length;
+        if(ctt<=45){
+            $(".fk").css("display","none");
+        }
+    });
+    $(".remark").click(function(){
+        var id =$(this).attr('data-id');
+        $.post("{php echo $this->createMobileUrl('remark')}&id="+id,{},function(response){
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },"json");
+    });
+    $(".js_btn-cancle").click(function(){
+        $(".alert-allot").fadeOut(300);
+    });
+    $(".cancel").click(function(){
+        var id =$(this).attr('data-id');
+        $.post("{php echo $this->createMobileUrl('cancel')}&id="+id,{},function(response){
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },"json");
+    });
+
+    //搜索用户
+    $('.searchs').bind('input propertychange', function() {
+        keyword =$(this).val();
+        addAdminList(keyword);
+    });
+
+    function addAdminList(keyword){
+        var html="";
+        $.post('{php echo $this->createMobileUrl("search")}',{keyword:keyword},function(response){
+            var data = response.data;
+            for(var i=0;i<data.length;i++){
+                html += '<li>'+
+                        '<span class="sp1">'+data[i].name+'</span>'+
+                        '<span class="sp2">'+data[i].organize+'</span>'+
+                        '<a href="javascript:" class="btn-choose " data-id="'+data[i].id+'"><em>选择</em></a>'+
+                        '</li>';
+            }
+            $(".admin_list").html(html);
+        },"json");
+    }
+
+    //选择员工
+    body.on('click','.btn-choose',function(){
+        $(".btn-choose").removeClass("on");
+        $(this).addClass("on");
+    });
+
+    //确认分配
+    $(".fp").click(function(){
+        var id = $(".admin_list").find(".on").attr("data-id");
+        if(id==undefined){
+            layer.open({
+                content: "请选择员工"
+                ,skin: 'msg'
+                ,time: 1
+            });
+            return false;
+        }
+        //提交数据
+        var post = new Object();
+        post.admin=id;
+        post.pool="{$poolId}";
+        $.post("{php echo $this->createMobileUrl('Pp')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    //开始处理标示
+    $(".btn-start").click(function(){
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+        $.post("{php echo $this->createMobileUrl('cmd')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    //处理完成
+    $(".btn-remark").click(function(){
+        post.md=$(this).attr("data-m");
+        post.rd=$(this).attr("data-r");
+        post.td=$(this).attr("data-t");
+    });
+    //提交消息操作数据
+    $(".btn-msg").click(function(){
+        post.remark=$("#remark").val();
+        $.post("{php echo $this->createMobileUrl('cmd')}",post,function (response) {
+            layer.open({
+                content: response.msg
+                ,skin: 'msg'
+                ,time: 1
+            });
+            if(response.code==1){
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+        },'json');
+    });
+
+    body.on('click', '.page2 .btn-fp', function(event) {
+        $(".alert-allot").fadeIn(300);
+    });
+
+    //播放语音
+    function play(url){
+        audio.src=url;
+        if(isPlay){
+            audio.pause();
+            isPlay=false;
+            clearInterval(timeInt);
+            playVoice(2);
+            return false;
+        }
+        timeInt = setInterval(function(){
+            if(bg==2){
+                bg=3;
+            }else{
+                bg=2;
+            }
+            playVoice(bg);
+        },600);
+        audio.play();
+        isPlay=true;
+    }
+
+    //播放语音
+    function hidPlay(url){
+        audio.src=url;
+        audio.play();
+    }
+
+    //显示地理位置
+    $(".show_address").click(function(){
+        wx.openLocation({
+            latitude: Number($(this).attr("data-lat")),
+            longitude: Number($(this).attr("data-lnt")),
+            name: '位置',
+            address: '',
+            scale: 14
+        });
+    });
+
+    $(".notice_lc").click(function(){
+        wx.openLocation({
+            latitude: Number($(this).attr("data-lat")),
+            longitude: Number($(this).attr("data-lnt")),
+            name: '位置',
+            address: $(this).attr("data-name"),
+            scale: 14
+        });
+    });
+
+    //监听播放结束
+    audio.addEventListener('ended', function () {
+        isPlay=false;
+        clearInterval(timeInt);
+        playVoice(2);
+    }, false);
+
+    //图片预览
+    $("body").on("click",".swiper-slide",function(){
+        var imgArr=new Array();
+        imgList = $(this).parent().find("img");
+        imgList.each(function () {
+            imgArr.push($(this).attr("data-id"));
+        });
+        wx.previewImage({
+            urls: imgArr
+        });
+    });
+
+    $(".img").click(function(){
+        var imgArr=new Array();
+        imgList = $(this).find("img");
+        imgList.each(function () {
+            imgArr.push($(this).attr("data-id"));
+        });
+        wx.previewImage({
+            urls: imgArr
+        });
+    });
+
+    var swiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        paginationClickable: '.swiper-pagination',
+        nextButton: '.swiper-button-next',
+        prevButton: '.swiper-button-prev',
+//        slidesPerView: 3,
+        paginationClickable: true,
+        spaceBetween: 30
+    });
+</script>
+</body>
+</html>

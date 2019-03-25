@@ -1,0 +1,107 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op == 'display'}class="active"{/if}>
+    <a href="{php echo $this->createWebUrl('result', array('op' => 'display'))}">成果管理</a>
+  </li>
+  <li {if $op == 'post'}class="active"{/if}>
+	  {if empty($item['id'])}<a href="{php echo $this->createWebUrl('result', array('op' => 'post'))}">新增成果</a>
+	  {else}<a href="{php echo $this->createWebUrl('result', array('op' => 'post'))}">编辑成果</a>
+	  {/if}
+	</li>
+</ul>
+{if $op == 'post'}
+<div class="panel panel-default">
+	<div class="panel-heading">
+     	成果设置
+    </div>
+	<div class="panel-body">
+		<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data" >
+			<input type="hidden" name="id" value="{$item['id']}">
+			<div class="panel panel-default">
+				<div class="panel-body">
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+				 		<div class="col-sm-5">
+				 			 <input type="text" name="ressort" class="form-control" value="{$item['ressort']}" />
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">成果名称</label>
+				 		<div class="col-sm-8">
+							<input type="text" name="resname" class="form-control" value="{$item['resname']}" />
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">成果照片</label>
+				 		<div class="col-sm-8">
+							 {php echo tpl_form_field_image('respic', $item['respic'])}
+				 		</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">成果简介</label>
+				 		<div class="col-sm-8">
+				 			<textarea name="resinfo" class="form-control" id="reply-add-text" cols="50">{$item['resinfo']}</textarea>
+				 		</div>
+				 	</div>					 	
+				 	<div class="form-group">
+				 		<label class="col-xs-12 col-sm-3 col-md-2 control-label">所属家教机构</label>
+				 		<div class="col-sm-9">
+							<select name='department_id'>
+								<option value='-1'>请选择</option>
+								{loop $departments $dep}
+								<option value='{$dep['id']}' {if $item['department_id'] == $dep['id']}selected{/if}>{$dep['department']}</option>
+								{/loop}
+							</select>
+				 		</div>
+				 	</div>								
+		 		</div>
+			</div>
+			 <div class="form-group">
+			 <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+			 <div class="col-sm-8">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			 </div> 
+			 </div>			
+		</form>
+	</div>
+</div>	
+{elseif $op == 'display'}
+<div style="padding:15px;">
+  <table class="table table-hover">
+    <thead class="navbar-inner">
+      <tr>
+        <th>序号</th>
+        <th>显示顺序</th>
+        <th>成果名称</th>
+        <th>成果照片</th>
+        <th>成果简介</th>
+        <th>所属家教机构</th>
+        <th>操作</th>
+  </tr>
+</thead>
+{loop $list $item}
+<tr style="align:center;">
+  <td>{$item['id']}</td>
+  <td>{$item['ressort']}</td>
+  <td>{$item['resname']}</td>
+  <td><img style="width: 100px;" src="{php echo $_W['attachurl'].$item['respic']}"></td>
+  <td>{$item['resinfo']}</td>
+  <td>{$item['department']}</td>
+  <td>
+    <a href="{php echo $this->createWebUrl('result',array('id' => $item['id'] ,'op' => 'post'))}">编辑
+    </a>
+    <a href="{php echo $this->createWebUrl('result',array('id' => $item['id'],'op' => 'delete'))}">删除
+    </a>
+  </td>
+</tr>
+{/loop}
+</table>
+</div>
+
+
+
+
+{/if}
+
+{template 'common/footer'}

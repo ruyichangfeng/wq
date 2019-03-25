@@ -1,0 +1,1259 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-5" style="padding-left: 5px;padding-right: 5px;">
+            <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                <div class="panel-body" id="searchgoodstoolbar"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                    <form  class="form-horizontal" role="form" id="search_goods" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="addmembercount" />
+                        <input type="hidden" name="op" value="goodslistdata" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <div class="form-group"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                            <label class="col-sm-1 control-label"  style="padding-top: 0px;width: 10%">商品分类</label>
+                            <div class="col-sm-1"  style="width: 30%">
+                                <div class="input-group" style="width: 100%">
+                                    <select data-placeholder="请选择套餐类别(可搜索名称)"  class="chosen-select" name="search_goodsTypeId" id="search_goodsTypeId"  style="width: 100%" tabindex="4">
+                                        {if in_array('0', $thisgoodstypelist) }
+                                        <option value="0"   hassubinfo="true" selected>无商品分类</option>
+                                        {else}
+                                        <option value="0"   hassubinfo="true">无商品分类</option>
+                                        {/if}
+                                        {loop $goodstypelist $index $goodstypeitem}
+                                        <option value="{$goodstypeitem['id']}"   hassubinfo="true"  {if in_array($goodstypeitem['id'], $thisgoodstypelist)}selected{/if}>{$goodstypeitem['gt_name']}</option>
+                                        {/loop}
+                                    </select>
+                                </div>
+                            </div>
+                            <label class="col-sm-1 control-label" style="padding-top: 0px;width: 10%">商品名称</label>
+                            <div class="col-sm-1" style="width: 35%">
+                                <input class="form-control" name="search_goodsKeyword"  id="search_goodsKeyword" type="text" value="{$_GPC['search_goodsKeyword']}">
+                            </div>
+                            <div class="col-sm-1"  style="width: 7%;">
+                                <button class="btn btn-outline btn-primary" type="button" onclick="btnSerachGoods()" id="btn_searchgoodssubmit"><i class="fa fa-search"></i> 搜索</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <table id="goodstabledata" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+        <div class="col-sm-7" style="padding-left: 0px;padding-right: 5px;">
+            <div class="ibox float-e-margins" style="margin-bottom: 0px;" >
+                <div class="ibox-title"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 5px;padding-bottom: 0px;">
+                    <form  class="form-horizontal" role="form" id="search_goodscode" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="memberconsume" />
+                        <input type="hidden" name="op" value="goodslistdata" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <div class="form-group"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                            <label class="col-sm-2 control-label" style="padding-left:5px;">请输入项目编码</label>
+                            <div class="col-sm-3" >
+                                <input class="form-control" name="tmqSearch_goodsKeywordCode" id="tmqSearch_goodsKeywordCode" onkeydown="if(event.keyCode==13){$('#btn_addgoodssubmit').focus()}" type="text"   placeholder="输入消费编码">
+                            </div>
+                            <div class="col-sm-1"  style="width: 7%;">
+                                <button class="btn btn-primary" type="button" onclick="addMemberConsume();return false;" id="btn_addgoodssubmit"><i class="fa fa-plus-square-o"></i> 添加</button>
+                            </div>
+                            <div class="col-sm-1"  style="width: 7%;text-align: right;margin-left: 10px;">
+                                <button class="btn btn-danger" type="button" onclick="btnShowConsumeSubmit()" id="btn_showconsumesubmit"><i class="fa fa-keyboard-o"></i> 开启操作收银</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 5px;padding-right: 5px;">
+                    <form role="form"   class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return check(this);" >
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="addmembercount" />
+                        <input type="hidden" name="op" value="saveAddMemberCountData" />
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        {template 'web/common/panel-member-card-info'}
+                        <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 0px;padding-right: 0px;z-index: 10;">
+                            <ul class="todo-list m-t" style=" margin-top: 5px;">
+                                <li>
+                                    <span class="m-l-xs">总次数：</span>
+                                    <small class="label label-info" style="font-size:large" id="addMemberRechargeTotalCount"><i class="fa fa-database"></i> 999次</small>
+                                    <input type="hidden" name="hidden_addMemberRechargeTotalCount"  id="hidden_addMemberRechargeTotalCount" />
+                                    <span class="m-l-xs">总金额：</span>
+                                    <small class="label label-info" style="font-size: large" id="addMemberRechargeTotalprice"><i class="fa fa-rmb"></i> 999元</small>
+                                    <input type="hidden" name="hidden_addMemberRechargeTotalprice" id="hidden_addMemberRechargeTotalprice" value="" />
+                                    <span class="m-l-xs">获得积分：</span>
+                                    <small class="label label-info" style="font-size:large" id="addMemberRechargeGivePointCount"><i class="fa fa-gift"></i> 900 积分</small>
+                                    <input type="hidden" name="hidden_addMemberRechargeGivePointCount" id="hidden_addMemberRechargeGivePointCount" value="" />
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="hr-line-dashed" style="margin-top: 3px; margin-bottom: 0px;"></div>
+                        <table class="table table-bordered table-hover"  id="addMemberRechargeCountDataTable"  style=" margin-bottom: 5px;" data-mobile-responsive="true"></table>
+                        <div class="shop-preview col-xs-12 col-sm-12 col-lg-12" id="showconsumecontrolpanel">
+                            <div class="text-center alert alert-info alert-dismissable" style="margin-bottom: 0px;">
+                                <button aria-hidden="true" id="hideconsumecontrolpanel" class="close" type="button" onclick="btnHideConsumeSubmit()">×</button>
+                                <button class="btn btn-lg btn-primary " type="button"  onclick="btn_showReadCard()"><i class="fa fa-search-plus"></i>&nbsp;读&nbsp;卡&nbsp;</button>
+                                <button class="btn btn-lg btn-info" type="button" id="btn_clearAddMemberRechargeCountData" ><i class="fa fa-trash-o"></i>&nbsp;清&nbsp;空&nbsp;</button>
+                                <button  class="btn btn-lg btn-danger " type="button"  data-toggle="modal" data-target="#consumeOrderData" ><i class="fa fa-money"></i>&nbsp;充&nbsp;次&nbsp;</button>
+                            </div>
+                        </div>
+                        {template 'web/common/paysimplecommon'}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .shop-preview {
+        position: fixed;
+        padding: 0 0;
+        bottom: 0;
+        right: 0;
+        z-index: 100;
+        width: 59%;
+    }
+    .shop-preview div {
+        filter:alpha(opacity=20);
+        /*background: rgba(255, 254, 220, 0.8);*/
+    }
+</style>
+<script>
+    key('q', function(){
+        payStyle_Check(2);
+    });
+    key('a', function(){
+        payStyle_Check(1);
+    });
+    key('z', function(){
+        payStyle_Check(3);
+    });
+    $(document).ready(function(){
+        //取付款模态内焦点
+        $('#consumeOrderData').on('shown.bs.modal',function(e){
+            $('#hidden_TextPayCode2').focus();
+        });
+        //收银台函数
+        funPayShowAsHideInfo();
+        //改变数量总价的按钮事件
+        //读卡
+        btn_showReadCard();
+        /****左侧商品列表----start  **/
+        $('#goodstabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('goods', array('op' => 'consumeServiceGoodsListData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            toolbar: '#searchgoodstoolbar',
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 11,                       //每页的记录行数（*）
+            pageList: [11, 22, 44, 88],
+            pagination: true,
+            height: 700,
+            rowStyle: packageroestyle,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                radio: true
+            },{
+                field: 'goo_code',
+                title: '商品编码',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'goo_name',
+                title: '商品名称',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'goo_price',
+                title: '商品售价',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'goo_number',
+                title: '库存',
+                align: "center",
+                valign: "middle",
+                formatter:NumberFormatter
+            },{
+                field: 'goo_goodsOrService',
+                title: '商品类型',
+                align: "center",
+                valign: "middle",
+                formatter:typeFormatter
+            },{
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionFormatter
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+                sortOrder: params.sortOrder,//排序
+                sortName:params.sortName//排序字段
+
+            };
+            return temp;
+        };
+
+        //商品类型渲染设置
+        function typeFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            if(id == 1){
+                result += "<span class='label label-primary' >实物商品</span>";
+            }else if(id == 2){
+                result += "<span class='label label-info' > 服务商品 </span>";
+            }else{
+                result += "<span class='label label-danger' STYLE=\"font-size:13px;\"> 套餐商品 </span>";
+            }
+            return result;
+        }
+        function NumberFormatter(value, row, index) {
+            //var rowvalue = JSON.stringify(row) ;
+            var rowvalue = row ;
+            var number = value;
+            var result = "";
+            if(number == 0 && rowvalue['goo_goodsOrService'] != 1){
+                result += "<span class='label label-warning' >无限制</span>";
+            }else{
+                result += number;
+            }
+            return result;
+        }
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "<button type='button'  class='btn btn-outline btn-sm btn-primary' onclick=\"ViewByGoods(" + id + ")\" title='查看商品详情'><i class='fa fa-eye'></i></button>";
+            return result;
+        }
+        //套餐商品行样式设置
+        function packageroestyle(row, index) {
+            var result = "";
+            if(row.goo_goodsOrService == 1){
+                result={css:{'color':'#000000'}};
+            }else if(row.goo_goodsOrService == 2){
+                result = {css:{'color':'#000000'}};
+            }else{
+                result = {css:{'color':'#9B0000'}};
+            }
+            return result
+        }
+        /****左侧商品套餐列表----end  **/
+
+        //添加左侧商品到右侧
+        $('#goodstabledata').on("dbl-click-row.bs.table",function(e, row, $element) {
+            var cmpdata = "{php echo util::set('cmp310',$setdata)}";
+            var cmpstatedata = "{php echo util::set('cmp311',$setdata)}";
+            var memberId = $("#memberId").val();
+            var addRowUrl ="{php echo $this->createWebUrl('addmembercount', array('op' => 'ajaxAddMemberRechargeCount'))}";
+            var  goods_id= row.id;
+            var  goods_goo_name= row.goo_name;
+            var  goods_goo_price= row.goo_price;
+            var  goods_givePoints= 0;
+            if(cmpstatedata == 1){
+                goods_givePoints= (row.goo_price)*cmpdata;
+            }else{
+                goods_givePoints= 0;
+            }
+            var  mrc_specifiedEndTime= laydate.now(365*19,"YYYY-MM-DD");
+            var params = {
+                'member_id': memberId,
+                'goods_id': goods_id,
+                'mrc_goodsName': goods_goo_name,
+                'mrc_goodsprice': goods_goo_price,
+                'mrc_totalPrice': goods_goo_price,
+                'mrc_givePoints': goods_givePoints,
+                'mrc_specifiedEndTime': mrc_specifiedEndTime,
+            };
+            $.ajax({
+                type: "post",
+                dataType: 'json',
+                url: addRowUrl,
+                data: params,
+                success: function (data) {
+                    if(data['message']['code'] == 0){
+                        //$('#addMemberRechargeCountDataTable').bootstrapTable('resetView');
+                        $("#addMemberRechargeCountDataTable").bootstrapTable('refresh');
+                        $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 元');
+                        $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalRechargeCount'] + ' 次');
+                        $('#hidden_addMemberRechargeTotalCount').attr('value',data['message']['totalRechargeCount']);
+                        $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> ' + data['message']['totalGivePointCount'] + ' 积分');
+                        $("#handleMoneyCount").attr("value",data['message']['totalPriceCount']);
+                        $("#realMoneyCount").attr("value",data['message']['totalPriceCount']);
+                        $("#hidden_realMoneyCount").attr('value',data['message']['totalPriceCount']);
+                        $("#hidden_addMemberRechargeGivePointCount").attr("value",data['message']['totalGivePointCount']);
+                        $('#hidden_addMemberRechargeTotalprice').attr('value',data['message']['totalPriceCount']);
+                    }
+                    else if (data['message']['code'] == 2) {
+                        swal("操作有误！", "该商品已售完。","error");
+                        return;
+                    }
+                    else{
+                        swal("操作有误", "已添加该商品！","warning");
+                    }
+                }
+
+            });
+        });
+    });
+    //商品列表查询按钮事件
+    function btnSerachGoods() {
+        $("#goodstabledata").bootstrapTable('refresh');
+    }
+    //查看商品详情
+    function ViewByGoods(goodsid){
+        var url = "{php echo $this->createWebUrl('goodspackage', array('op' => 'viewpackagedetail'))}&id=" + goodsid;
+        parent.layer.open({
+            type: 2,
+            title: '商品详情',
+            maxmin: false,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['800px' , '600px'],
+            content: url
+        });
+    }
+    //收银操作按钮事件
+    function btnShowConsumeSubmit() {
+        $("#showconsumecontrolpanel").show();
+        $("#btn_showconsumesubmit").hide();
+        $("#btn_hideconsumesubmit").show();
+    }
+    function btnHideConsumeSubmit() {
+        $("#showconsumecontrolpanel").hide();
+        $("#btn_showconsumesubmit").show();
+        $("#btn_hideconsumesubmit").hide();
+    }
+    //消费商品操作列表
+    //删除消费项目与清空购物车
+    function DeleteByMemberRechargeCount(memberrechargecountbufferid) {
+        var memberrechargecountbuffer_id = parseInt(memberrechargecountbufferid); //暂存id
+
+        var url = "{php echo $this->createWebUrl('addmembercount', array('op' => 'ajaxdelete'))}";
+        var params = {
+            'memberrechargecountbufferid': memberrechargecountbuffer_id,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] != 0) {
+                    swal("操作有误", "请选择要删除的项目！","error");
+                    return;
+                } else {
+                    swal({
+                        title: "操作成功！",
+                        text: "成功将此商品移除增次列表。",
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: true
+                    },function(){
+                        $("#addMemberRechargeCountDataTable").bootstrapTable('refresh');
+                        $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 元');
+                        $('#hidden_addMemberRechargeTotalprice').attr('value',data['message']['totalPriceCount']);
+                        $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalRechargeCount'] + ' 次');
+                        $('#hidden_addMemberRechargeTotalCount').attr('value',data['message']['totalRechargeCount']);
+                        $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> ' + data['message']['totalGivePointCount'] + ' 积分');
+                        $('#hidden_addMemberRechargeGivePointCount').attr('value',data['message']['totalGivePointCount']);
+                    });
+
+                }
+            }
+        });
+    }
+    $("#btn_clearAddMemberRechargeCountData").on('click', function () {
+        swal({
+                title: "确定清空吗？",
+                text: "你将无法对当前充次项目列表进行操作！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false
+            },
+            function(){
+                var memberId = $("#memberId").val();
+                var delurl = "{php echo $this->createWebUrl('addmembercount', array('op' => 'DeleteAllAddConsumeCountData','storeid' => $storeid))}";
+                var params = {
+                    'memberId': memberId,
+                };
+                $.ajax({
+                    url: delurl,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if(data['message']['code'] == 0){
+                            $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> 0 元');
+                            $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> 0 次');
+                            $('#hidden_addMemberRechargeTotalCount').attr('value','0');
+                            $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> 0积分');
+                            swal("清空完成", "","success");
+                            $("#addMemberRechargeCountDataTable").bootstrapTable('refresh');
+                            btn_clearMemberInfo();
+                        }else{
+                            swal("操作有误", "未删除成功！","warning");
+                        }
+                    }
+                });
+            });
+    });
+
+    //读卡操作
+    function btn_showReadCard() {
+        swal({
+                title: "读卡操作",
+                text: "请刷卡或输入会员卡号：",
+                type: "input",
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入卡号|手机号|身份证号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+                if (inputCardValue === "") {
+                    swal.showInputError("会员卡不能为空！");
+                    return false
+                }else{
+                    var memberCardNum = inputCardValue;
+                    var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+                    var params = {
+                        'memberCardNum': memberCardNum,
+                    };
+                    $.ajax({
+                        url: url,
+                        type: "post",
+                        data: params,
+                        dataType: 'json',
+                        success: function (data) {
+                            //alert(data['message']['code']);
+                            if (data['message']['code'] != 0) {
+                                swal({
+                                    title: "读卡失败",
+                                    text: "卡号错误或不存在卡号，请重新读卡！",
+                                    confirmButtonText: "确定",
+                                    type: "error",
+                                },
+                                    function(){
+                                        setTimeout(function(){
+                                            window.location.reload();
+                                        }, 2000);
+                                    });
+                            } else {
+                                var memberIdstr = data['message']['back_MemberId'];
+                                var memberCardNumstr = data['message']['back_MemberCardNum'];
+                                var memberNamestr = data['message']['back_MemberName'];
+                                var membercardlevelstr = data['message']['back_Membercardlevel'];
+                                var memberMobilestr = data['message']['back_MemberMobile'];
+                                var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                                var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                                var memberSpecifiedEndTimestr = data['message']['back_MemberSpecifiedEndTime'];
+                                var memberConsumeNotestr = data['message']['back_MemberConsumeNote'];
+                                $("#memberId").attr("value",memberIdstr);
+                                $("#memberCardNum").attr("value",memberCardNumstr);
+                                $("#memberName").attr("value",memberNamestr);
+                                $("#membercardlevel").attr("value",membercardlevelstr);
+                                $("#memberMobile").attr("value",memberMobilestr);
+                                $("#memberPointsCount").attr("value",memberPointsCountstr);
+                                $("#memberMoneyCount").attr("value",memberMoneyCountstr);
+                                $("#specifiedEndTime").attr("value",memberSpecifiedEndTimestr);
+                                $("#memberNote").attr("value",memberConsumeNotestr);
+                                if(memberMoneyCountstr>0){
+                                    $("#span_validPayRecharge").text("可用储值" +memberMoneyCountstr+"元");
+                                    $(".ifTrue_RechargePayCheckbox").show();
+
+                                }
+                                if(memberPointsCountstr>0){
+                                    $("#span_validPayPoints").text("可用积分" +memberPointsCountstr+"，可抵现"+(memberPointsCountstr / parseFloat({php echo $setStoreData['set_pointsAsMoney']}))+" 元");
+                                    $(".ifTrue_PointsPayCheckbox").show();
+
+                                }
+                                init_AddMemberRechargeCountData(memberCardNumstr);
+                                init_TwoMemberRechargeCountData(memberCardNumstr);
+                                $("#tmqSearch_goodsKeywordCode").focus();
+                                swal("读卡成功！", "会员卡号是：" + memberCardNumstr,"success");
+                            }
+                        }
+
+                    });
+                }
+            });
+
+    }
+
+    function init_AddMemberRechargeCountData(memberCardStr) {
+        /****右侧侧商品明细列表----start  **/
+
+        var memberCardStr = memberCardStr;
+        var editRowUrl ='';
+        editRowUrl = "{php echo $this->createWebUrl('addmembercount', array('op' => 'ajaxUpdateRowData'))}";
+
+        var editUrl = "{php echo $this->createWebUrl('goods', array('op' => 'getMemberRechargeCountList'))}&memberCardStr=" + memberCardStr ;
+        //alert(editUrl);
+        //var editUrl = "{php echo $this->createWebUrl('goods', array('op' => 'getMemberRechargeCountList'))}" ;
+        /****充次项目数据列表----start  **/
+        $('#addMemberRechargeCountDataTable').bootstrapTable({
+            url: editUrl,
+            method: "post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache: false,  //是否使用缓存
+            search: false, //显示搜索框
+            showPaginationSwitch: false,//是否显示数据条数选择框
+            striped: true,//隔行变色
+            queryParamsType: '',
+            queryParams: queryParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 25, 50, 100],
+            pagination: true,
+            height: 410,
+            selectItemName: "id",
+            uniqueId: "id",
+            columns: [{
+                field: 'goods_id',
+                title: 'ID',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_goodsName',
+                title: '消费项目',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_goodsprice',
+                title: '单价(元)',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_count',
+                title: '增加次数',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '增加次数',
+                    validate: function (v) {
+                        if (isNaN(v)) return '次数必须是数字';
+                        var count = parseInt(v);
+                        if (count <= 0) return '次数必须是正整数';
+                    }
+                }
+            },{
+                field: 'mrc_specifiedEndTime',
+                title: '有效期',
+                align: "center",
+                valign: "middle",
+                formatter:AddConsumeCountDateFormatter,
+                editable: {
+                    type: 'date',
+                    emptytext: '永久有效',
+                    title: '请选择有效期',
+                    format: 'yyyy-mm-dd',
+                    viewformat: 'yyyy-mm-dd',
+                    datepicker: {
+                        language: "zh",
+                        todayBtn: true,
+                        todayHighlight: true
+                    }
+                }
+            },{
+                field: 'mrc_totalPrice',
+                title: '小计金额(元)',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_givePoints',
+                title: '积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mrc_note',
+                title: '备注',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'textarea',
+                    title: '请输入备注',
+                    rows: 2
+                }
+            },{
+                field: 'id',
+                title: '查看',
+                align: "center",
+                valign: "middle",
+                formatter:actionAddConsumeCountFormatter
+            },],onLoadSuccess:function(){
+                btnSaveShowOrHide();
+
+            },
+            onEditableSave: function (field, row, oldValue, $el) {
+                var memberId = $("#memberId").val();
+                //alert(JSON.stringify(row));
+                $.ajax({
+                    type: "post",
+                    url: editRowUrl,
+                    data: {row: row,member_id: memberId,},
+                    //data: row,
+                    dataType: 'JSON',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "操作有误",
+                                text: data['message']['msg'],
+                                type: "error",
+                            });
+                            return;
+                        } else {
+                            $("#addMemberRechargeCountDataTable").bootstrapTable('refresh');
+                            $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 元');
+                            $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalRechargeCount'] + ' 次');
+                            $('#hidden_addMemberRechargeTotalCount').attr('value',data['message']['totalRechargeCount']);
+                            $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> ' + data['message']['totalGivePointCount'] + ' 积分');
+                            $("#handleMoneyCount").attr("value",data['message']['totalPriceCount']);
+                            $("#realMoneyCount").attr("value",data['message']['totalPriceCount']);
+                            $("#hidden_realMoneyCount").attr('value',data['message']['totalPriceCount']);
+                            $("#hidden_addMemberRechargeGivePointCount").attr("value",data['message']['totalGivePointCount']);
+                            $('#hidden_addMemberRechargeTotalprice').attr('value',data['message']['totalPriceCount']);
+                        }
+
+                    }
+
+                });
+            }
+        });
+
+        //得到查询的参数
+        function queryParamspage(params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            return temp;
+        };
+        function AddConsumeCountDateFormatter(value, row, index) {
+            var result = "";
+            if(value == laydate.now(365*19,"YYYY-MM-DD")){
+                result +="永久有效";
+            }else{
+                result +=value;
+            }
+
+            return result;
+        }
+        //操作按钮渲染设置
+        function actionAddConsumeCountFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"DeleteByMemberRechargeCount('" + id + "')\" title='删除'><span class='glyphicon glyphicon-remove'></span></button>";
+            return result;
+        }
+        /****充次项目数据列表----end  **/
+
+        /****右侧侧商品明细列表----end  **/
+    }
+    function init_TwoMemberRechargeCountData(memberCardStr) {
+        var memberCardNumstr =memberCardStr;
+        var getCountUrl = "{php echo $this->createWebUrl('addmembercount', array('op' => 'ajaxGetTwoMemberRechargeCountData'))}";
+        $.ajax({
+            type: "post",
+            url: getCountUrl,
+            data: {memberCardStr: memberCardNumstr},
+            dataType: 'JSON',
+            success: function (data) {
+                if (data['message']['code'] != 0) {
+                    swal({
+                        title: "操作有误",
+                        text: data['message']['msg'],
+                        type: "error",
+                    });
+                    return;
+                } else {
+                    var a = data['message']['totalPriceCount'];
+                    var b = data['message']['totalRechargeCount'];
+                    var c = data['message']['totalGivePointCount'];
+                    if((a==null||a==undefined||a=="") && (b==null||b==undefined||b=="") && (c==null||c==undefined||c=="")){
+                        $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> 0 元');
+                        $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> 0 次');
+                        $('#hidden_addMemberRechargeTotalCount').attr('value','0');
+                        $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> 0 积分');
+                    }else{
+                        $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 元');
+                        $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalRechargeCount'] + ' 次');
+                        $("#hidden_addMemberRechargeTotalCount").attr('value',b);
+                        $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> ' + data['message']['totalGivePointCount'] + ' 积分');
+                        //结账优惠价格光标焦点事件
+                        $("#handleMoneyCount").attr("value",data['message']['totalPriceCount']);
+                        $("#realMoneyCount").attr("value",data['message']['totalPriceCount']);
+                        $("#hidden_realMoneyCount").attr('value',data['message']['totalPriceCount']);
+                        $("#hidden_addMemberRechargeGivePointCount").attr("value",data['message']['totalGivePointCount']);
+                        $('#hidden_addMemberRechargeTotalprice').attr('value',data['message']['totalPriceCount']);
+                    }
+                }
+
+            }
+
+        });
+    }
+    //清空会员信息
+    function btn_clearMemberInfo() {
+        $("#memberId").attr("value","");
+        $("#memberCardNum").attr("value","");
+        $("#memberName").attr("value","");
+        $("#membercardlevel").attr("value","");
+        $("#memberMobile").attr("value","");
+        $("#memberPointsCount").attr("value","");
+        $("#memberMoneyCount").attr("value","");
+        $("#specifiedEndTime").attr("value","");
+        $("#memberNote").attr("value","");
+        window.location.reload();
+    }
+    //收款优惠
+    function funPayShowAsHideInfo() {
+        //储值和积分文本框默认不可用
+        $("#get_memberMoneyCount").attr("readonly",true);
+        $("#get_memberPointsCount").attr("readonly",true);
+
+        /****开启关闭操作收银按钮事件----start  **/
+        $("#btn_showconsumesubmit").hide();
+        /****开启关闭操作收银按钮事件----end  **/
+
+        /****开启关闭储值积分支付复选框事件----start  **/
+        $(".ifTrue_RechargePayCheckbox").hide();
+        $(".ifTrue_PointsPayCheckbox").hide();
+        /****开启关闭储值积分支付复选框事件----end  **/
+    }
+    //储值积分勾选文本框启用事件
+    $("#preferentialMoney").on('keyup', function () {
+
+
+        var handleMoneyCount = Math.round(parseFloat($("#handleMoneyCount").val()) * 100) / 100;
+        var preferentialMoney = Math.round(parseFloat($("#preferentialMoney").val()) * 100) / 100;
+        var realMoneyCount = Math.round(parseFloat(handleMoneyCount - preferentialMoney) * 100) / 100;
+
+        if(preferentialMoney > handleMoneyCount){
+            swal("操作异常！", "不能超出实付金额","error");
+        }else{
+            $("#realMoneyCount").attr('value',realMoneyCount);
+            $("#hidden_realMoneyCount").attr('value',realMoneyCount.toFixed(2));
+        }
+
+    });
+    function btn_checkMemberInfoIsTrue() {
+        var memberCardNum = $("#memberCardNum").val();
+        var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+        var params = {
+            'memberCardNum': memberCardNum,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                //alert(data['message']['code']);
+                if (data['message']['code'] == 0) {
+                    var memberCardSpecifiedEndTime = data['message']['back_TIMESTAMP_MemberSpecifiedEndTime'];
+                    var memberSpecifiedEndTime = data['message']['back_MemberSpecifiedEndTime'];
+                    var memberPointsCountstr = data['message']['back_MemberPointsCount'];
+                    var memberMoneyCountstr = data['message']['back_MemberMoneyCount'];
+                    var now_timestamp = Date.parse(new Date()) / 1000;
+                    if(memberCardSpecifiedEndTime < now_timestamp){
+                        swal({
+                            title: "会员卡异常！",
+                            text: "会员卡于<strong>[ "+memberSpecifiedEndTime+" ]</strong>过期，储值与积分已冻结。",
+                            type:"warning",
+                            html: true
+                        });
+                        $(".ifTrue_RechargePayCheckbox").hide();
+                        $(".ifTrue_PointsPayCheckbox").hide();
+                    }else{
+                        $(".ifTrue_RechargePayCheckbox").show();
+                        $(".ifTrue_PointsPayCheckbox").show();
+                    }
+                }
+            }
+
+        });
+    }
+    //校验比对会员可用储值和积分
+    function btn_checkMemberRechargeIsTrue() {
+        var value_RechargePayCheckbox_checked = parseInt($("#RechargePayCheckbox").val());
+        var realMoneyCount = parseFloat($("#realMoneyCount").val());
+        var memberCardNum = $("#memberCardNum").val();
+        var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+        var params = {
+            'memberCardNum': memberCardNum,
+        };
+        if(value_RechargePayCheckbox_checked === 2 && $("#RechargePayCheckbox").is(":checked")){
+            $.ajax({
+                url: url,
+                type: "post",
+                data: params,
+                dataType: 'json',
+                success: function (data) {
+                    //alert(data['message']['code']);
+                    if (data['message']['code'] == 0) {
+                        var memberMoneyCountstr = parseFloat(data['message']['back_MemberMoneyCount']);
+                        if(memberMoneyCountstr <= 0 ){
+                            $("#get_memberMoneyCount").attr("value",memberMoneyCountstr);
+                            $("#get_memberMoneyCount").attr("readonly",true);
+                            btn_checkMemberLaseMoneyCount();
+                        }else if(memberMoneyCountstr <= realMoneyCount){
+                            $("#get_memberMoneyCount").attr("readonly",false);
+                            $("#get_memberMoneyCount").attr("value",memberMoneyCountstr);
+                            btn_checkMemberLaseMoneyCount();
+
+                        }else if(memberMoneyCountstr > realMoneyCount){
+                            $("#get_memberMoneyCount").attr("readonly",false);
+                            $("#get_memberMoneyCount").attr("value",realMoneyCount);
+                            btn_checkMemberLaseMoneyCount();
+                        }
+                    }
+                }
+
+            });
+        }else{
+            $("#get_memberMoneyCount").attr("value","0.00");
+            btn_checkMemberLaseMoneyCount();
+            $("#get_memberMoneyCount").attr("readonly",true);
+
+        }
+    }
+    function btn_checkMemberPointsIsTrue() {
+        var value_PointsPayCheckbox_checked = parseInt($("#PointsPayCheckbox").val());
+        var realMoneyCount = parseFloat($("#realMoneyCount").val());
+        var rate_pointsAsMoney = parseFloat({php echo $setStoreData['set_pointsAsMoney']});
+        var memberCardNum = $("#memberCardNum").val();
+        var url = "{php echo $this->createWebUrl('memberconsume', array('op' => 'ajaxGetMemberIfo','storeid' => $storeid))}";
+        var params = {
+            'memberCardNum': memberCardNum,
+        };
+        if(value_PointsPayCheckbox_checked === 3 && $("#PointsPayCheckbox").is(":checked")){
+            $.ajax({
+                url: url,
+                type: "post",
+                data: params,
+                dataType: 'json',
+                success: function (data) {
+                    //alert(data['message']['code']);
+                    if (data['message']['code'] == 0) {
+                        var memberPointsCountstr = parseFloat(data['message']['back_MemberPointsCount']) / rate_pointsAsMoney;
+                        if(memberPointsCountstr <= 0){
+                            $("#get_memberPointsCount").attr("value",memberPointsCountstr);
+                            $("#get_memberPointsCount").attr("readonly",true);
+                            btn_checkMemberLaseMoneyCount();
+                        }else if(memberPointsCountstr <= realMoneyCount){
+                            $("#get_memberPointsCount").attr("readonly",false);
+                            $("#get_memberPointsCount").attr("value",memberPointsCountstr);
+                            btn_checkMemberLaseMoneyCount();
+                        }else if(memberPointsCountstr > realMoneyCount){
+                            $("#get_memberPointsCount").attr("readonly",false);
+                            $("#get_memberPointsCount").attr("value",realMoneyCount);
+                            btn_checkMemberLaseMoneyCount();
+                        }
+                    }
+                }
+
+            });
+        }else{
+            $("#get_memberPointsCount").attr("value","0.00");
+            btn_checkMemberLaseMoneyCount();
+            $("#get_memberPointsCount").attr("readonly",true);
+        }
+    }
+    function btn_checkMemberLaseMoneyCount() {
+        var realMoneyCount = parseFloat($("#realMoneyCount").val());
+        var x = parseFloat($("#get_memberMoneyCount").val());
+        var y = parseFloat($("#get_memberPointsCount").val());
+        if((x.length == 0 || x == 0) && (y.length == 0 || y == 0)){
+            $("#hidden_realMoneyCount").attr("value",realMoneyCount);
+        }else if((x.length == 0 || x == 0) && (y.length > 0 || y > 0)){
+            $("#hidden_realMoneyCount").attr("value",realMoneyCount - y);
+        }else if((x.length > 0 || x > 0) && (y.length == 0 || y == 0)){
+            $("#hidden_realMoneyCount").attr("value",realMoneyCount - x);
+        }else if((x.length > 0 || x > 0) && (y.length > 0 || y > 0)){
+            if(x >= realMoneyCount && y < realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value","0.00");
+                $("#get_memberMoneyCount").attr("value",realMoneyCount- y);
+            }else if(x < realMoneyCount && y >= realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value","0.00");
+                $("#get_memberPointsCount").attr("value",realMoneyCount- x);
+            }else if(x >= realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value","0.00");
+                $("#get_memberPointsCount").attr("value","0.00");
+            }else if(y >= realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value","0.00");
+                $("#get_memberMoneyCount").attr("value","0.00");
+            }else if(x < realMoneyCount && y < realMoneyCount && (x + y)>realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value","0.00");
+                $("#get_memberMoneyCount").attr("value",x);
+                $("#get_memberPointsCount").attr("value",realMoneyCount- x);
+            }else if(x < realMoneyCount && y < realMoneyCount && (x + y)<realMoneyCount){
+                $("#hidden_realMoneyCount").attr("value",realMoneyCount- x - y);
+                $("#get_memberMoneyCount").attr("value",x);
+                $("#get_memberPointsCount").attr("value",y);
+            }
+
+        }else{
+            swal("操作异常！", "请刷新当前页面重新操作。","error")
+        }
+    }
+    //手动更改储值和积分抵现支付金额
+    $("#get_memberMoneyCount").on('keyup', function () {
+        var a = parseFloat($("#get_memberMoneyCount").val());
+        var b = parseFloat($("#get_memberPointsCount").val());
+        var realMoneyCount = parseFloat($("#realMoneyCount").val());
+        if(a+b >realMoneyCount){
+            swal("操作异常！", "不能超出实付金额","error");
+            $("#hidden_realMoneyCount").attr("value","0.00");
+        }else{
+            $("#hidden_realMoneyCount").attr("value",realMoneyCount - a- b);
+        }
+
+    });
+    $("#get_memberPointsCount").on('keyup', function () {
+        var a = parseFloat($("#get_memberMoneyCount").val());
+        var b = parseFloat($("#get_memberPointsCount").val());
+        var realMoneyCount = parseFloat($("#realMoneyCount").val());
+        if(a+b >realMoneyCount){
+            swal("操作异常！", "不能超出实付金额","error");
+            $("#hidden_realMoneyCount").attr("value","0.00");
+        }else{
+            $("#hidden_realMoneyCount").attr("value",realMoneyCount - a- b);
+        }
+
+    });
+
+    //日期格式化函数-----------------暂未使用，保留
+    function FormatgetLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+    }
+    //充次按钮启用事件函数
+    function btnSaveShowOrHide() {
+        var rowcountstr = $('#addMemberRechargeCountDataTable').bootstrapTable('getOptions').totalRows;
+        if(rowcountstr > 0){
+            $("#btn_saveAddMemberRechargeCountOrder").attr("disabled", false);
+        }else{
+            $("#btn_saveAddMemberRechargeCountOrder").attr("disabled", true);
+        }
+    }
+
+    //条码枪添加消费商品
+    function addMemberConsume(){
+        var getSearch_goodsKeywordCode = $("#tmqSearch_goodsKeywordCode").val();
+        var  mrc_specifiedEndTime= laydate.now(365*19,"YYYY-MM-DD");
+        var memberId = $("#memberId").val();
+        var url ="{php echo $this->createWebUrl('addmembercount', array('op' => 'ajaxAddMemberRechargeCount'))}";
+        var params = {
+            'goodscode': getSearch_goodsKeywordCode,
+            'member_id': memberId,
+            'optype':'ScanCode',
+            'mrc_specifiedEndTime': mrc_specifiedEndTime,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if(data['message']['code'] == 0){
+                    $("#addMemberRechargeCountDataTable").bootstrapTable('refresh');
+                    $('#addMemberRechargeTotalprice').html('<i class="fa fa-rmb"></i> ' + data['message']['totalPriceCount'] + ' 元');
+                    $('#addMemberRechargeTotalCount').html('<i class="fa fa-database"></i> ' + data['message']['totalRechargeCount'] + ' 次');
+                    $('#hidden_addMemberRechargeTotalCount').attr('value',data['message']['totalRechargeCount']);
+                    $('#addMemberRechargeGivePointCount').html('<i class="fa fa-gift"></i> ' + data['message']['totalGivePointCount'] + ' 积分');
+                    $("#hidden_addMemberRechargeGivePointCount").attr("value",data['message']['totalGivePointCount']);
+                    $("#handleMoneyCount").attr("value",data['message']['totalPriceCount']);
+                    $("#realMoneyCount").attr("value",data['message']['totalPriceCount']);
+                    $("#hidden_realMoneyCount").attr('value',data['message']['totalPriceCount']);
+                    $('#hidden_addMemberRechargeTotalprice').attr('value',data['message']['totalPriceCount']);
+                    $("#tmqSearch_goodsKeywordCode").val("");
+                    $("#tmqSearch_goodsKeywordCode").focus();
+                    return;
+
+                }
+                else if (data['message']['code'] == 2) {
+                    swal("操作有误！", "该商品已售完。","error");
+                    return;
+                }
+                else{
+                    swal("操作有误", "已添加该商品！","warning");
+                    $("#tmqSearch_goodsKeywordCode").val("");
+                    $("#tmqSearch_goodsKeywordCode").focus();
+                    return;
+                }
+            }
+        });
+    }
+
+    var dingshi1='';
+    var dingshi2='';
+    var imgsrc='{HLMMS_IMG}chenggong.gif';
+    var imgsrc3='{HLMMS_IMG}dengdai.gif';
+    var imgsrc1='{HLMMS_IMG}shibai.gif';
+    function  payStyle_Check(payid){
+        //alert(payid);
+        var imgsrc1='{HLMMS_IMG}dengdai.png';
+        var imgsrc2='{HLMMS_IMG}ma.gif';
+        for(var i=1; i<=3;i++){
+            $('#payStyle_Check'+i).removeClass('main-right-top-active');
+            $('#div_payResultShowOrHide'+i).hide();
+            $('#payresult'+i+'-'+i).html('结果区域');
+            if(i==1 || i==3 ){
+                $('#payresult'+i).attr('src',imgsrc2);
+            }else{
+                $('#payresult'+i).attr('src',imgsrc2);
+            }
+        }
+        $('#hidden_TextPayCode'+payid).val('');
+
+        $('#payStyle_Check'+payid).addClass('main-right-top-active');
+        $('#div_payResultShowOrHide'+payid).show();
+        $('#radio_consumePayStyle'+payid).attr('checked', true);
+        $('#hidden_TextPayCode'+payid).focus();
+
+    }
+
+    //刷卡
+    function ShuaKaPay(){
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var pay_get_TextPayCode2=$('#hidden_TextPayCode2').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "增加计次";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0,请采用现金支付方式！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(pay_get_TextPayCode2==''){
+            swal("操作异常！", "付款码不能为空！","error");
+            return false;
+        }else{
+            if(!/^\d{18}$/.test(pay_get_TextPayCode2)){
+                swal("操作异常！", "付款码格式不对,应为长度为18位数字,请检查！","error");
+                return false;
+            }
+        }
+        var wechatCodePayUrl = "{php echo $this->createWebUrl('doMemberRechargePay', array())}";
+        var wechatCodePayParams = {
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'pay_get_TextPayCode2': pay_get_TextPayCode2
+        };
+        $("#btn_SaveConsumeOrderData2").hide();
+        $.ajax({
+            url: wechatCodePayUrl,
+            data: wechatCodePayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['status'] == 0) {
+
+                    $('#payresult2').attr('src',imgsrc3);
+                    dingshi1=setTimeout("PayResultQuery('"+data['message']['out_trade_no']+"','"+data['message']['out_trade_no_type']+"')",3000);
+                    //alert(data['message']['msg']);
+                } else {
+                    $('#payresult2').attr('src',imgsrc1);
+                    //alert(data['message']['msg']);
+                    setTimeout('waitDoClosePayFalse()',3000);
+                }
+            }
+        });
+    }
+    function PayResultQuery(out_trade_no,out_trade_no_type){
+        if(out_trade_no_type == 'wechatpay'){
+            var PayQueryUrl = "{php echo $this->createWebUrl('doWechatPayQuery', array())}";
+        }else{
+            var PayQueryUrl = "{php echo $this->createWebUrl('doAliPayQuery', array())}";
+        }
+        var order_id=out_trade_no;
+        var order_type=out_trade_no_type;
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultTotalCount=$('#hidden_addMemberRechargeTotalCount').val();
+        var hidden_resultPointsCount=$('#hidden_addMemberRechargeGivePointCount').val();
+        var hidden_resultMoneyCount=$('#hidden_addMemberRechargeTotalprice').val();
+        var consumeType="arsl3";
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "增加计次";
+        }
+        var PayParams = {
+            'out_trade_no': order_id,
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+            'hidden_resultTotalCount': hidden_resultTotalCount,
+            'consumeType': consumeType
+        };
+
+        $.ajax({
+            url: PayQueryUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: PayParams,
+            success: function (data) {
+                if (data['message']['status'] == 1) {
+                    $('#payresult2').attr('src',imgsrc);
+                    clearTimeout(dingshi1);
+                    clearTimeout(dingshi2);
+                    setTimeout('waitDoClosePayTrue()',3000);
+                }else{
+                    //alert(data['message']['msg']);
+                    dingshi2=setTimeout("PayResultQuery('"+order_id+"','"+order_type+"')",3000);
+                }
+            }
+        });
+    }
+    function moneryisnum(monery){
+        var reg = new RegExp("^[0-9]+(.[0-9]{1,2})?$");
+        if(!reg.test(monery)){
+            return true;
+        }
+        return false;
+    }
+    function PayNoteFomat(value_txt_PayNote){
+        var reg = new RegExp("^[\u4e00-\u9fa5]{0,}$");
+        if(!reg.test(value_txt_PayNote)){
+            return true;
+        }
+        return false;
+    }
+    //现金和一码付收款
+    function cashPay(){
+        var pay_memberId=$('#memberId').val();
+        var pay_memberCardNum=$("#memberCardNum").val();
+        var pay_memberName= $("#memberName").val();
+        var pay_txt_PayNote=$("#txt_PayNote").val();
+        var pay_radio_consumePayStyle=$('input:radio[name="radio_consumePayStyle"]:checked').val();
+        var pay_hidden_realMoneyCount=$('#hidden_realMoneyCount').val();
+        var hidden_resultTotalCount=$('#hidden_addMemberRechargeTotalCount').val();
+        var hidden_resultPointsCount=$('#hidden_addMemberRechargeGivePointCount').val();
+        var hidden_resultMoneyCount=$('#hidden_addMemberRechargeTotalprice').val();
+        if(pay_txt_PayNote==''){
+            pay_txt_PayNote = "增加计次";
+        }
+        if(pay_hidden_realMoneyCount=='' || pay_hidden_realMoneyCount=='0' || pay_hidden_realMoneyCount=='0.0' || pay_hidden_realMoneyCount=='0.00'){
+            swal("操作异常！", "收款金额不能为空或0！","error");
+            return false;
+        }
+        var moneyformat=pay_hidden_realMoneyCount.substr(pay_hidden_realMoneyCount.length-1,1);
+        if(moneyformat=='.'){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        if(PayNoteFomat(pay_txt_PayNote)){
+            swal("操作异常！", "备注只能输入汉字！","error");
+            return false;
+        }
+        if(moneryisnum(pay_hidden_realMoneyCount)){
+            swal("操作异常！", "收款金额格式错误！","error");
+            return false;
+        }
+        var cashPayUrl = "{php echo $this->createWebUrl('addmembercount', array('op' => 'saveAddMemberCountData'))}";
+        var cashPayParams = {
+            'memberId': pay_memberId,
+            'memberCardNum': pay_memberCardNum,
+            'memberName': pay_memberName,
+            'txt_PayNote': pay_txt_PayNote,
+            'radio_consumePayStyle': pay_radio_consumePayStyle,
+            'hidden_realMoneyCount': pay_hidden_realMoneyCount,
+            'hidden_resultMoneyCount': hidden_resultMoneyCount,
+            'hidden_resultPointsCount': hidden_resultPointsCount,
+            'hidden_resultTotalCount': hidden_resultTotalCount,
+        };
+        if(pay_radio_consumePayStyle == 1){
+            $("#yiMaFuPayhidden").hide();
+        }
+        if(pay_radio_consumePayStyle == 3){
+            $("#cashPayhidden").hide();
+        }
+        //alert(JSON.stringify(cashPayParams));
+        $.ajax({
+            url: cashPayUrl,
+            data: cashPayParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //alert(data['message']['code']);
+                if (data['message']['code'] == 0) {
+                    if(pay_radio_consumePayStyle == 1){
+                        $('#payresult1').attr('src',imgsrc);
+                        $('#payresult1-1').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc);
+                        $('#payresult3-3').html('支付成功，支付订单号：'+ data['message']['msg']);
+                        setTimeout('waitDoClosePayTrue()',3000);
+                    }
+                } else {
+                    if(pay_radio_consumePayStyle  == 1){
+                        $('#payresult1').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }else{
+                        $('#payresult3').attr('src',imgsrc1);
+                        setTimeout('waitDoClosePayFalse()',3000);
+                    }
+                }
+            }
+        });
+    }
+    //延迟执行
+    function waitDoClosePayTrue(){
+        $('#consumeOrderData').modal('hide');
+        swal("结账成功！", "","success");
+        window.location.reload();
+    }
+    function waitDoClosePayFalse(){
+        $('#consumeOrderData').modal('hide');
+        swal("支付失败！", "操作异常，请重新操作结账。","error");
+        window.location.reload();
+    }
+
+</script>
+{template 'web/common/footer'}

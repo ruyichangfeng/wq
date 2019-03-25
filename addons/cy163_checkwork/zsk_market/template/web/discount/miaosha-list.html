@@ -1,0 +1,187 @@
+{template 'public/header'}  
+<style type="text/css">
+	.day-header,.day-footer{color:#999;}
+	.goodspic{width: 80px;height: 80px;}
+	.sortab td{
+		padding:8px 10px;
+	}
+	.layui-table th,.layui-table td{text-align: center;}
+		.rili-day{
+		width: 100px;float:left;height: 60px;border-top: 1px solid #ccc;text-align: center;
+	}
+	.rili-th{
+		height: 40px;font-weight: bolder;line-height: 40px;
+	}
+	.rili-day .step{line-height: 30px;}
+	.rili-day .day{line-height: 25px;cursor: pointer;}
+	.ccc{color:#999;}
+	.ddd{float:left;width: 33.3%;line-height: 50px;text-align: center;}
+</style>
+ 
+<div id="sortHt" style="display: none;">
+	<table class="sortab">
+		<tr >
+			<td style="width: 30%;">
+				商品
+			</td>
+			<td id="sortname" style="width: 70%">
+				
+
+			</td>
+		</tr>
+		<tr>
+			<td >
+				排序
+			</td>
+			<td >
+				<input type="hidden" name="goodsid" id="sortid">
+				<input type="number" id="sortsort" name="sort" value="0" class="form-control"><br/>
+				数字越大越靠前
+			</td>
+		</tr>
+	</table>
+
+</div>
+<div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title">
+    <li style="display: none;">秒杀日历</li>
+    <li class="layui-this">秒杀列表</li> 
+  </ul>
+  <div class="layui-tab-content"  >
+  
+    <div class="layui-tab-item">
+    	<div style="width: 702px;height:400px;margin-top:20px; border-radius: 5px;clear:both;border-left:1px solid #ccc;border-right: 1px solid #ccc;border-bottom: 1px solid #ccc;">
+			<div class="rili-day rili-th">周日</div>
+			<div class="rili-day rili-th">周一</div>
+			<div class="rili-day rili-th">周二</div>
+			<div class="rili-day rili-th">周三</div>
+			<div class="rili-day rili-th">周四</div>
+			<div class="rili-day rili-th">周五</div>
+			<div class="rili-day rili-th">周六</div>
+			{loop $day30['header'] $index $day}
+				<div class="rili-day day-header" data-date="{$day['date']}">
+					<div class="day">{$day['day']}</div> 
+				</div>
+			{/loop}
+			{loop $day30['data'] $index $day}
+				<div class="rili-day day-center" data-date="{$day['date']}" >
+					<div class="day">{$day['day']}</div> 
+				</div>
+			{/loop}
+			{loop $day30['footer'] $index $day}
+				<div class="rili-day day-footer" data-date="{$day['date']}">
+					<div class="day">{$day['day']}</div> 
+				</div>
+			{/loop}
+		</div>
+    </div> 
+    <div class="layui-tab-item  layui-show">
+    	 <div class="row form-row">
+			<form action="<?php echo $this->routeUrl('discount.miaoshalist');?>" method="post" id="keyform">			
+			<div class="col-xs-6 col-sm-6 paddingx">
+				<div class="input-group">
+			      <input type="text" name="name" placeholder="商品名或编号" value="{$params['name']}" class="form-control" style="display: inline-block;" />
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			         
+			        <button class="btn btn-default" type="button" style="display: inline-block;" onclick="addMiaosha()">添加秒杀</button>  
+			      </span>
+			    </div>  
+			</div>
+			</form> 
+		</div> 
+		<table class="layui-table ">
+			<thead>
+				<tr>
+					<th>商品编号</th> 
+					<th  style="width: 120px;word-break: break-all;overflow: hidden;" >商品名称</th> 
+					<th>封面图片</th>  
+					<th style="width: 60px;">最低价</th> 
+
+					<th style="width:60px;">库存</th> 
+					<th style="width: 150px;">活动时间</th>
+					 
+					<th style="width: 80px;">状态</th>
+					
+					<th style="width: 150px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $goodslist $index $item}
+				<tr>
+					<td  style="width: 80px;">{$item['number']}</td>
+					<td  style="width: 120px;word-break: break-all;overflow: hidden;" >{$item['goodsname']}</td>
+					<td  style="width: 80px;"><img src="{$_W['attachurl']}{$item['catalog']}{$item['picture']}"  class="goodspic" /> </td>
+				 
+					<td>{$item['pricelow']} </td>
+					<td>{$item['stock']} </td>
+					<?php if($item['starttime']!=$item['stoptime']){;?>
+					<td>{$item['starttime']}<br/> - <br/>{$item['stoptime']} </td>
+					<?php };?>
+					<?php if($item['starttime']==$item['stoptime']){;?>
+					<td>{$item['starttime']}<br/>
+					<?php };?>
+				 	<td><?php 
+						$stoptime = strtotime($item['stoptime']);
+				 		if($stoptime > time()){
+						if(intval($item['status'])==1){ ?>
+						<a href="javascript:void(0);" onclick="chgStatus({$item['id']},'{$item['name']}',0)" class='linkbtn linkbtn-green'>启用</a>
+						<?php }else{?>
+						<a href="javascript:void(0);" onclick="chgStatus({$item['id']},'{$item['name']}',1)" class='linkbtn linkbtn-gray'>停用</a>
+						<?php } }else{ ?>
+						<a href="javascript:void(0);"  class='linkbtn linkbtn-red'>已过期</a>
+						<?php } ?>
+					</td>
+					 
+					<td>  
+						<a href="<?php echo $this->routeUrl('discount.edit');?>&did={$item['id']}" class='linkbtn '>编辑</a>
+						<a href="javascript:void(0);" onclick="delgoods({$item['id']},'{$item['name']}')" class='linkbtn linkbtn-red'>删除</a>
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="8" align="center">
+						{template 'public/pagenation'}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+    </div>
+  </div>
+</div>   
+
+
+<script type="text/javascript">
+	function addMiaosha(){
+		window.location.href="<?php echo $this->routeUrl('discount.addMiaosha');?>";
+	}
+	 
+	function chgStatus(id,name,sts){
+		var msg="禁用";
+		if(parseInt(sts)==1)msg="启用";
+		modalDlg("是否 <span style='color:#1E9FFF;'> "+name+"</span> "+msg,function(){
+			window.location.href="<?php echo $this->routeUrl('discount.chgStatus');?>&did="+id+"&status="+sts;
+		});
+	}
+
+	function chgSort(id,name,sort){
+		$("#sortid").val(id);
+		$("#sortsort").val(sort);
+		$("#sortname").text(name);
+		var  html='<form id="sortForm" action="<?php echo $this->routeUrl('goods.chgSort');?>" method="post">';
+		html+=$("#sortHt").html();
+		html+='</form>';
+
+		modalDlg(html,function(){
+			$("#sortForm").submit(); 
+		});
+	}
+ 
+	function delgoods(id,name){
+		modalDlg("是否删除"+name+"?",function(){
+			window.location.href="<?php echo $this->routeUrl('discount.delDiscount');?>&type=2&did="+id;
+		});
+	}
+</script>
+{template 'public/footer'}

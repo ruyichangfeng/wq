@@ -1,0 +1,209 @@
+{template 'common/header'}
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li  ><a href="{php echo $this->createWebUrl('project', array('op'=>'display'));}">服务项目管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('project', array('op'=>'create'));}">添加服务项目</a></li>
+    </ul>
+    <form action="{php echo $this->createWebUrl('project', array('op'=>'create'))}" method="post" class="form-horizontal form" id="project_form">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">{if $op == 'create'}添加服务项目{else if $op == 'modify'}编辑服务项目{/if}</div>
+            <div class="panel-body">
+                <div class="form-group" hidden>
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="project[project_id]"  class="form-control" value="{$project['project_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>所属商家</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="project[project_businessid]" class="form-control" id="">
+                            <option value="" selected>请选择</option>
+                            {loop $business $key $item}
+                            <option value="{$item['business_id']}" {if $project['project_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>项目类型</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="project[project_type]" class="form-control" id="">
+                            <option value="" selected>请选择</option>
+                            {loop $ptypes $key $item}
+                            <option value="{$item['ptype_id']}" {if $project['project_type'] == $item['ptype_id']}selected{/if}>{$item['ptype_title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>排序</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="project[project_order]"  class="form-control" value="{$project['project_order']}" />
+                        <div class="help-block">序号越大越靠前</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>项目名称</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="project[project_name]"  class="form-control" value="{$project['project_name']}" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color"></span>项目列表图</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_image('project[project_pic]', $project['project_pic'])}
+                        <div class="help-block">上传列表图则项目列表展示为图片否则为项目标题</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">项目状态</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="state-2" class="radio-inline">
+                            <input id="state-2" type="radio" name="project[project_state]" value="2" {if $project['project_state'] != 1}checked{/if}>通过
+                        </label>
+                        <label for="state-1" class="radio-inline">
+                            <input id="state-1" type="radio" name="project[project_state]" value="1" {if $project['project_state'] == 1}checked{/if}>审核中
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">项目详情页</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="info-2" class="radio-inline">
+                            <input id="info-2" type="radio" name="project[project_info_state]" value="1" {if $project['project_info_state'] == 1 || empty($project['project_info_state'])}checked{/if}>关闭
+                        </label>
+                        <label for="info-1" class="radio-inline">
+                            <input id="info-1" type="radio" name="project[project_info_state]" value="2" {if $project['project_info_state'] == 2}checked{/if}>开启
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">首页推荐</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="index-1" class="radio-inline">
+                            <input id="index-1" type="radio" name="project[project_index]" value="1" {if $project['project_index'] == 1 || empty($project['project_index'])}checked{/if}>关闭
+                        </label>
+                        <label for="index-2" class="radio-inline">
+                            <input id="index-2" type="radio" name="project[project_index]" value="2" {if $project['project_index'] == 2}checked{/if}>开启
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="reason">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>推荐理由</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="project[project_index_reason]" class="form-control" value="{$project['project_index_reason']}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">项目描述</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_ueditor('project[project_info]',$project['project_info'])}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+
+    $(function () {
+
+        reasonState();
+    })
+
+    $('input:radio[name="project[project_index]"]').change(function () {
+
+        reasonState();
+    })
+
+    function reasonState() {
+
+        var reason = $('input:radio[name="project[project_index]"]:checked').val();
+
+        if (reason == 1)
+        {
+            $('#reason').hide();
+
+        } else if(reason == 2)
+        {
+            $('#reason').show();
+        }
+    }
+
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#project_form').submit(function(){
+
+                if($('select[name="project[project_businessid]"]').val() == ''){
+                    util.message('未选择所属商家.');
+                    return false;
+                }
+                if($('select[name="project[project_type]"]').val() == ''){
+                    util.message('未选择项目类型.');
+                    return false;
+                }
+                if($('input[name="project[project_order]"]').val() == ''){
+                    util.message('未填排序.');
+                    return false;
+                }
+
+                if($('input[name="project[project_name]"]').val() == ''){
+                    util.message('未填写服务项目名称.');
+                    return false;
+                }
+                if ($('input:radio[name="project[project_index]"]').val() == 2)
+                {
+                    if ($('input[name="project[project_index_reason]"]').val() == '')
+                    {
+                        util.message('未填写推荐理由.');
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        });
+    });
+
+    $('select[name="project[project_businessid]"]').change(function () {
+
+        var business = $(this).val();
+        if (business != '')
+        {
+            $.ajax({
+                url:"{php echo $this->createWebUrl('project', array('op'=>'ptype'))}" + "&business="+business,
+                type:"get",
+                success:function (res) {
+
+                    $('select[name="project[project_type]"]').html(res);
+
+                }
+            })
+        }
+    })
+    require(['jquery', 'util'], function($, u){
+        $(function(){
+            u.editor($('.richtext')[0]);
+            u.editor($('.richtexti')[0]);
+        });
+    });
+</script>
+{template 'common/footer'}

@@ -1,0 +1,274 @@
+{template 'public/header'}
+<style type="text/css">
+	.card{float:left;width: 150px;margin: 10px 20px;margin-left:0px;padding:10px 10px;border: 1px solid #ccc;border-radius: 5px;}
+	.chkBox{width: 16px;height: 16px;}
+	.ainput{
+		padding:3px 6px;
+		width:100px;
+	}
+	span{height: auto!important;}
+</style>
+<div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+	<ul class="layui-tab-title">
+		<li class="layui-this">商品规格</li>
+		<li >商品属性</li>
+		<li>快速生成</li>
+	</ul>
+	<div class="layui-tab-content"  >
+
+		<div class="layui-tab-item layui-show">
+			<div style="margin:10px auto;text-align: left;">
+				<button class="btn btn-default" type="button" style="display: inline-block;" onclick="addCase()">添加规格</button>
+				<button class="btn btn-default" type="submit"  form="stockForm" style="display: inline-block;" >保存库存</button>
+
+				<form method="post" action="<?php echo $this->routeUrl('goods.saveCaseStock');?>" id="stockForm">
+					<input type="hidden" name="gid" value="{$_GPC['gid']}">
+				</form>
+			</div>
+
+			<table id="caseTab" class="layui-table" style="width: 100%!important">
+				<tr>
+					<th>{$goods['opt1']}</th>
+					<?php if(strlen(trim($goods['opt2']))>0){ ?>
+					<th>{$goods['opt2']}</th>
+					<?php } ?>
+					<th>价格</th>
+					<th>库存</th>
+					<th>缩略图</th>
+					<th>创建时间</th>
+
+					<th>操作</th>
+				</tr>
+				{loop $cases $index $item}
+				<?php $span=0;
+				foreach($cases as $k=>$v ){
+				if($v['option1']==$item['option1']){
+				$span++;
+				}
+				}
+
+				?>
+				<tr>
+					<?php if($item['option1']!=$cases[$index-1]['option1']){ ?>
+					<td rowspan="{$span}" >{$item['option1']}</td>
+					<?php   } ?>
+					<?php if(strlen(trim($goods['opt2']))>0){ ?>
+					<td>{$item['option2']}</td>
+					<?php }?>
+					<td>
+						<input type="hidden" value="{$item['id']}" name="cid[]" form="stockForm">
+						<input type="float" name="price[]" form="stockForm" class="layui-input ainput" value="<?php  if($item['price']==NULL){
+					echo $goods['price'];
+				}else {
+				echo floatval($item['price']);
+			} ?>"></td>
+					<td><input type="number" name="stock[]" class="layui-input ainput"  form="stockForm" value="<?php echo intval($item['stock']);
+			?>"></td>
+					<td><img src="<?php echo $item['thumb'] ? $_W['attachurl'].$item['thumb'] :  $_W['siteroot'].'static/images/nopic.jpg'; ?>" style="width: 50px;height: 50px;"></td>
+					<td>{$item['date']}</td>
+					<td>
+						<a href="<?php echo $this->routeUrl('goods.editcase');?>&goodsid={$goods['id']}&caseid={$item['id']}" class="linkbtn"   >编辑</a>
+						<a href="javascript:void(0);" onclick="delCase({$item['id']})" class="linkbtn linkbtn-red" >删除</a></td>
+				</tr>
+				{/loop}
+			</table>
+		</div>
+		<div class="layui-tab-item">
+			<form class="layui-form" method="post" action="<?php echo $this->routeUrl('goods.saveProperty');?>&goodsid={$goods['id']}" id="prop" >
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">选择属性<br/><span style="color:#ff4444;font-size: 12px;">最多设置2个</span></label>
+					<div class="layui-input-block"  >
+						{loop $options $index $opt}
+						<input type="checkbox" name="prop[][{$opt['id']}]"  data-id="{$opt['id']}" title="{$opt['name']}" data-name="{$opt['name']}" value="{$opt['name']}" lay-filter="prop" <?php if($opt['id']==$goods['opt1_id']||$opt['id']==$goods['opt2_id']){echo 'checked';}?> >
+						{/loop}
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
+					<button class="layui-btn" lay-submit lay-filter="prop"   id="subbtn">保存</button>
+				</div>
+			</form>
+		</div>
+		<div class="layui-tab-item">
+			<form class="layui-form" method="post" action="<?php echo $this->routeUrl('goods.makeCase');?>&goodsid={$goods['id']}" id="optform">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">选择属性</label>
+					<div class="layui-input-block" id="opt1div">
+						{loop $options $index $opt}
+						<input type="checkbox" name="opt[]"  data-id="{$opt['id']}" title="{$opt['name']}" data-name="{$opt['name']}" value="{$opt['name']}" lay-filter="opt1" >
+						{/loop}
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">选择属性1</label>
+					<div class="layui-input-block" id="opt1son">
+
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">选择属性2</label>
+					<div class="layui-input-block" id="opt2son">
+
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
+					<button class="layui-btn" onclick="makeCase()"  type="button" lay-filter="optform"   id="subbtn">生成</button>
+				</div>
+				<input type="hidden" name="opt0" id="opt0"/>
+				<input type="hidden" name="opt1" id="opt1">
+			</form>
+		</div>
+		<p style="color:#ff4444;">修改商品规格后，与该商品相关的拼团、砍价、秒杀、促销等活动需要重新设置价格，否则可能出现购买价格与显示价格不一致！</p>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	var optTree=<?php echo json_encode($options);?>;
+	var curr=new Array();
+	var submitBuff=false;
+	$('.collapse').on('show.bs.collapse', function () {
+		$("#pbody").find(".in");
+		console.log();
+	});
+	$(".chkBox").bind("click",function(e){
+		var chkopts=$(".chkBox:checked");
+		var lastPid=-1;
+		var count=0;
+		$.each(chkopts,function(i,v){
+			var pid=parseInt($(v).attr("data-pid"));
+			if(pid!=lastPid){
+				lastPid=pid;
+				if(count>=2){
+					e.preventDefault();
+					modalMsg("最多添加2种规格");
+				}
+				count++;
+
+			}
+		});
+	});
+	function delCase(id){
+		modalDlg("是否删除改规格套餐？",function(){
+			window.location.href="<?php echo $this->routeUrl('goods.delCase');?>&goodsid={$_GPC['gid']}&cid="+id;
+		});
+	}
+	function addCase(id=0){
+		window.location.href="<?php echo $this->routeUrl('goods.editcase');?>&goodsid={$_GPC['gid']}&cid="+id;
+
+	}
+	function makeCase(){
+		modalDlg("是否重新生成规格，旧的规格将全部失效，优惠、拼团、秒杀也将失效，是否继续？<br/>库存默认100",function(){
+			$("#optform").submit();
+
+		});
+	}
+	function chkBox(box){
+		$(".card").attr("class","card");
+		var chkopts=$(".chkBox:checked");
+		$.each(chkopts,function(i,v){
+			if($(v).is(":checked")){
+				$($(v).attr("data-pdom")).attr("class","card card-checked");
+			};
+		});
+		var checked=$(".card-checked");
+
+		if(checked.length>3){
+			modalMsg("每个商品最多设置3个规格，多余的不能生效");
+			return false;
+		}else{
+			var cards=$(".card-checked");
+			var head="";
+			var totalrows=1;
+			var datas=new Array();
+			var chk=$(".chkBox:checked");
+			$.each(chk,function(i,v){
+				var d= {
+					id:parseInt($(v).attr("data-id")),
+					pid:parseInt($(v).attr("data-pid"))
+				};
+				datas.push(d);
+			} );
+			data0=datas;
+		}
+	}
+
+</script>
+{template 'public/footer'}
+<script>
+	function remake(){
+		$("#opt1son").html("");
+		$("#opt2son").html("");
+		$("#opt2").val("");
+		$("#opt1").val("");
+		$.each(curr,function(i0,v0){
+			var html="";
+			console.log(v0.name)
+			$("#opt"+i0).val(v0.name);
+			$.each(optTree,function(i,v){
+				if(parseInt(v.id)==parseInt(v0.id)){
+					$.each(v.children,function(i2,v2){
+						html+='	<input type="checkbox" name="op'+(i0)+'[]"  data-id="'+v2.id+'" title="'+v2.name+'" value="'+v2.name+'"  lay-skin="primary" lay-filter="option'+(i0+1)+'" />';
+					})
+				}
+			})
+			$("#opt"+(i0+1)+"son").html(html);
+
+		})
+		layui.use(["layer",'form'], function(){
+			var form = layui.form;
+			form.render();
+		})
+	}
+
+	layui.use(["layer",'form'], function(){
+		var form = layui.form;
+		var layer=layui.layer
+		//监听提交
+		form.on('submit(prop)', function(data){
+			var length=(Object.keys(data.field).length);
+			if(length>2){
+				layer.msg("最多选择2种属性");
+
+				return false;
+			}else if(length<=0){
+				return false;
+			}
+
+		});
+		form.on('checkbox(opt1)', function(data){
+			var len=$("#opt1div .layui-form-checked").length;
+
+			console.log(len);
+			if(len>2){
+				$(data.elem).attr("checked","");
+				$(data.othis).removeClass("layui-form-checked");
+				$(this).removeAttr('checked','checked');
+				layer.msg("最多选择2种属性");
+				return false;
+			}else{
+
+				var oid=parseInt($(data.elem).attr("data-id"));
+				var name=$(data.elem).attr("data-name");
+				// console.log(data.elem.checked);
+
+				if(data.elem.checked){
+					curr.push({id:oid,name:name});
+				}else{
+					$.each(curr,function(i,v){
+						if(v.id == oid){
+							var rmObj = curr[i];
+							curr.splice($.inArray(rmObj,curr),1);
+						}
+					});
+				}
+				remake();
+			}
+
+
+		});
+	});
+</script>

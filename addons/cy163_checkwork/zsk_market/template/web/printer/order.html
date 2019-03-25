@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+    <style media="print">
+  @page {
+   size: auto;
+   margin: 0mm;
+  }
+ </style>
+  <style type="text/css">
+    html, body {
+  height: 100%;
+  margin: 0;
+}
+.wrapper {
+  min-height: 100%;
+  /* 等于footer的高度 */
+  margin-bottom: -50px;
+}
+.footer,
+.push {
+  height: 50px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="content">
+    <div class="content-inside">
+      <?php if(isset($result1['Order'])){?>  
+      <!--startprint-->
+      <?php echo $result1['PrintTemplate'];?>
+      <!--endprint-->
+        <script language="javascript" type="text/javascript">
+
+        var hkey_root, hkey_path, hkey_key;
+        hkey_root = "HKEY_CURRENT_USER";
+        hkey_path = "\\Software\\Microsoft\\Internet Explorer\\PageSetup\\";
+        //设置网页打印的页眉页脚为空
+        function pagesetup_null() {
+            try {
+                var RegWsh = new ActiveXObject("WScript.Shell");
+                hkey_key = "header";
+                RegWsh.RegWrite(hkey_root + hkey_path + hkey_key, "");
+                hkey_key = "footer";
+                RegWsh.RegWrite(hkey_root + hkey_path + hkey_key, "");
+            } catch (e) { };
+        }
+            window.onload=function(){
+              
+                 bdhtml=window.document.body.innerHTML; 
+                  var headHtml = "<head><style type='text/css' media='print'> @page{ size:  auto;   /* auto is the initial value */margin:0mm;  /* this affects the margin in the printer settings */}html{/*background-color: #FFFFFF; */margin: 0px;  /* this affects the margin on the html before sending to printer */}</style></head><body>"
+ 
+            var bottHtml = "</body>"; 
+                 bdhtml = window.document.body.innerHTML; //获取当前页的html代码
+                sprnstr = "<!--startprint-->"; //设置打印开始区域
+                eprnstr = "<!--endprint-->"; //设置打印结束区域
+                prnhtml = headHtml + bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+ 
+                prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr)) + bottHtml; //从结束代码向前取html
+ 
+                //var styleHtml =  " style = '' ";
+                window.document.body.innerHTML = prnhtml;
+
+               window.document.body.innerHTML=prnhtml; 
+               if (!!window.ActiveXObject || "ActiveXObject" in window) { //是否ie
+                 pagesetup_null();
+                }
+                window.print();
+            }  
+        </script>
+    <?php }else{ ?>
+    <script type="text/javascript">
+
+      alert("请求接口失败，{$result1['Reason']}")
+    </script>
+    <?php  } ?>
+    </div>
+  </div>
+  <footer class="footer"></footer>
+</body>
+</html>
+ 

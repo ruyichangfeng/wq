@@ -1,0 +1,276 @@
+<!--正文导航-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$data['school']['title']}</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+    <script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+    {php echo register_jssdk();}
+</head>
+<body>
+<style>
+    dd.teacher_count li {font: 13px/18px "黑体";padding: 10px 60px 10px 34px;position: relative;background: url({OSSURL}public/mobile/img/teacher_inf.jpg) no-repeat 10px 15px;background-size: 15px 15px;border-bottom: 1px solid #ddd;}
+    .teacher_count div.add > div {background-image: url("{OSSURL}public/mobile/img/state_add.png");}
+    .teacher_count div.hot > div {background-image: url("{OSSURL}public/mobile/img/state_hot.png");}
+    .teacher_count  div.new > div{ background-image: url("{OSSURL}public/mobile/img/state_new.png")}
+    .selectList{position:fixed; left:0; right:0; top:0; bottom:0;-webkit-box-sizing:border-box; box-sizing:border-box; background-color:rgba(0,0,0,.53); text-align:center; z-index:30;font-size:20px;color:#fe6700;}
+    .selectList .single{ position:absolute; left:5%; right:5%; top:15%; padding: 0 20px; background-color:#fff; padding-bottom:0px; padding-top: 10px;}
+    .selectList ul{width:100%;height:150px;overflow:auto;}
+    .selectList ul li{height:50px;line-height:50px;border-bottom:1px solid #e9e9e9;padding:0 1px;}
+    .selectList ul li.selected{border-left:5px solid #ffc74e;}
+    .selectList ul li span.le{height:50px;line-height:50px;float:left;font-size:16px;}
+    .selectList ul li span.ri{height:50px;line-height:50px;font-size:16px;}
+    .closeMenu {display: inline-block;
+        width: 30px;
+        height: 30px;
+        background: #fff;
+        font-size: 24px;
+        color: #aaa;
+        -webkit-border-radius: 100%;
+        -moz-border-radius: 100%;
+        -o-border-radius: 100%;
+        border-radius: 100%;
+        line-height: 30px;
+        text-align: center;
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        font-family: 宋体b8b\4f53;
+        cursor: default;}
+</style>
+<div id="wrap" class="teacher_inf" style="padding-top: 0">
+    <div class="ddb-tab-bar" style="display: inline-table;padding: 10px 0;height: 20px;z-index:1000;position: fixed;background-color: #E2E1D0">
+        <div class="ddb-tab-item ng-scope">
+            <a href="javascript:;" class="ng-binding" id="age">按年龄</a>
+            <i class="fa fa-caret-down"></i>
+        </div>
+        <div class="ddb-tab-item ng-scope">
+            <a href="javascript:;" class="ng-binding" id="lb">按类别</a>
+            <i class="fa fa-caret-down"></i>
+        </div>
+        <div class="ddb-tab-item ng-scope" ng-repeat="pane in panes" ng-class="{active:pane.selected}"
+             ng-click="toggle(pane)">
+            <a href="javascript:;" class="ng-binding" id="distance">按距离</a>
+            <i class="fa fa-caret-down"></i>
+        </div>
+        <div class="ddb-tab-item ng-scope" ng-repeat="pane in panes" ng-class="{active:pane.selected}"
+             ng-click="toggle(pane)">
+            <a href="javascript:;" class="ng-binding" id="keyword">按关键字</a>
+            <i class="fa fa-caret-down"></i>
+        </div>
+    </div>
+    <!--列表-->
+    <dl>
+        <dd class="weui-panel weui-panel_access" style="padding-top: 12%;">
+            <h3>闲书列表</h3>
+            <ul>
+                {loop $data['data']['books'] $item}
+                <li onclick="showList('{$item['openid']}');" style="border-bottom: 1px solid #e9e9e9;">
+                    <div class="weui-panel__bd">
+                        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                            <div class="weui-media-box__hd">
+                                <img class="weui-media-box__thumb" src="{php echo tomedia($item['userImg']);}" alt="">
+                            </div>
+                            <div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{$item['nickname']}的书库</h4>
+                                {if $item['is_institution'] == true}<h6 class="weui-media-box__title" style="font-size: 14px;color: orange">(共享漂流点)</h6>{/if}
+                                <!--<p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>-->
+                                <ul class="weui-media-box__info">
+                                    <!--<li class="weui-media-box__info__meta">上传总数:<span style="color: orange">{$item['bookCount']}本</span></li>-->
+                                    {loop $data['data']['cats'][$item['openid']] $cat}
+                                    <li class="weui-media-box__info__meta">{$cat['age_name']}:<span style="color: orange">{$data['data']['bookCats'][$item['openid']][$cat['age_id']]['count']}本</span></li>
+                                    {/loop}
+                                </ul>
+                            </div>
+                        </a>
+                        <div class="weui-panel__ft">
+                            <div class="weui-cell__bd" style="display: inline-block;font-size: 13px;padding-left: 20px;">距离您注册位置{$item['distance']}</div>
+                            <span class="weui-cell__ft" style="float: right;padding-right: 30px;">更多</span>
+                        </div>
+                    </div>
+                </li>
+                {/loop}
+            </ul>
+        </dd>
+    </dl>
+</div>
+
+<!--导航栏-->
+<div class="all">
+    <div class="selectList" id="ageList" style="z-index:100000;display:none;">
+        <div class="single" style="z-index:100000;">
+            <ul>
+                {loop $data['data']['bookAge'] $row}
+                <li onclick="selectType('age',{$row['sid']},{$row['schoolid']});">{$row['sname']}</li>
+                {/loop}
+            </ul>
+            <span id="closedage" class="closeMenu">×</span>
+        </div>
+    </div>
+    <div class="selectList" id="lbList" style="z-index:100000;display:none;">
+        <div class="single" style="z-index:100000;">
+            <ul>
+                {loop $data['data']['bookLb'] $row}
+                <li onclick="selectType('lb',{$row['sid']},{$row['schoolid']});"><span>{$row['sname']}</span></li>
+                {/loop}
+            </ul>
+            <span id="closedlb" class="closeMenu">×</span>
+        </div>
+    </div>
+    <div class="selectList" id="distanceList" style="z-index:100000;display:none;">
+        <div class="single" style="z-index:100000;">
+            <ul>
+                {loop $data['data']['bookDistance'] $row}
+                <li onclick="selectType('distance',{$row['id']},{$data['schoolid']});"><span>{$row['name']}</span></li>
+                {/loop}
+            </ul>
+            <span id="closeddistance" class="closeMenu">×</span>
+        </div>
+    </div>
+    <div class="selectList" id="kw" style="z-index:100000;display:none;">
+        <div class="single" style="z-index:100000;left:2%; right:2%;padding-bottom: 33px;padding-top: 10px;">
+            <input type="text" id = "kwsearch" name="keyword" placeholder="作者或书名" style="font-size: 20px;float:left;">
+            <button onclick="searchKw({$_GPC['schoolid']},'keyword');"><i class="fa fa-search" style="font-size: 20px;"></i> 搜索</button>
+            <span id="closedkeyword" class="closeMenu">×</span>
+        </div>
+    </div>
+</div>
+<input id="flag" value="{$flag}" type="hidden">
+<input id="cache" value="{$userss}" type="hidden">
+<script type="text/javascript">
+    $(function ($) {
+        var flag = $("#flag").val();
+        var cache = $("#cache").val();
+
+        if (flag == 2) {
+            if (cache == "" || cache == null) {
+                $('#selectList').show();
+            }
+        }
+    });
+    function selectType(typeName,id,schoolid){
+        location.href = "{php echo $this->createMobileUrl('bookmap')}"+ '&typeId=' + id + '&schoolid=' + schoolid + '&typeName='+typeName;
+        location.href = reload();
+    }
+    function searchKw(schoolid,typeName){
+        location.href = "{php echo $this->createMobileUrl('bookmap')}"+ '&typeId=' + $("#kwsearch").val() + '&schoolid=' + schoolid + '&typeName='+typeName;
+        location.href = reload();
+    }
+    //年龄
+    $("#age").click(function(){
+        $('#ageList').show();
+    });
+    //类别
+    $("#lb").click(function(){
+        $('#lbList').show();
+    });
+    //距离
+    $("#distance").click(function(){
+        $('#distanceList').show();
+    });
+    //关键字
+    $("#keyword").click(function(){
+        $('#kw').show();
+    });
+
+    $("#closedage").on('click', function () {
+        $('#ageList').hide();
+    });
+    $("#closedlb").on('click', function () {
+        $('#lbList').hide();
+    });
+    $("#closeddistance").on('click', function () {
+        $('#distanceList').hide();
+    });
+    $("#closedkeyword").on('click', function () {
+        $('#kw').hide();
+    });
+</script>
+<script>
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height())
+    });
+    function showList(openid) {
+        window.location.href = "{php echo $this->createMobileUrl('bookCenter',array('schoolid' => $data['schoolid']))}"+'&ownerOpenId='+openid;
+    }
+</script>
+{php include $this->template('footer');}
+<script type="text/javascript">
+    $(function() {
+
+        WeixinJSShowShareMenu();
+
+        WeixinJSShowProfileMenuAndShare();
+
+        wx.ready(function () {
+            sharedata = {
+                title: "附近闲书列表",
+                desc: "闲书地图|按地理位置进行排序找书",
+                link: "{$data['data']['links']}",
+                imgUrl: "{$data['data']['imgUrl']}",
+                success: function(){
+
+                },
+                cancel: function(){
+
+                }
+            };
+            sharedata1 = {
+                title: "附近闲书列表",
+                desc: "闲书地图|按地理位置进行排序找书",
+                link: "{$data['data']['links']}",
+                imgUrl: "{$data['data']['imgUrl']}",
+                success: function(){
+
+                },
+                cancel: function(){
+
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata1);
+        });
+
+    });
+
+    function WeixinJSShowShareMenu(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+                wx.showMenuItems({
+                    menuList: ['menuItem:share:appMessage','menuItem:share:timeline'] // 要显示的菜单项，所有menu项见附录3
+                });
+            });
+        }
+    }
+
+
+    function WeixinJSShowProfileMenuAndShare(){
+
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+                wx.showMenuItems({
+                    menuList: ['menuItem:share:appMessage','menuItem:share:timeline','menuItem:profile','menuItem:addContact','menuItem:favorite'] // 要显示的菜单项，所有menu项见附录3
+                });
+            });
+        }
+    }
+</script>
+</body>
+</html>

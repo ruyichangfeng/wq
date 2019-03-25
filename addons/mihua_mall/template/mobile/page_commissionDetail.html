@@ -1,0 +1,180 @@
+
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>佣金明细</title>
+     <link rel="stylesheet" type="text/css" href="{MODULE_URL}/recouse/css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="{MODULE_URL}/recouse/css/normalize.css">
+     <link rel="stylesheet" type="text/css" href="{MODULE_URL}/recouse/css/common-v4.1.css?201411241620000000">
+	 <link href="{MODULE_URL}/recouse/css/bottom.css?x={mihua_mall_VERSION}" rel="stylesheet" type="text/css" />
+	 <link href="{MODULE_URL}/recouse/css/xin_v3.s.min.css" rel="stylesheet" type="text/css" />
+    <script src="{MODULE_URL}/recouse/js/jquery.js"></script>
+</head>
+
+<body>
+ 
+    <!--table begin-->
+    <dl class="tabs tab-title2">
+
+		<dd class="active" id="brokeragetab"><a href="javascript:void(0)" onClick="brokeragelistshow(this)"><i class="icon-comdetail"></i>佣金明细</a></dd>
+        <dd id="extracttab"><a href="javascript:void(0)" onClick="extractlistshow(this)"><i class="icon-extract"></i>提现记录</a></dd>
+    </dl>
+    <!--table end-->
+    <!--content begin-->
+    <div class="tabs-content">
+          <!--content begin-->
+    <div class="tabs-content">
+        <!--commission begin-->
+        <div class="content active" id="brokeragelist">
+        	{if !empty($list)}
+              <ul class="list-disorder">
+              	  	<table class="table table-hover" style="width:100%">
+			<!--<thead class="navbar-inner" >
+				<tr>
+					<th >订单编号</th>
+					
+					<th >状态</th>
+					<th >下单时间</th>
+					<th >佣金</th>	
+					<th >级别</th>	
+					<th >昵称</th>	
+				</tr>
+			</thead>-->
+			<tbody>
+				{loop $list $item}
+			
+				<tr>
+					<td>{$item['level']}级订单:{$item['ordersn']}</td>
+						
+					
+
+					
+				
+					<td>{if !empty($item['commission'])}+{$item['commission']}元{else}--{/if}</td>
+				<!--<td>{$item['level']}</td>
+					<td>{$item['realname']}</td>-->
+				</tr>
+						<tr>
+					
+						
+					<td style="color:#999;">{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+
+					<td style="color:#999;">
+		{if $item['status1'] == 0}	<span class="label-info">{if $item['status'] == 0}待付款{/if}
+						{if $item['status'] == 1}待发货{/if}
+						{if $item['status'] == 2}待收货{/if}
+						{if $item['status'] == 3}已完成{/if}
+						{if $item['status'] == -1}已关闭{/if}</span>{/if}
+
+						{if $item['status1'] == 1}<span class=" label-info">审核中</span>{/if}
+						{if $item['status1'] == 2}<span class=" label-info">已提现</span>{/if}
+					
+				
+					
+				</tr>
+				
+				{/loop}
+			</tbody>
+			
+		</table>
+              </ul>
+              	{$pager}
+           {/if}
+           {if empty($list)}
+            <!--none begin-->
+            <div class="disorder-none"><i class="icon-none"></i><span class="nonetext">您还没有佣金！</span></div>
+            <!--none end-->
+           {/if}
+        </div>
+        <!--commission end-->
+        
+        <!--wait recevie begin-->
+        <div class="content" id="extractlist">
+        	
+        	
+        		{if !empty($list2)}
+              <ul class="list-disorder">
+              	  	<table class="table table-hover" style="width:100%">
+			<thead class="navbar-inner" >
+								<tr>
+									<th style="text-align: center;">日期</th>
+									<th style="text-align: center;">类型</th>
+									<th style="text-align: center;">金额</th>
+								
+									<th style="text-align: center;">说明</th>
+								</tr>
+									</thead>
+										<tbody>
+						{loop $list2 $v}
+									
+								<tr>
+									<td style="text-align: center;">
+										{$v['tid']}
+									</td>
+									<td style="text-align: center;">
+										打款
+										
+									</td>
+									<td style="text-align: center;">
+										{$v['fee']}	
+									</td>
+									<!--<td style="text-align:center;">
+										{$mtype[$v['module']]}
+									</td>-->
+									<td style="text-align: center;">
+										{$v['tag']}								
+									</td>
+								</tr>
+									
+								{/loop}
+											</tbody>
+	
+		
+		</table>
+              </ul>
+           {/if}
+        	
+                  {if empty($list2)}
+            <!--none begin-->
+            <div class="disorder-none"><i class="icon-none"></i><span class="nonetext">您还没有提现记录！</span></div>
+            <!--none end-->
+               {/if}
+        </div>
+        <!--wait recevie end-->
+    </div>
+	
+ {template 'wx_nav'}
+    <!--content begin-->
+    <script type="text/javascript">
+        $('a[name="list"]').click(function () {
+            //  alert(1)
+            $(this).parent().children("div").toggle();
+            $(this).parent().toggleClass("current");
+        })
+
+        $('div[name="listext"]').click(function () {
+            $(this).toggleClass("current");
+        })
+            
+        
+        function brokeragelistshow() {
+            $("#brokeragelist").show();
+            $("#extractlist").hide();
+            $("#brokeragetab").addClass("active");
+            $("#extracttab").removeClass("active");
+        }
+        function extractlistshow() {
+            $("#brokeragelist").hide();
+            $("#extractlist").show();
+            $("#extracttab").addClass("active");
+            $("#brokeragetab").removeClass("active");
+        }
+    </script>
+</body>
+</html>

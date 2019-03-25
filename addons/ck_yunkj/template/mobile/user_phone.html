@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+<meta name="format-detection" content="telephone=no">
+<title>修改手机号码 - {$cwgl_config['webtitle']}</title>
+
+<link href="{$templateurl}/css/css.css" rel="stylesheet" type="text/css">
+<link href="{$templateurl}/css/common.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="{$templateurl}/js/jquery.js"></script>
+<script>
+function phone_ckd(){					
+	var phone = document.p_register.phone.value;
+	var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/; 
+	if(!myreg.test(phone)){
+		alert("请输入有效的手机号码!");
+		document.p_register.phone.focus();
+		return false; 
+	} 
+}
+
+//获取手机验证码
+function get_mobile_code(pcode){
+	$.post('{$url_sms}', {mobile:jQuery.trim($('#mobile').val()),send_code:pcode}, function(msg) {
+		alert(jQuery.trim(unescape(msg)));
+		if(msg=='提交成功'){
+			RemainTime();
+		}
+	});
+};
+var iTime = 59;
+var Account;
+function RemainTime(){
+	document.getElementById('zphone').disabled = true;
+	var iSecond,sSecond="",sTime="";
+	if (iTime >= 0){
+		iSecond = parseInt(iTime%60);
+		iMinute = parseInt(iTime/60)
+		if (iSecond >= 0){
+			if(iMinute>0){
+				sSecond = iMinute + "分" + iSecond + "秒";
+			}else{
+				sSecond = iSecond + "秒";
+			}
+		}
+		sTime=sSecond;
+		if(iTime==0){
+			clearTimeout(Account);
+			sTime='获取验证码';
+			iTime = 59;
+			document.getElementById('zphone').disabled = false;
+		}else{
+			Account = setTimeout("RemainTime()",1000);
+			iTime=iTime-1;
+		}
+	}else{
+		sTime='没有倒计时';
+	}
+	document.getElementById('zphone').value = sTime;
+}
+</script>
+</head>
+<body >
+<div class="head">
+	<div class="content-top clearFix">
+    <a href="{php echo $this->createMobileUrl('user_index')}">
+	<em class="return"><</em>
+	<span class="fanhui">返回</span>
+	</a>
+   </div>
+</div>
+	
+<div id="content" >
+   
+   <div class="contbox">
+     <div class="titbox">
+	   <i class="toushu"></i>
+	   <span>修改手机号码</span>
+	 </div>
+	 <form name="p_register" action="{$urltk}" method="post" onSubmit="return phone_ckd();">
+     <input name="token" type="hidden" value="{$_W['token']}" />
+	 <div class="toushu-bd">
+		 <div style="padding:0px 2%;">
+		 <div class="reg-message">
+		  <i class="tel"></i>
+		  <input type="text" id="mobile" name="phone" value="" placeholder="请输入新手机号"  class="ipucss"/>
+		</div>
+		{if $cwgl_config['sms_open']}
+		<div class="reg-yzm clearFix">
+		  <em>短信验证码</em>
+		  <input type="txt" name="mobile_code" value="" class="inpyzm">
+		  <input id="zphone" type="button" value="获取验证码 " onClick="get_mobile_code({$_SESSION['send_code']});" class="yzm" style="border:0px;">
+		</div>
+		{/if}
+		 <input type="submit" name="save_submit" value="确认修改" class="submit" style="background:#EC3131;">
+		 </div>
+	 </div>
+	 </form>
+   </div>
+  
+</div>
+
+<!--footer star-->
+{template 'user_footer'}
+</body>
+</html>

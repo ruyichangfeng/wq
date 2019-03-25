@@ -1,0 +1,83 @@
+{template 'common/header'}
+<style>
+    body{
+        background-color: #f5fafe;
+    }
+    .mui-content {
+        background-color: #f5fafe;
+    }
+    .import {
+        margin-right: 55px;
+        margin-left: 55px;
+        margin-top: 50px;
+    }
+</style>
+<form class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">储值扣费</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mui-card" style="margin-top: 10%">
+            <div style="text-align: center;margin-top: 40px;">
+                <img src="{HLMMS_MOBILE_ICOS}Changecard.png"/>
+                <h3>储值扣费</h3>
+                <div class="import">
+                    <div class="mui-input-row m-b-xl">
+                        <input type="hidden" name="memberid" value="{$memberid}">
+                        <input type="text" name="deductionAmount" id="deductionAmount" placeholder="请输入金额">
+                    </div>
+                    <div class="mui-content" style="text-align: center;margin-top: 5%;background-color: white">
+                        <button type="button"  name="button_deductionStored" id="button_deductionStored" onclick="deductionStored()" class="mui-btn mui-btn-success"  style="width: 60%;height: 40px;margin-bottom: 10%">扣除</button>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    function deductionStored() {
+
+        var deductionAmount = $("#deductionAmount").val();//获取会员ID
+
+        var memberid = "{php echo $memberid}";
+        var url ="{php echo $this->createMobileUrl('member',array('op' => 'Ajaxmemberchargemoney'))}";
+        mui.ajax(url,{
+            data:{
+                deductionAmount:deductionAmount,
+                memberid:memberid
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+                if(data['message']['code'] == 0){
+                    mui.alert('储值扣费', '扣费成功', function() {
+                        var activeUrl = "{php echo $this->createMobileUrl('member',array('op' => 'indexoperating'))}&memberid="+memberid;
+                        mui.openWindow({
+                            url:activeUrl,
+                            waiting:{
+                                autoShow:true,//自动显示等待框，默认为true
+                                title:'正在加载...',//等待对话框上显示的提示内容
+                                options:{
+                                    width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                    height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                                }
+                            }
+                        });
+                    });
+
+                }
+                else if(data['message']['code'] == 1){
+                    mui.alert('余额不足');
+                }
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('连接失败');
+            }
+        });
+
+    }
+</script>

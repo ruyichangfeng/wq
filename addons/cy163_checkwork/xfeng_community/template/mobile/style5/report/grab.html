@@ -1,0 +1,147 @@
+{template 'style5/header'}
+<script type="text/javascript">
+    var myurl = "{php echo $this->createMobileUrl('imgupload')}";
+</script>
+<!--图片上传js-->
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/style5/static/css/comm.css">
+<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/global.js">
+</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/seajs-0.1.5.js">
+</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/newthread.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style5/static/js/jpegmeta.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style5/static/js/jpeg.encoder.basic.js">
+</script>
+<script type="text/javascript" charset="utf-8" src="{MODULE_URL}template/mobile/style5/static/js/image_compress.js">
+</script>
+
+<body class="max-width bg-f2">
+<div class="page">
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+        <h1 class="title txt-fff">建议详情</h1>
+    </header>
+    <div class="content">
+        <div class="card">
+            <div class="card-header">建议详情</div>
+            <div class="card-content">
+                <div class="card-content-inner">
+                    <p>姓名：{$item['realname']}</p>
+                    <p>电话：<a href="tel:{$item['mobile']}" style="color: red">{$item['mobile']}</a></p>
+                    <p>状态：<span class="label label-success">{if $item['status'] == 3}处理中{elseif $item['status'] == 1}已处理{elseif $item['status'] == 2}未处理{/if}</span></p>
+                    <p>内容：{$item['content']}</p>
+                    {if $imgs}
+                    <div class="card-content-inner"><a href="#" class="button button-fill button-danger pb-popup" style="width:40%">查看报修图片</a></div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="list-block ">
+            <form role="form" method="post" enctype="multipart/form-data" name="newthread" id="newthread" class="form-horizontal">
+                <ul style="margin-top: -30px;">
+                    <li class="item-content item-link">
+                        <div class="item-inner">
+                            <div class="item-media">状态：</div>
+                            <div class="item-input">
+                                <select id="status">
+                                    <option value="2" {if intval($item['status'])==2} selected{/if}>未处理</option>
+                                    <option value="3" {if intval($item['status'])==3} selected{/if}>处理中</option>
+                                    <option value="1" {if intval($item['status'])==1} selected{/if}>已处理</option>
+                                </select>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <textarea  placeholder="请输入处理结果" id="resolve" >{$item['resolve']}</textarea>
+                                <div class="textarea-counter">
+                                    <span>0</span>/200
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content">
+                        <div class="item-inner">
+                            <div class="tipLayer">
+                                <div class="photoList">
+                                    <ul style="padding-left: 0px">
+                                        <li class="on" id="addPic">
+                                            <input type="file" class="on needsclick" style="z-index:200;opacity:0;filter:alpha(opacity=0);-ms-filter:'alpha(opacity=0)';" id="uploadFile" accept="image/*" single>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                </ul>
+            </form>
+            <div class="content-block">
+                <a href="#" class="button button-big button-fill button-success" id="showToast">提交信息</a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $(function() {
+
+        $("#showToast").click(function(event) {
+            var status = $('#status option:selected').val();
+            var resolve = $('#resolve').val();
+            var id = "{$id}";
+            var picIds ='';
+            $('input[name="picIds[]"]').each(function(){
+                var t1 = $(this).val();
+                picIds += t1+',';
+            });
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('repair',array('op' => 'grab'))}",
+                dataType: 'json',
+                data: {
+                    status: status,
+                    resolve: resolve,
+                    id:id,
+                    picIds :picIds
+                },
+                success:function(s) {
+                    if (s.result == 1) {
+                        $.toast('处理成功');
+                        setTimeout(function() {
+                            window.location.href="{php echo $this->createMobileUrl('home')}";
+                        }, 30);
+                    }
+                }
+            })
+
+
+        });
+
+    })
+</script>
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="utf-8"></script>
+<script>
+    $(function(){
+        var imgArray = [];
+        var img  = {$images} || [];//
+        for(var o in img){
+            var itemSrc = img[o].src;
+            imgArray.push(itemSrc);
+        }
+        /*=== Popup ===*/
+        var myPhotoBrowserPopup = $.photoBrowser({
+            photos : imgArray,
+            type: 'popup'
+        });
+        $(document).on('click','.pb-popup',function () {
+            myPhotoBrowserPopup.open();
+        });
+
+
+    })
+</script>
+{template 'style5/footer'}

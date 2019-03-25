@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    {if $op == 'list' || $op == 'detail' || $op == 'add'}
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('center')}">会员列表</a>
+        <a class="layui-btn layui-btn-normal right ml10" href="{php echo $this->createWebUrl('center', array('op' => 'add'))}">添加会员</a>
+        <a class="layui-btn layui-btn-normal right ml10" href="{php echo $this->createWebUrl('center', array('op' => 'excel'))}">导出</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('center', array('op' => 'updateinfo'))}">同步会员粉丝信息</a>
+    </div>
+    {/if}
+    <script>
+    layui.use(['laydate', 'laypage', 'form', 'layer', 'table', 'carousel', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+    });
+    </script>
+
+    {if $op == 'list'}
+    <style>
+    .select-pane .layui-inline{
+        margin: 0;
+    }
+    </style>
+    <div class="layui-form-item">
+        <form action="" method="post" class="layui-form layui-form-pane select-pane">
+            <div class="layui-inline" style="margin-bottom: -10px;">
+                <div class="layui-inline">
+                    <label class="layui-form-label mb5">会员分组</label>
+                    <div class="layui-input-inline mb5 w120">
+                        <select name="groupid">
+                            <option value="all" {if $_GPC[ 'groupid']=="all" } selected {/if}>全部分组</option>
+                            {loop $group $g}
+                            <option value="{$g['id']}" {if $_GPC[ 'groupid']==$g[ 'id']} selected{/if}>{$g['title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label mb5">会员类别</label>
+                    <div class="layui-input-inline mb5 w120">
+                        <select name="isopenid">
+                            <option value="all" {if $_GPC[ 'isopenid']=="all" } selected {/if}>全部类别</option>
+                            <option value="1" {if $_GPC[ 'isopenid']=="1" } selected {/if}>微信会员</option>
+                            <option value="2" {if $_GPC[ 'isopenid']=="2" } selected {/if}>实体会员</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">会员卡号</label>
+                    <div class="layui-input-inline mb5 w150">
+                        <input type="text" name="hid" class="layui-input" value="{$_GPC['hid']}" placeholder="请输入实体卡号">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">会员名称</label>
+                    <div class="layui-input-inline mb5 w150">
+                        <input type="text" name="name" class="layui-input" value="{$_GPC['name']}" placeholder="请输入会员名称">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">手机号</label>
+                    <div class="layui-input-inline mb5 w150">
+                        <input type="text" name="mobile" class="layui-input" value="{$_GPC['mobile']}" placeholder="请输入手机号">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <div class="layui-input-inline mb5 w120">
+                        <button class="layui-btn">搜索</button>
+                    </div>
+                </div>
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="m" value="hy_supstore">
+                <input type="hidden" name="do" value="center" />
+                <input type="hidden" name="page" value="1">
+            </div>
+        </form>
+    </div>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>会员id</th>
+                <th>会员名称</th>
+                <th>会员类别</th>
+                <th>分组</th>
+                <th>门店</th>
+                <th>手机号</th>
+                <th>余额 </th>
+                <th>积分</th>
+                <th width="60">充值总额<span style="margin-right:5px;"><a href="{php echo $this->createWebUrl('center',array('sortcolumn'=>'credit2','sorttype'=>'asc'))}">↑</a></span><span><a href="{php echo $this->createWebUrl('center',array('sortcolumn'=>'credit2','sorttype'=>'desc'))}">↓</a></span></th>
+                <th width="60">消费总额<span style="margin-right:5px;"><a href="{php echo $this->createWebUrl('center',array('sortcolumn'=>'consum','sorttype'=>'asc'))}">↑</a></span><span><a href="{php echo $this->createWebUrl('center',array('sortcolumn'=>'consum','sorttype'=>'desc'))}">↓</a></span></th>
+                <th width="100">添加时间</th>
+                <th width="50">状态</th>
+                <th width="100">充值消费</th>
+                <th width="100">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop $list $item}
+            <tr>
+                <td class="w100 text-center">
+                    {$item['id']}
+                </td>
+                <td class="w160 text-center">
+                    <img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" width="38" height="38" style="border-radius:38px; margin-bottom:2px;">
+                    <br /><span class="w100 text-center">{if $item['name']}<green>{$item['name']}</green>{else}<red>未绑定</red>{/if}</span>
+                </td>
+                <td class="w160 text-center">
+                    {if $item['mobile']}<span class="layui-badge" style="background-color: #5B98F1;">手机号/APP</span>{/if}
+                    {if $item['openid']}<span class="layui-badge" style="background-color: #44b549;">微信</span>{/if}
+                    {if $item['wpopenid']}<span class="layui-badge" style="background-color: #605AB0;">小程序</span>{/if}
+                    {if $item['cardnumber']}<span class="layui-badge layui-bg-blue">实体卡</span>{/if}
+                </td>
+                <td class="w100 text-center">{$item['group']}</td>
+                <td class="w100 text-center">{$item['storename']}</td>
+                <td class="w100 text-center">{$item['mobile']}</td>
+                <td class="text-center"><span class="label label-primary">{if !empty($item['user']['credit2'])}{$item['user']['credit2']}{else}0.00{/if}元</span>
+                    <br>
+                </td>
+                <td class="text-center"><span class="label label-warning">{$item['user']['credit1']}</span></td>
+                <td class="text-center"><span class="w100 text-center">{$item['credit2']}元</span></td>
+                <td class="text-center"><span class="w100 text-center">{$item['consum']}元</span></td>
+                <td class="text-center">{php echo date('Y-m-d H:i:s', $item[createtime]);}</td>
+                <td class="text-center">{if $item['isstop']==1}
+                    <red>锁定</red>{else}
+                    <green>正常</green>{/if}</td>
+                <td class="text-center">
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'recharge','id'=>$item['id']))}','充值');" href="javascript:;">充值</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'consum','id'=>$item['id']))}','消费');" href="javascript:;">消费</a>
+                    <a class="layui-btn layui-btn-sm " onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'oncecardconsum','id'=>$item['id']))}','次卡消费');" href="javascript:;">次卡消费</a>
+                </td>
+                <td class="text-center">
+                    <a href="{php echo $this->createWebUrl('center', array('op' => 'detail','id' => $item['id']))}" class="layui-btn layui-btn-sm">查看详细</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'post','id'=>$item['id']))}','修改信息');" href="javascript:;">修改信息</a>
+                    <!--a href="{php echo $this->createWebUrl('center', array('op' => 'delete','id' => $item['id']))}" class="layui-btn layui-btn-sm layui-btn-danger item-action-delete">删除</a-->
+                </td>
+            </tr>
+            {/loop} {if empty($list)}
+            <tr>
+                <td colspan="14" style="text-align:center; line-height:50px; color:red; font-weight:bold;">暂无信息</td>
+            </tr>
+            {/if}
+        </tbody>
+    </table>
+    <div class="fenye">{$pager}</div>
+    <style>
+    .layui-table .layui-btn {
+        margin: 0 0 5px 0 !important;
+    }
+    </style>
+    <script>
+        $('.item-action-delete').click(function() {
+            var href = $(this).attr('href');
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+            return false;
+        })
+
+        function openview(url, title) {
+            layer.open({
+                type: 2,
+                title: title,
+                closeBtn: 1,
+                maxmin: true,
+                moveOut: true,
+                scrollbar: false,
+                shade: 0,
+                shadeClose: true, //点击遮罩关闭层
+                area: ['800px', '95%'],
+                content: url,
+                zIndex: layer.zIndex, //重点1
+                success: function(layero) {
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+        //关闭弹窗
+        function select_entrylayui(message, jumpUrl, index) {
+            //alert(message);
+            //layer.msg(message);
+            layer.close(index); //先关闭弹窗，在操作   
+            layer.msg(message, function() {
+                //关闭后的操作
+                if (jumpUrl) {
+                    window.location.href = jumpUrl;
+                } else {
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+    {elseif $op == 'detail'}
+    <style>
+    .list_edit_item.on{
+        width: 78px;
+        text-align: left;
+        padding-left: 11px;
+        position: relative;
+        background-color: #1E9FFF;
+        color: #fff;
+        border: none;
+    }
+    .list_edit_item.on::before{
+        content: " ";
+        position: absolute;
+        top: 5px;
+        right: 4px;
+        width: 20px;
+        height: 20px;
+        background-color: #fff;
+        border-radius: 50%;
+    }
+    .list_edit_item.close{
+        width: 78px;
+        text-align: right;
+        padding-right: 11px;
+        position: relative;
+        border: 1px solid #d2d2d2;
+        background-color: #fff;
+        color: #999;
+    }
+    .list_edit_item.close::before{
+        content: " ";
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 20px;
+        height: 20px;
+        background-color: #d2d2d2;
+        border-radius: 50%;
+    }
+    </style>
+    <fieldset class="layui-elem-field">
+        <legend>基本信息</legend>
+        <div class="layui-field-box">
+            <div class="center-detail-top">
+                <input type="hidden" name="memberId" value="{$item['id']}">
+                <input type="hidden" name="memberMobile" value="{$item['mobile']}">
+                <img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}">
+                <span>{$item['name']}</span>
+                {if $item['isstop']==1}
+                <span><a class="list_edit_item close layui-btn layui-btn-radius layui-btn-sm layui-btn-primary" data-lock="2" data-url="{php echo $this->createWebUrl('center', array('op' => 'deallock','id'=>$id))}" href="javascript:void(0);">已锁定</a></span> 
+                {else}
+                <span><a class="list_edit_item on layui-btn layui-btn-radius layui-btn-sm " data-lock="1" data-url="{php echo $this->createWebUrl('center', array('op' => 'deallock','id'=>$id))}" href="javascript:void(0);">正常</a></span> 
+                {/if}
+                <span class="red">添加时间:{php echo date('Y-m-d H:i:s', $item[createtime]);}</span>
+                <span class="red right">
+                    <a class="layui-btn layui-btn-sm"  onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'credit2','id'=>$item['id']))}','余额调整');" href="javascript:;">余额调整</a>
+                    <a class="layui-btn layui-btn-sm"  onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'credit1','id'=>$item['id']))}','积分调整');" href="javascript:;">积分调整</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'recharge','id'=>$item['id']))}','充值');" href="javascript:;">充值</a>   
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'consum','id'=>$item['id']))}','消费');" href="javascript:;">消费</a>
+                    <a class="layui-btn layui-btn-sm " onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'oncecardconsum','id'=>$item['id']))}','次卡消费');"  href="javascript:;" >次卡消费</a>
+                    <a class="layui-btn layui-btn-sm" onClick="javascript:openview('{php echo $this->createWebUrl('center',array('op'=>'post','id'=>$item['id']))}','修改信息');" href="javascript:;">修改信息</a>
+                </span>
+            </div>
+            <table class="layui-table">
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="background-color: #f2f2f2;">会员基础信息</td>
+                    </tr>
+                    <tr>
+                        <td width="100">会员类别</td>
+                        <td>
+                        {if $item['mobile']}<span class="layui-badge" style="background-color: #5B98F1;">手机号/APP</span>{/if}
+                        {if $item['openid']}<span class="layui-badge" style="background-color: #44b549;">微信</span>{/if}
+                        {if $item['wpopenid']}<span class="layui-badge" style="background-color: #605AB0;">小程序</span>{/if}
+                        {if $item['cardnumber']}<span class="layui-badge layui-bg-blue">实体卡</span>{/if}
+                        </td>
+                        <td width="100">分组</td>
+                        <td>{$item['gname']}</td>
+                    </tr>
+                    <tr>
+                        <td width="100">门店</td>
+                        <td>{$item['storename']}</td>
+                        <td width="100"></td>
+                        <td></td>
+                    </tr>
+                    <?php for($i=0;$i<$arrcount;$i++){ ?>
+                    <tr>
+                        <?php for($j=0;$j<2;$j++) { ?>
+                        <td>
+                            <?php echo $arr[($i*2)+$j]['name']; ?>
+                        </td>
+                        <td>
+                            <?php 
+                              $vallist = explode(",",$arr[($i*2)+$j]['value']);
+                              if (count($vallist)>1){
+                                foreach ($vallist as $k => $val2){ 
+                                    $arr1 = explode("=",$val2);
+                                    if  ($arr1[0]==$item[$arr[($i*2)+$j]['inputname']])
+                                    echo $arr1[1];
+                                }
+                              }
+                              else{
+                                echo $item[$arr[($i*2)+$j]['inputname']];
+                              } 
+                            ?>
+                        </td>
+                        <?php } ?>
+                    </tr>
+                    <?php } ?>
+                    <tr><td colspan="4" style="background-color: #f2f2f2;">会员财务信息</td></tr>
+                    <tr>
+                        <td width="100">余额</td>
+                        <td>{$item['user']['credit2']}元 </td>
+                        <td width="100">积分</td>
+                        <td>{$item['user']['credit1']}(赠送积分：{$item['credit1']}个)</td>
+                    </tr>
+                    <tr>
+                        <td width="100">充值总额</td>
+                        <td>充值金额：{$item['credit2']}元 , 赠送金额：{$item['credit3']}元</td>
+                        <td width="100">消费总额</td>
+                        <td>{$item['consum']}元</td>
+                    </tr>
+                    <tr><td colspan="4" style="background-color: #f2f2f2;">绑定信息</td></tr>
+                    <tr>
+                        <td width="100">手机</td>
+                        <td>{if $item['mobile']}{$item['mobile']}<span class="layui-badge" style="margin: 0 5px;background-color: #5FB878;">已绑定</span><div class="layui-btn layui-btn-xs" onclick="javascript:bindOriginalMobile();">修改手机号</div>{else}<div class="layui-btn layui-btn-xs" onclick="javascript:bindNewMobile();">绑定手机号</div>{/if}</td>
+                        <td width="100">微信</td>
+                        <td>{if $item['openid']}{$_W['account']['name']}公众号 <span class="layui-badge" style="margin: 0 5px;background-color: #5FB878;">已绑定</span>{else} <div class="layui-btn layui-btn-xs" onclick="javascript:bindWx();">绑定微信</div>&nbsp仅支持新用户转移{/if}</td>
+                    </tr>
+                    <tr>
+                        <td width="100">实体卡</td>
+                        <td>{if $item['cardnumber']}{$item['cardnumber']}<span class="layui-badge" style="margin: 0 5px;background-color: #5FB878;">已绑定</span> <div class="layui-btn layui-btn-xs" onclick="javascript:bindCardNumber();">添加卡号</div>{else} <div class="layui-btn layui-btn-xs" onclick="javascript:bindCardNumber();">绑定实体卡号</div>{/if}</td>
+                        <td width="100">小程序</td>
+                        <td>{if $item['wpopenid']}已关注微信小程序<span class="layui-badge" style="margin: 0 5px;background-color: #5FB878;">已绑定</span>{else} <div class="layui-btn layui-btn-xs" onclick="javascript:bindWxSmall();">绑定微信小程序</div>{/if}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>记录统计</legend>
+        <div class="layui-field-box">
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">充值记录</li>
+                    <li>消费记录</li>
+                    <li>积分记录</li>
+                    <li>优惠券</li>
+                    <li>次卡</li>
+                </ul>
+                <div class="layui-tab-content" style="margin-top:25px;">
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table">
+                            <thead>
+                                <tr>
+                                    <th>账单号</th>
+                                    <th>充值日期</th>
+                                    <th>门店</th>
+                                    <th>充值金额</th>
+                                    <th>赠送金额</th>
+                                    <th>赠送积分</th>
+                                    <th>优惠券</th>
+                                    <th>次卡</th>
+                                    <th>充值方式</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loop $rechargelist $item}
+                                <tr>
+                                    <td class="text-center">{$item['orderno']}</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+                                    <td class="text-center">{$item['storename']}</td>
+                                    <td class="text-center">
+                                        <green>+{$item['credit2']}元</green>
+                                    </td>
+                                    <td class="text-center">{if $item['credit3']==0}无{else}{$item['credit3']}元{/if}</td>
+                                    <td class="text-center">{if $item['credit1']==0}无{else}{$item['credit1']}个{/if}</td>
+                                    <td class="text-center">{$item['couponcount']}张</td>
+                                    <td class="text-center">{$item['oncecardcount']}张</td>
+                                    <td class="text-center">
+                                        {if $item['type']==1} {if $item['chaneltype']==1}现金 {elseif $item['chaneltype']==2}后台 {elseif $item['chaneltype']==3}支付宝 {elseif $item['chaneltype']==4}微信 {/if}充值 {elseif $item['type']==2} {if $item['chaneltype']==1}现金 {elseif $item['chaneltype']==2}余额 {elseif $item['chaneltype']==3}支付宝 {elseif $item['chaneltype']==4}微信 {/if}消费 {/if}
+                                    </td>
+                                    <td class="text-center">
+                                        {if $item['author']==1}管理员 {elseif $item['author']==2}店长 {elseif $item['author']==3}本人 {/if}
+                                    </td>
+                                </tr>
+                                {/loop} {if empty($rechargelist)}
+                                <tr>
+                                    <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <td colspan="10" class="fenye">{$rechargepager}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table">
+                            <thead>
+                                <tr>
+                                    <th>账单号</th>
+                                    <th>消费日期</th>
+                                    <th>门店</th>
+                                    <th>消费金额</th>
+                                    <th>赠送金额</th>
+                                    <th>赠送积分</th>
+                                    <th>消费方式</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loop $consumlist $item}
+                                <tr>
+                                    <td class="text-center">{$item['orderno']}</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+                                    <td class="text-center">{$item['storename']}</td>
+                                    <td class="text-center">
+                                        <red>-{$item['credit2']}元</red> {if $item['couponvalue']!=0}(优惠：{$item['couponvalue']}元){/if}</td>
+                                    <td class="text-center">{if $item['credit3']==0}无{else}{$item['credit3']}元{/if}</td>
+                                    <td class="text-center">{if $item['credit1']==0}无{else}{$item['credit1']}个{/if}</td>
+                                    <td class="text-center">
+                                        {if $item['chaneltype']==1}现金 {elseif $item['chaneltype']==2}余额 {elseif $item['chaneltype']==3}支付宝 {elseif $item['chaneltype']==4}微信 {/if}消费
+                                    </td>
+                                    <td class="text-center">
+                                        {if $item['author']==1}管理员 {elseif $item['author']==2}店长 {elseif $item['author']==3}本人 {/if}
+                                    </td>
+                                </tr>
+                                {/loop} {if empty($consumlist)}
+                                <tr>
+                                    <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <td colspan="10" class="fenye">{$consumpager}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table">
+                            <thead>
+                                <tr>
+                                    <th>积分数</th>
+                                    <th>时间</th>
+                                    <th>类型</th>
+                                    <th>操作</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loop $credit1list $item}
+                                <tr>
+                                    <td class="text-center">
+                                        <green>+{$item['credit1']}个</green>
+                                    </td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+                                    <td class="text-center">
+                                        {if $item['type']==1} {if $item['chaneltype']==1}现金 {elseif $item['chaneltype']==2}后台 {elseif $item['chaneltype']==3}支付宝 {elseif $item['chaneltype']==4}微信 {/if}充值 {elseif $item['type']==2} {if $item['chaneltype']==1}现金 {elseif $item['chaneltype']==2}余额 {elseif $item['chaneltype']==3}支付宝 {elseif $item['chaneltype']==4}微信 {/if}消费 {/if}赠送
+                                    </td>
+                                    <td class="text-center">{if $item['author']==1}管理员{elseif $item['author']==2}店长{elseif $item['author']==3}本人{/if}</td>
+                                    <td class="text-center">{$item['content']}</td>
+                                </tr>
+                                {/loop} {if empty($credit1list)}
+                                <tr>
+                                    <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <td colspan="10" class="fenye">{$credit1pager}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" width="500">
+                            <thead>
+                                <tr>
+                                    <th>优惠券名称</th>
+                                    <th>面值</th>
+                                    <th>启用值</th>
+                                    <th>单次使用张数</th>
+                                    <th>和其他券混用</th>
+                                    <th>获得时间</th>
+                                    <th>到期时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loop $couponlist $item}
+                                <tr>
+                                    <td class="text-center">{$item['title']}</td>
+                                    <td class="text-center">{$item['value']}元</td>
+                                    <td class="text-center">{$item['condition']}元</td>
+                                    <td class="text-center">{$item['single_max']}张</td>
+                                    <td class="text-center">{if $item['isdefanlt']==1}可以{else}否{/if}</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['addtime'])}</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['expirytime'])}</td>
+                                    <td class="text-center">{if $item['status']==1}<a class="layui-btn layui-btn-xs">可用</a>{elseif $item['status']==2}<a class="layui-btn layui-btn-sm layui-btn-disabled">已使用</a>{else}<a class="layui-btn layui-btn-sm layui-btn-disabled">过期</a>{/if}</td>
+                                </tr>
+                                {/loop} {if empty($couponlist)}
+                                <tr>
+                                    <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <td colspan="10" class="fenye">{$couponpager}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" width="500">
+                            <thead>
+                                <tr>
+                                    <th>次卡名称</th>
+                                    <th>总次数</th>
+                                    <th>剩余次数</th>
+                                    <th>已用次数</th>
+                                    <th>获得时间</th>
+                                    <th>到期时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loop $oncecardlist $item}
+                                <tr>
+                                    <td style="text-align:left;">
+                                        <div style="width:30px; float:left; text-align:center;"> &nbsp;{if $item['log']}<i class="layui-icon logshow" id="{$item['id']}">&#xe61f;</i>{/if}</div>
+                                        {$item['title']}
+                                    </td>
+                                    <td class="text-center">{if $item['number']==999999}无限制{else}{$item['number']}次{/if}</td>
+                                    <td class="text-center">{if $item['number']==999999}无限制{else}
+                                        <red>{$item['value']}次</red>{/if}</td>
+                                    <td class="text-center">{$item['amount']}次</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['addtime'])}</td>
+                                    <td class="text-center">{php echo date('Y-m-d H:i:s', $item['expirytime'])}</td>
+                                    <td class="text-center">{if $item['status']==1}<a class="layui-btn layui-btn-xs">可用</a>{elseif $item['status']==2}<a class="layui-btn layui-btn-sm layui-btn-disabled">已使用</a>{else}<a class="layui-btn layui-btn-sm layui-btn-disabled">过期</a>{/if}</td>
+                                </tr>
+                                {if $item['log']}
+                                <tr class="loghide " id="log{$item['id']}">
+                                    <td colspan="10">
+                                        <table class="layui-table" style=" margin-left:65px;width:calc(100% - 67px)">
+                                            <tbody>
+                                                {loop $item['log'] $vol}
+                                                <tr>
+                                                    <td>
+                                                        账单号：{$vol['orderno']} &nbsp; &nbsp; 门店：{$vol['storename']} &nbsp; &nbsp; 操作人：{if $vol['author']==1}管理员 {elseif $vol['author']==2}店长 {elseif $vol['author']==3}本人 {/if} &nbsp; &nbsp; 消费次数：{$vol['amount']}次 &nbsp; &nbsp; 消费日期：{php echo date('Y-m-d H:i:s',$vol['createtime'])} &nbsp; &nbsp; 备注：{$vol['content']}
+                                                    </td>
+                                                </tr>
+                                                {/loop}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                {/if} {/loop} {if empty($oncecardlist)}
+                                <tr>
+                                    <td colspan="10" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                                </tr>
+                                {/if}
+                                <tr>
+                                    <td colspan="10" class="fenye">{$oncecardpager}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <script>
+
+        var getUid = $('input[name="memberId"]').val();
+        var getMobile = $('input[name="memberMobile"]').val();
+
+        function openview(url, title) {
+            layer.open({
+                type: 2,
+                title: title,
+                closeBtn: 1,
+                maxmin: true,
+                moveOut: true,
+                scrollbar: false,
+                shadeClose: true, //点击遮罩关闭层
+                area: ['800px', '95%'],
+                content: url,
+            });
+        }
+        //关闭弹窗
+        function select_entrylayui(message, jumpUrl, index) {
+            // alert(message);
+            //layer.msg(message);
+            layer.close(index); //先关闭弹窗，在操作   
+            layer.msg(message, function() {
+                //关闭后的操作
+                if (jumpUrl) {
+                    window.location.href = jumpUrl;
+                } else {
+                    window.location.reload();
+                }
+            });
+        }
+        
+        //绑定状态
+        $('.list_edit_item').click(function() {
+            var url = $(this).attr('data-url');
+            var lock = $(this).attr('data-lock');
+            $.get(url, { lock: lock }, function(data) {
+                var result = JSON.parse(data);
+                layer.msg(result.msg);
+                if (result.code == 1) {
+                    $('.list_edit_item').text("正常");
+                    $('.list_edit_item').removeClass("close").addClass('on');
+                    $(".list_edit_item").attr("data-lock", 1);
+                } else {
+                    $('.list_edit_item').text("已锁定");
+                    $('.list_edit_item').removeClass("on").addClass('close');
+                    $(".list_edit_item").attr("data-lock", 2);
+                }
+            });
+        })
+        $('.loghide').hide();
+        $('.logshow').click(function() {
+            var id = $(this).attr('id');
+            var display = $('#log' + id).css("display");
+            if (display == 'none') {
+                $('#log' + id).show();
+            } else {
+                $('#log' + id).hide();
+            }
+        })
+
+        //页面多次调用避免函数覆盖
+        function select_entry(type,id, val, name, openid, mobile){
+            if(type == 'cardnumber'){
+                select_cardnumber(id,val);
+            }else if(type == 'openid'){
+                select_wx(id, val, name, openid, mobile);
+            }
+        }
+
+        //绑定卡号
+
+        //打开卡号列表
+        function bindCardNumber() {
+            var url = "{php echo $this->createWebUrl('querycard',array('funtype'=>'cardnumber'))}";
+
+            layer.open({
+                title: "卡号列表",
+                type: 2,
+                area: ['80%', '600px'],
+                closeBtn: 1,
+                anim: 1,
+                maxmin: false,
+                shadeClose: true,
+                content: url,
+                zIndex: layer.zIndex, //重点1
+                success: function(layero) {
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+
+        //选择一个卡号
+        function select_cardnumber(id, number) {
+            $.post('{php echo $this->createWebUrl("BindMemInfo", array("op" => "cardnumber"))}',{id:getUid,cardnumberid:id},function(data){
+                layer.closeAll();
+                if(data == true){
+                    layer.msg('绑定卡号成功', function(){
+                        location.reload();
+                    });
+                }else{
+                    layer.msg(data, function(){
+                        location.reload();
+                    });
+                }
+            });
+        }
+
+
+        //绑定微信
+
+        //打开微信会员列表
+        function bindWx() {
+            var url = "{php echo $this->createWebUrl('query',array('funtype'=>'openid','isopenid'=>1,'memberEmpty'=>'none'))}";
+
+            layer.open({
+                title: "微信会员列表",
+                type: 2,
+                area: ['80%', '600px'],
+                closeBtn: 1,
+                anim: 1,
+                maxmin: false,
+                shadeClose: true,
+                content: url,
+                zIndex: layer.zIndex, //重点1
+                success: function(layero) {
+                    layer.setTop(layero); //重点2
+                }
+            });
+        }
+
+        //选择一个微信会员
+        function select_wx(id, avatar, name, openid, mobile) {
+            layer.closeAll();
+
+            layer.open({
+                type: 1,
+                title: '微信身份验证',
+                closeBtn: 1,
+                area: '400px;',
+                shade: 0.8,
+                btn: ['确认', '返回'],
+                btnAlign: 'c',
+                moveType: 1,
+                content: '<div style="width:100%;padding: 20px 0; text-align:center;"><div class="layui-inline"><label class="layui-form-label" style="width:auto;display:inline-block;">微信验证码</label><div class="layui-input-inline"><input type="number" name="wxCode"  autocomplete="off" class="layui-input" style="width:auto; vertical-align: middle; margin-right: 5px;" placeholder="请输入6位验证码"><input type="text" class="layui-btn" style="width:130px;" id="get_wxCode" onclick="sendCheckVal(this,function(){ajaxWx('+id+')})" value="获取验证码"></div></div></div>',
+                yes: function(layero) {
+
+                    var val = $('input[name="wxCode"]').val();
+                    var reg = /^\d{6}$/;
+
+                    if (val.length == 6 && reg.test(val)) {
+                        if (val == getCookie('ims_hy_supstore_wxcode')) {
+                            layer.closeAll();
+                            //弹出转移数据弹框
+                            layer.confirm('确定转移微信账号数据到实体卡<br>(用户的消费充值记录也会转移)?', { icon: 3, title: '提示' }, function(index) {
+
+                                $.post('{php echo $this->createWebUrl("BindMemInfo", array("op" => "wx"))}',{id:getUid,wxid:id},function(data){
+                                    clearCookie('ims_hy_supstore_wxcode');
+                                    layer.closeAll();
+                                    if(data == true){
+                                        layer.msg('绑定微信会员成功', function(){
+                                            location.reload();
+                                        });
+                                    }else{
+                                        layer.msg(data, function(){
+                                            location.reload();
+                                        });
+                                    }
+                                });
+                                
+                            });
+                        } else {
+                            layer.msg('验证码不匹配', { 'zIndex': 100000000 });
+                        }
+                    } else {
+                        layer.msg('验证码请输入正确形式');
+                    }
+                }
+            });
+        }
+
+        //异步调用微信模板
+        function ajaxWx(id) {
+            $.post('{php echo $this->createWebUrl("wxmsgsend")}', { id: id }, function(data) {
+                data = JSON.parse(data);
+                if (!data.error) {
+                    layer.msg('模板消息发送成功', { 'zIndex': 100000000 });
+                    setCookie('ims_hy_supstore_wxcode',data.code,10 * 60);
+                } else {
+                    layer.msg(data.error, { 'zIndex': 100000000 });
+                }
+            })
+        }
+
+        //绑定原手机号
+        function bindOriginalMobile(){
+            //手机验证弹框
+            var str  = '';
+                str += '<div style="width:100%;padding: 20px 0; text-align:center;">';
+                    str += '<div class="layui-inline" style="padding-right: 110px; margin-bottom: 15px;">';
+                        str += '<label class="layui-form-label" style="width:auto;display:inline-block;">原手机</label>';
+                        str += '<div class="layui-input-inline">';
+                            str += '<div name="mobileNumber" class="layui-input" style="width:158px; vertical-align: middle; margin-right: 13px; text-align:left;">'+getMobile+'</div>';
+                        str +=  '</div>';
+                    str +=  '</div>';
+                    str += '<div class="layui-inline">';
+                        str += '<label class="layui-form-label" style="width:auto;display:inline-block;">验证码</label>';
+                        str += '<div class="layui-input-inline">';
+                            str += '<input type="number" name="mobileCode"  autocomplete="off" class="layui-input" style="width:auto; vertical-align: middle; margin-right: 5px;" placeholder="请输入6位验证码"><input type="button" class="layui-btn" style="width:120px;" id="get_mobileCode" onclick="checkMobile(this,1)" value="获取验证码">';
+                        str +=  '</div>';
+                    str +=  '</div>';
+                str += '</div>';
+
+            layer.open({
+                type: 1,
+                title: '原手机身份验证',
+                closeBtn: 1,
+                area: '400px;',
+                shade: 0.8,
+                btn: ['确认', '返回'],
+                btnAlign: 'c',
+                moveType: 1,
+                content: str,
+                yes: function(layero) {
+
+                    var val = $('input[name="mobileCode"]').val();
+                    var reg = /^\d{6}$/;
+
+                    if (val.length == 6 && reg.test(val)) {
+                        if (val == getCookie('ims_hy_supstore_mobilecode_original')) {
+                            layer.closeAll();
+                            
+                            bindNewMobile();
+                        } else {
+                            layer.msg('验证码不匹配', { 'zIndex': 100000000 });
+                        }
+                    } else {
+                        layer.msg('验证码请输入正确形式');
+                    }
+                }
+            });
+        }
+
+        //绑定新手机号
+        function bindNewMobile(){
+            //手机验证弹框
+            var str  = '';
+                str += '<div style="width:100%;padding: 20px 0; text-align:center;">';
+                    str += '<div class="layui-inline" style="padding-right: 129px; margin-bottom: 15px;">';
+                        str += '<label class="layui-form-label" style="width:auto;display:inline-block;">新手机</label>';
+                        str += '<div class="layui-input-inline">';
+                            str += '<input type="number" name="mobileNumber"  autocomplete="off" class="layui-input" style="width:auto; vertical-align: middle; margin-right: 5px;" placeholder="请输入手机号">';
+                        str +=  '</div>';
+                    str +=  '</div>';
+                    str += '<div class="layui-inline">';
+                        str += '<label class="layui-form-label" style="width:auto;display:inline-block;">验证码</label>';
+                        str += '<div class="layui-input-inline">';
+                            str += '<input type="number" name="mobileCode"  autocomplete="off" class="layui-input" style="width:auto; vertical-align: middle; margin-right: 13px;" placeholder="请输入6位验证码"><input type="button" class="layui-btn" style="width:120px;" id="get_mobileCode" onclick="checkMobile(this,2)" value="获取验证码">';
+                        str +=  '</div>';
+                    str +=  '</div>';
+                str += '</div>';
+
+            layer.open({
+                type: 1,
+                title: '新手机身份验证',
+                closeBtn: 1,
+                area: '400px;',
+                shade: 0.8,
+                btn: ['确认', '返回'],
+                btnAlign: 'c',
+                moveType: 1,
+                content: str,
+                yes: function(layero) {
+
+                    var val = $('input[name="mobileCode"]').val();
+                    var reg = /^\d{6}$/;
+
+                    if (val.length == 6 && reg.test(val)) {
+                        if (val == getCookie('ims_hy_supstore_mobilecode_new')) {
+                            
+                            var mobile = $('input[name=mobileNumber]').val();
+
+                            $.post('{php echo $this->createWebUrl("BindMemInfo", array("op" => "mobile"))}',{id:getUid,mobile:mobile},function(data){
+                                layer.closeAll();
+                                clearCookie('ims_hy_supstore_mobilecode_original');
+                                clearCookie('ims_hy_supstore_mobilecode_new');
+                                if(data == true){
+                                    layer.msg('绑定手机号成功', function(){
+                                        location.reload();
+                                    });
+                                }else{
+                                    layer.msg(data, function(){
+                                        location.reload();
+                                    });
+                                }
+                            });
+
+                        } else {
+                            layer.msg('验证码不匹配', { 'zIndex': 100000000 });
+                        }
+                    } else {
+                        layer.msg('验证码请输入正确形式');
+                    }
+                }
+            });
+        }
+
+        //验证手机
+        function checkMobile(dom,type){
+            var mobile = $('input[name=mobileNumber]').val();
+            if(type == 1) mobile = $('div[name=mobileNumber]').html();
+
+            if(/^1(3|4|5|7|8)\d{9}$/.test(mobile)){
+                sendCheckVal(dom,function(){ajaxMobile(mobile,type);});
+            }else{
+                layer.msg('请输入正确的手机号');
+            }
+        }
+
+        //验证码重新发送
+        var waitTime = 30,isGoSend = true;
+        function sendCheckVal(dom,callback) {
+            if (isGoSend == true) {
+                isGoSend = false;
+                time();
+                callback();//执行回调函数
+
+                function time() {
+                    if (waitTime == 0) {
+                        dom.value = "获取验证码";
+                        $(dom).removeClass("layui-btn-disabled").attr("disabled", false);
+                        waitTime = 30;
+                        isGoSend = true;
+                    } else {
+                        dom.value = "重新发送(" + waitTime + ")";
+                        $(dom).addClass("layui-btn-disabled").attr("disabled", "disabled");
+                        waitTime--;
+                        setTimeout(function() { time() },1000);
+                    }
+                }
+            }
+        }
+
+        //异步发送短信
+        function ajaxMobile(mobile,type){
+            $.post('{php echo $this->createWebUrl("smsset",array("op"=>"check"))}',{mobile:mobile},function(data){
+                data = JSON.parse(data);
+                if(data.success != 'error'){
+                    layer.msg(data.errmsg, { 'zIndex': 100000000 });
+                    if(type == 1){
+                        setCookie('ims_hy_supstore_mobilecode_original',data.success,10 * 60);
+                    }else if(type == 2){
+                        setCookie('ims_hy_supstore_mobilecode_new',data.success,10 * 60);
+                    }
+                }else{
+                    layer.msg(data.errmsg, { 'zIndex': 100000000 });
+                }
+            });
+        }
+
+        //绑定小程序
+        function bindWxSmall(){
+            layer.msg('请关注微信小程序');
+        }
+
+        //设置cookie
+        function setCookie(cname, cvalue, second) { 
+            var d = new Date();
+            d.setTime(d.getTime() + (second * 1000)); var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires; 
+        }
+        //获取cookie 
+        function getCookie(cname) { 
+            var name = cname + "="; 
+            var ca = document.cookie.split(';'); 
+            for (var i = 0; i < ca.length; i++) { 
+                var c = ca[i]; 
+                while (c.charAt(0) == ' ') c = c.substring(1); 
+                if (c.indexOf(name) != -1) return c.substring(name.length, c.length); 
+            } 
+            return ""; 
+        }
+        //清除cookie  
+        function clearCookie(name) { 
+            setCookie(name, "", -1); 
+        }
+
+    </script>
+    {elseif $op == 'post'}
+    <div style="margin:20px;">
+        <form id="form1" action="" method="post" class="layui-form layui-form-pane" enctype="multipart/form-data">
+         <input type="hidden" value="{$wxtoken}">
+            <input type="hidden" name="id" value="{$item['id']}" />
+            <div class="layui-form-item">
+                <label class="layui-form-label">头像</label>
+                <div class="layui-input-inline">
+                    <div class="layui-upload">
+                        <button type="button" class="layui-btn" id="test1">修改头像</button>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">格式：200*200 大小：50KB</div>
+                    <div class="layui-upload-list">
+                        <img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style="width:200px; height:200px;" class="layui-upload-img" id="demo1">
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="avatar" id="avatar" value="{$item['avatar']}" />
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员名称</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <input name="name" id="name" class="layui-input" autocomplete="off" value="{$item['name']}">
+                </div>
+            </div>
+            <script>
+            // 参数，最大高度 
+            var MAX_WIDTH = 400;
+            var MAX_HEIGHT = 300;
+            var nkeusi = 0;
+            // 渲染 
+            function render(src) {
+                // 创建一个 Image 对象 
+                var image = new Image();
+                // 绑定 load 事件处理器，加载完成后执行 
+                image.onload = function() {
+                    // 获取 canvas DOM 对象 
+                    var canvas = document.getElementById("myCanvas");
+                    // 如果高度超标 
+                    if (image.height > MAX_HEIGHT) {
+                        // 宽度等比例缩放 *= 
+                        image.width *= MAX_HEIGHT / image.height;
+                        image.height = MAX_HEIGHT;
+                    }
+                    // 如果宽度超标 
+                    if (image.width > MAX_WIDTH) {
+                        // 高度等比例缩放 *= 
+                        image.height *= MAX_WIDTH / image.width;
+                        image.width = MAX_WIDTH;
+                    }
+                    // 获取 canvas的 2d 环境对象,  
+                    var ctx = canvas.getContext("2d");
+                    // canvas清屏 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    // 重置canvas宽高 
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    // 将图像绘制到canvas上
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    // !!! 注意，image 没有加入到 dom之中 
+                };
+                // 设置src属性，浏览器会自动加载。 
+                // 记住必须先绑定事件，才能设置src属性，否则会出同步问题。 
+                image.src = src;
+            };
+            // 加载 图像文件(url路径) 
+            function loadImage(src) {
+                // 过滤掉 非 image 类型的文件 
+                if (!src.type.match(/image.*/)) {
+                    if (window.console) {
+                        window.confirm("选择的文件类型不是图片");
+                    } else {
+                        window.confirm("只能选择图片文件");
+                    }
+                    return;
+                }
+                // 创建 FileReader 对象 并调用 render 函数来完成渲染. 
+                var reader = new FileReader();
+                // 绑定load事件自动回调函数 
+                reader.onload = function(e) {
+                    // 调用前面的 render 函数 
+                    render(e.target.result);
+                };
+                // 读取文件内容 
+                reader.readAsDataURL(src);
+                nkeusi = 1;
+            };
+            // 上传图片，jQuery版 
+            function sendImage() {
+                if (nkeusi == 1) {
+                    $("#btnsend").attr("disabled", true); //按钮禁止点击
+                    // 获取 canvas DOM 对象 
+                    var canvas = document.getElementById("myCanvas");
+                    // 获取Base64编码后的图像数据，格式是字符串 
+                    // "data:image/png;base64,"开头,需要在客户端或者服务器端将其去掉，后面的部分可以直接写入文件。 
+                    var base64Img = canvas.toDataURL("image/png");
+                    var url = "{php echo $this->createWebUrl('face', array('op' => 'uploadimage'))}";
+                    $.post(url, { base64Img: base64Img }, function(data) {
+                        var result = JSON.parse(data);
+                        if (result.code == 1) {
+                            //成功了，返回信息
+                            $('#imageurl').val(result.url);
+                        }
+                        layer.msg(result.message);
+                    });
+                } else {
+                    layer.msg('请先选择图片');
+                }
+
+            };
+
+            function init() {
+                // 获取DOM元素对象 
+                var target = document.getElementById("drop-target");
+                // 阻止 dragover(拖到DOM元素上方) 事件传递 
+                target.addEventListener("dragover", function(e) { e.preventDefault(); }, true);
+                // 拖动并放开鼠标的事件 
+                target.addEventListener("drop", function(e) {
+                    // 阻止默认事件，以及事件传播 
+                    e.preventDefault();
+                    // 调用前面的加载图像 函数，参数为dataTransfer对象的第一个文件 
+                    loadImage(e.dataTransfer.files[0]);
+                }, true);
+
+                var btnsend = document.getElementById("btnsend");
+                btnsend.addEventListener("click", function(e) {
+                    sendImage();
+                }, true);
+            };
+            window.addEventListener("DOMContentLoaded", function() {
+                init();
+            }, false);
+            </script>
+            <div class="layui-form-item">
+                <label class="layui-form-label">人脸识别</label>
+                <div class="layui-input-inline" style="width:auto !important">
+                    {if $item['face_id']==''}
+                    <div id="drop-target" style="width:200px;line-height:38px;background:#eee;cursor:pointer; float:left;">拖动图片文件到这里...</div>
+                    <button type="button" class="layui-btn demoMore" id="btnsend">确认上传</button>
+                    {/if}
+                    <p style="color:red">格式：jpg/png， 图片大小：400*300，本接口只能上传一次</p>
+                    <input type="hidden" name="imageurl" id="imageurl" value="{$item['imageurl']}">
+                    <div class="layui-upload-list">
+                        <canvas id="myCanvas" width="0" height="0" style=" float:left;"></canvas>
+                        <img src="{$item['imageurl']}">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所属分组</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="groupid" class="layui-input layui-unselect">
+                        <option value="" {if empty($item[ 'groupid'])} selected{/if}>未分组</option>
+                        {loop $group $g}
+                        <option value="{$g['id']}" {if $item[ 'groupid']==$g[ 'id']} selected{/if}>{$g['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所属店面</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" class="layui-input layui-unselect">
+                        <option value="" {if empty($item[ 'storeid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $item[ 'storeid']==$store[ 'id']} selected{/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            {loop $arr $key $val1} {if $val1['type']=='text'}
+            <div class="layui-form-item" id="{$key}str">
+                <label class="layui-form-label">{$val1['name']}</label>
+                <div class="layui-input-inline" style="min-width:300px;">
+                    <input type="text" name="{$val1['inputname']}" id="{$val1['inputname']}" value="{$item[$val1['inputname']]}" class="layui-input">
+                </div>
+            </div>
+            {/if} {if $val1['type']=="radio"}
+            <div class="layui-form-item" pane style=" float:left; min-width:407px;" id="{$key}str">
+                <label class="layui-form-label">{$val1['name']}</label>
+                <div class="layui-input-block">
+                    <?php
+                        $vallist = explode(",",$val1['value']);
+                        foreach ($vallist as $k => $val2){ 
+                          $arr = explode("=",$val2);
+                    ?>
+                        <input type="radio" name="{$val1['inputname']}" id="{$val1['inputname']}" value="{$arr[0]}" {if trim($item[$val1[ 'inputname']])==trim($arr[0]) }checked{/if} title="{$arr[1]}">
+                        <?php}?>
+                </div>
+            </div>
+            {/if} {if $val1['type']=="checkbox"}
+            <div class="layui-form-item" pane style=" float:left; min-width:407px;" id="{$key}str">
+                <label class="layui-form-label">{$val1['name']}</label>
+                <div class="layui-input-block">
+                    <?php 
+                        $vallist = explode(",",$val1['value']);
+                        foreach ($vallist as $k => $val2){ 
+                            $arr = explode("=",$val2);
+                            $ckboxval=explode(",",$item[$val1['inputname']]);
+                            foreach($ckboxval as $key1=>$value){
+                                $ckboxval[$key1] = trim($value);
+                            }
+                    ?>
+                    <input type="checkbox" name="{$val1['inputname']}[]" id="{$val1['inputname']}" value="{$arr[0]}" lay-skin="primary" title="{$arr[1]}" {if in_array(trim($arr[0]),$ckboxval) }checked="checked" {/if}>
+                    <?php } ?>
+                </div>
+            </div>
+            {/if} {if $val1['type']=="select"}
+            <div class="layui-form-item" id="{$key}str">
+                <label class="layui-form-label">{$val1['name']}</label>
+                <div class="layui-input-inline" style="min-width:300px;">
+                    <select name="{$val1['inputname']}" id="{$val1['inputname']}">
+                        <?php 
+                            $vallist = explode(",",$val1['value']);
+                            foreach ($vallist as $k => $val2){
+                            $arr = explode("=",$val2);
+                        ?>
+                        <option value="{$arr[0]}" {if trim($item[$val1[ 'inputname']])==trim($arr[0]) }selected{/if}>{$arr[1]}</option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+            {/if} {if $val1['type']=="textarea"}
+            <div class="layui-form-item layui-form-text" style="width: 600px;" id="{$key}str">
+                <label class="layui-form-label">{$val1['name']}</label>
+                <div class="layui-input-block">
+                    <textarea name="{$val1['inputname']}" id="{$val1['inputname']}" class="layui-textarea">{$item[$val1['inputname']]}</textarea>
+                </div>
+            </div>
+            {/if} {/loop}
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block" style="width:150px; border: 1px solid #e6e6e6;">
+                    <input type="checkbox" name="isstop" lay-skin="primary" title="会员锁定" value="1" {if $item[ 'isstop']==1 }checked="checked" {/if}>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit name="submit" lay-filter="formDemo" value="提交">保存</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    <script>
+    layui.use(['form', 'layer', 'table', 'upload', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            upload = layui.upload,
+            layer = layui.layer,
+            element = layui.element,
+            laydate = layui.laydate;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1',
+            url: './index.php?c=utility&a=file&do=upload',
+            size: 50 //限制文件大小，单位 KB
+                ,
+            done: function(res) {
+                $('#demo1').attr('src', res.url);
+                $('#avatar').val(res.url);
+            }
+        });
+
+        if($('input[name="birthday"]')){
+            laydate.render({
+                elem: 'input[name="birthday"]',
+                min: '<?php echo date("Y-m-d",strtotime("-100 year"))?>',
+                max: '<?php echo date("Y-m-d",strtotime("-10 year"))?>',
+                value: '<?php echo date("Y-m-d",strtotime("-25 year"))?>',
+            });
+
+            $('input[name="birthday"]').attr("readOnly","true");
+        }
+
+        //监听提交
+        form.on('submit(formDemo)', function(data) {
+            if (data.field.name == "") {
+                layer.msg('必须输入会员名称');
+                return false;
+            }
+            $('#form1').submit();
+        });
+    });
+
+    $val1 = "{$item['type']}";
+    if ($val1 == "select" || $val1 == "radio" || $val1 == "checkbox") {
+        $('#backvalue').show();
+    }
+    $("#type").change(function() {
+        $val = $("#type").find("option:selected").val();
+        $('#backvalue').hide();
+        if ($val == "select" || $val == "radio" || $val == "checkbox") {
+            $('#backvalue').show();
+        }
+    });
+
+    function delcolumn(id) {
+        $(id).remove();
+    }
+    </script>
+    {elseif $op == 'add'}
+    <fieldset class="layui-elem-field">
+        <legend>批量生成会员</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('center', array('op'=>'add','type'=>'batch'))}" method="post" id="formBatch" class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 注意事项： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip red">
+                        每个会员有一个固定卡号 卡号按一定规则自动匹配
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 剩余卡号： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip blue">
+                        {$count}个
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">生成数量</label>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="number" class="layui-input" value="1" id="memnum" name="memnum" step="1" lay-verify="require|number" maxlength="2">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">必填项 1-10人</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit name="submit" lay-filter="formDemo" value="提交">立即生成</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </form>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>设计生成会员</legend>
+        <div class="layui-field-box">
+            <form action="{php echo $this->createWebUrl('center', array('op'=>'add','type'=>'design'))}" method="post" id="formDesign" class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 注意事项： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip red">
+                        每次只能生成一名会员
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"> 剩余卡号： </label>
+                    <div class="layui-form-mid layui-word-aux oncecardtip blue">
+                        {$count}个
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">卡号</label>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="text" class="layui-input" value="" name="cardnumber" maxlength="6" minlength="10" lay-verify="require|number" placeholder="请选择卡号" onclick="javascript:storemanag();">
+                        <input type="hidden" name="cardnumberId" value="">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">点击输入框选择</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit name="submit" lay-filter="formDemo" value="提交">立即生成</button>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    //打开卡号列表
+    function storemanag() {
+        var url = "{php echo $this->createWebUrl('querycard')}";
+
+        layer.open({
+            title: "卡号列表",
+            type: 2,
+            area: ['70%', '90%'],
+            offset: '20px',
+            closeBtn: 1,
+            anim: 1,
+            maxmin: false,
+            shadeClose: true,
+            content: url,
+            zIndex: layer.zIndex, //重点1
+            success: function(layero) {
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
+    //选择一个卡号
+    function select_entry(id, number) {
+        $('input[name=cardnumber]').attr('value', number).val(number);
+        $('input[name=cardnumberId]').attr('value', id);
+        layer.closeAll();
+    }
+    </script>
+    {elseif $op=="credit2"}
+    <div style="margin:20px;">
+        <form action="{php echo $this->createWebUrl('center', array('op'=>'credit2'))}" method="post" id="form2" class="layui-form layui-form-pane">
+            <input type="hidden" name="id" value="{$row['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员</label>
+                <div class="layui-input-inline layui-input" style="width:300px;">
+                    {$row['name']} ({$row['mobile']})
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">余额</label>
+                <div class="layui-input-inline layui-input" style="width:300px;color:#FF0000;">
+                    {$row['credit2']}元
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择门店</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" id="storeid" class="layui-input layui-unselect" lay-filter="filter">
+                        <option value="" {if empty($item[ 'groupid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $_GPC[ 'storeid']==$store[ 'id']} selected {/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">金额</label>
+                <div class="layui-input-inline" style="width:100px; margin:0; border-right:0;">
+                    <input type="number" id="amount" class="layui-input" placeholder="" name="amount" step="0.01">
+                </div>
+                <label class="layui-form-label" style=" width:auto; border-left:0;">元 (如果是减余额，请输入负数)</label>
+            </div>
+            <div class="layui-form-item layui-form-text" style="width: 600px;">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="content" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div style="color:#FF0000; margin-bottom:10px;">备注:此功能仅限调账使用，不触发任何规则</div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="立即提交">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    {elseif $op=="credit1"}
+    <div style="margin:20px;">
+        <form action="{php echo $this->createWebUrl('center', array('op'=>'credit1'))}" method="post" id="form2" class="layui-form layui-form-pane">
+            <input type="hidden" name="id" value="{$row['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员</label>
+                <div class="layui-input-inline layui-input" style="width:300px;">
+                    {$row['name']} ({$row['mobile']})
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">积分</label>
+                <div class="layui-input-inline layui-input" style="width:300px;color:#FF0000;">
+                    {$row['credit1']}个
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择门店</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" id="storeid" class="layui-input layui-unselect" lay-filter="filter">
+                        <option value="" {if empty($item[ 'groupid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $_GPC[ 'storeid']==$store[ 'id']} selected {/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">积分</label>
+                <div class="layui-input-inline" style="width:100px; margin:0; border-right:0;">
+                    <input type="number" id="amount" class="layui-input" placeholder="" name="amount" step="0.01">
+                </div>
+                <label class="layui-form-label" style=" width:auto; border-left:0;">元 (如果是减积分，请输入负数)</label>
+            </div>
+            <div class="layui-form-item layui-form-text" style="width: 600px;">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="content" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div style="color:#FF0000; margin-bottom:10px;">备注:此功能仅限调账使用，不触发任何规则</div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="立即提交">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    {elseif $op=="recharge"}
+    <style>
+    .layui-form-pane .layui-form-radio{
+        padding: 0!important;
+        margin: 0!important;;
+    }
+    </style>
+    <div style="margin:20px;">
+        <form action="{php echo $this->createWebUrl('center', array('op'=>'recharge'))}" method="post" id="formRechargeMod" lay-filter="formRechargeMod" class="layui-form layui-form-pane">
+            <input type="hidden" name="id" value="{$row['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员</label>
+                <div class="layui-input-inline layui-input" style="width:300px;">
+                    {$row['name']} {if $row['mobile']}{$row['mobile']}{/if}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">余额</label>
+                <div class="layui-input-inline layui-input" style="width:300px;color:#FF0000;">
+                    {$row['credit2']}元
+                </div>
+            </div>
+            <div class="layui-form-item" style="margin-bottom: 0;">
+                <label class="layui-form-label">选择门店</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" id="storeid" class="layui-input layui-unselect" required lay-verify="required" lay-filter="filter">
+                        <option value="" {if empty($item[ 'groupid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $_GPC[ 'storeid']==$store[ 'id']} selected {/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-mid layui-word-aux" style="margin-left: 110px;width: 100%;">注:规则选中之后才会激活,根据金额判定是否激活规则。<br>
+                如果激活自动匹配,当没有选中或选中规则无法匹配,则会自动匹配符合条件的规则。</div>
+                <div class="layui-input-block">
+                    {loop $rulelist $key $item}
+                    <div class="layui-block">
+                        <input name="ruleid" type="radio" value="{$item['id']}" data-val="{$item['credit2']}" lay-filter="switchRules">
+                        <div class="layui-inline" style="display: inline;">
+                        充值{$item['credit2']}元
+                        {if $item['iscredit']==1}(充值无效){/if}
+                        {if $item['credit3']!=0}
+                            &nbsp;送{$item['credit3']}元
+                        {/if}
+                        {if $item['credit1']!=0}
+                            &nbsp;送{$item['credit1']}积分
+                        {/if}
+                        {loop $item['couponlist'] $rules}
+                            &nbsp;送{$rules['title']}(优惠券){$rules['couponnum']}张
+                        {/loop}
+                        {if $item['iscredit']==1}
+                            {loop $item['oncecardlist'] $rules}
+                                &nbsp;买{$rules['title']}{$rules['oncecardnum']}张
+                            {/loop}
+                        {else}
+                            {loop $item['oncecardlist'] $rules}
+                                &nbsp;送{$rules['title']}(次卡){$rules['oncecardnum']}张
+                            {/loop}
+                        {/if}
+                        </div>
+                    </div>
+                    {/loop}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">自动匹配规则</label>
+                <div class="layui-input-block" style="border: 1px #e6e6e6 solid;width: 130px;line-height: 36px;padding-left: 10px;">
+                    <input type="radio" name="automatch" value="1" title="开启" checked>
+                    <input type="radio" name="automatch" value="2" title="关闭">
+                </div>
+            </div>            
+            <div class="layui-form-item">
+                <label class="layui-form-label">充值金额</label>
+                <div class="layui-input-block">
+                    <input name="amount" id="amount" required lay-verify="required" type="number" class="layui-input" value="" step="0.01" style="width:100px;">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text" style="width: 600px;">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="content" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="立即提交">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    <script>
+    layui.use(['form','layer','element'], function() {
+        var form = layui.form,
+            layer = layui.layer;
+        //切换店铺
+        form.on('select(filter)', function(data) {
+            var storeid = data.value;
+            var id = "{$id}";
+            window.location.href = "{php echo $this->createWebUrl('center',array('op'=>'recharge'))}&id=" + id + "&storeid=" + storeid;
+        });
+        //点击规则自动添加金额
+        form.on('radio(switchRules)', function(data) {
+            $("#amount").val(parseFloat(data.elem.dataset.val));
+        });
+        form.on('submit(formDemo)', function(data) {
+            //如果选择规则 金额必须大于规则限制的金额
+            var credit2 = $('input[name="ruleid"]:checked').attr('data-val');
+            var amount = $("#amount").val();
+            if(credit2){
+                var diff = parseFloat(amount) - parseFloat(credit2);
+                if(diff < 0){
+                    layer.msg('规则必须金额大于等于规则金额时才能生效');
+                    return false;
+                }
+            }
+
+            $('#formRechargeMod').submit();
+        });
+    });
+    </script>
+    {elseif $op=="consum"}
+    <style>
+    .layui-form-pane .layui-form-radio{
+        padding: 0!important;
+        margin: 0!important;;
+    }
+    </style>
+    <div style="margin:20px;">
+        <form class="layui-form layui-form-pane" action="{php echo $this->createWebUrl('center', array('op'=>'consum'))}" method="post" id="formConsumMod">
+            <input type="hidden" name="id" value="{$row['id']}" />
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员</label>
+                <div class="layui-input-inline layui-input" style="width:300px;">
+                    {$row['name']} {if $row['mobile']}{$row['mobile']}{/if}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">余额</label>
+                <div class="layui-input-inline layui-input" style="width:300px;color:#FF0000;">
+                    {$row['credit2']}元
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择门店</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" class="layui-input layui-unselect" lay-filter="filter">
+                        <option value="" {if empty($item['storeid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $store['id'] == $storeid}selected{/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-mid layui-word-aux" style="margin-left: 110px;width: 100%;">注:规则选中之后才会激活,根据金额判定是否激活规则。<br>如果激活自动匹配,当没有选中或选中规则无法匹配,则会自动匹配符合条件的规则。</div>
+                <div class="layui-input-block rules">
+                    {loop $rulelist $key $item}
+                    <div class="layui-block">
+                        <input name="rulelistsid" type="radio" value="{$item['id']}" data-val="{$item['credit2']}" lay-filter="switchRules">
+                        <div class="layui-inline" style="display: inline;">
+                        消费{$item['credit2']}元
+                        {if $item['credit3']!=0}
+                            &nbsp;送{$item['credit3']}元
+                        {/if}
+                        {if $item['credit1']!=0}
+                            &nbsp;送{$item['credit1']}积分
+                        {/if}
+                        {loop $item['couponlist'] $rules}
+                            &nbsp;送{$rules['title']}(优惠券){$rules['couponnum']}张
+                        {/loop}
+                        {if $item['iscredit']==1}
+                            {loop $item['oncecardlist'] $rules}
+                                &nbsp;买{$rules['title']}{$rules['oncecardnum']}张
+                            {/loop}
+                        {else}
+                            {loop $item['oncecardlist'] $rules}
+                                &nbsp;送{$rules['title']}(次卡){$rules['oncecardnum']}张
+                            {/loop}
+                        {/if}
+                        </div>
+                    </div>
+                    {/loop}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">自动匹配规则</label>
+                <div class="layui-input-block" style="border: 1px #e6e6e6 solid;width: 180px;line-height: 36px;padding-left: 10px;">
+                    <input type="radio" name="automatch" value="1" title="开启" checked>
+                    <input type="radio" name="automatch" value="2" title="关闭">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">消费类型</label>
+                <div class="layui-input-block" style="border: 1px #e6e6e6 solid;width: 180px;line-height: 36px;padding-left: 10px;">
+                    <input type="radio" value="1" name="chaneltype" checked title="现金" />
+                    <input type="radio" value="2" name="chaneltype" title="余额" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">消费金额</label>
+                <div class="layui-input-inline" style="width:100px; margin:0; border-right:0;">
+                    <input type="number" name="amount" id="amountInput" class="layui-input" required lay-verify="required" placeholder="" step="0.01">
+                </div>
+                <label class="layui-form-label" style=" width:auto; border-left:0;">元</label>
+                <label class="layui-form-label" id="amountReal" style="width:auto; border-left:0;background-color: #fff;">实际收取金额&nbsp;<span class="num" style="color: red;">0</span>&nbsp;元  减免&nbsp;<span class="coupon" style="color: red;">0</span>&nbsp;元</label>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">优惠券</label>
+                <div class="layui-input-inline" style="width:380px">
+                    <select name="couponid" lay-filter="coupon" id="couponSelect">
+                        <option value="">选择优惠券</option>
+                        {loop $couponlist $item}
+                        <option value="{$item['id']}" data-value="{$item['value']}" data-condition="{$item['condition']}">{$item['title']} 面值{$item['value']}元 启用金额{$item['condition']}元【到期：{php echo date('Y-m-d', $item['expirytime'])}】</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text" style="width: 600px;">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="content" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">提交</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    <script>
+    layui.use(['form','layer','element'], function() {
+        var form = layui.form,
+            layer = layui.layer;
+        //切换店铺
+        form.on('select(filter)', function(data) {
+            var storeid = data.value;
+            var id = "{$id}";
+            window.location.href = "{php echo $this->createWebUrl('center',array('op'=>'consum'))}&id=" + id + "&storeid=" + storeid;
+        });
+        //切换优惠券
+        form.on('select(coupon)', function(data) {
+            var value = $(data.elem).find("option:selected").attr("data-value");//面值
+            var condition = $(data.elem).find("option:selected").attr("data-condition");//启用金额
+            var amountInput = $('#amountInput').val();
+            amountInput = amountInput?amountInput:0;
+            value = Number(value);
+            condition = Number(condition);
+            amountInput = Number(amountInput);
+
+            if(amountInput < condition){
+                layer.msg('消费金额必须大于优惠券启用金额才能匹配');
+                $('#couponSelect').val('');
+                form.render('select'); //更新表单状态
+                $('#amountReal span.num').html(amountInput);
+                $('#amountReal span.coupon').html('0');
+            }else{
+                //点击优惠券存值
+                $('#amountReal span.num').html(amountInput-value);
+                $('#amountReal span.coupon').html(value);
+            }
+        });
+        //点击规则自动添加金额
+        form.on('radio(switchRules)', function(data) {
+            var val = parseFloat(data.elem.dataset.val);
+            //自动赋值
+            $("#amountInput").val(val);
+            $('#amountReal span.num').html(val);
+            $('#amountReal span.coupon').html('0');
+            //优惠券清空
+            $('#couponSelect').val('');
+            form.render('select'); //更新表单状态
+        });
+        //监听金额输入框
+        $('#amountInput').bind('input propertychange', function() {
+            var val = $(this).val();
+            val = val?val:0;
+            $('#amountReal span.num').html(val);
+            
+            //每次输入清空优惠券
+            $('#couponSelect').val('');
+            form.render('select'); //更新表单状态
+            $('#amountReal span.coupon').html('0');
+        });
+
+        form.on('submit(formDemo)', function(data) {
+            //如果选择规则 金额必须大于规则限制的金额
+            var credit2 = $('input[name="ruleid"]:checked').attr('data-val');
+            var amount = $("#amountInput").val();
+            if(credit2){
+                var diff = parseFloat(amount) - parseFloat(credit2);
+                if(diff < 0){
+                    layer.msg('规则必须金额大于等于规则金额时才能生效');
+                    return false;
+                }
+            }
+
+            $('#formConsumMod').submit();
+        });
+    });
+    </script>
+    {elseif $op=="oncecardconsum"}
+    <div style="margin:20px;">
+        <form class="layui-form layui-form-pane" action="{php echo $this->createWebUrl('center', array('op'=>'oncecardconsum'))}" method="post" id="formOncard">
+            <input type="hidden" name="id" value="{$row['id']}" />
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员</label>
+                <div class="layui-input-inline layui-input" style="width:300px;">
+                    {$row['name']} {if $row['mobile']}{$row['mobile']}{/if}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择门店</label>
+                <div class="layui-input-inline" style="width:300px;">
+                    <select name="storeid" class="layui-input layui-unselect" lay-filter="filter">
+                        <option value="" {if empty($item['storeid'])} selected{/if}>请选择</option>
+                        {loop $stores $store}
+                        <option value="{$store['id']}" {if $_GPC['storeid']==$store[ 'id']} selected {/if}>{$store['title']}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择次卡</label>
+                <div class="layui-input-inline" style="width:300px">
+                    <select name="oncecardid" >
+                        <option value="">请选择</option>
+                        {loop $oncecardlist $item}
+                        <option value="{$item['id']}" {if $_GPC[ 'storeid']==$store['id']} selected {/if}>{$item['title']}【剩余：{php echo intval($item['value']);}次 到期：{php echo date('Y-m-d', $item['expirytime'])}】</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">消费次数</label>
+                <div class="layui-input-inline" style="width:100px; margin:0; border-right:0;">
+                    <input type="number" id="amount" class="layui-input" value="1" name="amount" step="1">
+                </div>
+                <label class="layui-form-label" style=" width:auto; border-left:0;">次</label>
+            </div>
+            <div class="layui-form-item layui-form-text" style="width: 600px;">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="content" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" name="submit" lay-submit lay-filter="formDemo" value="提交">提交</button>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </form>
+    </div>
+    <script>
+    layui.use(['form','layer','element'], function() {
+        var form = layui.form,
+            layer = layui.layer;
+        //切换店铺
+        form.on('select(filter)', function(data) {
+            var storeid = data.value;
+            var id = "{$id}";
+            window.location.href = "{php echo $this->createWebUrl('center',array('op'=>'oncecardconsum'))}&id=" + id + "&storeid=" + storeid;
+        });
+
+        form.on('submit(formDemo)', function(data) {
+
+            $('#formOncard').submit();
+        });
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

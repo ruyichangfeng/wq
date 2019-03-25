@@ -1,0 +1,117 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.form-group{margin-top: 15px;height: 40px;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >打印设置</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('cate.list');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			     <!--  <input type="text" class="form-control" placeholder="请输入分类名称"> -->
+			      <span class="input-group-btn">
+			      <!--   <button class="btn btn-default" type="button"  form="keyform">搜索</button> -->
+			        <a href="javascript:void(0);" class="btn btn-default" style="display: inline-block;" onclick="addtp()">新建模板</a>
+
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th >模板名称</th> 
+					<th >模板类型</th> 
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $tplist $index $item}
+				<tr> 
+					<td>{$item['name']} </td>  
+					<td><?php if($item['type'] == 1){echo "店铺名片";}if($item['type'] == 2){echo "商品二维码";}if($item['type'] == 3){echo "价格标签";}if($item['type'] == 4){echo "出货单";} ?></td> 
+					<td>  
+							<a href="javascript:void(0);" class="linkbtn" onclick="tpEdit({$item['id']},'{$item['name']}')">编辑</a>
+						<a href="javascript:void(0);" class="linkbtn" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+				</tr>
+				{/loop}
+				 
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<script id="contentr" type="text/html">
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-4 control-label jpmc">模板名称:</label>
+		<div class="col-sm-8">
+			<input type="text" class="form-control" id="tpname" value="" name="tpname" valid="kong" valid-msg="奖品名称不能为空！">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-4 control-label jpmc">模板类型:</label>
+		<div class="col-sm-8">
+			<select class="forminput form-control" id="tptype" name="tptype" valid="kong" valid-msg="店铺分类不能为空！">
+				<option value="">———&nbsp;————</option>
+				<option value="1">店铺名片</option>
+				<option value="2">商品二维码</option>
+				<option value="3">价格标签</option>
+				<option value="4">出货单</option>
+			</select>
+		</div>
+	</div>
+</script>
+<script type="text/javascript">
+	function addtp(){ 
+			var index=layer.open({
+			  title: '新建模板'
+			  ,content: $("#contentr").html()
+			  ,btn: ['确定']
+			  ,shade: 0
+			  ,area: ['500px', '350px']
+			  ,yes: function(index, layero){
+			  	var tpname = $('#tpname').val();
+                var tptype = $('#tptype').val();
+                 var data = {
+                        'tpname':tpname,
+                        'tptype':tptype,
+					}
+				   $.ajax({
+                    url:"<?php echo $this->routeUrl('printerupdate.addtemplete');?>",
+                    data:data,
+                    type:"Post",
+                    dataType:"json",
+                    success:function(data){
+                    	console.log(data);
+                        if(data.type == true){
+                            layer.close(index);
+                            layer.msg(data.message);
+                            window.setTimeout(function(){
+                                location=data.redirect;
+                            },1000);
+                        }else{
+                            layer.close(index);
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+				}
+		}); 
+	}
+	function tpEdit(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('printerupdate.editview');?>&id="+id+"&name="+name;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除"+text,function(){
+		window.location.href="<?php echo $this->routeUrl('printerupdate.delcate');?>&id="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

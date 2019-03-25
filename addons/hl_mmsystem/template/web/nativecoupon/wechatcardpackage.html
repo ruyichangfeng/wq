@@ -1,0 +1,585 @@
+{template 'web/common/header'}
+<link href="/favicon.ico" rel="shortcut icon" />
+<link rel="stylesheet" type="text/css" href="{HLMMS_CSS}plugins/wxcard/index.css"/>
+
+<link rel="stylesheet" type="text/css" href="{HLMMS_CSS}plugins/wxcard/iconfont.css"/>
+<style>
+    .dropdown-menu {
+        border: medium none;
+        font-size: 12px;
+        left: 0;
+        list-style: none outside none;
+        padding: 0;
+        text-shadow: none;
+        top: 100%;
+        z-index: 1000;
+        border-radius: 0;
+        box-shadow: 0 0 3px rgba(86, 96, 117, 0.3);
+    }
+
+    .dropdown-menu li {
+        display: inline-block;
+    }
+
+    .bootstrap-colorpalette {
+        padding-left: 4px;
+        padding-right: 4px;
+        white-space: normal;
+        line-height: 1;
+    }
+
+    .tabs-container .form-group-color {
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight" style="padding: 0px;margin: 0px;">
+    <form action="" method='post' class='form-horizontal form-validate'>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="preview" style="overflow: visible;position: relative;margin-top: 5px;top: 0;">
+                    <div class="cart-top">
+                        <img src="{HLMMS_IMG}cart_top.jpg" alt=""/>
+                    </div>
+                    <div class="title">
+                        <i class="more fa fa-angle-left"></i>
+                        <i class="more pull-right fa fa-th-large"></i>
+                    </div>
+                    <div class="panel">
+                        <!--商户信息-->
+                        <div class="logo-area">
+
+                            <div class="logo">
+                                <img id="logoimg" src="{if empty($getCardPackageSetting['cpi_merchantlogo']) || empty($getCardPackageSetting)}{HLMMS_IMG}noface.png{else}{$getCardPackageSetting['cpi_merchantlogo']}{/if}"/>
+                            </div>
+                            <div class="name"  id="brandname">
+                                {php echo empty($getCardPackageSetting['cpi_brand_name'])?'会员卡商铺名称':$getCardPackageSetting['cpi_brand_name']}
+                            </div>
+                            </br>
+                            <div class="name"  id="title">
+                                {php echo empty($getCardPackageSetting['cpi_title'])?'会员卡标题名称':$getCardPackageSetting['cpi_title']}
+                            </div>
+                            <div class="code">
+                                <img src="{HLMMS_IMG}code.jpg" width="20" height="20" />
+                            </div>
+
+                            <div class="bot">
+                                <span>888 888 888</span>
+                                <i class="icon icon-info pull-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-other">
+                            <ul>
+                                <li id="show_custom_cell1">
+                                    <span id="show_custom_cell1_name">{php echo empty($getCardPackageSetting['cpi_cell1_name'])?'自定义入口':$getCardPackageSetting['cpi_cell1_name']}</span>
+                                    <span style="float: right;">
+                        <span id="show_custom_cell1_tips">{php echo empty($getCardPackageSetting['cpi_cell1_tips'])?'立即进入':$getCardPackageSetting['cpi_cell1_tips']}</span>
+
+						<i  class="go pull-right icon icon-right"></i>
+					</span>
+                                </li>
+                                <li>会员卡详情<i class="go pull-right icon icon-right"></i></li>
+                                <li>公众号<i class="go pull-right icon icon-right"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--自定义入口-->
+                    <!--卡券其他-->
+                    <div class="card-other">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+                <!--控制台-->
+                <div class="control" style="padding: 10px;margin-top: 5px;border: 1px solid #d0d1d2;width: 600px;">
+                    <div class="editor_section">
+
+                        <!--商铺名称-->
+                        <div class="control-group limit">
+                            <div class="frm_label pull-left">
+                                商铺名称<span style="color: red;">*</span>
+                            </div>
+                            <div class="frm_controls">
+
+                                <input type="text" name="card_brand_name" id="card_brand_name" class="form-control"  value="{$getCardPackageSetting['cpi_brand_name']}"{if !empty($getCardPackageSetting['cpi_card_id'])}disabled{/if} maxlength=15/>
+
+                            </div>
+                            <p class='card_tip'>商铺名称创建后无法修改</p>
+                        </div>
+
+                        <!--会员卡标题-->
+                        <div class="control-group limit">
+                            <div class="frm_label pull-left">
+                                会员卡标题<span style="color: red;">*</span>
+                            </div>
+                            <div class="frm_controls">
+                                <input type="text" name="card_title" id="card_title" class="form-control" value="{$getCardPackageSetting['cpi_title']}"   maxlength=15 {if !empty($getCardPackageSetting['cpi_card_id'])}disabled{/if} />
+                            </div>
+                            <!--<p class='error'>会员卡标题创建后无法修改</p>-->
+                            <p class='card_tip'>会员卡标题创建后无法修改</p>
+                        </div>
+
+                        <!--库存总量-->
+                        <div class="control-group limit">
+                            <div class="frm_label pull-left">
+                                库存总量<span style="color: red;">*</span>
+                            </div>
+
+
+
+                            <div class="input-group">
+
+                                <input type="text"  class="form-control"  name="card_totalquantity" id="card_totalquantity" value="{$wx_getCardPackageQuantity['quantity']}"  {if !empty($getCardPackageSetting['cpi_card_id'])}disabled{/if}/>
+                                {if !empty($getCardPackageSetting['cpi_card_id'])}
+                                <div class="input-group-btn">
+                                    <button data-toggle="dropdown" class="btn btn-white dropdown-toggle" type="button">修改 <span class="caret"></span></button>
+                                    <ul class="dropdown-menu pull-right">
+                                         <li><a onclick="changequantity(1)">新增库存</a></li>
+                                         <li><a onclick="changequantity(2)">减少库存</a></li>
+                                    </ul>
+                                </div>
+                                {/if}
+                            </div>
+
+
+                        </div>
+
+
+                        <!--商家联系电话-->
+                        <div class="control-group limit">
+                            <div class="frm_label pull-left">
+                                商家联系电话<span style="color: red;">*</span>
+                            </div>
+                            <div class="frm_controls">
+                                <input type="text" name="card_service_phone" id="card_service_phone"   class="form-control" value="{$getCardPackageSetting['cpi_service_phone']}"   />
+                            </div>
+                        </div>
+
+
+                        <!--logo图片-->
+                        <div class="control-group">
+                            <div class="frm_label pull-left">
+                                logo图片<span style="color: red;">*</span>
+                            </div>
+                            <div class="frm_controls">
+                                <div class="frm-image">
+                                    <input type="hidden" name="merchantlogo" id="merchantlogo" value="{$getCardPackageSetting['cpi_merchantlogo']}"/>
+                                    <input type="hidden" name="merchantlogo_url" id="merchantlogo_url" value="{$getCardPackageSetting['cpi_merchantlogo']}"/>
+                                    <img  id="showlogo" style="border-radius: 50%" src="{if empty($getCardPackageSetting['cpi_merchantlogo'])}{HLMMS_IMG}noface.png{else}{$getCardPackageSetting['cpi_merchantlogo']}{/if}" />
+                                </div>
+                            </div>
+                            <div class="frm_controls">
+                                <a class="btn btn-default upload" href="javascript:void(0);" id="uploadlogo" >上传图片</a>
+                                <p class='frm_tip'>会员卡的商户logo，建议像素为100*100。图片大小不能超过1mb,仅支持jpg,png格式</p>
+                            </div>
+                        </div>
+
+                        <!--卡券背景设置-->
+                        <div class="control-group">
+                            <div class="frm_label pull-left">
+                                卡券背景设置
+                            </div>
+                            <div class="radio radio-info radio-inline">
+                                <input type="radio" name="wxcard_backgroundtype" id="radio1" value="0"  {if $getCardPackageSetting['cpi_backgroundtype'] != 1}checked{/if} checked  onclick="$('.backgroundimg').hide();$('.color').show();$('.btn-color-down').hide();">
+                                <label for="radio1">
+                                    使用背景色
+                                </label>
+                            </div>
+                            <div class="radio radio-inline radio-danger">
+                                <input type="radio" name="wxcard_backgroundtype" id="radio2" value="1" {if $getCardPackageSetting['cpi_backgroundtype'] == 1}checked{/if} onclick="$('.backgroundimg').show();$('.color').hide();$('.btn-color-down').hide();" >
+                                <label for="radio2">
+                                    使用背景图片
+                                </label>
+                            </div>
+                        </div>
+
+                        <!--会员卡背景图-->
+                        <div class="control-group backgroundimg" {if empty($getCardPackageSetting['card_backgroundtype'])} style="display:none;"{/if}>
+                        <div class="frm_label pull-left">
+                            会员卡背景图
+                        </div>
+                        <div class="frm_controls">
+                            <div class="frm-image">
+                                <input type="hidden" name="wxcard_backgroundimg" id="wxcard_backgroundimg" value="{$getCardPackageSetting['cpi_backgroundimgurl']}"/>
+                                <input type="hidden" name="wxcard_backgroundimg_url" id="wxcard_backgroundimg_url" value=""/>
+                                <img  id="showbackground"  src="{if empty($getCardPackageSetting['cpi_backgroundurl_img'])}{HLMMS_IMG}nopic-small.jpg{else}{$getCardPackageSetting['cpi_backgroundurl_img']}{/if}"/>
+                            </div>
+                        </div>
+                        <div class="frm_controls">
+                            <a class="btn btn-default upload" href="javascript:void(0);" id="uploadbackground">上传图片</a>
+                            <p class='frm_tip'>会员卡背景图，建议像素为1000*600。图片大小不能超过1mb,仅支持jpg,png格式</p>
+                        </div>
+                    </div>
+                        <!--卡券颜色-->
+                        <div class="control-group color">
+                            <div class="frm_label pull-left">
+                                卡券背景色
+                            </div>
+                            <div class="btn-groups  btn-group btns">
+                                <input type="hidden" name="color" id="color" value="Color010"/>
+                                <a id="selected-color2" class="dropdown-toggle" data-toggle="dropdown"><i  ></i><span class="caret pull-right"></span></a>
+                                <ul class="dropdown-menu" style="width:180px;">
+                                    <li style="display:inline-block;">
+                                        <div id="colorpalette3"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!--特权说明-->
+                        <div class="control-group">
+                            <div class="frm_label pull-left">
+                                特权说明<span style="color: red;">*</span>
+                            </div>
+
+                            <div class="input-group">
+                                <textarea  name="prerogative" class="form-control" id="prerogative" rows="5" cols="50">{$getCardPackageSetting['cpi_prerogative']}</textarea>
+                            </div>
+
+
+                            <p class='card_tip'>文本长度不能超过300字</p>
+                        </div>
+
+                        <!--使用须知-->
+                        <div class="control-group">
+                            <div class="frm_label pull-left">
+                                使用须知<span style="color: red;">*</span>
+                            </div>
+
+                            <div class="input-group">
+                                <textarea  name="card_description"  class="form-control" id="card_description" rows="5" cols="50">{$getCardPackageSetting['cpi_description']}</textarea>
+                            </div>
+
+                            <p class='card_tip'>文本长度不能超过300字</p>
+                        </div>
+
+
+                        <!--是否自定义入口-->
+                        <div class="control-group">
+                            <div class="frm_label pull-left">
+                                开启自定入口
+                            </div>
+                            <div class="radio radio-inline radio-danger">
+                                <input type="radio" name="custom_cell1"   id="custom_cell1"  value="0" {if $getCardPackageSetting['cpi_custom_cell1'] != 1}checked{/if} onclick="$('.custom_cell1').hide();$('#show_custom_cell1').hide();">
+                                <label for="custom_cell1">
+                                    关闭
+                                </label>
+                            </div>
+                            <div class="radio radio-info radio-inline">
+                                <input type="radio" name="custom_cell1"   id="custom_cell2"  value="1" {if $getCardPackageSetting['cpi_custom_cell1'] == 1}checked{/if} onclick="$('.custom_cell1').show();$('#show_custom_cell1').show();"">
+                                <label for="custom_cell2">
+                                    开启
+                                </label>
+                            </div>
+                        </div>
+
+                        <!--入口名称-->
+                        <div class="control-group custom_cell1"  >
+                            <div class="frm_label pull-left">
+                                入口名称
+                            </div>
+                            <div class="frm_controls">
+                                <input type="text" name="custom_cell1_name" id="custom_cell1_name" class="form-control" value="{$getCardPackageSetting['cpi_cell1_name']}" />
+                            </div>
+                        </div>
+
+                        <!--引导语-->
+                        <div class="control-group custom_cell1"  >
+                            <div class="frm_label pull-left">
+                                引导语
+                            </div>
+                            <div class="frm_controls">
+                                <input type="text" name="custom_cell1_tips" id="custom_cell1_tips" class="form-control" value="{$getCardPackageSetting['cpi_cell1_tips']}" />
+                            </div>
+                        </div>
+
+
+                        <!--入口跳转链接-->
+                        <div class="control-group custom_cell1" >
+                            <div class="frm_label pull-left">
+                                入口跳转链接
+                            </div>
+                            <div class="frm_controls">
+                                <input type="text" name="custom_cell1_url" id="custom_cell1_url" class="form-control" value="{$getCardPackageSetting['cpi_cell1_url']}"  />
+                            </div>
+                        </div>
+
+                    </div>
+             </div>
+        </div>
+    <div class="form-group">
+        <div class="col-sm-12" style="text-align: center;margin-bottom: 10px;">
+            <input  type="submit"  value="提交" class="btn btn-primary btn-w-m">
+            <input  type="hidden"  value="AjaxSubmitCard" name="op" >
+        </div>
+    </div>
+    </form>
+</div>
+
+
+<script type="text/javascript" src="{HLMMS_JS}plugins/wxcard/colorpalette.js" charset="utf-8"></script>
+<script>
+
+
+    $(document).ready(function(){
+        var wxcard_backgroundtype = $('input[name="wxcard_backgroundtype"]:checked ').val();
+        var custom_cell1 = $('input[name="custom_cell1"]:checked ').val();
+        if(wxcard_backgroundtype == 1){
+            //隐藏卡券
+            $('.backgroundimg').show();
+            $('.color').hide();
+            $('.btn-color-down').show();
+
+        }
+        else{
+            $('.backgroundimg').hide();
+            $('.color').show();
+            $('.btn-color-down').hide();
+
+        }
+        if(custom_cell1 == 1){
+            //隐藏是否开启入口
+
+            $('.custom_cell1').show();
+            $('#show_custom_cell1').show();
+
+        }
+        else{
+
+            $('.custom_cell1').hide();
+            $('#show_custom_cell1').hide();
+        }
+    });
+
+
+    // $(document).on('click', '#addcardsubmit', function() {
+    //
+    //     var card_brand_name = $("#card_brand_name").val();
+    //     var card_title = $("#card_title").val();
+    //     var card_totalquantity = $("#card_totalquantity").val();
+    //     var wxcard_merchantlogo = $("#merchantlogo").val();
+    //     var wxcard_merchantlogo_url = $("#merchantlogo_url").val();
+    //     var color = $("#color").val();
+    //     var wxcard_backgroundimg = $("#wxcard_backgroundimg").val();
+    //     var wxcard_backgroundimg_url = $("#wxcard_backgroundimg_url").val();
+    //     var wxcard_backgroundtype = $('input[name="wxcard_backgroundtype"]:checked ').val();
+    //     var prerogative = $("#prerogative").val();
+    //     var card_description = $("#card_description").val();
+    //     var custom_cell1 = $('input[name="custom_cell1"]:checked ').val();
+    //     var custom_cell1_name = $("#custom_cell1_name").val();
+    //     var custom_cell1_tips = $("#custom_cell1_tips").val();
+    //     var card_service_phone = $("#card_service_phone").val();
+    //     var custom_cell1_url = $("#custom_cell1_url").val();
+    //
+    //
+    //     var url = "{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'AjaxSubmitCard'))}";
+    //     var params = {
+    //         'card_brand_name': card_brand_name,
+    //         'card_title': card_title,
+    //         'card_totalquantity': card_totalquantity,
+    //         'wxcard_merchantlogo': wxcard_merchantlogo,
+    //         'wxcard_merchantlogo_url': wxcard_merchantlogo_url,
+    //         'color':color,
+    //         'wxcard_backgroundimg':wxcard_backgroundimg,
+    //         'wxcard_backgroundimg_url':wxcard_backgroundimg_url,
+    //         'wxcard_backgroundtype':wxcard_backgroundtype,
+    //         'prerogative': prerogative,
+    //         'card_description': card_description,
+    //         'custom_cell1': custom_cell1,
+    //         'custom_cell1_name': custom_cell1_name,
+    //         'custom_cell1_tips': custom_cell1_tips,
+    //         'custom_cell1_url': custom_cell1_url,
+    //         'card_service_phone': card_service_phone,
+    //     };
+    //     $.ajax({
+    //         url: url,
+    //         type: "post",
+    //         data: params,
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             if (data['message']['code'] == 1) {
+    //                 swal({
+    //                     title: "成功！",
+    //                     text: data['message']['msg'],
+    //                     type: "success",
+    //                 },function () {
+    //                     var index=parent.layer.getFrameIndex(window.name);//获取当前弹出层的层级
+    //                     parent.layer.close(index);//关闭弹出层
+    //                 });
+    //
+    //                 return;
+    //             }
+    //             else{
+    //                 swal({
+    //                     title: "失败！",
+    //                     text: "失败！",
+    //                     type: "error",
+    //                 });
+    //                 return;
+    //             }
+    //         }
+    //     });
+    // });
+
+
+     {if $getCardPackageSetting['cpi_backgroundtype'] ==1 &&!empty($getCardPackageSetting['cpi_backgroundurl_img'])}
+    $(".logo-area").css({
+        "background":"url('{$getCardPackageSetting['cpi_backgroundurl_img']}') no-repeat left top",
+        "background-size":"100% 100%",
+    });
+      {/if}
+
+     {if $getCardPackageSetting['cpi_backgroundtype'] ==0 &&  !empty($getCardPackageSetting['cpi_color'])}
+    $(".logo-area").css({
+        "background":"{$getCardPackageSetting['cpi_color']}"
+    });
+      {/if}
+
+
+    $('#colorpalette3').colorPalette()
+        .on('selectColor', function (e) {
+            $('#selected-color2 i').css('background-color', e.color);
+            $(".btn-color-down").hide();
+            $(".logo-area").css({
+                "background":e.color
+            });
+
+            $('#color2').val(e.color);
+        });
+
+    $(".btn-color-drop").off("click").on("click", function () {
+        if ($(".btn-color-down").css("display") == "block") {
+            $(".btn-color-down").hide();
+        } else {
+            $(".btn-color-down").show();
+        }
+    });
+
+
+</script>
+<script>
+    require(['jquery', 'util'], function ($, util) {
+        //示例图logo控制
+        $('#uploadlogo').click(function () {
+            util.image('', function (data) {
+                $("#showlogo").attr('src', data.url);
+                $("#showlogo").show();
+                $("#merchantlogo").val(data.url);
+                $("#merchantlogo_url").val(data.attachment);
+
+                $("#logoimg").attr('src', data.url);
+
+            });
+        });
+
+        //示例图封面图片控制
+        $('#uploadbackground').click(function () {
+            util.image('', function (data) {
+                $("#showbackground").attr('src', data.url);
+                $("#showbackground").show();
+                $("#wxcard_backgroundimg").val(data.url);
+                $("#wxcard_backgroundimg_url").val(data.attachment);
+
+
+                $(".logo-area").css({
+                    "background":"url("+data.url+") no-repeat left top",
+                    "background-size":"100% 100%",
+                });
+
+            });
+        });
+
+
+        //示例图自定义入口1文本控制
+        $('#custom_cell1_name').change(function(){
+
+            var str = $(this).val();
+
+            if(str=="")
+            {
+                str="自定义入口1(选填)";
+            }
+
+            $('#show_custom_cell1_name').html(str);
+        });
+        //示例图自定义入口1引导文本控制
+        $('#custom_cell1_tips').change(function(){
+            $('#show_custom_cell1_tips').html($(this).val());
+        });
+        //示例图自定义入口1引导文本控制
+        $('#card_title').change(function(){
+            $('#title').html($(this).val());
+        });
+
+        //示例图自定义入口1引导文本控制
+        $('#card_brand_name').change(function(){
+            $('#brandname').html($(this).val());
+        });
+
+
+    });
+
+
+    function changequantity(typequantity){
+
+        var typequantity = typequantity;
+        swal({
+                title: "本次修改数量",
+                text: "输入数量：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "不能为0的数量"
+            },
+            function(quantity){
+                var quantity = quantity;
+                if (quantity === false) return false;
+                if (quantity === "") {
+                    swal.showInputError("修改数量不能为空！");
+                    return false
+                }
+
+                if (quantity === 0) {
+                    swal.showInputError("修改数量不能为0！");
+                    return false
+                }
+                var url = "{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'AjaxChangeQuantity'))}";
+
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: {quantity:quantity,typequantity:typequantity},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "更新成功",
+                                text: "请刷新之后查看",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            });
+                            return;
+                        }
+                        else {
+                            swal({
+                                title: "更新失败",
+                                text: "请重新操作！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                    }
+
+                });
+            });
+
+
+    }
+</script>
+{template 'web/common/footer'}

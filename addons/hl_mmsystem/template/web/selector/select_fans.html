@@ -1,0 +1,52 @@
+
+<br />
+<div class="form-group container" style="width: 500px;">
+	<div class="col-sm-12">
+		<div class="input-group form-group">
+			<input type="text" class="form-control" placeholder="粉丝昵称" id="fans_nick" />
+			<span class="input-group-addon btn btn-default" style="background-color: #00CA79;color: white;" onclick="get_fans(this)">
+				搜索
+			</span>
+		</div>
+        <div class="input-group col-sm-12">
+			<div id="select_templalte"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    function get_fans(obj){
+        var fans_nn = $('#fans_nick').val();
+        $(obj).html($(obj).html() + "...");
+        $("#select_templalte div").remove();
+        $.post("{php echo $this->createWebUrl('messagecommon',array('op'=>'get_fans'))}"
+                ,{fans_nickname:fans_nn}
+                ,function(d){
+                    $(obj).html($(obj).html().replace("...",""));
+                    if(d.status == 1){
+                        var items = d.result;
+                        for(var i=0;i<items.length;i++){
+                            $("#select_templalte").append(  "<div class='col-sm-6'>"+
+                                                            "<input type='text' class='form-control' value='"+items[i].nickname+"' onclick='chose(\"this\",\""+items[i].openid+"\",\""+items[i].nickname+"\")' style='cursor: pointer;' readonly='true'>"+
+                                                        "</div>"
+                            );
+                        }
+                    }else{
+                        new $.flavr(d.errmsg);
+                    }
+                },"json"
+        );
+    }
+    
+    function chose(obj,id,title){
+        $("#{$id1}").val(id);
+        $("#{$id2}").val(title);
+        //$(obj).addClass("active");
+        {if !$close}
+        $('body').find('.flavr-container').each(function() {
+            var a = $(this).data('flavr').instance;
+            a.close()
+        });
+        {/if}
+    }
+    
+</script>

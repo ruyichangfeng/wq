@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html data-trans-num="{$html['order']['trans_num']}" data-trans-info="{$resource['urls']['TransInfo']}" data-zl-confirm="{$resource['urls']['zlConfirm']}" data-take-over-confirm="{$resource['urls']['takeOverConfirm']}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta content="telephone=no" name="format-detection"/>
+    <meta id="share-logo" name="share_logo" content="{$share['share_logo']}" />
+    <meta id="share-url-id" name="share_url" content="{$share['share_url']}" />
+    <meta id="share-title-id" name="share_title" content="{$share['share_title']}" />
+    <meta id="share-content-id" name="share_content" content="{$share['share_description']}" />
+    <title>兑换结果</title>
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/normalize.min.css">
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/modal.min.css">
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/exchange-result.css">
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/ordinaryRecommend.css">
+    <style>
+        .theme-color{color: {$html['config']['theme_color']};}
+        .theme-bgcolor{background-color: {$html['config']['theme_color']};}
+        .theme-bordercolor{border-color: {$html['config']['theme_color']};}
+        /* radio */
+        .radio-group.cur{border-color:{$html['config']['theme_color']}; }
+        .radio-group .cur-arrow{border-color: {$html['config']['theme_color']} transparent transparent {$html['config']['theme_color']};}
+        .description a {color: {$html['config']['theme_color']};}
+    </style>
+    <style>
+        footer a{color: {$html['config']['theme_color']};border-color: {$html['config']['theme_color']};}
+        footer a:active{background-color: {$html['config']['theme_color']};color: #fff;}
+        .tel i{background-color:{$html['config']['theme_color']}; }
+        .use{background-color:{$html['config']['theme_color']};}
+        .recommandLocationItems a .recommandBj p{color: {$html['config']['theme_color']};}
+        .alipay-error{color:red;margin-left:10px;}
+        .dialog section .item-info .title h3{margin:5px 0 10px;}
+        .description{border-bottom: solid #ddd 1px;border-top: solid #ddd 1px;}
+    </style>
+</head>
+<body>
+<div id="db-content">
+    <div class="dialog coupon {if $html['order']['status'] != -1}success{else}failed{/if}">
+        {if $_GPC['first']}
+        <header>
+            <div class="title"><i></i><span>恭喜您兑换成功</span></div>
+            <i class="close"></i>
+        </header>
+        {elseif $html['order']['status'] == -1}
+        <header>
+            <div class="title"><i></i><span>抱歉，您的兑换失败了</span></div>
+            <i class="close"></i>
+        </header>
+        {/if}
+        <section>
+            <div class="item-info">
+                <img class="item-icon" src="{php echo tomedia($html['gift']['icon'])}">
+
+                <div class="title">
+                    <h3>{$html['gift']['title']}&nbsp;&nbsp;</h3>
+                    <p>{php echo date("Y-m-d H:i:s",$order['create_time'])}</p>
+                </div>
+            </div>
+            <div class="attribute">
+                <p>
+                    <span>兑换价格：</span>
+                    <strong>
+                        {if $order['order_score'] == 0 && $order['order_money'] == 0}免费领取{/if}
+                        {if $order['order_score'] > 0 && $order['order_money'] == 0}{$html['order']['order_score']}{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}{/if}
+                        {if $order['order_score'] == 0 && $order['order_money'] > 0}{$html['order']['order_money']}元{/if}
+                        {if $order['order_score'] > 0 && $order['order_money'] > 0}{$html['order']['order_score']}{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if} ＋ {$html['order']['order_money']}元{/if}
+                    </strong>
+                </p>
+                {if $order['raffle'] == 0 || ($order['raffle'] >= 1 && $order['raffle_status'] == 1)}
+                {if $order['type'] == 1}
+                <p>
+                    <span>红包金额：</span>
+                    <strong>{$html['order']['hb_amount']}</strong>
+                </p>
+                <p>
+                    <span>发放状态：</span>
+                    <strong>{$module_config['order']['hb_status'][$html['order']['hb_status']]}</strong>
+                </p>
+                {/if}
+                {if $order['type'] == 2}
+                <p>
+                    <span>券码：</span>
+                    <strong>{$html['order']['quan']['hao']}</strong>
+                </p>
+                <p>
+                    <span>密钥：</span>
+                    <strong>{$html['order']['quan']['value']}</strong>
+                </p>
+                {/if}
+                {if $order['type'] == 3}
+
+                {/if}
+
+                {if $order['type'] == 4}
+                <p>
+                    <span>领取地址：</span>
+                    <strong>{$html['gift']['link_address']}</strong>
+                </p>
+                    {if $order['zl_status'] == 2}
+                    <p>
+                        <span>领取时间：</span>
+                        <strong>{php echo date("Y-m-d H:i:s",$html['order']['zl_time'])}</strong>
+                    </p>
+                    {/if}
+                {/if}
+                {/if}
+
+                <p><span>订单状态：</span>
+                    <strong class="success">
+                        {if $order['pay_status'] == 0}
+                        未支付
+                        {else}
+                        {if $order['raffle'] >= 1}
+                            {if $order['raffle_status'] == 1}
+                                恭喜您中奖!
+                                {if $order['status'] == 0}
+                                    (未审核)
+                                {elseif $order['status'] == 1}
+                                    (已审核)
+                                {elseif $order['status'] == -1}
+                                    (已拒绝，原因：{$order['remark']})
+                                {/if}
+                            {else}
+                                很遗憾未中奖！
+                            {/if}
+                        {else}
+                            {$module_config['order']['status'][$html['order']['status']]}
+                            {if $order['type'] == 4}
+                            	({$module_config['order']['zl_status'][$html['order']['zl_status']]})
+                            {/if}
+                        {/if}
+                        {/if}
+                    </strong>
+                </p>
+                {if $html['order']['status'] == -1}
+                <p><span>失败原因：</span><strong class="failed">{$html['order']['remark']}</strong></p>
+                {/if}
+            </div>
+
+
+            <div class="attribute">
+                <p><span>订单编号：</span><strong>{$html['order']['order_num']}</strong></p>
+                {if $html['gift']['link_phone']}
+                <p><span>客服热线：</span><a class="tel theme-color" href="tel:{$html['gift']['link_phone']}"><i></i>{$html['gift']['link_phone']}</a></p>
+                {/if}
+                {if $html['gift']['link_address']}
+                <p><span>联系地址：</span><strong>{$html['gift']['link_address']}</strong></p>
+                {/if}
+                {if ($html['order']['raffle'] == 1 && $html['order']['raffle_status'] == 1) || $html['order']['raffle'] == 0}
+                    {if $order['type'] == 3}
+                        <p>
+                            <span>快递公司：</span>
+                            <strong class="express-company">{$html['order']['trans_company']}</strong>
+                        </p>
+                         <p>
+                             <span>运单状态：</span>
+                             <strong>{$module_config['order']['trans_status'][$html['order']['trans_status']]}</strong>
+                         </p>
+                        {if $order['trans_num']}
+                            <p><span>运单号：</span><strong>{$html['order']['trans_num']}</strong></p>
+                        {/if}
+                    {/if}
+                {/if}
+            </div>
+            {if $order['type'] == 3 && $order['trans_status'] > 0}
+            <div class="express-info attribute">
+                <p><span>上一站：</span><br><strong class="content"></strong></p>
+                <p><span>更新时间：</span><br><strong class="last-update-time"></strong></p>
+            </div>
+            <div class="theme-color" style="padding-left: 10px;">
+                <a href="http://m.kuaidi100.com/result.jsp?nu={$order['trans_num']}"> 快递信息不显示？点这里</a>
+            </div>
+            {/if}
+
+            {if $html['gift']['guidelines']}
+            <div class="description">
+                {php echo htmlspecialchars_decode($html['gift']['guidelines'])}
+                <br><br>
+            </div>
+            {/if}
+        </section>
+        <div class="recommandLocation" style='margin-top:10px;margin-bottom: 20px; display:none'>
+            <em></em><i></i><span>为您推荐</span><em></em>
+        </div>
+        <div class="recommandLocationItems clearfix" style='display:none'>
+        </div>
+
+        <footer>
+            <a href="{$resource['urls']['index']}" class="back-home">回到首页</a>
+            {if $html['order']['status'] != -1}
+                {if ($html['order']['raffle'] >= 1 && $html['order']['raffle_status'] == 1) || $html['order']['raffle'] == 0}
+                    {if $html['order']['buy_type'] == 2 || $html['order']['buy_type'] == 3}
+                        {if $html['order']['type'] == 3}
+                            {if $html['order']['pay_status'] == 0 ||( $html['order']['trans_fee'] > 0 && $html['trans_fee_status'] == 1)}
+
+                            {else}
+                                <a href="javascript:void(0);" class="use takeOver">确认收货</a>
+                            {/if}
+                        {/if}
+                    {else}
+                        {if $html['order']['type'] == 3 && $html['order']['trans_status'] != 2}
+                            {if $html['order']['trans_fee'] >= 0 && $html['order']['trans_fee_status']==1}
+                                <a href="{$resource['urls']['OrderPay']}&order_num={$html['order']['order_num']}" class="use">支付运费</a>
+                            {else}
+                                <a href="javascript:void(0);" class="use takeOver">确认收货</a>
+                            {/if}
+                        {/if}
+                    {/if}
+                    {if $html['order']['type'] == 4 && $html['order']['status'] == 1 && $html['order']['zl_status'] == 1}
+
+                        <a href="javascript:void(0);" class="use takeReceive">确认领取</a>
+                    {/if}
+                {/if}
+            {/if}
+            {if $html['order']['status'] != -1 && $html['order']['buy_type'] >=1 && $html['order']['pay_status'] == 0 && $html['order']['order_money'] >0 ||( $html['order']['trans_fee'] > 0 && $html['trans_fee_status'] == 1)}
+                <a href="{$resource['urls']['OrderPay']}&order_num={$html['order']['order_num']}" class="use">去支付</a>
+            {/if}
+        </footer>
+        {template 'copyright'}
+    </div>
+</div>
+</body>
+<script src="{$resource['prefix']}assets/js/zepto.min.js"></script>
+<script src="{$resource['prefix']}assets/js/fastclick-v1.0.6.min.js"></script>
+<script src="{$resource['prefix']}assets/js/modal.min.js"></script>
+<script>
+    $(function(){
+
+
+        $('.takeReceive').on('click',function(){
+            $.modal({
+                type:'confirm',
+                title:'确认领取',
+                section:'请至商家指定地址兑换，让工作人员点击下方👇“确定”按钮，私自点击视为主动放弃哦。确定后订单失效，将无法再次领取(^ω^)！',
+                callback:{
+                    save:function(){
+                        window.loading=$.modal({
+                            type:'loading',
+                            title:'正在处理，请稍后···'
+                        });
+                        $.ajax({
+                            type:'POST',
+                            url:$("html").data("zl-confirm"),
+                            data:{
+                                order_num : "{$html['order']['order_num']}"
+                            },
+                            dataType:'json',
+                            success:function(result){
+                                window.loading.close();
+                                if(result.status == 200){
+                                    $.modal({
+                                        type:'alert',
+                                        title:'领取成功'
+                                    });
+                                    $('.takeReceive').hide();
+                                    window.location.reload();
+                                }else{
+                                    $.modal({
+                                        type:'alert',
+                                        title:result.message
+                                    })
+                                }
+                            },
+                            error:function(){
+                                window.loading.close();
+                                $.modal({
+                                    type:'alert',
+                                    title:'网络解析错误'
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        });
+    });
+
+    $(function(){
+        $('.takeOver').on('click',function(){
+            $.modal({
+                type:'confirm',
+                title:'确认收货',
+                section:'您已经收到货并确认收货？',
+                callback:{
+                    save:function(){
+                        window.loading=$.modal({
+                            type:'loading',
+                            title:'正在处理，请稍后···'
+                        });
+                        $.ajax({
+                            type:'GET',
+                            url:$("html").data("take-over-confirm")+"&order_num={$html['order']['order_num']}",
+                            dataType:'json',
+                            success:function(result){
+                                window.loading.close();
+                                if(result.success){
+                                    $.modal({
+                                        type:'alert',
+                                        title:'收货成功'
+                                    });
+                                    $('.takeOver').hide();
+                                    window.location.reload();
+                                }else{
+                                    $.modal({
+                                        type:'alert',
+                                        title:result.message
+                                    })
+                                }
+                            },
+                            error:function(){
+                                $.modal({
+                                    type:'alert',
+                                    title:'网络解析错误'
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        });
+    });
+
+    $(function () {
+        var url = $("html").data("trans-info");
+        var trans_num = $("html").data("trans-num");
+        if(trim(trans_num) == ""){
+            return false;
+        }else{
+            var data = {
+                trans_num :trans_num
+            }
+            $.ajax({
+                type:'POST',
+                url:url,
+                data:{
+                    trans_num : trans_num
+                },
+                dataType:'json',
+                success:function(result){
+                    window.loading.close();
+                    if(result.success){
+                        if(result.status == 200){
+                            var time = result.data.last_update_time;
+                            var content = result.data.content;
+                            var company = result.data.company;
+                            $(".express-info .content").text(content);
+                            $(".express-info .last-update-time").text(time);
+                            $(".express-company").text(company);
+                        }
+                    }else{
+
+                    }
+                },
+                error:function(){
+
+                }
+            })
+
+        }
+
+
+    });
+
+</script>
+
+<script type="text/javascript">
+    Zepto(function($) {
+        /**
+         * 链接转换
+         */
+        var isOpen = false
+        var links = $('[data-tag="is-link"]')
+
+        links.each(function() {
+            if (isOpen) {
+                var text = $(this).text()
+                $(this).replaceWith('<span>' + text + '</span>')
+            } else {
+                $(this).removeAttr('data-tag')
+            }
+        })
+    })
+</script>
+
+<script type="text/javascript" src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    wx.config({
+        debug: false,
+        appId: '{$resource['js']['appId']}',  //微信的appid需要在公众平台生成
+        timestamp: '{$resource['js']['timestamp']}', //这是由php部分生成的
+        nonceStr: '{$resource['js']['nonceStr']}', //这是由php部分生成的
+        signature: '{$resource['js']['signature']}', //这是由php部分生成的
+        jsApiList: [
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'scanQRCode',
+        ]
+    });
+</script>
+<script src="{$resource['prefix']}share-assets/wxshare.js"></script>
+</html>

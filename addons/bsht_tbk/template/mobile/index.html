@@ -1,0 +1,229 @@
+   {template 'header'}
+
+<script src="../addons/bsht_tbk/res/js/main.js"></script>
+    <div id="msv">
+     <link rel="stylesheet" type="text/css" href="{$res}static/jwap/css/newpulic.css" />
+
+     <div class="index_w">
+
+
+
+
+<!-- 焦点广告 -->
+<center>
+<div class="swiper-container" style="padding:5px;background-color:#fff">
+    <div class="swiper-wrapper">
+	{loop $ads $i}
+        <div class="swiper-slide"><a href="{if !empty($i['jumpurl'])}{php echo $this->createMobileUrl('show_ads',array('id'=>$i['id']));}{else}javascript:{/if}"><img src="{if !empty($i['thumb'])}{php echo tomedia($i['thumb']);}{else}{$res}images/noads.jpg{/if}"></a></div>
+    {/loop}
+    </div>
+    <!-- 如果需要分页器 -->
+    <div class="swiper-pagination"></div>
+</div>
+</center>
+<!-- 焦点广告 -->
+
+
+
+
+<div id="search-box" style="width:100%;background-color:#fff;padding-top:10px;{if $setting['skin']==3}padding-bottom:10px{else}padding-bottom:0px{/if}">
+       <form id="search-form" action="./index.php" method="get">
+	        <input type="hidden" name="c" value="entry" />
+			<input type="hidden" name="i" value="{$_W['uniacid']}" />
+        	<input type="hidden" name="m" value="bsht_tbk" />
+        	<input type="hidden" name="do" value="search" />
+			{if $_GPC['cate_id']}
+            <!--input type="hidden" name="cate_id" value="{$_GPC['cate_id']}" /-->
+			{/if}
+			{if $_GPC['keywords']}
+            <!--input type="hidden" name="keywords" value="{$_GPC['keywords']}" /-->
+			{/if}
+        <div class="box-search">
+         <input type="text" id="keywords" name="keywords" x-webkit-speech="" placeholder="搜索商品" autocomplete="off" value="{if $_GPC['keywords']}{$_GPC['keywords']}{/if}" />
+         <a href="javascript:;" class="del"><img src="{$res}static/jwap/images/del.png" /></a>
+        </div>
+        <button id="search-submit" type="submit"><img src="{$res}static/jwap/images/search.png" /></button>
+       </form>
+</div>
+
+
+      <ul class="category">
+	   
+          
+      {loop $indexcateall $ii}
+       <li class="ujs" p-url="{php echo $this->createMobileUrl('list_all', array('cate_id' => $ii['id']))}"><span><img src="{php echo tomedia($ii['pic']);}" alt="{$ii['name']}" /></span><strong>{$ii['name']}</strong></li>
+      {/loop}
+
+
+      </ul>
+
+	 
+
+
+    <div id="goods">
+     <section class="{if $setting['skin']!=4}goods{else}goods_list index_goodslist{/if}" id="pageCon">
+      <ul class="{if $setting['skin']!=4}{if $setting['skin']!=5}goods-list{/if} list_box clear{else}list_box skin4ul{/if}" id="list_box">
+
+
+      </ul>
+     </section>
+
+	 {php $tpage=$_GPC['page'];}
+     {if empty($_GPC['page'])}{php $tpage=1;$npage=$tpage-1;$npage2=$tpage+1;}{else}{php $npage=$tpage-1;$npage2=$tpage+1;}{/if}
+	 
+	 <div id="list_more" class="loading" style="margin-top:10px">
+	 <span onclick="get_list(0);">查看更多</span>
+	 </div>
+
+     
+    </div>
+
+ 
+
+	
+<script type="text/javascript">
+
+var limit = {$tpage};
+
+
+
+function get_list(ty){
+    
+    if(ty==1){
+	   $("#pageCon .list_box").html('');
+	}else{
+	   $("#list_more").html('<div class="loading"><span > 卖命加载中...</span></div>');
+	   
+	}
+	
+	$.ajax({
+	    type : "post",
+	    url : "{php echo $this->createMobileUrl('index_ajax',array('op'=>'list'))}",
+	    data : {
+	    	limit:limit,
+	    },
+        dataType : "json",		
+	    success : function(data) {
+	    	if(data.status==200){
+						var list = data.content;
+						var content = '';
+						for(var i=0; i<list.length; i++){
+ 
+
+         content += '<li class="picCon"><a class="goods-a" href="'+list[i]['url']+'" target="_self">'
+		 +'<img class="loazd lazy-bk" src="../addons/bsht_tbk/res/images/load.gif" data-bk="'+list[i]['pic']+'{$setting['maxpic']}.jpg" /><span style="background:url('+list[i]['icon']+') no-repeat 0 0;height:0;overflow:hidden; padding-bottom:15px; width: 15px;position:absolute;bottom:5px; right:5px;z-index:15;"></span></a>'
+		 +'<a href="'+list[i]['url']+'" target="_self">'
+		 +'<h3>'+list[i]['title']+'</h3>'
+         +'<div class="list-price buy">'
+         +'<span class="price-new"><i>券后 ￥</i>'+list[i]['jiage']+'</span>'
+         +'<!--span class="qhj" style="margin-left:5px">'+list[i]['tag']+'</span-->'
+         +'<a id="J_weixin" href="'+list[i]['url']+'" target="_self" class="coupon"><span class="good-btn" style="color:#999">销量'+list[i]['itemmsell']+'</span></a>'
+         +'</div></a>'
+         +'<div class="lingquan">'
+         +'<a id="J_weixin" href="'+list[i]['yhjurl']+'" target="_self" class="coupon"><span>'+list[i]['jiage2']+'元券</span></a>'
+         +'</div></li>';
+
+
+						}
+                        $("#pageCon .list_box").append(content);
+						
+						var aa = $(".goods-list li").innerWidth();
+                        $(".goods-list li img").css('height',aa);
+						if(list.length=={if $setting['pageno']}{$setting['pageno']}{else}10{/if}){
+							$("#list_more").html('<span onclick="get_list(0);">点击查看更多</span>');
+						}else{
+							$("#list_more").html('<span></span>');
+							$("#list_more").fadeOut(500);
+						}		
+	                    limit++;
+
+				
+	
+
+//waterfall();
+lazy_img();
+		    }else if(data.status==-103){
+	    		$("#list_more").html('<span onclick="location.reload();">没有更多记录，点击刷新！</span>');
+				//dialog("没有更多记录！");
+				//$("#list_more").fadeOut(500);
+				//limit=1;
+				//get_list(0);
+				//location.reload();
+
+	    	}else if(data.status==301){
+	    		$("#list_more").html('没有更多记录');
+				//$("#list_more").fadeOut(500);
+				
+	    	}else{
+			    $("#list_more").html('<span>没有更多记录！</span>');
+				//dialog("没有更多记录！！");
+				$("#list_more").fadeOut(500);
+			}    	
+	    },
+	    error : function(xhr, type) {
+
+	    }
+	});
+	    
+
+}
+get_list(0);
+
+
+$(window).scroll(function () {
+var scrollTop = $(this).scrollTop();
+var scrollHeight = $(document).height();
+var windowHeight = $(this).height();
+if (scrollTop + windowHeight == scrollHeight) {
+setTimeout(get_list(0),1000);
+}
+});
+
+
+function yhjjumpurl(obj){
+{if $setting['skin1tip']==1} 
+ var url = obj.name;
+ //alert(url);
+ layer.open({
+  type: 2,
+  title: false,
+  shadeClose: true,
+  shade: 0.8,
+  area: ['85%', '85%'],
+  content: url
+}); 
+{/if}
+}
+
+function yhjjumpurl_hit(obj){
+var id = obj.id;
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('act'=>'itemall'));}&id="+id;		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+}
+
+</script>
+
+
+<script>        
+  var swiper = new Swiper('.swiper-container', {
+            pagination: '.swiper-pagination',
+            paginationClickable: true,
+            loop: true,
+			effect:'flip',
+			autoplay:5000,
+        });
+  var swiper2 = new Swiper('.swiper2', {
+            slidesPerView: 'auto',
+            paginationClickable: true,
+            freeMode: true,
+			autoplay:3000,
+			pagination: '.swiper-pagination',
+            
+  });
+</script>
+
+
+    {template 'foot'}
+	{template 'footer'}

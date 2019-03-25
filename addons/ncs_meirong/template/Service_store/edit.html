@@ -1,0 +1,177 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="../addons/ncs_meirong/resource/css/style.css" />
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            加盟店铺>编辑
+        </h3>
+    </div>
+    <div class="panel-body">
+        <form id="sign-form" class="form-horizontal" role="form" method="post" action="{url 'site/entry/service_store',array('m'=>'ncs_meirong','op'=>'savemodel','version_id'=>$_GPC['version_id'])}"  style="padding: 20px 0;">
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control"  name="name" id="name" value="{$list['name']}">
+                    <input type="hidden" name="id" value="{$list['id']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">图标(50*50)</label>
+                <div class="col-sm-8">
+                    {php echo tpl_form_field_image('simg',$list['simg']);}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">图片(100*150)</label>
+                <div class="col-sm-8">
+                    {php echo tpl_form_field_image('bimg',$list['bimg']);}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-8">
+                    {if $list['status']==1}
+                    <input type="checkbox" checked class="js-switch" value="1" name="status">
+                    {else}
+                    <input type="checkbox" class="js-switch" name="status" value="1">
+                    {/if}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">排序</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control"  name="sort" value="{$list['sort']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">店铺描述</label>
+                <div class="col-sm-10">
+                    {php echo tpl_ueditor('content',$list['content']);}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">地址地址</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control"  name="address" id="address" value="{$list['address']}">
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-default search" style="margin-right:5px;">查询</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">经纬度</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control"  name="address_id" value="{$list['address_id']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">地图</label>
+                <div class="col-sm-10">
+                    <div id="container" style="width: 100%;height: 400px;"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="button" class="btn btn-default my-submit" value="保存">
+                    <a class="btn btn-default" href="{url 'site/entry/service_store',array('m'=>'ncs_meirong')}">返回</a>
+                </div>
+            </div>
+
+
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.2&key={$amapKey}"></script>
+<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<script>
+    $(function () {
+        $('.my-submit').click(function () {
+            if($("input[name='address_id']").val() == ''|| $('#name').val() == ''){
+                alert('店铺名称或者地址坐标为空');
+                return false;
+            }
+            $('form').submit();
+        })
+    })
+
+    $(function () {
+        var ipdata = $("input[name='address_id']").val();
+        var latitude=ipdata.split(',')[0];
+        var longitude=ipdata.split(',')[1];
+
+        AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
+
+            var latlng = []
+            if(longitude!="" && latitude!=""){
+                latlng = [longitude,latitude]
+            }else{
+                latlng = [39.916527,116.397128]
+            }
+            var map = new AMap.Map('container',{
+                center: latlng,
+                zoom:16
+            });
+
+            var marker = new AMap.Marker({
+                position : latlng,
+                map : map,
+            });
+
+
+            AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow','AMap.Geocoder','AMap.Scale','AMap.OverView','AMap.Geolocation','AMap.PlaceSearch','AMap.MarkerClusterer'],function(){
+                var placeSearch = new AMap.PlaceSearch({
+                    map: map,
+                    pageSize:1,
+                });
+                var geocoder = new AMap.Geocoder({
+                   //城市，默认：“全国”
+                });
+
+                //给dom 赋值数据
+                var setData = function (address,latlng) {
+                    $("input[name='address_id']").val(latlng.lat+','+latlng.lng)
+                    $("input[name='address']").val(address)
+                }
+
+                $(".search").click(function(){
+                    var content=$("input[name='address']").val();
+                    if(content!=""){
+                        placeSearch.search(content,function (status, result) {
+                            if(result.info != "OK"){
+                                return alert('地址不够详细，请加上城市')
+                            }
+                            setData(result.poiList.pois[0].address,result.poiList.pois[0].location)
+                        });
+                    }
+                });
+
+                map.on('click',function(e){
+                    marker.setPosition(e.lnglat);
+                    console.log(e.lnglat)
+                    geocoder.getAddress(e.lnglat,function(status,result){
+                        if(status=='complete'){
+                            console.log(result)
+                            setData(result.regeocode.formattedAddress,e.lnglat);
+                        }
+                    })
+                })
+
+            })
+
+
+            map.panBy(0, 1);
+            map.addControl(new AMap.ToolBar({
+                liteStyle: true
+            }))
+        });
+    })
+
+
+
+</script>
+{template 'common/footer'}

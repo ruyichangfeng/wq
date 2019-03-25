@@ -1,0 +1,177 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo $this->createWebUrl('spending', array('op'=>'display'));}">消费类型管理</a></li>
+    <li><a href="{php echo $this->createWebUrl('spending', array('op'=>'create'));}">添加消费类型</a></li>
+</ul>
+
+<div class="main">
+    <div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+	            <div class="panel-body">
+	                <form action="" method="post" class="form-horizontal form" id="form">
+	                <div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">消费类型</label>
+						<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+							<input type="text" class="form-control" name="search[spending_title]" value="{$data['search']['spending_title']}" placeholder="可模糊查询"/>
+						</div>
+					</div>
+					<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">奖励类型</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_type]" id="spending_type_0"  value="" {if $data['search']['spending_type']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_type]"  value="1" {if $data['search']['spending_type']=='1'} checked="checked"{/if} > 积分
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_type]"  value="2" {if $data['search']['spending_type']=='2'} checked="checked"{/if} > 余额
+                        </label>
+					</div>
+					</div>
+					  <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_state]" id="store_state_0"  value="" {if $data['search']['spending_state']==''} checked="checked"{/if} > 全部
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_state]"  value="1" {if $data['search']['spending_state']=='1'} checked="checked"{/if} > 开启
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="search[spending_state]"  value="2" {if $data['search']['spending_state']=='2'} checked="checked"{/if} > 关闭
+                        </label>
+					</div>
+					</div>
+	                <div class="form-group">
+						<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+							<input name="submit" type="submit" value="搜索" class="btn btn-primary" style="width:10%;"/>
+	                        <input name="reset" type="button" value="清空" class="btn btn-primary" style="width:10%;" onclick="formreset()"/>
+							<input type="hidden" name="token" value="{$_W['token']}" />
+	                        <input type="hidden" name="searchflag" value="1" />
+						</div>
+					</div>
+	                </form>
+	            </div>
+            </div>
+        </div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">消费类型管理</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:6%;">序号</th>
+								<th style="width:14%;">消费类型</th>
+								<th style="width:15%;">奖励类型</th>
+								<th style="width:15%;">奖励比例</th>
+								<th style="width:10%;">状态</th>
+								<th style="width:10%;">排序</th>
+								<th style="width:10%;">默认首选</th>
+								<th style="width:20%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {php $i=($pindex-1)*$psize}
+                            {loop $data["records"] $key $item}
+                            {php $i++}
+							<tr>
+								<td>
+                                    {$i}
+								</td>
+                                <td>
+                                    {$item['spending_title']}
+								</td>
+								<td>
+                                    {if $item['spending_type']==1}积分{else}余额{/if}
+								</td>
+								<td>
+                                    1{if $item['spending_type']==1}积分{else}余额{/if}：{$item['spending_number']}元
+								</td>
+								<td>
+                                    {if $item['spending_state']==1}开启{else}关闭{/if}
+								</td>
+								<td>
+                                    {$item['spending_order']}
+								</td>
+                             	<td>
+                                    {if $item['spending_firststate']==1}是{else}否{/if}
+								</td>
+								<td>
+                                    <a href="{php echo $this->createWebUrl('spending', array('op'=>'create','spending_id'=>$item['spending_id']));}" class="btn btn-primary">编辑</a>
+									<a onclick="if(!confirm('删除后数据将不可恢复，确定要删除吗?')) return false;" href="{php echo $this->createWebUrl('spending', array('op'=>'delete', 'spending_id'=>$item['spending_id']));}" class="btn btn-danger">删除</a>
+								</td>
+							</tr>
+							{/loop}
+							{if !empty($data["records"])}
+							<tr>
+								<td colspan="9">
+									<!--<input name="submit" type="submit" value="保存" class="btn btn-primary" />-->
+									<input type="hidden" name="token" value="{$_W['token']}" />
+								</td>
+							</tr>
+							{else}
+							<tr>
+								<td colspan="9">
+									信息不存在！
+								</td>
+							</tr>
+							{/if}
+						</tbody>
+					</table>
+                    <div style="text-align:left;">{$pagination}</div>
+
+				</div>
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+function formreset()
+{
+	$('.form-control').val("");
+	$("#spending_type_0").prop("checked",'checked');
+	$("#store_state_0").prop("checked",'checked');
+}
+function submitjifen(id){
+	var re = /^-?\\d+$/,
+		type=$('input:radio[name="credit_type"]:checked').val();
+	if($('#jine').val=='')
+	{
+		alert('请先填写充值分值，在进行提交');		
+	}else if (type==1&&re.test($('#jine').val)){
+		alert('积分分值必须为整数。');		
+	}else{
+		$.ajax({  
+            type:"POST",
+            url: "{php echo $this->createWebUrl('ajaxstore');}",
+            data:$('#jifenform'+id).serialize(),
+            dataType:"json",
+            // dataType:"text",
+            async:false,
+            success: function(data){
+                if(data.result=='success')
+                {
+                	$('#credit'+data.type+id).html(data.rs);
+                	$("#myModal"+id).modal('hide');
+                }else{
+                	alert('充值失败');
+                }
+            }
+        });
+	}		
+}
+function clearformss()
+{
+	$('#jine').val("");
+}
+</script>
+
+{template 'common/footer'}

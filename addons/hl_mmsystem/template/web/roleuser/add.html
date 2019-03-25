@@ -1,0 +1,135 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+        <div class="col-sm-12">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('roleuser', array('op' => 'list'))}"></a>员工信息</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('roleuser',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="roleUser">
+                        <input type="hidden" name="id" value="{$item['id']}">
+                        <div class="form-group">
+                            <label for="userAccount" class="col-sm-3 control-label">工号</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="userAccount" class="form-control" value="{$item['ru_userAccount']}" id='userAccount' placeholder="请输入工号"/>
+                            </div>
+                            <label for="userPhone" class="col-sm-1 control-label">手机号</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="userPhone" class="form-control" value="{$item['ru_userPhone']}" id='userPhone' placeholder="请输入手机号"/>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="userPhone" class="col-sm-3 control-label">所属机构</label>
+                            <div class="col-xs-3">
+                                <select  class="form-control" name="organization" id="organization">
+                                    <option value=""> 无</option>
+                                    {loop $roleusertype $itemroleuser}
+                                    <option value="{$itemroleuser['id']}" {if $itemroleuser['id'] == $item['organization_id']}selected = "selected"{/if} >{$itemroleuser['org_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                            <label class="col-sm-1 control-label">操作店铺</label>
+                            <div class="col-sm-3">
+                                <select  class="form-control" name="storeIdCount" id="storeIdCount">
+                                    <option value=""> 无</option>
+                                    {loop $storeIdCount $itemcount}
+                                    <option value="{$itemcount['id']}" {if $itemcount['id'] == $item['ru_storeIdCount']}selected = "selected"{/if} >{$itemcount['sto_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="userName" class="col-sm-3 control-label">姓名</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="userName" class="form-control" value="{$item['ru_userName']}" id='userName' placeholder="请输入姓名"/>
+                            </div>
+                            <label for="userPassword" class="col-sm-1 control-label">密码</label>
+                            <div class="col-xs-3">
+                                <input type="password" name="userPassword" class="form-control" value="" id='userPassword' />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="userSatus1" class="col-sm-3 control-label">员工状态</label>
+                            <div class="col-sm-3">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="userSatus" id="userSatus1" value="1" {if $item['ru_userSatus']==1 || empty($item['ru_userSatus'])}checked="checked" {/if}>
+                                    <label for="userSatus1"> 激活 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="userSatus" id="userSatus2" value="2" {if $item['ru_userSatus']==2 }checked="checked" {/if}>
+                                    <label for="userSatus1"> 冻结 </label>
+                                </div>
+                                <div class="radio radio-inline ">
+                                    <input type="radio" name="userSatus" id="userSatus3" value="3" {if $item['ru_userSatus']==3 }checked="checked" {/if}>
+                                    <label for="userSatus1"> 禁用 </label>
+                                </div>
+                            </div>
+                            <label for="note" class="col-sm-1 control-label">备注</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="note" class="form-control" value="{$item['ru_note']}" id='note' placeholder="请输入备注"/>
+                            </div>
+
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-5"></div>
+                            <div class="col-sm-7">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+        </div>
+</div>
+<script>
+    $("#roleUser").validate({
+        rules: {
+            userAccount: {
+                required: true,
+                digits:true,
+                maxlength:20,
+            },
+            userPhone: {
+                required: true,
+                phone1:true,
+            },
+            userName: {
+                required: true,
+                maxlength:7,
+            },
+            userPassword: {
+                required: true,
+                password:true,
+            }
+        },
+        messages: {
+            userAccount: {
+                required: "请输入工号",
+                maxlength: $.validator.format( "不能大于20个字符" ),
+            },
+            userPhone: {
+                required: "请输入手机号",
+            },
+            userName: {
+                required: "请输入姓名",
+            },
+            userPassword: {
+                required: "请输入密码",
+            },
+        }
+    });
+    jQuery.validator.addMethod("name1", function(value, element) {
+        return this.optional(element) || /^[\u0391-\uFFE5]+$/.test(value);
+    }, "只能包含中文字符。");
+    jQuery.validator.addMethod("phone1", function(value, element) {
+        return this.optional(element) || /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(value);
+    }, "请输入正确的手机号码。");
+    jQuery.validator.addMethod("password", function(value, element) {
+        return this.optional(element) || /^[\w]{6,12}$/.test(value);
+    }, "长度在6~12之间，只能包含字母、数字");
+</script>
+{template 'web/common/footer'}

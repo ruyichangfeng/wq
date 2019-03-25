@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="google-site-verification" content="DVVM1p1HEm8vE1wVOQ9UjcKP--pNAsg_pleTU5TkFaM">
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>课程报名</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.80120" />
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script   src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script   src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<div class="weui-cells__title">请选择{$classSize}名学生</div>
+<div class="weui-cells weui-cells_checkbox" id="students_box">
+    {loop $user $student}
+    <label class="weui-cell weui-check__label" for="{$student['sid']}">
+        <div class="weui-cell__hd">
+            <input type="checkbox" class="weui-check" name="checkedStudents" id="{$student['sid']}" value="{$student['sid']}">
+            <i class="weui-icon-checked"></i>
+        </div>
+        <div class="weui-cell__bd">
+            <p>{$student['s_name']}</p>
+        </div>
+    </label>
+    {/loop}
+</div>
+<div class="weui-btn-area">
+    <a class="weui-btn weui-btn_primary" onclick="baoming();" id="showTooltips">确定</a>
+</div>
+{php include $this->template('footer');}
+<script>
+    var PB = new PromptBox();
+    var userid =  $("#userid").val();
+    var oss = 'http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/';
+    function baoming(){
+        var student_ids = new Array();
+        $("#students_box :checked").each(function(index){
+            student_ids.push($(this).val());
+        });
+        if(student_ids.length <=0 ){
+            PB.prompt('请至少选择一个学生!');
+            return;
+        }
+        var classSize = "{$classSize}";
+        if(classSize != student_ids.length){
+            PB.prompt('您报的是'+classSize+'人班,请选择'+classSize+'个学生!');
+            return;
+        }
+        var submitData = {
+            schoolid : "{$schoolid}",
+            weid     : "{$_W['uniacid']}",
+            openid   : "{$openid}",
+            uid      : "{$fan['uid']}",
+            kcid     : "{$item['id']}",
+            sid      : "{$student['id']}",
+            user     : "{$its['id']}",
+            sids     : student_ids.join(",")
+        };
+        $.post("{php echo $this->createMobileUrl('payajax',array('op'=>'sigeup'))}",submitData,function(data){
+            if(data.result){
+                PB.prompt(data.msg);
+                window.location.href = "{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid), true)}";
+            }else{
+                PB.prompt(data.msg);
+            }
+        },'json');
+    }
+</script>
+</body>
+</html>

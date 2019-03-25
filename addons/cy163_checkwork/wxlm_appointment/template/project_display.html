@@ -1,0 +1,118 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{php echo $this->createWebUrl('project', array('op'=>'display'));}">服务项目管理</a></li>
+        <li ><a href="{php echo $this->createWebUrl('project', array('op'=>'create'));}">添加服务项目</a></li>
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >服务项目名称</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[project_name]" value="{$search['project_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">所属商家</label>
+                            <div class="col-sm-3">
+                                <select name="search[project_businessid]" class="form-control">
+                                    <option value="">请选择</option>
+                                    {loop $business $key $item}
+                                    <option value="{$item['business_id']}" {if $search['project_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">分类列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="">序号</th>
+                        <th>排序</th>
+                        <th style="">项目名称</th>
+                        <th style="">所属商家</th>
+                        
+                        <th style="">最后修改</th>
+                        <th style="min-width: 50px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $projects $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['project_order']}</td>
+                        <td>{$item['project_name']}</td>
+                        <td>{$item['business_name']}</td>
+                        <td>{$item['project_time_update']}</td>
+                        <td>
+                            {if $item['project_state'] == 1}
+                            <a class="btn btn-warning" href="{php echo $this->createWebUrl('project', array('op'=>'look', 'id'=>$item['project_id'], 'look'=>2))}">待审核</a>
+                            {else}
+                            <a class="btn btn-success" href="{php echo $this->createWebUrl('project', array('op'=>'look', 'id'=>$item['project_id'], 'look'=>1))}">已通过</a>
+                            {/if}
+                            <a class="btn btn-primary" href="{php echo $this->createWebUrl('project', array('op'=>'modify', 'id'=>$item['project_id']))}">编辑</a>
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('project', array('op'=>'delete', 'id'=>$item['project_id']))}">删除</a>
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($projects)}
+                    <tr>
+                        <td colspan="5">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="5">
+                            暂无服务项目
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+</script>
+{template 'common/footer'}

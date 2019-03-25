@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no, address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>上传图片</title>
+    <style>
+        .myfile {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            overflow: hidden;
+        }
+    </style>
+    <link href="{$_W['siteroot']}app/resource/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="{$_W['siteroot']}app/resource/css/font-awesome.min.css" rel="stylesheet">-->
+    <!--<link href="{$_W['siteroot']}app/resource/css/animate.css" rel="stylesheet">-->
+    <!--<link href="{$_W['siteroot']}app/resource/css/common.css" rel="stylesheet">-->
+    <script type="text/javascript" src="{$_W['siteroot']}app/resource/js/lib/jquery-1.11.1.min.js"></script>
+    <!--<script type="text/javascript" src="{$_W['siteroot']}addons/fm_photosvote/template/mobile/jquery.lazyload.js"></script>-->
+    <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-10">
+            <form id="myform" style="margin-top: 40px;" action="{php echo $this->createMobileUrl('uploadfile')}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label style="width: 20%">手机号码</label>
+                    <input type="text" id="mymobile" name="mymobile" style="background-image: url(http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/mobile_input.png);border: none;width: 70%;height: 30px;background-size: contain;background-repeat: no-repeat;" placeholder="请输入手机号">
+                    <!--http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/mobile_input.png-->
+                    <!--<img src="http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/desc_text.png"/>-->
+                </div>
+                <!--<div class="form-group">-->
+                    <!--<label style="width: 20%">验证码</label>-->
+                    <!--<input type="text" id="myverification" name="myverification" style="background-image: url(http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/verification_input.png);width: 40%;height: 30px;background-size: contain;border: none;background-repeat: no-repeat;" placeholder="请输入验证码">-->
+                    <!--<button style='background-image: url("http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/verification_btn.png");border: none;width: 80px;height: 24px;background-size: contain;background-repeat: no-repeat;' class="btn btn-default"></button>-->
+                <!--</div>-->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img id="previewImg" src="http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/upload_btn.png" style="width: 100%;"/>
+                        <input id="file" type="file" class="myfile" name="upfile" onchange="preview(this)" style="position: absolute;left: 0;top: 0;">
+                    </div>
+
+                </div>
+                <button id="submit_btn" type="button" onclick="mysubmit()" class="btn btn-default" style="background-image: url('http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/submit_btn.png');border: none;width: 140px;height:36px;display: block;margin: 30px auto;background-size: cover;"></button>
+            </form>
+            <div><img src="http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/images/desc_text.png" style="width: 100%"></div>
+        </div>
+        <div class="col-xs-1"></div>
+    </div>
+</div>
+
+<div id="dialog"></div>
+</body>
+
+<script type="text/javascript" src="http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="http://7xsq9y.com2.z0.glb.clouddn.com/dhw_redpack/js/qiniu.js"></script>
+
+
+<script type="text/javascript" src="{DHWSTATIC}js/dhw.js"></script>
+<script>
+//    $(document).ready(function() {
+//        var Qiniu_UploadUrl = "http://up.qiniu.com";
+//        $("#submit_btn").click(function() {
+//            //普通上传
+//            var Qiniu_upload = function(f, token, key) {
+//                var xhr = new XMLHttpRequest();
+//                xhr.open('POST', Qiniu_UploadUrl, true);
+//                var formData, startDate;
+//                formData = new FormData();
+//                if (key !== null && key !== undefined) formData.append('key', key);
+//                formData.append('token', token);
+//                formData.append('file', f);
+//                var taking;
+//                xhr.upload.addEventListener("progress", function(evt) {
+//                    if (evt.lengthComputable) {
+//                        var nowDate = new Date().getTime();
+//                        taking = nowDate - startDate;
+//                        var x = (evt.loaded) / 1024;
+//                        var y = taking / 1000;
+//                        var uploadSpeed = (x / y);
+//                        var formatSpeed;
+//                        if (uploadSpeed > 1024) {
+//                            formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+//                        } else {
+//                            formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+//                        }
+//                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+//                        progressbar.progressbar("value", percentComplete);
+//                        // console && console.log(percentComplete, ",", formatSpeed);
+//                    }
+//                }, false);
+//
+//                xhr.onreadystatechange = function(response) {
+//                    if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+//                        var blkRet = JSON.parse(xhr.responseText);
+//                        console && console.log(blkRet);
+//                        $("#dialog").html(xhr.responseText).dialog();
+//                    } else if (xhr.status != 200 && xhr.responseText) {
+//
+//                    }
+//                };
+//                startDate = new Date().getTime();
+////                $("#progressbar").show();
+//                xhr.send(formData);
+//            };
+//
+//
+//         $.get("{php echo $this->createMobileUrl('tokenGet')}",function(rst){
+//         	alert(rst);
+//            var qiniuToken = JSON.parse(rst);
+//            var token = qiniuToken.token;
+//            var key = qiniuToken.key;
+//            if ($("#file")[0].files.length > 0 && token != "") {
+//                var imgsStr = "";
+//                for(var i=0;i<$("#file")[0].files.length;i++){
+//                    var filename = $("#file")[0].files[i].name;
+////                 	filename = filename.replace(/^.+?\\([^\\]+?)(\.[^\.\\]*?)?$/gi,"$1") +"."+ filename.replace(/.+\./,"");
+//                    Qiniu_upload($("#file")[0].files[i], token, key);
+//
+//                    //获取下载链接
+////                     $.get("${ctx}/qiniu/getUrlByKey?key="+filename,function(res){
+////                     	var img = "<img src='"+res.imgUrl+"' /><br>" ;
+////                     	imgsStr += img;
+////                     });
+//                }
+////             	$("#upload_imgs").html(imgsStr);
+//// 				document.getElementById("upload_imgs").innerHTML = imgsStr;
+//            } else {
+//                console && console.log("form input error");
+//            }
+//         });
+//
+////         var token = '';
+////         var key = '';
+////         if ($("#file")[0].files.length > 0 && token != "") {
+////             Qiniu_upload($("#file")[0].files[0], token, key);
+////         } else {
+////             console && console.log("form input error");
+////         }
+//        })
+//    });
+
+
+    function preview(file)
+    {
+        var prevDiv = document.getElementById('previewImg');
+        if (file.files && file.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function(evt){
+                prevDiv.src = evt.target.result;
+            }
+            reader.readAsDataURL(file.files[0]);
+        }
+    //    else
+    //    {
+    //        prevDiv.innerHTML = '<div class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src=\'' + file.value + '\'"></div>';
+    //    }
+    }
+
+    function mysubmit(){
+        var form = document.getElementById('myform');
+
+//        var myverification = document.getElementById('myverification').value;
+        var mymobile = document.getElementById('mymobile').value;
+
+        var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        if(mymobile==''){
+            alert('请输入手机号');
+            return;
+        }else if(!myreg.test(mymobile)){
+            alert('请输入有效的手机号码');
+            return;
+        }
+//        if(myverification == ''){
+//            alert('请输入验证码');
+//            return;
+//        }
+
+        if($('#file').val() == ''){
+            alert('请选择图片');
+            return;
+        }
+        form.submit();
+    }
+
+</script>
+</html>

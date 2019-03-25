@@ -1,0 +1,128 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" xmlns="http://www.w3.org/1999/html"
+     xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="ibox-content" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+            <form class="form-horizontal form" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="goodsInventoryinScript">
+                <div class="form-group">
+                    {if $goo_specificationjson['goo_size'] == 1}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>规格</th>
+                            <th>价格</th>
+                            <th>编码</th>
+                            <th>条码</th>
+                            <th>库存</th>
+                        </tr>
+                        </thead>
+                        <tbody id="option-items">
+
+                        {if !empty($bak_goodsinventoryinspecificationjson)}
+                        {loop $bak_goodsinventoryinspecificationjson $bak_goodsinventoryinspecificationjsonloop}
+                        <tr>
+                            <td></td>
+                            <td><input name="specification_title[]" type="text" class="form-control option_title" readonly  value="{$bak_goodsinventoryinspecificationjsonloop['specification_title']}"/></td>
+                            <td><input name="specification_price[]" type="text" class="form-control option_normalprice" readonly  value="{$bak_goodsinventoryinspecificationjsonloop['specification_price']}"/></td>
+                            <td><input name="specification_code[]" type="text" class="form-control option_normalprice" readonly  value="{$bak_goodsinventoryinspecificationjsonloop['specification_code']}"/></td>
+                            <td><input name="specification_barcode[]" type="text" class="form-control  option_stock" readonly value="{$bak_goodsinventoryinspecificationjsonloop['specification_barcode']}"/></td>
+                            <td><input name="specification_stock[]" type="text" class="form-control  option_stock" value="{$bak_goodsinventoryinspecificationjsonloop['specification_stock']}"/></td>
+
+
+                        </tr>
+                        {/loop}
+                        {else}
+                        {loop $bak_specificationjson $specificationjsonloop}
+                        <tr>
+                            <td></td>
+                            <td><input name="specification_title[]" type="text" class="form-control option_title" readonly  value="{$specificationjsonloop['specification_title']}"/></td>
+                            <td><input name="specification_price[]" type="text" class="form-control option_normalprice" readonly  value="{$specificationjsonloop['specification_price']}"/></td>
+                            <td><input name="specification_code[]" type="text" class="form-control  option_stock" readonly value="{$specificationjsonloop['specification_barcode']}"/></td>
+                            <td><input name="specification_barcode[]" type="text" class="form-control option_normalprice" readonly  value="{$specificationjsonloop['specification_barcode']}"/></td>
+                            <td><input name="specification_stock[]" type="text" class="form-control  option_stock" value="{if $specificationjsonloop['specification_stock'] !='' || $specificationjsonloop['specification_stock'] != 0}0{/if}"/></td>
+                        </tr>
+                        {/loop}
+
+                        {/if}
+                        </tbody>
+
+                    </table>
+
+                    {else}
+                    <label for="title" class="col-sm-3 control-label">增加数量</label>
+                    <div class="col-xs-5">
+                        <input type="text" name="addQuantity" id="addQuantity" class="form-control" value="{$goodsinventoryindetailjson['giid_goodsNumber']}"/>
+                    </div>
+                    {/if}
+                    <div class="form-group"  style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <label for="title" class="col-sm-5 control-label"></label>
+                        <div class="col-sm-2">
+                            <input type="hidden" id="goo_specificationjsonsize" name="goo_specificationjsonsize" value="{$goo_specificationjson['goo_size']}"/>
+                            <input type="hidden" id="row_id" name="row_id" value="{$row_id}"/>
+                            <button type="button" class="btn btn-primary btn-rounded btn-block" name="form_Quantity"  id="form_Quantity"/>提交</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $("#form_Quantity").click(function(){
+        var url =  "{php echo $this->createWebUrl('goodsinventoryin', array('op' => 'ajaxlayerspecificationjson'))}";
+        var goo_specificationjsonsize = $("#goo_specificationjsonsize").val();
+        var addQuantity = $("#addQuantity").val();
+        var row_id = $("#row_id").val();
+        var specification_title = $("*[name='specification_title[]']").map(function(){return $(this).val()}).get();
+        var specification_price = $("*[name='specification_price[]']").map(function(){return $(this).val()}).get();
+        var specification_code = $("*[name='specification_code[]']").map(function(){return $(this).val()}).get();
+        var specification_barcode = $("*[name='specification_barcode[]']").map(function(){return $(this).val()}).get();
+        var specification_stock = $("*[name='specification_stock[]']").map(function(){return $(this).val()}).get();
+
+
+        var params = {
+            'specification_title' : specification_title,
+            'specification_price' : specification_price,
+            'specification_code' : specification_code,
+            'specification_barcode' : specification_barcode,
+            'specification_stock' : specification_stock,
+            'goo_specificationjsonsize' : goo_specificationjsonsize,
+            'row_id' : row_id,
+            'addQuantity' : addQuantity,
+        };
+        $.ajax({
+            url: url,
+            type: "post",
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 1) {
+                    swal({
+                        title: "保存失败",
+                        text: "卡号错误或不存在卡号，请重新读卡！",
+                        confirmButtonText: "确定",
+                        type: "error",
+                    });
+                    return;
+                }
+                else{
+                    swal({
+                            title: "保存成功",
+                            text: "信息保存成功",
+                            confirmButtonText: "确定",
+                            type: "success",
+                        },
+                        function(){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+                }
+            }
+        });
+    });
+
+</script>
+{template 'web/common/footer'}

@@ -1,0 +1,131 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="../addons/ncs_meirong/resource/css/style.css" />
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {$xtitle}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="post" action="{url 'site/entry/'.$url,array('m'=>'ncs_meirong','op'=>'savemodel','version_id'=>$_GPC['version_id'])}" name="submit" style="padding: 20px 0;">
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control"  name="name" id="name" value="{$list['name']}">
+                    <input type="hidden" name="id" value="{$list['id']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">地址搜索</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control"  name="search" id="search" value="{$list['search']}">
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-default search" style="margin-right:5px;">查询</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">地图</label>
+                <div class="col-sm-10">
+                    <div id="container" style="width: 100%;height: 400px;"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label"></label>
+                <label for="name" class="col-sm-2 control-label" style="width: auto;padding-left: 15px;">经度</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control"  name="longitude" value="{$list['content']['longitude']}">
+                </div>
+                <label for="name" class="col-sm-2 control-label" style="width: auto;">纬度</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control"  name="latitude" value="{$list['content']['latitude']}">
+                </div>
+            </div>
+            <div class="form-group">
+
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="submit" name="submit" class="btn btn-default">
+                </div>
+            </div>
+
+
+
+        </form>
+    </div>
+</div>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=S4MBZ-R3K3R-LIVWM-WOGGV-M2SMJ-23BT5"></script>
+<script>
+    $(function(){
+        var markers=[];
+        var longitude=$("input[name='longitude']").val();
+        var latitude=$("input[name='latitude']").val();
+        if(longitude!="" && latitude!=""){
+            var center = new qq.maps.LatLng(latitude, longitude);
+        }else{
+            var center=new qq.maps.LatLng(39.916527,116.397128);
+        }
+        var map = new qq.maps.Map(document.getElementById('container'),{
+            center: center,
+            zoom: 16
+        });
+        var marker = new qq.maps.Marker({
+            map:map,
+            position: center
+        });
+        markers.push(marker);
+        //调用地址解析类
+        geocoder = new qq.maps.Geocoder({
+            complete : function(result){
+                if(result.detail.location!=""){
+                    map.setCenter(result.detail.location);
+                    console.log(result.detail.location);
+                    $("input[name='longitude']").val(result.detail.location.lng);
+                    $("input[name='latitude']").val(result.detail.location.lat);
+                    clearOverlays(markers);
+                    var marker = new qq.maps.Marker({
+                        map:map,
+                        position: result.detail.location
+                    });
+                    markers.push(marker);
+                }
+                if(result.detail.address!=""){
+                    $("input[name='search']").val(result.detail.address);
+                }
+            }
+        });
+        geocoder.getAddress(center);
+        qq.maps.event.addListener(
+                map,
+                'click',
+                function(event) {
+                    $("input[name='longitude']").val(event.latLng.getLng());
+                    $("input[name='latitude']").val(event.latLng.getLat());
+                    var center = new qq.maps.LatLng(event.latLng.getLat(), event.latLng.getLng());
+                    clearOverlays(markers);
+                    var marker = new qq.maps.Marker({
+                        map:map,
+                        position: center
+                    });
+                    markers.push(marker);
+                    geocoder.getAddress(center);
+                }
+        );
+        $(".search").click(function(){
+            var content=$("input[name='search']").val();
+            if(content!=""){
+                geocoder.getLocation(content);
+            }
+        });
+    })
+    function clearOverlays(overlays) {
+        var overlay;
+        if(overlays.length>0){
+            while (overlay = overlays.pop() ) {
+                overlay.setMap(null);
+            }
+        }
+
+    }
+</script>
+
+{template 'common/footer'}

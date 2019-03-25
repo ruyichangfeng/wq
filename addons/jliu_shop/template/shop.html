@@ -1,0 +1,222 @@
+{template 'common/header'}
+{if $operation == 'display'}
+<a href="{php echo $this->createWebUrl('lists',array('op' =>'post'))}" class="btn btn-success"><i class="fa fa-plus"></i> 添加门店</a>
+<div class="main panel panel-default">
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:30px;">ID</th>
+					<th>显示顺序</th>					
+					<th>门店名称</th>
+					<th>门店电话</th>
+					<th>门店地址</th>
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $item}
+				<tr>
+					<td>{$item['id']}</td>
+					<td>{$item['displayorder']}</td>
+					<td>{$item['shop_name']}</td>
+					<td>{$item['shop_tel']}</td>
+					<td>{$item['shop_address']}</td>
+					<td style="text-align:left;">
+						<!--a href="{php echo $this->createWebUrl('lists', array('op' => 'comment', 'id' => $item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="评论管理">评论</a-->
+						<a href="{php echo $this->createWebUrl('lists', array('op' => 'post', 'id' => $item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="修改"><i class="fa fa-edit"></i></a>
+						<a href="{php echo $this->createWebUrl('lists', array('op' => 'delete', 'id' => $item['id']))}" onclick="return confirm('确认删除吗？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+{elseif $operation == 'post'}
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+		<input type="hidden" name="id" value="{$shop['id']}" />
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				门店设置
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='shop_name' name="shop_name" class="form-control" value="{$shop['shop_name']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店logo</label>
+                    <div class="col-sm-9 col-xs-12">
+                        {php echo tpl_form_field_image('shop_logo', $shop['shop_logo'])}
+                    </div>
+                </div>
+
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店描述</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='shop_des' name="shop_des" class="form-control" value="{$shop['shop_des']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店地址</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='shop_address' name="shop_address" class="form-control" value="{$shop['shop_address']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店位置</label>
+					<div class="col-sm-9 col-xs-12">
+						{php echo tpl_form_field_coordinate('location', array('lng' => $shop['shop_lng'], 'lat' => $shop['shop_lat']))}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店电话</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='shop_tel' name="shop_tel" class="form-control" value="{$shop['shop_tel']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店营业时间</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='shop_time' name="shop_time" class="form-control" value="{$shop['shop_time']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>门店详情</label>
+                    <div class="col-sm-9 col-xs-12">
+                        {php echo tpl_ueditor('content', $shop['content'])}
+                    </div>
+                </div>
+
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否推荐</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='recommend' value='1' {if $shop['recommend']==1}checked{/if} /> 是
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='recommend' value='0' {if $shop['recommend']==0}checked{/if} /> 否
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否显示</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='1' {if $shop['enabled']==1}checked{/if} /> 是
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='0' {if $shop['enabled']==0}checked{/if} /> 否
+						</label>
+					</div>
+				</div>
+
+            </div>
+		</div>
+
+		<!--div class="panel panel-default">
+			<div class="panel-heading">
+				优惠券设置
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>优惠券名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='coupon_name' name="coupon_name" class="form-control" value="{$shop['coupon_name']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>优惠券面值</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='coupon_value' name="coupon_value" class="form-control" value="{$shop['coupon_value']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>优惠券价格</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='coupon_price' name="coupon_price" class="form-control" value="{$shop['coupon_price']}" />
+						<span class="help-block">0为免费领取</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>优惠券总数量</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='coupon_num' name="coupon_num" class="form-control" value="{$shop['coupon_num']}" />
+						<span class="help-block">0为不限制</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>优惠券每人最多领取</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" id='coupon_limit' name="coupon_limit" class="form-control" value="{$shop['coupon_limit']}" />
+						<span class="help-block">0为不限制</span>
+					</div>
+				</div>
+            </div>
+		</div--> 
+
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+</div>
+<script language='javascript'>
+	function formcheck() {
+		if ($("#shop_name").val() == '') {
+			util.message("请输入门店名称");
+			return false;
+		}
+		if ($("#shop_des").val() == '') {
+			util.message("请输入门店描述");
+			return false;
+		}
+		if ($("#shop_address").val() == '') {
+			util.message("请输入门店地址");
+			return false;
+		}
+		if ($("#shop_tel").val() == '') {
+			util.message("请输入门店电话");
+			return false;
+		}
+		if ($("#shop_time").val() == '') {
+			util.message("请输入门店营业时间");
+			return false;
+		}
+		// if ($("#coupon_name").val() == '') {
+		// 	util.message("请输入优惠券名称");
+		// 	return false;
+		// }
+		// if ($("#coupon_value").val() == '') {
+		// 	util.message("请输入优惠券面值");
+		// 	return false;
+		// }
+		// if ($("#coupon_price").val() == '') {
+		// 	util.message("请输入优惠券价格");
+		// 	return false;
+		// }
+		// if ($("#coupon_num").val() == '') {
+		// 	util.message("请输入优惠券数量");
+		// 	return false;
+		// }
+		return true;
+	}
+</script>
+{/if}
+{template 'common/footer'}

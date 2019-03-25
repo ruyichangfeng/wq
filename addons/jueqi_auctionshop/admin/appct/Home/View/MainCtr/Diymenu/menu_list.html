@@ -1,0 +1,92 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>商品管理</cite></a>
+          <a><cite>商品管理</cite></a>
+        </span>
+       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    
+    <div class="x-body">
+    	
+       <xblock>
+            <button class="layui-btn" onclick="menu_edit('添加菜单','{:U('Home/MainCtr/Diymenu/menu_add')}','660','490')"><i class="layui-icon">&#xe608;</i>添加</button>
+       </xblock>
+      	 
+      	<form id="delform" class="layui-form">
+      	 	<table class="layui-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>菜单名称</th>  
+                    <th>菜单图片</th>
+                    <th>菜单路径</th>
+                    <th>序号</th>
+                    <th>添加时间</th>                   
+                    <th>操作</th>
+                </tr>
+            </thead>
+          
+            <tbody id="formdata">
+              <volist name="list" id="v">	
+                 <tr> 
+                    <td>{$v.id}</td>
+                    <td>{$v.name}</td>
+                    <td><img src="__ROOT__/Uploads/{$v.menu_img}"></td>
+					<td>{$v.jump_url}</td>					
+                   	<td>{$v.rank}</td>
+                    <td><?php echo  date('Y-m-d H:i:s', $v['add_time']); ?></td>                
+                    <td class="td-manage">
+                        <a title="编辑" href="javascript:;" onclick="menu_edit('编辑','{:U('Home/MainCtr/Diymenu/menu_add',array('id'=>$v['id']))}','660','490')"  class="ml-5" style="text-decoration:none">
+                        	<i class="layui-icon">&#xe642;</i>
+                        </a>
+                       <a title="删除" href="javascript:;" onclick="menu_del('{$v.id}')"  style="text-decoration:none">
+                            <i class="layui-icon">&#xe640;</i>
+                       </a>
+                    </td>
+                </tr>
+              </volist>  
+            </tbody>
+             </table>
+          </form> 
+       	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+    </div>
+     <include file="Public/footer.html"/>
+     <script>    	
+        layui.use(['form','element','laypage','layer'], function(){
+           var laypage = layui.laypage;
+           var layer = layui.layer;
+           var form = layui.form;
+           $ = layui.jquery; 
+        });
+        
+        function menu_edit (title,url,w,h) {
+            x_admin_edit(title,url,w,h); 
+        }
+        
+       function menu_del(id){
+		   var par = {"id":id};
+			layer.confirm('确认要删除吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Diymenu/menu_del')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('删除成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('删除失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+ </script>
+   
+</body>
+</html>

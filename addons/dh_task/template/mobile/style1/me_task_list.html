@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <style type="text/css">
+        .list{background-color: #fff;margin-bottom: 10px;}
+        .list .userinfo{display:block;height:78px;border-bottom: 1px solid #f8f8f8;padding: 10px;overflow: hidden;}
+        .list .userinfo .info{width: 80%;float: left;}
+        .list .userinfo .info p{color: #333;line-height: 26px;}
+        .list .userinfo .info .p1{font-size: 13px;}
+        .list .userinfo .info .p2{color: #888;font-size: 12px;}
+        .list .userinfo .info .p3 span{font-size: 12px;background-color: #F67916;color: #fff;padding:3px;border-radius: 3px;margin-right: 5px;}
+        .list .userinfo .review{width: 20%;float: right;text-align: center;line-height: 78px;color: #a0a0a0;}
+        .list .userinfo .review span{width: 70%;}
+        .list .userinfo .review i{width: 30%;float: right;font-size: 14px;}
+        
+        .empty{margin-top: 100px;text-align: center;}
+        .empty i:before{color: #dedede;font-size: 5em;}
+        .empty p{text-align: center;color: #999;line-height: 30px;font-size: 14px;}
+        
+        .pager{margin-bottom: 10px;}
+        .pager .pager-left{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-right{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-left .pager-pre{width: 60%;background-color: #fff;border-radius: 3px;}
+        .pager .pager-right .pager-next{width: 60%;background-color: #fff;border-radius: 3px;border:none;}
+    </style>
+    
+</head>
+<body ontouchstart  class="page-bg">
+    {template 'style1/follow'}
+    <div class="searchbar_wrap"></div> 
+    <div class="list">
+        {loop $tasklist $i $v}
+        <a class="userinfo" href="{php echo $this->createMobileUrl('me', array('op'=>'metaskinfo','id'=>$v['rid']), true)}">
+            <div class="info">
+                <p class="p1">{$v['task_title']}</p>
+                <p class="p2">{$v['task_do_time']}</p>
+                <p class="p3"><span>{$v['navtitle']}</span><span>{if $v['task_points'] > 0}+{$v['task_points']}{/if}</span>{if $v['points']}<span>{if $v['points'] > 0}+{$v['points']}{else}{$v['points']}{/if}</span>{/if}</p>
+            </div>
+            <div class="review"><span>{if $v['status'] == 1}通过{elseif $v['status'] == 2}未通过{elseif $v['status'] == 3}审核中{elseif $v['status'] == 4}已放弃{/if}</span><i class="icon icon-108"></i></div>
+        </a>
+        {/loop}
+    </div>
+    {if empty($tasklist)}
+    <div class="empty">
+        <i class="weui_icon_msg weui_icon_info"></i>
+        <p>没有数据，先浏览其他项目吧</p>
+    </div>
+    {/if}
+    <div class="page-bd-15">
+        <div class='pager'>
+            <div class="pager-left">
+                {if $prevPage}<div class="pager-pre"><a class="pager-nav" href="{$prevPage}">上一页</a></div>{/if}
+            </div>
+            {if $allpage}<div class="pager-cen">{$page}/{$allpage}</div>{/if}
+            <div class="pager-right">
+                {if $nextPage}<div class="pager-next"><a class="pager-nav" href="{$nextPage}">下一页</a></div>{/if}
+            </div>
+        </div> 
+    </div>
+    <script type="text/javascript">
+        $('.searchbar_wrap').searchBar({
+            cancelText:"取消",
+            searchText:"{if $_GPC['key']}{$_GPC['key']}{else}关键字{/if}",
+            onsubmit:function(value){
+                window.location.href="{php echo $this->createMobileUrl('me', array('op'=>'metask'), true)}&key="+value;
+            }
+        });
+    </script>
+    {template 'style1/footer'}
+</body>
+</html>

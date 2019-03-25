@@ -1,0 +1,73 @@
+
+{template 'common/header'}
+
+<div class="panel panel-default">
+  <div class="panel-heading">活动报名列表</div>
+  <div class="panel" style="padding: 10px;">
+      <form method="post" action="{php echo $this->createWebUrl('DataToExcel');}" >
+        <div class="col-lg-6">
+  	    <div class="input-group">
+  	      <!-- <input type="text" class="form-control" placeholder="输入你要导出的最新数据的条数(例如：20),如果没有输入任何条数,默认导出所有数据"> -->
+  	      <span class="input-group-btn">
+  	        <button class="btn btn-default" type="submit" name="submit" >导出数据</button>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+  	      </span>
+  	    </div>
+      </form>
+	  </div>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          {loop $fields $val}
+          <th>{$val['name']}</th>
+          {/loop}
+          <th>短信验证号码</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+
+      <tbody>             
+        {loop $datas $id $val}
+        <tr>
+          <?php 
+             $arr = explode(',',$datas[$id]["group_concat(id ORDER BY id)"]);
+             $arrfield_id = explode(',',$datas[$id]["group_concat(field_id ORDER BY id)"]);
+             //var_dump($arr[0]);
+             //var_dump($arrfield_id[0]);exit;
+          ?>
+          <?php for($i=0;$i< $count;$i++) {?>
+            <?php 
+                $value = pdo_get('hao_field_data',array('id'=>$arr[$i]));
+                $type = pdo_get('hao_field',array('id'=>$arrfield_id[$i]));
+                $phone = pdo_get('hao_huodong_vaild',array('openid'=>$value['openid']));
+                //var_dump($type['type']);
+            ?>
+            {if $type['type'] == 'image' }
+            <td><img style="height:50px;width:50px;" src="{php echo tomedia($value['value']); }" /></td>
+            {else}
+            <td>{$value['value']}</td>
+            {/if}
+          <?php }?>
+          <td>{$phone['phone']}</td>
+          <td><a href="{php echo $this->createWebUrl('DeleteData',array('id'=>$datas[$id]['groupid']))}" type="button" onclick="javascript:return del()" class="btn btn-danger">删除</a></td>
+        </tr>
+        {/loop}
+      </tbody>
+    </table>
+    {$pager}
+  </div>
+</div>
+<script type="text/javascript">
+  function del(){
+    var msg = "您真的确定要删除吗？\n\n请确认！";
+    if (confirm(msg)==true){
+       return true;
+    }else{
+       return false;
+    }
+  }
+</script>
+
+{template 'common/footer'}

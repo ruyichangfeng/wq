@@ -1,0 +1,215 @@
+{template $style.'/header'}
+<body>
+<style>
+    .page, body {
+        background-color: #f8f8f8;
+    }
+    body {
+        font-family: -apple-system-font,Helvetica Neue,Helvetica,sans-serif;
+    }
+    .font9 {
+        font-size: .9em;
+    }
+    .color-gray {
+        color: #999999
+    }
+    .getcash_all_btn {
+        color: #586C94;
+    }
+    .error_info {
+        padding-left: 15px;
+        color: #FF0000;
+        font-size: 12px;
+    }
+    .consume_info {
+        color: #333;
+        font-size: 12px;
+    }
+    .radio_info {
+        text-align: center;
+        color: #999999;
+        font-size: .7rem;
+    }
+    .weui-tabbar {
+        height: 40px;
+    }
+    .weui-tabbar .weui-tabbar__item {
+        padding-top: 0
+    }
+    .weui-tabbar .weui-tabbar__item .weui-tabbar__label {
+        line-height: 40px;
+    }
+</style>
+<div class="container" id="container">
+    <div class="page preview js_show">
+        <div class="page__bd">
+            <form name="theform" method="post" role="form" id="form1">
+                <input type="hidden" name="c" value="entry" />
+                <input type="hidden" name="m" value="superman_getcash" />
+                <input type="hidden" name="i" value="{$_W['uniacid']}" />
+                <input type="hidden" name="do" value="getcash" />
+                <div class="weui-form-preview">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd font9 color-gray">您的账号有</div>
+                        <div class="weui-cell__ft font9 color-gray">
+                            {$credit[value]} {$credit[title]}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd font9 color-gray">提现方式</div>
+                        <div class="weui-cell__ft weui-form-preview__value weui-form-preview__btn_primary font9">
+                            微信钱包
+                        </div>
+                    </div>
+                    {if $conf['getcash']['realname']}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <label class="weui-form-preview__label font9">收款账号姓名</label>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input font9" type="text" id="realname" name="realname">
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="weui-cell weui-cell_vcode">
+                        <div class="weui-cell__hd">
+                            <label class="weui-form-preview__label font9">提现金额</label>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input font9" name="money" id="money" type="number" step="0.01" min="1" data-min-getcash={$conf['getcash']['min']} data-credit-title="{$credit[title]}">
+                        </div>
+                        <div class="weui-cell__ft">
+                            <a class="weui-vcode-btn font9 getcash_all_btn" data-max-create="{$max_create}">全部提现</a>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <textarea name="remark" id="remark" class="weui-textarea getcash_remark font9" placeholder="备注（选填）" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="weui-cell font9">
+                        <div class="color-gray">提现说明：{php echo htmlspecialchars_decode($this->module['config']['getcash']['desc'])}</div>
+                    </div>
+                </div>
+                <span class="error_info"></span>
+                <span class="consume_info"></span>
+                <div class="weui-btn-area">
+                    <input type="hidden" name="token" value="{$_W['token']}">
+                    {if $conf['base']['open']}
+                        {if $conf['getcash']['min'] > 0 && $conf['getcash']['min'] > $credit[value]}
+                        <input type="submit" name="submit" disabled class="weui-btn weui-btn_disabled weui-btn_primary" value="申请提现（最低提现金额{$conf['getcash']['min']}）">
+                        {else}
+                        <input type="submit" name="submit" disabled class="weui-btn weui-btn_disabled weui-btn_primary" value="申请提现">
+                        {/if}
+                    {else}
+                    <input type="submit" name="submit" disabled class="weui-btn weui-btn_disabled weui-btn_primary" value="申请提现（未开启）">
+                    {/if}
+                </div>
+                <div style="text-align: center">
+                {if $radio != 1}
+                <span class="radio_wrap radio_info" data-radio="{$radio}">提现比率：{$radio}{$credit[title]}兑1元</span>
+                {/if}<span class="radio_info">（最多{$max_create}元）</span>
+                </div>
+            </form>
+            <div class="weui-tabbar">
+                <a href="{php echo $this->createMobileUrl('cashlog')}" class="weui-tabbar__item">
+                    <p class="weui-tabbar__label">提现记录</p>
+                </a>
+                <a href="{php echo url('mc/home')}" class="weui-tabbar__item">
+                    <p class="weui-tabbar__label">个人中心</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    require(['jquery', 'util'],function($, u){
+        function pageInit() {
+            var realnameFlag = false;
+            var moneyFlag = false;
+            var min_credit = parseFloat($('#money').attr('data-min-getcash'));
+            var max_credit = $('.getcash_all_btn').attr('data-max-create');
+            var radio = $('.radio_wrap').attr('data-radio');
+            var credit_title = $('#money').attr('data-credit-title');
+            //全部提现快捷操作
+            $('.getcash_all_btn').click(function () {
+                $('#money').val(max_credit);
+                if ($('#money').val().length > 0 && $('#money').val() >= min_credit) {
+                    moneyFlag = true;
+                    $('.error_info').text('');
+                    if (max_credit*radio) {
+                        $('.consume_info').text('本次提现需消耗'+(Math.floor(max_credit*radio * 100) / 100)+credit_title);
+                        //$('.consume_info').text('本次提现需消耗'+max_credit*radio+credit_title);
+                    } else {
+                        $('.consume_info').text('');
+                    }
+                } else {
+                    moneyFlag = false;
+                    $('.consume_info').text('');
+                    $('.error_info').text('最低提现金额为 '+min_credit+' 元');
+                }
+                if (realnameFlag && moneyFlag) {
+                    removeDisabled();
+                } else {
+                    addDisabled();
+                }
+            });
+            //提现按钮状态函数
+            function addDisabled() {
+                $('input[name=submit]').addClass('weui-btn_disabled');
+                $('input[name=submit]').attr('disabled', true);
+            }
+            function removeDisabled() {
+                $('input[name=submit]').removeClass('weui-btn_disabled');
+                $('input[name=submit]').attr('disabled', false);
+            }
+            //如果收款账号必填时
+            <!--{if $conf['getcash']['realname']}-->
+            $('#realname').bind('input propertychange', function() {
+                if ($(this).val().length > 0) {
+                    realnameFlag = true;
+                } else {
+                    realnameFlag = false;
+                }
+                if (realnameFlag && moneyFlag) {
+                    removeDisabled();
+                } else {
+                    addDisabled();
+                }
+            });
+            <!--{else}-->
+            realnameFlag = true;
+            <!--{/if}-->
+            //提现金额条件
+            $('#money').bind('input propertychange', function() {
+                var credit = parseFloat($(this).val());
+                if (credit > max_credit) {
+                    $('.consume_info').text('');
+                    $('.error_info').text('输入金额超过现有余额 '+max_credit+' 元');
+                } else if (credit < min_credit) {
+                    $('.consume_info').text('');
+                    $('.error_info').text('最低提现金额为 '+min_credit+' 元');
+                } else {
+                    $('.error_info').text('');
+                    if (credit*radio) {
+                        $('.consume_info').text('本次提现需消耗'+(Math.floor(credit*radio * 100) / 100)+credit_title);
+                        //$('.consume_info').text('本次提现需消耗'+credit*radio+credit_title);
+                    } else {
+                        $('.consume_info').text('');
+                    }
+                }
+                if ($(this).val().length > 0 && credit <= max_credit && credit >= min_credit) {
+                    moneyFlag = true;
+                } else {
+                    moneyFlag = false;
+                }
+                if (realnameFlag && moneyFlag) {
+                    removeDisabled();
+                } else {
+                    addDisabled();
+                }
+            });
+        }
+        pageInit();
+    });
+</script>

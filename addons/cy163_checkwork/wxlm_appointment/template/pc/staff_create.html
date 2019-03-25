@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+    <title>{php echo $this->config['system_name']}</title>
+    {template '../pc/head'}
+    <script src="{RES}public/pc/ueditor/ueditor.config.js"></script>
+    <script src="{RES}public/pc/ueditor/ueditor.all.min.js"></script>
+    <script src="{RES}public/pc/ueditor/lang/zh-cn/zh-cn.js"></script>
+</head>
+<style>
+    .stress_red {
+        color: red;
+    }
+</style>
+<body class="nav-md" style="overflow-y: auto">
+{template '../pc/header'}
+<!-- page content -->
+<div class="right_col con-box" role="main">
+    <div class="con">
+        <div class="col-md-12 col-xs-12">
+            <div class="x_panel">
+               <!--  <div class="x_title" style="margin-bottom: 25px">
+                    <h2 style="font-weight:bold;">服务员工</h2>
+
+                    <div class="clearfix"></div>
+                </div> -->
+                <div class="x_content">
+                    <ul class="nav nav-tabs" style="margin-bottom: 20px">
+
+                        <li ><a  href="{php echo $this->createMobileUrl('pcStaff', array('op'=>'display'));}">服务员工管理</a></li>
+                        <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createMobileUrl('pcStaff', array('op'=>'create'));}">添加服务员工</a></li>
+                        {if $op == 'modify'}
+                        <li class="active" ><a href="#">编辑服务员工</a></li>
+                        {/if}
+                    </ul>
+
+                    <div class="table-responsive" style="margin-top:10px;">
+                        <form action="{php echo $this->createMobileUrl('pcStaff', array('op'=>'create'))}" method="post" enctype="multipart/form-data" class="form-horizontal form" id="staff_form">
+                            <div class="panel panel-primary" style="margin-bottom:0px;border-color: #3F5367">
+                                <div style="background-color: #3F5367;border-color: #3F5367" class="panel-heading">{if $op == 'create'}添加服务员工{else if $op == 'modify'}编辑服务员工{/if}</div>
+                                <div class="panel-body">
+                                    <div class="form-group" style="display:none;">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="staff[staff_id]" class="form-control" value="{$staff['staff_id']}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>选择员工</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="staff[staff_nickname]" class="form-control" value="{$staff['staff_nickname']}" onclick="searchShow()" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>openID</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" readonly name="staff[staff_openid]" class="form-control" value="{$staff['staff_openid']}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>头像</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" hidden name="img-val" id="img-state">
+                                            <input id="image_file" type="file" name="staff_avatar" value="" class="form-control" onchange="preview(this)">
+                                            <div class="input-group " style="margin-top:.5em;">
+                                                <img id="preview" src="{php echo tomedia($staff['staff_avatar'])}" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail"  width="200" />
+                                                <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>所属商家</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <select disabled="disabled" name="staff[staff_businessid]" class="form-control" id="">
+                                                <option value="{$business['business_id']}" selected>{$business['business_name']}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>姓名</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="staff[staff_name]" class="form-control" value="{$staff['staff_name']}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>职称</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="staff[staff_jobname]" class="form-control" value="{$staff['staff_jobname']}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>性别</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <select name="staff[staff_gender]" class="form-control">
+                                                <option value="0" {if $staff['staff_gender'] == 0 || empty($staff['staff_gender'])}selected{/if}>保密</option>
+                                                <option value="1" {if $staff['staff_gender'] == 1}selected{/if}>男</option>
+                                                <option value="2" {if $staff['staff_gender'] == 2}selected{/if}>女</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>电话号</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="staff[staff_tel]" class="form-control" value="{$staff['staff_tel']}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>简介背景图</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+
+                                            <input type="text" hidden name="img2-val" id="img2-state">
+                                            <input id="image2_file" type="file" name="staff_pic" value="" class="form-control" onchange="preview(this)">
+                                            <div class="input-group " style="margin-top:.5em;">
+                                                <img id="preview2" src="{php echo tomedia($staff['staff_pic'])}" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail"  width="200" />
+                                                <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">员工介绍</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <script id="editor" type="text/plain" name="staff[staff_info]" style="width:100%;height:350px;">{$staff['staff_info']}</script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                                            <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;background-color: #3F5367"/>
+                                            <input type="hidden" name="token" value="{$_W['token']}" />
+                                            <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="myModal-search" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-body">
+            <form action="" method="post" class="form-horizontal form" id="form1">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">选择员工</div>
+                    <div class="panel-body">
+                        <div class="form-group" style="margin-bottom: 0">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="昵称/电话号/openID" id="search_info">
+                                    <span class="input-group-btn">
+        <button class="btn btn-default" onclick="searchStaff()" type="button">搜索</button>
+      </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive panel-body">
+                            <table class="table table-hover table-responsive" style="min-width: 300px;">
+                                <thead class="navbar-inner">
+                                <tr>
+                                    <th style="">昵称</th>
+                                    <th></th>
+                                    <th style="">电话</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th style="">操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody id="search_content">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: center">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" style="width:100px;">关闭</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div><!-- /.modal -->
+</div>
+
+
+<script src="{RES}/public/pc/js/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="{RES}public/pc/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="{RES}public/pc/js/fastclick.js"></script>
+<!-- NProgress -->
+<script src="{RES}public/pc/js/nprogress.js"></script>
+<!-- iCheck -->
+<script src="{RES}public/pc/js/icheck.min.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="{RES}public/pc/js/custom.min.js"></script>
+
+<!-- 系统提示框（Modal） -->
+<div class="modal fade in" id="warming-Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog we7-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>系统提示</h3>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <p>
+                    <img src="{RES}public/images/warming.png" alt="">
+                    <span id="message">啥都没写</span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+    function searchShow() {
+
+        $("#myModal-search").modal().css({
+
+            "margin-top": function () {
+                return - ($(this).height() / 2);
+            }
+        });
+    }
+    function searchStaff() {
+
+        var info = $('#search_info').val();
+
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('ajaxFans', array())}"+"&content="+info,
+            type:"get",
+            success:function(data){
+
+                $('#search_content').html(data);
+
+            }
+        });
+
+    }
+    function chooseFans(openid, nickname, avatar) {
+
+
+        if (openid == '')
+        {
+            alert('未找到粉丝信息');
+            return false;
+        }
+
+        $('input[name="staff[staff_openid]"]').val(openid);
+        $('input[name="staff[staff_nickname]"]').val(nickname);
+        $('#myModal-search').modal('hide');
+    }
+    /** 删除图片 */
+    function deleteImage(elm){
+        $(elm).prev().attr("src", "./resource/images/nopic.jpg");
+        $(elm).parent().prev().find("input").val("");
+        var file = $('#image_file');
+        file.val('');
+
+    }
+</script>
+
+<script>
+
+    /** 头像上传 */
+    $("#image_file").change(function(){
+
+        var objUrl = getObjectURL(this.files[0]) ;
+        console.log("objUrl = "+objUrl) ;
+        if (objUrl) {
+            $("#preview").attr("src", objUrl) ;
+        }
+    }) ;
+
+    /** 背景图上传 */
+    $("#image2_file").change(function(){
+
+        var objUrl = getObjectURL(this.files[0]) ;
+        console.log("objUrl = "+objUrl) ;
+        if (objUrl) {
+            $("#preview2").attr("src", objUrl) ;
+        }
+    }) ;
+
+    //建立一個可存取到該file的url
+    function getObjectURL(file) {
+
+        var url = null ;
+        if (window.createObjectURL != undefined) { // basic
+
+            url = window.createObjectURL(file) ;
+
+        } else if (window.URL != undefined) { // mozilla(firefox)
+
+            url = window.URL.createObjectURL(file) ;
+
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+
+            url = window.webkitURL.createObjectURL(file) ;
+        }
+        return url ;
+    }
+
+    //文本编辑器
+    var ue = UE.getEditor('editor');
+
+    function message(content) {
+
+        $('#message').html(content);
+        $("#warming-Modal").modal().css({
+
+            "margin-top": function () {
+                return - ($(this).height() / 2);
+            }
+        });
+
+    }
+    $('#staff_form').submit(function(){
+
+        $('#img-state').val($("#preview").attr("src"));
+        $('#img2-state').val($("#preview2").attr("src"));
+
+        if($('input[name="staff[staff_openid]"]').val() == ''){
+           message('未选择员工.');
+            return false;
+        }
+        if($('#img-state').val() == './resource/images/nopic.jpg'){
+            message('未选择员工头像.');
+            return false;
+        }
+        if($('select[name="project[project_businessid]"]').val() == ''){
+            message('未选择所属商家.');
+            return false;
+        }
+
+        if($('input[name="staff[staff_name]"]').val() == ''){
+            message('未填写姓名.');
+            return false;
+        }
+
+        if($('input[name="staff[staff_jobname]"]').val() == ''){
+            message('未填写职称.');
+            return false;
+        }
+        if($('input[name="staff[staff_tel]"]').val() == ''){
+            message('未填写电话.');
+            return false;
+        }
+        if($('#img2-state').val() == './resource/images/nopic.jpg'){
+            message('未选择背景图.');
+            return false;
+        }
+
+        return true;
+    });
+
+</script>
+</body>
+</html>

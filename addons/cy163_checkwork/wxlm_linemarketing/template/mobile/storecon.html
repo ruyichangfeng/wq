@@ -1,0 +1,660 @@
+    {template 'head2'}
+
+<title>{$title}</title>
+
+     <script>
+
+         wx.ready(function () {
+
+            sharedata = {
+
+                title: "{$onestore_list['store_title']}",
+
+                desc: "{$onestore_list['store_title']}",
+
+                link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('storecon',array('store_id'=>$onestore_list['store_id'],'parent'=>$openid)))}",
+
+                imgUrl: "{php echo tomedia($onestore_list['store_thumb'])}",
+
+                type: '', // 分享类型,music、video或link，不填默认为link
+
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+
+                success: function(){
+
+                },
+
+                cancel: function(){
+
+                }
+
+            };
+
+            wx.onMenuShareAppMessage(sharedata);
+
+            wx.onMenuShareTimeline(sharedata);
+
+            wx.onMenuShareQQ(sharedata);
+
+            wx.onMenuShareWeibo(sharedata);
+
+            wx.onMenuShareQZone(sharedata);
+
+        }); 
+
+     </script>  
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <input type="hidden" id="store_id" value="{$onestore_list['store_id']}">
+
+    <div class="cont-box">
+
+        <ul class="cont">
+
+            <li>
+
+                <div class="cont-t">
+
+                    <div class="cont-image01">
+
+                        <img src="{php echo tomedia($onestore_list['store_thumb'])}">
+
+                    </div>
+
+                     <div class="explord01_show-image" >
+
+                        <img  class="explord01_show-image02" id="img_2" onClick="javascript:_show(this,{$onestore_list['store_id']},2)" src="{RES}public/discount/images/xin03.png"  style="display: {if $onestore_list['collect_gzzt']==1}none{else}block{/if};width: 30px;">
+
+
+
+                        <img class="explord01_show-image02"  id="img_3" onClick="javascript:_show(this,{$onestore_list['store_id']},3)" src="{RES}public/discount/images/xin02.png"  style="display: {if $onestore_list['collect_gzzt']==1}block{else}none{/if};width: 30px;">
+
+                    </div>
+
+                </div>
+
+                <div class="cont-c">
+
+                    <div class="cont-text01">{$onestore_list['store_title']}</div>
+
+                </div>
+
+                <ul class="cont-b"  id="collectid{$onestore_list['store_id']}">
+
+                    {loop $collect_list $key $item}
+
+                    <li id="avatar{$onestore_list['store_id']}{$item['collect_id']}">
+
+                        <img src="{if $item['collect_avatar']}{$item['collect_avatar']}{else}{RES}images/noavatar.gif{/if}" class="img-circle">
+
+                    </li>
+
+                    {/loop}
+
+                    <div class="cont-text02">等<span id="count{$onestore_list['store_id']}">{$onestore_list['store_amountcollect']}</span>人想去</div>
+
+                </ul>
+
+                <div class="wz">
+
+                    <div class="wz-l">
+
+                        <div class="wz-l-image">
+
+                            <img src="{RES}/public/discount/images/dingwei.png">
+
+                        </div>
+
+                        <div class="wz-l-text" style="font-size: 14px;"><a href="{$urladdr}">{$onestore_list['store_address']}</a></div>
+
+                    </div>
+
+                    <div class="wz-r">
+
+                        <img src="{RES}/public/discount/images/right.png">
+
+                    </div>
+
+                    <div class="wz-l" style="margin-top: 4px;">
+
+                        <div class="wz-l-image">
+
+                            <img src="{RES}/public/discount/images/tel.png">
+
+                        </div>
+
+                        <div class="wz-l-text" style="font-size: 14px;">{$onestore_list['store_tel']}</div>
+
+                    </div>
+
+                    <div class="wz-r">
+
+                        <!-- <a href="place.html">Go></a> -->
+
+                    </div>
+
+                </div>
+
+            </li>
+
+        </ul>
+
+
+
+        <script>
+
+           function _show(t,storeid,i2)
+
+            {
+
+               t.style.display="none";
+
+               if(i2==2)
+
+               {
+
+                    addordelcollect(storeid,1);
+
+                    dg("img_2").style.display="none";
+
+                    dg("img_3").style.display="block";
+
+                }
+
+                else
+
+                {
+
+                    addordelcollect(storeid,2);
+
+                    dg("img_2").style.display="block";
+
+                    dg("img_3").style.display="none";
+
+
+
+                }
+
+            }
+
+            function dg(id)
+
+            {
+
+                return document.getElementById(id);
+
+            }
+
+
+
+            function addordelcollect(storeid,state)
+
+            {
+
+                $.ajax({
+
+                    type:"POST",
+
+                    url: "{php echo $this->createMobileUrl('ajaxcollect');}",
+
+                    data:{store_id:storeid,collect_state:state},
+
+                    dataType:"json",
+
+                    async:false,
+
+                    success:function(data){
+
+                        if(data.result=='success')
+
+                        {
+
+                            if(data.type==1)
+
+                            {
+
+                                var sss='';
+
+                                sss="<li id='avatar"+storeid+data.content.id+"'>";
+
+                                sss+="<img src='"+data.content.avatar+"' class='img-circle'>";
+
+                                sss+='</li>';
+
+                                $("#collectid"+storeid).prepend(sss); 
+
+                            }else{
+
+                                $("#avatar"+storeid+data.content.id).remove();
+
+                            }
+
+                             $('#count'+storeid).text(data.count);
+
+                        }else{
+
+                            alert(data.rs);
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        </script>
+
+        {if $onestore_list['store_diy1_img']!=''}
+
+        <div class="explore01_show-con01" style="padding-top:0px; ">
+
+            <ul class="zkmx-con" style="margin: 0px;">
+
+                {if $onestore_list['store_diy1_img']!=''}
+
+                <a href="{if $onestore_list['store_diy1_url']!=''}{$onestore_list['store_diy1_url']}{else}javascript:;{/if}">
+
+                    <li style="border: none;margin-top: 14px;">
+
+                        <div class="zkmx-t">
+
+                            <img src="{php echo tomedia($onestore_list['store_diy1_img']);}" style="width: 100%;">
+
+                        </div>
+
+                    </li>
+
+                </a>
+
+                {/if}
+
+
+
+            </ul>
+
+        </div>
+
+        {/if}
+
+             {if $onestore_list['store_diy2_img']!=''}
+
+        <div class="explore01_show-con01" style="padding-top:0px; ">
+
+            <ul class="zkmx-con" style="margin: 0px;">
+
+                        {if $onestore_list['store_diy2_img']!=''}
+
+                <a href="{if $onestore_list['store_diy2_url']!=''}{$onestore_list['store_diy2_url']}{else}javascript:;{/if}">
+
+                    <li style="border: none;margin-top: 14px;">
+
+                        <div class="zkmx-t">
+
+                            <img src="{php echo tomedia($onestore_list['store_diy2_img']);}" style="width: 100%;">
+
+                        </div>
+
+                    </li>
+
+                </a>
+
+                {/if}
+
+
+
+            </ul>
+
+        </div>
+
+        {/if}
+
+        {if $onestore_list['store_diy3_img']!=''}
+
+        <div class="explore01_show-con01" style="padding-top:0px; ">
+
+            <ul class="zkmx-con" style="margin: 0px;">
+
+                {if $onestore_list['store_diy3_img']!=''}
+
+                 <a href="{if $onestore_list['store_diy3_url']!=''}{$onestore_list['store_diy3_url']}{else}javascript:;{/if}">
+
+                    <li style="border: none;margin-top: 14px;">
+
+                        <div class="zkmx-t">
+
+                            <img src="{php echo tomedia($onestore_list['store_diy3_img']);}" style="width: 100%;">
+
+                        </div>
+
+                    </li>
+
+                </a>
+
+                {/if}
+
+            </ul>
+
+        </div>
+
+        {/if}
+
+
+
+
+
+
+
+        {if count($discoid_list)>0}
+
+
+
+        <div class="explore01_show-con01">
+
+            <div class="explore01_show-con01-t">
+
+                <div class="explore01_show-con01-image01">
+
+                    <img src="{RES}/public/discount/images/tuijian.png">
+
+                </div>
+
+                <div class="explore01_show-con01-text01 explore01_show-con01-text001">折扣卡详情</div>
+
+            </div>
+
+            <ul class="zkmx-con">
+
+                {loop $discoid_list $key $item}
+
+
+
+              {if $item['state']==1}
+
+                <a href="{php echo $this->createMobileUrl('usemydiscard',array('discountcard_id'=>$item['discountcard_id'],'buycardlog_id'=>$item['buycardlog_id']));}">
+
+                {else}
+
+                <a href="{php echo $this->createMobileUrl('Mydiscardcon',array('discountcard_id'=>$item['discountcard_id']));}">
+
+                {/if}
+
+                <li>
+
+                    <div class="zkmx-t">
+
+                        <div class="zkmx-image">
+
+                            <img src="../attachment/{$item['discountcard_thumb']}">
+
+                        </div>
+
+                        <div class="zkmx-c">
+
+                            <div class="zkmx-text01">{$item['discountcard_title']}</div>
+
+                            <div class="zkmx-text02">立即购买</div>
+
+                        </div>
+
+                        <div class="zkmx-text03"><span>{$item['storedis_number']}</span>折</div>
+
+                    </div>
+
+                    <div class="zkmx-b">
+
+                        <div class="zkmx-text04">{$item['storedis_remark']}</div>
+
+                    </div>
+
+                </li>
+
+                </a>
+
+                {/loop}
+
+            </ul>
+
+        </div>
+
+        {/if}
+
+        
+
+
+
+        {if count($store_list)>0}
+
+        <div class="explore01_show-con01">
+
+            <div class="explore01_show-con01-t">
+
+                <div class="explore01_show-con01-image01">
+
+                    <img src="{RES}/public/discount/images/tuijian1.png">
+
+                </div>
+
+                <div class="explore01_show-con01-text01">特别推荐</div>
+
+            </div>
+
+            <ul class="explore01_show-con01-b">
+
+                {loop $store_list $key $item}
+
+                <a href="{php echo $this->createMobileUrl('storecon',array('store_id'=>$item['store_id']));}"><li class="col-xs-4">{$item['store_title']}</li></a>
+
+                {/loop}
+
+            </ul>
+
+        </div>
+
+        {/if}
+
+        <div class="explore01_show-con01">
+
+            <div class="explore01_show-con01-t">
+
+                <div class="explore01_show-con01-image01">
+
+                    <img src="{RES}/public/discount/images/pinglun.png">
+
+                </div>
+
+                <div class="explore01_show-con01-text01">门店详情</div>
+
+            </div>
+
+            <div>
+
+                {php echo htmlspecialchars_decode($onestore_list['store_content'])}
+
+            </div>
+
+        </div>
+
+
+
+        <div class="explore01_show-con01" style="margin-bottom: 0; ">
+
+            <div class="explore01_show-con01-t">
+
+                <div class="explore01_show-con01-image01">
+
+                    <img src="{RES}/public/discount/images/tihuan3.png">
+
+                </div>
+
+                <div class="explore01_show-con01-text01">门店点评</div>
+
+            </div>
+
+            <ul class="explore01_show-con02" id="comment_list">
+
+
+
+ 
+
+            </ul>
+
+            <a class="explore01_show-con02-text03" href="javascript:ajaxchuli();">
+
+                <div class="explore01_show-con02-text04" id="pingluntishi">查看更多</div>
+
+                <!--<div class="explore01_show-con02-image">
+
+                    <img src="{RES}/public/discount/images/right.png">
+
+                </div>-->
+
+            </a>
+
+        </div>
+
+        <div class="explore01_show-con01" style="padding:0 10px;margin-top: -18px;">
+
+           <form action="{php echo $this->createMobileUrl('comment')}" role="form" class="form-inline myform" method="post"  id="form1" onSubmit="return checksubmit();">
+
+                <div class="explore01_show-con01-t">
+
+                    <div class="col-xs-8 explore01_show-con01-l">
+
+                        <div class="explore01_show-con02-image01">
+
+                            <img src="{RES}/public/discount/images/tihuan4.png">
+
+                        </div>
+
+                        <div class="explore01_show-con01-text01">我要点评</div>
+
+                    </div>
+
+                    <div class="col-xs-3 explore01_show-con01-r">
+
+                        <input type="hidden" name="qf" value="comment">
+
+                        <input type="hidden" name="comment[comment_storeid]" value="{$onestore_list['store_id']}">
+
+                        <input type="submit" value="发表">
+
+                    </div>
+
+                </div>
+
+                <div class="wbk" style="margin-bottom: 10px;">
+
+                    <textarea class="explore01_show-con02-text002" name="comment[comment_remark]" maxlength="25" id="t1" onkeyup="checkLen()" placeholder="评论信息" rows="3"></textarea>
+
+                    <div class="explore01_show-con02-text003" style="text-align: right;">您还可以输入 <span id="count">25</span> 个文字</div> 
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <script type="text/javascript"> 
+
+        function checkLen() {  
+
+            var maxChars = 25;//最多字符数  
+
+            var t1=$('#t1').val();
+
+            if (t1.length <= maxChars)  
+
+            {  
+
+                var curr = maxChars - t1.length;  
+
+                $("#count").text(curr);
+
+            }
+
+        } 
+
+        function checksubmit()
+
+        {
+
+            if($('#t1').val()=='')
+
+            {
+
+                alert('请输入评论信息');
+
+                return false;
+
+            }
+
+            return true;
+
+        }
+
+        var storeid=$('#store_id').val();
+
+        var lastID=999999999999;
+
+        //滚动条到页面底部加载更多案例 
+
+        $(function(){
+
+            ajaxchuli();
+
+        })
+
+        function ajaxchuli()
+        {
+             $.ajax({  
+              type:"POST",
+              url: "{php echo $this->createMobileUrl('ajaxconmmentlist');}",
+              data:{store_id:storeid,"lastID":lastID,"pageSize":5},
+              dataType:"json",
+              async:false,
+              success:function(data){
+                //清空联动数据
+                if(data.result=="success")
+                { 
+                    var op="";
+                    for (var i = 0; i < data.rs.length; i++) {
+                        op+='<li><div class="col-xs-3">';
+                        op+='<img src="'+data.rs[i]["fans_avatar"]+'" class="img-circle" style="width:100%;"></div>';
+                        op+='<div class="col-xs-9">';
+                        op+='<div class="explore01_show-con02-text01">'+data.rs[i]["fans_nickname"]+'</div>'
+                        op+='<div class="explore01_show-con02-text02">'+data.rs[i]["comment_remark"]+'</div>';
+                        op+=' </div></li>';
+                        if(data.rs.length < 5)
+                        {
+                            lastID=0; 
+                            $('#pingluntishi').html('');
+                        }else{
+                            lastID=data.rs[i].comment_id; 
+                        }
+                    }
+                $("#comment_list").append(op);  
+                }else{
+                  lastID=0; 
+                  $('#pingluntishi').html('暂无评论信息')
+                }
+              }
+          });
+        }
+
+
+
+
+
+        </script>
+
+        
+
+    </div>
+
+  {template 'foot-nav'}

@@ -1,0 +1,68 @@
+<include file="Public/header.html"/>
+</head>
+<body>	
+    <div class="x-body">
+		<div class="layui-tab-content" style="height: 100px;">
+	        <div class="layui-tab-item layui-show">
+	        	<form id="form-article-add">
+					<div class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label"><span class="x-red">*</span>选择用户</label>
+							<div class="layui-input-inline" style="width: 280px;">
+								<input type="text" readonly="readonly" id="nickname" name="nickname" value="{$insider['nickname']}" class="layui-input">
+							</div>														
+						</div>						
+						<div class="layui-form-item">						
+							<label class="layui-form-label"><span class="x-red">*</span>选择商品</label>
+							<div class="layui-input-inline" style="width: 280px;">
+								<input type="text" readonly="readonly" id="title" name="title" value="{$insider['title']}" class="layui-input">
+							</div>													
+						</div>						
+					</div>
+					<input type="hidden" name="uid" id="uid" value="{$insider['uid']}" />
+					<input type="hidden" name="telephone" id="telephone" value="{$insider['telephone']}" />
+					<input type="hidden" name="goods_id" id="goods_id" value="{$insider['goods_id']}" />
+					<input type="hidden" name="id" value="{$insider['id']}" />
+			        <button class="layui-btn" lay-submit="" lay-filter="subfrom" style="display: none;" id="submitBtn">立即提交</button>			          			        
+	        	</form>
+	    	</div>
+		</div>
+	</div>	
+	<script type="text/javascript" src="__ROOT__/Public/js/jquery.min.js"></script>
+	<include file="Public/footer.html"/>
+    <script>
+		layui.use(['form','element','layer'],
+		function() {
+		    var form = layui.form,
+		    layer = layui.layer;
+		    form.on('submit(subfrom)',function(da) {
+			  	$.ajax({
+		        	url: "{:U('Home/MainCtr/Insider/doinsider')}",
+			        type : "POST",
+			        data :$("#form-article-add").serialize(),
+			        dataType:"text",
+			        success:function(data){		        	
+	                  	if (data == '1') {
+		                    parent.layer.msg('提交成功', {icon: 1,offset: '40%',time: 1000,shade: 0.3},
+		                    function() {
+		                        parent.location.reload();
+		                    });
+		                } else if (data == '2') {
+		                    parent.layer.msg('提交失败', {icon: 2,offset: '40%',time: 1000,shade: 0.3});
+		                } 
+	              	}
+		       	});		    	
+		       	return false;
+		    });	
+		});	
+		
+		$('#nickname').click(function(){
+			parent.m_show('用户列表','{:U("Home/MainCtr/Insider/m_list")}','1000','');
+		})	
+		
+		$('#title').click(function(){
+			parent.g_show('商品列表','{:U("Home/MainCtr/Insider/g_list")}','1000','');
+		})	
+	</script>
+</body>
+</html>

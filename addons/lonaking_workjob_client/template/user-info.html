@@ -1,0 +1,270 @@
+{template 'common/header'}
+
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+	</ul>
+	{if $userinfo['tip']}
+	<div class="alert alert-danger">
+		<p>
+			{$userinfo['tip']}
+		</p>
+	</div>
+	{/if}
+	<div class="panel panel-info">
+		<div class="panel-heading">用户信息</div>
+		<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<tr>
+				<th style="width:250px;">用户ID</th>
+				<td>{$userinfo['userInfo']['id']}</td>
+			</tr>
+			<tr>
+				<th>微擎论坛昵称</th>
+				<td>{$userinfo['we7User']['username']}</td>
+			</tr>
+			<tr>
+				<th>微擎论坛id</th>
+				<td>{$userinfo['we7User']['we7id']}</td>
+			</tr>
+			<tr>
+				<th style="width:250px;">网址</th>
+				<td>{$userinfo['userInfo']['domain']} &nbsp;<span class="label label-success">已授权</span></td>
+			</tr>
+			<tr>
+				<th>我购买的产品</th>
+				<td>
+					{loop $plugins $plugin}
+					<span class="label label-primary">{$plugin['name']}</span>
+					{/loop}
+				</td>
+			</tr>
+			<tr>
+				<th>消费总金额</th>
+				<td><span class="label label-primary">¥ {$userinfo['userInfo']['totalAmount']}</span></td>
+			</tr>
+			<tr>
+				<th>工单总数 </th>
+				<td>{$userinfo['userInfo']['workTimes']}</td>
+			</tr>
+			<tr>
+				<th>帐户类型</th>
+				<td><span class="label label-warning">{if $userinfo['userInfo']['type'] == 1}个人用户{/if}{if $userinfo['userInfo']['type'] == 2}企业用户{/if}</span></td>
+			</tr>
+			<tr>
+				<th>级别</th>
+				<td>{$userinfo['userInfo']['star']}</td>
+			</tr>
+		</table>
+		</div>
+	</div>
+
+	<form class="form-horizontal form" id="user-info-form" action=""
+		  method="post">
+		<div class="panel panel-default select-panel">
+			<div class="panel-heading">联系人信息(请务必填写可以联系到您的信息，保证工程师可以与您取得联系，提交后无法修改)</div>
+			<div class="panel-body">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 团队类别</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="radio" name="data[team_type]" value="1" {if $userinfo['userInfo']['type'] == '1'}checked="true"{/if}> 个人用户
+						</label>
+						<label class="radio-inline">
+							<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="radio" name="data[team_type]" value="2" {if $userinfo['userInfo']['type'] == '2'}checked="true"{/if}> 企业用户
+						</label>
+						<span class="help-block">请根据贵公司（团队）真实情况填写，八戒团队不会因为团队性质影响我们的售后质量，一视同仁</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 联系人姓名</label>
+					<div class="col-sm-8">
+						<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[link_name]"
+							   value="{$userinfo['userInfo']['linkname']}" />
+						<span class="help-block">请输入您的姓名，或姓式</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span class="text-danger">*</span> 联系人性别</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="radio" name="data[sex]" value="1" {if $userinfo['userInfo']['sex'] == '1'}checked="true"{/if}> 男
+						</label>
+						<label class="radio-inline">
+							<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="radio" name="data[sex]" value="2" {if $userinfo['userInfo']['sex'] == '2'}checked="true"{/if}> 女
+						</label>
+						<span class="help-block">不选择或许会产生打电话时不知道如何问候～</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 联系人手机</label>
+					<div class="row">
+						<div class="col-lg-8">
+							<div class="input-group">
+								<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[link_mobile]" value="{$userinfo['userInfo']['mobile']}" required/>
+								{if $userinfo[userInfo]['infoStatus'] == 0}
+								<span class="input-group-btn">
+									<button class="btn btn-default" id="send-verify-code" type="button">点击发送验证码</button>
+								</span>
+								{/if}
+							</div>
+							<span class="help-block">可以联系到您的手机号码，方便我们的技术人员回访</span>
+						</div>
+					</div>
+				</div>
+
+				{if $userinfo['userInfo']['infoStatus'] == 0}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 验证码</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[mobile_verify_code]" required/>
+						<span class="help-block">手机验证码，每天仅可最多发送两次</span>
+					</div>
+				</div>
+				{/if}
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> 联系人QQ</label>
+					<div class="col-sm-8">
+						<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[qq]"
+							   value="{$userinfo['userInfo']['qq']}" />
+						<span class="help-block">请填写您与我们客服或技术人员平常联系的QQ号码，仅限一个</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> <span class="text-danger">*</span> QQ名称</label>
+					<div class="col-sm-8">
+						<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[qq_nickname]"
+						value="{$userinfo['userInfo']['qqNickname']}" />
+						<span class="help-block">微擎有论坛id、论坛昵称、而平时联系最多的是QQ，所以昵称千万不能忘记，不然也容易记错人的</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label"> 公司名称</label>
+					<div class="col-sm-8">
+						<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[company]"
+							   value="{$userinfo['userInfo']['company']}" />
+						<span class="help-block">请输入贵公司的全称，如果是个人用户，请忽略此项</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">联系电话</label>
+					<div class="col-sm-8">
+						<input {if $userinfo['userInfo']['infoStatus'] == 1}disabled{/if} type="text" class="form-control" name="data[link_phone]"
+							   value="{$userinfo['userInfo']['phone']}" />
+						<span class="help-block">可以联系到您的电话，方便我们的技术人员回访，可选项目</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">绑定微信</label>
+					<div class="col-sm-8">
+						<style type="text/css">
+							.bind-qrcode{
+							}
+							.bind-qrcode .tip{
+								position: absolute;
+								top: 70px;
+								left: 90px;
+								width: 52px;
+								border-radius: 5px;
+								background-color: #469eff;
+								opacity: 0.9;
+								padding: 5px 10px;
+								font-size: 16px;
+								color: #fff;
+								font-weight: 600;
+							}
+						</style>
+						<span class="label label-success" id="bind-label-success">已绑定</span>
+						<div class="bind-qrcode" id="bind-qrcode">
+							<img src="{$qrcode}" width="200px">
+							<span class="tip" style="background-color: #4dca56;color: #fff;">绑定微信</span>
+						</div>
+						<span class="help-block">微信扫码绑定公众号，请务必关注我们的官方演示公众号“生活通O2O”,绑定后您可以接收到工单提醒哦，也会接收到我们的优惠信息、客户案例等推送</span>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input name="token" type="hidden" value="{$_W['token']}" /> <input
+				type="submit" class="btn btn-primary" name="submit"
+				value="绑定微信后提交" disabled/>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	var SEND_MESSAGE_API = "{$message_api}";
+	var CHECK_WECHAT_BIND_API = "{$wechat_bind_check_api}";
+	$(function () {
+		bind_wechat();
+		function bind_wechat(){
+			$.ajax({
+				url : CHECK_WECHAT_BIND_API,
+				data : {
+					
+				},
+				dataType : 'json',
+				type : 'post',
+				success : function (json) {
+					if(json.data == true || json.data == 'true'){
+						$("input[name='submit']").removeAttr("disabled");
+						$("input[name='submit']").val("提交保存");
+						$("#bind-qrcode").hide();
+						$("#bind-label-success").show();
+					}else{
+						$("#bind-label-success").hide();
+						$("#bind-qrcode").show();
+						setTimeout(function () {
+							bind_wechat();
+						},3000);
+
+					}
+				},
+				error : function () {
+					setTimeout(function () {
+						bind_wechat();
+					},1000);
+				}
+			});
+		}
+
+
+		$("#send-verify-code").on('click', function () {
+			var mobile = $("input[name='data[link_mobile]']").val();
+			if(mobile == null || mobile == undefined || mobile == ""){
+				util.message("手机不能为空");
+				return false;
+			};
+			var url = "";
+			var data = {
+				mobile : mobile
+			};
+			$(this).attr("disabled",true);
+			$.post(SEND_MESSAGE_API, data, function (e) {
+				console.log("短信发送成功");
+			});
+		});
+		$("#user-info-form").submit(function (e) {
+			var mobile = $("input[name='data[link_mobile]']").val();
+			if(mobile == null || mobile == undefined || mobile == ""){
+				util.message("手机不能为空");
+				return false;
+			}
+
+			var mobile_verify_code = $("input[name='data[mobile_verify_code]']").val();
+			if(mobile_verify_code == null || mobile_verify_code == undefined || mobile_verify_code == ""){
+				util.message("验证码不能为空");
+				return false;
+			}
+
+		});
+	});
+</script>
+{template 'common/footer'}

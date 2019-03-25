@@ -1,0 +1,193 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('membercardlevel', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;会员卡级别编辑</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('membercardlevel',array('op' => 'add','id' => $id))}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal  m-t" method="post" id="commentForm"  enctype="multipart/form-data"  onsubmit="return check(this);">
+                        <input type="hidden" name="id" value="{$item['id']}">
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">级别名称：</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="levelName" class="form-control" value="{$item['mcl_levelName']}" id='levelName'  required/>
+                            </div>
+                            <label class="col-sm-2 control-label">售卡金额：</label>
+                            <div class="col-sm-3">
+                                <div class="input-group m-b">
+                                    <input type="text" name="cardPrice" class="form-control" value="{$item['mcl_cardPrice']}" id='cardPrice' required/>
+                                    <span class="input-group-addon">元</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">有效期：</label>
+
+                            <div class="col-xs-2">
+                                <div class="radio radio-info radio-inline">
+                                    <input type="radio" name="memberleveltimetype" id="memberleveltimetype1" value="1" {if $item['mcl_specifiedEndTime'] == '2147483647' || empty($item['mcl_specifiedEndTime'])}checked="checked" {/if}>
+                                    <label for="memberleveltimetype1"> 永久有效 </label>
+                                </div>
+                                <div class="radio radio-inline radio-danger">
+                                    <input type="radio" name="memberleveltimetype" id="memberleveltimetype2" value="2" {if $item['mcl_specifiedEndTime'] != '2147483647' }checked="checked" {/if}>
+                                    <label for="memberleveltimetype2"> 限制时间 </label>
+                                </div>
+                            </div>
+
+                            <div id="hidde_time">
+                                <div class="col-sm-3">
+                                    {php echo tpl_form_field_daterange('membercardleveldate', array('starttime' => $starttime,'endtime' => $endtime));}
+                                </div>
+                            </div>
+
+                            <label class="col-sm-2 control-label">最低储值金额：</label>
+                            <div class="col-sm-3">
+                                <div class="input-group m-b">
+                                    <input type="text" name="initMoney" class="form-control" value="{$item['mcl_initMoney']}" id='initMoney' required/>
+                                    <span class="input-group-addon">元</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">初始积分：</label>
+                            <div class="col-sm-2">
+                                <div class="input-group m-b">
+                                    <input type="text" name="initPoint" class="form-control" value="{$item['mcl_initPoint']}"  id='initPoint' required/>
+                                    <span class="input-group-addon">积分</span>
+                                </div>
+                            </div>
+                            <label class="col-sm-1 control-label">折扣率：</label>
+                            <div class="col-sm-2">
+                                <div class="input-group m-b">
+                                    <input type="text" class="form-control" value="{$item['mcl_discount']}" name="discount" id="discount" required>
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+
+                            <label class="col-sm-1 control-label">积分倍率：</label>
+                            <div class="col-sm-2">
+                                <div class="input-group m-b">
+                                    <input type="text" class="form-control" value="{$item['mcl_points']}" name="points" id="points" required>
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">等级卡片图片：</label>
+                            <div class="col-sm-3">
+                                {php echo tpl_form_field_image('cardPic', $item['mcl_cardPic'])}
+                                <span class="help-block">建议比例:360像素 * 200像素<span style="color: red"></span></span>
+                            </div>
+                            <label class="col-sm-2 control-label">权益说明：</label>
+                            <div class="col-sm-3">
+                                <textarea name="memberContent" id="memberContent" class="form-control">{$item['mcl_memberContent']}</textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-5 control-label"></label>
+                            <div class="col-sm-7">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+
+    $(document).ready(function(){
+        $("#memberleveltimetype1").click(function(){
+            $("#hidde_time").hide();
+        });
+        $("#memberleveltimetype2").click(function(){
+            $("#hidde_time").show();
+        });
+
+
+        var mcl_specifiedEndTime = "{php echo $item['mcl_specifiedEndTime']}";
+
+        if(mcl_specifiedEndTime == '' || mcl_specifiedEndTime != '2147483647'){
+            $("#hidde_time").show();
+        }
+        else{
+
+            $("#hidde_time").hide();
+        }
+
+
+
+    });
+
+
+
+
+    $("#commentForm").validate({
+        rules: {
+            discount: {
+                required: true,
+                range:[1,100],
+                digits:true,
+
+            },
+            points: {
+                required: true,
+                range:[1,100],
+                digits:true,
+
+            },
+            cardPrice: {
+                required: true,
+                number:true,
+                min:0.01,
+            },
+            initMoney: {
+                required: true,
+                number:true,
+                min:0.01,
+            },
+            cardPic: {
+                url:false,
+
+            },
+            initPoint: {
+                required: true,
+                number:true,
+            },
+        },
+        messages: {
+            discount: {
+                required: "请输入1-100的整数",
+            },
+            points: {
+                required: "请输入1-100的整数",
+            },
+            cardPrice: {
+                required: "请输入数字",
+                min:"最小值为0.01",
+            },
+            initMoney: {
+                required: "请输入数字",
+                min:"最小值为0.01",
+            },
+            initPoint: {
+                required: "请输入数字",
+            },
+        }
+    });
+
+</script>
+{template 'web/common/footer'}

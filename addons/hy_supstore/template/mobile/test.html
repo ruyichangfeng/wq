@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    <div style=" float:right; max-width:300px;">
+        <div style="width:200px; margin:0 auto;">
+            <div style="position:relative;">
+                <video autoplay="autoplay" style="width:200px;"></video>
+                <canvas id="canvas" style="width:200px; height:160px;"></canvas>
+            </div>
+            <input type="button" title="拍照采集" value="拍照采集" onclick="getPhoto();" style="margin:20px; padding:5px 10px;">
+        </div>
+        <script>
+        var video = document.querySelector('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+
+        var exArray = []; //存储设备源ID  
+        MediaStreamTrack.getSources(function(sourceInfos) {
+            for (var i = 0; i != sourceInfos.length; ++i) {
+                var sourceInfo = sourceInfos[i];
+                //这里会遍历audio,video，所以要加以区分  
+                if (sourceInfo.kind === 'video') {
+                    exArray.push(sourceInfo.id);
+                }
+            }
+        });
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({
+                'video': true
+            }, successFunc, errorFunc); //success是获取成功的回调函数  
+        } else {
+            alert('该设备不支持拍照功能！');
+        }
+
+        function successFunc(stream) {
+            if (video.mozSrcObject !== undefined) {
+                //Firefox中，video.mozSrcObject最初为null，而不是未定义的，我们可以靠这个来检测Firefox的支持  
+                video.mozSrcObject = stream;
+            } else {
+                video.src = window.URL && window.URL.createObjectURL(stream) || stream;
+            }
+            //video.play();
+        }
+
+        function errorFunc(e) {
+            alert('Error！' + e);
+        }
+
+        //拍照  
+        function getPhoto() {
+            context.drawImage(video, 0, 0, 300, 140); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。  
+            //获取base64数据并上传
+            var img = canvas.toDataURL();
+            //var base64Img = canvas[0].toDataUrl();
+            //只能使用post,get会报错,数据太长
+            alert(img);
+        }
+        </script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'post'} class="active"{/if}><a href="{php echo $this->createWebUrl('slides', array('op'=>'post'))}">添加</a></li>
+	<li {if $operation == 'display'} class="active"{/if}><a href="{php echo $this->createWebUrl(slides, array('op' => 'display','type'=>'1'))}">列表</a></li>
+</ul>
+
+{if $operation == 'post'}
+	
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				添加幻灯片
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示顺序</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="slides[show_sort]"  class="form-control" {if !empty($slide)}value="{$slide['show_sort']}"{else}value="0" {/if}/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>幻灯片名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="slides[name]" required="required" class="form-control" {if !empty($slide)}value="{$slide['name']}" {/if}/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">图片</label>
+					<div class="col-sm-9 col-xs-12">
+						{php echo tpl_form_field_image('slides[thumb]', $slide['thumb'])}
+						<span class="help-block">建议尺寸：400*180 px</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">链接</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="slides[link]"  class="form-control" value="{if !empty($slide)} {$slide['link']} {/if}" />
+						<span class="help-block">为空则不跳转</span>
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">描述</label>
+					<div class="col-sm-9 col-xs-12">
+						<textarea name="slides[description]" class="form-control" cols="70">{if !empty($slide)} {$slide['description']} {else}{/if}</textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+</div>
+{elseif $operation == 'display'}
+	
+<div class="main">
+	<div class="panel panel-default">
+		<!-- <div class="panel-heading">
+		</div> -->
+		<div class="panel-body table-responsive">
+			<form action="" method="post" onsubmit="return formcheck(this)">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<!-- <th style="width:10px;"></th> -->
+									<th style="width:80px;">显示顺序(升序)</th>
+									<th style="width:150px;">名称</th>
+									<th style="width:150px;">图片</th>
+									<th style="width:150px;">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+							{if empty($slides)}
+								<tr>
+									<td></td>
+									<td colspan="4">
+										<div class="jumbotron" style="text-align:center;"><h3>暂无幻灯片</h3></span>
+									</td>
+								</tr>
+							{else}
+								{loop $slides $slide}
+									<tr>
+										<td>{$slide['show_sort']}</td>
+										<td><span>{$slide['name']}</span></td>
+										<td><a target="_blank" href="{php echo tomedia($slide['thumb']);}"><img style="width:100px;height:100px;" src="{php echo tomedia($slide['thumb']);}" /></a></td>
+										<td><a href="{php echo $this->createWebUrl('slides', array('op' => 'post', 'id' => $slide['slides_id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="编辑"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
+								<a href="{php echo $this->createWebUrl('slides', array('op' => 'delete', 'id' => $slide['slides_id']))}" onclick="return confirm('确认删除此幻灯片吗？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a></td>
+									</tr>
+								{/loop}
+							{/if}
+							
+							
+							</tbody>
+						</table>
+					
+			</form>
+		</div>
+	</div>
+</div>
+
+{/if}
+{template 'common/footer'}

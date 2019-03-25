@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>我的次卡</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='../addons/hy_supstore/template/mobile/css/common.css' rel='stylesheet' type='text/css'>
+    <link href='../addons/hy_supstore/template/mobile/css/myoncecard.css' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="header-nav">
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>1))}" {if $_GPC[ 'status']==1}class="active" {/if}><span>使用中</span></a>
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>2))}" {if $_GPC[ 'status']==2}class="active" {/if}><span>已使用</span></a>
+            <a href="{php echo $this->createMobileUrl('oncecard',array('status'=>0))}" {if $_GPC[ 'status']==0&&$_GPC[ 'status']!==NULL}class="active" {/if}><span>已过期</span></a>
+        </div>
+        <?php echo var_dump($settings);?>
+        <div class="oncecard-list">
+            <div class="oncecard-list-content">
+                <ul>
+                    {loop $list $item}
+                    <li>
+                        <div class="card-box">
+                            <img src="{if $boss['oncecardimg']}{$boss['oncecardimg']}{else}../addons/hy_supstore/template/mobile/images/oncecardbg.png{/if}">
+                            <p class="title">{$item['title']}</p>
+                            <p class="buy-time">购买时间：{php echo date('Y年m月d日',$item['addtime'])}</p>
+                            <p class="expire-time">过期时间：{php echo date('Y年m月d日',$item['expirytime'])}</p>
+                            <p class="use-number">
+                                {if $item['value']==999999} 使用次数无限制，已使用
+                                <red>{$item['amount']}</red>次 {else} 共
+                                <red>{$item['number']}</red>次，已用
+                                <red>{$item['amount']}</red>次，剩余
+                                <red>{$item['value']}</red>次 {/if}
+                            </p>
+                            <a class="use-log" href="{php echo $this->createMobileUrl('oncecardconsumlog',array('oncecardmemid' => $item['id']))}">使用记录</a>
+                            <p class="use-state">{if $item['status']==1}{elseif $item['status']==2}
+                                <red>已使用</red>{else}
+                                <red>已过期</red>{/if}</p>
+                        </div>
+                    </li>
+                    {/loop} 
+                    {if empty($list)}
+                    <div style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无记录</div>
+                    {/if}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--底部导航-->
+    {template 'footerindex'}
+</body>
+
+</html>

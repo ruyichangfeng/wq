@@ -1,0 +1,155 @@
+{template 'inc/header'}
+<style type="text/css">
+	.font-color{
+		color:#AFADAD;
+	}
+	.browse{
+		width:10px;
+		margin-left:10px;
+	}
+	.interest{
+		width:10px;
+		margin-left:10px;
+	}
+	.comment{
+		width:10px;
+		margin-left:5px;
+	}
+	.type ul{width:90%;margin:0px auto;}
+</style>
+<body>
+	
+	<section id="wrap">
+		{loop $stores $sto}
+		<a href="{php echo $this->createMobileUrl('showDetail',array('id'=>$sto['id']));}">
+		<div class="point-div">
+			<div class="con">
+				<div class="detail">
+					
+					<div class="pic" style="margin-top:3px;">
+						{if $sto['logo']}
+						<img src="{php echo tomedia($sto['logo']);}" width="130px" height="90px">
+						{elseif $setting['avar']}
+						<img src="{php echo tomedia($setting['avar']);}" width="130px" height="90px">
+						{else}
+						<img src="{ONLINEMV_IMAGE}123.png" width="130px" height="90px">
+						{/if}
+					</div>
+					
+					<div class="title" >
+						{php $name =  mb_substr($sto['videoname'],0,10,'utf-8');}
+						
+						<h3 class="font-color">{$name}</h3>
+						{loop $sto['lable'] $row}
+							<span style="background-color: {$setting['color']};color:#ffffff;padding:1px 3px;border-radius:3px;margin-left:3px;">{$row['name']}</span>
+						{/loop}
+						{php $remark =  mb_substr($sto['remark'],0,9,'utf-8');}
+						<p class="font-color" style="word-wrap: break-word;word-break:break-all;">简介 {$remark}...</p>
+						
+						<p class="font-color">
+							{php echo date("Y-m-d",$sto['createtime']);}
+							
+							<img src="{ONLINEMV_IMAGE}interest.png" class="interest" id="interest{$sto['id']}" onclick="inter({$sto['id']})" />  &nbsp;{$sto['dolike']}
+							<img src="{ONLINEMV_IMAGE}comment.png" class="comment" />  &nbsp;{$sto['comnum']}
+						</p>
+					</div>
+					
+				</div>
+				
+			</div>
+		</div>
+		</a>
+		{/loop}
+	</section>
+	<div class="upload" style="display:none;" data-page="{$page}">
+		<div class="showindex" style="width:20%;margin:0 auto;">
+			<img src="{ONLINEMV_IMAGE}123.gif" width="20px;">
+			<div style="float:left;">加载中</div>
+		</div>
+	</div>
+	<input id="page" type="hidden" name="page" value="{if $pindex} {$pindex} {else}1{/if}">
+	<input id="isscroll" type="hidden" name="page" value="1">
+	<div class="copyright" style="padding:0;"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+	<div style="width:100%;height:60px;"></div>	
+	{template 'menu'}	
+</body>
+<!-- <script src="js/swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container');
+</script> -->
+
+<script type="text/javascript">
+var params = {
+    {if empty($title)}
+    title: "{$setting['sharetitle']}",
+    {else}
+    title: "{$title}",
+    {/if}
+    {if empty($setting['sharedesc'])}
+    desc: "在线视频",
+    {else}
+    desc: "{$setting['sharedesc']}",
+    {/if}
+    {if empty($setting['sharelogo'])}
+    imgUrl: "{$_W['siteroot']}addons/jy_signup_a/icon.jpg",
+    {else}
+    imgUrl: "{php echo tomedia($setting['sharelogo'])}",
+    {/if}
+};
+wx.ready(function () {
+    wx.showOptionMenu();
+    wx.onMenuShareAppMessage.call(this, params);
+    wx.onMenuShareTimeline.call(this, params);
+});
+</script>
+<script type="text/javascript">
+$(function(){
+	$("#page").val(1);
+	$("#isscroll").val(1);
+})
+$(window).scroll(function(){
+	var page = parseInt($("#page").val())+1;
+	var isscroll = $("#isscroll").val();
+	// {if $do=='Tlistc'}
+	// var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('Tlistc'),2)}"+"&rad="+Math.random();
+	// {/if}
+	// {if $do=='clist'}
+	var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('clist'),2)}"+"&rad="+Math.random();
+	// {/if}
+	if(isscroll==1){
+		if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+			$(".upload").show();
+			$("#isscroll").val(2);
+			setTimeout(function(){
+					$.ajax({
+						type: 'POST',
+			    		url: url,
+				    	data: {doajax:1,cid:{$id},page:page},
+				    	success:function(datas){
+				    		console.log(datas);
+				    		if(datas.statue==1){
+				    			$("#wrap").append(datas.data);
+					    		$("#page").val(datas.page);
+					    		$("#isscroll").val(1);
+					    		$(".upload").hide();
+				    		}else{
+				    			$("#isscroll").val(2);
+				    			$(".showindex").html('已加载全部');
+				    		}
+				    	},
+				    	error:function(datas){
+
+					    },
+				    	dataType:'json',
+					})
+				},1000);
+		}
+	}
+})
+</script>
+<script type="text/javascript">
+	function inter(vid){
+	
+	}
+</script>
+</html>

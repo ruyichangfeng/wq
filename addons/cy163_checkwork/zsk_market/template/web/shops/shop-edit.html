@@ -1,0 +1,213 @@
+{template 'public/header'}
+<style type="text/css">
+	.notice{display: block;color:orange;}
+</style>
+
+<div class="panel panel-info">
+	<div class="panel-heading"  >
+		<ol class="crumb">
+			<li><a href="<?php echo $this->routeUrl('shops.listview');?>">店铺管理</a></li>
+			<li class="active">编辑店铺</li>
+		</ol>
+	</div>
+	<div class="panel-body">
+
+
+
+		<form class="layui-form" style="width: 500px;margin-left: 100px;" method="post" id="memForm" name="memForm" action="<?php echo $this->routeUrl('shops.saveShop');?>">
+
+			<input type="hidden" name="sid" value="{$_GPC['sid']}">
+			<div class="layui-form-item">
+				<label class="layui-form-label">店铺名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="name"  placeholder="10字以内"  lay-verify="required" value="{$shop['name']}"  class="layui-input" id="name" <?php if(intval($shop['parentid'])>0){echo 'disabled';};?>>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">店铺LOGO</label>
+				<div class="layui-input-block">
+					{php echo tpl_form_field_images('logo',$shop['logo']);}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">商户资质</label>
+				<div class="layui-input-block">
+					{php echo tpl_form_field_images('qualification',$qualification,2);}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">商家类型</label>
+				<div class="layui-input-block">
+					<select name="shoptype" lay-filter="xww">
+						<option value="" >请选择</option>
+						<?php foreach ($catesList as $key => $val) { ?>
+						<option value="<?php echo $val['id']; ?>" <?php if($val['id'] == $shop['shoptype']){ echo 'selected = "selected"'; } ?> > <?php echo $val['name']; ?></option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系电话</label>
+				<div class="layui-input-block">
+					<input type="text" name="phone"  placeholder="20字以内"  class="layui-input"  value="{$shop['phone']}" >
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">联系地址</label>
+				<div class="layui-input-block">
+					<input type="text" name="address"    value="{$shop['address']}"  class="layui-input" id="title">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">地图导航坐标</label>
+				<div class="layui-input-block">
+					<input type="text" name="latlng" value="<?php if(!empty($shop['latitude'])&&!empty($shop['longitude'])){ echo ($shop['latitude']).','.$shop['longitude'];}?>"   class="layui-input"  placeholder="如：30.657369,104.065804" >
+					<span class="notice">
+						<a href="http://lbs.qq.com/tool/getpoint/" style="padding:0px 10px;" target="__block">腾讯地图坐标拾取器</a>
+						将拾取结果填这里
+					</span>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">入驻时间</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$shop['joindate']}" lay-verify="required" id="joindate" name="joindate" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">到期时间</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$shop['limitdate']}" lay-verify="required"  id="limitdate" name="limitdate" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">营业状态</label>
+				<div class="layui-input-block">
+					<select name="status" lay-filter="xww">
+
+						<option value="1" >正常</option>
+						<option value="0" <?php if(($shop['status'])=="0"){echo 'selected=""';}?>  >关闭</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">短信条数</label>
+				<div class="layui-input-block">
+					<input type="text" name="smsnum"    value="{$shop['smsnum']}"  class="layui-input" id="smsnum">
+				</div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">店铺标签</label>
+			    <div class="layui-input-block">
+			    	<div style="clear: right;margin-bottom:5px;" id="shoplistpic"></div>
+			    	<?php if($shop['certificate']){
+			    	    foreach($shopimg as $v){?>
+			    	<div>
+			    		<img style="width: 30px;height:30px;margin-right:5px;float: left;" onclick="getdelete(this)" src="{$_W['attachurl']}{$v}">
+			    		<input type="hidden" name="certificate[]" value="{$v}">
+			    	</div>
+			    	<?php} } ?>
+			    	<button type="button" class="layui-btn" id="test1">
+					  <i class="layui-icon">&#xe67c;</i>上传标签
+					</button>
+			    </div>
+			  </div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">管理员账号</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value="{$shop['account']}"  name="username">
+					<span style="font-size: 13px;color:#ff4444;">注:提交后会同步账号与店铺的有效期（默认店铺除外）</span>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">密码</label>
+				<div class="layui-input-block">
+					<input type="text" class="layui-input" value=""   name="password" >
+					<span style="font-size: 13px;color:#ff4444;">注:输入密码则修改密码,不输入密码保持原密码!</span>
+				</div>
+			</div>
+			<div class="layui-form-item" style="margin-top:30px;">
+				<div class="layui-input-block">
+					<button class="layui-btn" type="button"  onclick="subBase()">保存</button>
+					<button type="button" onclick="cvgr();" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+{template 'public/footer'}
+<script type="text/javascript">
+	function cvgr(){
+		$('input[name=name]').val('');
+		$('input[name=phone]').val('');
+		$('input[name=address]').val('');
+		$('input[name=latlng]').val('');
+		$('input[name=joindate]').val('');
+		$('input[name=limitdate]').val('');
+		$('input[name=smsnum]').val('');
+		$('input[name=username]').val('');
+		$('input[name=logo]').val('');
+		$('.multi-item').empty();
+		$('.mult-figure-imglogo').attr('src','');
+	}
+
+	layui.use('upload', function(){
+	  var upload = layui.upload;
+
+	  //执行实例
+	  var uploadInst = upload.render({
+	    elem: '#test1' //绑定元素
+	    ,url: "<?php echo $this->routeUrl('upload.uploadwb1');?>" //上传接口
+	    ,done: function(res){
+	      //上传完毕回调
+	      var data = '<div><img style="width: 30px;height:30px;margin-right:5px;float: left;" onclick="getdelete(this)" src="'+res.data.src+'"> <input type="hidden" name="certificate[]" value="'+res.data.imageval+'"></div>';
+	      $("#shoplistpic").append(data);
+	      // data.push(res.data.imageval)
+	    }
+	    ,error: function(res){
+	      //请求异常回调
+	      console.log(res)
+
+	    }
+	  });
+	});
+	function getdelete(elm){
+		layer.confirm('确认删除当前标签?', {
+        btn: ['确定','取消'] //按钮
+	    }, function(index){
+	    	$(elm).parent().remove()
+	        layer.close(index);
+	    })
+	}
+	function subBase(){
+		var name = $('#name').val().length;
+
+		if(name > 10){
+			modalMsg('店铺名称小于10个汉字');
+			return false;
+		}
+		$("form[name='memForm']").submit();
+	}
+	layui.use('laydate', function(){
+		var laydate = layui.laydate;
+
+		//执行一个laydate实例
+		laydate.render({
+			type:"date",
+			value:"{$shop['limitdate']}",
+			elem: '#limitdate' //指定元素
+		});
+		laydate.render({
+			type:"date",
+			value:"{$shop['startdate']}",
+			elem: '#joindate' //指定元素
+		});
+	});
+	layui.use('form', function(){
+		var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+		form.render();
+	});
+
+
+</script>

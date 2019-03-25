@@ -1,0 +1,90 @@
+{template 'common/header'}
+	<div class="mian">
+    <ul class="nav nav-tabs">
+        <li class="active"><button class="btn btn-warning" onclick="redirect()">导出excel</button></li>
+    </ul>
+</div>
+	<div>
+		<table class="table">
+      <thead>
+        <tr>
+          <th width="100">姓名</th>
+          <th>年龄</th>
+          <th>性别</th>
+          <th>婚姻状况</th>
+          <th>联系方式</th>
+          <th>单位</th>
+          <th>报名时间</th>
+
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+      {loop $result $k $v}
+           <tr class="active">
+          <td>{$v['user']}</td>
+          <td>{$v['age']}</td>
+          <td>{if $v['sex'] == 1}男{else}女{/if}</td>
+          <td>{if $v['hunyin'] == 1}已婚{else}未婚{/if}</td>
+          <td>{$v['tel']}</td>
+          <td>{$v['danwei']}</td>
+          <td>{$v['time']}</td>
+          <th>
+          
+          <button class="btn btn-info delbtn" did="{$v['id']}">删除</button>&nbsp;&nbsp;
+			
+          </th>
+        </tr>
+        {/loop}
+                
+             </tbody>
+    </table>
+    {$pager}
+	</div>
+	<script>
+	$(document).ready(function(){
+		$(".delbtn").each(function(){
+			$(this).click(function(){
+				var id = $(this).attr('did');
+
+				var r = confirm("是否删除此条信息?");
+
+				if(r)
+				{
+					$.ajax({
+						url : "{php echo $this->createWebUrl('Dodel')}",
+						type:'post',
+						data:{
+							id : id,
+						},
+						success:function(res)
+						{
+							
+							if(res == 1)
+							{
+								alert("删除成功");
+								window.location.reload();
+							}
+							else
+							{
+								alert("请求error");
+							}
+						}
+					});
+				}
+
+			});
+		});
+	});
+
+	function redirect()
+	{
+		var r = confirm("是否导出全部数据？");
+		if(r)
+		{
+			window.location.href="{php echo $this->createWebUrl('Excel')}";
+		}
+	}
+	</script>
+
+{template 'common/footer'}

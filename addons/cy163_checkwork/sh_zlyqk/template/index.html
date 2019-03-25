@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>消息管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{MODULE_URL}/static/admin/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_tnyc012u2rlwstt9.css" media="all" />
+    <link rel="stylesheet" href="{MODULE_URL}/static/admin/css/main.css" media="all" />
+</head>
+<body class="childrenBody">
+<div class="panel_box row" style="margin-top:50px">
+    <div class="panel col">
+        <a href="javascript:;" >
+            <div class="panel_icon">
+                <i class="layui-icon" data-icon="&#xe63a;">&#xe63a;</i>
+            </div>
+            <div class="panel_word newMessage">
+                <span>{$notice['total']}</span>
+                <cite>新消息</cite>
+            </div>
+        </a>
+    </div>
+    <div class="panel col">
+        <a href="javascript:;" >
+            <div class="panel_icon" style="background-color:#5FB878;">
+                <i class="layui-icon" data-icon="&#xe64a;">&#xe64a;</i>
+            </div>
+            <div class="panel_word imgAll">
+                <span>{$notice['photo']}</span>
+                <cite>图片消息</cite>
+            </div>
+        </a>
+    </div>
+    <div class="panel col">
+        <a href="javascript:;">
+            <div class="panel_icon" style="background-color:#FF5722;">
+                <i class="layui-icon"></i>
+            </div>
+            <div class="panel_word userAll">
+                <span>{$notice['voice']}</span>
+                <cite>语音消息</cite>
+            </div>
+        </a>
+    </div>
+    <div class="panel col">
+        <a href="javascript:;">
+            <div class="panel_icon" style="background-color:#F7B824;">
+                <i class="iconfont icon-wenben" data-icon="icon-wenben"></i>
+            </div>
+            <div class="panel_word waitNews">
+                <span>{$notice['text']}</span>
+                <cite>文字消息</cite>
+            </div>
+        </a>
+    </div>
+    <div class="panel col max_panel">
+        <a href="javascript:;">
+            <div class="panel_icon" style="background-color:#2F4056;">
+                <i class="layui-icon"></i>
+            </div>
+            <div class="panel_word waitNews">
+                <span>{$notice['address']}</span>
+                <cite>位置消息</cite>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="row" style="margin-top: 50px;">
+    <div class="sysNotice col">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div class="sysNotice col">
+        <canvas id="chart-area" style="height: 200px;" />
+    </div>
+</div>
+
+<script type="text/javascript" src="{MODULE_URL}/static/admin/layui/layui.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/main.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/chart/Chart.bundle.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/static/admin/js/chart/utils.js"></script>
+
+<script>
+    var randomScalingFactor = function() {
+        return Math.round(Math.random() * 100);
+    };
+
+    var config_line = {
+        type: 'line',
+        data: {
+            labels: {$dateJson},
+            datasets: [{
+                label: "消息总数",
+                backgroundColor: window.chartColors.red,
+                borderColor: window.chartColors.red,
+                data: {$allMsg},
+                fill: false,
+            }, {
+                label: "处理数",
+                fill: false,
+                backgroundColor: window.chartColors.blue,
+                borderColor: window.chartColors.blue,
+                data: {$finaMsg},
+            }]
+        },
+        options: {
+            responsive: true,
+            title:{
+                display:true,
+                text:'最近7天处理情况'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: '消息数'
+                    },
+                    ticks: {
+                        min: 0,
+                        max: {$config['max']},
+                        stepSize: {$config['stepSize']}
+                    }
+                }]
+            }
+        }
+    };
+    var config = {
+        type: 'pie',
+        data: {
+            datasets: [{
+                data:{$outPix},
+                backgroundColor: [
+                    window.chartColors.red,
+                    window.chartColors.orange,
+                    window.chartColors.yellow,
+                    window.chartColors.green,
+                    window.chartColors.blue,
+                ],
+                label: 'Dataset 1'
+            }],
+            labels: {$sumTitle}
+        },
+        options: {
+            responsive: true,
+            title:{
+                display:true,
+                text:'当天处理情况'
+            }
+        }
+    };
+    window.onload = function() {
+        var ctx_pie = document.getElementById("chart-area").getContext("2d");
+        window.myPie = new Chart(ctx_pie, config);
+
+        var ctx_line = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx_line, config_line);
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>一键关注引导</title>
+<meta name="renderer" content="webkit">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="Description" content="输入公众号，一键生成关注二维码">
+<link rel="stylesheet" href="../addons/yc_duoheyi/template/style/css/animate.min.css">
+<link rel="stylesheet" href="../addons/yc_duoheyi/template/style/css/style.css"> 
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script> 
+<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<style>
+body{    background-color: lightblue;}
+.col-xs-12s{
+	float:left;
+}
+#ewm{
+    position: fixed;
+    top: 20%; 
+    text-align: center;
+}
+.images{
+    bottom: 0px; 
+    position: fixed;
+	text-align: center;
+}
+.panel-heading{
+	font-size: 28px;
+    color: #fff;
+}
+</style>
+<script type="text/javascript">
+wx.config({
+    debug: false,
+    appId: 'wxbdab504df0af64dc',
+    timestamp: '1477830879',
+    nonceStr: '3b5e5de5-8f00-4fa2-b1dd-5de2e28e48ff',
+    signature: 'c21c7025ae41289200a7c03a85e40d91702b387b',
+    jsApiList: [
+      'onMenuShareTimeline',
+      'onMenuShareAppMessage',
+    ]
+});
+wx.error(function(res){
+});
+
+wx.ready(function () {
+	wx.onMenuShareAppMessage({
+	      title: '简单方便，一键敲定',
+	      desc: '信息时代，让你的信息与众不同',
+	      link: '',
+	      imgUrl: 'http://tools.xmt.cn:80/resources/images/ic_share.png',
+	    });
+	
+	 wx.onMenuShareTimeline({
+	      title: '简单方便，一键敲定',
+	      link: '{php $this->createMobileUrl("duoheyi",array("username"=>'+$("#gzh").val()+'))}',
+	      imgUrl: '../addons/yc_duoheyi/template/style/images/count.png',
+	    });
+});
+</script>
+
+</head>
+<body>
+<div class="clearfix"> 
+    <form id="theform" class="form form-horizontal" action="" enctype ="multipart/form-data" method="post">                     
+                <div class="panel panel-default">    
+          <div class="panel-heading">
+                                一键引导关注H5
+            </div>
+            <div class="panel-body">                         
+                      			
+		<div class="form-group">
+		  <label class="col-xs-12s col-sm-3 col-md-2 control-label">微信公众号</label>
+			<div class="col-sm-9 col-xs-12s">
+			  <input id="gzh" placeholder="请输入微信公众号" name="gzh" class="form-control" value=""/> 
+				</div>
+			</div>		
+	  
+      <div class="form-group">
+               	<label class="col-xs-12s col-sm-3 col-md-2 control-label">一键提示语</label>
+						<div class="input-group col-sm-9">
+							<input type="text" name="tip" id="tip" class="form-control" placeholder="请输入一键引导关注提示语"/>					 			
+							<div class="input-group-addon btn btn-primary" onclick="getewm()">生成链接</div>
+						</div>
+						<div id="tp" style="display:none;">
+						<label class="col-sm-3 col-md-2 control-label">引导关注图片</label>
+						 <div class=" col-sm-9 col-xs-12s">	
+							
+							<div class="imagespic" style=" float:right;">
+								 		
+							</div>
+						</div>
+						</div></div>  </div>  </div>    
+    </form>
+	
+</div> 
+	<div class="showdiag"></div>
+<script> 
+		 function getUrlParam(name) {
+		   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		   var r = window.location.search.substr(1).match(reg); //匹配目标参数
+		   if (r != null) return unescape(r[2]); return null; //返回参数值
+		  }
+		  
+		  function showMsg(msg){
+				$('.showdiag').html("<div style='color:#fff;background-color:rgba(0,0,0,.8);padding:20px;border-radius:4px;'>"+msg+"</div>").show();
+				setTimeout(function(){
+					$('.showdiag').hide();
+				},4000);
+			}
+		function getewm(){   
+				   $.ajax({
+							url: '{php echo $this->createMobileUrl('checkQrCode')}',
+							data:{username:$("#gzh").val(),tips:$("#tip").val()},
+							type: "GET",
+							dataType:'JSON',					
+							success:function(d){ 							
+									if (d.ret==0) {  
+									<!-- $("#gzhwem").attr("src",imgsrc); -->
+									<!-- $("#tips").html($("#tip").val()); -->
+									<!-- $(".images").show();  -->
+									<!-- $(".clearfix").hide();  -->
+										window.location.href="{php echo $this->createMobileUrl('duoheyi')}&username="+$("#gzh").val()+"&tips="+$("#tip").val();
+									}else{
+										showMsg('请检查填写账号是否正确');
+									}
+							},
+							error:function(e){
+								showMsg('生成失败');
+							}
+				});
+			}   
+		$('.nav-btn').click(function() {
+			if ($('.nav-box').hasClass('show')) {
+				$('.nav-box').removeClass('show');
+			}else{
+				$('.nav-box').addClass('show');
+			}
+		});
+
+		$('.codeimg').click(function() {
+			if ($('.nav-box').hasClass('show')) {
+				$('.nav-box').removeClass('show');
+			}
+		});
+
+		 
+
+
+	</script> 
+</body>
+</html>

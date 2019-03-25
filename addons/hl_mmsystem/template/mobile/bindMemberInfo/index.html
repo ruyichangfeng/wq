@@ -1,0 +1,319 @@
+{php define('MUI', true);}
+{template 'common/header_base'}
+
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">激活会员卡</h1>
+</header>
+
+<div class="mui-content mc-login">
+
+    <div class="mui-content-padded" style="margin: 5px;" id="bindMember-basic">
+        <input type="hidden" name="hidden_Storeid" value="{php echo $storeid}"  id="hidden_Storeid">
+        <h4 class="mui-content-padded"  style="padding-top: 10px;">手机号：</h4>
+        <div class="mui-input-row">
+            <input type="text" class="mui-input-clear js-mobile-val" name="memberMobile" id="memberMobile" placeholder="请输入手机号">
+        </div>
+        <div class="mui-button-row">
+            <button type="button"  class="mui-btn mui-btn-royal mui-btn-outlined" id="button_ajaxverification">获取短信验证码</button>
+
+        </div>
+        <div class="mui-input-row" style="margin-top: 20px;">
+            <input type="text" class="mui-input-clear js-mobile-val" name="memberMobilajaxverification" id="memberMobilajaxverification" placeholder="请输入短信验证码">
+        </div>
+        <h5 class="mui-content-padded"><span class="mui-icon mui-icon-help" style="color: red"></span> 有实体卡号可直接输入手机号绑定<br>没有实体卡号的新会员可绑定手机号(也是卡号)</h5>
+    </div>
+    <div class="mui-content-padded"  style="padding-bottom: 10px;">
+        <div class="mui-button-row">
+            <button type="button" class="mui-btn mui-btn-primary mui-btn-block" id="bindMember">提交绑定</button>
+            <input type="hidden" name="hidden_SMScode"  id="hidden_SMScode">
+        </div>
+    </div>
+
+</div>
+<script>
+    $(function(){
+        $("#memberMobilajaxverification").hide();
+        $("#button_ajaxverification").hide();
+
+        $(document).on('input propertychange', '.js-mobile-val', function(){
+            var mobile_value = $(this).val();
+            var smsVerification = {$setStoreData['set_smsVerification']};
+            if (mobile_value.length == '11') {
+                var hidden_Storeid = $("#hidden_Storeid").val();
+                var url ='{php echo util::app_url('common',array('op' => 'checkMobileIfTrue'))}&hidden_Storeid='+hidden_Storeid;
+
+                $.post(url, {'get_mobileValue' : mobile_value}, function(data) {
+                    data = $.parseJSON(data);
+                    if (data.message.errno == '1') {
+                        util.toast('存在实体卡号,请您提交绑定', '', 'error');
+                        $('#bindMember').removeClass('bindMember-insert');
+                        $('#bindMember').addClass('bindMember-update');
+
+                        if(smsVerification == 1){
+                            $("#button_ajaxverification").show();
+                        }
+
+                        $("#hidde_storeselect").show();
+
+
+                    } else if (data.message.errno == '2'){
+                        util.toast('您是新会员，请您提交绑定激活', '', 'error');
+                        $('#bindMember').removeClass('bindMember-update');
+                        $('#bindMember').addClass('bindMember-insert');
+
+                        if(smsVerification == 1){
+                            $("#button_ajaxverification").show();
+                        }
+
+
+                    }else if (data.message.errno == '3'){
+                        mui.alert('该手机号已绑定激活！', '请更换手机号');
+                        $('#bindMember').removeClass('bindMember-update');
+                        $('#bindMember').removeClass('bindMember-insert');
+                        $("#memberMobile").val('');
+                    }
+                });
+            }
+        });
+        $(document).on('click', '.bindMember-update', function() {
+            var memberMobile_value = $('#bindMember-basic input[name="memberMobile"]').val();
+            var hidden_SMScode = $("#hidden_SMScode").val();
+            var memberMobilajaxverification = $("#memberMobilajaxverification").val();
+            var hidden_Storeid = $("#hidden_Storeid").val();
+            var smsVerification = {$setStoreData['set_smsVerification']};
+            if (!memberMobile_value) {
+                util.toast('手机号为空', '', 'error');
+                return;
+            }
+            if(!/^1[3|4|5|7|8][0-9]{9}$/.test(memberMobile_value)) {
+                mui.alert('手机号为11位', '格式错误', function() {
+                    $("#memberMobile").val('');
+                });
+                return;
+            }
+            if(smsVerification == 1){
+                if (hidden_SMScode==''|| hidden_SMScode==undefined) {
+                    util.toast('请发送短信验证码', '', 'error');
+                    return;
+                }
+                else{
+                    var params = {};
+                    params.post_memberMobile = memberMobile_value;
+                    params.hidden_SMScode = hidden_SMScode;
+                    params.memberMobilajaxverification = memberMobilajaxverification;
+                    params.hidden_Storeid = hidden_Storeid;
+                    params.Lordopenid = "{php echo $_GPC['Lordopenid']}";
+                    params.operatoruid = "{php echo $_GPC['operatoruid']}";
+                    var url = "{php echo util::app_url('common', array('op' => 'updateMemberAvailable'))}";
+                    $.post(url, params, function(data) {
+                        data = $.parseJSON(data);
+                        if (data.message.errno == '1') {
+                            //mui.alert(data.message.message);
+                            mui.alert('欢迎您享受VIP会员待遇', '绑定成功', function() {
+                                var openUrl = "{php echo util::app_url('wechatindex')}&storeid="+hidden_Storeid ;
+                                mui.openWindow({
+                                    url:openUrl,
+                                });
+                            });
+                        } else if (data.message.errno == '2'){
+                            util.toast('请重新绑定', '绑定失败', 'error');
+                            var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                            mui.openWindow({
+                                url:openUrl,
+                            });
+                        }
+                        else if (data.message.errno == '3'){
+                            mui.alert('手机验证码错误，请重新输入！');
+
+                        }
+                    })
+                }
+            }
+            else{
+                var params = {};
+                params.post_memberMobile = memberMobile_value;
+                params.hidden_SMScode = hidden_SMScode;
+                params.memberMobilajaxverification = memberMobilajaxverification;
+                params.hidden_Storeid = hidden_Storeid;
+                params.Lordopenid = "{php echo $_GPC['Lordopenid']}";
+                params.operatoruid = "{php echo $_GPC['operatoruid']}";
+                var url = "{php echo util::app_url('common', array('op' => 'updateMemberAvailable'))}";
+                $.post(url, params, function(data) {
+                    data = $.parseJSON(data);
+                    if (data.message.errno == '1') {
+                        //mui.alert(data.message.message);
+                        mui.alert('欢迎您享受VIP会员待遇', '绑定成功', function() {
+                            var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                            mui.openWindow({
+                                url:openUrl,
+                            });
+                        });
+                    }
+                    else if (data.message.errno == '2'){
+                        util.toast('请重新绑定', '绑定失败', 'error');
+                        var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                        mui.openWindow({
+                            url:openUrl,
+                        });
+                    }
+                    else if (data.message.errno == '3'){
+                        mui.alert('手验证码错误，请重新输入！');
+
+                    }
+                })
+            }
+        });
+        $(document).on('click', '.bindMember-insert', function() {
+            var memberMobile_value = $('#bindMember-basic input[name="memberMobile"]').val();
+            var hidden_SMScode = $("#hidden_SMScode").val();
+            var memberMobilajaxverification = $("#memberMobilajaxverification").val();
+            var hidden_Storeid = $("#hidden_Storeid").val();
+            var smsVerification = {$setStoreData['set_smsVerification']};
+            if (!memberMobile_value) {
+                util.toast('手机号为空', '', 'error');
+                return;
+            }
+            if(!/^1[3|4|5|7|8][0-9]{9}$/.test(memberMobile_value)) {
+                mui.alert('手机号为11位', '格式错误', function() {
+                    $("#memberMobile").val('');
+                });
+                return;
+            }
+
+
+            if(smsVerification == 1){
+                if (hidden_SMScode==''|| hidden_SMScode==undefined) {
+                    util.toast('请发送短信验证码', '', 'error');
+                    return;
+                }
+                else{
+                    var params = {};
+                    params.post_memberMobile = memberMobile_value;
+                    params.hidden_SMScode = hidden_SMScode;
+                    params.memberMobilajaxverification = memberMobilajaxverification;
+                    params.hidden_Storeid = hidden_Storeid;
+                    params.Lordopenid = "{php echo $_GPC['Lordopenid']}";
+                    params.operatoruid = "{php echo $_GPC['operatoruid']}";
+                    var url = "{php echo util::app_url('common', array('op' => 'insertMemberAvailable'))}";
+                    $.post(url, params, function(data) {
+                        data = $.parseJSON(data);
+                        if (data.message.errno == '1') {
+                            mui.alert('欢迎您享受VIP会员待遇', '绑定成功', function() {
+                                var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                                mui.openWindow({
+                                    url:openUrl,
+                                });
+                            });
+                        } else if (data.message.errno == '2'){
+                            util.toast('请重新绑定', '绑定失败', 'error');
+                            var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                            mui.openWindow({
+                                url:openUrl,
+                            });
+                        }
+                        else if (data.message.errno == '3'){
+                            mui.alert('手验证码错误，请重新输入！');
+
+
+                        }
+                    })
+                }
+            }
+            else{
+                var params = {};
+                params.post_memberMobile = memberMobile_value;
+                params.hidden_SMScode = hidden_SMScode;
+                params.memberMobilajaxverification = memberMobilajaxverification;
+                params.hidden_Storeid = hidden_Storeid;
+                params.Lordopenid = "{php echo $_GPC['Lordopenid']}";
+                params.operatoruid = "{php echo $_GPC['operatoruid']}";
+                var url = "{php echo util::app_url('common', array('op' => 'insertMemberAvailable'))}";
+                $.post(url, params, function(data) {
+                    data = $.parseJSON(data);
+                    if (data.message.errno == '1') {
+                        mui.alert('欢迎您享受VIP会员待遇', '绑定成功', function() {
+                            var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                            mui.openWindow({
+                                url:openUrl,
+                            });
+                        });
+                    } else if (data.message.errno == '2'){
+                        util.toast('请重新绑定', '绑定失败', 'error');
+                        var openUrl = "{php echo util::app_url('wechatindex')}&storeid=" +hidden_Storeid;
+                        mui.openWindow({
+                            url:openUrl,
+                        });
+                    }
+                    else if (data.message.errno == '3'){
+                        mui.alert('手验证码错误，请重新输入！');
+
+
+                    }
+                })
+            }
+
+
+        });
+
+    });
+
+    document.getElementById("button_ajaxverification").addEventListener('tap', function() {
+        var url ="{php echo $this->createMobileUrl('bindMemberInfo',array('op' => 'ajaxverification'))}";
+        var memberMobile = $('#bindMember-basic input[name="memberMobile"]').val();
+
+        if (!memberMobile) {
+            util.toast('手机号为空', '', 'error');
+            return;
+        }
+        if(!/^1[3|4|5|7|8][0-9]{9}$/.test(memberMobile)) {
+            mui.alert('手机号为11位', '格式错误', function() {
+                $("#memberMobile").val('');
+            });
+            return;
+        }
+
+        mui.ajax(url,{
+            data:{
+                memberMobile:memberMobile,
+                storeid:{$storeid}
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+
+                if(data['message']['code'] == 1){
+                    $("#memberMobilajaxverification").show();
+                    $("#hidden_SMScode").attr("value",data['message']['SMScode']);
+
+                    var count = 60;
+                    var countdown = setInterval(CountDown, 1000);
+
+                    function CountDown() {
+                        $("#button_ajaxverification").attr("disabled", true);
+                        document.getElementById('button_ajaxverification').innerHTML =count +" 秒后重发"
+                        if (count == 0) {
+                            $("#button_ajaxverification").val("button").removeAttr("disabled");
+                            document.getElementById('button_ajaxverification').innerHTML =" 获取短信验证码"
+                            clearInterval(countdown);
+                        }
+                        count--;
+                    }
+                }
+                else{
+                    mui.alert('发送失败', '请重新绑定', function() {
+                        $("#memberMobile").val('');
+                    });
+                }
+
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('失败');
+            }
+        });
+
+
+
+    });
+</script>
+{template 'common/footer_base'}

@@ -1,0 +1,84 @@
+{template 'common/header-base'}
+<link href="{MODULE_URL}static/js/artDialog/skins/idialog.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/plugins/iframeTools.js"></script>
+
+<ul class="nav nav-tabs">
+    <li class="active">
+    	<a href="{php echo $this->createWebUrl('serveperson', array('foo'=>'chong', 'id'=>$id));}">余额充值</a>
+    </li>
+    <li>
+    	<a href="{php echo $this->createWebUrl('serveperson', array('foo'=>'bao', 'id'=>$id));}">保证金</a>
+    </li>
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="javascript:;" method="post">
+    	<input type="hidden" name="id" id="id" value="{$id}" >
+    	<input type="hidden" name="flag" id="flag" value="{$flag}"  />
+		<div class="panel panel-default">
+        	<div class="panel-body">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">充值金额</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="money" id="money" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <div onclick="submitok()" class="btn btn-primary btn-block">充值</div>
+                        
+                    </div>
+                </div>
+            </div>
+			
+			<div class="panel-heading"></div>
+            <div class="panel-body">
+				<span style="color:red;"> </span>
+			</div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+function submitok(){
+    var id   = $("#id").val();
+    var flag = $("#flag").val();
+    var money= $("#money").val();
+    if(money == ''){
+    	alert("充值金额不能为空！");
+    	return false;
+    }
+    if(money <= 0){
+    	alert("充值金额不能小于等于0！");
+    	return false;
+    }
+
+    $.ajax({
+        url: "{php echo $this->createWebUrl('serveperson', array('foo'=>'chongok'))}",
+        type:"POST",
+        data:{"id":id, "flag":flag, "money":money},
+        dataType:"json",
+        success: function(res){
+            if(res == 1){
+                art.dialog({
+                    title: '提示消息',
+                    content: '充值成功，请刷新页面',
+                    ok: function () {
+                        art.dialog.close();
+                        return false;
+                    }
+                });
+            }else{
+                art.dialog({
+                    time: 1,
+                    content: '充值失败！'
+                });
+            }
+        }
+    });
+}
+</script>

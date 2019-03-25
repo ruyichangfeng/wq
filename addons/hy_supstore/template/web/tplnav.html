@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {template 'web/header'} {template 'web/header'} 
+    {if $op == 'update' || 'add'}
+    <link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./resource/css/common.css" rel="stylesheet">
+    <script type="text/javascript">
+    if (navigator.appName == 'Microsoft Internet Explorer') {
+        if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+            alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+        }
+    }
+    window.sysinfo = {
+        'uniacid': '{$_W['uniacid']}',
+        'acid': '{$_W['account']['acid']}',
+        'uid': '{$_W['uid']}',
+        'isfounder': '{$_W['isfounder']}',
+        'family': 'v',
+        'siteroot': '{$_W['siteroot']}',
+        'siteurl': '{$_W['siteurl']}',
+        'attachurl': '{$_W['attachurl']}',
+        'attachurl_local': '{$_W['attachurl_local']}',
+        'attachurl_remote': '{$_W['attachurl_remote']}',
+        'module': { 'url': '', 'name': '' },
+        'cookie': { 'pre': 'mendian' },
+    };
+    </script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/util.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/common.min.js"></script>
+    <script type="text/javascript" src="{$_W['siteroot']}web/resource/js/require.js"></script>
+    <style>
+    body {
+        background-color: #fff;
+        min-width: auto !important;
+    }
+
+    .layui-elem-field legend {
+        margin: 0 0 0 20px;
+        border-bottom: 0;
+        width: auto;
+    }
+    .system-select.active{
+        color: #1890ff;
+    }
+    </style>
+    {/if}
+</head>
+
+<body>
+    {if $op == 'list'}
+    <style>
+    #navTable {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    #navTable input[name="orderNum"] {
+        width: 60px;
+        text-align: center;
+    }
+
+    .btn-block {
+        margin-top: 15px;
+    }
+
+    .layui-table img {
+        max-width: 100%;
+        max-height: 55px;
+    }
+    @media screen and (max-width:710px) {
+        .layui-table .delete-btn{
+            margin-left: 0;
+        }
+    }
+    </style>
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">导航管理</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('Tplnav', array('op'=>'add'))}" style="margin-left:10px;" href="#">添加导航</a>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>导航列表</legend>
+        <div class="layui-field-box">
+            <table class="layui-table" id="navTable">
+                <colgroup>
+                    <col width="60">
+                    <col width="50">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>排序</th>
+                        <th>id</th>
+                        <th>分类名称</th>
+                        <th>缩略图</th>
+                        <th>链接</th>
+                        <th>修改时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loop $list $key $value}
+                    <tr>
+                        <td>
+                            <input type="number" name="orderNum" autocomplete="off" class="layui-input" value="{$value['rank']}" data-id="{$value['id']}">
+                        </td>
+                        <td>{$value['id']}</td>
+                        <td>{$value['name']}</td>
+                        <td><img src="{$_W['attachurl']}{$value['img_url']}" alt="" ></td>
+                        <td>{if $value['url']}{$value['url']}{else}空{/if}</td>
+                        <td>{php echo date('Y-m-d H:i:s',$value['update_time'])}</td>
+                        <td><a href="{php echo $this->createWebUrl('TplNav', array('op'=>'update','id'=>$value['id']))}" class="layui-btn layui-btn-sm layui-btn-normal">修改</a><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-danger delete-btn" onclick="deleteNav({$value['id']})">删除</a></td>
+                    </tr>
+                    {/loop}
+                    {if count($list) == 0}
+                    <tr><td colspan="7" style="color: red;text-align: center;line-height: 50px;font-weight: bold;">列表数据为空</td></tr>
+                    {/if}
+                </tbody>
+            </table>
+            <div class="btn-block">
+                <button class="layui-btn" id="navRank">排序</button>
+            </div>
+        </div>
+    </fieldset>
+    <script>
+    //layui
+    layui.use(['layer'], function() {
+        var layer = layui.layer;//弹层
+    });
+    //排序按钮
+    $('#navRank').on('click', function() {
+        if($('#navTable input[name="orderNum"]').length>0){
+            var idsArr = [],ranksArr = [];
+            $('#navTable input[name="orderNum"]').each(function(index, ele) {
+                idsArr.push($(ele).attr('data-id'));
+                ranksArr.push($(ele).val());
+            })
+
+            $.post('{php echo $this->createWebUrl("TplNav", array("op"=>"rank"))}', {idsArr:idsArr,ranksArr:ranksArr}, function(data) {
+                if(data == true){
+                    layer.msg('导航排序成功', function() {
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('导航排序失败 '+data, function() {
+                        window.location.reload();
+                    });
+                }
+            })
+        }else{
+            layer.msg('导航列表为空,不支持排序');
+        }
+    })
+    //删除
+    function deleteNav(id){
+        layer.confirm('您确定删除数据吗?', function() {
+            $.post('{php echo $this->createWebUrl("TplNav", array("op"=>"delete"))}', {id:id}, function(data) {
+                if(data == true){
+                    layer.msg('删除导航成功', function() {
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg('删除导航失败 '+data, function() {
+                        window.location.reload();
+                    });
+                }
+            })
+        });
+    }
+    </script>
+    {elseif $op == 'update'}
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">修改导航</a>
+    </div>
+    <blockquote class="layui-elem-quote layui-quote-nm" style="color:#1E9FFF;font-size:14px;">注意：可选择系统url链接</blockquote>
+    <fieldset class="layui-elem-field">
+        <legend>修改选项</legend>
+        <div class="layui-field-box">
+            <form class="layui-form" action="{php echo $this->createWebUrl('Tplnav', array('op'=>'update'))}" method="post" name="navUpdate">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">导航名称:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="navName" required lay-verify="required" placeholder="请输入导航名称" autocomplete="off" class="layui-input" style="width: 60%" value="{$row['name']}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图:</label>
+                    <div class="layui-input-block" style="width: 60%">
+                        {php echo tpl_form_field_image('thumbnailUrl',$row['img_url'],$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                        <span class="help-block">图片尺寸: 80*80像素 (如果觉得不够清晰，可以变成120*120)</span>
+                    </div>
+                </div>
+                <input type="hidden" name="id" value="{$row['id']}">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">链接url:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="navUrl" placeholder="请输入链接url" autocomplete="off" class="layui-input" style="width: 60%" value="{$row['url']}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">系统链接url:</label>
+                    <div class="layui-input-block" style="width: 70%;">
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=my&m=hy_supstore">会员中心</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=recharge&m=hy_supstore">会员充值</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=rechargelog&m=hy_supstore">充值记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=consum&m=hy_supstore">会员消费</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=acclog&m=hy_supstore">消费记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=integral&m=hy_supstore">积分记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=product&m=hy_supstore">产品分类</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=article&m=hy_supstore">文章分类</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=storelist&m=hy_supstore">店铺列表</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&status=1&do=coupon&m=hy_supstore">我的优惠券</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&status=1&do=oncecard&m=hy_supstore">我的次卡</a>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序:</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;" value="{$row['rank']}">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <div class="layui-input-block">
+                    <input type="submit" class="layui-btn" name="submit" value="提交" />
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['form'], function() {
+        var form = layui.form;
+    });
+    $('.system-select').on('click',function(){
+        $('.system-select').removeClass('active');
+        $(this).addClass('active');
+        $('input[name="navUrl"]').val($(this).attr('data-href'));
+    });
+    </script>
+    {elseif $op == 'add'}
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="#">添加导航</a>
+    </div>
+    <blockquote class="layui-elem-quote layui-quote-nm" style="color:#1E9FFF;font-size:14px;">注意：可选择系统url链接</blockquote>
+    <fieldset class="layui-elem-field">
+        <legend>添加选项</legend>
+        <div class="layui-field-box">
+            <form class="layui-form" action="{php echo $this->createWebUrl('Tplnav', array('op'=>'add'))}" method="post" name="navAdd">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">导航名称:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="navName" required lay-verify="required" placeholder="请输入导航名称" autocomplete="off" class="layui-input" style="width: 60%">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图:</label>
+                   <div class="layui-input-block" style="width: 60%">
+                        {php echo tpl_form_field_image('thumbnailUrl','',$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                        <span class="help-block">图片尺寸: 80*80像素 (如果觉得不够清晰，可以变成120*120)</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">链接url:</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="navUrl" placeholder="请输入链接url" autocomplete="off" class="layui-input" style="width: 60%">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">系统链接url:</label>
+                    <div class="layui-input-block" style="width: 70%;">
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=my&m=hy_supstore">会员中心</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=recharge&m=hy_supstore">会员充值</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=rechargelog&m=hy_supstore">充值记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=consum&m=hy_supstore">会员消费</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=acclog&m=hy_supstore">消费记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=integral&m=hy_supstore">积分记录</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=product&m=hy_supstore">产品分类</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=article&m=hy_supstore">文章分类</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=storelist&m=hy_supstore">店铺列表</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&status=1&do=coupon&m=hy_supstore">我的优惠券</a>
+                        <a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary system-select mb5" data-href="{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&status=1&do=oncecard&m=hy_supstore">我的次卡</a>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序:</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;">
+                        <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                    </div>
+                </div>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <div class="layui-input-block">
+                    <input type="submit" class="layui-btn" name="submit" value="提交" />
+                </div>
+            </form>
+        </div>
+    </fieldset>
+    <script>
+    layui.use(['form'], function() {
+        var form = layui.form;
+    });
+    $('.system-select').on('click',function(){
+        $('.system-select').removeClass('active');
+        $(this).addClass('active');
+        $('input[name="navUrl"]').val($(this).attr('data-href'));
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

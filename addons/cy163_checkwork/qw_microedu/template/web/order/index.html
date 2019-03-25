@@ -1,0 +1,110 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'orderlist'))}">排课表</a>
+        </li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="post" class="form-horizontal" role="form">
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>合同名称</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="search_contract_name" type="text" value="{$_GPC['search_contract_name']}" style="width:70%;display: inline-block;">
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>课程名称</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="search_class_name" type="text" value="{$_GPC['search_class_name']}" style="width:60%;display: inline-block;margin-right:3%">
+                    <button class="btn btn-md btn-primary">查询</button>
+                </div>
+                <input type="hidden" name="page" value="index_search" />
+            </form>
+        </div>
+    </div>
+    <style>
+        .label{cursor:pointer;}
+    </style>
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <h4>合同课程列表</h4>
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:25%;">合同名称</th>
+                    <th class="text-center" style="width:25%;">课程名称</th>
+                    <th class="text-center" style="width:30%;">课程简介</th>
+                    <th class="text-center" style="width:15%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {if $contractsclasses}
+                    {loop $contractsclasses $index $contractclass}
+                    <tr>
+                        <td class="text-center">{$index}</td>
+                        <td class="text-center">{$contractclass['contract_name']}</td>
+                        <td class="text-center">{$contractclass['class_name']}</td>
+                        <td class="text-center"><a href="javascript:;" data-toggle="modal" data-target="#class_detail{$contractclass['id']}">点击查看课程简介</a> </td>
+                        <td class="text-center">
+                            <a href="{php echo $this->createWebUrl('order', array('page' => 'add-class', 'contractclass_id' => $contractclass['id'], 'contract_name' => $contractclass['contract_name']))}" class="btn btn-primary btn-sm" title="排课">排课</a>
+                            <div id="class_detail{$contractclass['id']}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contract_detail" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">查看课程简介</h4>
+                                        </div>
+                                        <div class="modal-body" style="white-space: initial;text-align: left">
+                                            {$contractclass['class_description']}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {/loop}
+                {else}
+                    <tr>
+                        <td colspan="5"><p class="text-center">系统中还没有合同课程</p></td>
+                    </tr>
+                {/if}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+<script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+{template 'common/footer'}

@@ -1,0 +1,163 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-nav">
+    	<span class="layui-breadcrumb">
+	      	<a><cite>首页</cite></a>
+	      	<a><cite>互动管理</cite></a>
+	      	<a><cite>互动面板</cite></a>
+	    </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <xblock>       	  
+        	<button class="layui-btn" onclick="interact_add('添加','{:U('Home/MainCtr/Interact/interact_sz')}','600','520')"><i class="layui-icon">&#xe640;</i>添加</button>
+        	<span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+       	</xblock>
+       	<form id="delform" class="layui-form">
+	      <table class="layui-table">
+	            <thead>
+	                <tr>
+	                    <th>ID</th>
+	                    <th>名称</th>	                   
+	                    <th>入口图片</th>
+	                    <th>url地址</th>
+	                    <th>序号</th>
+	                    <th>类型</th>
+	                    <th>状态</th>
+	                    <th>操作时间</th>
+	                    <th>操作</th>
+	                </tr>
+	            </thead>
+	            <tbody id="formdata">
+	              <volist name="list" id="v">	
+	                <tr>
+	                    <td>{$v.id}</td>
+	                    <td>{$v.title}</td>	                   
+	                    <td><img  border="0"   width="200px" 
+		               		<?php 
+		               	   	if( strstr($v['pic'],'Public') ){
+		               	   	    $ym = $system['ym'].$v['pic'];
+		               	   	   	echo 'src="'.$ym.'"';
+		               	   	}else{
+		               	       	echo 'src="__ROOT__/Uploads/'.$v['pic'].'"';
+		               	   	}
+		               	  	?>
+		               	  /">
+	                    </td>
+	                    <td>
+	                    	<?php if($v['type']==1){ ?>
+							<span><?php echo str_replace("getinfo",$v['url'],$system['oauth_url']);?></span>		                  	
+	                    	<?php }else{?>
+	                    	<span><?php echo $v['url'];?></span>
+	                    	<?php } ?>	                    	 
+	                    </td>
+	                    <td>{$v.xh}</td>
+	                    <td>
+	                    	<?php if($v['type']==1){ ?>
+	                    	<span class="layui-badge layui-bg-green">系统内置</span>
+	                    	<?php }else{?>
+	                    	<span class="layui-badge">自定义</span>
+	                    	<?php } ?>
+	                    </td>
+	                    <td class="td-status" onclick="interact_change('{$v['id']}','{$v['is_show']}');">
+	                    	<?php 
+	                    		if($v['is_show'] == '1'){ 
+	                    		    echo '<span class="layui-badge layui-bg-green">开启</span>';
+	                    		}else {
+	                    			echo '<span class="layui-badge ">关闭</span>';
+	                    	    }
+	                    	 ?>
+	                    </td>
+	                    <td><?php echo  date('Y-m-d H:i:s', $v['createtime']); ?></td>
+	                    <td class="td-manage">
+	                        <a title="编辑" href="javascript:;" onclick="interact_add('编辑','{:U('Home/MainCtr/Interact/interact_sz',array('id'=>$v['id']))}','600','520')"  class="ml-5" style="text-decoration:none">
+	                        	<i class="layui-icon">&#xe642;</i>
+	                        </a>
+	                        <?php if($v['type']!=1){ ?>
+	                        <a title ="删除" href="javascript:;" onclick="interact_del({$v.id})"  style="text-decoration:none">
+	                            <i class="layui-icon">&#xe640;</i>
+	                        </a>
+	                        <?php } ?>
+	                    </td>
+	                </tr>
+	              </volist>  
+	            </tbody>
+	        </table>
+		</form>
+        <div id="page"></div>
+    </div>
+    <include file="Public/footer.html"/>    
+    <script>
+        layui.use(['form','element','laypage','layer'], function(){
+          	laypage = layui.laypage;//分页
+          	layer = layui.layer;//弹出层
+          	form = layui.form;
+          	$ = layui.jquery;
+			
+		   	laypage.render({
+			   	elem: 'page',
+			   	count: {$count},
+			   	limit: {$limit},
+			   	curr : {$page},
+			   	jump: function(obj, first){
+				   	if(!first){
+				    	var $purl = "{:U('Home/MainCtr/Interact/interact_list',array('page'=>'pageval'))}"
+				    	window.location.href= $purl.replace('pageval',obj.curr);
+				   	}
+				}
+		  	});          
+        });
+                   
+        // 用户-编辑
+        function interact_add(title,url,w,h) {
+            x_admin_edit(title,url,w,h); 
+        }
+        
+        function interact_change (id,is_show) {
+			if(is_show==1){
+           		is_show = 0;
+           	}else{
+           		is_show = 1;
+           	}
+           	var par = {"id":id,"is_show":is_show};
+           	layer.confirm('确认要更改状态吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Interact/interact_change')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('更改成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else if(data=='2'){
+							layer.msg('更改失败！', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+            
+        /*用户-删除*/
+        function interact_del(id,type){
+          	var par = {"id":id};
+			layer.confirm('确认要删除吗？',function(index){
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Interact/interact_del')}",
+					data: par,
+					dataType: 'text',
+					success: function(data){
+						if(data=='1'){
+							layer.msg('删除成功！', {icon: 1,offset: '40%',time:2000,shade: 0.3});
+						    location.reload();
+						}else{
+							layer.msg(data,{icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+					}
+				});	
+			});
+        }
+</script>   
+</body>

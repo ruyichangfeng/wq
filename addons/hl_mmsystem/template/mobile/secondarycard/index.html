@@ -1,0 +1,163 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="{HLMMS_MOBILE_CSS}chargelist.css" />
+<script src="{HLMMS_MOBILE_JS}tab.js"></script>
+<body>
+<section class="aui-flexView">
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">次卡详情</h1>
+    </header>
+    <section class="aui-scrollView">
+        <div class="aui-tab" data-ydui-tab >
+            <ul class="tab-nav">
+                <li class="tab-nav-item tab-active">
+                   <a href="{php echo $this->createMobileUrl('secondarycard',array('op' => 'index', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">未领取</a>
+                </li>
+                <li class="tab-nav-item">
+                    <a href="{php echo $this->createMobileUrl('secondarycard',array('op' => 'beinguse', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">使用中</a>
+
+                </li>
+                <li class="tab-nav-item">
+                    <a href="{php echo $this->createMobileUrl('secondarycard',array('op' => 'userear', 'memberid'=>$mobilememberinfo['id'],'storeid'=>$storeid))}">过期/停用</a>
+                </li>
+            </ul>
+            <div class="tab-panel"style="margin-top: 15%">
+                <div class="tab-panel-item tab-active">
+                    <div class="tab-item">
+                        <div class="tab-item-list tab-item-list-green">
+
+                            {if util::set('mfc1',$setdata) == 1  && util::set('mfc3',$setdata) == 1 && !empty($goodsrechargecountfree)}
+                            <h5 style="margin-top: 10px;">免费领取次卡</h5>
+                            {loop $goodsrechargecountfree  $goodsrechargecountfreeitem}
+                            <div class="aui-flex">
+                                <div class="aui-left-change">
+                                    <h2>{$goodsrechargecountfreeitem['grc_count']}<em>次</em></h2>
+                                    <p style="font-size: 15px;color: white">{php echo util::getGoodsNameOne($goodsrechargecountfreeitem['goods_id'])}</p>
+                                    <div class="aui-icon-circle" style="background-image:url('{HLMMS_MOBILE_ICOS}icon-circle.png');"></div>
+                                </div>
+                                <div class="aui-flex-box aui-flex-box-two">
+                                    <h3>
+                                        <em>未领取</em>
+                                      免费领取
+                                    </h3>
+                                    <div class="aui-flex aui-flex-bor-bom">
+                                        <div class="aui-flex-box aui-flex-box-flow">
+                                            {if $goodsrechargecountfreeitem[grc_specifiedEndTime] >= '1572883200'}
+                                            永久有效
+                                            {else}
+                                            {php echo date('Y-m-d', $goodsrechargecountfreeitem[grc_specifiedStartTime]);}-{php echo date('Y-m-d', $goodsrechargecountfreeitem[grc_specifiedEndTime]);}
+                                            {/if}
+                                        </div>
+                                        <div class="aui-btn-use" onclick="nowreceive({$goodsrechargecountfreeitem['id']});">立即领取</div>
+                                    </div>
+                                    <div class="aui-flex aui-flex-show">
+                                        <div class="aui-flex-box">{$goodsrechargecountfreeitem['grc_rechargeRuleDescription']}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/loop}
+                            {/if}
+
+                            <h5 style="margin-top: 10px;">付费次卡展示</h5>
+                            {loop $memberrechargepackageslist $memberrechargepackagesitem}
+                            <div class="aui-flex">
+                                <div class="aui-left-change">
+                                    <h2>{$memberrechargepackagesitem['grc_count']}<em>次</em></h2>
+                                    <p style="font-size: 15px;color: white">{php echo util::getGoodsNameOne($memberrechargepackagesitem['goods_id'])}</p>
+                                    <div class="aui-icon-circle" style="background-image:url('{HLMMS_MOBILE_ICOS}icon-circle.png');"></div>
+                                </div>
+                                <div class="aui-flex-box aui-flex-box-two">
+                                    <h3>
+                                        <em>未购买</em>
+                                        实体店购买使用
+                                    </h3>
+                                    <div class="aui-flex aui-flex-bor-bom">
+                                        <div class="aui-flex-box aui-flex-box-flow">
+                                            {if $memberrechargepackagesitem[grc_specifiedEndTime] >= '1572883200'}
+                                            永久有效
+                                            {else}
+                                            {php echo date('Y-m-d', $memberrechargepackagesitem[grc_specifiedStartTime]);}-{php echo date('Y-m-d', $goodsrechargecountfreeitem[grc_specifiedEndTime]);}
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <div class="aui-flex aui-flex-show">
+                                        <div class="aui-flex-box">{$memberrechargepackagesitem['grc_rechargeRuleDescription']}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/loop}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+</body>
+<script type="text/javascript">
+
+
+
+    function nowreceive(cardid) {
+
+
+        var url =  "{php echo $this->createMobileUrl('secondarycard', array('op' => 'secondarycardreceive'))}";
+        var cardid = cardid;
+        mui.ajax(url,{
+            data:{
+                cardid:cardid,
+            },
+            dataType:'json',
+            type:'post',
+            success:function(data){
+                var code1 = data['message']['code'];
+                if(code1 == 2){
+                    mui.alert("领取失败", '次卡领取');
+                }
+                else{
+                    mui.alert('领取成功', '成功', function() {
+                        var activeUrl = "{php echo $this->createMobileUrl('secondarycard',array('op'=>'index'))}";
+                        mui.openWindow({
+                            url:activeUrl,
+                            waiting:{
+                                autoShow:true,//自动显示等待框，默认为true
+                                title:'正在加载...',//等待对话框上显示的提示内容
+                                options:{
+                                    width:'waiting-dialog-widht',//等待框背景区域宽度，默认根据内容自动计算合适宽度
+                                    height:'waiting-dialog-height',//等待框背景区域高度，默认根据内容自动计算合适高度
+                                }
+                            }
+                        });
+                    });
+                }
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('读卡失败');
+            }
+        });
+
+    }
+
+
+    function showDiv1(){
+        //$("#test1").attr("style","display:block");
+        //$("#test1").show();
+        $("#test1").css("display","block");
+    }
+    function showDiv2(){
+        //$("#test2").attr("style","visibility:visible");
+        $("#test2").css("visibility","visible");
+    }
+
+
+    function hiddenDiv1(){
+        $("#test1").hide();
+    }
+
+    function hiddenDiv2(){
+        $("#test2").attr("style","visibility:hidden");
+    }
+
+</script>
+

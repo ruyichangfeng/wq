@@ -1,0 +1,167 @@
+{template "header"}
+<body ontouchstart>
+{template "notice"}
+{template "thems"}
+<header class="ui-header">
+    <div class="ui-icon-left">
+        <a href="javascript:" class="ui-icon icon-back"></a>
+    </div>
+    <div class="ui-title">员工入驻</div>
+</header>
+<div class="ui-content m_sig">
+    <form>
+        <div class="weui-cells weui-basis_form">
+            {loop $colList $col}
+            {if $col['type']=='name'}
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><label class="weui-label">{$col['name']}</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" placeholder="{$col['val']}" name="{$col['id']}" type="text" value="{$ext[$col['id']]}" >
+                </div>
+            </div>
+            {/if}
+            {if $col['type']=='input'}
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><label class="weui-label">{$col['name']}</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" placeholder="{$col['val']}" name="{$col['id']}" type="text" value="{$ext[$col['id']]}" >
+                </div>
+            </div>
+            {/if}
+            {if $col['type']=='mobile'}
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><label class="weui-label">{$col['name']}</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" placeholder="{$col['val']}" name="{$col['id']}" type="number" value="{$ext[$col['id']]}" >
+                </div>
+            </div>
+            {/if}
+            {if $col['type']=='radio'}
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label  class="weui-label">{$col['name']}</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <select class="weui-select" name="{$col['id']}">
+                        {loop $col['val'] $item}
+                        <option value="{$item}">{$item}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+            {/if}
+            {if $col['type']=='date'}
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><label class="weui-label">{$col['name']}</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" placeholder="{$col['val']}" name="{$col['id']}" type="text" value="{$ext[$col['id']]}" >
+                </div>
+            </div>
+            {/if}
+            {if $col['type']=='textarea'}
+            <div class="weui-cell weui-cell_access">
+                <div class="weui-cell__hd"><label class="weui-label">{$col['name']}</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" placeholder="{$col['val']}" name="{$col['id']}" type="text" value="{$ext[$col['id']]}" >
+                </div>
+            </div>
+            {/if}
+            {/loop}
+        </div>
+    </form>
+    {if $info['pass']==0}
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_confirm" href="javascript:">确认修改</a>
+    </div>
+    {/if}
+</div>
+{template "js"}
+<script src="{MODULE_URL}/static/new/js/city-picker.min.js"></script>
+<script>
+    $(function() {
+      $(".weui-btn_confirm").click(function(){
+          var post = $("form").serialize();
+          var can=true;
+          var msg="";
+          var url="{php echo $this->createMobileUrl('staffSave')}";
+          $(".weui-input").each(function(){
+              if($(this).val()==""){
+                  msg=$(this).attr("placeholder");
+                  can =false;
+              }
+          });
+          if(!can){
+              msg = (msg=="")?"请填写内容":msg;
+              errorMsg(msg);
+              return false;
+          }
+          $.post(url,{post:post},function(response){
+              if(response.code==1){
+                  successMsg(response.msg);
+                  setTimeout(function(){
+                      location.href="{php echo $this->createMobileUrl('member')}";
+                  },1000);
+              }else{
+                  errorMsg(response.msg);
+              }
+          },'json')
+      });
+    });
+</script>
+<script>
+    //城市选择
+    $("#citypicker").cityPicker({
+        title: "城市"
+    });
+    //日历
+    $("#mycalendar").calendar({
+        dateFormat:"yyyy-mm-dd"
+    });
+    //性别
+    $("#sex").select({
+        title: "性别",
+        items: ["男", "女"],
+        onChange: function(d) {
+            console.log(this, d);
+        },
+        onClose: function() {
+            console.log("close");
+        },
+        onOpen: function() {
+            console.log("open");
+        },
+    });
+    //图片上传
+    $(function(){
+        var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>',
+                $gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+                $uploaderInput = $("#uploaderInput"),
+                $uploaderFiles = $("#uploaderFiles")
+                ;
+
+        $uploaderInput.on("change", function(e){
+            var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+            for (var i = 0, len = files.length; i < len; ++i) {
+                var file = files[i];
+
+                if (url) {
+                    src = url.createObjectURL(file);
+                } else {
+                    src = e.target.result;
+                }
+
+                $uploaderFiles.append($(tmpl.replace('#url#', src)));
+            }
+        });
+        $uploaderFiles.on("click", "li", function(){
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+        $gallery.on("click", function(){
+            $gallery.fadeOut(100);
+        });
+    });
+
+</script>
+</body>
+</html>

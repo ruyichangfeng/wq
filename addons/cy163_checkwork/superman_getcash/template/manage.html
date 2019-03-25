@@ -1,0 +1,283 @@
+{template 'common/header'}
+<ul class="nav nav-tabs" style="margin-bottom: 10px;">
+	<li {if $act == 'display' && !isset($_GPC['status'])}class="active"{/if}><a href="{php echo $this->createWebUrl('manage', array('act' => 'display'));}">全部</a></li>
+	<li {if isset($_GPC['status']) && $_GPC['status'] == 0}class="active"{/if}><a href="{php echo $this->createWebUrl('manage', array('act' => 'display', 'status' => 0));}">处理中</a></li>
+	<li {if $_GPC['status'] == 1}class="active"{/if}><a href="{php echo $this->createWebUrl('manage', array('act' => 'display', 'status' => 1));}">已提现</a></li>
+	<li {if $_GPC['status'] == -1}class="active"{/if}><a href="{php echo $this->createWebUrl('manage', array('act' => 'display', 'status' => -1));}">已取消</a></li>
+	<li {if $_GPC['status'] == -2}class="active"{/if}><a href="{php echo $this->createWebUrl('manage', array('act' => 'display', 'status' => -2));}">失败</a></li>
+	{if $act == 'post'}<li class="active"><a href="{php echo $this->createWebUrl('manage', array('act' => 'post', 'id' => $_GPC['id']));}">编辑</a></li>{/if}
+</ul>
+{if $act=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="manage">
+			<input type="hidden" name="act" value="display">
+			<input type="hidden" name="m" value="superman_getcash">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称(uid)</label>
+				<div class="col-sm-4 col-md-4 col-lg-4 col-xs-4">
+					<input type="text" class="form-control" name="keyword" value="{$_GPC['keyword']}" />
+				</div>
+				<div class="col-sm-4 col-md-4 col-lg-4 col-xs-4">
+					<button type="submit" class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					<input type="hidden" name="token" value="{$_W['token']}" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<form action="" method="get">
+<input type="hidden" name="c" value="site">
+<input type="hidden" name="a" value="entry">
+<input type="hidden" name="do" value="manage">
+<input type="hidden" name="act" value="pay">
+<input type="hidden" name="m" value="superman_getcash">
+<div class="panel panel-default ">
+	<div class="table-responsive panel-body">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th width="50">
+						<input type="checkbox" id="checkall">
+					</th>
+					<th>头像/昵称</th>
+					<th width="90">提现金额</th>
+					<th width="70">状态</th>
+					<th width="160">申请时间</th>
+					<th width="180" class="text-right">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+			{loop $list $li}
+			<tr>
+				<td>
+					<input type="checkbox" name="id[]" value="{$li['id']}" data-status="{$li['status']}" {if $li['status']==1||$li['status']==-1}disabled{/if}>
+				</td>
+				<td>
+					<div class="clearfix">
+						<div class="pull-left" style="width: 40px;height: 40px; overflow: hidden; border-radius: 50%;">
+							<img src="{php echo tomedia($li['avatar'])}" onerror="this.src='../app/resource/images/heading.jpg'" style="width: 100%" />
+						</div>
+						<div class="pull-left" style="line-height: 40px; margin-left: 10px;">
+							{if $li['nickname']!=''}{$li['nickname']}{else}{$li['uid']}{/if}
+						</div>
+					</div>
+				</td>
+				<td>¥{$li['money']}</td>
+				<td>
+					{if $li['status']==1}
+					<span class="label label-success">{php echo superman_getcash_get_status_title(1)}</span>
+					{elseif $li['status']==0}
+					<span class="label label-primary">{php echo superman_getcash_get_status_title(0)}</span>
+					{elseif $li['status']==-1}
+					<span class="label label-default">{php echo superman_getcash_get_status_title(-1)}</span>
+					{elseif $li['status']==-2}
+					<span title="{$li['reason']}" class="label label-danger">{php echo superman_getcash_get_status_title(-2)}</span>
+					{/if}
+				</td>
+				<td>{$li['insert_time']}</td>
+                <style>
+                    .btn-group a:hover {
+                        border-color: #e7e7eb;
+                    }
+                </style>
+				<td class="text-right" style="overflow:visible;">
+					<div class="btn-group">
+						{if $li['status']!=1&&$li['status']!=-1&&$li['status']!=-2}
+						<a onclick="return confirm('确认支付提现吗？'); return false;" href="{php echo $this->createWebUrl('manage', array('act' => 'pay', 'id' => $li['id']))}" title="提现" class="btn btn-default btn-sm"><i class="fa fa-dollar"></i></a>
+						{/if}
+						<a href="{php echo $this->createWebUrl('manage', array('act' => 'post', 'id' => $li['id']))}" title="编辑" class="btn btn-default btn-sm"><i class="fa fa-edit"></i></a>
+						<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('manage', array('act' => 'delete', 'id' => $li['id']))}" title="删除" class="btn btn-default btn-sm"><i class="fa fa-times"></i></a>
+					</div>
+				</td>
+			</tr>
+			{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div class="row">
+	<input onclick="return confirm('确认支付提现吗？'); return false;" name="submit" type="submit" value="批量提现" class="btn btn-primary col-lg-2">
+	<input type="hidden" name="token" value="{$_W['token']}" />
+</div>
+{$pager}
+</form>
+<script>
+	$('#checkall').click(function() {
+		if ($(this).prop('checked')) {
+			$('input[type=checkbox]').each(function(){
+				var status = $(this).attr('data-status');
+				if (status != 1 && status != -1) {
+					$(this).prev().addClass('checked');
+                    $(this).prop('checked', true);
+				}
+			});
+		} else {
+			$('input[type=checkbox]').each(function(){
+				var status = $(this).attr('data-status');
+				if (status != 1 && status != -1) {
+					$(this).prev().removeClass('checked');
+                    $(this).prop('checked', false);
+				}
+			});
+		}
+	});
+</script>
+{/if}
+{if $act == 'post'}
+<form class="form-horizontal form" action="" method="post" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">提现数据</div>
+		<div class="panel-body">
+			<input type="hidden" name="id" value="{$item[id]}">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">昵称</label>
+				<div class="col-sm-8 col-xs-12">
+                    <p class="form-control-static">
+                        {$item['nickname']}
+                    </p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">头像</label>
+				<div class="col-sm-8 col-xs-12">
+					<div class="pull-left" style="width: 40px;height: 40px; overflow: hidden; border-radius: 50%;">
+						<img src="{php echo tomedia($item['avatar'])}" onerror="this.src='../app/resource/images/heading.jpg'" style="width: 100%" />
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">UID</label>
+				<div class="col-sm-8 col-xs-12">
+                    <p class="form-control-static">
+                        {$item['uid']}
+                    </p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">openid</label>
+				<div class="col-sm-8 col-xs-12">
+                    <p class="form-control-static">
+                        {$item['from_user']}
+                    </p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">交易号</label>
+				<div class="col-sm-8 col-xs-12">
+                    <p class="form-control-static">
+                        {$item['payment_no']}
+                    </p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">真实姓名</label>
+				<div class="col-sm-8 col-xs-12">
+					<input type="text" class="form-control" placeholder="" name="realname" value="{$item['realname']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">提现金额</label>
+				<div class="col-sm-8 col-xs-12">
+
+                    <div class="input-group ">
+                        <input type="number" min="0" step="0.01" class="form-control" placeholder="" id="money" name="money" value="{$item['money']}" data-getcash-ratio="{php echo $this->module['config']['getcash']['ratio']}" disabled="disabled">
+                        <span class="input-group-btn">
+								<button class="btn btn-default" type="button">元</button>
+							</span>
+                    </div>
+                    <span class="help-block" style="color: #ff0000">本次提现需消耗 <span class="consume"></span> {$credit_title}</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">备注</label>
+				<div class="col-sm-8 col-xs-12">
+					<textarea name="remark" class="form-control">{$item['remark']}</textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">回复备注</label>
+				<div class="col-sm-8 col-xs-12">
+					<textarea class="form-control" name="message" placeholder="提现申请不通过时，可填写相关说明信息">{$item['message']}</textarea>
+					<span class="help-block">当状态变更为已提现、处理中、取消时，前台会员可在提现记录里看到回复备注内容(点击状态即可展示)</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">提现失败原因</label>
+				<div class="col-sm-8 col-xs-12">
+					<textarea disabled class="form-control" name="reason" placeholder="">{$item['reason']}</textarea>
+					<span class="help-block">由微信支付接口返回的错误信息，方便排查接口问题，前台会员无法看到，只有管理员可以看到，不可修改</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">提现状态</label>
+				<div class="col-sm-8 col-xs-12">
+					<label class="checkbox-inline">
+						<input type="radio" name="status" value="0" {if $item['status']==0}checked{/if} {if $item['status']==-1 || $item['status']==1 || $item['status']==-2}disabled{/if}> 处理中
+					</label><br/>
+					<label class="checkbox-inline">
+						<input type="radio" name="status" id="cancel" value="-1" {if $item['status']==-1}checked{/if} {if $item['status']==1 || $item['status']==-2}disabled{/if}> 取消
+					</label><br/>
+					<label class="checkbox-inline">
+						<input type="radio" name="status" value="-2" {if $item['status']==-2}checked{/if} {if $item['status']==-1 || $item['status']==1}disabled{/if}> 失败
+					</label><br/>
+					<label class="checkbox-inline">
+						<input type="radio" name="status" value="1" {if $item['status']==1}checked{/if} {if $item['status']==-1 || $item['status']==-2}disabled{/if}> 已提现
+					</label><br/>
+					<span class="help-block state" {if $item['status']==-1}style="display: none;"{/if}>提现状态可在此手动修改，当操作提现时，将根据支付状态自动更新提现状态</span>
+                    <span class="help-block cancel" {if $item['status']!=-1}style="display: none;"{/if}>取消后不能再修改状态, 因为已退回积分或余额，需重新提交申请</span>
+				</div>
+			</div>
+			{if $item['user']['username']}
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">操作人</label>
+				<div class="col-sm-8 col-xs-12" style="padding-top: 7px">
+					{$item['user']['username']}
+				</div>
+			</div>
+			{/if}
+            {if $item['update_time']}
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">支付时间</label>
+                <div class="col-sm-8 col-xs-12">
+                    <p class="form-control-static">
+                    {php echo date('Y-m-d H:i:s', $item['update_time'])}
+                    </p>
+                </div>
+            </div>
+            {/if}
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-12">
+			<input name="submit" type="submit" value="提交" class="btn btn-primary col-lg-1">
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+    require(['jquery', 'util'],function($, u){
+        var money = $('#money').val();
+        var getcash_ratio = $('#money').attr('data-getcash-ratio');
+        $('.consume').html(Math.floor(money*getcash_ratio * 100) / 100);
+        $('#money').bind('input propertychange', function() {
+            $('.consume').html(Math.floor($(this).val()*getcash_ratio * 100) / 100);
+        });
+        //取消提现显示提示信息
+        $('input[name=status]').click(function(){
+            if ($(this).val() == -1) {
+                $('.cancel').css('display','block');
+                $('.state').css('display','none');
+            } else {
+                $('.cancel').css('display','none');
+                $('.state').css('display','block');
+            }
+        });
+    });
+</script>
+{/if}
+{template 'common/footer'}

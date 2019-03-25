@@ -1,0 +1,165 @@
+﻿﻿<include file="Public/header.html"/>
+<link rel="stylesheet" type="text/css" href="__ROOT__/Public/css/update_css.css" />
+
+</head>
+<body>
+<div class="x-nav">
+        <span class="layui-breadcrumb">
+          <a><cite>首页</cite></a>
+          <a><cite>文件完整校验</cite></a>
+        </span>   
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right;height:30px;padding: 0 15px;"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+<div class="page-container">
+	<div class="update_d"> 
+		<div class="update_d1">
+			<img  class="update_d1_img1"  src="__ROOT__/Public/images/flie.png">
+			<div class="update_d1_d1">
+				<p class="p1">{$system['p_name']}</p>
+				<p class="p2">最新校验版本：{$version}</p>
+				<p class="p2">共有<span style="color:red;">{$count}</span>个文件待校验</p>
+			</div>
+			<div class="update_d1_d2">
+				<button type="button" class="btn1" id="btn1" onclick='startcheck();'>开始文件校验</button>
+				<button type="button" class="btn1" onclick='startcheckdata();'>开始数据校验</button>
+				<br/>
+				<span style="color: red;">请校验文件后，再进行数据校验！</span>
+			</div>
+			
+		</div>
+		<div class="mt-20">
+		<table class="layui-table">
+			<thead>
+				<tr class="text-c">
+					<th width="300">文件</th>
+					<th width="150">加密串</th>
+					<th width="100">状态</th>
+				</tr>
+			</thead>
+			<tbody>
+				<volist name="filearray" id="vo">
+					<tr class="text-c">
+						<td>{$vo.path}</td>
+						<td>{$vo.checksum}</td>
+						<td>待校验</td>
+					</tr>
+				</volist> 
+			</tbody>
+		</table>
+		 
+	</div>
+	</div>
+	</div>
+</div>
+
+
+
+<!--_footer 作为公共模版分离出去-->
+<include file="Public/footer.html"/>
+
+<script type="text/javascript">
+	var type = 0;
+	var out = 0;
+	var $=null;
+	 layui.use(['form','laydate','element','laypage','layer'], function(){
+	 	$ = layui.jquery;
+	 	$('.application_d1_d1').css('height',$('.application_d1_d1').css('width'));
+	 	//startcheck();
+	 });
+	
+	function startcheckdata(){
+		var tjing = layer.msg('数据校验中...', {icon: 16,shade: 0.3,time: 60*1000});
+		$.ajax({
+		  type: 'POST',
+		  url: "{:U('Home/MainCtr/File/check_data')}",
+		  data: {},
+		  dataType: 'text',
+		  success: function(data){
+		  	layer.close(tjing);
+		  	if('ok'==data){
+		  		parent.layer.msg('数据校验成功！', {icon: 1,offset: '40%',time:3000,shade: 0.3,shadeClose:true});
+		  	}else{
+		  	    parent.layer.msg('数据校验失败！'+data, {icon: 2,offset: '40%',time:8000,shade: 0.3,shadeClose:true});
+		  	}
+			
+		  }
+	    });
+		
+	}
+	
+	function startcheck(){
+		
+		if($("tbody .text-c").length==0){
+			window.location.href="{:U('Home/MainCtr/Index/index')}";
+			parent.layer.msg('请等待云端上传校验文件。。', {icon: 2,offset: '40%',time:3000,shade: 0.3});
+			return false;
+		}
+		
+		if(type==1){
+				return false;
+		}
+		if(type==2){
+			window.location.reload();
+			return false;
+		} 
+		type = 1;
+		$('#btn1').text('正在校验。。'); 
+		
+		getfile($("tbody .text-c")[out]);
+		/*$("tbody .text-c").each(function(i){
+			var path=this.children[0];
+			var checksum=this.children[1];
+			var status=this.children[2];
+			getfile(path,checksum,status);
+			
+			out=i;
+			if(out==5){
+				return false;
+			}
+			
+		});*/
+	}
+	function getfile(node){
+		
+		var path=node.children[0];
+		var checksum=node.children[1];
+		var status=node.children[2];
+		var version='{$version}';
+		out++;
+		$.ajax({
+				  type: 'POST',
+				  url: "{:U('Home/MainCtr/File/check_files')}",
+				  data: {'path':path.innerHTML,'checksum':checksum.innerHTML,'version':version},
+				  dataType: 'text',
+				  success: function(data){
+				  	if('ok'==data){
+				  		status.innerHTML='校验文件成功';	
+				  		status.style.border='1px solid #e1e1e1';
+				  		status.style.color='#68c429';
+				  		status.style.backgroundColor='#f9f2f4';
+				  		status.style.borderRadius='4px';
+				  		status.style.boxShadow='0 1px 4px rgba(0,0,0,.1)';
+				  	}else{
+				  		status.innerHTML='请修改文件权限';
+				  		status.style.border='1px solid #e1e1e1';
+				  		status.style.color='#c7254e';
+				  		status.style.backgroundColor='#f9f2f4';
+				  		status.style.borderRadius='4px';
+				  		status.style.boxShadow='0 1px 4px rgba(0,0,0,.1)';
+				  	}
+					if($("tbody .text-c").length>out){
+						getfile($("tbody .text-c")[out]);
+					}else{
+						type = 2;
+						$('#btn1').text('再次校验');
+						//window.location.href="{:U('Home/MainCtr/Index/index')}";
+					}
+				 }
+			});
+	}
+	
+	
+	</script>
+
+</body>
+</html>

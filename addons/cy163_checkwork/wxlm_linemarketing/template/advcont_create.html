@@ -1,0 +1,107 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<!-- <li ><a href="{php echo $this->createWebUrl('adv', array('op'=>'display'));}">广告组信息</a></li> -->
+	<li ><a href="{php echo $this->createWebUrl('adv', array('op'=>'display'));}">广告管理</a></li>
+	<!-- <li ><a href="{php echo $this->createWebUrl('adv', array('op'=>'create'));}">添加分组</a></li> -->
+	 <li class="active">{if isset($advcont_list[advcont_id])}<a href="javascript:;">编辑广告</a>{else}<a href="{php echo $this->createWebUrl('adv', array('op'=>'create'));}">添加广告{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">{if isset($advcont[advcont_id])}编辑广告{else}添加广告{/if}</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="advcont[advcont_id]" class="form-control" value="{$advcont_list['advcont_id']}" />
+					</div>
+				</div>
+	<!-- 			<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>广告组</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<select name="advcont[advcont_type]" id="advcont_type" class="form-control">
+                        	<option value="" >请选择</option>
+							{loop $adv_list $key $item}
+						    <option value="{$item['adv_id']}" {if $advcont_list['advcont_type']==$item['adv_id'] || $advcont_type == $item['adv_id']}selected="selected"{/if}>{$item['adv_title']}</option>
+							{/loop}
+                        </select>
+					</div>
+				</div> -->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="advcont[advcont_title]" class="form-control" value="{$advcont_list['advcont_title']}" maxlength="50" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label"><span class="xhred">*</span>广告图片</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_form_field_image('advcont[advcont_thumb]', $advcont_list['advcont_thumb'])}
+					    <div class="help-block">建议尺寸大小：640*320</div>
+					</div>
+				</div>
+
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>广告跳转链接</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="url" name="advcont[advcont_url]" class="form-control" value="{$advcont_list['advcont_url']}" maxlength="200" />
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="advcont[advcont_order]" class="form-control" value="{$advcont_list['advcont_order']}" maxlength="20" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>开启状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="advcont[advcont_state]" id="advcont_state1" value="1" {if $advcont_list['advcont_state'] == 1 ||$advcont_list['advcont_state'] == ''} checked="checked"{/if}> 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="advcont[advcont_state]" id="advcont_state2" value="2" {if $advcont_list['advcont_state'] == 2} checked="checked"{/if}> 关闭
+						</label>
+						<span class="help-block"></span>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="backadvcont()"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="advcont[advcont_thumb]"]').val() == ''){
+				util.message('请填写广告图片');
+				return false;
+			}	
+			if($('input[name="advcont[advcont_order]"]').val() == ''){
+				util.message('请填写排序');
+				return false;
+			}
+			if($('input:radio[name="advcont[advcont_state]"]:checked').val()==undefined){
+				util.message('请选择开启状态');
+				return false;
+			}
+			return true;
+		});
+	});
+});
+function backadvcont(){
+	window.location.href="{php echo $this->createWebUrl('adv', array('op'=>'display'));}";
+}
+</script>
+{template 'common/footer'}

@@ -1,0 +1,148 @@
+
+{template 'header'}
+
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+    <div class="c-gre3 ub ub-ver ub-ac ub-pc" style=" padding:2rem 0rem 3rem 0rem ">
+    	<div class="umar-t ulev1 t-yel">
+            <div class="tx-c">手机认证</div>
+            <div class="tx-c ulev-2">手机认证以后才可以提交项目订单</div>
+        </div>
+    </div>
+    <div class="ub-f1">
+    	<form class="form-horizontal ub ub-f1 ub-ver" id="form1" action="javascript:;" method="post">
+        <div class="uinn8 umar-t1 tx-c">
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-phone ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="tel" name="mobile" id="mobile" placeholder="手机号码" value="{$item['mobile']}" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:3.5rem">
+                        <i class="iconfont icon-nan ulev2 umar-r1 umar-l1 t-gre1"></i>
+                    </div>
+                    <div class="ub-f1 ub ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="text" name="code" id="code" placeholder="输入验证码" value=""  class="uinn ulev0 block ub-f1" style="" />
+                        </div>
+                    </div>
+                    <div id="on" class="kk-check t-gra" style="padding:0.5rem 0.5rem 0.1rem 0.5rem " onClick="getCode()">
+                    <!--
+                        <label class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" id="lable_text" >获取验证码<i class="iconfont ulev0 t-org"></i></label>
+                    -->
+                        <input type="button" id="btn" class="block uinn3 uba b-gra umar-b umar-r ufl ulev-1 uc-a15" value="免费获取验证码" />  
+                        <div class="clear"></div>
+                    </div>
+                </li>
+            </ul>
+           
+    	</div>
+        <div class="uinn8 ub">
+            <button class="c-gre3 ub ub-pc uc-a1 ub-f1 btnn block" onClick="submit1()" style="margin-bottom:0.5em;padding:0.75rem 3rem" type="submit"><span class="ulev0 t-wh">下一步</span></button>
+        </div>
+        </form>
+    </div>    
+</div>
+
+
+<script type="text/javascript" src="{MODULE_URL}/template/mobile/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/template/mobile/js/main.js"></script>
+<script type="text/javascript" src="{MODULE_URL}/template/mobile/js/jquery_min.js"></script>
+<script type="text/javascript">
+function submit1(){
+	var mobile = document.getElementById('mobile').value;
+	var code = document.getElementById('code').value;
+			
+	if(mobile == ''){
+		alert("请输入电话");
+		return false;
+	}
+	if (!/^1[34578]{1}[0-9]{9}/.test(mobile)) {
+		alert('请输入正确的手机号码！');
+		return false;
+	}
+	if(code == ''){
+		alert("请输入获取的验证码");
+		return false;
+	}
+			
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('authmobileok', array());}",
+		type:"POST",
+		data:{"mobile":mobile,"code":code},
+		dataType:"json",
+		success: function(res){
+			if(res == "0"){
+				alert('对不起,认证失败！');
+			}
+			if(res == "1"){
+				alert('恭喜你，认证成功！');
+				window.location.href = "{php echo $this->createMobileUrl('Myinfo', array())}"; 
+			}
+			if(res == "2"){
+				alert('对不起,该手机号码已经认证！');
+			}
+		}
+	});
+				
+}
+
+function getCode(){
+	var mobile = document.getElementById('mobile').value;
+	if(mobile == ''){
+		alert('请输入手机号码！');
+		return false;
+	}
+	if (!/^1[34578]{1}[0-9]{9}/.test(mobile)) {
+		alert('请输入正确的手机号码！');
+		return false;
+	}
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('CodeOk', array());}",
+		type:"POST",
+		data:{'mobile':mobile,'type':1},
+		dataType:"json",
+		success: function(res){
+			if(res==1){
+				var wait = "{$timeout}";
+				time(wait); 
+				//document.getElementById('lable_text').innerHTML = '已发送';
+				//document.getElementById('on').onclick = function(){}; 
+			}else{
+				alert('验证码发送失败！请重试');
+				return false;
+			}
+		}
+	});
+}
+
+function time(wait) {  
+       if (wait == 0) {  
+            document.getElementById("btn").removeAttribute("disabled");            
+            document.getElementById("btn").value="免费获取验证码";  
+            wait = 60;  
+        } else {  
+            document.getElementById("btn").setAttribute("disabled", true);  
+            document.getElementById("btn").value="重新发送(" + wait + ")";  
+            wait--;  
+            setTimeout(function() {  
+                time(wait)  
+            },  
+            1000)  
+        }  
+    }  
+</script>
+
+</body>
+</html>

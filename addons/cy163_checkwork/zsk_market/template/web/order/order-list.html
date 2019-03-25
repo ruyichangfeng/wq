@@ -1,0 +1,211 @@
+{template 'public/header'} 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+<script language='javascript' src="{ZSK_STATIC}layui/layui.all.js"></script>
+<script language='javascript' src="{ZSK_STATIC}js/vue.js"></script>
+<script language='javascript' src="{ZSK_STATIC}dsg/js/downloadtp.js"></script>
+<style type="text/css">
+	.form-input{width:150px;display:inline-block;margin:auto 20px;margin-left:0;}
+	.table td{
+		word-break: break-all;
+	}
+</style> 
+<div id="example-1">
+<div class="panel panel-info" style="position:absolute;background-color: #ffffff;z-index:20; width: 100%;">
+	<div class="panel-heading" >订单管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo $this->routeUrl('order.listview');?>" method="post" id="keyform">
+			<div class="col-xs-12 col-sm-12" style="padding:0 0;">
+				<input type="hidden" name="discounttype" value="{$_GPC['type']}">
+				<input type="text" name="num" placeholder="订单编号" value="{$param['num']}" class="form-control form-input" style="width: 180px;" /> 
+				<input type="text" name="mobile" placeholder="收货人手机" value="{$param['mobile']}" class="form-control form-input" /> 
+				<input type="date" name="date" placeholder="下单时间" value="{$param['date']}" id="date" class="form-control form-input" readonly="readonly" /> 
+				<select class="form-control form-input" name="sts">
+					<option value="99" >全部</option> 
+					<option value="1" <?php if($param['sts']=='1'){echo "selected='selected'";}?>>未发货</option>
+					<option value="2" <?php if($param['sts']=='2'){echo "selected='selected'";}?>>待收货</option>
+					<option value="3" <?php if($param['sts']=='3'){echo "selected='selected'";}?>>已收货</option>
+					<option value="4" <?php if($param['sts']=='4'){echo "selected='selected'";}?>>已完成</option>
+				</select>
+				<button type="submit" class="btn btn-default" style="display: inline-block;" form="keyform">搜索</button>
+			</div>
+			</form>
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 100px;">订单编号</th> 
+					<th style="width: 150px;">商品</th>
+					<th style="width: 130px;">收货人</th> 
+					<th style="width: 150px;">地址</th>
+					<th style="width: 120px;">下单时间</th>
+					<th style="width: 100px;">支付方式</th>
+					 <th style="width: 70px;">金额</th>
+					 <th style="width: 100px;">状态</th>
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $orderlist $index $item}
+				<tr>
+					<td  style="width: 140px;word-break: break-all;" data-payno='{$item["wxpay_no"]}'>{$item['num']}</td>
+					<td  style="width: 200px;word-break: break-all;">{$item['abs']}</td>
+					<td >{$item['name']}<br/>{$item['mobile']}  </td>
+					<td style="width: 120px;word-break: break-all;">{$item['address']} </td>
+					<td>{$item['time']} </td> 
+					<td><?php 
+						if(intval($item['pay_way'])==1){ ?>
+						 微信支付 
+						 	
+					<?php }else if(intval($item['pay_way'])==2){ ?>
+					 货到付款 
+					 
+				<?php } ?>
+				<!--<br/>-->
+					<!--<?php if(intval($item['pay_status'])==1){ ?>-->
+						 <!--<span class="label-green">已支付</span>-->
+							<!--<?php }else if(intval($item['pay_status'])==-1){ ?>-->
+							<!--<span class="label-gray">已退款</span>-->
+						<!--<?php }else if(intval($item['pay_way'])==1){ ?>-->
+							<!--<span class="label-orange">未支付</span>-->
+						<!--<?php } ?>-->
+				</td>
+					
+					<td>{$item['money_pay']} </td> 
+					<td>
+				<?php if($item['status']=="0"){ ?>
+					   <span class="label-orange">待付款</span>
+				<?php }else if($item['status']=="1"){ ?>
+					   <span class="label-blue">待发货</span>
+				<?php }else if($item['status']=="2"){ ?>
+					   <span class="label-blue">已发货</span>
+				<?php } else if($item['status']=="3"){ ?>
+						<span class="label-green">已收货</span>
+				<?php } else if($item['status']=="4"){ ?>
+						<span class="label-green">已完成</span>
+				<?php } else if($item['status']=="-1"){ ?>
+					   <span class="label-red">已取消</span>
+				<?php } else if($item['status']=="-2"){ ?>
+					   <span class="label-red">申请退款</span>
+				<?php } ?>  </td>
+					<td> 
+						<!-- <a  class="linkbtn" style="background-color: #7D7D7D" @click="chuhuodan('{$item['num']}')" data-num="{$item['num']}" ref="dataNum{$index}">出货单</a> -->
+						<a href="<?php echo $this->routeUrl('order.detail');?>&order={$item['num']}" class="linkbtn" >详细信息</a>
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="9" align="center">
+						{template "public/pagenation"}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</div>  
+<!-- 出货单模板start -->
+<div style="top:0px;z-index: 10;position: fixed;">
+<div style="height:842px; width:595px; position:relative;top:50px;z-index:1;background-color: #fff" id="example-container">
+        <img id="bgimg" :src="dwtpdata['bg']" v-if="dwtpdata['bg']"/> 
+       <template v-for="(d,index) in dwtpdata['datas']" >
+            <div class="drag" 
+                :style='"font-size:"+d.size+"pt; z-index:"+index+";left:"+d.left+";top:"+d.top+";width:"+d.width+";height:"+d.height+"; text-align:"' style="position: absolute;" :id='"drag"+index'>
+                <template v-if="d['cate']==1">
+                    <div class="text" :style='"font-family: "+d.font+";font-size:"+d.size+"pt;color: "+d.color+";{if !empty($d['bold'])}font-weight:bold;{/if}"'>
+                          <template v-if="d['string1']=='商品名称'||d['string1']=='商品编号'||d['string1']=='商品价格'">
+                          	{{d['pre']}}
+                          	<template v-for="(dr,index) in d['string']" >
+                          		 <div v-html="dr"></div>
+                          	</template>
+                          	 {{d['last']}}
+                          </template>
+                           <template v-else>
+                          	  	{{d['pre']}}
+		                        <div v-html="d['string']"></div>
+		                        {{d['last']}}
+                          </template>
+                    </div>
+                </template>
+            </div>
+       </template>
+    </div>
+</div>
+</div>
+<!-- 出货单模板end -->
+</div>
+
+{template 'public/footer'}
+
+<script type="text/javascript">
+    var  empt= new Vue({
+  el: '#example-1',
+  data: {
+    name: 'Vue.js',
+    shop:[],
+    orderdata:[],
+    dwtpdata:[],
+    attachurl:"",
+    sizewidth:595,
+    sizeheight:842,
+  },
+  methods: {
+  	chuhuodan: function (datarid) {
+  		var id=datarid
+  	  var that=this
+      $.ajax({
+        url:"<?php echo $this->routeUrl('printerupdate.orderdataone');?>",
+        type:"Post",
+        data:{
+        	id:id
+        },
+        dataType:"json",
+        success:function(res){
+            that.orderdata=res.data
+            that.shop=res.shop
+            console.log(that.shop);
+            empt.downloadshoptpto()
+        }
+    });
+  	},
+    shopmatching: function () {
+        var that=this
+        picture("example-container","jpg",this.orderdata.order_no,empt);
+    },
+    downloadshoptpto: function () {
+      	var that=this
+        datamatching(that.orderdata,that.tplist,that,function(res){
+            if(res==400){
+                empt.shopmatching()
+            }
+         });
+        layer.msg("正在生成图片....!");
+    }
+  },
+ created() {
+    var that=this
+    $.ajax({
+        url:"<?php echo $this->routeUrl('printerupdate.printerjsonorder');?>",
+        type:"Post",
+        dataType:"json",
+        success:function(res){
+            that.tplist=res.tplist2
+            that.attachurl=res.attachurl
+        }
+    });
+  }
+
+})
+</script>
+<script type="text/javascript">
+	 layui.use('laydate', function(){
+	  var laydate = layui.laydate;
+	  
+	  //执行一个laydate实例
+	  laydate.render({
+	  	type:"date",
+	    elem: '#date' //指定元素
+	  });
+	    
+	});
+</script>

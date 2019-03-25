@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+    <title>{php echo $this->config['system_name']}</title>
+
+    {template '../pc/head'}
+
+    <script src="{RES}public/pc/ueditor/ueditor.config.js"></script>
+    <script src="{RES}public/pc/ueditor/ueditor.all.min.js"></script>
+    <script src="{RES}public/pc/ueditor/lang/zh-cn/zh-cn.js"></script>
+</head>
+<style>
+    .red_color {
+        color: red;
+    }
+</style>
+<body class="nav-md" style="overflow-y: auto">
+{template '../pc/header'}
+<!-- page content -->
+<div class="right_col con-box" role="main">
+    <div class="con">
+        <div class="col-md-12 col-xs-12">
+            <div class="x_panel">
+<!--                 <div class="x_title" style="margin-bottom: 25px">
+                    <h2 style="font-weight:bold;">服务项目</h2>
+
+                    <div class="clearfix"></div>
+                </div> -->
+
+                <div class="x_content">
+                    <ul class="nav nav-tabs" style="margin-bottom: 20px">
+                        <li><a  href="{php echo $this->createMobileUrl('pcProject', array('op'=>'display'));}">服务项目项目管理</a></li>
+                        <li {if $op == 'create'}class="active"{/if} ><a href="{php echo $this->createMobileUrl('pcProject', array('op'=>'create'));}">添加服务项目</a></li>
+                        {if $op == 'modify'}
+                        <li class="active" ><a href="#">编辑服务项目</a></li>
+                        {/if}
+                    </ul>
+
+                    <div class="table-responsive" style="margin-top:10px;">
+                        <form action="{php echo  $this->createMobileUrl('pcProject', array('op'=>'create'))}" method="post" enctype="multipart/form-data" class="form-horizontal form" id="pc-project" >
+                            <div class="panel panel-primary" style="margin-bottom:0px;border-color: #3F5367">
+                                <div style="background-color: #3F5367;border-color: #3F5367" class="panel-heading">{if $op == 'create'}添加服务项目{else if $op == 'modify'}编辑服务项目{/if}</div>
+                                <div class="panel-body">
+                                    <div class="form-group" hidden>
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label">ID</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="project[project_id]"  class="form-control" value="{$project['project_id']}" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>排序</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="project[project_order]"  class="form-control" value="{$project['project_order']}" />
+                                            <div class="help-block">序号越大越靠前</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>项目名称</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" name="project[project_name]"  class="form-control" value="{$project['project_name']}" maxlength="20"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>项目列表图</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <input type="text" hidden name="img-val" id="img-state">
+                                            <input id="image_file" type="file" name="staff_avatar" value="" class="form-control" onchange="preview(this)">
+                                            <div class="input-group " style="margin-top:.5em;">
+                                                <img id="preview" src="{php echo tomedia($project['project_pic'])}" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail"  width="200" />
+                                                <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>
+                                                <div class="help-block">上传列表图则项目列表展示为图片否则为项目标题</div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="red_color">*</span>所属商家</label>
+                                        <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <select disabled="disabled" name="project[project_businessid]" class="form-control" id="">
+                                                <option value="{$business['business_id']}" selected>{$business['business_name']}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">项目详情页</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <label for="info-2" class="radio-inline">
+                                                <input id="info-2" type="radio" name="project[project_info_state]" value="1" {if $project['project_info_state'] == 1 || empty($project['project_info_state'])}checked{/if}>关闭
+                                            </label>
+                                            <label for="info-1" class="radio-inline">
+                                                <input id="info-1" type="radio" name="project[project_info_state]" value="2" {if $project['project_info_state'] == 2}checked{/if}>开启
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">项目描述</label>
+                                        <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                                            <script id="editor" type="text/plain" name="project[project_info]" style="width:100%;height:500px;">{$project['project_info']}</script>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                                            <input name="submit" type="submit"  value="提交" class="btn btn-primary" style="width:150px;background-color: #3F5367"/>
+
+                                            <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- /page content -->
+<script src="{RES}/public/pc/js/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="{RES}public/pc/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="{RES}public/pc/js/fastclick.js"></script>
+<!-- NProgress -->
+<script src="{RES}public/pc/js/nprogress.js"></script>
+<!-- iCheck -->
+<script src="{RES}public/pc/js/icheck.min.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="{RES}public/pc/js/custom.min.js"></script>
+
+
+<!-- 系统提示框（Modal） -->
+<div class="modal fade in" id="warming-Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog we7-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>系统提示</h3>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <p>
+                    <img src="{RES}public/images/warming.png" alt="">
+                    <span id="message"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<script>
+
+    var ue = UE.getEditor('editor');
+
+    function message(content) {
+
+        $('#message').html(content);
+        $("#warming-Modal").modal().css({
+
+            "margin-top": function () {
+                return - ($(this).height() / 2);
+            }
+        });
+
+    }
+    $('#pc-project').submit(function(){
+
+        $('#img-state').val($("#preview").attr("src"));
+
+        if($('input[name="project[project_order]"]').val() == ''){
+
+            message('未填排序');
+            return false;
+        }
+        if($('input[name="project[project_name]"]').val() == ''){
+
+            message('未填写服务项目名称');
+            return false;
+        }
+
+        if($('select[name="project[project_businessid]"]').val() == ''){
+
+            message('未选择所属商家');
+            return false;
+        }
+        return true;
+    });
+
+    /** 头像上传 */
+    $("#image_file").change(function(){
+
+        var objUrl = getObjectURL(this.files[0]) ;
+        console.log("objUrl = "+objUrl) ;
+        if (objUrl) {
+            $("#preview").attr("src", objUrl) ;
+        }
+    }) ;
+
+
+    //建立一個可存取到該file的url
+    function getObjectURL(file) {
+
+        var url = null ;
+        if (window.createObjectURL != undefined) { // basic
+
+            url = window.createObjectURL(file) ;
+
+        } else if (window.URL != undefined) { // mozilla(firefox)
+
+            url = window.URL.createObjectURL(file) ;
+
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+
+            url = window.webkitURL.createObjectURL(file) ;
+        }
+        return url ;
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}js/util.js"></script>
+<!-- <script type="text/javascript" src="{ZSK_STATIC}layui/laydate/laydate.js"></script> -->
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+	.sortab td{vertical-align: middle !important;}
+	.layui-layer-content{
+		background-color: #f4f4f4;
+	}
+	._pro_rigth{
+		float: left;width: 75%;overflow-y: auto;
+	}
+	._pro_rigth_layout{
+		width: 100%;margin-top: 10px;height: 30px;line-height: 30px;
+	}
+	._pro_rigth_one{
+		margin-left: 10px;float: left;width: 5%;
+	}
+	._pro_rigth_two{
+		float: left;margin-left: 10px;width: 5%;
+	}
+	._pro_rigth_three{
+		float: left;margin-left: 10px;width:50%;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;height: 35px;
+	}
+	._pro_rigth_four{
+		float: left;margin-left: 10px;width: 20%
+	}
+	._pro_rigth_five{
+		float: left;margin-left: 10px;width: 10%
+	}
+	._pro_left{
+		width: 100%;margin: -20px;height: calc(100% + 40px);overflow-y: auto;
+	}
+	._pro_left_layout{
+		float: left;width: 25%;background-color: #fff;height: 100%;overflow: auto;text-align: center;
+	}
+	._pro_left_li{
+		width: 100%;height: 40px;line-height:40px;cursor:pointer;
+	}
+	._pro_rigth_input{
+		width: 40px;height: 20px;
+	}
+	._pro_right_img{
+		width: 20px;height: 20px;
+	}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >一元抢购</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('discount.promotional');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" placeholder="请输入活动名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			        <?php if($_W['role']=="operator"||$_W['role']=="clerk"){ ?>
+			         <?php }else{ ?>
+			        <a class="btn btn-default" style="display: inline-block;"  onclick="adduser()">添加活动</a>
+        			<?php } ?>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 100px;">活动名称</th> 
+					<th style="width: 100px;">报名时间</th> 
+					<th style="width: 100px;">开始时间</th>
+					<th style="width: 100px;">结束时间</th> 
+					<th style="width: 100px;">已报名商家</th>
+					<th style="width: 100px">每个商家可报商品种数</th> 
+					<th style="width: 100px;">报名商品数</th>
+					<th style="width: 100px;">活动状态</th>
+					<th style="width: 100px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $memberlist $index $item}
+				<tr> 
+					 
+					<td>{$item['activityname']}</td> 
+					<td><?php echo date("Y-m-d",$item['signingtime']); ?></td> 
+					<td><?php echo date("Y-m-d",$item['starttime']); ?></td> 
+					<td><?php echo date("Y-m-d",$item['endtime']); ?></td> 
+					<td>
+						<?php 
+						$a = $model->tablename("shop");
+						$b = $model->tablename("goods");
+						$c = $model->tablename("activities");
+						$sql = "SELECT * FROM $c INNER JOIN $a ON $c.shopid = $a.id INNER JOIN $b ON $b.id = $c.goodsid where $c.activityid=".$item['id']." group by $c.shopid";
+ 						$res = Model("activities")->query($sql);
+					?>
+					<?php 
+						echo count($res);
+					?>
+					</td> 
+					<td>{$item['shopnum']}</td>
+					<td>
+					<?php 
+					$a = Model("activities")->tablename("activities");
+					$sql = "SELECT SUM(goodsnum) as total FROM $a WHERE activityid = ".$item['id'];
+ 					$res = Model("activities")->query($sql);
+					$rew = $res[0]["total"];
+					?>
+					{$rew}
+					</td>
+					<td>
+						<?php
+				 		if($item['endtime'] > time()){ ?>
+						<a href="javascript:void(0);"  class='linkbtn linkbtn-red'>活动中 </a>
+						<?php }else{ ?>
+						<a href="javascript:void(0);"  class='linkbtn linkbtn-gray'>已过期 </a>
+						<?php } ?>
+					</td>
+					<td>  
+						<?php if($item['starttime']>time()){?>
+							<a href="javascript:void(0);" class="linkbtn" onclick="sign({$item['id']})">报名</a>
+						<?php }else{?>
+							<a href="javascript:void(0);" class="linkbtn layui-btn-disabled">报名</a>
+						<?php}?>
+						<?php if($_W['role']=="operator"||$_W['role']=="clerk"){ ?>
+			         	<?php }else{ ?>
+						<a href="<?php echo $this->routeUrl('discount.selectshopgoods');?>&activityid={$item['id']}" class="linkbtn">查看</a>
+						<a href="javascript:void(0);" class="linkbtn" onclick="editShop({$item['id']})">编辑</a>
+						<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="remove0({$item['id']})">删除</a>
+						<?php } ?>
+					</td>
+				</tr>
+				 
+				{/loop}
+				<tr>
+					<td colspan="8">
+					{template 'public/pagenation'}	
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<!-- 模态框（Modal） -->
+<script id="contentr" type="text/html">
+	<form class="layui-form" id="formid" action="<?php echo $this->routeUrl('discount.addpromotional');?>" method="post">
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">活动名称</label>
+	    <div class="layui-input-block">
+	    	<input type="hidden" id="id" name='id'>
+	      <input type="text" name="activityname" required id="activityname"  lay-verify="required" placeholder="请输入活动名称" autocomplete="off" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">报名时间</label>
+	    <div class="layui-input-block">
+		    <input type="date" name="signingtime" id="signingtime" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">开始时间</label>
+	    <div class="layui-input-block">
+	      <input type="date" name="starttime" id="starttime"  class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">结束时间</label>
+	    <div class="layui-input-block">
+	      <input type="date" name="endtime" id="endtime" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">每个商家可报商品种数</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="shopnum" id="shopnum" required lay-verify="required" autocomplete="off" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">用户抢购本次活动总量</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="totalnumber" id="totalnumber" required lay-verify="required" autocomplete="off" class="layui-input">
+	    </div>
+	  </div>
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">用户单次抢购商品数</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="onenumber" id="onenumber" required lay-verify="required" autocomplete="off" class="layui-input">
+	      <span id="helpBlock" class="help-block" style="display: none;color: red">单次抢购商品不能大于活动总量</span>
+	    </div>
+	  </div>
+	</form>
+</script>
+<script id="addshop" type="text/html" style="background-color: #f4f4f4">
+	<div class="_pro_left">
+		<div class="_pro_left_layout">
+			<ul>
+				{loop $cates $index $item}
+				<li class="_pro_left_li" onclick="xuanze(this,{$item['id']})" style="text-align: left;padding-left: 5px;overflow: hidden;">
+					<?php if(count($item['children'])>0){ ?>
+				<span class="glyphicon glyphicon-plus" aria-hidden="true" sts="0" onclick="swithParentSts(this)" pid="{$item['id']}" style="color:#999;"></span>
+				<?php }else{ ?> 
+				<span>&nbsp;&nbsp;</span>
+				<?php } ?>{$item['name']}
+				</li>
+				{loop $item['children'] $index2 $item2}
+				<li parentid="{$item2['parentid']}" class="_pro_left_li children" onclick="xuanze(this,{$item2['id']})" style="text-align: left;padding-left: 20px;display:none;overflow: hidden;">
+					{$item2['name']}
+				</li>
+				{/loop}
+				{/loop}
+			</ul>
+		</div>
+		<div class="_pro_rigth" >
+		</div>
+	</div>
+</script>
+<script type="text/javascript">
+	$(function(){
+		sessionStorage.removeItem("check")
+	})
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","block");
+		}
+	}
+	// 选中分类
+	function xuanze(elm,id){
+		// console.log($(elm).children(".glyphicon")[0])
+		// if(!$(elm).children(".glyphicon")[0]){
+			$("._pro_left_li").css("background-color","#fff")
+			$(elm).css("background-color","#f4f4f4")
+			$.ajax({
+				url:"<?php echo $this->routeUrl('discount.categoods');?>",
+			 	dataType:"json",
+			 	type:"post",
+			 	data:"id="+id,
+			 	success:function(res){
+			 		console.log(res)
+			 		$("._pro_rigth").empty()
+			 		$.each(res.goods,function(i,n){
+			 			console.log(res.goods);
+			 			var data = '<div class="_pro_rigth_layout"><div class="_pro_rigth_one">';
+			 				if(ls(n.id)==true){
+			 					var data2 ='<input type="checkbox" value="'+n.id+'" onclick="check(this,'+n.id+','+n.wechat_payment+')" checked>';
+			 				}else{
+			 					var data2 ='<input type="checkbox" value="'+n.id+'" onclick="check(this,'+n.id+','+n.wechat_payment+')">';
+			 				}
+			 			var data3 = '</div><div class="_pro_rigth_two"><img class="_pro_rigth_img" src="'+res.attachurl+n.picture+'" style="width:25px;height:25px"></div><div class="_pro_rigth_three">'+n.name+'</div><div class="_pro_rigth_four">报名数量</div><div class="_pro_rigth_five">';
+				 			if(lst(n.id)>0&&lst(n.id)!=true){
+				 				var data4 = '<input class="_pro_rigth_input" onchange="setchange(this,'+n.id+')" type="text" value="'+lst(n.id)+'"></div></div>';
+				 			}else if(lst(n.id)==true){
+				 				var data4 = '<input class="_pro_rigth_input" onchange="setchange(this,'+n.id+')" type="text"></div></div>';
+				 			}else{
+			 				var data4 = '<input class="_pro_rigth_input" onchange="setchange(this,'+n.id+')" type="text" disabled></div></div>';
+			 				}
+			 			$("._pro_rigth").append(data+data2+data3+data4)
+			 		})
+				}
+			})
+		// }
+	}
+	//返回遍历
+	function ls(id){
+		var check = sessionStorage.getItem("check")
+		var check = JSON.parse(check)
+		if(check){
+			for(var l=0;l<check.length;l++){
+				if(check[l][0]==id){
+					return true
+				}
+			}
+		}
+	}
+	//返回遍历
+	function lst(id){
+		var check = sessionStorage.getItem("check")
+		var check = JSON.parse(check)
+		if(check){
+			for(var l=0;l<check.length;l++){
+				if(check[l][0]==id){
+					if(check[l][1]){
+						return check[l][1]
+					}else{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	//填写商品件数
+	function setchange(elm,id){
+		var data = $(elm).val()
+		var check = sessionStorage.getItem("check")
+		if(check){
+			var check = JSON.parse(check)
+			for(var i=0;i<check.length;i++){
+				if(check[i][0]==id){
+					check[i][1] =parseInt($(elm).val())
+					var data = JSON.stringify(check)
+					sessionStorage.setItem("check",data)
+				}
+			}
+		}
+	}
+	//选中多选
+	function check(elm,id,stat){
+		if(stat > 1){
+			layui.layer.alert('该商品未开启微信支付，请开启后在添加此活动');
+			return false;
+		}
+		var check = sessionStorage.getItem("check")
+		if(!$(elm).is(':checked')){
+			var check = JSON.parse(check)
+			$(elm).parent().next().next().next().next().children().val("");
+			$(elm).parent().next().next().next().next().children().attr("disabled",true);
+			for(var i=0;i<check.length;i++){
+				if(check[i][0]==id){
+					check.splice(i,1);
+					sessionStorage.removeItem("check")
+					var data = JSON.stringify(check)
+					sessionStorage.setItem("check",data)
+				}
+			}
+			return false
+		};
+		$(elm).parent().next().next().next().next().children().attr("disabled",false)
+		if(check){
+			var check = JSON.parse(check)
+			var list = new Array()
+			list[0]=id
+			check.push(list)
+			var data = JSON.stringify(check)
+			sessionStorage.setItem("check",data)
+			// console.log('---第二次存入--')
+			// console.log(data)
+		}else{
+			var data=new Array()
+			var list = new Array()
+			list[0]=id
+			data[0] =list
+			var id = JSON.stringify(data)
+			sessionStorage.setItem("check",id)
+			// console.log("----第一次存入--")
+			// console.log(id)
+		}
+	}
+	function adduser(){
+		$("#helpBlock").hide();
+		layer.open({
+		   title:"添加活动"
+		  ,content: $("#contentr").html()
+		  ,btn: ["确认"]
+		  ,shade: 0
+		  ,area: ['500px', '570px']
+		  ,yes: function(index, layero){
+		  	var totalnumber = $("#totalnumber").val();
+		  	var onenumber = $("#onenumber").val();
+		  	if(parseInt(totalnumber)<parseInt(onenumber)){
+		  		$("#helpBlock").show();
+		  		return false;
+		  	}
+			$("#formid").submit();
+		  }
+		});
+	}
+	function editShop(id){ 
+		 layer.open({
+		   title:"编辑活动"
+		  ,content: $("#contentr").html()
+		  ,btn: ['提交']
+		  ,shade: 0
+		  ,area: ['500px', '570px']
+		  ,yes: function(index, layero){
+		   	 $('#id').val(id);
+			 $("#formid").submit();
+		   }
+		});
+		 $.ajax({
+		 	url:"<?php echo $this->routeUrl('discount.findpromotional');?>",
+		 	dataType:"json",
+		 	type:"post",
+		 	data:"id="+id,
+		 	success:function(res){
+		 		console.log(res)
+		 		$("input[name='id']").val(res.id)
+		 		$("#activityname").val(res.activityname)
+			  	$("#signingtime").val(res.signingtime)
+			  	$("#starttime").val(res.starttime)
+			  	$("#endtime").val(res.endtime)
+			  	$("#shopnum").val(res.shopnum)
+			  	$("#totalnumber").val(res.totalnumber)
+			  	$("#onenumber").val(res.onenumber)
+		 	}
+		 })
+	}
+	function remove0(id){
+	modalDlg("<span style='color:#ff4444;'>是否删除当前，此操作不可恢复，请谨慎操作?</span>",function(){
+		window.location.href="<?php echo $this->routeUrl('discount.deletecount');?>&id="+id; 
+	});
+	}
+	function sign(id){
+		sessionStorage.setItem("activeid",id),
+		layer.open({
+		   title:"抢购报名<span style='font-size:10px;color:red'> 　  	 活动开始后商品将自动改为一元</span>"
+		  ,content: $("#addshop").html()
+		  ,btn: ["确认报名"]
+		  ,shade: 0
+		  ,area: ['800px', '570px']
+		  ,yes: function(index, layero){
+		  	// console.log(sessionStorage.getItem("check"))
+		  	$.ajax({
+		  		url:"<?php echo $this->routeUrl('discount.promotionallistlimit');?>",
+		  		dataType:"json",
+		  		type:"post",
+		  		data:"data="+sessionStorage.getItem("check")+"&id="+sessionStorage.getItem("activeid"),
+		  		success:function(res){
+		  			// console.log(res)
+		  			layer.alert(res);
+		  			return false;
+		  		}
+		  	})
+		  	$.ajax({
+		  		url:"<?php echo $this->routeUrl('discount.savepromotionallist');?>",
+		  		dataType:"json",
+		  		type:"post",
+		  		data:"data="+sessionStorage.getItem("check")+"&id="+sessionStorage.getItem("activeid"),
+		  		success:function(res){
+		  			// console.log(res)
+					layer.alert(res.msg);
+		  		}
+		  	})
+		  }
+		});
+	}
+</script> 
+{template 'public/footer'} 

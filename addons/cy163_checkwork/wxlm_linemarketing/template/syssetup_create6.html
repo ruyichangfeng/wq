@@ -1,0 +1,123 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>1));}">应用基础设置</a></li>
+    <li ><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>2));}">PC端内容设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>3));}">手机端内容设置</a></li>
+    <li ><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>4));}">折扣卡设置</a></li>
+    <li class="active"><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>6));}">店员充值设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>5));}">手机端DIY设置</a></li>
+    <li ><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>7));}">支付设置</a></li>
+    <li><a href="{php echo $this->createWebUrl('syssetup', array('systype'=>8));}">排行榜</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">基础设置</div>
+			<div class="panel-body" style="padding-bottom: 0px;">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-1 col-lg-1 control-label"></label>
+					<div class="col-xs-12 col-sm-7 col-md-10 col-lg-10">
+						<p>说明：“此功能用于店员在手机端通过微信支付方式充值自己的可用积分|可用余额，开启前请先设置[支付设置-微信支付]，否则会造成支付失败”</p>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body" style="margin-top: -30px;">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>开启充值积分</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="create[web_payc1_state]" id="web_payc1_state" value="1" {if $config['web_payc1_state'] == 1} checked="checked"{/if} > 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="create[web_payc1_state]" id="web_payc1_state" value="2" {if $config['web_payc1_state'] == 2||$config['web_payc1_state'] == ''} checked="checked"{/if} > 关闭
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>充值积分比例</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<div class="input-group">
+							<input type="number" class="form-control" name="create[web_payc1_money]" value="{$config['web_payc1_money']}" step="0.01">
+							<span class="input-group-addon">元充值  1积分</span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>开启充值余额</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="create[web_payc2_state]" id="web_payc2_state" value="1" {if $config['web_payc2_state'] == 1} checked="checked"{/if} > 开启
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="create[web_payc2_state]" id="web_payc2_state" value="2" {if $config['web_payc2_state'] == 2||$config['web_payc2_state'] == ''} checked="checked"{/if} > 关闭
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>充值余额比例</label>
+					<div class="col-xs-12 col-sm-7 col-md-4 col-lg-4">
+						<div class="input-group">
+							<input type="number" class="form-control" name="create[web_payc2_money]" value="{$config['web_payc2_money']}" step="0.01">
+							<span class="input-group-addon">元充值  1余额</span>
+						</div>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="op" type="hidden" value="create"/>
+						<input name="systype" type="hidden" value="6"/>
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){	
+			if($('input:radio[name="create[web_payc1_state]"]:checked').val()==undefined){
+				util.message('请选择开启充值积分');
+				return false;
+			}
+			if($('input:radio[name="create[web_payc1_state]"]:checked').val()==1)
+			{
+				if($('input[name="create[web_payc1_money]"]').val()=='')
+				{
+					util.message('充值积分状态为开启时，充值积分比例不能为空！');
+					return false;
+				}
+				if($('input[name="create[web_payc1_money]"]').val()==0)
+				{
+					util.message('充值积分状态为开启时，充值积分比例不能为0！');
+					return false;
+				}
+			}
+			if($('input:radio[name="create[web_payc2_state]"]:checked').val()==undefined){
+				util.message('请选择开启充值余额');
+				return false;
+			}
+			if($('input:radio[name="create[web_payc2_state]"]:checked').val()==1)
+			{
+				if($('input[name="create[web_payc2_money]"]').val()=='')
+				{
+					util.message('充值余额状态为开启时，充值余额比例不能为空！');
+					return false;
+				}
+				if($('input[name="create[web_payc2_money]"]').val()==0)
+				{
+					util.message('充值余额状态为开启时，充值余额比例不能为0！');
+					return false;
+				}
+			}
+			return true;
+		});
+	});
+});
+</script>
+{template 'common/footer'}

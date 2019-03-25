@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    {template 'head'}
+    <title>{php echo $this->config['system_name']}</title>
+</head>
+
+<body>
+<div class="box">
+    <div class="tc">
+    	<div class="">
+        	<div class="">
+            	<div class="modal-header">
+                	<div class="col-xs-2 tc-back">
+                        <a href="javascript:" onclick="history.back(); ">
+                            <img src="{RES}mobile/images/back-blue.png">
+                        </a>
+                    </div>
+                    <div class="col-xs-10">
+                    	<div class="tc-r">
+                        	<img src="{RES}mobile/images/search.png">
+                            <input type="text" id="search" onchange="searchCircle()" placeholder="请输入商圈名称……">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" id="content_content">
+                	<div class="tc-text01">商圈</div>
+                    <div class="tc-c">
+                        <a href="{php echo $this->createMobileUrl('index')}"><div class="tc-text02">全部</div></a>
+                    </div>
+                    <div id="circle">
+                        {php $i = 1;}
+                        {loop $res $key $item}
+                        <div class="tc-c">
+                            <div class="tc-text02" onclick="chooseCircle({$key})">{$item['circle_city']}{if $i == 1 && !empty($now_city)}<span>GPS定位</span>{/if}</div>
+                            <ul class="tc-con circle" hidden id="ul-{$key}">
+                                {loop $item['circles'] $key2 $item2}
+                                <a href="{php echo $this->createMobileUrl('index', array('circle_id'=>$item2['circle_id']))}">
+                                    <li class="col-xs-4">{$item2['circle_name']}</li>
+                                </a>
+                                {/loop}
+
+                            </ul>
+                        </div>
+                        {php $i++;}
+                        {/loop}
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var state = new Array();
+
+    function chooseCircle(id) {
+
+
+        $('.circle').hide();
+
+        var s = state[id];
+        if (s == undefined)
+        {
+           s = state[id] = true;
+
+        }
+        if (s)
+        {
+            $('#ul-' + id).show();
+            state[id] = false;
+
+        } else
+        {
+            $('#ul-' + id).hide();
+            state[id] = true;
+        }
+
+
+    }
+
+    function searchCircle() {
+
+       var content= $('#search').val();
+
+       if (content == '')
+       {
+           window.location.href = '{php echo $this->createMobileUrl("circle", array())}';
+
+       } else
+       {
+           $.ajax({
+               url:"{php echo $this->createMobileUrl('ajaxCircle', array())}"+"&content="+content,
+               type:'get',
+               success:function (data) {
+
+                  $('#circle').html(data);
+               }
+           })
+       }
+
+    }
+</script>
+</html>

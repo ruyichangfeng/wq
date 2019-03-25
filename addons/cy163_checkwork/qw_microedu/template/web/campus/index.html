@@ -1,0 +1,100 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    {if isset($_SESSION['success'])}
+    <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {$_SESSION['success']}
+    </div>
+    {/if}
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <label>校区名称</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="name" type="text" value="{$_GPC['name']}" style="width:80%;display: inline-block;">
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <label>校区地址</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="address" type="text" value="{$_GPC['address']}" style="width:80%;display: inline-block;">
+                </div>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                    <button type="submit" class="btn btn-md btn-primary">查询</button>
+                </div>
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="page" value="search">
+                <input type="hidden" name="do" value="campus">
+                <input type="hidden" name="m" value="qw_microedu">
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <h4>校区列表</h4>
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                    <tr>
+                        <th class="text-center" style="width:5%;">序号</th>
+                        <th class="text-center" style="width:15%;">名称</th>
+                        <th class="text-center" style="width:30%;">地址</th>
+                        <th class="text-center" style="width:20%;">状态</th>
+                        <th class="text-center" style="width:25%;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {if $campuses}
+                    {loop $campuses $index $campus}
+                    <tr>
+                        <td class="text-center">{$index}</td>
+                        <td class="text-center">{$campus['name']}</td>
+                        <td class="text-center">{$campus['address']}</td>
+                        <td class="text-center">
+                            {if $campus['enabled']}
+                            已启用
+                            {else}
+                            已禁用
+                            {/if}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="{php echo $this->createWebUrl('campus', array('page' => 'disable', 'id' => $campus['id']))}" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="禁用课程">禁用课程</a>
+                                <a href="{php echo $this->createWebUrl('campus', array('page' => 'edit', 'id' => $campus['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>
+                            </div>
+
+                        </td>
+                    </tr>
+                    {/loop}
+                {else}
+                    <tr><td colspan="5"><p class="text-center">未找到校区</p></td></tr>
+                {/if}
+                </tbody>
+            </table>
+            <div class="text-right">
+                <a href="{php echo $this->createWebUrl('campus', array('page' => 'create'))}" class="btn btn-md btn-default"><i class="fa fa-plus"></i> 增加校区</a>
+            </div>
+            {$pager}
+        </div>
+    </div>
+</div>
+{template 'common/footer'}

@@ -1,0 +1,375 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>{$reply['form_theme']}</title>
+	<meta name="format-detection" content="telephone=no, address=no">
+	<meta name="apple-mobile-web-app-capable" content="yes" /> <!-- apple devices fullscreen -->
+	<meta name="apple-touch-fullscreen" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="shortcut icon" href="{$_W['siteroot']}{$_W['config']['upload']['attachdir']}/{if !empty($_W['setting']['copyright']['icon'])}{$_W['setting']['copyright']['icon']}{else}images/global/wechat.jpg{/if}" />	
+<link type="text/css" rel="stylesheet" href="{MODULE_URL}/static/css/weui.min.css">
+	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js?v=20150120"></script>
+	<script src="{$_W['siteroot']}app/resource/js/require.js"></script>
+	<script src="{$_W['siteroot']}app/resource/js/app/config.js"></script> 
+</head>
+<body>
+<script type="text/javascript">
+	window.sysinfo = {
+		{if !empty($_W['uniacid'])}'uniacid': '{$_W['uniacid']}',{/if}
+		{if !empty($_W['acid'])}'acid': '{$_W['acid']}',{/if}{if !empty($_W['openid'])}'openid': '{$_W['openid']}',{/if}
+		{if !empty($_W['uid'])}'uid': '{$_W['uid']}',{/if}
+		'siteroot': '{$_W['siteroot']}',
+		'siteurl': '{$_W['siteurl']}',
+		'attachurl': '{$_W['attachurl']}',
+		'attachurl_local': '{$_W['attachurl_local']}',
+		'attachurl_remote': '{$_W['attachurl_remote']}',
+		{if defined('MODULE_URL')}'MODULE_URL': '{MODULE_URL}',{/if}
+		'cookie' : {'pre': '{$_W['config']['cookie']['pre']}'}
+	};
+	// jssdk config 对象
+	jssdkconfig = {php echo json_encode($_W['account']['jssdkconfig']);} || {};
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'hideMenuItems',
+		'showMenuItems',
+		'hideAllNonBaseMenuItem',
+		'showAllNonBaseMenuItem',
+		'translateVoice',
+		'startRecord',
+		'stopRecord',
+		'onRecordEnd',
+		'playVoice',
+		'pauseVoice',
+		'stopVoice',
+		'uploadVoice',
+		'downloadVoice',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'getNetworkType',
+		'openLocation',
+		'getLocation',
+		'hideOptionMenu',
+		'showOptionMenu',
+		'closeWindow',
+		'scanQRCode',
+		'chooseWXPay',
+		'openProductSpecificView',
+		'addCard',
+		'chooseCard',
+		'openCard'
+	];
+	wx.config(jssdkconfig);
+</script>
+<link type="text/css" rel="stylesheet" href="{MODULE_URL}/static/css/weui.min.css">
+<style>
+body {
+	margin:0 auto;
+	min-width:320px;
+	max-width:640px;
+	height:100%;
+	background:#FFF;
+	font-size:14px;
+	font-family:Helvetica,STHeiti STXihei, Microsoft JhengHei, Microsoft YaHei, Arial;
+	line-height:1.5;
+	color:#666;
+	background-color:#fbf9fe;
+	-webkit-text-size-adjust:100% !important;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none
+}
+.weui_uploader_file {-webkit-touch-callout:none;}
+.selected {border:2px solid red; margin:0px 5px 5px 0px;;}
+</style>
+<img src="{php echo tomedia($reply['form_pic'])}" width="100%"/>
+<div class="weui_cells weui_cells_access">
+	<a class="weui_cell" href="{php echo $this->createMobileUrl ( 'index', array ('op' => 'mine','rid'=>$rid) )}">
+		<div class="weui_cell_bd weui_cell_primary">
+			<p><i class="weui_icon_info"></i>&nbsp;我的&nbsp;{$reply['form_theme']}&nbsp;</p>
+		</div>
+		<div class="weui_cell_ft">
+		</div>
+	</a>
+</div>
+<div class="weui_panel weui_panel_access">
+	<div class="weui_media_box weui_media_text">
+		{$reply['details']}
+	</div>	
+</div>
+
+<div class="weui_panel">
+	<div class="weui_panel_bd">
+		<div class="weui_media_box weui_media_small_appmsg">
+			<div class="weui_cells weui_cells_access">
+				<a class="weui_cell" href="javascript:;">
+					<div class="weui_cell_bd weui_cell_primary">
+						<p>有效时间&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<b>{php echo date('Y-m-d', $reply['valid_time_start']);}</b>至
+							<b>{php echo date('Y-m-d', $reply['valid_time_end']);}</b>
+						</p>
+					</div>
+				</a>
+				<a class="weui_cell" href="javascript:;">
+					 <div class="weui_cell_bd weui_cell_primary">
+						<p>联系电话&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>{$reply['phone']}</b></p>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+<form action="" method="post" id="form" enctype="multipart/form-data">
+<div class="weui_panel">	
+<div class="weui_cells_title">请认真填写以下内容</div>
+
+<div class="weui_cells weui_cells_form" id="cells">
+
+</div>
+</div>
+
+<div class="weui_btn_area">
+	<a class="weui_btn weui_btn_primary" href="javascript:" id="submit">确定</a>
+</div>
+
+<input type="hidden" id="inputs" name="inputs" value="{$reply['fields']}">
+<input type="hidden" name="op" value="post">
+<input type="hidden" name="bc_zhbd_sid" value="{$bc_zhbd_sid}">
+</form>
+<footer style="width:100%;min-width:300px;margin-top:0px;margin-bottom:0px;padding:10px 0;color:#555;text-align:center;">
+	<a style="color:#555;margin:0 3px;" href="{php echo $this->module['config']['footerurl']}">
+		&copy;{if empty($this->module['config']['footer'])}{$_W['account']['name']}{else}{php echo $this->module['config']['footer']}{/if}
+	</a>
+</footer>
+<script>
+
+require(['jquery'], function ($, u) {
+	var checkinput = function(d){
+		if (d.inputtype == 3) return true;
+		var n = "fields"+d.sn;
+		var v = "";
+		switch(d.inputtype){
+			case 2:
+				v = $("textarea[name='"+n+"']").val();
+				break;
+			case 7:
+				v = $("textarea[name='"+n+"']").val();
+				break;				
+			case 4:
+				var chk_value =[]; 
+				$('input[name="' + n + '"]:checked').each(function(){ 
+					chk_value.push($(this).val()); 
+				});	
+				v=chk_value.join(",");			
+				break;
+			case 9:
+				v = $("input[name='"+n+"[]']").val();
+				break;
+			default:
+				v = $("input[name='"+n+"']").val();
+		}
+		if (d.isneed == 1 && !v){
+			alert("【"+d.title+"】必须填写！");
+			return false;
+		}
+		if (d.checktype == 1){ //手机号码
+			var phonereg = /^(((13[0-9]{1})|(15[0-9]{1})|(170)|(18[0-9]{1}))+\d{8})$/; 
+			if(!phonereg.test(v)){
+				alert("【"+d.title+"】必须填写正确的手机号码！");
+				return false;
+			}			
+		}
+		if (d.checktype == 2){ //身份证号码
+			var cardreg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; 
+			if(!cardreg.test(v)){
+				alert("【"+d.title+"】必须填写正确的身份证号码！");
+				return false;
+			}
+		}
+		return true;
+	};
+	var tosubmit = function(){
+		var inputs = $("#inputs").val();
+		if (inputs.length == 0) return;
+		inputs = eval("(" + inputs + ")");
+		for (var k in inputs){
+			var pass = checkinput(inputs[k]);
+			if (!pass) return;
+		}
+		for (var k in inputs){
+			var n = "fields"+inputs[k].sn;
+			switch(inputs[k].inputtype){
+				case 4:
+					var chk_value =[]; 
+					$('input[name="' + n + '"]:checked').each(function(){ 
+						chk_value.push($(this).val()); 
+					});	
+					inputs[k].value=chk_value.join(",");				
+					break;
+				case 8:
+					var v1 = $("#cells").find("[name='province"+inputs[k].sn+"']").val();	
+					var v2 = $("#cells").find("[name='"+n+"']").val();					
+					inputs[k].value=v1+v2;
+					break;
+				case 9:
+					inputs[k].value=$("#cells").find("[name='"+n+"[]']").val();	
+					break;
+				default:
+					inputs[k].value=$("#cells").find("[name='"+n+"']").val();	
+			}
+		}
+		var s = JSON.stringify(inputs);
+		$("#inputs").val(s);
+		$("#form").submit();
+	};
+	var init = function(d){
+		var s = "";
+		var top = '<div class="weui_cell">';
+		var label = '<div class="weui_cell_hd"><label class="weui_label">' + d.title + '</label></div>';
+		var input = "";
+		if (d.inputtype == 1){
+			input = '<div class="weui_cell_bd weui_cell_primary">'
+					+'<input name="fields' + d.sn + '" ' + 'class="weui_input" type="text" placeholder="'+ d.desc +'">'
+					+'</div>';
+		}
+		if (d.inputtype == 2){
+			//top = '';
+			label = '<div class="weui_cells_title">' + d.title + '</div>';
+			label = '';
+			input = '<div class="weui_cell_bd weui_cell_primary"><textarea name="fields' 
+			+ d.sn + '" ' + 'class="weui_textarea" placeholder="'
+			+ d.desc +'" rows="3"></textarea><div class="weui_textarea_counter"><span>' + d.title + '</span></div></div>'
+		}
+		if (d.inputtype == 3){
+			input =  '<div class="weui_cell_bd weui_cell_primary">'
+						+ '<select class="weui_select" name="fields' + d.sn + '">';
+			for (var k in d.options){
+				input = input + '<option value="' + d.options[k] + '">' + d.options[k] + '</option>';
+			}
+            input = input + '</select></div>';
+			top = '<div class="weui_cell weui_cell_select weui_select_after">';
+		}
+		if (d.inputtype == 4){
+			input =  '';
+			top = '';
+			label = '<div class="weui_cells_title">' + d.title + '</div>';
+			for (var k in d.options){
+				input = input + '\
+					<label class="weui_cell weui_check_label" for="s' + d.sn + k + '">\
+						<div class="weui_cell_hd">\
+							<input type="checkbox" class="weui_check" name="fields'+ d.sn + '" id="s' + d.sn + k +'" value="' + d.options[k] + '">\
+							<i class="weui_icon_checked"></i>\
+						</div>\
+						<div class="weui_cell_bd weui_cell_primary">\
+							<p>' + d.options[k] + '</p>\
+						</div>\
+					</label>';
+			}
+			input = '<div class="weui_cells weui_cells_checkbox">'+input;
+		}
+		if (d.inputtype == 5){
+			input = '<div class="weui_cell_bd weui_cell_primary">'
+					+'<input name="fields' + d.sn + '" ' + 'class="weui_input" type="date">'
+					+'</div>';
+		}
+		if (d.inputtype == 6){
+			input = '<div class="weui_cell_bd weui_cell_primary">'
+					+'<input name="fields' + d.sn + '" ' + 'class="weui_input" type="datetime-local">'
+					+'</div>';
+		}
+		if (d.inputtype == 7){
+			label = '<div class="weui_cells_title">' + d.title + '</div>';
+			label = '';
+			input = '<div class="weui_cell_bd weui_cell_primary"><textarea name="fields' 
+			+ d.sn + '" ' + 'class="weui_textarea" placeholder="'
+			+ d.desc +'" rows="3"></textarea><div class="weui_textarea_counter"><span>' + d.title + '</span></div></div>'
+		}
+		if (d.inputtype == 8){
+			input =  '';
+			label = '<div class="weui_cells_title">' + d.title + '</div>';
+			top = '';
+			input = '<div class="weui_cell weui_cell_select weui_select_before">\
+				<div class="weui_cell_hd">\
+					<select class="weui_select provincecode" name="province' + d.sn +'">\
+					</select>\
+				</div>\
+				<div class="weui_cell_bd weui_cell_primary">\
+					<input class="weui_input" name="fields' + d.sn + '" ' + ' type="text" >\
+				</div>';		
+		}	
+		if (d.inputtype == 9){
+			label = '';
+			input = '<div class="weui_cell_bd weui_cell_primary">' 
+					+ '<div class="weui_uploader"><div class="weui_uploader_hd weui_cell"><div class="weui_cell_bd weui_cell_primary">'+ d.title +'</div></div>'
+					+ '<div class="weui_uploader_bd"><ul class="weui_uploader_files"></ul>'
+					+ '<div class="weui_uploader_input_wrp"><input class="weui_uploader_input" type="button" data="fields' + d.sn + '[]">'
+					+ '<input type="hidden" name="fields' + d.sn + '[]" >'
+					+ '</div></div></div>';	
+		}		
+		s = label + input;
+		s = top + s + '</div>';
+		$("#cells").append(s);
+	};
+	$(document).ready(function () {
+		var inputs = $("#inputs").val();
+		if (inputs.length == 0) return;
+		inputs = eval("(" + inputs + ")");
+		for (var i in inputs){
+			init(inputs[i]);
+		}
+		$("#submit").click(function(){tosubmit();});
+	});
+	$(function () {
+		$(document).on("click",".weui_uploader_input",function(){
+			var btn = this;
+			var ul = $(this).parent().parent().find("ul");	
+			var images = $(this).parent().find("input[type='hidden']");
+			$(ul).html("");	
+			$(images).val("");
+			wx.chooseImage({
+				sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+				sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有			
+				success : function (res) {
+					var localIds = res.localIds;
+					for (var i in localIds) {
+						$(ul).append('<li class="weui_uploader_file weui_uploader_status" style="background-image:url(' + localIds[i] + ')"></li>');
+					}
+					var j = 0;
+					var max = localIds.length;
+					var serverIds = [];
+					function upload() {
+						wx.uploadImage({
+							localId : localIds[j],
+							success : function (res) {
+								$(ul).find("li:eq(" + j + ")").removeClass("weui_uploader_status");							
+								j++;
+								serverIds.push(res.serverId);
+								var t = {"serverIds":serverIds.join(";")};
+								$(images).val(JSON.stringify(t));
+								if (j < max) {
+									upload();
+								}
+							},
+							fail : function (res) {
+								//alert(JSON.stringify(res));
+							}
+						});
+					}
+					upload();
+				}
+			});
+		});
+	});
+});
+</script>
+</body>
+</html>

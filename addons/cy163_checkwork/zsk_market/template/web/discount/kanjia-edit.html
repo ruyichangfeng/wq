@@ -1,0 +1,321 @@
+{template 'public/header'}  
+<style type="text/css">
+	.table-bordered td{
+		vertical-align: middle!important;
+		text-align: center;
+	}
+	.goods-info{display: inline-block;height: 50px;}
+	.goods-info img{height: 50px;width: 50px;margin-right: 10px;vertical-align: top;display: inline-block;}
+	.goods-info div{height: 50px;text-align: left;display: inline-block;overflow: hidden;width:160px;}
+	.goodstab .layui-form-radio{padding-right: 0px !important;margin: 0px auto!important;}
+	.goodstab .layui-form-radio i{margin-right: 0px!important;}
+	.goodstab .layui-form-radio span{display: none !important;}
+	.case-opts .layui-input,.case-default .layui-input{
+		height: 32px;line-height: 32px;
+	}
+	.case-opts ,.case-default{
+		display: none;
+	}
+	.case-opt1,.case-opt2{
+		display: none;
+	}
+	.layui-table td{
+		padding: 3px 8px;
+	}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >
+		<ol class="crumb">
+		  <li><a href="javascript:history.go(0);">砍价活动</a></li>
+		 
+		</ol>
+	</div>
+	<div class="panel-body">
+		<form class="layui-form" method="post" id="memForm"  action="<?php echo $this->routeUrl('discount.saveKanjia');?>">
+			<div style="width: 500px;display: block;float: left;" >
+		 	<input type="hidden" readonly="" name="did" value="{$discount['id']}">
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">活动商品</label>
+		    <div class="layui-input-block">
+		    	<div class="goods-info">
+		    		<img id="goodspic" src="{$_W['attachurl']}{$goods['picture']}"/>
+		    		<div id="goodsname" value="{$goods['price']}">{$goods['name']}</div>
+		    	</div>
+		    	<div class="layui-btn layui-btn-normal" style="vertical-align: top;margin-top:8px;" onclick="showGoods()">选择商品</div> 
+		    </div>
+		  </div>
+		  <div class="layui-form-item case-default" style="padding-left: 80px;">
+		  	<table class="layui-table" lay-size="sm">
+			  <colgroup>
+			    <col >
+			    <col width="120">
+			    <col width="120">
+			  </colgroup>
+			  <thead>
+			    <tr>
+			      <th >规格</th>
+			      <th>活动价</th>
+			      <th>商品数量</th>
+			    </tr> 
+			  </thead>
+			  <tbody>
+			    <tr>
+			      <td>默认规格</td>
+			      <td>
+			      	<input type="text"  name="caseprice[]" id="defaultprice" value="" placeholder="..."    class="layui-input"  >
+			      	<input type="hidden"  name="caseid[]" id="defaultid" value="" placeholder="..."    class="layui-input"  >
+			      </td>
+			      <td><input type="text"  name="casestock[]" id="defaultstock" value="" placeholder="..."    class="layui-input"  ></td>
+			    </tr>
+			     
+			  </tbody>
+			</table>
+		  </div>
+		  <div class="layui-form-item case-opts" style="padding-left:80px;">
+		  	<table class="layui-table" lay-size="sm">
+			  <colgroup>
+			    <col width="100">
+			    <col width="100">
+			    <col width="100">
+			    <col width="100">
+			  </colgroup>
+			  <thead>
+			    <tr>
+			      <th class="case-opt1" id="case-opt1"></th>
+			      <td class="case-opt2" id="case-opt2"></td>
+			      <th>活动价</th>
+			      <th>商品数量</th>
+			    </tr> 
+			  </thead>
+			  <tbody  id="case-tbody">
+			   
+			  </tbody>
+			</table>
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">活动名称</label>
+		    <div class="layui-input-block">
+		     	<input type="text"  name="title" value="{$discount['title']}" placeholder="50字以内，如：疯狂砍价中..."    class="layui-input"  >
+		    </div>
+		  </div>
+		  
+		  
+		   
+		  <!-- <div class="layui-form-item">
+		    <label class="layui-form-label">购买条件</label>
+		    <div class="layui-input-block">
+		     	<input type="radio" name="randtype" <?php echo $discount['randtype']!='2'?'checked':'';?> value="1" title="指定人数">
+		     	<input type="radio" name="randtype" <?php echo $discount['randtype']=='2'?'checked':'';?> value="2" title="达到最低价" >
+		    </div>
+		  </div> -->
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">活动价</label>
+		    <div class="layui-input-block">
+		     	<input type="text" id="ile" name="pricelow" value="{$discount['pricelow']}" placeholder="活动价" onchange="idole(this);"   class="layui-input"  >
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">砍价人数</label>
+		    <div class="layui-input-block">
+		     	<input type="bumber"  name="group_limit" min="2" step="1" value="{$discount['group_limit']}" placeholder="最少2人"  lay-verify="number" class="layui-input" >
+		    </div>
+		  </div>
+		 <!--  <div class="layui-form-item">
+		    <label class="layui-form-label">平均砍价次数</label>
+		    <div class="layui-input-block">
+		     	<input type="text"  name="group_limit" value="{$discount['group_limit']}" placeholder="大概砍多少次达到最低价，仅随机递减模式生效"    class="layui-input"  >
+		     
+		    </div>
+		  </div> -->
+		 
+		 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">活动开始时间</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="starttime"  readonly="readonly"  value="{$discount['starttime']}"  class="layui-input" id="starttime">
+		    </div>
+		  </div> 
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">活动结束时间</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="stoptime"  readonly="readonly"  value="{$discount['stoptime']}"  class="layui-input" id="stoptime">
+		    </div>
+		  </div> 
+		   <div class="layui-form-item">
+		    <label class="layui-form-label">说明</label>
+		    <div class="layui-input-block" style="color:#ff4444;font-size:13px;">
+		      <p style="margin-bottom:4px;">1.砍价活动的商品价格与商品本身的规格价格无关，最低价不得高于商品现价</p>
+
+		       <p style="margin-bottom:4px;">2.砍价人数为砍价多少次后达到最低价。例如设置最低价1元，砍价人数10人，则邀请10个好友砍价后即可1元购得商品</p>
+		        <p style="margin-bottom:4px;">3.活动中途请勿修改商品现价、活动价，否则可能导致活动算法出错。</p>
+		        <p style="margin-bottom:4px;">4.发布新活动请直接创建新活动，不要在已有活动上修改，否则会出现用户重复参与的提示。</p>
+
+
+		    </div>
+		  </div> 
+		    
+		   <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button class="layui-btn" type="button" onclick="sub()" >立即提交</button>
+		      <a href="javascript:reset();" class="layui-btn layui-btn-primary">重置</a>
+		    </div>
+		  </div>
+		 </div>
+		  <!-- 更多表单结构排版请移步文档左侧【页面元素-表单】一项阅览 -->
+		
+		<div id="goodsview" style="width: 480px;margin-left:30px;float: left; height: 500px;overflow-y: scroll;display: none;">
+		<table class="table table-bordered goodstab" style="width: 100%; ">
+			<tr>
+				<th>缩略图</th>
+				<th>编号</th>
+				<th>名称</th>
+				<th>现价</th>
+				<th>选择</th>
+			</tr>
+			{loop $goodslist $index $good}
+			<tr>
+				<td style="width: 50px;"><img src='{$_W['attachurl']}{$good['picture']}' style="width: 50px;height: 50px;" /></td>
+				<td style="width:60px;">{$good['number']}</td>
+				<td style="width: 230px; word-break: break-all;">{$good['name']}</td>
+				<td style="width: 60px; word-break: break-all;"><?php echo floatval($good['price']);?></td>
+				<td style="width: 50px;">
+					 <input type="radio" wechat_payment="{$good['wechat_payment']}" data-img="{$_W['attachurl']}{$good['picture']}" data-name="{$good['name']}" data-price="{$good['price']}" name="goodsid" form="memForm" value="{$good['id']}"  <?php if(intval($discount['goodsid'])==intval($good['id'])){ echo "checked";}?>  lay-filter="goodsid">
+					 
+				</td>
+			</tr>
+			{/loop} 
+		</table>
+		</div>
+		 
+		</form> 
+		
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	var isle = true;
+	function idole(a) {
+		var id = a.id;
+		var pric = $("#goodsname").attr("value");
+		if(parseFloat(a.value) > parseFloat(pric)){
+			layer.tips('活动价格不能大于现价，请合理调整活动价！', '#'+id);
+			isle = false;
+			return false;
+		}
+		isle = true;
+	}
+
+
+	function reset(){
+		$('input[name=title]').val('');
+		$('input[name=pricelow]').val('');
+		$('input[name=group_limit]').val('');
+		$('input[name=starttime]').val('');
+		$('input[name=stoptime]').val('');
+	}
+	 
+	function showOpt(id){
+		$(id).css("display","block");
+	}
+	function getOpt1(that,domid){
+		$(domid).html("");
+		$.ajax({
+			url:"<?php echo $this->routeUrl('goods.getOptByPid');?>&pid="+parseInt($(that).val()),
+			type:"post",
+			dataType:"json",
+			success:function(d){
+				var html="";
+				$.each(d,function(i,v){
+					html+="<option value='"+v.id+"'>"+v.name+"</option>";
+				});
+				$(domid).html(html);
+			}
+		});
+	}
+	function klje(){
+		var arrayColumn = new Array();
+		var trList = $("#case-tbody").children("tr");
+		for(var i=0; i<trList.length; i++){
+			var iule = trList.eq(i).find("td");
+			for(var s=0; s<iule.length;s++){
+				if(s == 2){
+					var dd = $(iule.eq(s).find('input')[0]).attr('data-max');
+					var vl = iule.eq(s).find('input')[0].value;
+					if(vl > dd){
+						// layer.alert('活动价格不能大于现价，请认真填写');
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	function sub(){
+		if(isle && klje()){
+			if(valid_easy('form-control')) {
+				modalDlg("是否继续？", function () {
+					$("#memForm").submit();
+				})
+			}
+		}else{
+			layer.alert('活动价格不能大于现价，请认真填写');
+			return false;
+		}
+		 
+	}
+	function showGoods(){
+		 $("#goodsview").fadeIn(2000);
+	}
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+	 layui.use(['laydate','form',"layer"], function(){
+	 	var form=layui.form;
+	 	var layer=layui.layer;
+	 	form.on('select(type)', function(data){ 
+		  $(".type-item").css("display","none");
+		  $(".type-"+data.value).css("display","block");
+		}); 
+		form.on('radio(goodsid)', function(data){
+			var wechat_payment = $(this).attr('wechat_payment');
+			if(wechat_payment > 1){
+				$(this)[0].checked = false;
+				form.render('radio');
+				layui.layer.alert('该商品未开启微信支付，请开启后在添加此活动');
+				$("#goodsname").attr("value",'');
+				$("#goodspic").attr("src",'');
+				$("#goodsname").text('');
+				$("#defaultprice").val('');
+				$("#defaultid").val('');
+				$("#defaultstock").val('');
+				return false;
+			}
+		   $("#goodspic").attr("src",$(data.elem).attr("data-img"));
+		   $("#goodsname").text($(data.elem).attr("data-name"));
+		   $("#goodsname").attr("value",$(data.elem).attr("data-price"));
+		   $("#goodsid").val($(data.elem).attr("data-goodsid"));
+		}); 
+		form.on("submit(*)",function(data){
+			 if(parseInt(data.field.group_limit)<2||isNaN(parseInt(data.field.group_limit))){
+			 	layer.msg("砍价人数最少2人");
+			 	return false;
+			 }
+		})
+		form.render();
+	  var laydate = layui.laydate;
+	  
+	  //执行一个laydate实例
+	  laydate.render({
+	  	type:"datetime",
+	    elem: '#stoptime' //指定元素
+	  });
+	   laydate.render({
+	  	type:"datetime",
+	    elem: '#starttime' //指定元素
+	  });
+	   
+	});
+	   
+</script>

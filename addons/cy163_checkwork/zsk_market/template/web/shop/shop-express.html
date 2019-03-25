@@ -1,0 +1,174 @@
+
+{template 'public/header'}    
+ <style type="text/css">
+ 	.mmmtab td{
+ 		padding: 10px 10px;
+ 	}
+ 	.layui-form-switch{width: 54px;height: 26px;line-height: 26px}
+ 	.maill{text-align: right !important;width: 30%;vertical-align: middle !important;}
+ 	.mailr{text-align: left !important;width: 70%;vertical-align: middle !important;}
+	.notice{display: block;color:orange;} 
+</style>
+ <div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title">
+   
+    <li class="layui-this">常用快递</li> 
+    <li >默认发货地址</li> 
+  </ul>
+  <div class="layui-tab-content"  >
+    <div class="layui-tab-item layui-show">
+     	<table class="layui-table ">
+			<thead>
+				<tr> 
+					<th style="width: 150px;">快递编号</th> 
+					<th style="width: 150px;">快递名称</th>
+					<th style="width: 150px;">电子面单</th>
+					<th style="width: 100px;">状态</th>  
+					<th style="width: 150px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $explist $index $item}
+				<tr> 
+					<td>{$item['code']}  </td>
+					<td>{$item['name']}</td>
+					<td><?php if(intval($item['printer'])==2){ ?>
+							<span class="label-green">支持</span>
+						<?php }else if(intval($item['printer'])==1){?>
+							<span class="label-orange">需申请</span>
+						<?php }else{?>
+							<span class="label-gray">不支持</span>
+						<?php } ?> </td>
+					<td>
+						<?php $sts=0;
+						foreach($mylist as $key=>$val){
+							if($item['code']==$val['code']){
+								$sts=intval($val['status']);
+							} 
+						}
+
+						 ?>
+						<?php if($sts==2){ ?>
+							<span style="color:#FF7F27;font-weight: bold;">默认快递</span>
+						<?php }else if($sts==1){?>
+							<span style="color:green;font-weight: bold;">常用快递</span>
+						<?php }else{?>
+							<span style="color:#666; ">未启用</span>
+						<?php } ?> 
+					</td> 
+					<td> 
+						<?php   ?>
+						<?php if($sts!=2){ ?>
+							<a href="<?php echo $this->routeUrl('expressinfo.setExpress');?>&code={$item['code']}&sts=2" class="linkbtn" >设为默认</a>
+						<?php };
+						if($sts!=1){?>
+							<a href="<?php echo  $this->routeUrl('expressinfo.setExpress');?>&code={$item['code']}&sts=1" class="linkbtn" >设为常用</a>
+						<?php };
+						if($sts!=0){?>
+							<a href="<?php echo  $this->routeUrl('expressinfo.setExpress');?>&code={$item['code']}&sts=0" class="linkbtn" >禁用</a>
+						<?php } ?> 
+					 
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="6" align="center">
+						{template 'public/pagenation'}
+					</td>
+				</tr>
+			</tbody>
+		</table>  
+    </div> 
+    
+    <div class="layui-tab-item">
+    	<div class="layui-collapse" lay-accordion=""> 
+		    <div class="layui-colla-item">
+			    <h2 class="layui-colla-title">发货信息</h2>
+			    <div class="layui-colla-content layui-show">
+			    	 <form class="layui-form" style="width: 500px;margin-left: 100px;" method="post" id="memForm"  action="<?php echo $this->routeUrl('expressinfo.saveSender');?>">
+
+			    	<div class="layui-form-item">
+					    <label class="layui-form-label">发件人</label>
+					    <div class="layui-input-block">
+					     	<input type="text" name='content' style="width: 200px;" value="{$shop['express']['contact']}"  class="form-control" ><span class="notice"></span>
+					    </div>
+					  </div> 
+					  <div class="layui-form-item">
+					    <label class="layui-form-label">电话</label>
+					    <div class="layui-input-block">
+					      <input type="text" name='mobile' style="width:200px;" value="{$shop['express']['mobile']}"  class="form-control"  >  
+					    </div>
+					  </div> 
+					  <div class="layui-form-item">
+					    <label class="layui-form-label">地址</label>
+					    <div class="layui-input-block">
+					    	<div class="layui-input-inline" style="width: 150px;">
+						      <select name="province" lay-filter="province">
+						        <option value=""></option>
+						        {loop $provinces $index $item}
+						        <option value="{$item['name']}" <?php if($shop['express']['province'] == $item['name']){echo 'selected';}?>>{$item['name']}</option>
+						        {/loop}
+						      </select>
+						    </div>
+						    <div class="layui-input-inline" style="width: 150px;">
+						      <select name="city" id="city">
+						        <option value=""></option>
+						        {loop $citys $index $item}
+						        <option value="{$item['name']}" <?php if($shop['express']['city'] == $item['name']){echo 'selected';}?>>{$item['name']}</option>
+						        {/loop}
+						      </select>
+						    </div>
+						     
+					    </div>
+					    
+					    <div class="layui-input-block"  style="width: 470px;margin-top:10px;">
+					      	 <input type="text" name='address' value="{$shop['express']['address']}"  class="form-control"  placeholder="请输入详细地址" > 
+					    </div>
+					  </div>   
+					  <div class="layui-form-item">
+					    <label class="layui-form-label"></label>
+					    <div class="layui-input-block">
+					    	<button class="layui-btn" lay-submit lay-filter="*">保存</button>
+					    </div>
+					  </div>
+					</form>
+					 <p style="font-size: 13px;color:orange;">电子面单将使用默认快递下单</p>
+				</div>   
+		    </div> 
+		</div>
+    	 
+
+    </div>
+  </div>
+</div>    
+<script type="text/javascript">
+	var citys=JSON.parse('<?php echo json_encode($citys);?>');
+	var provinces=JSON.parse('<?php echo json_encode($provinces);?>');
+</script>
+{template 'public/footer'}
+<script type="text/javascript"> 
+layui.use('form', function(){
+  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  form.render();
+  form.on('select(province)', function(data){
+	   var pid=0;
+	   $.each(provinces,function(i,v){
+	   		if(v.name==data.value){
+	   			pid=v.id;
+	   		}
+	   })  
+   	  	var html="<option value=''>下拉选择</option>";
+   	  	$.each(citys,function(i,v){
+   	  		if(v.parentid==pid){
+   	  			html+="<option value='"+v.name+"' >"+v.name+"</option>";
+   	  		} 
+   	  	})
+   	  	$("#city").html(html);
+   	  	form.render();
+	   	  
+  	});
+  form.on('submit(*)', function(data){
+    
+  });
+}); 
+</script>

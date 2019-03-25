@@ -1,0 +1,210 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	{template 'servic_header'}
+	<li class="active" style="margin-left:100px;"><a href="{$urlt}&op=add" >添加服务</a></li>
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+	.bati{float:left; line-height:35px;}
+</style>
+{if $op == 'add' || $op == 'edit'}
+<div class="main">
+	
+	<form name="formpt" action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+    	<input type="hidden" name="id" value="{$srdb['id']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">{if $op == 'add'}添加服务项目{elseif $op == 'edit'}修改服务项目{/if}</div>
+            <div class="panel-body">
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务名称</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="titlename" id="" type="text" value="{$srdb['titlename']}" >
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">封面</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_form_field_image('imgurl', $srdb['imgurl'])}
+						<br/>
+						建议尺寸137*113
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属类型</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<select name="type" class="form-control">
+							<option value="" >不限</option>
+							{loop $category $row1}
+							<option value="{$row1['cid']}" {if $row1['cid'] == $srdb['type']} selected="selected"{/if}>{$row1['name']}</option>
+							{/loop}
+						</select>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">价格</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input class="form-control" name="price" id="" type="text" value="{$srdb['price']}" onkeyup="value=value.replace(/[^\d.]/g,'')" style="width:100px; float:left;"><span class="bati">&nbsp;元</span>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+					<label class="col-sm-2 control-label">是否上架</label>
+					<div class="col-sm-10">
+					  <p class="form-control-static"><input type="checkbox" name="shelves" value="1" {if $srdb['shelves']==1}checked{/if}/> 是</p>
+					</div>
+				</div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务简介</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<textarea style="height:100px;" class="form-control" name="jianjie" cols="70" id="reply-add-text">{$srdb['jianjie']}</textarea>
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务详情</label>
+                    <div class="col-xs-12 col-sm-9" >
+						{php echo tpl_ueditor('content', $srdb['content']);}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="提交" class="btn btn-primary col-lg-1" />
+		</div>
+  </form>
+</div>
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputEmail2">关键字</label>
+				<input type="txt" class="form-control" name="keyword"  value="{$_GPC['keyword']}">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">状态</label>
+				<select name="sxj" class="form-control">
+					<option value="" >不限</option>
+					<option value="1" $shelves[1] >上架</option>
+					<option value="2" $shelves[2] >下架</option>
+				</select>
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">所属类型</label>
+				<select name="type" class="form-control">
+					<option value="" >不限</option>
+					{loop $category $row1}
+					<option value="{$row1['cid']}" $typecla[{$row1['cid']}]>{$row1['name']}</option>
+					{/loop}
+				</select>
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+	function checkAll(form, name) {
+		for(var i = 0; i < form.elements.length; i++) {
+			var e = form.elements[i];
+			if(e.name.match(name)) {
+				e.checked = form.elements['chkall'].checked;
+			}
+		}
+	}
+</script>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form method="post" class="form">
+	<input name="token" type="hidden" value="{$_W['token']}" />
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="50">选择</th>
+			<th width="80">图片</th>
+			<th>服务标题</th>
+			<th>类型</th>
+			<th>价格</th>
+			<th>发布时间</th>
+			<th width="80">状态</th>
+			<th width="150">操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td><input type="checkbox" name="ids[]" value="{$value[id]}"></td>
+			<td>
+				{if $value[imgurl]}
+				<img src="{php echo tomedia($value[imgurl]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:60px;"/>
+				{else}
+				<img src="../addons/{$_GPC['m']}/template/no_image.gif" style="max-width:60px;"/>
+				{/if}
+			</td>
+			<td>{$value['titlename']}</td>
+			<td>{$category[$value['type']]['name']}</td>
+			<td><font color="#FF6600">￥{$value['price']}</font></td>
+			<td>{php echo date('Y-m-d H:i', $value['dateline']);}</td>
+			<td>
+				{if $value['shelves']==1}上架
+				{else}<font color="#CC0000">下架</font>
+				{/if}
+			</td>
+			<td>
+				{if $value['shelves']==1}
+				<a href="{$urlt}&op=upja&id={$value[id]}">下架</a> &nbsp;|&nbsp; 
+				{else}
+				<a href="{$urlt}&op=onja&id={$value[id]}">上架</a> &nbsp;|&nbsp; 
+				{/if}
+				<a href="{$urlt}&op=edit&id={$value[id]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="8">{$pager}</td>
+		</tr>
+		{/if}
+		<tr >
+			<td colspan="8" align="center">
+				<input type="checkbox" id="chkall" name="chkall" onclick="checkAll(this.form, 'ids')">全选 &nbsp;&nbsp;
+				<input type="radio" name="optype" value="1">删除
+				<input type="submit" name="listsubmit" value="提交" class="btn btn-default">
+			</td>
+		 </tr>
+	  </table>
+	</div>
+	</form>
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

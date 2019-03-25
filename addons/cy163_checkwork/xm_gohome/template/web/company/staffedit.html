@@ -1,0 +1,182 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li><a href="{php echo  $this->createWebUrl('company', array('foo'=>'index'));}">公司管理</a></li>
+    <li><a href="{php echo  $this->createWebUrl('company', array('foo'=>'look', 'id'=>$company_id));}">公司员工</a></li>
+    <li class="active"><a href="#">修改员工</a></li>
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="{php echo $this->createWebUrl('company', array('foo'=>'editstaffok'));}" method="post">
+    <input type="hidden" name="id" value="{$item['id']}"  />
+    <input type="hidden" name="company_id" value="{$company_id}">
+
+	<div class="panel panel-default">
+            <div class="panel-heading">
+                修改公司服务人员
+            </div>
+            <div class="panel-body">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="staff_name" id="staff_name" value="{$item['staff_name']}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">手机号码</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="mobile" id="mobile" value="{$item['staff_mobile']}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">性别</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="1" {if $item['sex'] == 1} checked {/if}>男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="2" {if $item['sex'] == 2} checked {/if}>女
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">年龄</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="age" id="age" value="{$item['age']}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">工龄</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="year" id="year" value="{$item['year']}" class="form-control">
+                    </div>
+                    <span class="help-block"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+                    <div class="col-sm-9 col-xs-12">
+                        {php echo tpl_form_field_image('avatar',$item['avatar']);}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">身份证号码</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="card" id="card" value="{$item['card']}" class="form-control">
+                    </div>
+                </div>
+				
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">开户银行</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="bank" id="bank" value="{$item[bank]}" class="form-control">
+                        <span class="help-block">在此银行开户的银行卡持有人必须与添加员工姓名一致</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">银行卡号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="bank_num" id="bank_num" value="{$item[bank_num]}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付宝账号</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="alipay" id="alipay" value="{$item[alipay]}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">常驻地址</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	{php echo tpl_form_field_coordinate('location', array('lng'=>$item['log'],'lat'=>$item['lat']));}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务类型</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<table class="table">
+							{loop $list $vo}
+                            <thead>
+                            	<tr class="info">
+                                	<th colspan="6">
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" name="servetype[]" value="{$vo['id']}" {if $vo['child_num'] != 0} disabled {/if} {if in_array($vo['id'],$servetype)} checked {/if}>{$vo['type_name']}</label>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+							
+                            <tbody class="system_platform">
+                            	<tr>
+                                {php $n=0;}
+                                {loop $this->getCheckbox($vo['id']) $val}
+                                {php $n+=1;}
+                                    <td width="10px;">
+                                    </td>
+                                    <td>
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" name="servetype[]" value="{$val['id']}" {if in_array($val['id'],$servetype)} checked {/if}>{$val['type_name']}</label>
+                                        </div>
+                                    </td>
+                                    {php if($n%6==0) echo '</tr><tr>';}
+                                {/loop}
+                                </tr>
+                            </tbody>
+                            {/loop}
+						</table>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">工人介绍</label>
+                    <div class="col-sm-9 col-xs-12">
+                        {php echo tpl_ueditor('remark', $item['remark']);}
+                    </div>
+                </div>
+                
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否锁定</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="stop" value="1" {if $item['stop'] == 1} checked {/if}>否
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="stop" value="0" {if $item['stop'] == 0} checked {/if}>是
+                            </label>
+                        </div>
+						<span class="help-block">锁定以后该员工将不能接单及收到消息</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" type="submit" value="保存" class="btn btn-primary btn-block" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+				
+            </div>
+			
+			<div class="panel-heading"></div>
+            <div class="panel-body">
+				<span style="color:red;"> </span>
+			</div>
+        </div>
+    </form>
+</div>
+
+
+{template 'common/footer'}

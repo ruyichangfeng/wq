@@ -1,0 +1,106 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .form-control { width:60%}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'index'))}">客户管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'followup'))}">跟进管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'student'))}">学员管理</a>
+        </li>
+        <li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>时间范围</label>
+                    {php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $starttime),'endtime'=>date('Y-m-d', $endtime)));}
+                    <button class="btn btn-md btn-primary">查询</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            学员名字 上传作品
+        </div>
+        <div class="panel-body">
+                    <table class="table table-hover">
+                        <thead class="navbar-inner">
+                        <tr>
+                            <th class="text-center" style="width:5%;">序号</th>
+                            <th class="text-center" style="width:25%;">课程</th>
+                            <th class="text-center" style="width:25%;">时间</th>
+                            <th class="text-center" style="width:20%;">教师</th>
+                            <th class="text-center" style="width:20%;">教师手机</th>
+                            <th class="text-center" style="width:5%;">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {loop $schedulist  $index $item}
+                        <tr>
+                            <td class="text-center"><?php echo $index+1;?></td>
+                            <td class="text-center">{$item['class_name']}</td>
+                            <td class="text-center">{$item['timeslot']}</td>
+                            <td class="text-center">王宝强</td>
+                            <td class="text-center">18615254000</td>
+                            <td class="text-center"><input type="radio" name="upload-photo" value="{$item['id']}" /></td>
+                        </tr>
+                        {/loop}
+                        </tbody>
+                    </table>
+                    {$pager}
+                    <div class="form-horizontal" role="form">
+                        <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                            <label>说明</label>
+                            <input type="text" name="desc" class="form-control" placeholder="一句话说明" style="width:80%">
+                        </div>
+                        <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                            <label>上传作品</label>
+                            {php echo tpl_form_field_multi_image('thumbs',$piclist)}
+                            <button class="btn btn-primary upproduct">提交</button>
+                        </div>
+                        </div>
+        </div>
+    </div>
+</div>
+{template 'common/footer'}
+<script>
+    $("document").ready(function(){
+        var sid = "{$sid}";
+        $(".upproduct").click(function(){
+            var xuanze = $("input[name='upload-photo']:checked").val();
+            if(!xuanze){
+                alert("请选择");
+                return false;
+            }
+            var desc = $("input[name='desc']").val();
+            var pics = $("input[name='thumbs[]']").map(function(){
+                return $(this).val()
+            }).get().join(",");
+            var Url = "{php echo $this->createWeburl('user')}";
+            var Vdata = {caozuo:'upload-photo',desc:desc,pics:pics,sid:sid,xuanze:xuanze};
+            $.post(Url,Vdata,function(data){
+                if(data.error==1){
+                    alert(data.message);
+                    var producturl = "{php echo $this->createWeburl('user',array('page'=>'product','sid'=>'sid'))}";
+                    var newurl = producturl.replace("=sid","="+sid);
+                        window.location.href=newurl;
+                }else{
+                    alert(data.message);
+                }
+            },'json');
+            return false;
+        })
+    })
+</script>

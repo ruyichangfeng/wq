@@ -1,0 +1,118 @@
+{template 'common/header'}
+<style>
+    .stress_red
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'display'));}">商家管理</a></li>
+        <li ><a href="{php echo $this->createWebUrl('business', array('op'=>'create'));}">添加商家</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('march', array('op'=>'display'));}">商家申诉管理</a></li>
+
+    </ul>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF;display:block;outline:none;">
+                筛选条件 ↓
+            </a>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="form">
+                    <div class="form-group">
+                        <div>
+                            <label class="col-sm-2  control-label" >申诉人</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[march_admin_name]" value="{$search['march_admin_name']}" placeholder="可模糊搜素" class="form-control">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="col-sm-2 control-label">申诉人电话</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="search[march_admin_tel]" value="{$search['march_admin_tel']}"  class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <input name="submit" type="submit" value="查询" class="btn btn-primary" style="width:120px; margin-right: 30px;"/>
+                            <input name="reset" type="button" value="清空" class="btn btn-default" style="width:120px;" onclick="formreset()"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                            <input type="hidden" name="searchflag" value="1" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">分类列表</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover table-responsive" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="">序号</th>
+                        <th style="">负责人</th>
+                        <th style="">电话</th>
+                        <th style="">申诉商家名称</th>
+                        <th style="min-width: 50px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {php $i = 1;}
+                    {loop $marchs $key $item}
+                    <tr>
+                        <td>{$i}</td>
+                        <td>{$item['march_admin_name']}</td>
+                        <td>{$item['march_admin_tel']}</td>
+                        <td>{$item['march_business_name']}</td>
+                        <td>
+                            {if $item['march_state'] == 1}
+                            <a onclick="if(!confirm('通过后将以模板消息通知用户,确定通过吗?')) return false;" class="btn btn-success" href="{php echo $this->createWebUrl('march', array('op'=>'pass', 'id'=>$item['march_id']))}">通过</a>
+                            <a onclick="if(!confirm('拒绝后将不可恢复,确定拒绝吗?')) return false;" class="btn btn-warning" href="{php echo $this->createWebUrl('march', array('op'=>'refuse', 'id'=>$item['march_id']))}">拒绝</a>
+                            {else if $item['march_state'] == 2}
+                            <a  class="btn btn-success" href="javascript:void (0)">已通过</a>
+                            {else if $item['march_state'] == 3}
+                            <a  class="btn btn-warning" href="javascript:void (0)">已拒绝</a>
+                            {/if}
+                            <a class="btn btn-primary" href="{php echo $this->createWebUrl('march', array('op'=>'modify', 'id'=>$item['march_id']))}">查看</a>
+                            {if $item['march_state'] != 2}
+                            <a onclick="if(!confirm('删除后将不可恢复,确定删除吗?')) return false;" class="btn btn-danger" href="{php echo $this->createWebUrl('march', array('op'=>'delete', 'id'=>$item['march_id']))}">删除</a>
+                            {/if}
+                        </td>
+                    </tr>
+                    {php $i++;}
+                    {/loop}
+                    {if !empty($marchs)}
+                    <tr>
+                        <td colspan="6">
+                        </td>
+                    </tr>
+                    {else}
+                    <tr>
+                        <td colspan="6">
+                            暂无商家
+                        </td>
+                    </tr>
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center;">{$page}</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    function formreset()
+    {
+        $('.form-control').val("");
+    };
+
+</script>
+{template 'common/footer'}

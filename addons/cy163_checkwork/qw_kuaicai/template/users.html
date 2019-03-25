@@ -1,0 +1,176 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li  {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('users', array('op'=>'display'));}">用户列表</a></li>
+
+    <!--<li {if $op=='edit'}class="active"{/if}><a href="{php echo $this->createWebUrl('users', array('op'=>'edit', 'id'=>$id));}">编辑用户</a></li>-->
+
+</ul>
+
+{if $op=="display"}
+<div class="panel panel-default">
+    <div class="panel-heading">用户列表</div>
+    <div class="panel-body">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover" style="min-width: 300px;">
+                <thead class="navbar-inner">
+                <tr>
+
+                    <th class="col-sm-4">昵称</th>
+                    <th class="col-sm-2">姓名</th>
+                    <th class="col-lg-2">头像</th>
+                    <th class="col-sm-2">电话</th>
+
+                    <!--<th class="col-sm-1">状态</th>-->
+                    <th class="col-sm-1">操作</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                {loop $userlist $index $user}
+                <tr>
+
+
+                    <td>{$user['nicheng']}{$user['openid']}</td>
+                    <td>{$user['name']}</td>
+                    <td><image src="{$user['headimg']}" style="max-width: 48px; max-height: 48px; border: 1px dotted gray"></td>
+
+                    <td>{$user['phone']}</td>
+                    <td>
+
+                        <!--<a href="{php echo $this->createWebUrl('users', array('op'=>'edit', 'id'=>$user['id']));}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑"><i class="fa fa-pencil"></i></a>-->
+
+                        <a href="{php echo $this->createWebUrl('users', array('op'=>'del', 'idd'=>$user['id']));}" onclick="return confirm('确定要删除吗？所有关于此用户的订单也会删除');" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="" data-original-title="删除"><i class="fa fa-times"></i></a>
+
+                    </td>
+
+                </tr>
+                {/loop}
+                {if empty($userlist)}
+                <tr>
+                    <td colspan="8">
+                        尚未有用户加入
+                    </td>
+                </tr>
+                {/if}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+{elseif $op=='edit'}
+
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-default">
+            <div class="panel-heading">用户</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">昵称</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <input type="text" name="nicheng" class="form-control" value="{$user['nicheng']}" />
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">姓名</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <input type="text" name="name" class="form-control" value="{$user['name']}" />
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">电话</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="input-group">
+                            <input type="text" name="phone" class="form-control" value="{$user['phone']}" />
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">通知接收状态</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <label class="radio radio-inline">
+                            <input type="radio" name="infostatus" value="1" {if intval($user['infostatus']) == 1}checked="checked"{/if}> 开启
+                        </label>
+                        <label class="radio radio-inline">
+                            <input type="radio" name="infostatus" value="2" {if intval($user['infostatus']) == 2}checked="checked"{/if}> 关闭
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">买菜需求状态</label>
+                    <div class="col-xs-12 col-sm-8">
+                        <label class="radio radio-inline">
+                            <input type="radio" name="xqstatus" value="1" {if intval($user['xqstatus']) == 1}checked="checked"{/if}> 开始
+                        </label>
+                        <label class="radio radio-inline">
+                            <input type="radio" name="xqstatus" value="2" {if intval($user['xqstatus']) == 2}checked="checked"{/if}> 停止
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" id="send" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+{/if}
+
+<script>
+    $(document).ready(function(){
+
+
+
+
+        //提交
+        $("#send").click(function(){
+
+            var title = $("input[name='title']").val().trim();
+
+            var des = $("input[name='des']").val().trim();
+
+            var num = $("input[name='num']").val().trim();
+
+            if(title==''){
+
+
+
+                alert('请添加菜品标题');
+                return false;
+            }
+
+            if(des==''){
+
+
+
+                alert('请添加菜品描述');
+                return false;
+            }
+
+
+
+
+            // return false;
+
+        })
+    })
+
+
+</script>

@@ -1,0 +1,313 @@
+{template 'inc/header'}
+<!-- <script type="text/javascript" src="{ONLINEMV_JS}iscroll.js"></script> -->
+<style type="text/css">
+	.sea-form{
+		width:100%;
+		max-width: 400px;
+		margin:0 auto;
+		position:fixed;
+		top:3px;
+		height:25px;
+		z-index:99999999;
+		background-color:#F4F4F4;
+	}
+	.keyword{
+		position:absolute;
+		top:0px;
+		left:5%;
+		width:75%;
+		min-width:240px;
+		max-width:300px;
+		height:25px;
+		padding-left:10px;
+		z-index:99999999;
+		border-radius:15px;
+		border:none;}
+	.btn-sub{
+		position:absolute;
+		top:0px;
+		/*left:76%;*/
+		right:5%;
+		/*width:13%;
+		min-width:60px;
+		max-width:100px;*/
+		height:25px;
+		z-index:99999999;			
+		color:#C9C9C9;
+		margin-top:2px;
+		font-size:16px;
+		text-align: center;
+		border:none;
+		-webkit-appearance: none;
+		border-radius:0;
+		background-color:#F4F4F4;
+	}
+	.ctitle{
+		font-size:16px;
+		color:#8B8B8B;
+		float:left;
+		width:24%;
+		font-size:15px;
+		/*padding-left:15px;*/
+		text-align: center;
+	}
+	.ctitle a{
+		color:#8B8B8B;
+	}
+	.sanjiao{
+		display:block;
+		width:15px;
+		height:15px;
+		margin-right:10px;
+		float:right;
+		margin-top:6px;
+	}
+	.font-color{
+		color:#AFADAD;
+	}
+	.browse{
+		width:10px;
+		margin-left:10px;
+	}
+	.interest{
+		width:10px;
+		margin-left:10px;
+	}
+	.comment{
+		width:10px;
+		margin-left:5px;
+	}
+	select{
+		appearance:none;
+		-moz-appearance:none;
+		-webkit-appearance:none;
+		border:none;
+		color:#AFADAD;
+		background-color:#ffffff;
+	}
+	.point .point-div:nth-child(2n){
+		border-left:2px solid #F8F7F7;
+	}
+	#wrapper li{width:100%;text-align:left;font-size:16px;line-height:35px;height:35px;}
+	.cate-menu-one{height:30px;line-height:30px;text-align:center;margin-left:8px;padding:0px 15px;border-radius:15px;{if $setting['color']} color:{$setting['color']};border:1px solid {$setting['color']};{/if}}
+	.cate-menu-two{margin-left:15px;color:#909090;}
+</style>
+<body>
+	<section >
+		{if $list}
+		<div class="type" style="margin-top:0px;margin-bottom:0px;">
+			{loop $list $item}
+			<ul id="wrapper" class="swiper-container">
+				<li class="swiper-wrapper">
+					<a class="swiper-slide cate-menu-one" style="" href="{php echo $this->createMobileUrl('list',array('pid'=>$item['id']));}">
+					{$item['catename']}
+					</a>
+					{loop $children[$item['id']] $row}
+						<a class="swiper-slide cate-menu-two" style="" href="{php echo $this->createMobileUrl('clist',array('cid'=>$row['id']));}">
+							{$row['catename']}
+						</a>
+					{/loop}
+				</li>
+			</ul>
+			{/loop}
+		</div>
+		{/if}
+		<script type="text/javascript">
+			// var Scroll = new iScroll('wrapper',{hScroll:true,vScrollbar:false});
+		</script>
+		<div class="point" style="margin-top:1px;">
+			{loop $stores $sto}
+			<div class="point-div" style="width:39.5%;float:left;margin:1px 0px;padding-top:15px;padding-bottom:10px;">
+				<div class="con">
+					<a href="{php echo $this->createMobileUrl('showDetail',array('id'=>$sto['id']));}">
+					<div class="detail" style="border:none;">
+						
+						<div class="pic" style="width:100%;">
+							{if $sto['logo']}
+							<img src="{php echo tomedia($sto['logo']);}" width="100%" height="100px">
+							{elseif $setting['avar']}
+							<img src="{php echo tomedia($setting['avar']);}" width="100%" height="100px">
+							{else}
+							<img src="{ONLINEMV_IMAGE}123.png" width="100%" height="100px">
+							{/if}
+						</div>
+						
+						<div class="title" style="width:93%;max-width:93%;">
+							{php $name =  mb_substr($sto['videoname'],0,5,'utf-8');}
+							
+							<span class="font-color">{$name}</span>
+							
+							
+							<p class="font-color" style="float:right;">
+								
+								<img src="{ONLINEMV_IMAGE}interest.png" class="interest" />  &nbsp;
+								<span style="color:#AFADAD;" id="interest{$sto['id']}">{$sto['dolike']}</span>
+								<img src="{ONLINEMV_IMAGE}comment.png" class="comment" id="comment" />  &nbsp;{$sto['comnum']}
+							</p>
+						</div>
+					
+					</div>
+				</a>	
+					
+				</div>
+			</div>
+			{/loop}
+		</div>
+		
+		
+
+	</section>
+	<div style="clear:both;"></div>
+<div class="upload" style="display:none;" data-page="{$page}">
+			<div class="showindex" style="width:20%;margin:0 auto;">
+				<img src="{ONLINEMV_IMAGE}123.gif" width="20px;">
+				<div style="float:left;">加载中</div>
+			</div>
+		</div>
+		<input id="page" type="hidden" name="page" value="{if $pindex} {$pindex} {else}1{/if}">
+		<input id="isscroll" type="hidden" name="page" value="1">
+
+		<div class="copyright" style="padding:0;margin-bottom:0px;"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+<div style="width:100%;height:60px;"></div>	
+{template 'menu'}	
+</body>
+<script src="{ONLINEMV_JS}swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container', {
+        paginationClickable: true,
+        spaceBetween: 0,
+        centeredSlides: true,
+        autoplay: 0,
+        autoplayDisableOnInteraction: false
+    });
+    </script>
+
+<script>
+    var swiper = new Swiper('.swiper-container');
+    
+
+    $("#showdetail").click(function(){
+    	var title = $(this).data('title'),
+    	content = $(this).data('content');
+    	$(".showdetail").css('display','block');
+    	$(".showdetail .title").html(title);
+    	$(".showdetail .content").html(content);
+    })
+
+    $(".return").click(function(){
+    	$(".showdetail").css('display','none');
+    })
+
+</script>
+<script type="text/javascript">
+var params = {
+    {if !empty($setting['sharetitle'])}
+    title: "{$setting['sharetitle']}",
+    {elseif !empty($setting['title'])}
+    title: "{$setting['title']}",
+    {else}
+    title: "在线视频",
+    {/if}
+
+    {if !empty($setting['sharedesc'])}
+    desc: "{$setting['sharedesc']}",
+    {elseif !empty($setting['title'])}
+    desc: "{$setting['title']}",
+    {else}
+    desc: "在线视频",
+    {/if}
+
+    {if !empty($setting['sharelogo'])}
+    imgUrl: "{php echo tomedia($setting['sharelogo'])}",
+    {else}
+    imgUrl: "{$_W['siteroot']}addons/jy_onlinemv/icon.jpg",
+    {/if}
+};
+wx.ready(function () {
+    wx.showOptionMenu();
+    wx.onMenuShareAppMessage.call(this, params);
+    wx.onMenuShareTimeline.call(this, params);
+});
+</script>
+<script type="text/javascript">
+$(function(){
+	$("#page").val(1);
+	$("#isscroll").val(1);
+})
+$(window).scroll(function(){
+	var page = parseInt($("#page").val())+1;
+	var isscroll = $("#isscroll").val();
+
+	var sta="{$sta}";
+	var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('ajaxallcate'),2)}"+"&rad="+Math.random();
+	if(isscroll==1){
+		if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+			$(".upload").show();
+			$("#isscroll").val(2);
+			setTimeout(function(){
+					$.ajax({
+						type: 'POST',
+			    		url: url,
+				    	data: {doajax:1,page:page,sta:sta},
+				    	success:function(datas){
+				    		if(datas.statue==1){
+				    			$(".point").append(datas.data);
+					    		$("#page").val(datas.page);
+					    		$("#isscroll").val(1);
+					    		$(".upload").hide();
+				    		}else{
+				    			$("#isscroll").val(2);
+				    			$(".showindex").html('已加载全部');
+				    		}
+				    	},
+				    	error:function(datas){
+
+					    },
+				    	dataType:'json',
+					})
+				},1000);
+		}
+	}
+})
+</script>
+<script type="text/javascript">
+	function scate(){
+		var cid = $('#mdcateid').val();
+
+		if(cid != 0){
+			window.location.href="{php echo $this->createMobileUrl('list');}"+"&pid="+cid;
+		}
+		
+	}
+</script>
+<script type="text/javascript">
+	// 点赞
+	// $('#interest').click(function(){
+
+	// });
+	function inter(vid){
+		// var url = "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('setinterest'),2)}";
+		// $.ajax({
+		// 	type: 'POST',
+  //   		url: url,
+	 //    	data: {vid:vid},
+	 //    	success:function(datas){
+	 //    		if(datas.statue==1){
+	 //    			swal('点赞成功!');
+	 //    			$('#interest'+vid).html(datas.number);
+	 //    		}else{
+	 //    			swal('已赞');
+	    			
+	 //    		}
+	 //    	},
+	 //    	error:function(datas){
+
+		//     },
+	 //    	dataType:'json',
+		// })
+	}
+</script>
+<script type="text/javascript">
+	$('.swiper-slide').attr('style','width:50px;');
+</script>
+</html>

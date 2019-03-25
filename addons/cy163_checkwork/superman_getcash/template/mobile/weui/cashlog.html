@@ -1,0 +1,234 @@
+{template $style.'/header'}
+<body>
+<style>
+	.page, body {
+		background-color: #f8f8f8;
+	}
+	body {
+		font-family: -apple-system-font,Helvetica Neue,Helvetica,sans-serif;
+	}
+	.weui-form-preview__bd {
+		position: relative;
+	}
+	.weui-form-preview__bd:after {
+		content: " ";
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		height: 1px;
+		border-bottom: 1px solid #d9d9d9;
+		color: #d9d9d9;
+		-webkit-transform-origin: 0 100%;
+		transform-origin: 0 100%;
+		-webkit-transform: scaleY(0.5);
+		transform: scaleY(0.5);
+		left: 15px;
+	}
+	.font8 {
+		font-size: .8rem;
+	}
+	.fonta {
+		font-size: 1rem;
+	}
+	.text_align_default {
+		text-align: start;
+	}
+	.text_align_right {
+		text-align: right;
+	}
+	.insert_time, .getcash_money {
+		color: #333;
+	}
+	.cashlog_status {
+		text-align: right;
+		padding-left: .4rem
+	}
+	.getcash_message {
+		color: #fd7e75;
+	}
+	/*处理中*/
+	.cashlog_status0 {
+		color: #428bca;
+	}
+	/*取消*/
+	.cashlog_status-1 {
+		color: #777;
+	}
+	/*失败*/
+	.cashlog_status-2 {
+		color: #d9534f;
+	}
+	/*已提现*/
+	.cashlog_status1 {
+		color: #5cb85c;
+	}
+	.more_btn {
+		margin: 15px;
+	}
+    .weui-tabbar {
+        height: 40px;
+    }
+    .weui-tabbar .weui-tabbar__item {
+        padding-top: 0
+    }
+    .weui-tabbar .weui-tabbar__item .weui-tabbar__label {
+        line-height: 40px;
+    }
+</style>
+<div class="container" id="container">
+	<div class="page js_show">
+		<div class="page__bd">
+            <div class="weui-tab">
+                <div class="weui-tab__panel">
+                    <div class="weui-form-preview">
+                        {if $list}
+                        {loop $list $li}
+                        <div class="weui-form-preview__bd text_align_default">
+                            <div class="weui-flex">
+                                <div class="weui-flex__item fonta insert_time">
+                                    <div class="placeholder">{$li['insert_time']}</div>
+                                </div>
+                                <div class="fonta text_align_right">
+                                    <div class="placeholder getcash_money">
+                                        <strong>&yen;{$li['money']}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weui-flex">
+                                <div class="weui-flex__item font8">
+                                    {if $li['remark']}
+                                    <div class="placeholder">{$li['remark']}</div>
+                                    {/if}
+                                </div>
+                                <div class="font8 cashlog_status">
+                                    <div class="placeholder cashlog_status{$li['status']}">{php echo superman_getcash_get_status_title($li['status'])}</div>
+                                </div>
+                            </div>
+                            {if $li['message']}
+                            <div class="weui-flex">
+                                <div class="weui-flex__item font8 getcash_message">
+                                    <div class="placeholder">回复：{$li['message']}</div>
+                                </div>
+                            </div>
+                            {/if}
+                        </div>
+                        {/loop}
+                        {else}
+                        <div class="font8" style="text-align: center; padding: 10px; color: #333333">暂无数据</div>
+                        {/if}
+                    </div>
+                    {if count($list) == $pagesize}
+                    <a href="javascript:;" class="weui-btn weui-btn_default more_btn" data-page="1" data-pagesize="{$pagesize}">
+                        <i class="weui-loading" style="display: none"></i>
+                        <span class="loading_info">查看更多</span>
+                    </a>
+                    {/if}
+                    <div class="weui-tabbar" style="position: fixed">
+                        <a href="{php echo $this->createMobileUrl('getcash')}" class="weui-tabbar__item">
+                            <p class="weui-tabbar__label">申请提现</p>
+                        </a>
+                        <a href="{php echo url('mc/home')}" class="weui-tabbar__item">
+                            <p class="weui-tabbar__label">个人中心</p>
+                        </a>
+                    </div>
+                </div>
+		    </div>
+	    </div>
+    </div>
+</div>
+<script>
+	require(['jquery', 'util'],function($, u){
+        //解决后退时提示“确认重新提交表单”错误页信息
+        pushHistory();
+         window.addEventListener("popstate", function(e) {
+         window.location=document.referrer;
+         }, false);
+        function pushHistory() {
+            var state = {
+                title: '',
+                url: ''
+            };
+            window.history.pushState(state, '', '');
+        }
+        function addItems(data) {
+			var html = '', item;
+			for (var i=0; i<data.length; i++) {
+				item = data[i];
+				html += '<div class="weui-form-preview__bd text_align_default">';
+				html += '<div class="weui-flex">';
+				html += '<div class="weui-flex__item fonta insert_time">';
+				html += '<div class="placeholder">'+item['insert_time']+'</div>';
+				html += '</div>';
+				html += '<div class="fonta text_align_right">';
+				html += '<div class="placeholder getcash_money">';
+				html += '<strong>&yen;'+item['money']+'</strong>';
+				html += '</div>';
+				html += '</div>';
+				html += '</div>';
+				html += '<div class="weui-flex">';
+				html += '<div class="weui-flex__item font8">';
+				if(item['remark']) {
+					html += '<div class="placeholder">'+item['remark']+'</div>';
+				}
+				html += '</div>';
+				html += '<div class="font8 cashlog_status">';
+				html += '<div class="placeholder cashlog_status'+item['status']+'">';
+				if(item['status'] == '0') {
+					html += '处理中';
+				}
+				if(item['status'] == '-1') {
+					html += '取消';
+				}
+				if(item['status'] == '-2') {
+					html += '失败';
+				}
+				if(item['status'] == '1') {
+					html += '已提现';
+				}
+				html += '</div>';
+				html += '</div>';
+				html += '</div>';
+				if(item['message']) {
+					html += '<div class="weui-flex">';
+					html += '<div class="weui-flex__item font8 getcash_message">';
+					html += '<div class="placeholder">回复：'+item['message']+'</div>';
+					html += '</div>';
+					html += '</div>';
+				}
+				html += '</div>';
+			}
+			$('.weui-form-preview').append(html);
+		}
+		$('.more_btn').click(function () {
+			var t = this;
+			$(t).attr('disabled', true);
+			$(t).find('.loading_info').html('加载中...');
+			$(t).addClass('weui-btn_disabled weui-btn_loading');
+			$(t).find('.weui-loading').show();
+			var url = window.location.href+'&load=infinite';
+			var page = parseInt($(this).attr('data-page')) + 1;
+			var pagesize = parseInt($(this).attr('data-pagesize'));
+			url += '&page='+page;
+			$.ajax({
+				url: url,
+				dataType: 'json',
+				success:function(resp){
+					$(t).removeAttr('disabled');
+					$(t).find('.loading_info').html('查看更多');
+					$(t).removeClass('weui-btn_disabled weui-btn_loading');
+					$(t).find('.weui-loading').hide();
+					if (resp.length > 0) {
+						addItems(resp);
+						$(t).attr('data-page', page);
+						if (resp.length < pagesize) {
+							$(t).remove();
+						}
+					} else {
+						$(t).remove();
+					}
+				}
+			});
+		});
+	});
+</script>

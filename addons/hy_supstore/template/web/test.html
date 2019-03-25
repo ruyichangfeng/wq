@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {template 'web/header'}
+</head>
+<body>
+<script>
+layui.use(['laydate', 'laypage','form', 'layer', 'table', 'carousel', 'upload', 'element'], function(){
+  var $ = layui.jquery
+  ,form = layui.form
+  ,layer = layui.layer //弹层
+  ,element = layui.element; //元素操作
+  
+  
+});
+</script>
+	<div style="text-align:center; margin-top:10px;">
+    	<video autoplay="autoplay" width="200"></video> 
+      <input type="button" title="拍照采集" value="拍照采集" onclick="getPhoto();" style="margin:20px; padding:5px 10px;">
+    	<canvas id="canvas" width="200" height="150"></canvas>
+    </div>
+    <script>  
+	var video = document.querySelector('video');
+	var canvas = document.getElementById('canvas');
+	var context = canvas.getContext('2d');
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+	window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+	
+	var exArray = []; //存储设备源ID  
+	MediaStreamTrack.getSources(function (sourceInfos) {  
+		for (var i = 0; i != sourceInfos.length; ++i) {  
+			var sourceInfo = sourceInfos[i];  
+			//这里会遍历audio,video，所以要加以区分  
+			if (sourceInfo.kind === 'video') {  
+				exArray.push(sourceInfo.id);  
+			}  
+		}  
+	}); 
+	
+	if (navigator.getUserMedia) {  
+		navigator.getUserMedia({  
+			'video': true
+		}, successFunc, errorFunc);    //success是获取成功的回调函数  
+	}else{  
+		alert('该设备不支持拍照功能！');  
+	}
+	
+	function successFunc(stream){
+		if (video.mozSrcObject !== undefined) {  
+			//Firefox中，video.mozSrcObject最初为null，而不是未定义的，我们可以靠这个来检测Firefox的支持  
+			video.mozSrcObject = stream;  
+		}else{  
+			video.src = window.URL && window.URL.createObjectURL(stream) || stream;  
+		}
+		//video.play();
+	}
+	function errorFunc(e) {
+		alert('Error！'+e);
+	}
+
+	//拍照  
+	function getPhoto() {
+		
+		context.drawImage(video,0,0,200,150); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。  
+		//获取base64数据并上传
+		var base64Img = canvas.toDataURL();
+		//增加保存图片功能
+		
+		//只能使用post,get会报错,数据太长
+		var url="{php echo $this->createWebUrl('test', array('op' => 'ceshi'))}";
+		$.post(url,{base64Img:base64Img},function(data){
+			var result = JSON.parse(data);
+			if(result.code == 0){
+				layer.msg(result.message);
+			}else if(result.code == 110){
+				//成功了，返回信息
+				layer.msg(result.message);
+				openview("{php echo $this->createWebUrl('center',array('op'=>'consum'))}&id="+result.id,result.message);
+				
+			}else{
+				layer.msg(result.message);
+			}
+		});
+	}
+	
+	
+function openview(url,message) {
+	layer.open({
+		type: 2, 
+		title: message,
+		closeBtn:1,
+		maxmin: true,
+		moveOut: true,
+		scrollbar: false,
+		shadeClose: true, //点击遮罩关闭层
+		area : ['100%' , '100%'],
+		content: url
+	});
+}
+	
+//关闭弹窗
+function select_entry(message,jumpUrl,index) { 
+	//alert(message);
+	//layer.msg(message);
+	layer.close(index); //先关闭弹窗，在操作   
+	layer.msg(message, function(){
+		//关闭后的操作
+		if(jumpUrl){
+			window.location.href=jumpUrl;
+		}else{
+			window.location.reload();
+		}
+	});
+}
+	
+    </script>
+</body>
+</html>

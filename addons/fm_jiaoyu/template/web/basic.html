@@ -1,0 +1,420 @@
+{template 'common/header'}
+{template 'public/comhead'}
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#">通知配置</a></li>
+	{if $_W['isfounder']}<li {if ($_GPC['do'] == 'sms')}class="active"{/if}><a href="{php echo $this->createWebUrl('sms')}">短信配置</a></li>{/if}
+    {if $_W['isfounder']}<li {if ($_GPC['do'] == 'upgrade')}class="active"{/if}><a href="{php echo $this->createWebUrl('upgrade')}">在线升级</a></li>{/if}
+</ul>
+<style>
+     .item_box img{
+         w通知th: 100%;
+         height: 100%;
+     }
+</style>
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                模版消息通知
+            </div>
+			 {if $_W['isfounder'] || $_W['role'] == 'owner'}
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">消息通知</label>
+                    <div class="col-sm-9">
+                        <label for="isshow1" class="radio-inline"><input type="radio" name="istplnotice" value="1" 通知="isshow1" {if $setting['istplnotice'] == 1}checked="true"{/if} /> 是</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <label for="isshow2" class="radio-inline"><input type="radio" name="istplnotice" value="0" 通知="isshow2"  {if empty($setting) || $setting['istplnotice'] == 0}checked="true"{/if} /> 否</label>
+                        <span class="help-block">不填写短信配置则不发送短信</span>
+                    </div>
+                </div>	
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">验证码设置</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="code_time" placeholder="输入绑定验证码有效期" value="{$bd_set['code_time']}" class="form-control"/>以秒单位计算
+							<div class="help-block">请尽量设置超过5分钟</div>
+						</div>
+                    </div>					
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bd_singname" value="{$bd_set['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bd_code" value="{$bd_set['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 验证码 ${code} </div>
+						</div>
+                    </div>					
+                </div>				
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">学生请假申请通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqingjia" value="{if !empty($xsqingjia['xsqingjia'])}{$xsqingjia['xsqingjia']}{else}{$setting['xsqingjia']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">学生请假申请</span>”编号为TM00190的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqingjia_singname" value="{$xsqingjia['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqingjia_code" value="{$xsqingjia['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 学生姓名 ${name} 发布时间 ${time} (老师收)</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">学生请假审核通知</label>
+                     <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqjsh" value="{if !empty($xsqjsh['xsqjsh'])}{$xsqjsh['xsqjsh']}{else}{$setting['xsqjsh']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审核通知</span>”编号为OPENTM200864357的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-3 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqjsh_singname" value="{$xsqjsh['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-3 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xsqjsh_code" value="{$xsqjsh['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 学生姓名 ${name} （如：小明妈妈）状态 ${type} （状态= 同意or不同意）(家长或学生收)</div>
+						</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">教员请假申请提醒通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqingjia" value="{if !empty($jsqingjia['jsqingjia'])}{$jsqingjia['jsqingjia']}{else}{$setting['jsqingjia']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审核提醒</span>”编号为OPENTM203328559的模板
+							</div>
+						</div>	
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqingjia_singname" value="{$jsqingjia['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqingjia_code" value="{$jsqingjia['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 请假教师姓名 ${name} 请假时间 ${time} (校长或年级主任收)</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">教员请假审核结果通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqjsh" value="{if !empty($jsqjsh['jsqjsh'])}{$jsqjsh['jsqjsh']}{else}{$setting['jsqjsh']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审批结果通知</span>”编号为OPENTM207256255的模板
+							</div>
+						</div>	
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqjsh_singname" value="{$jsqjsh['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jsqjsh_code" value="{$jsqjsh['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 请假教师姓名 ${name} 状态 ${type} （状态 = 同意 or 不同意）（请假人本人收）</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">学校通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xxtongzhi" value="{if !empty($xxtongzhi['xxtongzhi'])}{$xxtongzhi['xxtongzhi']}{else}{$setting['xxtongzhi']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">学校通知</span>”编号为OPENTM204845041的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xxtongzhi_singname" value="{$xxtongzhi['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="xxtongzhi_code" value="{$xxtongzhi['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 接收者姓名（如 张起灵老师或小明妈妈） ${name} 发布时间 ${time}</div>
+						</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">放学和班级通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjtz" value="{if !empty($bjtz['bjtz'])}{$bjtz['bjtz']}{else}{$setting['bjtz']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">班级通知</span>”编号为OPENTM204533457的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjtz_singname" value="{$bjtz['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjtz_code" value="{$bjtz['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 接收者姓名（如：小明妈妈） ${name} 发布时间 ${time}  通知类型${type}  （通知类型=放学通知or班级通知）</div>
+						</div>
+                    </div>					
+                </div>				
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">家长留言通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyan" value="{if !empty($liuyan['liuyan'])}{$liuyan['liuyan']}{else}{$setting['liuyan']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">留言提醒</span>”编号为OPENTM202309749的模板
+							</div>
+						</div>
+						<div class="help-block">家长留言/通讯录私聊共用</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyan_singname" value="{$liuyan['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyan_code" value="{$liuyan['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 发送者姓名 ${name}（如：小明妈妈） 留言时间 ${time}（老师或学生家长收 姓名=发送人的姓名）</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">教师回复家长留言通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyanhf" value="{if !empty($liuyanhf['liuyanhf'])}{$liuyanhf['liuyanhf']}{else}{$setting['liuyanhf']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">家长意见回复通知</span>”编号为OPENTM205211081的模板
+							</div>
+						</div>
+						<div class="help-block">此方法现在仅用于对话班主任，班主任回复学校调用了</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyanhf_singname" value="{$liuyanhf['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="liuyanhf_code" value="{$liuyanhf['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 学生姓名 ${name} 回复时间 ${time}（家长或学生收）</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">作业提醒通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zuoye" value="{if !empty($zuoye['zuoye'])}{$zuoye['zuoye']}{else}{$setting['zuoye']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">作业消息提醒</span>”编号为OPENTM207873178的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zuoye_singname" value="{$zuoye['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zuoye_code" value="{$zuoye['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 老师姓名 ${name} 发布时间 ${time} （如：老师姓名= 【语文】-张起灵）</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈审核结果通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshjg" value="{if !empty($bjqshjg['bjqshjg'])}{$bjqshjg['bjqshjg']}{else}{$setting['bjqshjg']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">审核结果通知</span>”编号为OPENTM400501478的模板
+							</div>
+						</div>
+						<div class="help-block" style="color:red;font-weight:bold;">此模版与报名审核/微信签到审核结果共用</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshjg_singname" value="{$bjqshjg['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshjg_code" value="{$bjqshjg['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 接收者姓名 ${name} 类型 ${type} 状态 ${result}(家长或学生收 类型=班级圈内容审核or报名申请 状态=通过 or 未通过)</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈审核提醒通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshtz" value="{if !empty($bjqshtz['bjqshtz'])}{$bjqshtz['bjqshtz']}{else}{$setting['bjqshtz']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">审核提醒</span>”编号为OPENTM400047769的模板
+							</div>
+						</div>
+						<div class="help-block" style="color:red;font-weight:bold;">此模版与报名审核/微信签到提醒共用</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshtz_singname" value="{$bjqshtz['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="bjqshtz_code" value="{$bjqshtz['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 发送者姓名 ${name} 时间 ${time} 类型${type}(老师收 类型=班级圈内容审核or报名申请审核or微信签到审核)</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">到校离校提醒</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jxlxtx" value="{if !empty($jxlxtx['jxlxtx'])}{$jxlxtx['jxlxtx']}{else}{$setting['jxlxtx']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">到校离校提醒</span>”编号为TM00188的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jxlxtx_singname" value="{$jxlxtx['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jxlxtx_code" value="{$jxlxtx['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 学生姓名 ${name} 进出时间 ${time} 进出状态 ${type} （状态=进校 or 离校）</div>
+						</div>
+                    </div>					
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">缴费结果通知</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jfjgtz" value="{if !empty($jfjgtz['jfjgtz'])}{$jfjgtz['jfjgtz']}{else}{$setting['jfjgtz']}{/if}" class="form-control"/>
+							<div class="help-block">
+								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">校园缴费结果通知</span>”编号为OPENTM401619319的模板
+							</div>
+						</div>
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信签名</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jfjgtz_singname" value="{$jfjgtz['sms_SignName']}" class="form-control"/>
+							<div class="help-block">阿里云短信服务里创建的签名</div>
+						</div>
+                    </div>	
+                    <label class="col-xs-12 col-sm-2 col-md-1 control-label">短信模版</label>
+                    <div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jfjgtz_code" value="{$jfjgtz['sms_Code']}" class="form-control"/>
+							<div class="help-block">变量 学生姓名 ${name} 支付时间 ${time} 状态 ${type} （状态=成功 or 失败）</div>
+						</div>
+                    </div>					
+                </div>				
+            </div>
+        </div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				给开发者建议或留言
+			</div>
+			<div class="panel-body">
+			<div class="row-fluid">
+				<div class="span8 control-group">
+					【本部分仅创始人可见，不必担心客户或其他管理员能看到】有何建议或BUG请直接提交  联系开发者QQ:<a href="tencent://message/?uin=332035136&Site=qq&Menu=yes">332035136</a> 工作日时间（周一 - 周日 12：00 - 24：00）请直接Q我!其他时间勿扰。
+				</div>
+			</div>
+			</div>
+		</div>	
+		{else}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+			     抱歉：
+			</div>
+			<div class="panel-body">
+			<div class="row-fluid">
+				<div class="span8 control-group">
+					【你没有权限查看本页面，请联系管理员进行操作】
+				</div>
+			</div>
+			</div>
+		</div>
+        {/if}
+        {if $_W['isfounder'] || $_W['role'] == 'owner'}		
+        <div class="form-group col-sm-12">
+            <input type="hidden" name="id" value="{$setting['id']}" />
+            <input type="submit" name="submit" value="提交保存" class="btn btn-primary col-lg-1" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+		{/if}
+	</form>
+</div>
+{template 'common/footer'}

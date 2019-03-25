@@ -1,0 +1,202 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagebursts')}" aria-expanded="true"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <div class="ibox-content">
+                                            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                                <input type="hidden" name="c" value="site" />
+                                                <input type="hidden" name="a" value="entry" />
+                                                <input type="hidden" name="m" value="hl_mmsystem" />
+                                                <input type="hidden" name="do" value="messagebursts" />
+                                                <div class="page-toolbar row m-b-sm m-t-sm">
+                                                    <div class="col-sm-6">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" style="margin-left: 3px;"><i class="fa fa-bar-chart-o"></i> 当前申请总数: {$count}</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 pull-right">
+                                                        <div class="input-group">
+                                                            <input type="text" class="input form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入关键词">
+                                                            <span class="input-group-btn"><button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <form action="" method="post" >
+                                                {if count($list)>0}
+                                                <table class="table table-hover table-bordered table-responsive" style="margin-top: 20px;">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>申请任务名称</th>
+                                                        <th>申请状态</th>
+                                                        <th>支付状态</th>
+                                                        <th>次数</th>
+                                                        <th>申请店铺</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {loop $list $row}
+                                                    <tr>
+                                                        <td>{$row['mt_title']}</td>
+                                                        <td>
+                                                            {if $row['mt_application']==1 }<span class="badge badge-warning">申请中</span>
+                                                            {else if $row['mt_application']==2}<span class="badge badge-primary">申请通过</span>
+                                                            {else}<span class="badge badge-success">已发送</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td>
+                                                            {if $row['mt_paystatus']==1 }<span class="badge badge-danger">未支付</span>
+                                                            {else if $row['mt_paystatus']==2}<span class="badge badge-primary">已支付</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td>
+                                                            {if $row['mt_paystatus']==1 }<span class="badge badge-danger">未支付</span>
+                                                            {else if $row['mt_paystatus']==2&&$row['mt_frequency']!=0}
+                                                            <span class="badge badge-warning">{$row['mt_frequency']}</span>
+                                                            {else if $row['mt_paystatus']==2}<span class="badge badge-primary">已支付</span>
+                                                            {/if}
+
+                                                        </td>
+                                                        <td>{php echo util::getSetStoreName($row['store_id'])}</td>
+                                                        <td  style="overflow:visible;">
+                                                            {if $row['mt_status'] == '0'}
+                                                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'build', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="生成发送列表"><i class='fa fa-envelope-square'></i></a>
+                                                            {/if}
+                                                            <a class="btn btn-success btn-sm" href="JavaScript:;" onclick="check_msgagree('{$row['id']}')" data-toggle="tooltip" data-placement="top" title=""><i class="fa fa-paper-plane">同意申请</i></a>
+                                                            <!--<a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('messagebursts', array('op' => 'showsign', 'id' => $row['id']))}" data-toggle="tooltip" data-placement="top" title="查看发送日志"><i class="fa fa-book"></i></a>-->
+                                                            <a class='btn btn-info  btn-sm' href="JavaScript:;" onclick="check_msgtempl('{$row['id']}')" title='校验模板'><i class='fa fa-check-square-o'></i> 校验模板</a>
+
+                                                        </td>
+                                                    </tr>
+                                                    {if $row['mt_status'] == '0'}
+                                                    <script>
+                                                        hideli_{$row['id']}();
+                                                        function hideli_{$row['id']}(){
+                                                            $('.remove_{$row["id"]}').hide();
+                                                        }
+                                                    </script>
+                                                    {/if}
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                                {$pager}
+                                                {else}
+                                                <div class='panel panel-default'style="margin-top: 20px;">
+                                                    <div class='panel-body' style='text-align: center;padding:30px;'>
+                                                        暂时没有任何申请!
+                                                    </div>
+                                                </div>
+                                                {/if}
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function check_msgtempl(tid){
+        new $.flavr({
+            title   : '模板校验',
+            content : '<div id="check-form"></div>',
+            buttons : {
+                close : {text:'关闭'}
+            }
+        });
+        $.ajax({
+            url: "{php echo $this->createWebUrl('messageallmanage',array('op'=>'check_msgtempl'))}&tid="+tid,
+            cache: false,
+            data:{}
+        }).done(function (html) {
+            //console.log(html);
+            $("#check-form").append(html);
+        });
+    }
+    function check_msgagree(id){
+        swal({
+                title: "模板发送收款",
+                text: "请输入收款金额：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入金额"
+            },
+            function(inputmoneyValue){
+                if (inputmoneyValue === false) return false;
+
+                if (inputmoneyValue === "") {
+                    swal.showInputError("金额不能为空！");
+                    return false
+                }
+                if (inputmoneyValue <0 ) {
+                    swal.showInputError("金额大于0！");
+                    return false
+                }
+
+                var moneyNum = inputmoneyValue;
+                var url = "{php echo $this->createWebUrl('messagebursts', array('op' => 'agreeapplication'))}";
+                var params = {
+                    'moneyNum': moneyNum,
+                    'id':id,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data['message']['code'] != 0) {
+                            swal({
+                                title: "添加失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        }
+                        else {
+                            swal("申请通过！", "商家需要交纳的金额是：" + inputmoneyValue,"success");
+
+                        }
+                    }
+
+                });
+            });
+    }
+</script>
+
+
+{template 'web/common/footer'}

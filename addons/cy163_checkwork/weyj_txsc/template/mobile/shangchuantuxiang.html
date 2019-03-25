@@ -1,0 +1,98 @@
+{php define(MUI, false);}
+{php $html_mui_title='上传头像';}
+{php $html_mui_upload_label_title='头像';}
+{php $html_mui_upload_img_style='width:80px; height:80px; border:1px #ccc solid;';}
+{php $html_form_action_url=$this->createMobileUrl('yjbaocuntouxiang');}
+{php $html_form_action_id='u-form';}
+{php $html_form_data='data';}
+{php $html_form_data_img='avatar';}
+{template 'common/header'}
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">{$html_mui_title}</h1>
+</header>
+<div class="mui-content">
+	<div class="mui-card">
+    <div class="mui-input-row">
+                <label>{$html_mui_upload_label_title}</label>
+            </div>
+	
+
+        <form action="{$html_form_action_url}" method="post" class="form" id="{$html_form_action_id}">
+            
+			 <div class="mui-input-row">
+                <div class="mui-image-uploader">
+                    <div class="mui-image-preview js-image-preview mui-pull-left">
+                    	
+                    	{if $yj_mc['avatar']}
+                        	 <img src="{$yj_mc['avatar']}"  data-preview-src="">
+                        {else}
+                        	 <img src="{php echo MODULE_URL;}images/head_default_img.gif">
+                        {/if}
+                    </div>
+
+                    
+                    <a href="javascript:;" class="mui-pull-left js-image-img">
+                    	<img src="{php echo MODULE_URL;}images/jia.gif">
+                    </a>
+                </div>
+            </div>
+            <style>
+				.js-image-img img, .mui-image-preview img{{$html_mui_upload_img_style}}
+			</style>
+            <script>
+                util.image($('.js-image-img'), function(url){
+                    $('.js-image-img').parent().find('.js-image-preview').html('<input type="hidden" value="'+url.attachment+'" name="{$html_form_data}[{$html_form_data_img}]" /><img src="'+url.url+'" data-id="'+url.id+'" data-preview-src="" data-preview-group="__IMG_UPLOAD_img" />');
+                }, {
+                    crop : false,
+                    multiple : false,
+                    preview : '__IMG_UPLOAD_img'
+                });
+                </script>
+            
+            <div class="mui-button-row" style="margin:0px 5px 10px 5px;">
+            	<input name="submit" type="submit" value="保存" class="mui-btn btn-primary" style="width:100%;"/>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+
+$(function(){
+	$('#hdbaoming-form').submit(function(){
+		var result = true;
+		if($('input[name="data[name]"]').val() == ''){
+			result = false;
+			mui.alert('未填写{php echo $this->module["config"]["hd_lan_xingming"]?$this->module["config"]["hd_lan_xingming"]:"姓名"}.');
+			return result;
+		}
+		if($('input[name="data[mobile]"]').val() == ''){
+			result = false;
+			mui.alert('未填写{php echo $this->module["config"]["hd_lan_shouji"]?$this->module["config"]["hd_lan_shouji"]:"手机"}.');
+			return result;
+		}
+		if($('input[name="data[title]"]').val() == ''){
+			result = false;
+			mui.alert('未填写{php echo $this->module["config"]["hd_lan_biaoti"]?$this->module["config"]["hd_lan_biaoti"]:"标题"}.');
+			return result;
+		}
+		//alert($('input[name="data[img]"]').val());
+		if(!$('input[name="data[img]"]').val()){
+			result = false;
+			mui.alert('未上传{php echo $this->module["config"]["hd_lan_zhutu"]?$this->module["config"]["hd_lan_zhutu"]:"活动主图"}.');
+			return result;
+		}
+		if($('textarea[name="data[text]"]').val() == ''){
+			result = false;
+			mui.alert('未填写{php echo $this->module["config"]["hd_lan_jianjie"]?$this->module["config"]["hd_lan_jianjie"]:"简介"}.');
+			return result;
+		}
+		return result;
+	});
+	
+});
+</script>
+{template 'common/footer'}

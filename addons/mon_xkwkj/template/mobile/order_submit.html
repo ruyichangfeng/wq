@@ -1,0 +1,202 @@
+<!DOCTYPE html><html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>订单</title>
+    <link rel="stylesheet" type="text/css" href="{MON_XKWKJ_RES}css/newActivity.53.min.css?v=20170605" />
+    <script src="{MON_XKWKJ_RES}js/jquery_min.js" type="text/javascript"></script>
+    {template 'message'}
+</head>
+<body class="save"><link href="{MON_XKWKJ_RES}css/shop_header.css?v=20170605" rel="stylesheet" type="text/css">
+<section class="shop_header clearfix">
+    <a href="javascript:history.back(-1);"><span id="shop_header_back">&nbsp;</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <!--<span id="shop_header_more"><a></a><a></a><a></a></span>-->
+</section>
+<div id="shop_header_list" style="display:none">
+    <!--<ul>-->
+    <!--<li><a href="plugin.php?id=tom_shop&amp;mod=index">首 页</a></li>-->
+    <!--<li><a href="plugin.php?id=tom_pintuan&amp;mod=index">拼团商城</a></li>-->
+    <!--<li><a href="plugin.php?id=tom_weikanjia&amp;mod=index">砍价商城</a></li>-->
+    <!--<li><a href="plugin.php?id=tom_coupon&amp;mod=index">优惠券</a></li>-->
+    <!--</ul>-->
+</div>
+
+<script language="javascript">
+    var show_list_tab = 0;
+    $("#shop_header_more").click( function (){
+        if(show_list_tab == 1){
+            show_list_tab = 0;
+            $("#shop_header_list").hide();
+        }else{
+            show_list_tab = 1;
+            $("#shop_header_list").show();
+        }
+    });
+</script>
+<div class="payment gyPageSHow">
+    {if $xkwkj['lq_type'] == self::LQ_TYPE_ZX}
+            <div class="buy_take_type_top_main clearfix">
+                    <a href="{php echo $this->createMobileUrl('submitOrder',array('kid'=>$xkwkj['id'],  'lq_type' => self::LQ_TYPE_KD),true)}" class="left {if $lq_type == self::LQ_TYPE_KD}current{/if}">快递送货</a>
+                    <a href="{php echo $this->createMobileUrl('submitOrder',array('kid'=>$xkwkj['id'],  'lq_type' => self::LQ_TYPE_ZT),true)}" class="right {if $lq_type == self::LQ_TYPE_ZT}current{/if}">到店取货</a>
+            </div>
+
+    {else}
+            <div class="buy_take_type_choose" style="display: block;">
+                     <a href="javascript:void(0)">{if $xkwkj['lq_type'] == $this::LQ_TYPE_KD}快递送货{/if}{if $xkwkj['lq_type'] == $this::LQ_TYPE_ZT}到店取货{/if}</a>
+            </div>
+    {/if}
+
+
+
+    <div class="payDetail">
+        <p class="shangPinInfo">商品信息：</p>
+        <div class="goodsInfo clearfix">
+            <div class="leftImg">
+                <a href="{php echo $this->createMobileUrl ( 'auth',array('kid'=>$xkwkj['id'],'au'=>Value::$REDIRECT_USER_INDEX))}">
+                    <img class="img-responsive" src="{php echo MonUtil::getpicurl($goods['p_preview_pic'])}" />
+                </a>
+            </div>
+            <div class="rightText">
+                <strong>{$goods['p_name']}</strong>
+                <p style="color: #908E8E;font-size: 12px;">
+                    {$xkwkj['title']}
+                </p>
+            </div>
+        </div>
+
+        <div class="truePayment">
+            <p class="shifukuan clearfix"><span class="leftK">砍后价：</span><span class="rightK">￥{$uac['price']}</span></p>
+            <p class="shifukuan clearfix"><span class="leftK">快递费：</span><span class="rightK">￥{$xkwkj['yf_price']}</span></p>
+        </div>
+        <p class="shiFuKuan">实付款：<span class="Jiage" id="payPrice">￥{$zfprice}</span></p>
+        <div id="addressK" class="addressK" onclick="{if $lq_type == self::LQ_TYPE_KD}window.location.href='{php echo $this->createMobileUrl('myaddress',  array('kid'=> $xkwkj['id']),true)}';{/if}">
+            <div class="leftK">收货方式</div>
+            <p class="shuxian"></p>
+            {if $lq_type == self::LQ_TYPE_KD}
+                <div class="rightK gyDizhiK" id="addressMain">
+
+                    {if empty($orderAddress)}
+                           <p class="wkj_address">请选择您的地址信息</p>
+                    {else}
+                        <p><span class="wkj_name">{$orderAddress['uname']}</span><a href="javascript:;" class="wkj_cellphone">{$orderAddress['tel']}</a></p>
+                        <p class="wkj_address">{$orderAddress['address']}</p>
+                    {/if}
+
+
+                </div>
+            {/if}
+
+            {if $lq_type == self::LQ_TYPE_ZT}
+                <div class="rightK gyDizhiK">
+                    <p class="wkj_address">到店取货</p>
+                    <p class="wkj_address">地址：{$xkwkj['zt_address']}</p>
+                </div>
+            {/if}
+
+
+        </div>
+        <form name="payForm" id="payForm">
+            <div class="buy_order_beizu">
+                {if $lq_type == self::LQ_TYPE_ZT}
+                    <input id="uname" name="uname" value="" placeholder="填写联系人" type="text">
+                    <input id="tel" name="tel" value="" placeholder="填写手机号" type="text">
+                {/if}
+                <textarea name="remark" id="remark" placeholder="请填写订单备注"></textarea>
+                <input type="hidden" name="kid" value="{$kid}" />
+                <input type="hidden" name="lq_type" value="{$lq_type}" />
+                <input type="hidden" name="addid" id="addid" value="{$orderAddress['id']}" />
+
+            </div>
+        </form>
+        <div class="dibuwenlu">
+            <img class="img-responsive" src="{MON_XKWKJ_RES}images/dibuwenlu.jpg" />
+        </div>
+    </div>
+    <div class="payConfirm">
+        <div class="zhiFuButton fail" id="zhiFuButtonYi">
+            <div class="styleButtonYi">
+                <div>
+                    <a href="javascript:;" class="id_pay_btn"><span>提交订单</span></a>
+                </div>
+            </div>
+        </div>
+        <p class="shuomingK gyStyleZfYi"><img src="{MON_XKWKJ_RES}images/shangpintps4.jpg"/><span>提交订单前请确保填写正确收货地址</span></p>
+    </div>
+    <div id="zhegaik" class="zhegaik"></div>
+</div>
+
+<script>
+
+    var submintPayStatus = 0;
+    $(".id_pay_btn").click( function () {
+        if(submintPayStatus == 1){
+            return false;
+        }
+
+        {if  $lq_type == self::LQ_TYPE_ZT}
+            var order_xm       = $("#uname").val();
+            var order_tel      = $("#tel").val();
+            if(order_xm == ""){
+                tipMsg("必须填写联系人姓名");
+                return false;
+            }
+            if(order_tel == "" || !checkMobile(order_tel)){
+                tipMsg("必须联系人手机");
+                return false;
+            }
+
+        {/if}
+
+        {if $lq_type == self::LQ_TYPE_KD}
+            var addid =  $("#addid").val();
+            if (addid == "") {
+                tipMsg("请选选择收货地址");
+                return false;
+            }
+
+        {/if}
+
+            layer.open({
+                content: '确定提交订单吗？'
+                ,btn: ['提交订单', '取消']
+                ,yes: function(index){
+                    layer.close(index);
+                    submitOrder();
+                }
+            });
+    });
+
+    function submitOrder() {
+        submintPayStatus = 1;
+        $.ajax({
+            type: "POST",
+            url: "{php echo $this->createMobileUrl('submitOrder',array('kid'=>$xkwkj['id'], 'op'=> 'submit'), true)}",
+            dataType : "json",
+            data: $('#payForm').serialize(),
+            success: function(res){
+                submintPayStatus = 0;
+                if (res.code == 200) {
+                    tipMsg("下单成功");
+                    window.location.href = "{php echo $this->createMobileUrl('OrderDetail',array('kid'=>$xkwkj['id']),true)}";
+                } else {
+                    dMsg(res.msg);
+                }
+            }
+        });
+    }
+
+    function checkMobile(s){
+        var regu =/^[1][3|8|4|5|7][0-9]{9}$/;
+        var re = new RegExp(regu);
+        if (re.test(s)) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+</script>
+</body>
+</html>

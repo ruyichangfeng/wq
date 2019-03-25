@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+<head>
+	<meta charset="utf-8">
+	<title>{$setting['name']}</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link href="../addons/cy163_checkwork/static/css/mui.min.css" rel="stylesheet" />
+	<style>
+	.btn{
+		width:10rem;
+		height:10rem;
+		border-radius:10rem;
+		margin-top:3rem;
+		margin-bottom:3rem;
+	}
+	.t-c{
+		text-align:center;
+	}
+	.thumb{
+		border-radius:42px;
+	}
+	#alertbox{
+		width:90%;
+		position:absolute;
+		z-index:9999;
+		left:5%;
+		margin-top:3rem;
+	}
+	
+	</style>
+	<script src="../addons/cy163_checkwork/static/js/mui.min.js"></script>
+</head>
+
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<h1 class="mui-title">{$setting['name']}</h1>
+	</header>
+	
+	<div class="mui-content">
+		{if empty($staff)}
+		<div class="mui-backdrop"></div>
+		<div id="alertbox">
+			{if empty($openid)}
+				<div style="background-color:#fff;padding:1rem 0;text-align:center;font-weight:bold;">没有获取到您的微信信息</div>
+			{else}	
+				<div style="background-color:#fff;padding:1rem 0;text-align:center;font-weight:bold;">请完善信息</div>
+				<div class="mui-input-group">
+					<div style="height:1rem;"></div>
+					<a href="#companynames" class="mui-btn mui-btn-primary mui-btn-block mui-btn-outlined" id="selcom" style="padding: 5px 0;width:90%;margin:0 auto;">选择公司</a>
+					<input id='companyname' name="companyname" type="hidden" class="mui-input-clear mui-input">
+					<div class="mui-input-row">
+						<label>真实姓名</label>
+						<input id='realname' name="realname" type="text" class="mui-input-clear mui-input" placeholder="请填写真实姓名">
+					</div>
+					<div class="mui-input-row">
+						<label>联系方式</label>
+						<input id='phone' name="phone" type="tel" class="mui-input-clear mui-input" placeholder="请填写联系方式">
+					</div>
+					<div class="mui-input-row">
+						<label>部门</label>
+						<input id='department' name="department" type="text" class="mui-input-clear mui-input" placeholder="请填写部门">
+					</div>
+					<div class="mui-input-row">
+						<label>职位</label>
+						<input id='position' name="position" type="text" class="mui-input-clear mui-input" placeholder="请填写职位">
+					</div>
+					<div class="mui-button-row">
+						<button class="mui-btn mui-btn-primary" id="submsg" type="button">提交</button>
+					</div>
+				</div>
+				<script type="text/javascript" charset="utf-8">
+				var btn = document.getElementById("submsg");
+				btn.addEventListener("tap",function(){
+					if(document.getElementById("companyname").value == '' || document.getElementById("realname").value == '' || document.getElementById("phone").value == '' || document.getElementById("department").value == '' || document.getElementById("position").value == ''){
+						mui.toast("请填写完整信息后提交！");
+					}else{
+						mui.ajax("{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('submsg')}",{
+							data:{
+								'companyname':document.getElementById("companyname").value,
+								'realname':document.getElementById("realname").value,
+								'phone':document.getElementById("phone").value,
+								'department':document.getElementById("department").value,
+								'position':document.getElementById("position").value,
+							},
+							dataType:'json',//服务器返回json格式数据
+							type:'get',//HTTP请求类型
+							timeout:10000,//超时时间设置为10秒；
+							headers:{'Content-Type':'application/json'},            
+							success:function(data){
+								if(data.iserror == 1){
+									mui.toast(data.msg);
+								}else{
+									mui.toast(data.msg);
+									setTimeout(function(){
+										history.go(0);
+									},1000);
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								mui.toast("网络异常！");
+							}
+						});
+					}
+				});
+				mui('body').on('tap', '.mui-popover-action li>a', function() {
+					var a = this,
+						parent;
+					//根据点击按钮，反推当前是哪个actionsheet
+					for (parent = a.parentNode; parent != document.body; parent = parent.parentNode) {
+						if (parent.classList.contains('mui-popover-action')) {
+							break;
+						}
+					}
+					//关闭actionsheet
+					mui('#' + parent.id).popover('toggle');
+					
+					document.getElementById("selcom").innerHTML = a.innerHTML;
+					document.getElementById("companyname").value = a.innerHTML;
+				})
+				</script>
+			{/if}
+		</div>
+		{/if}
+		{if $hour >= $setting['middlehour']}
+			{if empty($hasda)}
+				<div class="t-c"><button type="button" class="mui-btn mui-btn-primary btn" id="xiabandaka">{$setting['xbtext']}</button></div>
+				<script type="text/javascript" charset="utf-8">
+				var xiabandaka = document.getElementById("xiabandaka");
+				xiabandaka.addEventListener("tap",function(){
+					var btnArray = ['是', '否'];
+					mui.confirm('真的要打卡吗？', '打卡确认', btnArray, function(e) {
+						if (e.index == 0) {
+							mui.ajax("{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('daka')}",{
+								data:{},
+								dataType:'json',//服务器返回json格式数据
+								type:'get',//HTTP请求类型
+								timeout:10000,//超时时间设置为10秒；
+								headers:{'Content-Type':'application/json'},            
+								success:function(data){
+									if(data.iserror == 1){
+										mui.toast(data.msg);
+									}else{
+										mui.toast(data.msg);
+										setTimeout(function(){
+											history.go(0);
+										},1000);
+									}
+								},
+								error:function(xhr,type,errorThrown){
+									mui.toast("网络异常！");
+								}
+							});
+						}
+					})
+				});
+				</script>
+			{else}
+				<div class="t-c"><button type="button" class="mui-btn mui-btn-success btn">{$setting['hasxbtext']}</button></div>
+			{/if}
+		{else}
+			{if empty($hasda)}
+				<div class="t-c"><button type="button" class="mui-btn mui-btn-primary btn" id="shangbandaka">{$setting['sbtext']}</button></div>
+				<script type="text/javascript" charset="utf-8">
+				var shangbandaka = document.getElementById("shangbandaka");
+				shangbandaka.addEventListener("tap",function(){
+					var btnArray = ['是', '否'];
+					mui.confirm('真的要打卡吗？', '打卡确认', btnArray, function(e) {
+						if (e.index == 0) {
+							mui.ajax("{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('daka')}",{
+								data:{},
+								dataType:'json',//服务器返回json格式数据
+								type:'get',//HTTP请求类型
+								timeout:10000,//超时时间设置为10秒；
+								headers:{'Content-Type':'application/json'},            
+								success:function(data){
+									if(data.iserror == 1){
+										mui.toast(data.msg);
+									}else{
+										mui.toast(data.msg);
+										setTimeout(function(){
+											history.go(0);
+										},1000);
+									}
+								},
+								error:function(xhr,type,errorThrown){
+									mui.toast("网络异常！");
+								}
+							});
+						}
+					})
+				});
+			</script>
+			{else}
+				<div class="t-c"><button type="button" class="mui-btn mui-btn-success btn">{$setting['hassbtext']}</button></div>
+			{/if}
+		{/if}
+		<div style="background:#fff;padding:1rem 0;text-indent:15px;color:#007AFF;font-weight:bold;">{$date} 打卡记录</div>
+		<ul class="mui-table-view">
+			{loop $checkworkList $row}
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;">
+					<img class="mui-media-object mui-pull-left thumb" {if $row['avtar'] == ''}src="{$_W['siteroot']}/addons/cy163_checkwork/static/defaultthumb.jpg"{else}src="{$row['avtar']}"{/if} />
+					<div class="mui-media-body">
+						{$row['realname']}<span style="margin-left:5px;">[{$row['department']} - {$row['position']}]</span>
+						<p class='mui-ellipsis'>
+							{if $row['type'] == 1}{if $row['issuccess'] == 0}<span class="mui-badge mui-badge-danger">{$row['ttime']}上班打卡迟到</span>{else}<span class="mui-badge mui-badge-success">{$row['ttime']}上班打卡成功</span>{/if}{else}{if $row['issuccess'] == 0}<span class="mui-badge mui-badge-danger">{$row['ttime']}提前下班打卡</span>{else}<span class="mui-badge mui-badge-success">{$row['ttime']}下班打卡成功</span>{/if}{/if}</span>
+						</p>
+					</div>
+				</a>
+			</li>
+			{/loop}
+		</ul>
+	</div>
+	{if empty($staff)}
+	<div id="companynames" class="mui-popover mui-popover-action mui-popover-bottom">
+		<ul class="mui-table-view">
+			{loop $companys $row}
+			<li class="mui-table-view-cell">
+				<a href="#">{$row}</a>
+			</li>
+			{/loop}
+		</ul>
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell">
+				<a href="#companynames"><b>取消</b></a>
+			</li>
+		</ul>
+	</div>
+	{/if}
+</body>
+</html>

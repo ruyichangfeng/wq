@@ -1,0 +1,98 @@
+<div class="side" data-status="xs">
+    <!--afterMood-->
+
+    <!--全网：相关新闻下的搜索-->
+    <div class="search-bar" style="display: none">
+        <form action="" method="get" class="search-form">
+            <input type="hidden" value="wm808378" name="from">
+            <input type="hidden" value="jokecontent" name="channel">
+            <input type="text" name="q" class="search-txt" value="">
+            <i class="search-icon"></i>
+            <input type="submit" class="search-btn" value="">
+            <div id="selectWrap" class="selectWrap">
+                <select name="jmty"> <option value="1">网页</option> </select>
+            </div>
+        </form>
+    </div>
+    <!-- 全网：资讯热点-->
+    <div class="mod mOrder">
+        <section class="od od_xs_2 od_sm_1 od_md_1 hotSpotC">
+            <header class="titlebar tb-o not-bd-b">
+                <h2 class="titlebar-t"><i></i>频道热点</h2>
+                <!--<a href="/NewsList/index/pn/0?chn=shared" class="titlebar-r commentMore more">更多资讯<i></i></a>-->
+            </header>
+            <div class="switch sw-news">
+                <ul class="sw-nav sw-nav5 clearfix">
+                    <?php foreach($list as $key => $value){
+                    if($key>4) {break;}
+                    ?>
+                    <li class="slider-category" data-id="{$key}">
+                        <a <?php if($key==0){ ?> class="cur"<?php } ?> href="javascript:void(0);"><?php echo $value['category']['name'];?></a>
+                    </li>
+                    <?php } ?>
+                </ul>
+                <div class="sw-cont">
+                    <?php foreach($list as $key => $value){ ?>
+                    <div class="slider-list-{$key} sw-area <?php if($key==0){ ?>hover<?php } ?>">
+                        <ul class="list list-order">
+                            <?php foreach($value['article'] as $k => $v){ ?>
+                            <li class="li{$k}">
+                                <i></i>
+                                <a href="<?php echo $v['jump'] ? $v['url'] : $this->createMobileUrl('detail',['category_id' => $value['category']['id'],'id' => $v['id']]);?>">{$v['title']}</a>
+                            </li>
+                            <?php } ?>
+                        </ul>
+                    </div>
+                    <?php } ?>
+
+                </div>
+            </div>
+        </section>
+    </div>
+    <!--bottom-->
+
+    <nav class="nav">
+        <p class="clearfix nav4">
+            <a class="first" href="<?php echo $this->createMobileUrl('index');?>">首页</a>
+            <?php foreach($cate as $value){ ?>
+        <a onclick="window.location.href='<?php echo $value['jump'] ? $value['url'] : $this->createMobileUrl('index',['category_id' => $value['id']]);?>'"><?php echo $value['name'];?></a>
+        <?php } ?>
+        </p>
+    </nav>
+</div>
+<script src="{STATIC_ROOT}/js/zepto.js"></script>
+<!--<script src="{STATIC_ROOT}/js/jquery-1.11.1.min.js"></script>-->
+<script>
+    $(".slider-category").click(function () {
+        var id = $(this).attr('data-id');
+        $(".slider-category").removeClass('first').find('a').removeClass('cur');
+        $(this).addClass('first').find('a').addClass('cur');
+        $('.sw-area').removeClass('hover');
+        $('.slider-list-'+id).addClass('hover');
+    });
+
+
+
+    var comment_url="{php echo $this->createMobileUrl('detail',['category_id' => $category['id'],'_wg' => 'comment']);}";
+    var category_id={php echo $category['id'];};
+    var article_id={php echo $article['id'];};
+    $("#submit-comment").click(function () {
+        if($.trim($('#content').val()) == '') {
+            alert('评论不能为空');
+            return false;
+        }
+        $.getJSON(comment_url,
+            {
+                content:$('#content').val(),
+                article_id:article_id
+            },
+            function(data) {
+                if(data.code==0) {
+                    alert('评论成功');
+                } else {
+                    alert('评论失败');
+                }
+            },'JSON');
+    });
+
+</script>

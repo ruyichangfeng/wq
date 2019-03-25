@@ -1,0 +1,107 @@
+<div class="rule-list-item">
+    <a href="javascript:;" class="remove-rule">×</a>
+    <div class="layui-inline">
+        消费
+        <input required="" class="layui-input width100" name="rule[{$key}][credit2]" size="5" type="text" value="{$item['credit2']}" lay-verify="required|number"> 元
+    </div> &nbsp;
+    <div class="layui-inline">
+        赠送金额
+        <input class="layui-input width100" name="rule[{$key}][credit3]" size="5" type="text" value="{$item['credit3']}" lay-verify="number"> 元 + 赠送积分
+        <input class="layui-input width100" name="rule[{$key}][credit1]" size="5" type="text" value="{$item['credit1']}" lay-verify="number"> 个
+    </div>
+    <div style="overflow:hidden;display: none;">
+        <div style="float:left;">
+            <span style="margin-top:10px; float:left;">充值金额无效：</span>
+            <input name="rule[{$key}][iscredit]" lay-skin="primary" title="是" type="checkbox" value="1" {if $item[ 'iscredit']==1}checked{/if}>
+        </div>
+        <div class="layui-form-mid layui-word-aux">该选项只针对次卡，勾选后是 买卡 而非 赠卡 </div>
+    </div>
+    <div class="layui-inline">
+        <div class="layui-input-inline" style="width: 100%;margin-top: 15px;">
+            <label class="layui-form-label" style="width: 110px;">有效时间</label>
+            <div class="layui-input-inline" style="width: 175px">
+                <input class="layui-input timeDateInput" placeholder="无限制" id="starttime{$key}" name="rule[{$key}][addtime]" value="{if $item['addtime']}{$item['addtime']}{/if}" lay-key="{php $dateKey++; echo $dateKey;}">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline" style="width: 175px">
+                <input class="layui-input timeDateInput" placeholder="无限制" id="endtime<?php $key2 = $key+1; echo $key2;?>" name="rule[{$key}][expiretime]" value="{if $item['expiretime']}{$item['expiretime']}{/if}" lay-key="{php $dateKey++; echo $dateKey;}">
+            </div>
+        </div>
+        <div class="layui-input-inline" style="width: 100%;">
+            <label class="layui-form-label" style="width: 110px;margin-top: 15px;">可使用的优惠券</label>
+            <div style="width:373px; float:right; margin:20px 45px 0 0;">
+                <div class="coupon-list">
+                    {if !empty($item['couponlist'])} {loop $item['couponlist'] $vol} {php echo $this->doWebcouponlists($storeid,$vol['couponid'],$vol['litkey'],$vol['couponnum']);} {/loop} {/if}
+                    <a class="layui-btn layui-btn-primary layui-btn-sm btn-add-coupon" layui-data="{$key}">+ 增加优惠券</a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-inline" style="width: 100%;">
+            <label class="layui-form-label" style="width: 110px;margin-top: 15px;">可使用的次卡</label>
+            <div style="width:373px; float:right; margin:20px 45px 0 0;">
+                <div class="oncecard-list">
+                    {if !empty($item['oncecardlist'])} {loop $item['oncecardlist'] $vol} {php echo $this->doWeboncecardlists($storeid,$vol['oncecardid'],$vol['litkey'],$vol['oncecardnum']);} {/loop} {/if}
+                    <a class="layui-btn layui-btn-primary layui-btn-sm btn-add-oncecard" layui-data="{$key}">+ 增加次卡</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+layui.use(['form', 'layer', 'element', 'laydate'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element,
+        laydate = layui.laydate;
+
+    var idStartTime = "#starttime{$key}";
+    var idEndTime = "#endtime{$key2}";
+
+    laydate.render({
+        elem: idStartTime,
+        done: function(value, date, endDate) {
+            var starttime = value;
+            var endtime = $(idEndTime).val();
+
+            var arys = new Array();
+            var startdate = new Date(arys[0], parseInt(arys[1] - 1), arys[2]);
+            if (starttime != null && endtime != null) {
+                arys = starttime.split('-');
+                var startdate = new Date(arys[0], parseInt(arys[1] - 1), arys[2]);
+                arys = endtime.split('-');
+                var endtime = new Date(arys[0], parseInt(arys[1] - 1), arys[2] - 1);
+                if (startdate > endtime) {
+                    layer.msg("结束日期最少比开始日期大一天");
+                    $(idStartTime).val('');
+                    return;
+                }
+            }
+        }
+    });
+
+    laydate.render({
+        elem: idEndTime,
+        done: function(value, date, endDate) {
+            var starttime = $(idStartTime).val();
+            var endtime = value;
+
+            var arys = new Array();
+            var startdate = new Date(arys[0], parseInt(arys[1] - 1), arys[2]);
+            if (starttime != null && endtime != null) {
+                arys = starttime.split('-');
+                var startdate = new Date(arys[0], parseInt(arys[1] - 1), arys[2]);
+                arys = endtime.split('-');
+                var endtime = new Date(arys[0], parseInt(arys[1] - 1), arys[2] - 1);
+                if (startdate > endtime) {
+                    layer.msg("结束日期最少比开始日期大一天");
+                    $(idEndTime).val('');
+                    return;
+                }
+            }
+        }
+    });
+
+    $(idStartTime + ',' + idEndTime).attr("readOnly", "true");
+});
+</script>

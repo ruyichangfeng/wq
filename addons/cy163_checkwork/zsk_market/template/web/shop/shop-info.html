@@ -1,0 +1,141 @@
+ 
+{template 'public/header'}
+
+<form action="<?php echo $this->routeUrl('shop.saveInfo');?>&sid={$shop['id']}" id="baseForm"  method="post">  
+    	<div class="panel panel-info">
+			<div class="panel-heading" >基础信息</div>
+			<div class="panel-body"> 
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >商户名称</div>
+				    <div class="alignL col-xs-8 col-md-8 "><input type="text" id="name"  value="<?php echo ($shop['name']);?>" style="width: 300px;"  valid-msg=商户名称10字以内  class="form-control"  placeholder="10字以内"  <?php if($_W['role']=='operator'){echo "disabled";}else{ echo 'name="shopinfo_name"';} ?>   > <span class="notice" >请输入10个字以内</span>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >商户logo</div>
+				    <div class="alignL col-xs-4 col-md-4 ">
+				    	{php echo tpl_form_field_images('logo',$shop['logo']);}
+				    </div>
+				     <div class="alignL col-xs-3 col-md-3 ">
+				    	 <span class="notice">建议200*200</span>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >商家类型</div>
+				    <div class="alignL col-xs-8 col-md-8 ">
+				    	<select style="width: 300px;" class="form-control" name="shoptype">
+							<option value="" >请选择</option>
+							<?php foreach ($catesList as $key => $val) { ?>
+				    		<option value="<?php echo $val['id']; ?>" <?php if($val['id'] == $shop['shoptype']){ echo 'selected = "selected"'; } ?> ><?php echo $val['name']; ?></option>
+							<?php } ?>
+				    	</select>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >商户资质</div>
+				    <div class="alignL col-xs-4 col-md-4 ">
+				    	{php echo tpl_form_field_images('qualification',$qualification,2);}
+				    </div>
+				     <div class="alignL col-xs-3 col-md-3 ">
+				    	 <span class="notice">建议200*300</span>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >地址</div>
+				    <div class="alignL col-xs-8 col-md-8 "><input type="text" name="address" valid="length|1|10" value="<?php echo ($shop['address']);?>"  style="width: 300px;"   class="form-control"  placeholder="30字以内" > <span class="notice">必填</span>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >地图导航坐标</div>
+				    <div class="alignL col-xs-8 col-md-8 "><input type="text" name="latlng" value="<?php if(!empty($shop['latitude'])&&!empty($shop['longitude'])){ echo ($shop['latitude']).','.$shop['longitude'];}?>"  style="width: 300px;"   class="form-control"  placeholder="如：30.657369,104.065804" > <span class="notice"><a href="http://lbs.qq.com/tool/getpoint/" style="padding:0px 10px;" target="__block">腾讯地图坐标拾取器</a>将拾取结果填这里</span>
+				    </div>
+				</div>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >客服电话</div>
+				    <div class="alignL col-xs-8 col-md-8 "><input type="text" name="phone" value="<?php echo  ($shop['phone']);?>" class="form-control" style="width: 300px;" min="0" placeholder="小程序拨号" >
+						 
+				    </div>
+				</div> 
+				<?php if($shop['certificate']){?>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >店铺标签</div>
+				    <div class="alignL col-xs-8 col-md-8 ">
+			    	<div style="clear: right;margin-bottom:5px;" id="shoplistpic"></div>
+			    	    <?php foreach($shoplist as $v){?>
+							<div>
+								<img style="width: 30px;height:30px;margin-right:5px;float: left;" onclick="getdelete(this)" src="{$_W['attachurl']}{$v}">
+								<input type="hidden" name="certificate[]" value="{$v}">
+							</div>
+						<?php} ?>
+						<button type="button" class="layui-btn" id="test1">
+							<i class="layui-icon">&#xe67c;</i>上传标签
+						</button>
+			    </div>
+			  </div>
+
+			  <?php } ?>
+				<div class="row form-row" >
+				    <div class="alignR col-xs-4 col-md-4 rowLabel" >店铺二维码</div>
+				    <div class="alignL col-xs-8 col-md-8 ">
+				    	<p style="color:#ff4444;">
+						<?php if(strlen($token)<50){ ?>
+							获取小程序码失败,{$tk['errmsg']}
+						<?php }else if(strlen($qrcode['base64'])<50){?>
+							获取小程序码失败,{$qrcode['errmsg']}
+						<?php } ?>
+						</p>
+				    	<img src="{$qrcode['base64']}" style="width:180px;height: 180px;">;
+				    </div>
+				</div>
+				
+			</div>
+		</div>  
+ <div class="row form-row" >
+    <div class="col-xs-12 col-md-12 " style="text-align: center;" >
+    	<input type="button"  class ="mybtn"  class="btn btn-default"  form="baseForm"  style="margin:0 auto;" onclick="subBase()" value="保&nbsp;存"/>
+    </div> 
+</div>
+	{template 'public/footer'}
+
+<script type="text/javascript">
+	// layui.use('upload,form', function(){
+	layui.use('upload', function(){
+		// var form = layui.form;
+		var upload = layui.upload;
+
+		//执行实例
+		var uploadInst = upload.render({
+			elem: '#test1' //绑定元素
+			,url: "<?php echo $this->routeUrl('upload.uploadwb1');?>" //上传接口
+			,done: function(res){
+				//上传完毕回调
+				var data = '<div><img style="width: 30px;height:30px;margin-right:5px;float: left;" onclick="getdelete(this)" src="'+res.data.src+'"> <input type="hidden" name="certificate[]" value="'+res.data.imageval+'"></div>';
+				$("#shoplistpic").append(data);
+				// data.push(res.data.imageval)
+			}
+			,error: function(res){
+				//请求异常回调
+				console.log(res)
+
+			}
+		});
+		// form.render();
+	});
+ 	function subBase(){
+		var name = $('#name').val().length;
+
+		if(name > 10){
+			modalMsg('店铺名称小于10个汉字');
+			return false;
+		}
+		modalDlg("是否继续？",function(){
+			$("#baseForm").submit();
+			setTimeout(function(){
+				window.location.reload();
+			}, 2000);
+
+		});
+
+	}
+
+
+</script>

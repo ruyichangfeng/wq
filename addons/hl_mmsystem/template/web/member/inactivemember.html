@@ -1,0 +1,194 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content">
+                <ul class="nav nav-tabs">
+                    <li>
+                        <a style="color: #1ab394" href="{php echo $this->createWebUrl('member', array('op' => 'list', 'storeid' => $storeid))}"><i class="fa fa-lg  fa-users" style="color: #ed8902"></i>会员列表</a>
+                    </li>
+                    <li >
+                        <a href="{php echo $this->createWebUrl('member', array('op' => 'memberrecyclelist', 'storeid' => $storeid))}"><i class="fa fa-lg fa-recycle" style="color: #e10c14"></i>会员回收站</a>
+                    </li>
+                    <li class="active">
+                        <a href="{php echo $this->createWebUrl('member', array('op' => 'inactivemember', 'storeid' => $storeid))}"><i class="fa fa-street-view" style="color: #e10c14"></i>未激活会员</a>
+                    </li>
+                </ul>
+                    <div class="panel-body" style="margin-top: 10px;margin-bottom:0px;padding-top: 5px;padding-bottom: 5px;">
+                    </div>
+                <div class="panel panel-default">
+                    <form class="form-horizontal form" method="post" >
+                        <input type="hidden" name="storeid" value="{$storeid}" />
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="2%">
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" id="checkids"
+                                               onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                        <label for="checkids"></label>
+                                    </div>
+                                </th>
+                                <th>姓名</th>
+                                <th>性别</th>
+                                <th>地址</th>
+                                <th>级别</th>
+                                <th>会员来源</th>
+                                <th>注册时间</th>
+                                <th>店铺</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}"
+                                               value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                <td>{$item['mem_memberName']}</td>
+                                <td>{if $item['mem_memberSex'] == 0}
+                                    <span class="badge badge-primary">未知</span>
+                                    {elseif $item['mem_memberSex'] == 1} <span class="badge badge-primary">男</span>
+                                    {elseif $item['mem_memberSex'] == 2} <span class="badge badge-danger">女</span>
+                                    {/if}
+                                </td>
+                                <td>{$item['mem_memberDetailAddress']}</td>
+                                <td>{if util::getMemberCardLevelOne($item['membercardlevel_id']) == 0 || util::getMemberCardLevelOne($item['membercardlevel_id']) == ''}<span class="label">普通(微信)会员</span>{else}<span class="label label-info">{php echo util::getMemberCardLevelOne($item['membercardlevel_id'])}</span>{/if}</td>
+                                <td>{if $item['openid'] != null && $item['xcxopenid'] == null}<span class="label label-success">公众号注册</span>{else if $item['xcxopenid'] != null && $item['openid'] == null}<span class="label label-info">小程序</span>{else}<span class="label label-warning">未知来源</span>{/if}</td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[mem_memberAddtime]);}</td>
+                                <td>{$setStoreData['set_storeName']}</td>
+                                <td>&nbsp;
+                                    <button type="button"  onclick="btn_showReadCard({$item['id']})" class="btn btn-primary btn-sm"><i class="fa fa-spin fa-spinner"></i>&nbsp;激活</button>
+                                    <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('member',array('op' => 'deletemember','id' => $item['id']))}">删除</a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <input name="token" type="hidden" value="{$_W['token']}" />
+                                <button class="btn btn-warning " id="recycledeleteall" type="button" name="recycledeleteall" ><i class="fa fa-trash"></i> 批量删除</button>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function btn_showReadCard(number) {
+        var number = number;
+        swal({
+                title: "激活操作",
+                text: "请输入手机号：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                confirmButtonColor: "#DD6B55",
+                animation: "slide-from-top",
+                inputPlaceholder: "输入手机号"
+            },
+            function(inputCardValue){
+                if (inputCardValue === false) return false;
+                if(!(/^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/.test(inputCardValue))){
+                    swal.showInputError("手机号格式错误！");
+                    return false
+                }
+                if (inputCardValue === "") {
+                    swal.showInputError("手机号不能为空！");
+                    return false
+                }
+                var memberCardNum = inputCardValue;
+
+                var url = "{php echo $this->createWebUrl('member', array('op' => 'ajaxinactivemember','storeid' => $storeid))}";
+                var params = {
+                    'memberCardNum': memberCardNum,
+                    'number': number,
+                };
+                $.ajax({
+                    url: url,
+                    type: "post",
+                    data: params,
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert(data['message']['code']);
+                        if (data['message']['code'] == 1) {
+                            swal({
+                                title: "激活失败",
+                                text: "卡号错误或不存在卡号，请重新读卡！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        } else if(data['message']['code'] == 2){
+                            swal({
+                                title: "激活失败",
+                                text: "已经存在改手机号，请更换手机号继续激活！",
+                                confirmButtonText: "确定",
+                                type: "error",
+                            });
+                            return;
+                        } else if(data['message']['code'] == 0){
+                            swal({
+                                title: "激活成功",
+                                confirmButtonText: "确定",
+                                type: "success",
+                            },function(){
+                                location.reload();
+                            });
+
+                        }
+                    }
+
+                });
+            });
+
+    }
+    $("button[name=recycledeleteall]").click(function(){
+        var check = $("input[type=checkbox][class!=check_all]:checked");
+        if(check.length < 1){
+            swal("操作有误", "请选择要删除的会员！","error");
+            return false;
+        }
+        if(confirm("确认要删除选择的会员?")){
+            var id = new Array();
+            check.each(function(i){
+                id[i] = $(this).val();
+            });
+            var url = "{php echo $this->createWebUrl('member', array('op' => 'deletebakinactivatedmember'))}";
+            $.post(
+                url,
+                {idArr:id},
+                function(data){
+                    swal({
+                        title: "操作成功！",
+                        text: data.error,
+                        timer: 2000,
+                        type:"success",
+                        showConfirmButton: false
+                    },function(){
+                        location.reload();
+                    });
+                },'json'
+            );
+        }
+    });
+</script>
+{template 'web/common/footer'}

@@ -1,0 +1,142 @@
+{template 'common/header'}
+<SCRIPT src="{STATIC_ROOT}/js/jquery.lazyload.min.js" type=text/javascript></SCRIPT>
+<meta name="referrer" content="never">
+<style>
+    .l_tableWrap .l_table_tit .l_formBar {
+        border: 0;
+        float: left;
+        font-size: 0;
+    }
+    .y_sele {
+        display: inline-block;
+        padding: 5px 0 12px 12px;
+    }
+    .y_sele_tit {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+    }
+    .l_table_search{
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+<div class="clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            打赏列表
+        </div>
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <style>
+                .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+                    white-space: normal;
+                }
+            </style>
+            <table class="table table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>用户ID</th>
+                    <th>用户</th>
+                    <th>文章分类</th>
+                    <th>文章ID</th>
+                    <th>金额</th>
+                    <th>微信订单ID</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>支付成功时间</th>
+                </tr>
+                {loop $list $row}
+                <tr>
+
+                    <td>
+                        <p class="form-control-static">
+                            {$row['id']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['user']['id']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['user']['nickname']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php echo $cate[$row['category_id']]['name'];?>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <a target="_blank" href="<?php echo $this->webmobileUrl('detail',['category_id' => $row['category_id'],'id'=>$row['article_id']]);?>">{$row['article_id']}</a>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php echo $row['pay_money']/100;?>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['trade_no']}
+
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php if($row['status']==1){
+                                echo '支付中';
+                            }elseif($row['status']==2) {
+                                echo '支付完成';
+                            }elseif($row['status']==3){
+                                echo '支付取消';
+                            }?>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="form-control-static">
+                            {php echo date('Y-m-d H:i:s',$row['create_time']);}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php if($row['update_time'] > 0){ ?>
+                            {php echo date('Y-m-d H:i:s',$row['update_time']);}
+                            <?php } ?>
+                        </p>
+                    </td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+        <div class="panel-body text-right">
+            {$show}
+        </div>
+    </div>
+</div>
+<script>
+    var url = "{php echo $this->createWebUrl('comment',['']);}";
+    var category_id = "{$category_id}";
+    var url_del = "{php echo $this->createWebUrl('comment',['_wg' => 'del']);}";
+    $(function () {
+        $('#category').change(function () {
+            location = url+'&category_id='+$(this).val();
+        });
+
+        $('.del-article').click(function () {
+            if(!confirm('确认删除此评论？')) {
+                return false;
+            }
+            var id = $(this).attr('data-id');
+            $.post(url_del,{id:id,category_id:category_id},function (data) {
+                if(data.code != 0) {
+                    alert(data.msg);
+                }
+                location.reload();
+            },'JSON');
+        });
+    })
+    </script>
+{template 'common/footer'}

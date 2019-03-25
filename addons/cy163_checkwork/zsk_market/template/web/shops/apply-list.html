@@ -1,0 +1,152 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >店铺管理</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('shops.applylist');?>" method="post" id="keyform">
+			  <div class="col-xs-7 col-sm-7 paddingx" style="width:400px;">
+			    <div class="input-group">
+			      <select class="form-control" name="status" style="width:25%;">
+			      	<option value="">全部</option>
+			      	<option value="0" <?php if($param['status'] == 0){echo 'selected = "selected"'; } ?>>未审核</option>
+			      	<option value="1" <?php if($param['status'] == 1){echo 'selected = "selected"'; } ?>>已通过</option>
+			      	<option value="-1" <?php if($param['status'] == -1){echo 'selected = "selected"'; } ?>>已驳回</option>
+			      </select>
+			      <input type="text" style="width:75%;" value="{$param['shopname']}" name="shopname" class="form-control" placeholder="请输入店铺名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			        
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 250px;">店铺名称</th>   
+					<th style="width: 100px;">电话</th> 
+					<th style="width: 100px;">真实姓名</th> 
+					<th style="width: 200px;">地址</th>    
+					<th style="width: 100px;">状态</th> 
+					<th style="width: 150px;">申请时间</th> 
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $applys $index $item}
+				<tr> 
+					 
+					<td>{$item['shopname']}</td> 
+					<td>{$item['mobile']}</td> 
+					<td>{$item['truename']} </td>  
+					<td>{$item['address']} </td>  
+					<td>
+					<?php if($item['status']=='1'){ ?>
+						<span class="label-blue">已通过</span>
+					<?php }else if($item['status']=='0') {?> 
+						<span class="label-green">待审核</span>
+					<?php }else if($item['status']=='-1'){ ?>
+						<span class="label-red">已驳回</span>
+					<?php }?>
+					</td> 
+					<td><?php echo date("Y-m-d H:i:s",$item['date']);?></td> 
+					<td>  
+						<a href="javascript:void(0);" class="linkbtn" onclick="editShop({$item['id']},'{$item['shopname']}')">详细</a>
+						 <a href="javascript:void(0);" class="linkbtn linkbtn-red" onclick="delShop({$item['id']},'{$item['shopname']}')">删除</a>
+						
+					</td>
+				</tr>
+				 
+				{/loop}
+				 <tr>
+					<td colspan="7">
+					{template 'public/pagenation'}	
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<div id="accountab" style="display: none;">
+	<table class="sortab">
+		<tr >
+			<td style="width: 30%;">
+				商家
+			</td>
+			<td id="sortname" style="width: 70%">
+				
+
+			</td>
+		</tr>
+		<tr>
+			<td >
+				账号
+			</td>
+			<td > 
+				<input type="text" name="username" value="0" class="form-control"> 
+			</td>
+		</tr>
+		<tr>
+			<td >
+				密码
+			</td>
+			<td > 
+				<input type="password"  name="password" value="0" class="form-control"> 
+			</td>
+		</tr>
+		<tr>
+			<td >
+				重复密码
+			</td>
+			<td > 
+				<input type="password"  name="repassword" value="0" class="form-control">  
+			</td>
+		</tr>
+		<tr>
+			<td >
+				账号备注
+			</td>
+			<td > 
+				<input type="text"  name="remark" value="0" class="form-control">
+			</td>
+		</tr>
+	</table>
+
+</div>	 
+<script type="text/javascript">
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function addCate(id,name){ 
+	 window.location.href="<?php echo $this->routeUrl('cate.addview');?>&pid="+id+"&name="+name;
+	}
+	function editShop(id,name){ 
+		 window.location.href="<?php echo $this->routeUrl('shops.applyview');?>&aid="+id+"&name="+name;
+	}
+	function delShop(id,text){
+	modalDlg("是否删除"+text+" 的入驻申请?",function(){
+		window.location.href="<?php echo $this->routeUrl('shops.delApply');?>&aid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

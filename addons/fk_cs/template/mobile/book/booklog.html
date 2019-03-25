@@ -1,0 +1,124 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+        .weui-navbar__item span{
+            display: block;
+        }
+        .tt a{display: inline-block;height:20px;padding: 0 0 0 15px;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<style>
+    .operation a{display: inline-block;font-size: 14px;padding: 0 1% 0 2%;}
+</style>
+<body>
+<div class="page">
+<div class="weui-panel">
+    <div class="page__bd">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">读书轨迹</div>
+            <div class="weui-panel__bd">
+                {loop $books $item}
+                <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd">
+                        <img class="weui-media-box__thumb" src="{$item['images_medium']}" alt="">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{$item['title']}</h4>
+                        <ul class="weui-media-box__info" style="margin-top: 0px;">
+                            <li class="weui-media-box__info__meta">{$item['author']}</li>
+                            <li class="weui-media-box__info__meta">￥{$item['price']}</li>
+                        </ul>
+                        <p style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;width:200px;">{$item['summary']}</p>
+                    </div>
+                </a>
+                <div class="tt">
+                    <div id="{$item['id']}jianjie" style="display: none;">
+                        {$item['summary']}
+                    </div>
+                    <a class="weui-form-preview__btn weui-form-preview__btn_default" data-jAlert data-title="简介" data-content="#{$item['id']}jianjie" href="#">图书简介</a>
+                    <!--<a class="weui-form-preview__btn weui-form-preview__btn_default" href="{$jian_url}">个人简记</a>-->
+                    <a class="weui-form-preview__btn weui-form-preview__btn_default" href="{php echo $this->createMobileUrl('commentlist',array('schoolid'=>$schoolid,'bookid' => $item['id']))}">查看点评</a>
+                    <a class="weui-form-preview__btn weui-form-preview__btn_default" href="{php echo $this->createMobileUrl('mybook',array('schoolid'=>$schoolid,'bookid' => $item['id'],'owneropenid' => $item['openid'],'op' => 'show_img'))}">查看图片</a>
+                    <!--<a id="{$item['id']}" class="weui-form-preview__btn weui-form-preview__btn_default" onclick="commentBook({$item['id']})">点评</a>-->
+                </div>
+                <div style="display: none;" id="comment_{$item['id']}">
+                    <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell">
+                            <div class="weui-cell__bd">
+                                <textarea class="weui-textarea" placeholder="请输入文本" rows="3" id="remark_{$item['id']}"></textarea>
+                                <!--<div class="weui-textarea-counter"></div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weui-btn-area">
+                        <a class="weui-btn weui-btn_primary" id="showTooltips" onclick="commitComment({$item['id']})">确定</a>
+                    </div>
+                </div>
+                {/loop}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+</script>
+{php include $this->template('footer');}
+<script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script>
+<script type="application/javascript">
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height());
+        $.jAlert('attach');
+    });
+    function commentBook(bookid){
+        if($("#comment_"+bookid).css('display') == 'none'){
+            $("#comment_"+bookid).show();
+        }else{
+            $("#comment_"+bookid).hide();
+        }
+    }
+    function commitComment(bookid){
+        var remark = document.getElementById("remark_"+bookid).value;
+        var submitData = {
+            schoolid : "{$schoolid}",
+            bookid : bookid,
+            remark : remark,
+        };
+            $.post("{php echo $this->createMobileUrl('booklog',array('op'=>'comment'))}", submitData, function (data) {
+
+                if (data.result) {
+                    PB.prompt('添加成功!');
+//                    window.location.href = "{php echo $this->createMobileUrl('booklog', array('schoolid' => $schoolid), true)}";
+                    $("#comment_"+bookid).hide();
+                } else {
+                    PB.prompt(data.msg);
+                }
+            }, 'json');
+    }
+</script>
+</body>
+</html>

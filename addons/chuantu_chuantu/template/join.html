@@ -1,0 +1,105 @@
+{template 'common/header'}
+<div class="main">
+	<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+			<input type="hidden" name="c" value="site" />
+			<input type="hidden" name="a" value="entry" />
+			<input type="hidden" name="m" value="chuantu" />
+			<input type="hidden" name="do" value="join" />
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">尾号数字</label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<select name="last" class='form-control'>
+						<option value="" {if $_GPC['last'] == ''} selected{/if}>不限</option>
+						<option value="-1" {if $_GPC['last'] == '-1'} selected{/if}>0</option>
+						<option value="1" {if $_GPC['last'] == '1'} selected{/if}>1</option>
+						<option value="2" {if $_GPC['last'] == '2'} selected{/if}>2</option>
+						<option value="3" {if $_GPC['last'] == '3'} selected{/if}>3</option>
+						<option value="4" {if $_GPC['last'] == '4'} selected{/if}>4</option>
+						<option value="5" {if $_GPC['last'] == '5'} selected{/if}>5</option>
+						<option value="6" {if $_GPC['last'] == '6'} selected{/if}>6</option>
+						<option value="7" {if $_GPC['last'] == '7'} selected{/if}>7</option>
+						<option value="8" {if $_GPC['last'] == '8'} selected{/if}>8</option>
+						<option value="9" {if $_GPC['last'] == '9'} selected{/if}>9</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12 col-sm-2 col-lg-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+				</div>
+			</div>
+			<div class="form-group">
+			</div>
+		</form>
+	</div>
+</div>
+<div class="clearfix">
+	<h1>参与人总数：{$total} </h1>
+	<form action="{php echo url('wechat/location/list');}" method="post" id="form2">
+		<input type="hidden" name="acid" value="{$acid}">
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive">
+				<table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+					<thead class="navbar-inner">
+					<tr>
+						<th width="80">id</th>
+						<th width="100">昵称</th>
+						<th width="120">头像</th>
+						<th width="120">上传的图</th>
+						<th width="60">编号</th>
+						<th width="120">上传时间</th>
+						<th width="120">兑奖代码</th>
+						<th width="120">最后操作时间</th>
+						<th width="120">操作</th>
+					</tr>
+					</thead>
+					<tbody>
+						{loop $list $li}
+							<tr>
+								<td>{$li['id']}</td>
+								<td>{php echo json_decode($li['json_nickname']);}</td>
+								<td><img src="{$li['headimgurl']}" width="100" /></td>
+								<td><img width="100" src="{$_W['attachurl']}{$li['picurl']}" /></td>
+								<td>{$li['bianhao']}</td>
+								<td>{php echo date('Y-m-d H:i:s',$li['createtime']);}</td>
+								<td>{$li['code']}</td>
+								<td>{php echo date('Y-m-d H:i:s',$li['lasttime']);}</td>
+								<td style="text-align:right;">
+									{if $li['state']!=1}
+									{if $li['state']!=-1}
+									<a href="javascript:;" onclick="ok({$li['id']},1)" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="有效">有效</a>&nbsp;&nbsp;
+									<a href="javascript:;"  onclick="ok({$li['id']},-1)" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="无效">无效</a>{/if}
+									{/if}
+								</td>
+							</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		{$pager}
+	</form>
+</div>
+<script type="text/javascript">
+function ok(id,val){
+    $.ajax({
+      url: "{php echo $this->createWeburl('ok')}", 
+      type:"post",
+      dataType: "json", 
+      data:{id:id,val:val},
+      success: function(data){
+          if(data.success==1){
+ 			alert(data.msg);
+          }else if(data.success!=1){
+            alert(data.msg);
+          }
+      }
+    });
+
+}
+
+</script>
+{template 'common/footer'}

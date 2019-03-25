@@ -1,0 +1,270 @@
+{template 'web/common/header-base-index'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>短信群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('smsmarketing')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'list'))}"><i class="fa fa-lg fa-telegram" style="color: #ed8902"></i>短信群发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsbirthdaycare'))}"><i class="fa fa-lg fa-calendar-check-o" style="color: #e10c14"></i>生日关怀</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smstemplate'))}"><i class="fa fa-lg fa-ticket" style="color:#0abc89"></i>短信模板</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smssendrecord'))}"><i class="fa fa-lg fa-industry" style="color:dodgerblue"></i>短信记录</a></li>
+                                    <!--<li class=""><a href="{php echo $this->createWebUrl('smssign')}"><i class="fa fa-lg fa-magic" style="color:deeppink; display: none;"></i>短信签名</a></li>-->
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smsinterface'))}"><i class="fa fa-lg fa-bandcamp" style="color:green"></i>短信接口</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('smsmarketing', array('op' => 'smspackage'))}"><i class="fa fa-lg fa-tasks" style="color:purple"></i>短信套餐</a></li>
+
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="panel-body">
+                                        <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">短信模板</label>
+                                                <div class="col-xs-5">
+                                                    <input style="border:none;" readonly type="text" name="name1" class="form-control" value="节日祝福" id='name1' required aria-required="true"/>
+                                                    <!--<select  class="form-control" name="pcname" id="stname">-->
+                                                        <!--<option value="" selected = "selected" >请选择</option>-->
+                                                        <!--{loop $templatetype $itempcname}-->
+                                                        <!--<option value="{$itempcname['st_templateCodeType']}" {if $itempcname['id'] == $itempcname['st_name']}selected = "selected"{/if} >{$itempcname['st_name']}</option>-->
+                                                        <!--{/loop}-->
+                                                    <!--</select>-->
+                                                </div>
+                                            </div>
+                                            <div class="form-group"   style="display:none;">
+                                                <label class="col-sm-1 control-label">选择短信签名</label>
+                                                <div class="col-xs-5">
+                                                    <select  class="form-control" name="pc_name" id="name">
+                                                        <option value="" selected = "selected" >请选择</option>
+                                                        {loop $signtype $itemsign}
+                                                        <option value="{$itemsign['id']}" {if $itempcname['id'] == $itemsign['ss_signName']}selected = "selected"{/if} >{$itemsign['ss_signName']}</option>
+                                                        {/loop}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">选择发送用户组</label>
+                                                <div class="col-xs-11">
+                                                    <div class="panel panel-default tab-content">
+                                                        <div class="panel-heading">
+                                                            <input type="hidden" name="hiddentype" id="hiddentype"/>
+                                                            <ul class="nav nav-pills">
+                                                                <li class="give_member active" style="background: none;border-left: 0;" onclick="showHideGiveMember(1)"><a data-toggle="tab" href="#tab-5"><i class="fa fa-laptop"></i>发放全部用户</a>
+                                                                </li>
+                                                                <li class="give_member" style="background: none;border-left: 0;" onclick="showHideGiveMember(2)"><a data-toggle="tab" href="#tab-1"><i class="fa fa-laptop"></i>发放给新用户</a>
+
+                                                                </li>
+                                                                <li class="give_member" onclick="showHideGiveMember(3)"><a data-toggle="tab" href="#tab-2"><i class="fa fa-desktop"></i>发放给老用户</a>
+
+                                                                </li>
+                                                                <li class="give_member" onclick="showHideGiveMember(4)"><a data-toggle="tab" href="#tab-3"><i class="fa fa-signal"></i>发放给活跃用户</a>
+
+                                                                </li>
+                                                                <li class="give_member" onclick="showHideGiveMember(5)"><a data-toggle="tab" href="#tab-4"><i class="fa fa-bar-chart-o"></i>发放沉寂跃用户</a>
+
+                                                                </li>
+                                                                <li class="give_member" onclick="showHideGiveMember(6)"><a data-toggle="tab" href="#tab-7"><i class="fa fa-signal"></i>发放给指定会员</a>
+
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <div class="tab-content">
+                                                                <div id="tab-1" class="tab-pane">
+                                                                    <span class="help-block help">&nbsp;&nbsp;&nbsp;新用户:  &nbsp;&nbsp;成为会员不超过{php echo $MemberNewIimitTime['newmember']}个月，并且只消费过一次或没消费的用户。<br/></span>
+                                                                    <span class="help-block help">用户人数 ： {php echo count($MemberPropertiesNewTime)}</span>
+                                                                </div>
+                                                                <div id="tab-5" class="tab-pane  active">
+                                                                    <span class="help-block help">&nbsp;&nbsp;&nbsp;全部用户:  &nbsp;&nbsp;没有被冻结的会员和已激活的会员！<br/></span>
+                                                                    <span class="help-block help">用户人数 ： {php echo $MemberTotal}</span>
+                                                                </div>
+                                                                <div id="tab-2" class="tab-pane">
+                                                                    <span class="help-block help">&nbsp;&nbsp;&nbsp;老用户:  &nbsp;&nbsp;成为会员{php echo $MemberNewIimitTime['oldmember']}个月以上的用户。<br/></span>
+                                                                    <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesOldTime);}</span>
+                                                                </div>
+                                                                <div id="tab-3" class="tab-pane">
+                                                                    <span class="help-block help">&nbsp;&nbsp;&nbsp;活跃用户: &nbsp;&nbsp;{php echo $MemberNewIimitTime['quietmember']}个月内消费超过2次的用户。<br/></span>
+                                                                    <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesQuietTime)}</span>
+                                                                </div>
+                                                                <div id="tab-4" class="tab-pane">
+                                                                    <span class="help-block help">&nbsp;&nbsp;&nbsp;沉寂用户: &nbsp;&nbsp;{php echo $MemberNewIimitTime['activitymember']}个月内没有消费的用户。<br/></span>
+                                                                    <span class="help-block help">用户人数 ：{php echo count($MemberPropertiesActivitTime);}</span>
+                                                                </div>
+                                                                <div id="tab-7" class="tab-pane" >
+                                                                    <button type="button" class="btn btn-default"  name="rechargeGoodsName_Id" data-toggle="modal" data-target="#selectmember">选择会员</button>
+                                                                    <span class="help-block help" id="membernumber"></span>
+                                                                    <input type="hidden" name="SpecifiedFans" id="SpecifiedFans"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                                                    <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                                </div>
+                                            </div>
+
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal fade" id="selectmember" tabindex="-1" role="dialog"  aria-hidden="true" >
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-header" style="min-height:40px;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title" style="float: left;">请选择会员</h4>
+        </div>
+        <div class="modal-content">
+            <div class="ibox-content">
+                <table id="selectmemberdata" data-mobile-responsive="true"></table>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal" id="btn_closeselectmember">关闭</button>
+                <button type="button" class="btn btn-primary" id="popupsubmit">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function(){
+        $("#hiddentype").attr("value",1);
+    });
+
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            $.post("{php echo $this->createWebUrl('updatekey')}",{hlsetkey:hlsetkey,status:status},function () {
+
+            })
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+
+
+    function showHideGiveMember(num) {
+
+
+        for (var i=1;i<=9;i++)
+        {
+            if(i == num){
+                $('.give_member').attr('class', 'give_member active');
+                $('.give_member').attr('style', 'background: none;border-left:0');
+                $('.tab-pane').attr('class', 'tab-pane active');
+                $("#hiddentype").attr("value",num);
+            }
+            else{
+                $('.give_member').attr('class', 'give_member');
+                $('.tab-pane').attr('class', 'tab-pane');
+            }
+
+        }
+    }
+
+
+
+    $('#selectmemberdata').bootstrapTable({
+        url: '{php echo $this->createWebUrl('couponmarket', array('op' => 'selectmemberdata'));}',
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded",
+        showPaginationSwitch:false,//是否显示数据条数选择框
+        queryParamsType:'',
+        cache:false,  //是否使用缓存
+        search:false, //显示搜索框
+        striped:true,//隔行变色
+        queryParams: queryParamspage,//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber:1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [10, 25, 50, 100],
+        pagination: true,
+        clickToSelect: true,
+        height: 300,
+        uniqueId: "id",
+        columns: [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: '会员id'
+        },{
+            field: 'mem_memberName',
+            title: '会员姓名'
+        },{
+            field: 'mem_memberMobile',
+            title: '电话号'
+        },]
+    });
+
+    function queryParamspage (params) {
+        var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            pageSize: params.pageSize,  //页面大小
+            pageNumber: params.pageNumber, //页码
+
+        };
+        return temp;
+    }
+        $("#popupsubmit").click(function () {
+            var arrselections = $("#selectmemberdata").bootstrapTable('getSelections');
+            var ids="";
+            for(var i=0;i<arrselections.length;i++){
+                if(i==0 || i=="0"){
+                    ids+=arrselections[i].id;
+                }else{
+                    ids+=","+arrselections[i].id;
+                }
+            }
+            var idArrdata=ids.split(",")
+            if (arrselections.length <= 0) {
+                swal("操作有误", "请选择要设置的项目！","error");
+                return;
+            }
+            else{
+                $.ajax({
+                    type: "post",
+                    dataType: 'jsonp',
+                    url: "{php echo $this->createWebUrl('couponmarket', array('op' => 'ajaxgetmemberdata'))}",
+                    data: { idArr:idArrdata },
+                    success: function (data) {
+                        $("#membernumber").html('<span>用户人数 ：'+idArrdata.length+'</span>');
+                        $("#SpecifiedFans").attr("value",idArrdata);
+                        $('#selectmember').modal('hide');
+                    },
+                    error: function () {
+                        swal("操作有误", "请关闭重新操作！","error");
+                    },
+                    complete: function () {
+
+                    }
+
+                });
+            }
+
+        });
+
+
+</script>
+{template 'web/common/footer'}

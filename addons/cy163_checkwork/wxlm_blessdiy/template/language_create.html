@@ -1,0 +1,91 @@
+{template 'common/header'}
+<meta http-equiv="cache-control" content="no-cache">
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('language', array('op'=>'display'));}">祝福语管理</a></li>
+    <li class="active">{if isset($language[language_id])}<a href="javascript:;">添加祝福语</a>{else}<a href="{php echo $this->createWebUrl('language', array('op'=>'create'));}">修改祝福语{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="languageform">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">{if isset($language[language_id])}修改祝福语{else}添加祝福语{/if}</div>
+			<div class="panel-body">
+			<input type="hidden" name="language[language_id]" class="form-control" value="{$language['language_id']}" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>祝福语标题</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="language[language_title]" class="form-control" value="{$language['language_title']}" maxlength="25" />
+					</div>
+				</div>
+				{if $fastlang!=""}
+					<input type="hidden" name="language[language_festivalid]" id="festivalid" class="form-control" value="{$fastlang}" />
+				{else}
+					<div class="form-group">
+					<label class="col-xs-12 col-sm-3  col-lg-2 control-label"><span class="xhred">*</span>分类</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<select  class="form-control" style="width:100%;" name="language[language_festivalid]" id="festivalid">
+                            <option value="">请选择</option>
+                            {loop $festival_list $key $item}
+                            <option value="{$item['festival_id']}" {if $language['language_festivalid']==$item['festival_id']}selected{/if}>{$item['festival_title']}</option>
+                            {/loop}
+                        </select>
+					</div>
+					</div>
+				{/if}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3  col-lg-2 control-label">祝福语内容</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						{php echo tpl_ueditor('language[language_content]',$language['language_content']);}
+						<div class="help-block">祝福语编辑若为图文祝福语，建议以图片形式保存上传。</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred"></span>状态开启</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					<label class="radio-inline">
+					  <input type="radio" name="language[language_state]" id="inlineRadio1" value="1" {if $language['language_state']==1}checked{/if}> 开启
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="language[language_state]" id="inlineRadio2" value="2" {if empty($language)||$language['language_state']==2}checked{/if}> 关闭
+					</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>排序</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="number" name="language[language_order]" class="form-control" value="{$language['language_order']}" maxlength="25" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="language_level_y" value="{$language['language_level']}" /> -->
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#languageform').submit(function(){
+			if($('input[name="language[language_title]"]').val() == ''){
+				util.message('祝福语标题不能为空');
+				return false;
+			}
+			if($('#festivalid').val() == ''){
+				util.message('分类不能为空');
+				return false;
+			}
+			if($('input[name="language[language_order]"]').val() == ''){
+				util.message('排序不能为空');
+				return false;
+			}
+				return true;	
+		});
+	});
+});
+</script>
+{template 'common/footer'}

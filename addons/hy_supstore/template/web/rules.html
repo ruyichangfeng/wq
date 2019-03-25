@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {template 'web/header'}
+</head>
+
+<body>
+    <!-- 内容主体区域 -->
+    <div class="layui-elem-quote lineh38 fontsize16">
+        <a href="{php echo $this->createWebUrl('rules')}">储值规则</a>
+        <a class="layui-btn layui-btn-normal right" href="{php echo $this->createWebUrl('rules', array('op' => 'add'))}">增加储值规则</a>
+        <button class="layui-btn layui-btn-normal right" style="margin-right: 10px;" onclick="javascript:document.getElementById('blockquote').style.display='block';">
+            <i class="layui-icon">&#xe702;</i>
+            提示
+        </button>
+    </div>
+    <blockquote class="layui-elem-quote layui-quote-nm" style="display: none;color: #1E9FFF;font-size: 14px;position: relative;padding-right: 90px;" id="blockquote">
+        提示：每个门店下有且只有<red>一个储值规则</red>,每个储值规则下面包含子规则,子规则可添加多个&nbsp;&nbsp;&nbsp;&nbsp;操作：可设置储值一定金额,赠送余额、积分、优惠券、次卡,可添加多个&nbsp;&nbsp;&nbsp;&nbsp;<red>前台充值触发规则并赠送优惠券,可能由于每人优惠券张数限制不能领取</red>&nbsp;&nbsp;&nbsp;&nbsp;(注意：<red>点击充值金额无效,表示购买次卡,充值金额不会加入余额中</red>)
+        <div class="layui-btn layui-btn-primary right" style="position: absolute;right: 15px;top: 50%;margin-top: -19px;" onclick="javascript:this.parentNode.style.display='none';">关闭</div>
+    </blockquote>
+    {if $op == 'list'}
+    <style>
+        .layui-textarea .layui-table td{padding-left: 10px;}
+    </style>
+    <div class="layui-form-pane">
+        {loop $list $item}
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">
+                <div class="right">
+                    <a class="layui-btn layui-btn-xs" href="{php echo $this->createWebUrl('rules', array('op' => 'update','id'=>$item['id']))}">编辑</a>
+                    <a class="layui-btn layui-btn-xs layui-btn-danger item-action-delete" href="{php echo $this->createWebUrl('rules', array('op' => 'detele','id'=>$item['id']))}">删除</a>
+                </div>
+                {$item['title']}
+            </label>
+            <div class="layui-input-block">
+                <div class="layui-textarea">
+                    <table class="layui-table">
+                        <tbody>
+                            <tr>
+                                <td width="100">适用门店：</td>
+                                <td>
+                                    {$item['storetitle']} &nbsp;&nbsp; 排序{$item['rank']}&nbsp;&nbsp;&nbsp;&nbsp;{if $item['recommend'] == 1}(推荐){/if}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>储值规则：</td>
+                                <td>
+                                    {loop $item['lists'] $vol}
+                                    <p style="line-height:30px;">充值
+                                        <red>{$vol['credit2']}</red>元{if $vol['iscredit']==1}（充值无效）{/if} 赠送金额
+                                        <red>{$vol['credit3']}</red>元 + 固定积分
+                                        <red>{$vol['credit1']}</red>个 {loop $vol['couponlist'] $rules} +
+                                        <red>{$rules['title']}</red> 优惠券
+                                        <red>{$rules['couponnum']}</red> 张 {/loop} {loop $vol['oncecardlist'] $rules} +
+                                        <red>{$rules['title']}</red> 次卡
+                                        <red>{$rules['oncecardnum']}</red> 张 {/loop}
+                                        {if $vol['addtime']}【有效时间：{if $vol['past']}<green>{$vol['addtime']} 至 {$vol['expiretime']}</green>{else}<red>{$vol['addtime']} 至 {$vol['expiretime']} 已过期</red>{/if}】{else}【<green>无时间限制</green>】{/if}
+                                    </p>
+                                    {/loop}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {/loop}
+        {if empty($list)}
+            <div style="color: red;text-align: center;line-height: 50px;font-weight: bold;margin-top: 10px;border:1px solid #d2d2d2;">未设置储值规则</div>
+        {/if}
+    </div>
+    <script>
+    layui.use(['form', 'layer', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        $('.item-action-delete').click(function() {
+            var href = $(this).attr('href');
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+            return false;
+        });
+    });
+    </script>
+    {elseif $op == 'add'}
+    <form action="" method="post" id="formRule" class="layui-form" enctype="multipart/form-data" lay-filter="fromRuleLay">
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 规则名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="title" id="title" size="50" required lay-verify="required" placeholder="请在此输入名称">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否推荐</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="recommend" value="1" title="是" {if $item['recommend'] == 1}checked{/if}>
+                <input type="radio" name="recommend" value="0" title="否" {if $item['recommend'] != 1}checked{/if}>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input type="number" name="rank" placeholder="请输入排序值 默认为0" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" id="storeCheckbox">
+            <label class="layui-form-label"> * 适用门店</label>
+            <div class="layui-input-block">
+                {loop $storelists $item}
+                <input name="storeid" lay-skin="primary" title="{$item['title']}" type="radio" value="{$item['id']}" lay-filter="selectStore" {if $storeid == $item['id']}checked{/if}>
+                {/loop}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 子规则</label>
+            <div class="layui-input-block">
+                <div class="rule-list">
+                    {template 'web/rulelists'}
+                    <a class="layui-btn layui-btn-primary layui-btn-sm btn-add-rule">+ 增加规则</a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" id="submit1" lay-submit lay-filter="formSubmit" value="提交">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+    <script>
+    var key = '{$key}';
+    var dateKey = '{$dateKey}';
+    key++;
+    dateKey++;
+
+    layui.use(['form', 'layer', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        $('.item-action-delete').click(function() {
+            var href = $(this).attr('href');
+            layer.confirm('该操作不可逆，请确认是否删除？', function() {
+                layer.closeAll();
+                location.href = href;
+            })
+            return false;
+        });
+
+        //监听提交
+        form.on('submit(formSubmit)', function(data) {
+
+            var storeidVal = $('input[name="storeid"]:checked').val();
+            if (!storeidVal) {
+                layer.msg('必须选择门店');
+                return false;
+            }
+
+            $('#formRule').submit();
+        });
+
+        //切换店铺
+        form.on('radio(selectStore)', function(data) {
+            var storeid = data.value;
+            var id = "{$id}";
+            window.location.href = "{php echo $this->createWebUrl('rules',array('op'=>'add'))}&storeid="+storeid;
+        });
+
+        //监听下拉菜单不能选取重复
+        form.on('select(couponSelect)', function(data){
+            $('.couponSelect').each(function(index,ele){
+                if($(ele).val() && ele != data.elem){
+                    if($(ele).val() == data.value){
+                        layer.msg('不能选中重复的优惠券');
+                        $(data.elem).val('');
+                        form.render('select', 'fromRuleLay'); //更新表单状态
+                        return false;
+                    }
+                }
+            });
+        });    
+
+        form.on('select(oncecardSelect)', function(data){
+            $('.oncecardSelect').each(function(index,ele){
+                if($(ele).val() && ele != data.elem && $(ele).attr('data-key') == $(data.elem).attr('data-key')){
+                    if($(ele).val() == data.value){
+                        layer.msg('不能选中重复的次卡');
+                        $(data.elem).val('');
+                        form.render('select', 'fromRuleLay'); //更新表单状态
+                        return false;
+                    }
+                }
+            });
+        }); 
+    
+        //添加规则
+        $(".rule-list").on('click', '.btn-add-rule', function() {
+            var _this = $(this);
+            var url = "{php echo $this->createWebUrl('rulelists');}";
+
+            $.get(url, { key: key ,dateKey:dateKey}, function(tpl) {
+                _this.before(tpl);
+                form.render('checkbox'); //更新表单状态
+                key++;
+                dateKey = dateKey+2;
+            });
+            return;
+        });
+
+        //添加优惠券
+        $(".rule-list").on('click', '.btn-add-coupon', function() {
+            var m_this = $(this);
+            var litkey = m_this.attr('layui-data');
+            var url = "{php echo $this->createWebUrl('couponlists');}";
+            var storeid = '{if $storeid}{$storeid}{else}{/if}';
+
+            $.get(url, { litkey: litkey , storeid:storeid }, function(data) {
+                m_this.before(data);
+                form.render('select', 'fromRuleLay'); //更新表单状态
+            });
+            return;
+        });
+
+        //添加次卡
+        $(".rule-list").on('click', '.btn-add-oncecard', function() {
+            var m_this = $(this);
+            var litkey = m_this.attr('layui-data');
+            var url = "{php echo $this->createWebUrl('oncecardlists');}";
+            var storeid = '{if $storeid}{$storeid}{else}{/if}';
+
+            $.get(url, { litkey: litkey , storeid:storeid }, function(data) {
+                m_this.before(data);
+                form.render('select', 'fromRuleLay'); //更新表单状态
+            });
+            return;
+        });
+    });
+
+
+    //删除规则
+    $(".rule-list").on('click', '.remove-rule', function() {
+        $(this).closest('.rule-list-item').remove();
+    });
+
+    //删除优惠券
+    $(".rule-list").on('click', '.remove-coupon', function() {
+        $(this).closest('.coupon-list-item').remove();
+    });
+
+    //删除次卡
+    $(".rule-list").on('click', '.remove-oncecard', function() {
+        $(this).closest('.oncecard-list-item').remove();
+    });
+    </script>  
+    {elseif $op == 'update'}
+    <form action="" method="post" id="formRule" class="layui-form" enctype="multipart/form-data" lay-filter="fromRuleLay">
+        <input type="hidden" name="id" value="{$item['id']}">
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 规则名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="title" required lay-verify="required" id="title" value="{$item['title']}" size="50" placeholder="请在此输入名称">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否推荐</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="recommend" value="1" title="是" {if $item['recommend'] == 1}checked{/if}>
+                <input type="radio" name="recommend" value="0" title="否" {if $item['recommend'] != 1}checked{/if}>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input type="number" name="rank" placeholder="请输入排序值 默认为0" autocomplete="off" class="layui-input" value="{php echo intval($item['rank']);}">
+            </div>
+        </div>
+        <div class="layui-form-item" id="storeCheckbox">
+            <label class="layui-form-label"> * 适用门店</label>
+            <div class="layui-input-block">
+                <input lay-skin="primary" title="{$storeName}" type="radio"  checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> * 子规则</label>
+            <div class="layui-input-block">
+                <div class="rule-list">
+                    {if !empty($rulelists)} {loop $rulelists $key $item}{template 'web/rulelists'} {/loop} {else} {template 'web/rulelists'} {/if}
+                    <a class="layui-btn layui-btn-primary layui-btn-sm btn-add-rule">+ 增加规则</a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" id="submit1" lay-submit lay-filter="formSubmit" value="提交">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <input type="hidden" name="token" value="{$_W['token']}" />
+            </div>
+        </div>
+    </form>
+    <script>
+    var key = '{$key}';
+    var dateKey = '{$dateKey}';
+    key++;
+    dateKey++;
+    
+    layui.use(['form', 'layer', 'element'], function() {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer, //弹层
+            element = layui.element; //元素操作
+
+        //监听提交
+        form.on('submit(formSubmit)', function(data) {
+            $('#formRule').submit(); 
+        });
+
+        //监听下拉菜单不能选取重复
+        form.on('select(couponSelect)', function(data){
+            $('.couponSelect').each(function(index,ele){
+                if($(ele).val() && ele != data.elem && $(ele).attr('data-key') == $(data.elem).attr('data-key')){
+                    if($(ele).val() == data.value){
+                        layer.msg('不能选中重复的优惠券');
+                        $(data.elem).val('');
+                        form.render('select', 'fromRuleLay'); //更新表单状态
+                        return false;
+                    }
+                }
+            });
+        });
+
+        form.on('select(oncecardSelect)', function(data){
+            $('.oncecardSelect').each(function(index,ele){
+                if($(ele).val() && ele != data.elem && $(ele).attr('data-key') == $(data.elem).attr('data-key')){
+                    if($(ele).val() == data.value){
+                        layer.msg('不能选中重复的次卡');
+                        $(data.elem).val('');
+                        form.render('select', 'fromRuleLay'); //更新表单状态
+                        return false;
+                    }
+                }
+            });
+        });     
+
+        //添加规则
+        $(".rule-list").on('click', '.btn-add-rule', function() {
+            var _this = $(this);
+            var url = "{php echo $this->createWebUrl('rulelists');}";
+
+            $.get(url, { key: key ,dateKey:dateKey}, function(tpl) {
+                _this.before(tpl);
+                form.render('checkbox'); //更新表单状态
+                key++;
+                dateKey = dateKey+2;
+            });
+            return;
+        });
+
+        //添加优惠券
+        $(".rule-list").on('click', '.btn-add-coupon', function() {
+            var m_this = $(this);
+            var litkey = m_this.attr('layui-data');
+            var url = "{php echo $this->createWebUrl('couponlists');}";
+            var storeid = '{if $storeid}{$storeid}{else}{/if}';
+
+            $.get(url, { litkey: litkey , storeid:storeid }, function(data) {
+                m_this.before(data);
+                form.render('select', 'fromRuleLay'); //更新表单状态
+            });
+            return;
+        });
+
+        //添加次卡
+        $(".rule-list").on('click', '.btn-add-oncecard', function() {
+            var m_this = $(this);
+            var litkey = m_this.attr('layui-data');
+            var url = "{php echo $this->createWebUrl('oncecardlists');}";
+            var storeid = '{if $storeid}{$storeid}{else}{/if}';
+
+            $.get(url, { litkey: litkey , storeid:storeid }, function(data) {
+                m_this.before(data);
+                form.render('select', 'fromRuleLay'); //更新表单状态
+            });
+            return;
+        });
+    });
+
+    //删除规则
+    $(".rule-list").on('click', '.remove-rule', function() {
+        $(this).closest('.rule-list-item').remove();
+    });
+
+    //删除优惠券
+    $(".rule-list").on('click', '.remove-coupon', function() {
+        $(this).closest('.coupon-list-item').remove();
+    });
+
+    //删除次卡
+    $(".rule-list").on('click', '.remove-oncecard', function() {
+        $(this).closest('.oncecard-list-item').remove();
+    });
+    </script>
+    {/if}
+</body>
+
+</html>

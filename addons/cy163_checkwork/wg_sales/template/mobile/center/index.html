@@ -1,0 +1,103 @@
+<!doctype html>
+<html id="html_" lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-title" content="xx">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>个人发布中心</title>
+    <link rel="stylesheet" href="{STATIC_ROOT}/css/uc-ad.css">
+    <link rel="stylesheet" type="text/css" href="{STATIC_ROOT}/css/base_new.css?123">
+</head>
+<body>
+<script>
+    var e = document.body.clientWidth;
+    var t = e / 7.5 > 128 ? 128 : e / 7.5;
+    document.getElementById('html_').style.fontSize = t+ "px";
+</script>
+<div class="uc-info">
+    <img src="{$user_info['headimgurl']}" alt="" class="uc-pic">
+    <p class="uc-wx-name">{$user_info['nickname']}</p>
+</div>
+<div class="uc-data">
+    <a href="#">
+        <p>{$article_count}</p>
+        <p>投稿</p>
+    </a>
+    <a href="#">
+        <p>{$ad_money}</p>
+        <p>广告投入</p>
+    </a>
+</div>
+<ul class="ad-tab">
+    <li data-cate="1" class="active">新闻投稿</li>
+    <li data-cate="2">广告投放</li>
+</ul>
+<ul class="list-status" id="list-data">
+
+</ul>
+
+
+</body>
+<script>
+    var swipe_box = function () {
+        //侧滑显示删除按钮
+        var expansion = null; //是否存在展开的list
+        var container = document.querySelectorAll('.swipe-box');
+        for(var i = 0; i < container.length; i++){
+            var x, y, X, Y, swipeX, swipeY;
+            container[i].addEventListener('touchstart', function(event) {
+                x = event.changedTouches[0].pageX;
+                y = event.changedTouches[0].pageY;
+                swipeX = true;
+                swipeY = true ;
+                if(expansion){   //判断是否展开，如果展开则收起
+                    expansion.className = "swipe-box";
+                }
+            });
+            container[i].addEventListener('touchmove', function(event){
+                X = event.changedTouches[0].pageX;
+                Y = event.changedTouches[0].pageY;
+                // 左右滑动
+                if(swipeX && Math.abs(X - x) - Math.abs(Y - y) > 0){
+                    // 阻止事件冒泡
+                    event.stopPropagation();
+                    if(X - x > 10){   //右滑
+                        event.preventDefault();
+                        this.className = "swipe-box";    //右滑收起
+                    }
+                    if(x - X > 10){   //左滑
+                        event.preventDefault();
+                        this.className = "swipe-box swipeleft";   //左滑展开
+                        expansion = this;
+                    }
+                    swipeY = false;
+                }
+                // 上下滑动
+                if(swipeY && Math.abs(X - x) - Math.abs(Y - y) < 0) {
+                    swipeX = false;
+                }
+            });
+        }
+        // 点击删除
+        var i = document.querySelectorAll('.list-del-btn');
+        i.forEach(function(item, index){
+            i[index].onclick = function(){
+                var id = this.id;
+                $.get(del_url,{id:id},function (data) {
+
+                },'JSON');
+                this.parentNode.parentNode.remove();
+            };
+        });
+    }
+
+</script>
+
+{template 'center/item'}
+{template 'center/js'}
+{template 'public/bottom_nav'}
+</html>

@@ -1,0 +1,92 @@
+{template 'public/header'} 
+<style type="text/css">
+	.layui-btn+.layui-btn{margin-left: 0px;}
+	.option-input{padding: 3px 10px;height: 32px;line-height: 32px;margin:4px 0px;}
+</style>
+ <div class="panel panel-info">
+	<div class="panel-heading">
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('goods.index');?>">商品管理</a></li>
+		  <?php if(intval($goods['id'])>0){?>
+		   <li class="active">{$goods['name']}</li>
+		  <?php }?>
+		  <li class="active">商品规格</li>
+		</ol></div>
+	<div class="panel-body">
+		<div style="margin:10px auto;text-align: left;">
+			<button class="btn btn-default" type="button" style="display: inline-block;" onclick="addProperty()">添加属性</button>
+			<button class="btn btn-default" type="submit" form="popform" style="display: inline-block;"  >保存规格</button>  
+		</div>
+		<form method="post" action="<?php echo $this->routeUrl('goods.saveOption2');?>" id="popform">
+    	<table id="caseTab" class="layui-table" style="width:500px!important">
+			<tr> 
+				<th style="width: 100px;">属性</th>
+				<th style="width: 300px;">预选规格</th> 
+				<th style="width: 100px;"></th>
+			</tr>
+			{loop $options $index $item}
+			<tr>  
+				<td>
+					<a href="javascript:void(0);"   class="layui-btn layui-btn-xs">
+						{$item['name']}
+					</a>
+					<i class="layui-icon layui-icon-close-fill" onclick="delopt({$item['id']},'{$item['name']}')" style="font-size: 16px; color: #9095a4;cursor:hand;"></i>
+				</td>
+				<td>
+					<p id="opt-{$item['id']}"></p>
+					<p style="padding: 10px 0px;">
+						{loop $item['children'] $index $option}
+						<div class="">
+							<a href="javascript:void(0);"  class="layui-btn layui-btn-xs" style="padding: 1px 10px 0px 10px;margin-right: -12px;margin-top:5px;margin-bottom: 5px;">{$option['name']}</a>
+							<a href="javascript:void(0);"  class="layui-btn layui-btn-xs" style="padding: 1px 10px 0px 10px;">
+								ID : {$option['id']}
+							</a>
+							<i class="layui-icon layui-icon-close-fill"  onclick="delopt({$option['id']},'{$option['name']}')" style="font-size: 16px; color: #9095a4;cursor:hand;"></i>
+						</div>
+						{/loop}
+					</p>
+				</td> 
+				<td>
+					<button class="layui-btn layui-btn-primary" type="button" onclick="addProp({$item['id']})"  style="width:80px;height:32px;display: inline-block;line-height: 32px;vertical-align: top;text-align: center;padding: 0px 0px;">添加规格</button> 
+				</td>
+			</tr>
+			{/loop}
+		</table> 
+		</form>
+	</div>
+</div>
+<div id="procase" style="display: none;">
+	<label style="display: inline-block;padding-right: 15px;">属性名称</label>
+	<input type="text" name="name" id="name" value="" class="form-control" style="width: 150px;">
+	<br/><br/>
+	 
+</div>
+ 
+<script type="text/javascript">
+	 
+	function delopt(id,name){
+		modalDlg("是否删除 "+name+"？",function(){ 
+			 window.location.href='<?php echo  $this->routeUrl('goods.delOption');?>&gid={$goods['id']}&oid='+id;
+		});
+	} 
+	function addProperty(){
+		var html = '<form id="proForm" action="<?php echo $this->routeUrl('goods.saveOption');?>&goodsid={$goods['id']}&parentid=0" method="post">'+$("#procase").html()+'</form>';
+
+		modalDlg(html,function(){
+			// var name = $('#name').val();
+			// alert(name);
+			// if(name == ''){
+			// 	layer.msg('属性名称不能为空');
+			// 	return false;
+			// }
+
+				$("#proForm").submit();
+			
+		});
+	}
+	function addProp(id){
+		var html='<input type="text" class="layui-input option-input" name="options['+id+'][]" placeholder="输入规格，10字以内"/>';
+		$("#opt-"+id).append(html);
+	}
+</script>
+{template 'public/footer'}

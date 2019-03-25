@@ -1,0 +1,94 @@
+{template 'common/header'}
+{php load()->func('tpl')}
+
+<div class='container' style='padding:0 5px 10px;margin:0;width:100%'>
+    <ul class="nav nav-tabs">
+      <li {if $_GPC['action'] == 'add'}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('module', array('action' => 'add'));}">添加字段</a>
+      </li>
+      <li {if $_GPC['action'] == ''}class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('module',array('action'=>''));}">字段列表</a>
+      </li>
+    </ul>
+
+    {if $_GPC['action'] =='add'}
+    <form class="form-horizontal form" action="" method="post">
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="sort" class="form-control" placeholder="整数，越小越靠前" />
+            </div>
+        </div>
+    	<div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段名</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="param_name" class="form-control" placeholder="英文小写字母" />
+            </div>
+        </div>
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段类型</label>
+            <div class="col-sm-9 col-xs-12">
+                <select class="form-control" name="param_type">
+                    <option value="varchar" selected>短文本(240个字符)</option>
+                	<option value="text">长文本</option>
+                	<option value="int">整数</option>
+                	<option value="upload_image">上传图片</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段默认值</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="param_default" class="form-control" placeholder="默认都为空" />
+            </div>
+        </div>
+        <div class="form-group" >
+            <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段说明</label>
+            <div class="col-sm-9 col-xs-12">
+                <input type="text" name="param_intro" class="form-control" placeholder="请说明该字段是用来记录什么信息的" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input name="token" type="hidden" value="{$_W['token']}"/>
+                <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+                    <i class="fa fa-check-circle"></i> 提交
+                </button>
+            </div>
+        </div>
+
+    </form>
+    {/if}
+
+    {if $_GPC['action'] ==''}
+    <table class="table table-hover">
+        <thead class="navbar-inner">
+        <tr>
+            <th style="width:60px;">排序</th>
+            <th style="width:60px;" class="row-first">ID</th>
+            <th >字段键<i></i></th>
+            <th >字段类型<i></i></th>
+            <th >字段默认值<i></i></th>
+            <th >字段介绍<i></i></th>
+            <th style="width:110px;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $paramArr $v}
+        <tr>
+            <td>{$v['sort']}</td>
+        	<td>{$v['uid']}</td>
+        	<td>{$v['param_name']}</td>
+        	<td>{$v['param_type']}</td>
+        	<td>{$v['param_default']}</td>
+        	<td>{$v['param_intro']}</td>
+        	<td><a href="{php echo $this->createWebUrl('module',array('action'=>'del', 'uid' => $v['uid'], 'param' => $v['param_name']));}">删除该字段</a></td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    {/if}
+
+</div>
+{template 'common/footer'}

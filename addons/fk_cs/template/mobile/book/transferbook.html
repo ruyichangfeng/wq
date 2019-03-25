@@ -1,0 +1,181 @@
+<!--正文导航-->
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+    <script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+</head>
+<body>
+<style>
+    dd.teacher_count li {font: 13px/18px "黑体";padding: 10px 60px 10px 34px;position: relative;background: url({OSSURL}public/mobile/img/teacher_inf.jpg) no-repeat 10px 15px;background-size: 15px 15px;border-bottom: 1px solid #ddd;}
+    .teacher_count div.add > div {background-image: url("{OSSURL}public/mobile/img/state_add.png");}
+    .teacher_count div.hot > div {background-image: url("{OSSURL}public/mobile/img/state_hot.png");}
+    .teacher_count  div.new > div{ background-image: url("{OSSURL}public/mobile/img/state_new.png")}
+    .suggestion{position:fixed; left:0; right:0; top:60%; bottom:15%;-webkit-box-sizing:border-box; box-sizing:border-box; background-color:rgba(0,0,0,0); text-align:center;font-size:16px;z-index:0px;color:#fe6700;}
+    .suggestion > div{ position:absolute; left:6%; right:6%; top:70%; padding: 0 20px; background-color:#fff; padding-bottom:10px; padding-top: 10px;}
+    .sugges > h1{ font-size: 10px; color:#fe6700; padding-top: 40px;}
+    .sugges > input{display: inline-block;width:50px;height:30px; padding: 0 0px; margin-bottom: 0px; border:0px solid #ccc;-webkit-box-sizing: border-box; box-sizing: border-box;font-size:15px;}
+    .sugges > input::-webkit-input-placeholder{ color: #666;font:15px "黑体";}
+    .suggestion>div>span{display:inline-block;width:30px;height:30px;background:#fff;font-size:24px;color:#aaa;-webkit-border-radius:100%;-moz-border-radius:100%;-o-border-radius:100%;border-radius:100%;line-height:30px;
+        text-align:center;
+        position:absolute;
+        top:-15px;
+        right:-15px;
+        font-family:宋体b8b\4f53;
+        cursor:default;
+    }
+    .newsList{width:100%;height:auto;background:white;border-top:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;}
+    .newsList .top{width:100%;height:45px;line-height:45px;position:relative;}
+    .newsList .top .title{height:45px;line-height:45px;margin:0 70px 0 10px;font-size:18px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;color:#333333;}
+    .newsList .top .more{height:45px;line-height:45px;width:50px;position:absolute;right:10px;top:0;font-size:14px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;text-align:right;}
+    .newsList .top .more a{color:#999999;}
+    .newsList ul{width:100%;height:auto;}
+    .newsList ul li{width:100%;height:100px;border-top:1px solid #e1e1e1;}
+    .newsList ul li:hover{background:#eee;}
+    .newsList ul li .img{float:left;width:90px;height:70px;background:#eee;overflow:hidden;position:relative;float:left;margin:15px 0 15px 10px;}
+    .newsList ul li .img img{position:absolute;}
+    .newsList ul li a {text-decoration: none;display: inline-block;height:20px;color: #999999;}
+    .newsList ul li input{display: inline-block;width:50px;height:20px; padding: 0 0px; margin-bottom: 0px; border:0px solid #ccc;-webkit-box-sizing: border-box; box-sizing: border-box;font-size:15px;}
+    .newsList ul li .content{height:70px;margin:15px 10px 15px 110px;position:relative;}
+    .newsList ul li .maxWidth{margin-left:10px !important;}
+    .newsList ul li .content .t{width:100%;height:20px;line-height:20px;color:#666666;font-size:16px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .newsList ul li .content .c{width:100%;height:20px;line-height:20px;color:#666666;font-size:12px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;margin-top:5px;}
+    .newsList ul li .content .b{width:100%;height:40px;line-height:20px;font-size:10px;overflow:hidden;color:#999999;margin-top:10px;}
+    .newsList ul li .content .time{width:70px;height:18px;line-height:22px;font-size:14px;color:#999999;position:absolute;right:0;bottom:0;text-align:right;}
+    .btn{height:44px; display: inline-block; background-color:#7bb52d;font:20px "黑体";text-align:center;color:#fff;cursor:pointer;float: right;padding-left: 2px;}
+    .btn-cancel{height:44px; display: inline-block; background-color:red;font:20px "黑体";text-align:center;color:#fff;cursor:pointer;float: right;padding-left: 2px;}
+</style>
+<div id="wrap" class="teacher_inf">
+    <!--列表-->
+    <dl>
+        <dd class="newsList">
+            <h3>闲书列表</h3>
+            <ul>
+                {loop $books $item}
+                <li>
+                    <!--<h4>{$item['title']}</h4>-->
+                    <!--<span style="float: left;padding-right: 30px;"></span>-->
+                    <!--<span style="color: red;font-size: 15px;">免费</span>-->
+                    <div class="img">
+                        <img alt src="{$item['images_medium']}" style="top: 0px; left: 0px; height: 100%; width: 100%; -webkit-touch-callout: none; -webkit-user-select: none;">
+                    </div>
+                    <!--通过hot、add和new分别设置热报、正在报名和新增 -->
+                    <div class="content">
+                        <div class="t">{$item['title']}</div>
+                        <div class="c">
+                            <span>{$item['author']}</span>
+                            ￥<input type="text" value="{$item['price']}" id="price">
+                            <span class="btn-cancel" onclick="cancelBook(this,{$item['id']});">取消</span>
+                            <span class="btn" onclick="addBook(this,{$item['id']});">借书</span>
+                        </div>
+                        <div class="b"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;width:200px;">{$item['summary']}</div>
+                    </div>
+                </li>
+                {/loop}
+            </ul>
+        </dd>
+    </dl>
+    <!--导航栏-->
+    <div class="suggestion" id="bookCart">
+        <div>
+            <ul>
+                <li class="sugges">
+                    <span>可用余额:</span><input type="text" id="balance" value="{$balance}">
+                    <span>已选金额:</span><input type="text" id="chooseAmount" value="0">
+                </li>
+                <button class="btn" style="float: none;height: 20px;font-size: 10px;" onclick="jiesuan();">结算</button>
+            </ul>
+            <!--<span id="closed">×</span>-->
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    var books = new Array();
+    function addBook(obj,bookid){
+        var balance       = $("#balance").val();
+        var chooseAmount  = $("#chooseAmount").val();
+        var new_balance,new_chooseAmount;
+        new_balance = balance*1 - $("#price").val()*1;
+        if(new_balance < 0){
+            PB.prompt('您的余额不足!');
+            return false;
+        }
+        new_chooseAmount = chooseAmount*1 + $("#price").val()*1;
+        $("#balance").val(new_balance);
+        $("#chooseAmount").val(new_chooseAmount);
+        books[bookid] = bookid;
+    }
+    function cancelBook(obj,bookid){
+        if(books[bookid] == 'undefined' || books[bookid] == ''){
+            PB.prompt('此书您还未点过购买!');
+            return false;
+        }
+        var balance       = $("#balance").val();
+        var chooseAmount  = $("#chooseAmount").val();
+        var new_balance,new_chooseAmount;
+        new_balance = balance*1 + $("#price").val()*1;
+        new_chooseAmount = chooseAmount*1 - $("#price").val()*1;
+        if(new_chooseAmount < 0){
+            PB.prompt('已没有可取消的闲书了!');
+            return false;
+        }
+        $("#balance").val(new_balance);
+        $("#chooseAmount").val(new_chooseAmount);
+        delete books[bookid];
+    }
+
+    $("#closed").on('click',function(){
+        $("#bookCart").hide();
+    });
+
+    //闲书结算
+    function jiesuan(){
+        if(books.length < 1){
+            PB.prompt('您还没有选择闲书哦!');
+            return false;
+        }
+
+        var submitData = {
+            schoolid    : "{$schoolid}",
+            weid        : "{$_W['uniacid']}",
+            openid      : "{$openid}",
+            bookownerid : "{$ownerOpenId}",
+            price       : $("#chooseAmount").val(),
+            bookIds     : books.join(',')
+        };
+        $.post("{php echo $this->createMobileUrl('mybookorder',array('op'=>'jiesuan'))}",submitData,function(data){
+
+            if(data.result){
+                PB.prompt(data.msg);
+                window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid), true)}";
+            }else{
+                PB.prompt(data.msg);
+                closeBox();
+            }
+        },'json');
+    }
+</script>
+<script>
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height())
+    });
+</script>
+{php include $this->template('footer');}
+</body>
+</html>

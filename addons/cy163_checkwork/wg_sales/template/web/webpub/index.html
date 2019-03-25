@@ -1,0 +1,127 @@
+{template 'common/header'}
+<SCRIPT src="{STATIC_ROOT}/js/jquery.lazyload.min.js" type=text/javascript></SCRIPT>
+<style>
+    .l_tableWrap .l_table_tit .l_formBar {
+        border: 0;
+        float: left;
+        font-size: 0;
+    }
+    .y_sele {
+        display: inline-block;
+        padding: 5px 0 12px 12px;
+    }
+    .y_sele_tit {
+        font-size: 14px;
+        padding: 0 0 0 10px;
+    }
+    .l_table_search{
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+<ul class="nav nav-tabs">
+    <li <?php if($cate==1){?> class="active" <?php }?> ><a href="{php echo $this->createWebUrl('webpub',['cate' => 1]);}">投稿列表</a></li>
+    <li <?php if($cate==2){?> class="active" <?php }?> ><a href="{php echo $this->createWebUrl('webpub',['cate' => 2]);}">广告列表</a></li>
+</ul>
+<div class="clearfix">
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body" style="overflow:visible;">
+            <style>
+                .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+                    white-space: normal;
+                }
+            </style>
+            <table class="table table-hover">
+                <tr>
+                    <th style="width: 100px;">ID</th>
+                    <th style="width: 100px">状态</th>
+                    <th style="width: 120px">用户</th>
+                    <th style="width: 230px">标题</th>
+                    <th style="width: 190px">分类</th>
+                    <th style="width: 190px">时间</th>
+                    <th style="width: 180px; text-align: center;">操作</th>
+                </tr>
+                {loop $list $row}
+                <tr>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['id']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            <?php if($row['status'] == 0){echo '审核中';}elseif($row['status'] == 1){echo '通过';}else{echo '拒绝';}?>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['author']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$row['title']}
+                        </p>
+                    </td>
+                    <td>
+                        <p class="form-control-static">
+                            {$category[$row['category_id']]['name']}
+                        </p>
+                    </td>
+                    <td>
+                    <?php echo date('Y-m-d H:i:s',$row['time_step']);?>
+                    </td>
+                    <td>
+                        <div class="form-control-static">
+                            <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('webpub', array('_wg' => 'edit', 'id' => $row['id']))}" >编辑</a>
+                            <a href="javascript:void(0);" class="del-article btn btn-default btn-sm" data-id="{$row['id']}" >删除</a>
+                        </div>
+                        <div>
+                            <a href="javascript:void(0);" data-id="{$row['id']}"  data-status="1" class="change-status btn btn-default btn-sm" >通过</a>
+                            <a href="javascript:void(0);" data-id="{$row['id']}"  data-status="2" class="change-status btn btn-default btn-sm" >拒绝</a>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+        <div class="panel-body text-right">
+            {$pager}
+        </div>
+    </div>
+</div>
+<script>
+   var url_del = "{php echo $this->createWebUrl('pub',['_wg' => 'del']);}";
+   var url_status = "{php echo $this->createWebUrl('pub',['_wg' => 'status']);}";
+    $(function () {
+
+        $("img").lazyload({
+            placeholder : "images/loading.gif",
+            effect: "fadeIn"
+        });
+        $('.del-article').click(function () {
+            if(!confirm('确认删除此记录？')) {
+                return false;
+            }
+            var id = $(this).attr('data-id');
+            $.post(url_del,{id:id},function (data) {
+                if(data.code != 0) {
+                    alert(data.msg);
+                }
+                location.reload();
+            },'JSON');
+        });
+
+        $('.change-status').click(function () {
+            var id = $(this).attr('data-id');
+            var status = $(this).attr('data-status');
+            $.post(url_status,{status:status,id:id},function (data) {
+                if(data.code != 0) {
+                    alert(data.msg);
+                }
+                location.reload();
+            },'JSON');
+        });
+    })
+    </script>
+

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="google-site-verification" content="DVVM1p1HEm8vE1wVOQ9UjcKP--pNAsg_pleTU5TkFaM">
+    <style>
+        body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+        body{padding-bottom: 0 !important;}
+    </style>
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>闲书结算</title>
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/jAlert.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.min.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style/css/weui.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+    <div class="weui-cells__title">闲书车</div>
+    <div class="weui-cells weui-cells_checkbox" id="books_box">
+    {loop $books $item}
+    <label class="weui-cell weui-check__label" for="{$item['id']}">
+        <div class="weui-cell__hd" >
+            <input type="checkbox" class="weui-check" name="bookids" id="{$item['id']}" value="{$item['id']}" checked="checked" onclick="choose(this,{$item['price']});">
+            <i class="weui-icon-checked"></i>
+        </div>
+        <div class="weui-panel__bd">
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="{php echo tomedia($item['images_medium']);}" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{$item['title']}</h4>
+                    <p class="weui-media-box__desc">{$item['author']}</p>
+                    <p class="weui-media-box__desc">￥{$item['price']}</p>
+                </div>
+            </a>
+        </div>
+    </label>
+    {/loop}
+</div>
+    <div class="weui-form-preview">
+    <div class="weui-form-preview__hd">
+        <label class="weui-form-preview__label">已选额度</label>
+        <em class="weui-form-preview__value" id="showChooseAmount">¥{$chooseAmount}</em>
+        <input type="hidden" id="chooseAmount" name="chooseAmount" value="{$chooseAmount}">
+    </div>
+    <div class="weui-form-preview__hd">
+        <label class="weui-form-preview__label">可用额度</label>
+        <em class="weui-form-preview__value">¥{$balance}</em>
+        <input type="hidden" id="balance" name="balance" value="{$balance}">
+    </div>
+    <div class="weui-form-preview__ft">
+        {if $orderId != null && $orderType == 'transfer' && $order['openid'] != $openid}
+        <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="jiesuan('transfer');">互换</button>
+        {else}
+        <a class="weui-form-preview__btn weui-form-preview__btn_default" href="{php echo $this->createMobileUrl('bookpay',array('schoolid'=> $schoolid))}">增加额度</a>
+        <a class="weui-form-preview__btn weui-form-preview__btn_default" onclick="jiesuan('transfer');" href="#">申请互换</a>
+        <a class="weui-form-preview__btn weui-form-preview__btn_default" onclick="jiesuan('borrow');" href="#">余额结算</a>
+        {/if}
+    </div>
+</div>
+</body>
+<script src="{MODULE_URL}/template/mobile/style/js/weui.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    var userid =  $("#userid").val();
+    var oss = 'http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/';
+    //闲书结算
+    function jiesuan(type){
+        var book_ids = new Array();
+        $("#books_box :checked").each(function(index){
+            book_ids.push($(this).val());
+        });
+        if(book_ids.length <=0 ){
+            PB.prompt('请至少选择一本书!');
+            return;
+        }
+        //判断是否可以借书
+        var balance = $("#balance").val()*1;
+        var chooseAmount = $("#chooseAmount").val()*1;
+        var is_accept_exchange;
+        if(type == 'borrow'){
+            is_accept_exchange = 1;
+        }else{
+            is_accept_exchange = 2;
+        }
+        if(is_accept_exchange == 1){
+            if(balance < chooseAmount){
+                PB.prompt('您余额不足哦!');
+                return false;
+            }
+        }
+        var submitData = {
+            schoolid    : "{$schoolid}",
+            weid        : "{$_W['uniacid']}",
+            openid      : "{$openid}",
+            bookownerid : "{$ownerOpenId}",
+            price       : $("#chooseAmount").val(),
+            bookIds     : book_ids.join(','),
+            is_accept_exchange : is_accept_exchange,
+            orderId     : "{$orderId}",
+            orderType   : "{$orderType}"
+        };
+        Weui.confirm({"title":"确定结算?","content":'',"cancelCallback":function(e){},"sureCallback":function(e){
+            $.post("{php echo $this->createMobileUrl('mybookorder',array('op'=>'jiesuan'))}",submitData,function(data){
+                if(data.result){
+                    PB.prompt(data.msg);
+                    if(is_accept_exchange == 1){
+                        window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid,'op' => 'borrow_in'), true)}";
+                    }else{
+                        window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid,'op' => 'transfer'), true)}";
+                    }
+                }else{
+                    PB.prompt(data.msg);
+                }
+            },'json');
+        }
+        });
+    }
+    function choose(obj,price){
+        var currentAmount = $("#chooseAmount").val();
+        if(obj.checked == false){
+            var newAmount = (currentAmount*1-price*1).toFixed(2);
+        }else{
+            var newAmount = (currentAmount*1+price*1).toFixed(2);
+        }
+        $("#chooseAmount").val(newAmount);
+        document.getElementById("showChooseAmount").innerHTML = "￥"+newAmount.toString();
+    }
+</script>
+<script src="{MODULE_URL}public/mobile/js/jAlert-functions.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jAlert.js"></script>
+</html>

@@ -1,0 +1,443 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('staff/header', TEMPLATE_INCLUDEPATH)) : (include template('staff/header', TEMPLATE_INCLUDEPATH));?>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Kcfo7IHPvRA75sKRElGLaLNQ"></script>
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+	<div class="c-gre1 ub ub-ver ub-ac ub-pc" style=" padding:2rem 0rem">
+    	<div class="uc-a15 t-yel uba b-org absolute ulev-4" style="left:1rem; top:1rem; padding:0.2rem 0.5rem;">
+            <?php  if($item['state'] == 0 || $item['state'] == 3) { ?>
+            抢单中
+            <?php  } else if($item['state'] == 1) { ?>
+            成功抢单
+            <?php  } else { ?>
+            已完工
+            <?php  } ?>
+        </div>
+        <div><i class="iconfont icon-dingdan t-org" style="font-size:5rem"></i> </div>
+        <div class="umar-t ulev1 t-yel font-b"><?php  echo $this->getServeType($item['serve_type']);?></div>
+    </div>
+    
+    <div class="c-gre1 ubt b-bla01">
+        <div class="ub ub-ac uinn11">
+        	<div class="tx-c" style="width:50%">
+            	<div class="ulev-4 t-bla04">上门时间</div>
+                <div class="t-yel"><span class="ulev-1"></span><span class="ulev1"> <?php  echo $this->getOrderTime($item['table_name'],$item['other_id'],'ftime')?></span></div>
+            </div>
+            <div class="ubl b-bla01 tx-c" style="width:50%">
+            	<div class="ulev-4 t-bla04">预计费用</div>
+                <div class="t-yel"><span class="ulev-1">￥</span><span class="ulev1"><?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'dealprice')?></span></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ub-f1 uinn8">
+    	<div class="umar-b c-wh ub uinn11 uc-a15">
+        	<div class="ub-f1 tx-c ulev-2">
+            	<div class="t-gra">已预约</div>
+                <div class="ub ub-ac" style="padding:0.2rem 0">
+                    <div class="ub-f1"></div>
+                    <div class="uc-a50 uba2 b-bla02">
+                        <div class="uc-a50 c-gra" style="height:0.5rem; width:0.5rem;"></div>
+                    </div>
+                    <div class="ub-f1 ubb b-gra"></div>
+                </div>
+                <div class="t-gra"><?php  echo substr($this->getOrderTime($item['table_name'],$item['other_id'],'addtime'),0,11)?></div>
+            </div>
+            <div class="ub-f1 tx-c ulev-2">
+            	<div class="t-gra">竞单中</div>
+                <div class="ub ub-ac" style="padding:0.2rem 0">
+                    <div class="ub-f1 ubb b-gra"></div>
+                    <div class="uc-a50 uba2 b-bla02">
+                        <div class="uc-a50 c-gra" style="height:0.5rem; width:0.5rem;"></div>
+                    </div>
+                    <div class="ub-f1 ubb b-gra"></div>
+                </div>
+                <div class="t-gra"><?php  echo substr($this->getGrabOneTime($item['id'],'addtime'),5,11)?></div>
+            </div>
+            <div class="ub-f1 tx-c ulev-2">
+            	<div class="t-gra">选定人</div>
+                <div class="ub ub-ac" style="padding:0.2rem 0">
+                    <div class="ub-f1 ubb b-gra"></div>
+                    <div class="uc-a50 uba2 b-bla02">
+                        <div class="uc-a50 c-gra" style="height:0.5rem; width:0.5rem;"></div>
+                    </div>
+                    <div class="ub-f1 ubb b-gra"></div>
+                </div>
+                <div class="t-gra"><?php  echo substr($this->getGrabInfo($item['id'],'selectedtime'),5,11)?></div>
+            </div>
+            <div class="ub-f1 tx-c ulev-2">
+            	<div class="t-gra">上门中</div>
+                <div class="ub ub-ac" style="padding:0.2rem 0">
+                    <div class="ub-f1 ubb b-gra"></div>
+                    <div class="uc-a50 uba2 b-bla02">
+                        <div class="uc-a50 <?php  if($item['state'] == 1) { ?> c-gre1 <?php  } else { ?> c-gra <?php  } ?>" style="height:0.5rem; width:0.5rem;"></div>
+                    </div>
+                    <div class="ub-f1 ubb b-gra"></div>
+                </div>
+                <?php  if($item['state'] == 1 || $item['state'] == 2) { ?>
+                <div class="t-gra"><?php  echo substr($this->getOrderTime($item['table_name'],$item['other_id'],'ftime'),0,11)?></div>
+                <?php  } ?>
+            </div>
+            <div class="ub-f1 tx-c ulev-2">
+            	<div class="t-gra">已完工</div>
+                <div class="ub ub-ac" style="padding:0.2rem 0">
+                    <div class="ub-f1 ubb b-gra"></div>
+                    <div class="uc-a50 uba2 b-bla02">
+                        <div class="uc-a50 <?php  if($item['state'] == 2) { ?> c-gre1 <?php  } else { ?> c-gra <?php  } ?>" style="height:0.5rem; width:0.5rem;"></div>
+                    </div>
+                    <div class="ub-f1"></div>
+                </div>
+                <div class="t-gra"><?php  echo substr($this->getOrderOver($item['id'],'overtime'),5,11)?></div>
+            </div>
+        </div>
+        
+        <ul class="uc-a15 c-wh uinn3 ulev-1" style="">
+        	<?php  if(is_array($list)) { foreach($list as $vo) { ?>
+            <li class="uinn3 ubb-blaimg ub">
+                <div class="tx-r uinn3 t-gra" style="width:4.5rem">
+                <?php  if($vo['input_type'] == 'radio' || $vo['input_type'] == 'checkbox' || $vo['input_type'] == 'select') { ?>
+                  <?php  if($this->getOrderInfoValue($item['table_name'],$item['other_id'],''.$vo[input_name].'',$item['temp_id']) != '') { ?>
+                    <?php  echo $vo['input_laber'];?>
+                  <?php  } ?>
+                <?php  } else { ?>
+                  <?php  if($this->getOrderInfo($item['table_name'],$item['other_id'],''.$vo[input_name].'') != '') { ?>
+                    <?php  echo $vo['input_laber'];?>
+                  <?php  } ?>
+                <?php  } ?>
+                </div>
+                
+                <div class="ub-f1 uinn3">
+                <?php  if($vo['input_type'] == 'radio' || $vo['input_type'] == 'checkbox' || $vo['input_type'] == 'select') { ?>
+                <?php  echo $this->getOrderInfoValue($item['table_name'],$item['other_id'],''.$vo[input_name].'',$item['temp_id'])?>
+                <?php  } else { ?>
+                <?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],''.$vo[input_name].'')?>
+                <?php  } ?>
+                </div>
+            </li>
+            <?php  } } ?>
+        </ul>
+        
+        <?php  if($listpic['0']['pic'] != '') { ?>
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <?php  if(is_array($listpic)) { foreach($listpic as $vopic) { ?>
+                <div class="ub ub-ver ub-ac block"  style="padding:0.5rem 0.5rem 0.3rem 0.5rem">
+                	<div onClick="showpic('<?php  echo $_W['attachurl'];?>gohome/pic/<?php  echo $vopic['pic'];?>')" class="uc-a1 c-blu ub ub-ac ub-pc iconn ub-img1 hide" style=" width:3rem; height:3rem; background-image:url(<?php  echo $_W['attachurl'];?>gohome/pic/<?php  echo $vopic['pic'];?>)">
+                    </div>
+                </div>
+                <?php  } } ?>
+                
+                <?php  $img = ''?>
+                <?php  if(is_array($listpic)) { foreach($listpic as $row) { ?>
+                <?php  $img .= "'".$_W['attachurl']."gohome/pic/".$row['pic']."',"?>
+                <?php  } } ?>
+                <script type="text/javascript">
+                //var pic = <?php  echo $img;?>;
+                function showpic(a){
+					//var firstPic = "'"+a+"'";
+                    //alert(firstPic);
+                    wx.previewImage({
+                      current: a,
+                      urls: [<?php  echo $img;?>]
+                    });
+                }
+                </script> 
+        </ul>
+        <?php  } ?>
+        
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">客户姓名</div>
+                <div class="ub ub-ac ubb ubl b-bla01 uinn">
+                    <div class="ub ulev0 ub-f1 uinn"><?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fname')?></div>
+                </div>
+            </li>
+        </ul>
+        
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">我的报价</div>
+                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                    <div>￥</div>
+                    <div class="ub ulev0 ub-f1 ">
+                        <input type="number" name="offer" id="offer" placeholder="输入报价" class="uinn ulev0 ub-f1 block t-gre1" />
+                    </div>
+               </div> 
+               <input type="hidden" name="staff_id" id="staff_id" value="<?php  echo $staff_id;?>" />
+            </li>
+        </ul>
+        
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">报价图片</div>
+                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                    <div class="ub ulev0 ub-f1 ">
+                        <input type="text" placeholder="点击上传图片"  class="uinn ulev0 ub-f1 block" onClick="upload()" readonly />
+						<input type="hidden" id="avatar" name="avatar" >
+                    </div>
+               </div>
+            </li>
+        </ul>
+        
+        <input type="hidden" id="random" name="random" value="<?php  echo $random;?>" >
+        <input type="hidden" id="picsum" name="picsum" value="0" >
+        
+        <ul class="userlist c-wh uc-a15 umar-b" id='show_box' style="display: none;">
+            <li class="ub ub-ac">
+            	<div style="width:4rem" class="tx-r">
+                
+            	</div>
+                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                    <div class="ub ulev0 ub-f1 " id="pic_show">
+                        
+                    </div>
+                </div>
+            </li>
+        </ul> 
+        
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">报价说明</div>
+                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                    <div class="ub ulev0 ub-f1 ">
+                        <textarea name="remark" id="remark" rows="3" class="uinn ulev-1 ub-f1 block uc-a15" style="width:6rem"></textarea>
+                    </div>
+               </div>
+            </li>
+        </ul>
+        
+        <!--
+        <ul class="userlist c-wh uc-a15 umar-t">
+            <li class="ub ub-ac">
+                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">需要人数</div>
+                <div class="ub ub-ac ubb ubl b-bla01 uinn">
+                    <div class="ub ulev0 ub-f1 uinn"><?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fperson')?></div>
+                </div>
+                <div class="ulev-1 t-gra">人</div>
+            </li>
+        </ul>
+        -->
+        
+        <?php  if($item['state'] == 1 || $item['staff_id'] == $staff_id) { ?>
+	        <ul class="userlist c-wh uc-a15 umar-t">
+	            <li class="ub ub-ac">
+	                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">客户电话</div>
+	                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+	                    <div class="ub ulev0 ub-f1 uinn"><?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fmobile')?></div>
+	                </div>
+	                <div class="uinn">
+	                	<a href="tel:<?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fmobile')?>" class="block uba b-gre1 ulev-4 t-gre1 uc-a15" style="padding:0.2rem 0.5rem">呼叫</a>
+	                </div>
+	            </li>
+	        </ul>
+	        <ul class="userlist c-wh uc-a15 umar-t">
+	            <li class="ub ub-ac">
+	                <div style="width:4rem; padding:0 1rem" class="tx-c t-gra ulev-1">详细地址</div>
+	                <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+	                    <div class="ub ulev-1 ub-f1 uinn"><?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fadr')?></div>
+	                </div>
+	                <div class="uinn">
+	                	<a href="http://apis.map.qq.com/tools/routeplan/eword=<?php  echo $this->getOrderInfo($item['table_name'],$item['other_id'],'fadr')?>?referer=o2o&key=DEZBZ-EQKKJ-CBFFB-K2SOD-GGNA3-N7BKM" class="block uba b-gre1 ulev-4 t-gre1 uc-a15" style="padding:0.2rem 0.5rem">导航</a>
+	                </div>
+	            </li>
+	        </ul>
+        <?php  } ?>
+    </div> 
+    <div class="" style="height:4.125rem"></div>
+    
+    <div id="footer" class="fix0 c-foot" style="width:100%; bottom:0; z-index:999">
+        <div class="ub">
+            <a href ="<?php  echo $this->createMobileUrl('Validate', array())?>" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-shouye ulev1"></i> 
+                    <span class="block ulev-1" style="">首页</span>
+                </div>
+            </a>
+            <div class="ub ub-pc block t-gre1 t-wh" style="width:33.33%">
+                <a onClick="submit1()" class="ub ub-ver uc-a50 c-gre3 ub-ac ub-pc uba2 b-bla02 t-yel block" style="height:4rem; width:4rem; top:-1.125rem">
+                    <i class="iconfont icon-5 ulev2 t-yel"></i> 
+                    <span class="block ulev-1 t-yel" style=""><?php  echo $diygrab;?></span>
+                </a>
+            </div>
+            <a href ="<?php  echo $this->createMobileUrl('Stafforder', array())?>" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-dingdan ulev1"></i> 
+                    <span class="block ulev-1" style="">订单</span>
+                </div>
+            </a>
+        </div>
+    </div>
+	
+</div>
+
+<input type="hidden" id="order_id" value="<?php  echo $item['id'];?>" />
+<input type="hidden" id="serve_type" value="<?php  echo $item['serve_type'];?>" />
+
+<?php (!empty($this) && $this instanceof WeModuleSite) ? (include $this->template('public/footerjs', TEMPLATE_INCLUDEPATH)) : (include template('public/footerjs', TEMPLATE_INCLUDEPATH));?>
+
+<script type="text/javascript">
+$(".closealert").click(function() {
+	 $(".mban").animate({top:'-800px'})
+	 $(".loginmask").fadeOut(500);
+});
+
+function openPe(){
+	$(".loginmask").fadeIn(500), $(".mban").animate({top:'0px'})
+}
+
+function getMap(){
+	var adr = document.getElementById('adr').value;
+	localStorage['adr'] = adr;
+	window.location.href = "<?php  echo $this->createMobileUrl('map', array('name'=>'xm_gohome'))?>";	
+}
+
+function submit1(){
+	var offer = document.getElementById('offer').value;	
+	var order_id = document.getElementById('order_id').value;
+	var serve_type = document.getElementById('serve_type').value;	
+	var staff_id = document.getElementById('staff_id').value;
+	var random = document.getElementById('random').value;
+	var remark = document.getElementById('remark').value;
+	var offer_state = "<?php  echo $offer_state;?>";
+	
+	if(offer_state == 1){
+		if(offer == ''){
+			alert("请输入报价!");
+			return false;
+		}
+		if(offer<=0){
+			alert("报价必须大于0");
+			return false;
+		}
+        if (!/^\d{1,12}(?:\.\d{1,2})?$/.test(offer)) {
+            alert('报价价格格式不对');
+            return false;
+        }	
+	}	
+	$.ajax({
+		url: "<?php  echo $this->createMobileUrl('grab', array('foo'=>'grabok'));?>",
+		type:"POST",
+		data:{"offer":offer,"order_id":order_id,"serve_type":serve_type,"staff_id":staff_id,"suiji":random,"remark":remark},
+		dataType:"json",
+		success: function(res){
+			//alert(res);
+			if(res == "1"){
+                //alert('恭喜您，抢单成功！请耐心等待客户确认');
+                window.location.href = "<?php  echo $this->createMobileUrl('grab', array('foo'=>'grabokinfo'))?>";
+			}else if(res == "2"){
+                alert('对不起，您已抢过此单！');
+                return false;
+            }else if(res == "3"){
+                alert('你下手晚了，订单已被人抢走！');
+            }else{
+				alert('抢单失败！');  
+                return false;
+			}
+		}
+	});
+}
+</script>
+
+<script type="text/javascript">
+	jssdkconfig = <?php  echo json_encode($_W['account']['jssdkconfig']);?> || {};
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'openLocation',
+		'getLocation',
+	];
+	
+	wx.config(jssdkconfig);
+	
+	wx.ready(function () {
+		
+	});
+	
+	//图片上传
+	function upload(){
+        var picsum = $("#picsum").val();
+        if(picsum>5){
+            alert("报价图片最多上传6张图片！");
+            return false;
+        }else{
+            wx.chooseImage({
+                count: 1, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    wx.uploadImage({
+                        localId: ''+localIds+'', // 需要上传的图片的本地ID，由chooseImage接口获得
+                        isShowProgressTips: 1, // 默认为1，显示进度提示
+                        success: function (res) {
+                            var serverId = res.serverId; // 返回图片的服务器端ID
+                            var suiji = document.getElementById('random').value; 
+                            
+                            $.ajax({
+                                url: "<?php  echo $this->createMobileUrl('UploadPic', array());?>",
+                                type:"POST",
+                                data:{"random":suiji,"serverId":serverId},
+                                dataType:"json",
+                                success: function(data){
+                                    //alert(data);
+                                    if(data== 0){
+                                        alert('上传图片失败');
+                                        return false;
+                                    }else{
+                                        var pic = "";
+                                        var getstr = eval(data);
+                                        for(var i=0;i<getstr.length;i++){
+                                            pic = pic + '<img src="<?php  echo $_W["attachurl"];?>gohome/pic/'+getstr[i].pic+'" style="width:70px; height:50px;margin-right: 0.5rem;" onclick="delpic('+getstr[i].id+')">';
+                                        }
+                                        document.getElementById("show_box").style.display = 'block';
+                                        document.getElementById("pic_show").innerHTML = pic;
+                                        document.getElementById("picsum").value = getstr.length;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+	}
+	
+	function delpic(a){
+		if(window.confirm('确定删除该图片吗？')){
+			var suiji = document.getElementById('random').value; 
+			$.ajax({
+				url: "<?php  echo $this->createMobileUrl('DeletePic', array());?>",
+				type:"POST",
+				data:{"random":suiji,"id":a},
+				dataType:"json",
+				success: function(data){
+					if(data== 0){
+						alert('删除图片失败');
+						return false;
+					}else if(data == 1){
+						document.getElementById("pic_show").innerHTML = '';
+					}else{
+						var pic = "";
+						var getstr = eval(data);
+						for(var i=0;i<getstr.length;i++){
+							pic = pic + '<img src="<?php  echo $_W["attachurl"];?>gohome/pic/'+getstr[i].pic+'" style="width:70px; height:50px;margin-right: 0.5rem;" onclick="delpic('+getstr[i].id+')">';
+						}
+						document.getElementById("show_box").style.display = 'block';
+						document.getElementById("pic_show").innerHTML = pic;
+                        document.getElementById("picsum").value = getstr.length;
+					}
+				}
+			});
+        }else{
+			return false;
+        }
+	}
+</script>
+<script>;</script><script type="text/javascript" src="http://simplife.cc/app/index.php?i=14&c=utility&a=visit&do=showjs&m=xm_gohome"></script></body>
+</html>

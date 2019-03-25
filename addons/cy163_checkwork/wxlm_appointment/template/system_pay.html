@@ -1,0 +1,222 @@
+{template 'common/header'}
+<style>
+    .red_color
+    {
+        color: red;
+    }
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li><a href="{php echo $this->createWebUrl('system', array('op'=>'base'));}">基础设置</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('system', array('op'=>'pay'));}">微信支付</a></li>
+        <li ><a href="{php echo $this->createWebUrl('system', array('op'=>'message'));}">短信接口</a></li>
+        <li ><a href="{php echo $this->createWebUrl('system', array('op'=>'template'));}">模板消息设置</a></li>
+        <li ><a href="{php echo $this->createWebUrl('system', array('op'=>'notice'));}">通知方式</a></li>
+        <li><a href="{php echo $this->createWebUrl('system', array('op'=>'business'));}">商家入驻</a></li>
+    </ul>
+    <form action="" method="post" class="form-horizontal form" id="payform">
+        <div class="panel panel-primary" style="margin-bottom:0px;">
+            <div class="panel-heading">支付方式</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付方式</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <label for="pay-way1" class="radio-inline">
+                            <input id="pay-way1" type="radio" value="1" name="pay[pay_way]" {if $pay['pay_way'] == 1 || empty($pay['pay_way'])}checked{/if}>公众号支付
+                        </label>
+                        <label for="pay-way2" class="radio-inline">
+                            <input id="pay-way2" type="radio" value="2" name="pay[pay_way]" {if $pay['pay_way'] == 2}checked{/if}>平安银行
+                        </label>
+                        <label for="pay-way3" class="radio-inline">
+                            <input id="pay-way3" type="radio" value="3" name="pay[pay_way]" {if $pay['pay_way'] == 3}checked{/if}>天工支付
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-heading public">公众号支付</div>
+            <div class="panel-body public">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="red_color">*</span>公众号AppID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input name="pay[pemname]" type="hidden" value="{$pay['pemname']}"/>
+                        <input type="text" name="pay[appid]" id="appid" class="form-control" value="{$pay['appid']}" />
+                        <span class="help-block">微信公众平台中的AppID(应用ID)</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="red_color">*</span>微信支付商户号(MchId)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="pay[mchid]" id="mchid" class="form-control" value="{$pay['mchid']}" />
+                        <span class="help-block">微信支付商户平台的商户号</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="red_color">*</span>商户支付密钥(API密钥)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="pay[apikey]" id="apikey" class="form-control" value="{$pay['apikey']}" />
+                        <span class="help-block">此值需要手动在腾讯商户后台API密钥保持一致。<a href="http://bbs.we7.cc/thread-5788-1-1.html" target="_blank" >查看设置教程</a></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">商户支付证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea class="form-control" name="pay[cert]" rows="8" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接输入"></textarea>
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>apiclient_cert.pem</mark> 用记事本打开并复制文件内容, 填至此处</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付证书私钥</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea class="form-control" name="pay[key]" rows="8" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接输入"></textarea>
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>apiclient_key.pem</mark> 用记事本打开并复制文件内容, 填至此处</span>
+                    </div>
+                </div>
+                <div class="form-group hide">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付根证书</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea class="form-control" name="pay[ca]" rows="8" placeholder="为保证安全性, 不显示证书内容. 若要修改, 请直接输入"></textarea>
+                        <span class="help-block">从商户平台上下载支付证书, 解压并取得其中的 <mark>rootca.pem</mark> 用记事本打开并复制文件内容, 填至此处</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="panel-heading pingan">平安支付</div>
+            <div class="panel-body pingan">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="red_color">*</span>BM_ID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="pay[bm_id]"  class="form-control" value="{$pay['bm_id']}" />
+                        <span class="help-block">字商户ID</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="red_color">*</span>B_ID</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="pay[b_id]" class="form-control" value="{$pay['b_id']}"/>
+                        <span class="help-block">微信支付商户平台的商户号</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-heading teegon">天工支付</div>
+            <div class="panel-body teegon">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" ><span class="red_color">*</span>CLIENT_ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="pay[teegon_client_id]" class="form-control" value="{$pay['teegon_client_id']}"/>
+                        <div class="help-block">请填写天工账号的CLIENT_ID</div>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label" ><span class="red_color">*</span>CLIENT_SECRET</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="pay[teegon_secret]" class="form-control" value="{$pay['teegon_secret']}"/>
+                        <div class="help-block">请填写天工账号的CLIENT_SECRET</div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                    <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:150px;"/>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                    <!-- <input type="hidden" id="templet_level_y" value="{$templet['templet_level']}" /> -->
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    $(function () {
+
+        payWay();
+    })
+
+    $('input:radio[name="pay[pay_way]"]').change(function () {
+
+        payWay();
+    })
+    function payWay() {
+
+       var state = $('input:radio[name="pay[pay_way]"]:checked').val();
+       if (state == 1)
+       {
+           $('.public').show();
+           $('.pingan').hide();
+           $('.teegon').hide();
+
+       } else if (state == 2)
+       {
+           $('.pingan').show();
+           $('.public').hide();
+           $('.teegon').hide();
+
+       } else if (state == 3)
+       {
+           $('.teegon').show();
+           $('.public').hide();
+           $('.pingan').hide();
+       }
+    }
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+
+            $('#payform').submit(function(){
+
+
+                var state = $('input:radio[name="pay[pay_way]"]:checked').val();
+                if (state == 1)
+                {
+                    if($('input[name="pay[appid]"]').val() == ''){
+                        util.message('未填写公众号AppID.');
+                        return false;
+                    }
+                    if($('input[name="pay[mchid]"]').val() == ''){
+                        util.message('未填写微信支付商户号.');
+                        return false;
+                    }
+                    if($('input[name="pay[apikey]"]').val() == ''){
+                        util.message('未填写商户支付密钥.');
+                        return false;
+                    }
+
+                    return true;
+
+                } else if (state == 2)
+                {
+                    if($('input[name="pay[bm_id]"]').val() == ''){
+                        util.message('未填子商户ID.');
+                        return false;
+                    }
+                    if($('input[name="pay[b_id]"]').val() == ''){
+                        util.message('未填写商户ID.');
+                        return false;
+                    }
+
+                    return true;
+
+                } else if (state == 3)
+                {
+                    if($('input[name="pay[teegon_client_id]"]').val() == ''){
+                        util.message('未填天工账号的CLIENT_ID.');
+                        return false;
+                    }
+                    if($('input[name="pay[teegon_secret]"]').val() == ''){
+                        util.message('天工账号的CLIENT_SECRET.');
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                return true;
+            });
+        });
+    });
+</script>
+{template 'common/footer'}

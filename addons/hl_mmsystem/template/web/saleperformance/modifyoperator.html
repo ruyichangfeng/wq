@@ -1,0 +1,341 @@
+{template 'web/common/header'}
+
+<script type="text/javascript" src="resource/js/lib/jquery-ui-1.10.3.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/bootstrap-table-export.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/xlsx.core.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/FileSaver.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/html2canvas.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.plugin.autotable.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/jspdf.min.js"></script>
+<script src="{HLMMS_JS}plugins/bootstrap-table/tableExport.js"></script>
+<script src="{HLMMS_JS}scroll.js"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div class="m-b-md">
+                                <h2>{$setStoreData['set_storeName']}</h2>
+                            </div>
+                            <dl class="dl-horizontal">
+                                <dt>状态：</dt>
+                                <dd>{if $RoleUserInfo['status'] == 2}<span class="label label-primary">启用</span>
+                                    {else}<span class="label label-danger">禁用</span>
+                                    {/if}
+                                </dd>
+
+                            </dl>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-6">
+                            <img src="{php echo $path}"  class="btn btn-white btn-xs pull-right" style="width: 90px; height: 90px;">
+                            <a class="btn btn-primary btn-xs" href="{php echo $path}"  target="_blank" style="float: right; margin-top: 3px;"   download="{$RoleUserInfo['username']}"><i class="fa fa-pencil"></i> 下载专属二维码 </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <dl class="dl-horizontal">
+                                <dt>操作员：</dt>
+                                <dd><span class="label label-info">{$RoleUserInfo['username']}</span></dd>
+                            </dl>
+                        </div>
+                        {if util::getMemberAimsSchedule(3,$roleid,$operatoruid) == 1}
+                        <div class="col-sm-2" >
+                            <dl class="dl-horizontal">
+                                <dt>当月当前总金额：</dt>
+                                <dd><span class="label label-warning">{php echo util::getMemberAimsSchedule(1,$roleid,$operatoruid)}&nbsp;元</span></dd>
+                            </dl>
+                        </div>
+                        <div class="col-sm-2">
+                            <dl class="dl-horizontal">
+                                <dt>列表总金额：</dt>
+                                <dd id="inputMemberCommissionSum"><span class="label label-primary">0&nbsp;元</span></dd>
+                            </dl>
+                        </div>
+                        <div class="col-sm-2">
+                            <dl class="dl-horizontal">
+                                <dt>列表总人数：</dt>
+                                <dd id="newschedule"><span class="label" >0&nbsp;元</span></dd>
+                            </dl>
+                        </div>
+                        {/if}
+                    </div>
+                    {if util::getMemberAimsSchedule(4,$roleid,$operatoruid) == 1}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <dl class="dl-horizontal">
+                                <dt>当前进度</dt>
+                                <dd>
+                                    <div class="progress progress-striped active m-b-sm">
+                                        <div style="width: {php echo util::getMemberAimsSchedule(2,$roleid,$operatoruid)};" class="progress-bar"></div>
+                                    </div>
+                                    <small>当前已完成总进度的 <strong>{php echo util::getMemberAimsSchedule(2,$roleid,$operatoruid)} <span class="label label-danger">{php echo  util::getMemberAimsSchedule(5,$roleid,$operatoruid)}</span></strong></small>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="row m-t-sm">
+                        <div class="col-sm-12">
+                            <div class="panel blank-panel">
+                                <div class="panel-heading">
+                                    <div class="panel-options">
+                                        <ul class="nav nav-tabs">
+                                            <li class="active"><a href="#tab-1" data-toggle="tab">会员邀请注册情况</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="tab-1">
+                                            <div class="form-group">
+                                                <div class="col-sm-2">
+                                                    <div class="input-group m-b"><span class="input-group-addon">会员姓名</span>
+                                                        <input type="text" name="MemberName" id="MemberName" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <div class="input-group m-b"><span class="input-group-addon">会员卡号</span>
+                                                        <input type="text" name="CardNumber" id="CardNumber" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    {php echo tpl_form_field_daterange('limittime', array('starttime' => '2018-01-01','endtime' => $endtime));}
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <button class="btn btn-outline btn-primary" type="button" onclick="MemberCommissionSum();"><i class="fa fa-search"></i> 搜索</button>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <button class="btn btn-outline btn-success" type="button" onclick="$('#table_Export_all table').tableExport({type:'excel',escape:'false',  exportOptions:{ignoreColumn: [0,1,2,3,4,5,6]},});"><i class="fa fa-sticky-note-o"></i> 导出xls文件</button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div id="table_Export_all">
+                                                    <table id="memberlistInfo" data-mobile-responsive="true" ></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+        MemberCommissionSum();
+    });
+
+
+    $('#memberlistInfo').bootstrapTable({
+        url: '{php echo $this->createWebUrl('saleperformance', array('op' => 'memberlistInfo'));}',
+        method:"post",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded",
+        showRefresh: true,
+        // search:true, //显示搜索框
+        //  clickToSelect: true,
+        showPaginationSwitch:false,//是否显示数据条数选择框
+        striped:true,//隔行变色
+        exportDataType: "all",              //basic', 'all', 'selected'.
+        showColumns: true,
+        // exportTypes:[ 'excel'],  //导出文件类型
+        queryParamsType:'',
+        queryParams: querygoodsParamspage,//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber:1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [10, 20, 40, 100],
+        pagination: true,
+        height: 556,
+        selectItemName:"id",
+        uniqueId: "id",
+        searchable:true,
+        showFooter:true,
+        onPostBody:function () {
+            //合并页脚
+            // merge_footer();
+        },
+        exportOptions:{
+            ignoreColumn: [0,1,2,3,4,5,6],  //忽略某一列的索引
+        },
+        columns: [{
+            radio: true
+        },{
+            field: 'mem_memberCardNum',
+            title: '会员卡号',
+            align: "center",
+            valign: "middle",
+            formatter:ViewMemberInfo,
+
+        },{
+            field: 'mem_memberName',
+            title: '会员姓名',
+            align: "center",
+            valign: "middle",
+            footerFormatter: function (value) {
+                return "会员总人数："+value.length;
+            }
+        },{
+            field: 'mem_memberPointsCount',
+            title: '会员积分',
+            align: "center",
+            valign: "middle",
+            formatter:formatterPointsCount,
+            footerFormatter: function (value) {
+                var count = 0;
+                $.each(value, function (i) {
+                    count += (value[i].mem_memberPointsCount * 1);
+                });
+                return "会员总积分："+count;
+            }
+        },{
+            field: 'mem_memberMoneyCount',
+            title: '会员余额',
+            align: "center",
+            valign: "middle",
+            formatter:formatterMoneyCount,
+            footerFormatter: function (value) {
+                var count = 0;
+                $.each(value, function (i) {
+                    count += (value[i].mem_memberMoneyCount * 1);
+                });
+
+                return "会员总余额："+count;
+            }
+        }, {
+            field: 'mem_memberAddtime',
+            title: '加入时间',
+            align: "center",
+            valign: "middle",
+            formatter:consumeinvoiceaddTime
+        }
+        ]
+    });
+    function querygoodsParamspage (params) {
+        var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            pageSize: params.pageSize,  //页面大小
+            pageNumber: params.pageNumber, //页码
+            operatoruid: "{php echo $operatoruid}", //页码
+            MemberName: $("#MemberName").val(),
+            CardNumber: $("#CardNumber").val(),
+            start_specifiedStartTime:$('input[name="limittime[start]"]').val(),
+            end_specifiedEndTime: $('input[name="limittime[end]"]').val(),
+
+        };
+        return temp;
+    }
+    //时间转换
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+    function ViewMemberInfo(value, row, index) {
+
+        var id = value;
+        var result = "<a  class='btn btn-outline btn-success dim btn-sm'  href='{php echo $this->createWebUrl('memberinfo')}&memberCardNum="+id+"' >"+id+"</a>";
+        return result;
+    }
+    function formatterPointsCount(value, row, index) {
+
+        var content = value;
+
+        if(content==null||content==undefined||content==""){
+
+
+            var result = "<span class='label label-primary'>0</span>";
+        }
+        else{
+
+            var result = "<span class='label label-primary'>"+content+"</span>";
+        }
+
+        return result;
+    }
+    function formatterMoneyCount(value, row, index) {
+
+        var content = value;
+
+        if(content==null||content==undefined||content==""){
+
+
+            var result = "<span class='badge badge-danger'>0</span>";
+
+        }
+        else{
+
+            var result = "<span class='badge badge-danger'>"+content+"</span>";
+        }
+
+        return result;
+    }
+    // function merge_footer() {
+    //     var footer_tbody = $('.fixed-table-footer table tbody');
+    //     var footer_tr = footer_tbody.find('>tr');
+    //     var footer_td = footer_tr.find('>td');
+    //     var footer_td_1 = footer_td.eq(0);
+    //     var footer_td_2 = footer_td.eq(1);
+    //
+    //
+    //
+    //     footer_td.eq(0).hide();
+    //     footer_td.eq(5).hide();
+    //
+    //
+    //     footer_td_2.attr('colspan', 3).show();
+    // }
+
+    function MemberCommissionSum() {
+        $('#memberlistInfo').bootstrapTable('refresh');
+
+        var operatoruid = "{php echo $operatoruid}";
+        var roleid = "{php echo $roleid}";
+        var MemberName = $("#MemberName").val();
+        var CardNumber = $("#CardNumber").val();
+        var start_specifiedStartTime = $('input[name="limittime[start]"]').val();
+        var end_specifiedEndTime = $('input[name="limittime[end]"]').val();
+
+        var url = "{php echo $this->createWebUrl('saleperformance', array('op' => 'MemberCommissionSum'))}";
+        $.ajax({
+            url: url,
+            type: "post",
+            data: {operatoruid:operatoruid,MemberName:MemberName,CardNumber:CardNumber,start_specifiedStartTime:start_specifiedStartTime,end_specifiedEndTime:end_specifiedEndTime,roleid:roleid},
+            dataType: 'json',
+            success: function (data) {
+                if (data['message']['code'] == 1) {
+                    $("#inputMemberCommissionSum").html("<span class=\"label label-primary\">"+Math.round(data['message']['msg']*100)/100+"元</span>");
+                    $("#newschedule").html("<span class=\"label\">"+Math.round(data['message']['newschedule']*100)/100+"元</span>");
+                    $('#memberlistInfo').bootstrapTable('refresh');
+                    return;
+                }
+                else{
+                    $('#memberlistInfo').bootstrapTable('refresh');
+                    return;
+                }
+            }
+        });
+
+
+    }
+</script>
+
+
+{template 'web/common/footer'}

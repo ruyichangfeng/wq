@@ -1,0 +1,198 @@
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<title>{$region['title']}</title>
+<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/style1/static/css/home.css"/>
+<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/style1/static/css/style.css"/>
+<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/style1/static/css/weui.css"/>
+
+<script src="{MODULE_URL}template/mobile/style1/static/js/jquery-1.7.1.min.js"></script>
+<script src="{MODULE_URL}template/mobile/style1/static/js/public.js"></script>
+<script src="{MODULE_URL}template/mobile/style1/static/js/laytpl.js"></script>
+
+<style>
+    .slide_img {
+        height: 160px;
+        height: expression(document.body.clientWidth>160?"160px":"auto");
+        width: 100%;
+    }
+    /*公告轮播*/
+
+    .scrollNews{  width: 100%;  height: 40px;  overflow: hidden; background-color: #ffffff;}
+
+    .yy{  width: 100%;  height: 40px;  background-repeat: no-repeat;  background-size: cover;  background-size: 100% 100%;  }
+
+    .notice{  width: 100%;  height: 40px;  margin-left: auto;  margin-right: auto;  }
+
+    .notice_pic{  width: 20px;  border: rgba(0, 0, 255, 0) 1px solid;  float: left;  margin-top: 10px;  margin-left: 2%; margin-right: 5px }
+
+    .notice_pic1{  width:20px;  height: 20px;  vertical-align: middle;  }
+
+    .notice_txt{  width: 90%;  height: 35px;  line-height: 35px;  border: rgba(0, 0, 255, 0) 1px solid;  margin-left: 26px;  margin-top: -3px;  text-align: left;  overflow: hidden;  }
+
+    .notice_h1{  margin-top: 3px;  color: #797979;  font-size:15px;  }
+</style>
+
+<body>
+
+<div id='slider' class='swipe'>
+    <div class='swipe-wrap'>
+        {loop $slides $row}
+        <div class='wrap'>
+            <a href="{$row['url']}">
+                <img src="{$_W['attachurl']}{$row['thumb']}" alt="{$row['title']}" class="slide_img"/>
+            </a>
+        </div>
+        {/loop}
+    </div>
+</div>
+<div class="scrollNews" style="border-bottom:1px solid #f2f2f2">
+    <div class="yy">            <!--通知轮播-->
+        {loop $notice $n}
+        <div class="notice"><a href="{php echo $this->createMobileUrl('announcement',array('op'=> 'detail','id' => $n['id']))}">
+            <div class="notice_pic" >
+                <img class="notice_pic1" src="{MODULE_URL}template/mobile/style1/static/image/icon-notice.png">
+            </div>
+            <div class="notice_txt" >
+                <p class="notice_h1" >
+                    {php echo date('Y-m-d',$n['createtime'])}{$n['title']}
+                </p>
+            </div>
+        </a>
+        </div>
+        {/loop}
+    </div>
+</div>
+<div style="height:10px;width:100%"></div>
+
+<section class="floor">
+    <div class="border-t"></div>
+    <h2 class="floor-title co-yellow" style="line-height:12px;">{$menu['title']}<i></i><span
+            onclick="javascript:window.location.href='{php echo $this->createMobileUrl('nav')}';">更多服务</span></h2>
+
+    <div class="border-b" style="top:44px"></div>
+    <ul class="floor-menu-1" style="margin-top:5px;">
+        {loop $g $row}
+        {loop $children[$row['id']] $nav}
+        <li {if $member['mobile']}onclick="javascript:window.location.href='{$nav['url']}'{else}{if
+        $nav['view']==1}onclick="javascript:window.location.href='{$nav['url']}'{else}onclick="show()"{/if}{/if}">
+        <img src="{php echo tomedia($nav['thumb'])}" style="width: 50px;height: 50px;">
+
+        <div>{$nav['title']}</div>
+        </li>
+        {/loop}
+        {/loop}
+    </ul>
+    <div class="border-b"></div>
+</section>
+{if $good}
+<section class="floor channel-floor">
+    <div class="border-t"></div>
+    <h2 class="floor-title-2">猜您喜欢</h2>
+
+    <div class="border-b" style="top:43px"></div>
+    <div id="showGoods">
+        <ul class="channel-floor-ul floor-two-ul">
+        </ul>
+    </div>
+    <br>
+</section>
+<!--猜您喜欢 e-->
+<!--加载更多 s-->
+
+<section class="floor" style=" text-align:center; padding:16px 0; font-size:16px;"
+         onclick="javascript:window.location.href='{php echo $this->createMobileUrl('shopping',array('op' => 'list'))}';">
+    查看全部商品
+</section>
+{/if}
+<!--加载更多 e-->
+<div style="height:5em;"></div>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <li><a href="{{ d.list[i].url }}"
+           class="p-img"><img src="{{ d.list[i].thumb }}"
+                              class="slide_img">
+
+        <h3 class="p-name"> {{ d.list[i].title }} <span>&nbsp;&nbsp;&nbsp; {{ d.list[i].unit }}</span></h3></a>
+
+        <div class="channer_media" onclick="#">
+            <div class="p-price"><span class="p-price-now"><b>¥{{ d.list[i].marketprice }}</b></span> <span
+                    id="market_price"
+                    class="p-price-cost"><b
+                    style="font-size:12px;">{{ d.list[i].productprice }}</b></span></div>
+        </div>
+        <div class="tag"></div>
+        <div class="tag-tltle">热卖</div>
+    </li>
+    {{# } }}
+
+</script>
+<style type="text/css">
+    .weui-footer {
+        color: #999999;
+        font-size: 14px;
+        text-align: center;
+        margin-top: -50px;
+        margin-bottom: 80px;
+    }
+</style>
+<div class="weui-footer" onclick="javascript:window.location.href='{php echo $this->module['config']['copyrighturl']}';">
+    <p class="weui-footer__text">{php echo $this->module['config']['copyright']}</p>
+</div>
+<!-- 底部 -->
+{template 'style1/footer'}
+{if $good}
+<a href="javascript:window.location.href='{php echo $this->createMobileUrl('shopping',array('op' => 'mycart'))}';"
+   class="footer-car" id="counts" style="display: inline;"><span>{$carttotal}</span></a>
+{/if}
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style1/static/js/swipe.js"></script>
+
+<script>
+    /*通知轮播*/
+    $(function () {
+        var $this = $(".scrollNews");
+        var t = null;
+        $this.hover(function () {
+            clearInterval(t);
+        }, function () {
+            t = setInterval(function () {
+                scrollNews($this);
+            }, 4000);
+        }).trigger("mouseleave");
+    });
+    function scrollNews(obj) {
+        var $self = obj.find('.yy');
+        var lineHeight = $self.find(".notice").eq(0).height();
+        $self.animate({"marginTop": -lineHeight + "px"}, 600, function () {
+            $self.css({marginTop: 0}).find(".notice").eq(0).appendTo($self);
+        })
+    }
+    $(function () {
+        new Swipe($('#slider')[0], {
+            speed: 500,
+            auto: 3000,
+            callback: function () {
+                var lis = $(this.element).next("ol").children();
+                lis.removeClass("on").eq(this.index).addClass("on");
+            }
+        });
+    });
+    $(function () {
+        select('a1');
+    });
+    function show() {
+        alert('对不起,你不是本小区的业主,可在个人中心完善账户信息');
+        var regionid = "{$member['regionid']}";
+        window.location.href = "{php echo $this->createMobileUrl('register',array('op' => 'member'))}&regionid=" + regionid;
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        loaddata("{php echo $this->createMobileUrl('home')}", $(".floor-two-ul"), 'xq_list', true);
+
+    });
+</script>
+
+</body>
+
+</html>

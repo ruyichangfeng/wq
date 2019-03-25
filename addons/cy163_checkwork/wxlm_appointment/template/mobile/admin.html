@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/style_admin.css">
+</head>
+<style>
+    .li-tab{
+        width: 100%;
+        margin-top: 30px;
+    }
+    .li-tab li{
+        width: 33.33333333333333333333%;
+        float: left;
+        text-align: center;
+    }
+    .li-tab li img{
+        width: 30px;
+        /* height: 36px; */
+    }
+    p{
+        margin-top: 10px;
+        margin-bottom: 0 !important;
+    }
+</style>
+<body>
+    <div class="banner">
+        <img src="{RES}mobile/images/admin_top.png" alt="">
+        <div class="headname"><p>{$staff['staff_name']}</p> </div>
+        <div class="headimg"><img src="{php echo tomedia($staff['staff_avatar'])}" alt=""></div>
+    </div>
+    <div class="selec">
+        <div class="selec-left">门店</div>
+        <div class="selec-right">
+            <select id="store">
+                {loop $stores $key $item}
+                <option value="{$item['store_id']}" {if $item['store_id'] == $default_store['store_id']}selected{/if}>{$item['store_name']}</option>
+                {/loop}
+            </select>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="li-tab">
+        <a href="{php echo $this->createMobileUrl('staffcomment')}">
+            <li>
+                <img src="{RES}mobile/images/pingjia.png">
+                <p>我的评价</p>
+            </li>
+        </a>
+        <a href="{php echo $this->createMobileUrl('selfcode')}">
+                <li>
+                    <img src="{RES}mobile/images/ewm.png">
+                    <p>专属二维码</p>
+                </li>
+        </a>
+        <a href="{php echo $this->createMobileUrl('archive')}">
+                <li>
+                    <img src="{RES}mobile/images/dac.png">
+                    <p>档案池</p>
+                </li>
+        </a>
+        <div class="clear"></div>
+            
+    </div>
+    <div class="project-title">
+        <span>服务项目</span>
+    </div>
+    <div class="project-list" id="project_content">
+        {loop $projects $key $item}
+        <a href="javascript:getStore('{$item["project_id"]}')"><li class="project-listinfo">
+            <div class="project-listinfo-left">{$item['project_name']}</div>
+            <div class="project-listinfo-right"><img src="{RES}mobile/images/admin_right.png" alt=""></div>
+            {if !empty($item['look'])}<div class="project-listinfo-num">{$item['look']}</div>{/if}
+            <div class="clear"></div>
+        </li>
+        </a>
+        {/loop}
+        {if empty($projects)}
+        <li class="project-listinfo">
+            暂无服务项目
+        </li>
+        {/if}
+    </div>
+
+    <script>
+        function getStore(projectid) {
+
+            var storeid = $('#store').val();
+
+            location.href = "{php echo $this->createMobileUrl('setting')}" + "&storeid=" + storeid + "&projectid=" + projectid;
+
+        }
+        $('#store').change(function () {
+
+            var storeid = $(this).val();
+            var staffid = "{$staff['staff_id']}";
+
+            $.ajax({
+
+                url:"{php echo $this->createMobileUrl('ajaxProject')}",
+                type:"post",
+                data:{store:storeid, staff:staffid},
+                success:function (res) {
+
+                    $('#project_content').html(res);
+                }
+            })
+
+
+        })
+    </script>
+</body>
+</html>

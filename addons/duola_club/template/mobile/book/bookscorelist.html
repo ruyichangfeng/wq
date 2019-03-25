@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    <!--<link href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet">-->
+    <!--<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>-->
+    <!--<link href="{MODULE_URL}public/mobile/css/star-rating.css" media="all" rel="stylesheet" type="text/css"/>-->
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+    <link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.60120" />
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+    <!--<script src="{MODULE_URL}public/mobile/js/star-rating.js" type="text/javascript"></script>-->
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+<body>
+<style>
+    .order_cnt{ min-height: 76px; border-top:1px solid #bec3cf; border-bottom:1px solid #bec3cf; margin-top: 10px; position: relative; padding:2px 68px 10px 10px; background-color: #fff; color: #828282;}
+    .order_cnt > dt
+    .order_cnt .order_static{position:absolute; width:120px; right: 0; bottom: 0;top: 0; border-left: 1px dashed #bec3cf;}
+    /*dl,dd,ol,ul,li{margin:0;padding:2px}*/
+    .score::after {position: absolute; top: 50%;left: 50%; width:60px; height: 20px; margin:-10px 0 0 -25px; font: 12px/20px "黑体"; text-align: center; color: #fff;-webkit-border-radius: 10px; border-radius: 10px;content: "评价"; background-color: #DDB;}
+</style>
+<div id="wrap" class="teacher_inf">
+    <!--列表-->
+    {if $count > 0}
+    <dl>
+        <dd class="newsList">
+            {if $orders}
+            <h3>借书订单</h3>
+            <ul>
+                {loop $orders $item}
+                <li class="order_cnt">
+                    <dt><div style="background-image:url({php echo tomedia($item['icon']);})"></div>{$item['nickname']}</dt>
+                    <dd>金额:{$item['price']}元</dd>
+                    <dd>下单时间:{$item['createDate']}</dd>
+                    <dd>订单状态:<strong style="color: #f77b23">
+            {if $item['orderStatus'] == 1}
+                        订单待确认
+            {else if $item['orderStatus'] == 2}
+                        确认待实物出库
+            {else if $item['orderStatus'] == 3}
+                        出库待入库
+            {else if $item['orderStatus'] == 4}
+            已完成
+            {else if $item['orderStatus'] == 5}
+            已取消
+            {/if}
+
+        </strong>
+        </dd>
+        <dd>是否评价:<strong style="color: #f77b23">
+            {if $item['orderScore'] == 0}
+            未评价
+            {else}
+            已评价
+            {/if}
+        </strong></dd>
+        {if $item['orderScore'] == 0}
+        <div class="order_static">
+            <a class="score" href="{php echo $this->createMobileUrl('bookscore',array('schoolid'=>$schoolid,'orderID' => $item['id'],'orderType' => 'borrow','op' => 'search'))}"></a>
+        </div>
+        {/if}
+                </li>
+                {/loop}
+            </ul>
+            {/if}
+            {if $tranferorders}
+            <h3>易书订单</h3>
+            <ul>
+                {loop $tranferorders $item}
+                <li class="order_cnt">
+                    <dt><div style="background-image:url({php echo tomedia($item['icon']);})"></div>{$item['nickname']}</dt>
+                    <dd>金额:{$item['price']}元</dd>
+                    <dd>下单时间:{$item['createDate']}</dd>
+                    <dd>订单状态:<strong style="color: #f77b23">
+                        {if $item['orderStatus'] == 1}
+                        首发订单待回选
+                        {else if $item['orderStatus'] == 2}
+                        回选生成待实物交接
+                        {else if $item['orderStatus'] == 3}
+                        回选出库待入库
+                        {else if $item['orderStatus'] == 4}
+                        回选完毕待首选出库
+                        {else if $item['orderStatus'] == 5}
+                        首选出库待入库
+                        {else if $item['orderStatus'] == 6}
+                        订单完成
+                        {else if $item['orderStatus'] == 6}
+                        订单已取消
+                        {/if}
+                    </strong>
+                    </dd>
+                    <dd>是否评价:<strong style="color: #f77b23">
+                        {if $item['isScored'] == 1}
+                        未评价
+                        {else}
+                        已评价
+                        {/if}
+                    </strong></dd>
+                    {if $item['orderScore'] == 0}
+                    <div class="order_static">
+                        <a class="score" href="{php echo $this->createMobileUrl('bookscore',array('schoolid'=>$schoolid,'orderID' => $item['id'],'orderType' => 'transfer','op' => 'search'))}"></a>
+                    </div>
+                    {/if}
+                </li>
+                {/loop}
+            </ul>
+            {/if}
+        </dd>
+    </dl>
+    {else}
+    <div class="icon-box" style="text-align: center;">
+        <i class="weui-icon-warn weui-icon_msg-primary"></i>
+        <div class="icon-box__ctn">
+            <h3 class="icon-box__title">没有未评价的订单了!</h3>
+        </div>
+    </div>
+    {/if}
+</div>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+</script>
+
+<script>
+    $(document).ready(function(e) {
+        $("#wrap").css("min-height", $(document).height());
+    });
+</script>
+{php include $this->template('footer');}
+</body>
+
+</html>
+

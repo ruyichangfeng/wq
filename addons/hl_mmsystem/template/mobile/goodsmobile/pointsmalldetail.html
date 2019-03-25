@@ -1,0 +1,248 @@
+{template 'common/header'}
+<style>
+    h4{
+        margin-top: 5px;
+        color:#000000;
+    }
+    h5 {
+        font-size: 20px;
+        color:#000000;
+        font-weight: bold
+    }
+    select{
+        text-align: center;
+        text-align-last: center;
+    }
+    label{
+        font-weight:bold;
+        font-size: 15px;
+    }
+</style>
+<body>
+<form class="form-horizontal" method="post" enctype="multipart/form-data" id="goodsinventorychangeForm" onsubmit="return check(this);">
+    <div class="mui-content">
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">商品详情</h1>
+        </header>
+        <div class="mui-content">
+            <div id="slider" class="mui-slider">
+                <div class="mui-slider-item">
+                    <div class="mui-card">
+                        <div class="mui-slider-item">
+                            <img src="{php echo tomedia($detaillist['goo_picture'])}" width="100%" height="100%">
+                        </div>
+                        <div class="mui-card-content">
+                            <div class="mui-card-content-inner" style="text-align: center">
+                                <h4 style="color:#f02402">{$detaillist['goo_name']}</h4>
+                                <h4 style="margin-top: 5%;"> 库存数量: {$detaillist['goo_number']}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mui-card">
+                <div class="mui-content-padded">
+                    <h4 style="text-align: center;">操作方式</h4>
+                    <select class="mui-btn mui-btn-block" name="giiinventorytype" style="">
+                        <option value="0"disabled="disabled" >请选择类型</option>
+                        <option value="1" >入库</option>
+                        <option value="2" >退货</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mui-card">
+                <div class="mui-card-content-inner">
+                    <h4 style="text-align: center">选择供应商</h4>
+                </div>
+
+                <select class="mui-btn mui-btn-block"name="goodssupplier">
+                    {loop $suppliersql $itemsupplier}
+                    <option value="{$itemsupplier['id']}" {if $itemsupplier['id'] == $itemsupplier['goodssupplier_id']}selected ='selected'{/if}>{$itemsupplier['gs_supplierName']}</option>
+                    {/loop}
+                </select>
+            </div>
+
+            <div class="mui-card">
+                <div class="mui-card-content-inner">
+                    <h5 class="mui-content-padded" style="text-align: center">数量设置</h5>
+                    <div class="mui-card-header" style="padding-left: 20%">
+                        <div class="mui-numbox" id="goodsNumber"  data-numbox-step='1' data-numbox-min='1' style="width: 80%;height: 45px;">
+                            <button class="mui-btn-numbox-minus" id="delValue" type="button">-</button>
+                            <input class="mui-input-numbox" id="giid_goodsNumber"name="giid_goodsNumber" type="number"  />
+                            <button class="mui-btn-numbox-plus" id="addValue" type="button">+</button>
+                        </div>
+                    </div>
+                    <div class="mui-card">
+
+                        <div class="mui-input-row">
+                            <label>购货单价-</label>
+                            <input type="text" value="{$detaillist['goo_purchasePrice']}" class="mui-input-clear" id="giid_goodsUnitPrice"name="giid_goodsUnitPrice" placeholder="{$detaillist['goo_purchasePrice']}">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>折扣率-</label>
+                            <input type="text" class="mui-input-clear" value="100" id="giid_goodsDiscountRate" name="giid_goodsDiscountRate"placeholder="请输入折扣率入：1">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>入库总价-</label>
+                            <input type="text" class="mui-input-clear"  id="giid_goodsDiscount" name="giid_goodsDiscounte" placeholder="请输入金额">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>折扣率-</label>
+                            <input type="text" class="mui-input-clear" value="100" name="giidiscountRate" id="giidiscountRate" placeholder="请输入折扣率入：1">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>结算金额-</label>
+                            <input type="text" class="mui-input-clear"  name="giitotal" value=""  id="giitotal" placeholder="请输入金额">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>本次付款-</label>
+                            <input type="text" class="mui-input-clear" name="giiprimarySupplement" id="giiprimarySupplement" placeholder="请输入金额">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>本次欠款-</label>
+                            <input type="text" class="mui-input-clear" name="giifoldClause" id="giifoldClause" placeholder="请输入金额">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>备注-</label>
+                            <input type="text" class="mui-input-clear" name="giinote" id="giinote" placeholder="请输入备注">
+                        </div>
+                        <div class="mui-content-padded" align="center">
+                            <input name="submit" type="submit" value=" 提 交 " class="mui-btn mui-btn-warning mui-btn-block" style="width: 50%;"/>
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+<script>
+    $(function(){
+        $(document).ready(function(){
+                var Rate = $("#giidiscountRate").val();
+                var a = parseInt(mui('#goodsNumber').numbox().getValue());
+                var price = $("#giid_goodsUnitPrice").val();
+                var trate = $("#giid_goodsDiscountRate").val();
+                var m=Rate*0.01;//供应商折扣额
+                var c=trate*0.01;//商品折扣额
+                var d=price*a;
+                var cont = c*d;//商品折扣后价格
+                var o=  cont.toFixed(2);
+                var n=cont*m;//供应商折扣后价格
+                var g=n.toFixed(2);
+                mui('#giid_goodsDiscount').popover(o);
+                $("#giid_goodsDiscount").attr("value",o);//
+                mui('#giitotal').popover(g);
+                $("#giitotal").attr("value",g);
+        });
+        document.getElementById('giid_goodsNumber').addEventListener('input',function(){
+            var Rate = $("#giidiscountRate").val();
+            var a = parseInt(mui('#goodsNumber').numbox().getValue());
+            var price = $("#giid_goodsUnitPrice").val();
+            var trate = $("#giid_goodsDiscountRate").val();
+            var m=Rate*0.01;//供应商折扣额
+            var c=trate*0.01;//商品折扣额
+            var d=price*a;
+            var cont = c*d;//商品折扣后价格
+            var o=  cont.toFixed(2);
+            var n=cont*m;//供应商折扣后价格
+            var g=n.toFixed(2);
+
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+        });
+        document.querySelector('#delValue').addEventListener('click',function () {
+            var Rate = $("#giidiscountRate").val();
+            var b= parseInt(mui('#goodsNumber').numbox().getValue()) -1;
+            var price = $("#giid_goodsUnitPrice").val();
+            var trate = $("#giid_goodsDiscountRate").val();
+            var m=Rate*0.01
+            var c=trate*0.01;
+            var d=price*b;
+            var cont = c*d;
+            var o=  cont.toFixed(2);
+            var n=cont*m;
+            var g=n.toFixed(2);
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+        });
+        document.getElementById('addValue').addEventListener('click',function(){
+            var Rate = $("#giidiscountRate").val();
+            var a = parseInt(	mui('#goodsNumber').numbox().getValue())+1;
+            var price = $("#giid_goodsUnitPrice").val();
+            var trate = $("#giid_goodsDiscountRate").val();
+            var m=Rate*0.01
+            var c=trate*0.01;
+            var d=price*a;
+            var cont = c*d;
+            var o=  cont.toFixed(2);
+            var n=cont*m;
+            var g=n.toFixed(2);
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+        });
+        document.getElementById('giid_goodsUnitPrice').addEventListener('input',function(){
+            var Rate = $("#giidiscountRate").val();
+            var price = $("#giid_goodsUnitPrice").val();
+            var a = parseInt(mui('#goodsNumber').numbox().getValue());
+            var trate = $("#giid_goodsDiscountRate").val();
+            var m=Rate*0.01
+            var c=trate*0.01;
+            var d=price*a;
+            var cont = c*d;
+            var o=  cont.toFixed(2);
+            var n=cont*m;
+            var g=n.toFixed(2);
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+
+        });
+        document.getElementById('giid_goodsDiscountRate').addEventListener('input',function(){
+            var Rate = $("#giidiscountRate").val();
+            var trate = $("#giid_goodsDiscountRate").val();
+            var price = $("#giid_goodsUnitPrice").val();
+            var a = parseInt(mui('#goodsNumber').numbox().getValue());
+            var m=Rate*0.01
+            var c=trate*0.01;
+            var d=price*a;
+            var cont = c*d;
+            var o=  cont.toFixed(2);
+            var n=cont*m;
+            var g=n.toFixed(2);
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+        });
+        document.getElementById('giidiscountRate').addEventListener('input',function(){
+            var Rate = $("#giidiscountRate").val();
+            var trate = $("#giid_goodsDiscountRate").val();
+            var price = $("#giid_goodsUnitPrice").val();
+            var a = parseInt(mui('#goodsNumber').numbox().getValue());
+            var m=Rate*0.01
+            var c=trate*0.01;
+            var d=price*a;
+            var cont = c*d;
+            var o=  cont.toFixed(2);
+            var n=cont*m;
+            var g=n.toFixed(2);
+            mui('#giid_goodsDiscount').popover(o);
+            $("#giid_goodsDiscount").attr("value",o);//
+            mui('#giitotal').popover(g);
+            $("#giitotal").attr("value",g);
+        });
+    });
+
+</script>
+

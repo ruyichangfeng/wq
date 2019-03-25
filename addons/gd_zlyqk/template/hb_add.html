@@ -1,0 +1,65 @@
+{template "base/child_header"}
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <input type="hidden" name="id" value="{$recorder['id']}">
+        <label class="layui-form-label">红包名</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[send_name]" value="{$recorder['send_name']}" required="" style="width: 400px;" lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">红包金额</label>
+        <div class="layui-input-block">
+            <input type="number" name="in[total_amount]" required="" value="{$recorder['total_amount']}" style="width: 400px;" lay-verify="required" placeholder="单位为:元"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">活动名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[act_name]" required="" value="{$recorder['act_name']}" style="width: 400px;" lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">红包祝福语</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[wishing]" required="" value="{$recorder['wishing']}" style="width: 400px;" lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <input type="text" name="in[remark]" required="" value="{$recorder['remark']}" style="width: 400px;"   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="in[status]" title="正常" value="1" {if $recorder['status']==1} checked {/if}>
+            <input type="radio" name="in[status]" title="禁用" value="0" {if $recorder['status']==0} checked {/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addAdmin">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','jquery'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        form.on('submit(addAdmin)', function(data){
+            $.post("{php echo $this->createWebUrl($_GPC['do'],array('tb'=>'hb'))}&Ajax=",data.field,function(response){
+                layer.msg(response.msg,{icon: response.code});
+                if(response.code==1){
+                    setTimeout(function(){
+                        parent.location.reload();
+                    },1000);
+                }
+            },"json");
+            return false;
+        });
+    });
+</script>
+{template "base/child_footer"}

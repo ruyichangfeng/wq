@@ -1,0 +1,303 @@
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp&key=VY3BZ-WRWWQ-WUP5C-GKZ6R-WNOSV-G3BZR"></script>
+<script type="text/javascript">
+wx.config({
+    debug: false,
+    appId: "{$jsSign['appId']}",
+    timestamp:{$jsSign['timestamp']},
+    nonceStr: "{$jsSign['nonceStr']}",
+    signature: "{$jsSign['signature']}",
+     jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'onMenuShareQZone',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onVoiceRecordEnd',
+        'playVoice',
+        'onVoicePlayEnd',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+      ]
+});
+</script>
+<script>
+
+   //录音操作
+   var bg=2;
+   var img;
+
+   var voiceId;
+   var voiceServerId="";
+   var btnRecord = $('.voice');
+   var isPlay=false;
+   var timeInt;
+   var playBtn=$(".play");
+   var voice_len="";
+   var voiceTime=0;
+   var timeLen;
+   var geocoder;
+
+   btnRecord.on('touchstart', function(event) {
+       event.preventDefault();
+       btnRecord.addClass('hold');
+       startTime = new Date().getTime();
+       timeLen = setInterval(function(){
+           voiceTime +=1;
+       },10);
+       recordTimer = setTimeout(function() {
+           wx.startRecord({
+               success: function() {
+               },
+               cancel: function() {
+                   alert('用户拒绝授权录音');
+               }
+           });
+       }, 300);
+   }).on('touchend', function(event) {
+       //添加录音时长
+       resetVoiceTime(voiceTime);
+       event.preventDefault();
+       btnRecord.removeClass('hold');
+       if (new Date().getTime() - startTime < 300) {
+           startTime = 0;
+           clearTimeout(recordTimer);
+       } else {
+           wx.stopRecord({
+               success: function(res) {
+                   voiceId = res.localId;
+                   uploadVoice(voiceId);
+               },
+               fail: function(res) {
+                   alert(JSON.stringify(res));
+               }
+           });
+       }
+   });
+
+   //播放录音,如果播放中,点击停止
+    playBtn.click(function(){
+        if(!isPlay){
+            wx.playVoice({
+                localId: voiceId
+            });
+            timeInt = setInterval(function(){
+                if(bg==2){
+                    bg=3;
+                }else{
+                    bg=2;
+                }
+                playVoice(bg);
+            },600);
+        }else{
+            wx.stopVoice({
+                localId: voiceId
+            });
+            bg=2;
+            playVoice(bg);
+            clearInterval(timeInt);
+        }
+        isPlay = !isPlay;
+    });
+
+
+
+    wx.ready(function () {
+        //如果超过一分钟自动停止
+        wx.onVoiceRecordEnd({
+            complete: function (res) {
+                resetVoiceTime();
+                voiceId = res.localId;
+                uploadVoice(voiceId);
+                alert('录音时间已超过一分钟');
+            }
+        });
+
+        //自动检测停止
+        wx.onVoicePlayEnd({
+            complete: function (res) {
+                bg=2;
+                isPlay =false;
+                playVoice(bg);
+                clearInterval(timeInt);
+            }
+        });
+
+        //位置插件,签到插件
+        var lc=$("#local_p");
+        var sign=$(".sign");
+        if(lc.length>0 || sign.length >0){
+            wx.getLocation({
+                type:'gcj02',
+                success: function (res) {
+                    //获取实际地理位置
+                    geocoder = new qq.maps.Geocoder({
+                        complete : function(result){
+                            if(lc.length>0){
+                                lc.val(result.detail.address);
+                            }
+                            if(sign.length >0){
+                                $("#sign_addr").val(result.detail.address);
+                            }
+                        }
+                    });
+                    var latLng = new qq.maps.LatLng(res.latitude, res.longitude);
+                    geocoder.getAddress(latLng);
+                    if(lc.length>0){
+                        $("#lat").val(res.latitude);
+                        $("#lnt").val(res.longitude);
+                    }
+                    if(sign.length >0){
+                        $("#sign_lat").val(res.latitude);
+                        $("#sign_lnt").val(res.longitude);
+                    }
+                },
+                cancel: function (res) {
+                    alert('用户拒绝授权获取地理位置');
+                }
+            });
+        }
+    });
+
+    //播放图标动画
+    function playVoice(bg,classes){
+        if(classes){
+            img = "{MODULE_URL}/static/mobile/css/images/vioce"+bg+".png";
+            $("."+classes).css("background",'url('+img+') 0.2rem center no-repeat #89e5d2');
+            $("."+classes).css("background-size",'.26rem .35rem');
+        }else{
+            img = "{MODULE_URL}/static/mobile/css/images/vioce"+bg+".png";
+            playBtn.css("background",'url('+img+') 0.2rem center no-repeat #89e5d2');
+            playBtn.css("background-size",'.26rem .35rem');
+        }
+
+    }
+
+    //初始化录音时长
+    function resetVoiceTime(second){
+        voiceTime=0;
+        clearInterval(timeLen);
+        if(second){
+            var sec=parseInt(second/100);
+            var mic = second%100;
+//            playBtn.html(''+sec+"'"+mic+'"');
+            voice_len=''+sec+"#"+mic+'*';
+            $("#voice_time").val(voice_len);
+        }else{
+//            playBtn.html(''+0+"'"+0+'"');
+            voice_len=''+0+"#"+0+'*';
+            $("#voice_time").val(voice_len);
+        }
+    }
+
+   //上传录音
+    function uploadVoice(voice_id){
+        wx.uploadVoice({
+            isShowProgressTips:0,
+            localId: voice_id,
+            success: function (res) {
+                voiceServerId= res.serverId;
+                $("#voice_url").val(res.serverId);
+//                $(".voice-box").css("display","block");
+            }
+        });
+    }
+
+    //图片处理最多 传4张图片
+   var localId = new Array();
+   var serverId = new Array();
+   var imgBox = $(".weui-uploader__files");
+
+   $(".weui-uploader__input-box").click(function(){
+       var imgTotal=$(".img_total").text();
+       wx.chooseImage({
+           count: imgTotal,
+           success: function (res) {
+               for (var len=0;len<res.localIds.length;len++){
+                   if(localId.length<imgTotal){
+                       localId.push(res.localIds[len]);
+                   }
+               }
+               //添加图片到预览列表
+               imgBox.html("");
+               var imgList="";
+               for(var index=0;index<localId.length;index++){
+                   imgList +='<li class="weui-uploader__file"><img  src="'+localId[index]+'" style="width: 79px;height:79px;"><a href="" class="btn-close" data-id="'+index+'"></a></li>';
+               }
+               imgBox.html(imgList);
+               upLoadImg();
+           }
+       });
+   });
+
+   //图片预览
+   imgBox.on("click","img",function(){
+       wx.previewImage({
+           urls: localId
+       });
+   });
+
+    //上传图片
+    function upLoadImg(){
+        var i = 0 ;
+        var length = localId.length;
+        $("#showTooltips").text("图片上传中");
+        serverId = [];
+        function upload() {
+            wx.uploadImage({
+                isShowProgressTips:0,
+                localId: localId[i],
+                success: function (res) {
+                    i++;
+                    serverId.push(res.serverId);
+                    if (i < length) {
+                        upload();
+                    }else{
+                        $("#showTooltips").text("确定");
+                    }
+                    $("#uploaderInput").val(JSON.stringify(serverId));
+                },
+                fail: function (res) {
+                    alert(JSON.stringify(res));
+                }
+            });
+        }
+        upload();
+    }
+    //查看地理位置
+    $(".local").click(function(){
+        wx.openLocation({
+            latitude: Number($("#lat").val()),
+            longitude: Number($("#lnt").val()),
+            name: 'TIT 创意园',
+            address: '广州市海珠区新港中路 397 号',
+            scale: 14
+        });
+    });
+</script>

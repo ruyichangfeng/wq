@@ -1,0 +1,218 @@
+{template 'common/header'}
+
+<style>
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>证书配置</strong>
+    </div>
+    <div class="panel-body">
+        <ul id="myTab" class="nav nav-tabs">
+            <li class="active">
+                <a href="#update" data-toggle="tab">
+                    查询/修改
+                </a>
+            </li>
+            <li><a href="#add" data-toggle="tab">新增证书</a></li>
+            <li><a href="#change" data-toggle="tab">修改默认证书内容</a></li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="update">
+                <form id="queryFrm" action="{php echo $this->createWebUrl('certUpdate')}" method="post">
+                    <div class="select-form-control form-group">
+                        {if count($certs) == 0}
+                        <div class="alert alert-warning" role="alert">1.请先添加证书信息<br>2.设置默认发红包证书</div>
+                        {else}
+                        <label>设置以下证书为默认发红包证书</label>
+                        <select class="form-control" id="uniac_name" name="cert_id">
+                            {loop $certs $cert}
+                            {if $cert['is_default'] == true}
+                            <option selected="selected" value="{$cert['cert_id']}">{$cert['cert_name']}({$cert['app_id']})</option>
+                            {else}
+                            <option value="{$cert['cert_id']}">{$cert['cert_name']}({$cert['app_id']})</option>
+                            {/if}
+                            {/loop}
+                        </select>
+                        {/if}
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="updateDefault()">更新配置</button>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="add">
+                <form id="addFrm" action="{php echo $this->createWebUrl('addCertConfig')}" method="post">
+                    <div class="form-group">
+                        <label >*公众号名称：</label>
+                        <input type="text" class="form-control" id="certName" name="certName" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*AppId：</label>
+                        <input type="text" class="form-control" id="appId" name="appId" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*AppSecret：</label>
+                        <input type="text" class="form-control" id="appSecret" name="appSecret" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*商户号(MchId)：</label>
+                        <input type="text" class="form-control" id="mchId" name="mchId" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*商户密钥(partnerKey)：</label>
+                        <input type="text" class="form-control" id="partnerKey" name="partnerKey" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label >*红包页面发送者显示名称：</label>
+                        <input type="text" class="form-control" id="sender" name="sender" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面祝福语：</label>
+                        <input type="text" class="form-control" id="wishing" name="wishing" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面活动名：</label>
+                        <input type="text" class="form-control" id="actName" name="actName" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面备注：</label>
+                        <input type="text" class="form-control" id="remark" name="remark" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label >*apiclient_cert：</label>
+                        <textarea class="form-control" id="apiclientCert" name="apiclientCert" placeholder="导出证书部分的内容，全选apiclient_cert.pem文件内容复制到此处"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label >*apiclient_key：</label>
+                        <textarea class="form-control" id="apiclientKey" name="apiclientKey" placeholder="导出证书秘钥的内容，全选apiclient_key.pem文件内容复制到此处"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label >*rootca：</label>
+                        <textarea class="form-control" id="rootca" name="rootca" placeholder="证明微信支付身份的服务器证书，全选rootca.pem文件内容复制到此处"></textarea>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="addCert()">新增证书配置</button>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="change">
+                <form id="changeFrm" action="{php echo $this->createWebUrl('changeCertConfig')}" method="post">
+                    <input type="hidden" name="certId" value="{$defaultCert['cert_id']}">
+                    <div class="form-group">
+                        <label >*公众号名称：</label>
+                        <input type="text" class="form-control" id="certName2" name="certName" value="{$defaultCert['cert_name']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*AppId：</label>
+                        <input type="text" class="form-control" id="appId2" name="appId" value="{$defaultCert['app_id']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*AppSecret：</label>
+                        <input type="text" class="form-control" id="appSecret2" name="appSecret" value="{$defaultCert['app_secret']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*商户号(MchId)：</label>
+                        <input type="text" class="form-control" id="mchId2" name="mchId" value="{$defaultCert['mch_id']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*商户密钥(partnerKey)：</label>
+                        <input type="text" class="form-control" id="partnerKey2" name="partnerKey" value="{$defaultCert['partner_key']}">
+                    </div>
+
+                    <div class="form-group">
+                        <label >*红包页面发送者显示名称：</label>
+                        <input type="text" class="form-control" id="sender2" name="sender" value="{$defaultCert['sender']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面祝福语：</label>
+                        <input type="text" class="form-control" id="wishing2" name="wishing" value="{$defaultCert['wishing']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面活动名：</label>
+                        <input type="text" class="form-control" id="actName2" name="actName" value="{$defaultCert['act_name']}">
+                    </div>
+                    <div class="form-group">
+                        <label >*红包页面备注：</label>
+                        <input type="text" class="form-control" id="remark2" name="remark" value="{$defaultCert['remark']}">
+                    </div>
+
+                    <div class="form-group">
+                    <label >apiclient_cert：</label>
+                    <textarea class="form-control" id="apiclientCert2" name="apiclientCert" placeholder="导出证书部分的内容，全选apiclient_cert.pem文件内容复制到此处【警告：1.如无需修改，请勿输入任何字符；2.如需修改，请同时修改apiclient_cert、全选apiclient_key、全选rootca】"></textarea>
+                    </div>
+                    <div class="form-group">
+                    <label >apiclient_key：</label>
+                    <textarea class="form-control" id="apiclientKey2" name="apiclientKey" placeholder="导出证书秘钥的内容，全选apiclient_key.pem文件内容复制到此处【警告：1.如无需修改，请勿输入任何字符；2.如需修改，请同时修改apiclient_cert、全选apiclient_key、全选rootca】"></textarea>
+                    </div>
+                    <div class="form-group">
+                    <label >rootca：</label>
+                    <textarea class="form-control" id="rootca2" name="rootca" placeholder="证明微信支付身份的服务器证书，全选rootca.pem文件内容复制到此处【警告：1.如无需修改，请勿输入任何字符；2.如需修改，请同时修改apiclient_cert、全选apiclient_key、全选rootca】"></textarea>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="changeCert()">更新证书配置</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /**
+     * 更新默认发红包配置
+     */
+    function updateDefault(){
+        if($('#cert_id').val() == ""){
+            alter("没有证书配置，请新增后进行此操作");
+            return ;
+        }
+        $('#queryFrm').submit();
+    }
+
+    /**
+     * 新增发红包配置
+     */
+    function addCert(){
+        if($('#certName')==''
+            || $('#appId')==''
+            || $('#appSecret')==''
+            || $('#mchId')==''
+            || $('#partnerKey')==''
+            || $('#sender')==''
+            || $('#wishing')==''
+            || $('#actName')==''
+            || $('#remark')==''
+            || $('#apiclientCert')==''
+            || $('#apiclientKey')==''
+            || $('#rootca')==''){
+            alert('数据不能为空');
+        }
+
+        $('#addFrm').submit();
+    }
+
+    /**
+     * 新增发红包配置
+     */
+    function changeCert(){
+        if($('#certName2')==''
+            || $('#appId2')==''
+            || $('#appSecret2')==''
+            || $('#mchId2')==''
+            || $('#partnerKey2')==''
+            || $('#sender2')==''
+            || $('#wishing2')==''
+            || $('#actName2')==''
+            || $('#remark2')==''){
+            alert('数据不能为空');
+        }
+
+        $('#changeFrm').submit();
+    }
+</script>
+
+
+
+
+{template 'common/footer'}

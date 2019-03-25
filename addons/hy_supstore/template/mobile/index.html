@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrom=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>主页</title>
+    <meta name="keywords" content="超级门店">
+    <meta name="description" content="超级门店">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/css/common.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/public/swiper/swiper-4.2.2.min.css" rel="stylesheet">
+    <link href="../addons/hy_supstore/template/mobile/public/layer-mobile/need/layer.css" rel="stylesheet">
+    <link href="{if isset($cache['theme']['link']) && $cache['theme']['link']}{$cache['theme']['link']}{else}../addons/hy_supstore/template/mobile/css/theme/theme-default.css{/if}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部模块 -->
+        <header class="header">
+            <div class="header_box" style="border-bottom: none;">
+                <a href="javascript:history.go(-1);" class="icon-left fa fa-angle-left fa-lg"></a>
+                <div class="title">{if isset($cache['golbal']['header']['title']['content']) && $cache['golbal']['header']['title']['content']}{$cache['golbal']['header']['title']['content']}{else}网站标题{/if}</div>
+                <a href="{php echo $this->createMobileUrl('indexMob')}" class="icon-right fa fa-list-ul fa-lg"></a>
+            </div>
+        </header>
+        <div class="header-fill"></div>
+        <!-- 头部模块 -->
+        <!-- banner模块 -->
+        <div class="banner" {if isset($cache['golbal']['banner']['isdisplay']) && $cache['golbal']['banner']['isdisplay'] == 0}style="display:none;"{/if}>
+            <div class="swiper-container" {if isset($cache['golbal']['banner']['height']) && $cache['golbal']['banner']['height']}style="height: {$cache['golbal']['banner']['height']}px;"{/if}>
+                <div class="swiper-wrapper">
+                    {if isset($cache['banner']) && $cache['banner']}
+                    {loop $cache['banner'] $key $value}
+                    <a href="{if $value['url']}{$value['url']}{else}javascript:void(0){/if}" class="swiper-slide lazyload" data-original="{$_W['attachurl']}{$value['img_url']}"></a>
+                    {/loop}
+                    {/if}
+                    {if empty($cache['banner']) || count($cache['banner'])<1}
+                    <div class="no-content" style="height: 96%;background-color: #fff;">无数据</div>
+                    {/if}
+                </div>
+                <!-- 如果需要分页器 -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        <!-- banner模块 -->
+        <!-- 导航模块 -->
+        <nav class="nav" {if isset($cache['golbal']['nav']['isdisplay']) && $cache['golbal']['nav']['isdisplay'] == 0}style="display:none;"{/if}>
+            <ul class="clearfix">
+                {if isset($cache['nav']) && $cache['nav']}
+                {loop $cache['nav'] $key $value}
+                <li {if isset($cache['golbal']['nav']['style'])}{if $cache['golbal']['nav']['style'] == 1}style="width: 33.333%;"{/if}{if $cache['golbal']['nav']['style'] == 2}style="width: 20%;"{/if}{/if}>
+                    <a href="{if $value['url']}{$value['url']}{else}javascript:void(0){/if}"><img class="lazyload" src="../addons/hy_supstore/template/mobile/images/thumb.jpg" data-original="{$_W['attachurl']}{$value['img_url']}" alt=""/>
+                    <p>{$value['name']}</p></a>
+                </li>
+                {/loop}
+                {/if}
+                {if empty($cache['nav']) || count($cache['nav'])<1}
+                <div class="no-content" style="line-height: 50px;height: 50px;">无数据</div>
+                {/if}
+            </ul>
+        </nav>
+        <!-- 导航模块 -->
+        <div class="divide-line"></div>
+        <!-- 公告模块 -->
+        <div class="announcement" {if isset($cache['golbal']['announcement']['isdisplay']) && $cache['golbal']['announcement']['isdisplay'] == 0}style="display:none;"{/if}>
+            <div class="info">
+                <span class="icon-left fa fa-bullhorn fa-lg"></span>
+                <div class="content" id="scrollBox">
+                    <ul>
+                    {if isset($cache['golbal']['announcement']['content']) && $cache['golbal']['announcement']['content']}
+                    <?php  $arr = explode("\n", $cache['golbal']['announcement']['content']); foreach($arr as $key=>$value){
+                        echo '<li>'.$value.'</li>';
+                    }?>
+                    {else}
+                    <li>暂无公告</li>
+                    {/if}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 公告模块 -->
+        <div class="divide-line"></div>
+        <!-- 优惠券模块 -->
+        <div class="coupon" {if isset($cache['golbal']['coupon']['isdisplay']) && $cache['golbal']['coupon']['isdisplay'] == 0}style="display:none;"{/if}>
+            {if isset($cache['golbal']['coupon']['title']) && $cache['golbal']['coupon']['title']}
+            <div class="module-title{if $cache['golbal']['coupon']['title']['style']}{php echo '-'.$cache['golbal']['coupon']['title']['style']}{/if}" {if $cache['golbal']['coupon']['title']['hidden'] == 1}style="display:none;"{/if}><span>{$cache['golbal']['coupon']['title']['content']}</span><a href="{php echo $this->createMobileUrl('markcoupon')}" class="more">更多</a></div>
+            {else}
+            <div class="module-title"><span>优惠券列表</span></div>
+            {/if}
+            <ul>
+                {if isset($couponIndex) && $couponIndex}
+                {loop $couponIndex $key $item}
+                <li>
+                    <a href="javascript:void(0);" onclick="getCoupon({$item['id']})">
+                        <div class="stamp {if isset($cache['golbal']['coupon']['style'])}{if $cache['golbal']['coupon']['style']==1}stamp-red{/if}{if $cache['golbal']['coupon']['style']==2}stamp-blue{/if}{if $cache['golbal']['coupon']['style']==3}stamp-green{/if}{else}stamp-yellow{/if}">
+                            <div class="par">
+                                <p>{php echo $item['storename']}通用</p>
+                                <p><sub class="sign">￥</sub><span>{if floor($item['value']) == $item['value']}{php echo floor($item['value'])}{else}{$item['value']}{/if}</span><sub>优惠券</sub></p>
+                                <p>订单满{if floor($item['condition']) == $item['condition']}{php echo floor($item['condition'])}{else}{$item['condition']}{/if}元</p>
+                            </div>
+                            <div class="copy">
+                                <p>{if $item['limit_num'] == 0}每人不限制张数{else}每人限领{$item['limit_num']}张{/if}</p>
+                                <p><span>开始:</span> {php echo date('Y-m-d',$item['addtime'])}
+                                    <br><span>截止:</span> {php echo date('Y-m-d',$item['expire_time'])}</p>
+                                <p>点击领取</p>
+                            </div>
+                            <i></i>
+                        </div>
+                    </a>
+                </li>
+                {/loop}
+                {/if}
+                {if isset($cache['golbal']['coupon']['title']['style'])}
+                {if $cache['golbal']['coupon']['title']['style'] == 1 || $cache['golbal']['coupon']['title']['style'] == 2}
+                <div class="list-more"><a href="{php echo $this->createMobileUrl('markcoupon')}">加载更多</a></div>
+                {/if}
+                {/if}
+                {if empty($couponIndex) || count($couponIndex)<1}
+                    <div class="no-content" style="line-height: 50px;height: 50px;">无数据</div>
+                {/if}
+            </ul>
+        </div>
+        <!-- 优惠券模块 -->
+        <div class="divide-line"></div>
+        <!-- 产品展示模块 -->
+        <div class="products" {if isset($cache['golbal']['product']['isdisplay']) && $cache['golbal']['product']['isdisplay'] == 0}style="display:none;"{/if}>
+            {if isset($cache['golbal']['product']['title']) && $cache['golbal']['product']['title']}
+            <div class="module-title{if $cache['golbal']['product']['title']['style']}{php echo '-'.$cache['golbal']['product']['title']['style']}{/if}" {if $cache['golbal']['product']['title']['hidden'] == 1}style="display:none;"{/if}><span>{$cache['golbal']['product']['title']['content']}</span> <a href="{php echo $this->createMobileUrl('product')}" class="more">更多</a></div>
+            {else}
+            <div class="module-title"><span>产品列表</span> <a href="{php echo $this->createMobileUrl('product')}" class="more">更多</a></div>
+            {/if}
+            <ul class="clearfix list">
+                {loop $listProduct $key $item}
+                <li>
+                    <a href="{php echo $this->createMobileUrl('product',array('op'=>'info','id'=>$item['id']))}">
+                        <div class="img_box"><img class="lazyload" src="../addons/hy_supstore/template/mobile/images/thumb.jpg" data-original="{$_W['attachurl']}{$item['img_url']}" alt="" /></div>
+                        <div class="name">{$item['name']}</div>
+                        <div class="bottom">
+                            <div class="price">&yen;{$item['price']}</div>
+                            <div class="num"></div>
+                        </div>
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+            {if empty($listProduct) || count($listProduct)<1}
+            <div class="no-content" style="line-height: 100px;height: 100px;">无数据</div>
+            {/if}
+            {if isset($cache['golbal']['product']['title']['style'])}
+            {if $cache['golbal']['product']['title']['style'] == 1 || $cache['golbal']['product']['title']['style'] == 2}
+            <div class="list-more"><a href="{php echo $this->createMobileUrl('product')}">加载更多</a></div>
+            {/if}
+            {/if}
+        </div>
+        <!-- 产品展示模块 -->
+        <div class="divide-line"></div>
+        <!-- 新闻列表模块 -->
+        <div class="news" {if isset($cache['golbal']['news']['isdisplay']) && $cache['golbal']['news']['isdisplay'] == 0}style="display:none;"{/if}>
+            {if isset($cache['golbal']['article']['title']) && $cache['golbal']['article']['title']}
+            <div class="module-title{if $cache['golbal']['article']['title']['style']}{php echo '-'.$cache['golbal']['article']['title']['style']}{/if}" {if $cache['golbal']['article']['title']['hidden'] == 1}style="display:none;"{/if}><span>{$cache['golbal']['article']['title']['content']}</span> <a href="{php echo $this->createMobileUrl('article')}" class="more">更多</a></div>
+            {else}
+            <div class="module-title"><span>文章列表</span> <a href="{php echo $this->createMobileUrl('article')}" class="more" >更多</a></div>
+            {/if}
+            <ul class="list">
+                {loop $listArticle $key $item}
+                <li>
+                    <a href="{php echo $this->createMobileUrl('article',array('op'=>'info','id'=>$item['id']))}">
+                        <div class="left">
+                            <div class="img lazyload" data-original="{$_W['attachurl']}{$item['img_url']}"></div>
+                        </div>
+                        <div class="right">
+                            <p class="title">{$item['name']}</p>
+                            <p class="content">{$item['digest']}</p>
+                            <p class="bottom"><span class="category">{$item['category_name']}</span><span class="time">{$item['release_time']}</span></p>
+                        </div>
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+            {if empty($listArticle) || count($listArticle)<1}
+            <div class="no-content" style="line-height: 100px; height: 100px;">无数据</div>
+            {/if}
+            {if isset($cache['golbal']['article']['title']['style'])}
+            {if $cache['golbal']['article']['title']['style'] == 1 || $cache['golbal']['article']['title']['style'] == 2}
+            <div class="list-more"><a href="{php echo $this->createMobileUrl('article')}">加载更多</a></div>
+            {/if}
+            {/if}
+        </div>
+        <!-- 新闻列表模块 -->
+        <div class="divide-line line20"></div>
+        <!-- 返回顶部 -->
+        <div id="goTop"><a href="javascript:void(0);" class="fa fa-angle-double-up fa-lg"></a></div>
+        <!-- 返回顶部 -->
+        <!-- 底部导航 -->
+        {template 'footerindex'}
+        <!-- 底部导航 -->
+    </div>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/lazyload/lazyload.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/swiper/swiper-4.2.2.min.js"></script>
+    <script src="../addons/hy_supstore/template/mobile/public/layer-mobile/layer.js"></script>
+    <script>
+    //懒加载
+    $(".lazyload").lazyload({
+        threshold : 200, // 设置阀值
+        effect : "fadeIn" // 设置图片渐入特效
+    });
+    //banner图轮播
+    var swiper = new Swiper('.swiper-container', {
+        pagination: {
+            el: '.swiper-pagination',
+        },
+        speed:{if isset($cache['golbal']['banner']['time']) && $cache['golbal']['banner']['time']}{$cache['golbal']['banner']['time']}00{else}300{/if},
+        {if isset($cache['golbal']['banner']['play']) && $cache['golbal']['banner']['play'] == 1}
+        autoplay:true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+        {/if}
+    });
+    
+    //公告栏滚动函数
+    function noticeUp(obj, top, time) {
+        $(obj).animate({ marginTop: top }, time, function() {
+            $(this).css({ marginTop: "0" }).find(":first").appendTo(this);
+        })
+    }
+
+    //网站公告栏滚动
+    if (document.getElementById("scrollBox")) {
+        // 调用 公告滚动函数  
+        setInterval("noticeUp('#scrollBox ul','-40px',700)", 4000);
+    }
+
+    //获得优惠券
+    function getCoupon(val){
+        $.post('{php echo $this->createMobileUrl("markcoupon", array("op"=>"add"))}',{id:val},function(data){
+            if(data == true){
+                layer.open({
+                    content: '领取优惠券成功',
+                    skin: 'msg',
+                    time: 2
+                });
+            }else{
+                layer.open({
+                    content: data,
+                    skin: 'msg',
+                    time: 4
+                });
+            }
+        })
+    }
+    goScrollTop();
+    //返回顶部的火箭
+    function goScrollTop(){
+        if($('#goTop>a')[0]){
+            var gotop = $('#goTop>a')[0];
+            var leader = 0,target = 0,timer = 0;
+            $(window).scrollTop() > 0 ? show(gotop):hide(gotop);
+            window.onscroll = function(){
+                leader = $(window).scrollTop();
+                leader > 0 ? show(gotop):hide(gotop);
+                gotop.onclick = function(){
+                    $(window).scrollTop(0);
+                }
+            };
+
+            function show(obj){
+                $(obj).parent().fadeIn('100');
+            }
+            function hide(obj){
+                $(obj).parent().fadeOut('100');
+            }
+
+        }
+
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+	<link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+	<style>
+		.nopoints{margin-top: 100px;}
+		.nopoints .icon{text-align: center;}
+		.nopoints .icon i:before{color: #dedede;font-size: 5em;}
+		.nopoints .noinfo{text-align: center;}
+		.nopoints .noinfo .notit{color: #999;line-height: 30px}
+		.nopoints .noinfo .nodesc{color: #ccc;line-height: 20px}
+
+		.weui_tab{height: auto;}
+		.weui_tab_bd{padding-bottom: 0;}
+		.points_list li{height: 50px;padding:10px 0 10px 3%;list-style-type: none;background-color: #fff;font-size: 12px;line-height: 25px;border-bottom: 1px solid #f8f8f8;}
+		.points_list .info{width:50%;float: left;line-height: 50px;}
+		.points_list .info img{width: 40px;border-radius: 20px;margin-right: 10px;vertical-align:middle;}
+		.points_list .info span{color: #333;}
+		.points_list .points{width:50%;float:right;line-height: 50px;text-align: center;font-size: 14px;color: #F66216;}
+	</style>
+	<script src="{MODULE_URL}template/mobile/style1/js/updown.js"></script>
+</head>
+<body ontouchstart  class="page-bg">
+	<div class="weui_tab">
+		<div class="weui_tab_bd">
+			<div class="weui_panel weui_panel_access">
+			    <div class="weui_panel_bd points_list" ></div>
+			</div>
+		</div>
+	</div>
+	{template 'style1/footer'}
+	<script type="text/javascript">
+		//数据加载
+		$(function() {
+		    var id = {$id};
+		    //页数 
+		     var page = 0;
+		    // 每页展示10个
+		     var size = 10;
+		    $('.weui_panel').dropload({
+		        scrollArea: window,
+		        autoLoad: true,
+		        //自动加载
+		        domDown: { //上拉
+		            domClass: 'dropload-down',
+		            domRefresh: '<div class="dropload-refresh f15 "><i class="icon icon-20"></i>上拉加载更多</div>',
+		            domLoad: '<div class="dropload-load f15"><span class="weui-loading"></span>正在加载中...</div>',
+		            domNoData: '<div class="dropload-noData">已显示所有记录</div>'
+		        },
+		        loadDownFn: function(me) { //加载更多
+		            page++;
+		            var result = '';
+		            $.ajax({
+		                type: 'GET',
+		                url: "{php echo $this->createMobileUrl('task', array('op'=>'taskreceivehis','id'=>$id), true)}"+"&page="+page+"&size="+size,
+		                dataType: 'json',
+		                success: function(data) {
+		                    var arrLen = data?data.length:0;
+		                    if (arrLen > 0) {
+		                        for (var i = 0; i < arrLen; i++) {
+		                        	if(data[i].points_income>0){
+			                        	data[i].points_income = "+"+data[i].points_income;
+			                        }
+		                            result+='<li>'
+		                            	+'<div class="info"><img src="'+data[i].headimgurl+'">'
+		                            	+'<span>'+data[i].username+'</span></div>'
+		                            	+'<div class="points">'+data[i].receive_time+'</div>'
+		                            	+'</li>';
+		                        }
+		                        // 如果没有数据
+		                    } else {
+		                        if(page === 1){
+		                        	var nopoints = '<div class="nopoints">'
+		                                    +'<div class="icon">'
+		                                        +'<i class="weui_icon_info"></i>'
+		                                    +'</div>'
+		                                +'<div class="noinfo">'
+		                                +'<p class="f16 notit">没有任何领取记录</p>'
+		                                +'<p class="f13 nodesc">你将成为第一个领取此任务的人</p></div>'
+		                                +'</div>';
+		                        	$(".weui_tab_bd").html(nopoints);
+		                        }else{
+			                        // 锁定
+			                        me.lock();
+			                        // 无数据
+			                        me.noData();
+		                        }
+		                    }
+		                    $('.weui_panel_bd').append(result);
+		                    // 每次数据加载完，必须重置
+		                    me.resetload();
+		                },
+		                error: function(xhr, type) {
+		                    alert('出现错误，请稍后再试!');
+		                    // 即使加载出错，也得重置
+		                    me.resetload();
+		                }
+		            });
+		        }
+		    });
+		});
+	</script>
+</body>
+</html>

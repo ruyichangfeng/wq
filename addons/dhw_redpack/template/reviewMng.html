@@ -1,0 +1,190 @@
+{template 'common/header'}
+
+<style>
+    #tooltip{position:absolute;border:1px solid #CCC;display:none;color:#FFF; padding:2px; background:#333;}
+    #tooltip img{
+        width: 300px;
+        height: auto;
+    }
+    .head_img{width: 40px;height: 40px;}
+    .test{width: 40px;height: 40px;}
+</style>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong>图片审核</strong>（审核成功奖励现金红包）
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" id="allCheck"/>全选</th>
+                    <th>编号</th>
+                    <th>微信昵称</th>
+                    <th>性别</th>
+                    <th>手机号</th>
+                    <th>头像</th>
+                    <th>上传图片</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                    <th>删除单条？</th>
+                </tr>
+                </thead>
+                <tbody id="dataBody">
+                {loop $uploads $id $upload}
+                <tr>
+                    <td><input type="checkbox" id="{$upload['upload_id']}"></td>
+                    <th>{php echo $id+1}</th>
+                    <td>{$upload['nick']}</td>
+                    <td>
+                        {if $upload['sex'] == 1}
+                        男
+                        {else if $upload['sex'] == 2}
+                        女
+                        {/if}
+                    </td>
+                    <td>{$upload['mobile']}</td>
+                    <td><img class="head_img" src="{$upload['head_img']}"/></td>
+                    <td>
+                        <img class="test" src="{php echo tomedia($upload['upload_img'])}"
+                             data-source="{php echo tomedia($upload['upload_img'])}"/>
+                    </td>
+                    <td><span title="{$upload['create_time']}">{$upload['create_time']}</span></td>
+                    <td>
+                        {if $upload['is_approve'] == 0}
+                        <button class="btn btn-primary" id="approve{$upload['upload_id']}" onclick="approve('{$upload['upload_id']}');">通过</button>
+                        {else}
+                        <button class="btn" disabled="disabled">已发送</button>
+                        {/if}
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-remove" onclick="deleteOne('{$upload['upload_id']}');"></span>
+                    </td>
+                </tr>
+                {/loop}
+
+                <!--<tr>-->
+                    <!--<th>2</th>-->
+                    <!--<td>戴鸿文</td>-->
+                    <!--<td>男</td>-->
+                    <!--<td>18516633103</td>-->
+                    <!--<td><img class="head_img" src="http://7xsip2.com2.z0.glb.qiniucdn.com/0f33c63a719e485289ad3437fd2feb95.jpg"/></td>-->
+                    <!--<td>-->
+                        <!--<img class="test" src="http://7xscr9.com2.z0.glb.qiniucdn.com/043fae93eb494f1fb79df591e224c775.jpg"-->
+                             <!--data-source="http://7xscr9.com2.z0.glb.qiniucdn.com/1459915367388.jpg"/>-->
+                    <!--</td>-->
+                    <!--<td>2016-05-07 00:00:00</td>-->
+                    <!--<td><button class="btn btn-primary" onclick="approve(2);">通过</button></td>-->
+                <!--</tr>-->
+                </tbody>
+            </table>
+
+            <span class="btn btn-primary" onclick="deleteAll()">删除选中</span>
+        </div>
+    </div>
+
+<script>
+    $(function(){
+        showBigImg();
+
+    });
+
+    function showBigImg(){
+        var x = 10;
+        var y = 20;
+        $("img.test").mouseover(function(e){
+            this.myTitle = this.title;
+            this.title = "";
+            var imgTitle = this.myTitle?"<br>"+ this.myTitle : "";
+            var tooltip = "<div id='tooltip'>上传图片预览<br/><img src='"+ this.getAttribute('data-source') +"' alt='产品预览图'/>"+this.title+"<\/div>"; //创建 div 元素
+            $("body").append(tooltip);        //把它追加到文档中
+            $("#tooltip").css({
+                "top": (e.pageY+y) + "px",
+                "left":  (e.pageX-x-300)  + "px"
+            }).fadeIn(600);          //设置x坐标和y坐标，并且显示
+        }).mouseout(function(){
+            this.title = this.myTitle;
+            $("#tooltip").remove();         //移除
+        });
+    }
+
+    /**
+     * 上传uploadID
+     * @param id
+     */
+    function approve(upload_id) {
+        if(confirm("确认发送红包？") == true) {
+            $.post("{php echo $this->createWebUrl('sendredpack')}", {"upload_id": upload_id}, function (rst) {
+                var result = JSON.parse(rst);
+                if (result.success) {
+                    alert("红包发送成功");
+                    document.getElementById("approve" + upload_id).disabled = true;
+                    document.getElementById("approve" + upload_id).innerHTML = "已发送";
+                    $("#approve" + upload_id).removeClass("btn-primary");
+                } else {
+                    alert(result.msg);
+                }
+
+            });
+        }
+    }
+
+    $('#allCheck').change(function(){
+        console.log($('#allCheck').is(':checked'));
+        if($('#allCheck').is(':checked') == true){
+            console.log('已经勾选');
+            $childs = $('#dataBody').find('input[type="checkbox"]');
+            for(var index=0;index<$childs.length;index++){
+                $childs[index].checked = true;
+            }
+            //勾选所有tbody中的input
+//            $('#allCheck').attr('checked',false);
+        }else{
+            console.log('没有勾选');
+            $childs = $('#dataBody').find('input[type="checkbox"]');
+            for(var index=0;index<$childs.size();index++){
+                $childs[index].checked = false;
+            }
+        }
+    });
+
+    function deleteOne(id){
+        if(confirm("确认删除？\n删除后用户可再次提交") == true) {
+            var arr = new Array();
+            arr[0] = id;
+            $.post("{php echo $this->createWebUrl('deleteOneUploadRecord')}", {"upload_ids": arr}, function (rst) {
+                var result = JSON.parse(rst);
+                alert(result.msg);
+                if ('删除成功' == result.msg) {
+                    window.location.href = "{php echo $this->createWebUrl('reviewMng')}";
+                }
+            });
+        }
+    }
+
+    function deleteAll(){
+        $childs = $('#dataBody').find('input[type="checkbox"]');
+        var arr = new Array();
+        for(var index=0;index<$childs.size();index++){
+            if($childs[index].checked == true){
+                arr.push(parseInt($childs[index].id));
+            }
+        }
+        if(arr.length <= 0){
+            alert('请选择删除项');
+            return;
+        }
+        $.post("{php echo $this->createWebUrl('deleteOneUploadRecord')}",{"upload_ids":arr},function(rst){
+            var result = JSON.parse(rst);
+            alert(result.msg);
+            if('删除成功' == result.msg){
+                window.location.href = "{php echo $this->createWebUrl('reviewMng')}";
+            }
+        });
+    }
+
+</script>
+
+
+
+
+{template 'common/footer'}

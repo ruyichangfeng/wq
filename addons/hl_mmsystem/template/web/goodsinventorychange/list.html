@@ -1,0 +1,158 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>库存盘点管理</h5>
+                    <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goodsinventorychange')}" >
+                        <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+
+                </div>
+                <div class="ibox-content">
+                    <form action="./hladministrator.php" method="get" class="form-horizontal" role="form">
+                        <input type="hidden" name="c" value="site" />
+                        <input type="hidden" name="a" value="entry" />
+                        <input type="hidden" name="m" value="{php echo $this->module['name']}" />
+                        <input type="hidden" name="do" value="goodsinventorychange" />
+                        <input type="hidden" name="op" value="list" />
+                        <div class="col-sm-2">
+                            <a href="javascript:;"id="parentIframe"class="btn btn-primary">
+                                <i class="fa fa-plus"></i>商品盘点库存添加</a>
+                        </div>
+                        <label class="col-xs-12 col-sm-1 col-md-1 col-lg-1 control-label" style="width: 100px;">盘点单据号</label>
+                        <div class="col-sm-1 col-lg-1">
+                            <input class="form-control" name="InventoryChangeCode" id="" type="text" value="{$_GPC['InventoryChangeCode']}">
+                        </div>
+                        <div class="col-sm-2">
+                            <select name="ifIsPackage" class="form-control">
+                                <option value="6" {if $_GPC['ifIsPackage'] == 6 || empty($_GPC['ifIsPackage'])}selected{/if}>请选择盘点类型</option>
+                                <option value="1" {if $_GPC['ifIsPackage'] == 1}selected{/if}>盘盈</option>
+                                <option value="2" {if $_GPC['ifIsPackage'] == 2}selected{/if}>盘亏</option>
+                                <option value="3" {if $_GPC['ifIsPackage'] == 3}selected{/if}>领用</option>
+                                <option value="4" {if $_GPC['ifIsPackage'] == 4}selected{/if}>报废</option>
+                                <option value="5" {if $_GPC['ifIsPackage'] == 5}selected{/if}>其他</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <select name="InventoryPlusOrLosr" class="form-control">
+                                <option value="3" {if $_GPC['InventoryPlusOrLosr'] == 3 || empty($_GPC['InventoryPlusOrLosr'])}selected{/if}>请选择盘点方式</option>
+                                <option value="1" {if $_GPC['InventoryPlusOrLosr'] == 1}selected{/if}>增加</option>
+                                <option value="2" {if $_GPC['InventoryPlusOrLosr'] == 2}selected{/if}>减少</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="keyword" placeholder="输入关键字"/>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                    <input type="hidden" name="token" value="{$_W['token']}" />
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                <div class="ibox-content">
+                    <form class="form-horizontal form" method="post" >
+
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="60px">    <div class="checkbox checkbox-success checkbox-inline">
+                                    <input type="checkbox" id="checkids"
+                                           onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});">
+                                    <label for="checkids"></label>
+                                </div></th>
+                                <th>盘点单据号</th>
+                                <th>名称</th>
+                                <th>库存数量</th>
+                                <th>盘点数量</th>
+                                <th>误差数量</th>
+                                <th>盘点类型</th>
+                                <th>盘点方式</th>
+                                <th>盘点原因</th>
+                                <th>盘点时间</th>
+                                <!--<th>操作</th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $list $item}
+                            <tr>
+                                <td>
+                                    <div class="checkbox checkbox-success checkbox-inline">
+                                        <input type="checkbox" type="checkbox" name="ids[]" id="ids_{$item['id']}" value="{$item['id']}">
+                                        <label for="ids_{$item['id']}"></label>
+                                    </div>
+                                </td>
+                                </td>
+                                <td>
+                                 {$item['gic_InventoryChangeCode']}
+                                </td>
+                                <td>{$item['goo_name']}</td>
+                                <td>{$item['goo_number']}</td>
+                                <td>{$item['gic_number']}</td>
+                                <td>
+                                    {php echo intval($item['goo_number']) - intval($item['gic_number'])}
+                                </td>
+                                <td>
+                                    {if $item['gic_InventoryChangeType'] == 0}
+                                    <span class="badge badge-primary">请选择</span>
+                                    {elseif $item['gic_InventoryChangeType'] == 1} <span class="badge badge-primary">盘盈</span>
+                                    {elseif $item['gic_InventoryChangeType'] == 2} <span class="badge badge-primary">盘亏</span>
+                                    {elseif $item['gic_InventoryChangeType'] == 3} <span class="badge badge-primary">领用</span>
+                                    {elseif $item['gic_InventoryChangeType'] == 4} <span class="badge badge-primary">报废</span>
+                                    {elseif $item['gic_InventoryChangeType'] == 5} <span class="badge badge-primary">其他</span>
+                                    {/if}
+                                </td>
+                                <td>{if $item['gic_InventoryPlusOrLosr']==1}<span class="badge badge-primary">增加</span>{else}<span class="badge badge-danger">减少</span>{/if}</td>
+                                <td>{$item['gic_reason']}</td>
+                                <td>{php echo date('Y-m-d H:i:s', $item[gic_addTime]);}</td>
+                                <!--<td>-->
+                                    <!--<span onclick="parent.layer.open({type: 2,title: 'iframe父子操作',maxmin: true,shadeClose: true,area: ['1200px', '700px'],content: '{php echo $this->createWebUrl('goodsinventorychange',array('op' => 'detail','id' => $item['id']))}'});"  class="btn btn-primary btn-sm">查看记录</span>-->
+                                <!--</td>-->
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint">
+                            <thead>
+                            {if $list}
+                            <tr>
+                                <td class="text-left">
+                                    <input type="submit" name="delete" class="btn btn-danger fa-times-circle" value="批量删除">
+                                    <input type="hidden" name="token" value="{$_W['token']}"/>
+                                </td>
+                                <td class="footable-visible"><ul class="pagination pull-right">{$pager}</ul></td>
+                            </tr>
+                            {else}
+                            <tr style="text-align: center"><td >没有找到对应的记录</td></tr>
+                            {/if}
+                            </thead>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    $('#parentIframe').on('click', function() {
+
+
+        var index = parent.layer.open({
+            type: 2,
+            title: '添加商品盘点',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area: ['1200px', '800px'],
+            content: '{php echo $this->createWebUrl('goodsinventorychange',array('op' => 'add'))}'
+        });
+        parent.layer.full(index);
+    });
+
+
+
+</script>
+
+{template 'web/common/footer'}

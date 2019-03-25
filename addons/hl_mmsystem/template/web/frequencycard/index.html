@@ -1,0 +1,119 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>次卡营销设置</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('frequencycard')}"></a></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" method="post" class="form-horizontal form">
+                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                            <thead>
+                            <tr>
+                                <td class="col-md-2">设置项目</td>
+                                <td class="col-md-3">说明</td>
+                                <td class="col-md-4">内容</td>
+                                <td class="col-md-3">是否启用</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="title">是否启用总开关</td>
+                                <td>是否开启次卡总开关</td>
+                                <td>开启之后会在充次设置中开启自定义选项，用于次卡的营销功能</td>
+                                <td>
+                                    <input type="checkbox" id="mfc1" class="js-switch_1" {if $set['mfc1']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">注册自领</td>
+                                <td>会员在移动端注册之后，自动领取到次卡卡包里</td>
+                                <td>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="mfc2" class="js-switch_2" {if $set['mfc2']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">免费领取</td>
+                                <td>在次卡卡包里显示，开启之后次卡金额会变为0</td>
+                                <td>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="mfc3" class="js-switch_3" {if $set['mfc3']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">支付推送</td>
+                                <td>会员支付成功后，会自动推送至次卡卡包</td>
+                                <td>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="mfc4" class="js-switch_4" {if $set['mfc4']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">会员注册页面宣传图</td>
+                                <td>设置微信端注册页面背景样式宣传图</td>
+                                <td>
+                                    {php echo tpl_form_field_image('mfc[mfc5]', $set['mfc5']['value'])}
+                                    <span class="help-block">建议比例:324像素 * 354像素<span style="color: red"></span></span>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="mfc6" class="js-switch_5" {if $set['mfc6']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label"></label>
+                            <div class="col-sm-7">
+                                <button type="submit" class="btn btn-w-m btn-primary" name="submit" value="提交">提交</button>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            var agaxurl = "{php echo $this->createWebUrl('updatekey')}";
+            var dataparam = {
+                'hlsetkey': hlsetkey,
+                'status': status,
+            };
+            $.ajax({
+                url: agaxurl,
+                data: dataparam,
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal("更新成功！", "","success");
+                    } else {
+                        swal("新增成功！", "","success");
+                    }
+                }
+            });
+
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+    });
+</script>
+{template 'web/common/footer'}

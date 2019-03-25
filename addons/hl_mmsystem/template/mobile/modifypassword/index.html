@@ -1,0 +1,109 @@
+{template 'common/header'}
+<style>
+    body{
+        background-color: white;
+    }
+    .mui-content {
+        background-color: white;
+    }
+    .import {
+        margin-right: 55px;
+        margin-left: 55px;
+        margin-top: 50px;
+    }
+
+</style>
+<form class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);">
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">修改密码</h1>
+    </header>
+    <div class="mui-content">
+        <div style="text-align: center;margin-top: 40px;">
+            <img src="{HLMMS_MOBILE_ICOS}xiugaimima.png"/>
+            <h3>密码修改</h3>
+            <div class="import">
+                <div class="mui-input-row m-b-xl">
+                    <input type="password" name="OldPwd" id="OldPwd" class="mui-input-password" placeholder="请输入旧密码">
+                </div>
+                <div class="mui-input-row m-b-xl">
+                    <input type="password" name="NewPwd" id="NewPwd" class="mui-input-password" placeholder="请输入新密码" readonly>
+                </div>
+                <div class="mui-input-row m-b-xl">
+                    <input type="password" name="ConfirmPwd" id="ConfirmPwd" class="mui-input-password" placeholder="确认密码" readonly>
+                    <input name="memberid"id="memberid" type="hidden" value="{$memberid}"/>
+                </div>
+            </div>
+            <div class="mui-content-padded" align="center">
+                <button name="button_submit" id="button_submit" type="button" class="mui-btn mui-btn-primary " style="width: 50%;height: 50px" />确认修改</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    document.getElementById("OldPwd").addEventListener('input', function() {
+        var url ='{php echo $this->createMobileUrl('modifypassword',array('op' => 'judge'))}';
+        var abc=5;
+        var OldPwd = mui("#OldPwd")[0].value;
+        var memberid = mui("#memberid")[0].value;
+        mui.ajax(url,{
+            data:{
+                OldPwd:OldPwd,
+                memberid:memberid,
+            },
+            dataType:'json',//服务器返回json格式数据
+            type:'post',//HTTP请求类型
+            success:function(data){
+                var code1 = data['message']['code'];
+                if(code1 == 1){
+                    mui.toast("密码错误");
+                }else{
+                    $("#NewPwd").attr("readonly",false);
+                    $("#ConfirmPwd").attr("readonly",false);
+                    $("#OldPwd").attr("readonly",true);
+                    mui.toast('密码正确');
+                }
+            },
+            error:function(xhr,type,errorThrown){
+                mui.toast('失败');
+            }
+        });
+    });
+    document.getElementById("button_submit").addEventListener('tap', function() {
+        // mui.toast("啦啦啦");
+        var OldPwd = mui("#OldPwd")[0].value;
+        var NewPwd = mui("#NewPwd")[0].value;
+        var memberid = mui("#memberid")[0].value;
+        var ConfirmPwd = mui("#ConfirmPwd")[0].value;
+        if(NewPwd!=ConfirmPwd) {
+            mui.alert('密码不一致或为空');
+            return false;
+        }
+        else if((OldPwd==null||OldPwd==undefined||OldPwd=="")){
+            mui.alert('请输入旧密码');
+            return false;
+        }
+        else {
+            var url ='{php echo $this->createMobileUrl('modifypassword',array('op' => 'add'))}';
+            mui.ajax(url,{
+                data:{
+                    NewPwd:NewPwd,
+                    memberid:memberid,
+                },
+                dataType:'json',//服务器返回json格式数据
+                type:'post',//HTTP请求类型
+                success:function(data){
+                    mui.alert( '修改成功', function() {
+                        var openUrl = "{php echo util::app_url('wechatindex')}" ;
+                        mui.openWindow({
+                            url:openUrl,
+                        });
+                    });
+                },
+                error:function(xhr,type,errorThrown){
+                    mui.toast('失败');
+                }
+            });
+        }
+    });
+</script>

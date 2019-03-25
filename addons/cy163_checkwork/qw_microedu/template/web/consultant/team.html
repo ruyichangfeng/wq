@@ -1,0 +1,304 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .modal-footer button { margin-left:5px}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'team'))}">顾问组管理</a>
+        </li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="qw_microedu" />
+                <input type="hidden" name="do" value="consultant" />
+                <input type="hidden" name="page" value="team" />
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>组名</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="teamname" type="text" value="" style="width:80%;display: inline-block;">
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label>组长</label>
+                    <input class="form-control col-lg-offset-1 col-md-offset-1" name="teamcap" type="text" value="" style="width:70%;display: inline-block;">
+                </div>
+                <div class="form-group col-sm-12 ">
+                    <button type="submit" class="btn btn-primary  col-lg-offset-6" name="submit" value="提交">查询</button>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <style>
+        .label{cursor:pointer;}
+    </style>
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <h4>顾问组列表</h4>
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:10%;">组名</th>
+                    <th class="text-center" style="width:10%;">组长</th>
+                    <th class="text-center" style="width:10%;">组长佣金</th>
+                    <th class="text-center" style="width:15%;">成员</th>
+                    <th class="text-center" style="width:35%;">备注</th>
+                    <th class="text-center" style="width:15%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $glist $index $item}
+                <tr>
+                    <td class="text-center">{$item['id']}</td>
+                    <td class="text-center consultant-name">{$item['group_name']}</td>
+                    <td class="text-center">{$item['fullname']}</td>
+                    <td class="text-center">{$item['leader_rate']}%</td>
+                    <td class="text-center">9</td>
+                    <td class="text-center">{$item['comments']}</td>
+                    <td class="text-center">
+                            <a href="javascript:;" class="btn btn-primary btn-sm edit-team" data-toggle="tooltip" data-placement="top" title="管理成员">管理成员</a>
+                            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'team-edit','idd'=>$item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;
+                            <a href="javascript:;"  class="btn btn-default btn-sm delgroup" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="text-right">
+                <a href="{php echo $this->createWebUrl('consultant', array('page' => 'team-edit'))}" class="btn btn-md btn-default"><i class="fa fa-plus"></i> 增加顾问组</a>
+            </div>
+            {$pager}
+        </div>
+    </div>
+</div>
+<div class="modal fade team_detail" tabindex="-1" role="dialog" aria-labelledby="contract_detail" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+                <!--<h4 class="modal-title" id="myModalLabel">这里是组名—成员管理</h4>-->
+            <!--</div>-->
+            <!--<div class="modal-body class-content">-->
+                <!--<table class="table table-hover">-->
+                    <!--<thead class="navbar-inner">-->
+                    <!--<tr>-->
+                        <!--<th class="text-center" style="width:33.333%;">姓名</th>-->
+                        <!--<th class="text-center" style="width:33.333%;">佣金</th>-->
+                        <!--<th class="text-center" style="width:33.333%;">操作</th>-->
+                    <!--</tr>-->
+                    <!--</thead>-->
+                    <!--<tbody>-->
+                    <!--<tr>-->
+                        <!--<td class="text-center">顾问姓名</td>-->
+                        <!--<td class="text-center">10%</td>-->
+                        <!--<td class="text-center">-->
+                            <!--<a href="javascript:;" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                    <!--<tr>-->
+                        <!--<td class="text-center">顾问姓名</td>-->
+                        <!--<td class="text-center">10%</td>-->
+                        <!--<td class="text-center">-->
+                            <!--<a href="javascript:;" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                    <!--</tbody>-->
+                <!--</table>-->
+            <!--</div>-->
+            <!--<div class="modal-footer" style="text-align: left;">-->
+                <!--<form class="form-inline" role="form">-->
+                    <!--<div class="form-group">-->
+                        <!--<label style="width:120px;">增加成员</label>-->
+                        <!--<select class="form-control" style="width:320px;">-->
+                            <!--<option>请选择顾问组成员</option>-->
+                            <!--<option>顾问一</option>-->
+                            <!--<option>顾问2</option>-->
+                            <!--<option>顾问3</option>-->
+                            <!--<option>顾问4</option>-->
+                        <!--</select>-->
+                        <!--<button type="button" class="btn btn-primary">提交</button>-->
+                    <!--</div>-->
+                <!--</form>-->
+                <!--<form class="form-inline" role="form" style="margin-top:15px;">-->
+                    <!--<div class="form-group">-->
+                        <!--<label style="width:120px;">批量修改佣金</label>-->
+                        <!--<input class="form-control" style="width:303px;margin-right:5px;" />%-->
+                        <!--<button type="button" class="btn  btn-primary">提交</button>-->
+                    <!--</div>-->
+                <!--</form>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+<script>
+    $(".edit-team").each(function () {
+        var ttt = $(this);
+        $(this).click(function () {
+            var idd = ttt.parent().parent().find("td").eq(0).text();
+            var Url = "{php echo $this->createWeburl('consultant')}";
+            var vdata = {caozuo:"team",id:idd};
+            $.post(Url,vdata,function (data) {
+                if(data.error==1){
+                    //执行页面操作
+                    $(".modal-content").empty();
+                    var group = data.group;
+                    var conlist = data.conlist;
+                    //select 选择顾问列表
+                    var str='';
+                    $.each(conlist,function(key,v){
+                            str+='<option value="'+v.id+'">'+v.fullname+'</option>';
+                    })
+                    //显示当前组的顾问
+                    var glist='';
+                    var group_list = data.group_list;
+                    $.each(group_list,function(key,vo){
+                        glist+='<tr><td style="display:none;">'+vo.id+'</td><td class="text-center">'+vo.fullname+'</td><td class="text-center">'+vo.rate+'%</td><td class="text-center"><a href="javascript:;" class="btn btn-default btn-sm delgw" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a></td></tr>';
+                    })
+                  var vhtml='<div class="modal-header">' +
+                          '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span>' +
+                          '<span class="sr-only">Close</span></button><h4 class="modal-title" id="myModalLabel">'+group.group_name+'</h4></div>' +
+                          '<div class="modal-body class-content"><table class="table table-hover">' +
+                          '<thead class="navbar-inner">' +
+                          '<tr><th style="display:none;">序号</th><th class="text-center" style="width:33.333%;">姓名</th><th class="text-center" style="width:33.333%;">佣金</th><th class="text-center" style="width:33.333%;">操作</th></tr></thead>' +
+                          '<tbody class="conxx">' +
+                            glist +
+                          '</tbody></table></div>' +
+                          '<div class="modal-footer" style="text-align: left;"><div class="form-inline">' +
+                          '<div class="form-group" style="margin-bottom: 10px"><label style="width:120px;">增加成员</label>' +
+                          '<select class="form-control xzgw" style="width:320px;">' +
+                          '<option>请选择顾问组成员</option>' +
+                            str+
+                          '</select>' +
+                          '<button type="button" class="btn btn-primary tjgw">提交</button>' +
+                          '</div></div>' +
+                          '<div class="form-inline"><div class="form-group"><label style="width:120px;">批量修改佣金</label>' +
+                          '<input class="form-control oorate" style="width:303px;margin-right:5px;" />%' +
+                          '<button type="button" class="btn  btn-primary uprate">提交</button>' +
+                          '</div></div></div>';
+                    $(".modal-content").append(vhtml);
+                    $('.team_detail').modal('show');
+                    //添加顾问到组
+                    $(".tjgw").click(function(){
+                        var xzid = $(".xzgw").find("option:selected").val();
+                        var xzdata = {caozuo:"addgw",xzid:xzid,idd:idd};
+                        var xzUrl = "{php echo $this->createWeburl('consultant')}";
+                        $.post(xzUrl,xzdata,function(msg){
+                            if(msg.error==1){
+                                alert(msg.message);
+                                $(".xzgw option[value='"+xzid+"']").remove();
+                                var con_xq = msg.con_xq;
+                                var newgw = '<tr><td style="display:none;">'+con_xq.id+'</td><td class="text-center">'+con_xq.fullname+'</td><td class="text-center">'+con_xq.rate+'%</td><td class="text-center"><a href="javascript:;" class="btn btn-default btn-sm delgw" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a></td></tr>';
+                                $(".conxx").append(newgw);
+                                //删除某一个组的成员
+                                $(".delgw").click(function(){
+                                    var xxx = $(this);
+                                    var delid = xxx.parent().parent().find('td').eq(0).text();
+                                    var delUrl = "{php echo $this->createWeburl('consultant')}";
+                                    var delData = {caozuo:"delgw",delid:delid,idd:idd};
+                                    $.post(delUrl,delData,function(data){
+                                        if(data.error==1){
+                                            alert(data.message);
+                                            xxx.parent().parent().remove();
+                                        }else{
+                                            alert(data.message);
+                                        }
+                                    },'json');
+                                    return false;
+                                })
+                                //结束
+                            }else{
+                                alert(msg.message);
+                            }
+                        },'json');
+                        return false;
+                    })
+                    //修改佣金比率
+                    $(".uprate").click(function(){
+                        var oorate = parseInt($(".oorate").val());
+                        if(oorate<1){
+                            alert("请输入合适的数字");
+                            return false;
+                        }
+                        var rateUrl = "{php echo $this->createWeburl('consultant')}";
+                        var rateData = {caozuo:"uprate",oorate:oorate,idd:idd};
+                        $.post(rateUrl,rateData,function(data){
+                            if(data.error==1){
+
+                                alert(data.message);
+                            }else{
+                                alert(data.message);
+                            }
+                        },'json');
+                        return false;
+                    })
+                    //删除某一个组的成员
+                    $(".delgw").click(function(){
+                        var xxx = $(this);
+                        var delid = xxx.parent().parent().find('td').eq(0).text();
+                        var delUrl = "{php echo $this->createWeburl('consultant')}";
+                        var delData = {caozuo:"delgw",delid:delid,idd:idd};
+                        $.post(delUrl,delData,function(data){
+                            if(data.error==1){
+                                alert(data.message);
+                                xxx.parent().parent().remove();
+                            }else{
+                                alert(data.message);
+                            }
+                        },'json');
+                        return false;
+                    })
+
+                }else{
+                    alert(data.message);
+                }
+            },'json');
+        })
+    })
+    //删除组
+    $(".delgroup").each(function(){
+        var ttt = $(this);
+        $(this).click(function(){
+            var delgroupid = ttt.parent().parent().find('td').eq(0).text();
+            var Url = "{php echo $this->createWeburl('consultant')}";
+            var vdata = {delgroupid:delgroupid,caozuo:"delgroup"};
+            $.post(Url,vdata,function(data){
+                if(data.error==1){
+                    alert(data.message);
+                }else{
+                    alert(data.message);
+                }
+            },'json');
+        })
+    })
+</script>
+{template 'common/footer'}

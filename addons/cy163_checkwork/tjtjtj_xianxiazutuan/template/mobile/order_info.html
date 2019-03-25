@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-sacle=1, user-scalable=no" />
+	<title>订单详情</title>
+	<link rel="stylesheet" href="{APP_TEMP_PATH}css/weui.css" />
+	<link rel="stylesheet" href="{APP_TEMP_PATH}css/example.css" />
+<style>
+input{-webkit-appearance:none;}
+*{margin: 0; padding: 0;}
+a{text-decoration: none;}
+li{list-style: none;}
+body{overflow-x: hidden; line-height: 1.6; font-size: 0.9em; background-color: #eee; font-family: "Microsoft YaHei";     color: #666;}
+.bg-red{float: left; width: 100%; height: 80px; background-color: #EF1818;}
+/* 用户信息 */
+.user-info{position: absolute; top:80px; left: 0; width: 94%; height: 60px; padding: 0 3%; border-bottom: 1px solid #CCC; box-shadow: 1px 2px 2px #ccc; background-color: #fff;}
+.u-img{position: absolute; top: 18px; left:3%;  width: 12%; margin: 0 auto; display: block; }
+.u-info{position: absolute; top: 0;left: 15%; width: 82%; height: auto;}
+.info-name{float: left; margin-top: 5px; min-width: 180px;}
+.info-add{float: left; min-width: 180px;}
+.info-num{position: absolute; top: 5px; right: 0;}
+
+/* 商家信息 */
+.shop-info{float: left; width: 94%; height: 40px; line-height: 40px; padding: 0 3%; margin-top: 75px; background-color: #fff; border-top: 1px solid #bcbcbc; box-shadow: 1px 2px 2px #bbb;}
+.shop-info img{float: left;margin-top: 5px; border-radius: 15px;}
+.shop-name{display: block; float: left; margin-left: 10px;}
+.shop-status{display: block; float: right;  color: #EF1818;}
+
+/* 商品信息 */
+.goods-info{float: left; width: 94%; height: auto; padding: 20px 3% 10px;}
+.goods-info img{float: left; display: block;}
+.goods-img{float: left; display: block; width: 70px; height: 60px;}
+.goods-name{float: left; display: block; margin-left: 10px; width: auto; max-width: 45%; height: auto; overflow-x: hidden;}
+.goods-price{float: right;  width: 80px; min-width-width: 70px; height: auto; display: block; text-align: right; color: #EF1818;}
+.goods-price img{float: left; border-radius: 3px;}
+.goods-num{float: right; width: 80px; min-width: 70px; height: auto; text-align: right; font-size: 14px; color: #7B7979;}
+/* 合计信息 */
+.total{float: left; width: 90%; height: 50px; line-height: 55px; text-align: right; background-color: #fff; padding-right: 10%;}
+.total img{}
+/* 联系信息 */
+.con-bg{float: left; width: 100%; height: auto; background-color: #fff; box-shadow: 1px  2px 2px #bbb;}
+.m-contact{float: left; width: 94%; height: 50px; margin: 0 3%; line-height: 50px; border-top: 1px solid #dedede; text-align: center;}
+.m-contact img{float: left;  margin-left: 30px; }
+.con-we, .con-tel{float: left; height: 30px; line-height: 30px; margin: 10px 0; display: block; }
+.con-we{ width: 50%; color: #EF1818;}
+.con-tel{ width: 49%; border-left: 1px solid #dedede; color: #09BB07;}
+/* 订单信息 */
+.order-info{float: left ; width: 94%; height: auto; padding: 10px 3%; background-color: #fff; margin-top: 8px; font-size: 14px; color: #8C8888;}
+.order-info li{margin: 2px 0;}
+/* 去支付信息 */
+.to-order{float: left; text-align: right;  width: 97%; height: auto; padding: 30px 3% 10px 0; background-color: #fff; font-size: 17px;}
+.order-cancel{font-size: 1.0em; width: 90px; height: 35px; line-height: 35px; text-align: center; border-radius: 6px; background-color: #fff;border: 1px solid rgba(0, 0, 0, 0.2);  display: inline-block;   color: #676565; float: right; margin-right: 10px;}
+.order-order{font-size: 1.0em; width: 90px; height: 35px; line-height: 35px;  border-radius: 6px; background-color: #F53737;  color: #fff; margin-left: 5px; border: none; display: inline-block; float: right; float: right; border: 1px solid #F53737;}
+</style>	
+</head>
+<body>
+<div class="bg-red"></div>
+<!-- 用户信息 -->
+<div class="user-info">
+	<div class="u-img">
+		<img src="{APP_TEMP_PATH}images/address.png" alt="" width="20px" height="24px">
+	</div>
+	<div class="u-info">
+		<p class="info-name">收货人：{$order['username']}</p>
+		<p class="info-add">收货地址：{$order['province']}{$order['city']}{$order['address']}</p>
+		<p class="info-num">{$order['mobile']}</p>
+	</div>
+</div>
+<!-- 商家信息 -->
+<div class="shop-info">
+	<!-- <img src="{$_W['attachurl']}{$_SESSION['xxzt_config']['shop_logo']}" alt="" width="30px" height="30px"> -->
+	<p class="shop-name"><!-- {$_SESSION['xxzt_config']['shop_name']} -->订单状态</p>
+	<p class="shop-status">{php echo status2string($order['status'])}</p>
+</div>
+<!-- 产品广泛信息 -->
+<div class="goods-info">
+	<div class="goods-img"><img src="{$_W['attachurl']}{$order['logo']}" alt="" width="60px" height="60px"></div>
+	<div class="goods-name"><span class="goods-jia">{$order['goodsname']}</span></div>
+	<div class="goods-price"><!-- <img src="{APP_TEMP_PATH}images/renminbi.png" alt="" width="20px" height="20px"> -->¥{$order['fee']}</div>
+	<div class="goods-num">X{$order['goodsnums']}</div>
+</div>
+<!-- 合计信息 -->
+<div class="total">共{$order['goodsnums']}件商品 合计: <img src="{APP_TEMP_PATH}images/renminbi.png" alt="" wdith="20px" height="20px">{$order['fee']}</div>
+<!-- 联系信息 -->
+<div class="con-bg">
+<div class="m-contact">
+	<a class="con-we" href="tel:{$_SESSION['xxzt_config']['service_tel']}">
+		<img src="{APP_TEMP_PATH}images/wexin-3.png" alt="" width="30px" height="30px">联系卖家
+	</a>
+	<a class="con-tel" href="tel:{$_SESSION['xxzt_config']['service_tel']}">
+		<img src="{APP_TEMP_PATH}images/phone-3.png" alt="" wdith="30px" height="30px">拨打电话
+	</a>
+</div>
+</div>
+<!-- 订单信息 -->
+<div class="order-info">
+	<ul>
+		<li>订单编号：{$order['orderid']}</li>
+		<li>支付方式：微信支付</li>
+		<li>下单时间：{php echo date('Y-m-d H:i', $order['create_at'])}</li>
+	</ul>
+</div>
+{if $order['status'] == 0}
+<!-- 支付信息 -->
+<!--<div class="weui_cells" style="float:left; margin-top:0; width:100%; background-color:#eee; ">-->
+    <!--<div class="weui_cell weui_cell_select">-->
+        <!--<div class="weui_cell_bd weui_cell_primary">-->
+            <!--<select class="weui_select" name="select1" style="color: #797B78;">-->
+                <!--<option selected="" value="1">请选择支付方式</option>-->
+                <!--<option value="2">微信支付</option>-->
+                <!--<option value="3">支付宝</option>-->
+            <!--</select>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+<!-- 去支付信息 -->
+<div class="to-order">
+	<form action="{php echo $this->createMobileUrl('order')}" method="post">
+		<input type="hidden" name="oldorderid" value="{$order['uid']}" />
+		<input type="hidden" name="groupid" value="{$order['groupid']}" />
+		<input type="hidden" name="goodsid" value="{$order['goodsid']}" />
+		<input type="hidden" name="aid" value="{$order['aid']}" />
+		<input type="hidden" name="orderid" value="{php echo genOrderId();}">
+		<input type="hidden" name="buyway" value="{$order['buyway']}">
+		<input type="hidden" name="fee" value="{$order['fee']}" />
+		<input type="hidden" name="goodsnums" value="{$order['goodsnums']}" />
+		<input type="submit" value="立即支付" class="order-order"/>
+	</form>
+
+	<a onclick="if (confirm('确定取消订单吗？')) { location.href = '{php echo $this->createMobileUrl('account', array('action' => 'order_cancel', 'uid' => $order['uid']));}'; }" class="order-cancel">取消订单</a>
+
+</div>
+{/if}
+    <script src="j{APP_TEMP_PATH}s/zepto.min.js"></script>
+    <script src="{APP_TEMP_PATH}js/example.js"></script>
+</body>
+</html>

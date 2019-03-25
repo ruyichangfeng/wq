@@ -1,0 +1,98 @@
+{template 'public/header'} 
+<style type="text/css">
+	.form-input{width:150px;display:inline-block;margin:auto 15px;}
+	.table td{
+		word-break: break-all;
+	}
+	.nickname,.avatar{display: inline-block;vertical-align: top;height: 50px;overflow: hidden;}
+	.avatar{width: 50px;} .nickname{max-width:130px;width: auto;height: 44px;line-height: 22px;}
+	.layui-form-select,.layui-select-title,.layui-form-select .layui-input{height: 34px!important;}
+	.goodsname,.goodspic{display: inline-block;vertical-align: top;height: 50px;overflow: hidden;}
+	.goodspic{width: 50px;} .goodsname{max-width: 210px;width: auto;height: 44px;line-height: 22px;}
+</style> 
+<div class="panel panel-info">
+	<div class="panel-heading" >拼团订单</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo $this->routeUrl('order.pintuan');?>" method="post" id="keyform" class="layui-form">			
+			<div class="col-xs-5 col-sm-5 paddingx">
+				<div class="input-group">
+			      <input type="text" name="date" id="date" placeholder="创建时间" value="{$params['date']}" class="form-control" style="display: inline-block;width: 50%" readonly autocomplete="false" />
+			      <div   style="display: inline-block;width: 50%;">
+			      	<select name="status">
+			      		<option>不限状态</option>
+				      	<option value="1" <?php echo $params['status']=='1'?'selected':'';?>>成功</option>
+				      	<option value="0" <?php echo $params['status']=='0'?'selected':'';?>>进行中</option>
+				      	<option value="-1" <?php echo $params['status']=='-1'?'selected':'';?>>失败</option>
+			      	</select>
+			      	
+			      </div>
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button> 
+			      </span>
+			    </div>  
+			</div>
+			</form> 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 220px;">团长</th> 
+					<th style="width: 90px;">当前人数</th> 
+					<th style="width: 300px;">商品</th>  
+					<th style="width: 180px;">开团时间</th>  
+					 <th style="width:120px;">状态</th>
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $orders $index $item}
+				<tr>
+					<td  style="width:220px;word-break: break-all;">
+						<img src="{$item['avatar']}" class="avatar">
+						<div class="nickname"  >{$item['nickname']}</div>
+					</td>
+					<td  style="width: 90px;word-break: break-all;text-align: center;">{$item['now_people']}</td> 
+					<td  style="width: 250px;word-break: break-all;">
+						<img src="{$_W['attachurl']}{$item['picture']}" class="goodspic">
+						<div class="goodsname">{$item['goodsname']}</div>
+					</td>
+					<td>{$item['createdate']} </td> 
+					<td>
+				<?php if($item['status']=="0"||$item['status']=="1"){ ?>
+						 <span class="label-orange">拼团中</span>
+				<?php }else if($item['status']=="2"){ ?>
+					   <span class="label-green">拼团成功</span> 
+				<?php } else if($item['status']=="-1"){ ?>
+					   <span class="label-red">拼团失败</span>
+				<?php } ?>  </td>
+					<td> 
+						<a href="<?php echo $this->routeUrl('order.pintuandet');?>&groupid={$item['id']}" class="linkbtn" >详细信息</a>
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="9" align="center">
+						{template "public/pagenation"}
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+</div>  
+
+{template 'public/footer'}
+<script type="text/javascript">
+	 layui.use('laydate', function(){
+	  var laydate = layui.laydate;
+	  
+	  //执行一个laydate实例
+	  laydate.render({
+	  	type:"date",
+	  	value:"",
+	    elem: '#date' //指定元素
+	  });
+	    
+	});
+</script>

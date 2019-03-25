@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['mobile_fans_title']}</title>
+{template 'head'}
+</head>
+<body>
+<div class="mnav mcolor-e" {if $config['mobile_diy7_bcolor']!=''} style="background-color: {$config['mobile_diy7_bcolor']}"{/if}>
+    <a href="javascript:back();" class="mbackbtn_l"><div class="mbackbtn"><img src="{RES}/public/images/m_btn_back.png"/></div></a>
+    {if $config['mobile_diy7_title']!=''}{$config['mobile_diy7_title']}{else}奖励信息{/if}
+</div>
+<div class="mtablediv">
+    <table class="table table-striped mtable">
+    	<thead>
+    		<tr>
+	    		<th><img src="{RES}public/images/fans_rew_table1.png" >时间</th>
+	    		<th><img src="{RES}public/images/fans_rew_table2.png" >项目</th>
+	    		<th><img src="{RES}public/images/fans_rew_table3.png" >类型</th>
+	    		<th><img src="{RES}public/images/fans_rew_table4.png" >分值</th>
+    		</tr>
+    	</thead>
+    	<tbody id='rewardlog_list'>
+
+    	</tbody>
+    </table>
+
+
+</div>
+<script type="text/javascript">
+	var storeid=$('#store_id').val();
+	var lastID=999999999999;
+   		$(document).ready(function() {
+            $(window).scroll(function() {
+                //$(document).scrollTop() 获取垂直滚动的距离
+                //$(document).scrollLeft() 这是获取水平滚动条的距离
+                if ($(document).scrollTop() <= 0) {
+                    // alert("滚动条已经到达顶部为0");
+                }
+                if ($(document).scrollTop() >= $(document).height() - $(window).height()) {
+                    if(lastID!=0)
+                    {
+                       ajaxchuli();
+                    }
+                }
+            });
+        });
+    $(function(){
+    	 ajaxchuli();
+    })
+	function ajaxchuli()
+	{
+		 $.ajax({  
+          type:"POST",
+          url: "{php echo $this->createMobileUrl('fansreward',array('op'=>'display'));}",
+          data:{store_id:storeid,"lastID":lastID,"pageSize":13},
+          dataType:"json",
+          async:false,
+          success:function(data){
+            //清空联动数据
+
+            if(data.result=="success")
+            {
+                for (var i = 0; i < data.rs.length; i++) {
+                 	var op="";
+	                op+='<tr>';
+	                op+='<td class="mtr1">'+data.rs[i]["addtime"]+'</td>';
+	                if(data.rs[i]["rewardlog_type"]==1)
+	                {
+	                	op+='<td class="mtr2">消费奖励</td>';
+	                }else if(data.rs[i]["rewardlog_type"]==2){
+	                	op+='<td class="mtr2">完善信息</td>';
+	                }else if(data.rs[i]["rewardlog_type"]==3){
+	                	op+='<td class="mtr2">推广分享</td>';
+	                }else if(data.rs[i]["rewardlog_type"]==4){
+	                	op+='<td class="mtr2">推广点击</td>';
+	                }else if(data.rs[i]["rewardlog_type"]==5){
+                    op+='<td class="mtr2">分销奖励</td>';
+                  }else if(data.rs[i]["rewardlog_type"]==6){
+                    op+='<td class="mtr2">首次注册</td>';
+                  }else{
+	                	op+='<td class="mtr2">其他</td>';
+	                }                
+	                op+='<td class="mtr3">'+data.rs[i]["credittype"]+'</td>'
+	                op+='<td class="mtr5">'+data.rs[i]["rewardlog_number"]+'</td>';
+	                op+='</tr>';
+
+                  if(data.rs.length < 12)
+                  {
+                    lastID=0; 
+                  }else{
+                    lastID=data.rs[i].rewardlog_id; 
+                  }                
+                  $("#rewardlog_list").append(op);
+              	}
+            }else{
+                lastID=0; 
+                $("#rewardlog_list").append("<tr><td colspan='4'><div class='memberbox common-content'  ><div style='height:100px; line-height:100px; text-align:center; font-size:18px; font-weight:bolder;'>还没有奖励信息！！</div></div></td></tr>"); 
+            }
+          }
+      });
+	}
+function back(){
+	window.location.href="{php echo $this->createMobileUrl('fanslogin');}";
+}
+</script>
+{template 'foot-msg'}
+</body>
+</html>

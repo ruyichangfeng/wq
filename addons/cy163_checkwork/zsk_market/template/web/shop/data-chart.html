@@ -1,0 +1,361 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}echarts/echarts.min.js"></script>
+<script type="text/javascript" src="{ZSK_STATIC}layui/layui.all.js"></script>
+<style type="text/css">
+    .mChart{
+        text-align:center;width:900px;margin-bottom:30px;
+    }
+    .sChart{
+        width: auto;height:115px;margin: 10px 20px;float: left;
+    }
+    .cly{
+        display: inline-block;
+        width: auto;height:80px;border-radius:10px;background-color: #3FB837;
+        margin:10px 10px;
+        color:#FFF;
+
+    }
+    .cly .label{
+        font-size: 15px;line-height: 30px;width: 115px;
+        float: left;
+    } 
+    .cly .value{
+        padding: 10px 10px 0px 10px;font-size: 25px;line-height: 36px;
+    }
+    .dile{background: url('{ZSK_STATIC}images/bile.png')no-repeat;width:100%;height:100%;background-size:100% 100%;  }
+    .dilet{background: url('{ZSK_STATIC}images/sasd.png')no-repeat;width:100%;height:100%;background-size:100% 100%;  }
+    .layui-table{margin-top: 10%;}
+</style>
+<div>
+<div class="mChart"   style="width: 100%;text-align: center;display: inline-block;padding-left:10px">
+    
+
+    <div   class="sChart .le"  style="vertical-align: top;padding-top:10px;" >
+        <div class="cly" style="background-color: #00A2E8;">
+            
+            <div class="value"><?php echo intval($order_today);?></div>
+            <div class="label">今日订单</div>
+        </div>
+         <div class="cly"  style="background-color: #FF4444;">
+            
+            <div class="value">￥<?php echo floatval($order_money);?></div>
+            <div class="label">今日收入</div>
+        </div>
+        <div class="cly">
+            
+            <div class="value"><?php echo intval($order_refund);?></div>
+            <div class="label">维权中</div>
+        </div>
+        <div class="cly" style="background-color: #FF7F27;">
+            
+            <div class="value"><?php echo intval($order_nosend);?></div>
+            <div class="label">未发货</div>
+        </div>
+        <div class="cly" style="background-color: #2960ed;width: auto;">
+
+            <div class="value"><?php echo intval($shopone['smsnum']);?></div>
+            <div class="label">短信条数</div>
+        </div>
+        <div class="cly" style="background-color: #FF34B3;width: auto;">
+
+            <div class="value">￥<?php echo $shopone['balance'];?></div>
+            <div class="label">可提现余额</div>
+        </div>
+    </div>
+
+</div>
+<div class="mChart" style="width: 99%">
+    <div id="money" class="sChart .ri" style="width: 53%;height: 300px; float: left;"></div>
+    <div id="day7" class="sChart .ri" style="width: 39%;height: 300px;float: left;"></div>
+</div>
+
+</div>
+<div style="display: none;vertical-align: top;width: 150px;background-color: #f8f8f8;">
+    <div style="width: 100%;height: 40px;line-height: 40px;text-align: center;font-size: 18px;">月销量排行</div>
+</div>
+<?php if($acountInfo['judge'] < 1){ ?>
+<div class="table-one" style="width: 40%;float: left;margin-left: 5%;">
+    <form class="layui-form" id="memForm" method="post" action="<?php echo $this->routeUrl('shop.datachart');?>">
+        <span style="float: left;font-size: 12px;line-height: 28px;text-align: center;width: 75px;">
+            <i class="dile" style="font-size: 30px;color: #1E9FFF;float: left;height: 13px;width: 13px;margin-top: 7px;"></i>
+            入口统计
+        </span>
+        <div class="time-sile">
+            <input type="text" style="width: 30%;float: left;height: 30px;" class="layui-input" name="start_time" value="{$time_it['start_time']}" id="test1" placeholder="yyyy-MM-dd">
+            <span style="text-align: center;width: 5%;float: left;height: auto;line-height: 25px;">-</span>
+            <input type="text" style="width: 30%;float: left;height: 30px;" class="layui-input" name="end_time" value="{$time_it['end_time']}" id="test2" placeholder="yyyy-MM-dd">
+        </div>
+        <span class="dc-one" style="width: 15%;color: #00A2E8;font-size: 12px;float: left;text-align: center;line-height: 30px;">
+            <a href="javascript:selectilt()" style="color: #00A2E8">查询</a>
+            <a href="javascript:daochu()" style="color: #00A2E8">导出</a>
+        </span>
+    </form>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th  >ID</th>
+            <th  >路径</th>
+            <th >访问次数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $visitList $index $item}
+        <tr>
+            <?php foreach($homeList as $k=>$v){   ?>
+            <?php if(strpos($item['page_path'],$k)){ ?>
+            <td class="td-name">{$v}</td>
+            <?php } ?>
+            <?php } ?>
+            <td class="td-last">{$item['page_path']}</td>
+            <td class="td-last">{$item['page_visit_pv']}</td>
+        </tr>
+        {/loop}
+        <tr>
+            <td colspan="3" align="center">
+                {template 'public/pagenation'}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="table-one" style="width: 40%;float: left;margin-left: 5%;">
+    <form class="layui-form" id="memForm1" method="post" action="<?php echo $this->routeUrl('shop.datachart');?>">
+        <span style="float: left;font-size: 12px;line-height: 28px;text-align: center;width: 75px;">
+            <i class="dilet" style="font-size: 30px;color: #1E9FFF;float: left;height: 13px;width: 13px;margin-top: 7px;"></i>
+            第一笔消费
+        </span>
+        <div class="time-sile">
+            <input type="text" style="width: 30%;float: left;height: 30px;" class="layui-input" name="start_time_two" value="{$time_it1['start_time_two']}" id="test3" placeholder="yyyy-MM-dd">
+            <span style="text-align: center;width: 5%;float: left;height: auto;line-height: 25px;">-</span>
+            <input type="text" style="width: 30%;float: left;height: 30px;" class="layui-input" name="end_time_two" value="{$time_it1['end_time_two']}" id="test4" placeholder="yyyy-MM-dd">
+        </div>
+        <span class="dc-one" style="width: 15%;color: #00A2E8;font-size: 12px;float: left;text-align: center;line-height: 30px;">
+            <a href="javascript:selectilt1()" style="color: #00A2E8;padding-right: 5px;">查询</a>
+            <a href="javascript:daochu1()" style="color: #00A2E8">导出</a>
+        </span>
+    </form>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th  >消费商家</th>
+            <th  >第一次购买</th>
+            <th >第一笔累计</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $at $index $item}
+        <tr>
+            <td class="td-name">{$item['name']}</td>
+            <td class="td-last">{$item['numbers']}</td>
+            <td class="td-last">{$item['money']}</td>
+        </tr>
+        {/loop}
+        <tr>
+            <td colspan="3" align="center">
+                {template 'public/pagenation1'}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<?php } ?>
+<script type="text/javascript">
+    function daochu() {
+        var start_time = $('#test1').val();
+        var end_time = $('#test2').val();
+        window.location.href="<?php echo $this->routeUrl('shop.topDaoc');?>&start_time="+start_time+"&end_time="+end_time;
+    }
+    function daochu1() {
+        var start_time_two = $('#test3').val();
+        var end_time_two = $('#test4').val();
+        window.location.href="<?php echo $this->routeUrl('shop.datachart');?>&start_time_two="+start_time_two+"&end_time_two="+end_time_two+'&dc='+1;
+    }
+    function selectilt(){
+        var start_time = $('#test1').val();
+        var end_time = $('#test2').val();
+        if(start_time == ''){
+            modalMsg('开始时间不能为空');
+            return false;
+        }
+        if(end_time == ''){
+            modalMsg('结束时间不能为空');
+            return false;
+        }
+        $("#memForm").submit();
+    }
+    function selectilt1(){
+        var start_time_two = $('#test3').val();
+        var end_time_two = $('#test4').val();
+        if(start_time_two == ''){
+            modalMsg('开始时间不能为空');
+            return false;
+        }
+        if(end_time_two == ''){
+            modalMsg('结束时间不能为空');
+            return false;
+        }
+        $("#memForm1").submit();
+    }
+    layui.use('laydate', function() {
+        var laydate = layui.laydate;
+
+        //常规用法
+        laydate.render({
+            elem: '#test1'
+        });
+        laydate.render({
+            elem: '#test2'
+        });
+        laydate.render({
+            elem: '#test3'
+        });
+        laydate.render({
+            elem: '#test4'
+        });
+    })
+        // 基于准备好的dom，初始化echarts实例
+      $(function(){
+         
+
+
+
+        // 使用刚指定的配置项和数据显示图表。
+       
+option = {
+     title : {
+        text: '最近一周访问量',
+        subtext: '',
+        x:'center'
+    },
+    color: ['#3398DB'],
+    tooltip : {
+        trigger: 'axis',
+        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis : [
+        {
+            type : 'category',
+            data : [{$alivex}],
+            axisTick: {
+                alignWithLabel: true
+            }
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'访问',
+            type:'bar',
+            barWidth: '60%',
+            data:[{$alivey}]
+        }
+    ]
+};
+
+
+  var myChart = echarts.init(document.getElementById('day7'));                   
+ myChart.setOption(option);
+ 
+option = {
+    title: {
+        text: '最近一个月销量走势',
+        textStyle:{
+            fontSize:22
+        },
+        subtext: '订单数:{$order30_count_total}，总金额：{$order30_money_total}',
+         x:'center',
+        subtextStyle:{
+            color:"#999",
+            fontSize:"14",
+            fontWeight:600
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['交易额','订单数'],
+        left:"0",
+        orient:"vertical"
+    },
+    toolbox: {
+        show: true,
+        feature: {  
+            magicType: {type: ['line', 'bar']}, 
+        }
+    },
+    xAxis:  {
+        type: 'category',
+        boundaryGap: false,
+        data: [{$monthx}]
+    },
+    yAxis: [{
+        type: 'value',
+        axisLabel: {
+            formatter: '{value}元'
+        }
+    },{
+            type: 'value', 
+            position: 'right',
+            
+            axisLabel: {
+                formatter: '{value}单'
+            }
+        },
+    ],
+    series: [
+        {
+            name:'交易额',
+            type:'line',
+            data:[{$monthy}],
+            markLine: {
+                data: [
+                    {type: 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'订单数',
+            type:'line',
+            data:[{$monthy2}],
+           markLine: {
+                data: [
+                    {type: 'average', name: '平均值'}
+                ]
+            }
+        }
+    ],
+     dataZoom: [
+        
+        {
+            show:true,
+            type: 'slider',
+            realtime: true,
+            start: 79,
+            end:100,
+            xAxisIndex: 0,
+            zoomOnMouseWheel:false
+        }
+    ],
+};
+var myChart = echarts.init(document.getElementById('money'));                   
+ myChart.setOption(option);
+      })
+        	
+     
+       
+    </script>
+{template 'public/footer'}

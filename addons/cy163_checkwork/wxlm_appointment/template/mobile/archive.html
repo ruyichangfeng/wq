@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>全部档案</title>
+    {template 'head'}
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+</head>
+<body style="background-color: #f8f8f8;">
+            <div class="dz-filehead dz-detailhead">
+                <a href="{php echo $this->createMobileUrl('admin')}"><img src="{RES}mobile/images/left2.png" class="goback"></a>
+                全部档案({php echo count($archives_list)})
+            </div>
+            <div class="visit-search">
+                <li><img src="{RES}mobile/images/search.png"><input type="text" placeholder="请输入姓名和手机号" id="search"></li>
+            </div>
+            <div class="visit-libox">
+                <a href="{php echo $this->createMobileUrl('birthday')}">
+                    <li>
+                        <img src="{RES}mobile/images/birthday.png">
+                          <span>本月生日</span>
+                          <img src="{RES}mobile/images/right.png">
+                    </li>
+                </a>
+                <a href="{php echo $this->createMobileUrl('warning')}">
+                        <li>
+                            <img src="{RES}mobile/images/early.png">
+                              <span>预警档案</span>
+                              <img src="{RES}mobile/images/right.png">
+                        </li>
+                    </a>
+                    <a href="{php echo $this->createMobileUrl('visitLog')}">
+                            <li>
+                                <img src="{RES}mobile/images/hfjl.png">
+                                  <span>回访记录</span>
+                                  <img src="{RES}mobile/images/right.png">
+                            </li>
+                    </a>
+            </div>
+            <div class="visit-box2" id="archive-content">
+                {loop $archives_list $key $item}
+                    <ul>
+                        <div class="visit-box-title">{$key}</div>
+                        {loop $item $key2 $item2}
+                        <a href="{php echo $this->createMobileUrl('archiveInfo', array('archive_id' => $item2['archive_id']))}">
+                            <li >
+                            <div class="visit-box2-left">
+                                <img src="{php echo tomedia($item2['archive_avatar'])}">
+                            </div>
+                            <div class="visit-box2-right">
+                                <div>
+                                    <span>{$item2['archive_name']}</span>
+                                    <img src="{RES}mobile/images/connect.png">
+                                    {loop $item2['archive_staff'] $row}
+                                    <span>{$row}</span>
+                                    {/loop}
+                                </div>
+                               <div>
+                                    <span><img src="{RES}mobile/images/clock_new.png">上次到店时间:{if empty($item2['lasttime'])} 暂无记录{else} {$item2['lasttime']}{/if}</span>
+                                    <object> <a href="tel:{$item2['archive_tel']}"><img src="{RES}mobile/images/tel.png"></a></object>
+                               </div>
+                               <p class="clear"></p>
+                            </div>
+                            <p class="clear"></p>
+                        </li>
+                        </a>
+                        {/loop}
+                    </ul>
+                {/loop}
+            </div> 
+
+</body>
+
+<script>
+    $('#search').change(function () {
+
+        var content = $(this).val();
+        var staff_id = "{$staff['staff_id']}";
+
+        $.ajax({
+            url:"{php echo $this->createMobileUrl('searchArchive')}",
+            type:"post",
+            data:{keyword:content, staff:staff_id},
+            success:function (res) {
+
+                $('#archive-content').html(res);
+
+            }
+        })
+    })
+</script>
+</html>

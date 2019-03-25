@@ -1,0 +1,105 @@
+{template 'common/header-base'}
+<link href="{MODULE_URL}static/js/artDialog/skins/idialog.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="{MODULE_URL}static/js/artDialog/plugins/iframeTools.js"></script>
+
+<ul class="nav nav-tabs">
+    <li>
+    	<a href="{php echo $this->createWebUrl('company', array('foo'=>'chong', 'id'=>$id));}">余额充值</a>
+    </li>
+    <li class="active">
+    	<a href="{php echo $this->createWebUrl('company', array('foo'=>'bao', 'id'=>$id));}">保证金</a>
+    </li>
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="javascript:;" method="post">
+    	<input type="hidden" name="id" id="id" value="{$id}" >
+        <input type="hidden" name="old_grade_id" id="old_grade_id" value={$item['grade_id']}>
+        <input type="hidden" name="old_grade_money" id="old_grade_money" value={$item['grade_money']}>
+		<div class="panel panel-default">
+            <div class="panel-heading">
+            {if $item[grade_id] != ''}
+                <div class="tx-c t-gra ulev-0">
+                您目前的保证金级别为:
+                {if $this->getGradeInfo($item[grade_id], 'grade_name') == ""}
+                    无保证金等级
+                {else}
+                    {php echo $this->getGradeInfo($item[grade_id], 'grade_name')}
+                {/if}
+                </div>
+            {/if}
+            </div>
+
+        	<div class="panel-body">
+                {php $n=0;}
+                {loop $list $vo}
+                {php $n+=1;}
+                <div class="form-group">
+                    <div class="col-sm-9 col-xs-12">
+                       <input type="radio" name="grade_id" value="{$vo['id']}@{$vo['grade_money']}" {if $item['grade_id'] == $vo['id']} checked {/if}>{$vo['grade_name']}[缴纳金额{$vo['grade_money']}]
+                        <!--
+                        <input type="text" name="money" id="money" class="form-control">
+                        -->
+                    </div>
+                </div>
+                {/loop}
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <div onclick="submitok()" class="btn btn-primary btn-block">确认缴纳</div>
+                    </div>
+                </div>
+            </div>
+			
+			<div class="panel-heading"></div>
+            <div class="panel-body">
+				<span style="color:red;">保证金等级只能向上等级升级</span>
+			</div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+function submitok(){
+    var id          = $("#id").val();
+    var grade_id    = $("input[name='grade_id']:checked").val();
+    var old_grade_id= $("#old_grade_id").val();
+    var old_grade_money= $("#old_grade_money").val();
+  
+    $.ajax({
+        url: "{php echo $this->createWebUrl('company', array('foo'=>'baook'))}",
+        type:"POST",
+        data:{"id":id, "grade_id":grade_id, "old_grade_id":old_grade_id, "old_grade_money":old_grade_money},
+        dataType:"json",
+        success: function(res){
+            if(res == 1){
+                art.dialog({
+                    title: '提示消息',
+                    content: '保证金缴纳成功！',
+                    ok: function () {
+                        art.dialog.close();
+                        return false;
+                    }
+                });
+            }else if(res == 2){
+                art.dialog({
+                    time: 1,
+                    content: '你没有升级您的保证等级！'
+                });
+            }else if(res == 3){
+                art.dialog({
+                    time: 1,
+                    content: '保证等级不能降低！'
+                });
+            }else{
+                art.dialog({
+                    time: 1,
+                    content: '充值失败！'
+                });
+            }
+        }
+    });
+}
+</script>

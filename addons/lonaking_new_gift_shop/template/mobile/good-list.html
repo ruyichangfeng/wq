@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta content="telephone=no" name="format-detection">
+    <title>
+        {if $group}{$group['name']}{else}所有兑换项{/if}
+    </title>
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/normalize.min.css?t=20151016">
+    <link rel="stylesheet" href="{$resource['prefix']}assets/css/list-page-v11.19.css">
+    <style>
+        .theme-color{color: {$html['config']['theme_color']};}
+        .theme-bgcolor{background-color: {$html['config']['theme_color']};}
+        .theme-bordercolor{border-color: {$html['config']['theme_color']};}
+        /* radio */
+        .radio-group.cur{border-color:{$html['config']['theme_color']}; }
+        .radio-group .cur-arrow{border-color: {$html['config']['theme_color']} transparent transparent {$html['config']['theme_color']};}
+        .description a {color: {$html['config']['theme_color']};}
+    </style>
+    <style>
+        .noRecord p{font-size:10px;padding:10px 0px 0px;}
+    </style>
+
+</head>
+<body>
+
+<section id="main">
+    {if $page['count'] > 0}
+    <div class="recommend single-row">
+        {loop $page['data'] $good}
+        <a href="{php echo $this->createMobileUrl('Good',array('id'=>$good['id'],'invite_id'=>$_GPC['invite_id']))}" class="item">
+            <img src="{php echo tomedia($good['thumbnail'])}">
+            <div class="item-info">
+                <h3>{$good['title']}</h3>
+                <p class="theme-color">{if $good['buy_type'] == NGSGiftService::GIFT_BUY_TYPE_SCORE}{$good['score']}{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}{elseif $good['buy_type'] == NGSGiftService::GIFT_BUY_TYPE_MONEY}{$good['money']}元{elseif $good['buy_type'] == NGSGiftService::GIFT_BUY_TYPE_SCORE_AND_MONEY}{$good['score']}{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if} + {$good['money']}元{/if}
+                </p>
+            </div>
+            <div class="tag" style="border-bottom-color:{$good['tag_color']};"><span>{$good['tag']}</span></div>
+            <button class="theme-color theme-bordercolor">
+                {if $good['buy_type'] == 2}
+                {if $good['num'] <= 0}售完{else}购买{/if}
+                {else}
+                {if $good['num'] <= 0}兑完{else}兑换{/if}
+                {/if}
+            </button>
+        </a>
+        {/loop}
+    </div>
+    {else}
+    <div class="noRecord">
+        <img src="{$resource['prefix']}/images/noRecord.png" width="66">
+        <p>列表为空</p>
+    </div>
+    {/if}
+</section>
+{template 'copyright'}
+
+<script src="{$resource['prefix']}assets/js/zepto.min.js" type="text/javascript"></script>
+<script>
+    const GET_ITEMS_URL = "{$resource['urls']['GoodList']}&ajax=true&group={$_GPC['group']}";
+    const _appItemNextPage = '{$html["end"]}';
+    const _autoRecommendNextPage = true;
+    const _arunum = 3;
+    const _arn = false;
+    const _type = "{$html['type']}";
+</script>
+<script src="{$resource['prefix']}assets/js/fastclick.min.js"></script>
+<script src="{$resource['prefix']}assets/js/list-page-app.js"></script>
+</body></html>

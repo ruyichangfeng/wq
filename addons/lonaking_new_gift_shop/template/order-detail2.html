@@ -1,0 +1,371 @@
+{template 'common/header'}
+<style type="text/css">
+	.f-25{
+		font-size: 25px;
+	}
+	.fw-800{
+		font-weight: 800;
+	}
+	.color-red{
+		color: #e4393c;
+	}
+	.none-border{
+		border: none;
+	}
+	table thead tr th,table tbody tr td{
+		text-align: left;
+	}
+	table tbody tr{
+		line-height: 30px;
+	}
+	.status-text,.status-sign{
+		font-size: 16px;
+		color: #999999;
+	}
+	.status-text.active,.status-sign.active{
+		color: #0089dc;
+		font-size: 18px;
+		font-weight: 500;
+	}
+	.status-text:nth-child(2){
+		padding-left: 300px;
+		padding-right: 300px;
+	}
+	.status-sign:nth-child(2){
+		padding-left: 340px;
+		padding-right: 340px;
+	}
+	.status-sign-time{
+		font-size: 13px;
+		color: #999999;
+	}
+	.status-sign-time.active{
+		color: #0089dc;
+	}
+	.status-sign-time:nth-child(2){
+		padding-left: 220px;
+		padding-right: 220px;
+	}
+	.line{
+		padding-left: 340px;
+	}
+	.shop-info{
+		background: #fefdee;
+
+		border: 1px solid #F8E5BA;
+	}
+	.shop-info th{
+		font-weight: 200;
+	}
+	.shop-info .shop-logo img{
+
+	}
+	.shop-info .shop-name{
+		font-size: 18px;
+		font-weight: 500;
+		color: #000;
+	}
+	.desc-gray{
+		color: #999999;
+	}
+	.order-state{
+		background: #fff;
+		border: none;
+		border-top: 4px solid #0089dc;
+		border-radius: 0px;
+	}
+	.order-state .right{
+		border-left: 1px solid #999999;
+	}
+	table.order-info{
+
+	}
+	table.order-info tr td,table.order-info tr th{
+		border-top: none;
+		text-align: left;
+		padding-left: 20px;
+		border-right: 1px solid #ddd;
+		border-bottom: none;
+		vertical-align : top;
+		color: #999999;
+		white-space: inherit;
+	}
+	table.order-info tr th{
+		color: #000;
+	}
+	table.order-good-info tr td,table.order-good-info tr th{
+		border-right: none;
+		vertical-align: middle;
+	}
+</style>
+<div class="main">
+	<ol class="breadcrumb">
+		<li><a href="#">首页</a></li>
+		<li class=""><a href="">订单管理</a></li>
+		<li class="active">订单详情</li>
+	</ol>
+	<div class="well order-state" style="text-align: center;position: relative;">
+		<div class="row">
+			<div class="col-xs-9 left">
+				<p style="padding-top: 10px;">
+					<span class="status-text {if $html['order']['status'] == 0}active{/if}">新订单</span>
+					<span class="status-text {if $html['order']['status'] == 1}active{/if}">已付款</span>
+					<span class="status-text {if $html['order']['status'] == 2}active{/if}">已使用</span>
+				</p>
+				<p style="">
+					<span class="status-sign {if $html['order']['status'] == 0}active{/if}"><i class="fa fa-circle"></i></span>
+					<span class="status-sign {if $html['order']['status'] == 1}active{/if}"><i class="fa fa-circle"></i></span>
+					<span class="status-sign {if $html['order']['status'] == 2}active{/if}"><i class="fa fa-circle"></i></span>
+				</p>
+				<p style="">
+					<span class="status-sign-time {if $html['order']['status'] == 0}active{/if}">{php echo date("Y-m-d H:i:s",$html['order']['create_time'])}</span>
+					<span class="status-sign-time {if $html['order']['status'] == 1}active{/if}">{php echo date("Y-m-d H:i:s",$html['order']['pay_success_time'])}</span>
+					<span class="status-sign-time {if $html['order']['status'] == 2}active{/if}">{php echo date("Y-m-d H:i:s",$html['order']['use_time'])}</span>
+				</p>
+			</div>
+			<div class="col-xs-3 right desc-gray">
+				<p class="copy" data-copy-text="19586601328">订单号 ：{$html['order']['order_num']}</p>
+				<p class="text-success f-25 fw-800" style="color: #71b247;">
+					{if $html['order']['status'] == 0}新订单{/if}
+					{if $html['order']['status'] == 1}已付款/待使用{/if}
+					{if $html['order']['status'] == 2}完成{/if}
+				</p>
+				<p><i class="fa fa-print" aria-hidden="true"></i> 打印订单</p>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<table class="table order-info">
+				<thead class="">
+				<tr>
+					<th>用户信息</th>
+					<th>付款信息</th>
+					<th style="display: none;">商品信息</th>
+					<th>奖励情况</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>
+						<p>昵称：{$html['user']['nickname']}</p>
+						<p>真实姓名：{$html['user']['realname']}</p>
+						<p>手机号码：{$html['user']['mobile']}</p>
+						<p>生日：{$html['user']['birthday']}</p>
+						<p>头像：<img class="img-circle" src="{$html['user']['avatar']}" width="50"></p>
+						<p>openid：{$html['user']['openid']}</p>
+						<p>关注：未关注</p>
+					</td>
+					<td>
+						<p>付款方式：{if $html['order']['buy_type'] == 1}现金{elseif $html['order']['buy_type'] ==2}店铺积分{elseif $html['order']['buy_type'] ==3}联盟积分{elseif $html['order']['buy_type'] ==4}现金＋店铺积分{elseif $html['order']['buy_type'] ==5}现金＋联盟积分{else}{/if}</p>
+						<p>商品总额：
+							{if $html['good']['price_type'] == 1}
+							¥{$html['good']['amount']}
+							{/if}
+							{if $html['good']['price_type'] == 2}
+							{$html['good']['shop_score']}
+							积分
+							{/if}
+							{if $html['good']['price_type'] == 3}
+							{$html['good']['union_score']}
+							联盟积分
+							{/if}
+							{if $html['good']['price_type'] == 4}
+							¥{$html['good']['amount']}
+							+{$html['good']['shop_score']} 积分
+							{/if}
+							{if $html['good']['price_type'] == 5}
+							¥{$html['good']['amount']}
+							+{$html['good']['union_score']} 联盟积分
+							{/if}
+						</p>
+						<p>联盟会员卡余额支付：
+							¥ {$html['order']['union_card_amount']}
+							{if $html['order']['union_card_amount'] > 0}
+								{if $html['order']['union_card_amount_status'] == 0}
+								<span class="label label-danger">未支付</span>
+								{elseif $html['order']['union_card_amount_status'] == 1}
+								<span class="label label-success">已支付</span>
+								{/if}
+							{/if}
+						</p>
+						<p>商户会员卡余额支付：
+							¥ {$html['order']['shop_card_amount']}
+							{if $html['order']['shop_card_amount'] > 0}
+								{if $html['order']['shop_card_amount_status'] == 0}
+								<span class="label label-danger">未支付</span>
+								{elseif $html['order']['shop_card_amount_status'] == 1}
+								<span class="label label-success">已支付</span>
+								{/if}
+							{/if}
+						</p>
+						<p style="color: #569561;">微信支付：
+							¥ {$html['order']['wx_amount']}
+							{if $html['order']['wx_amount'] > 0}
+								{if $html['order']['wx_amount_status'] == 0}
+								<span class="label label-danger">未支付</span>
+								{elseif $html['order']['wx_amount_status'] == 1}
+								<span class="label label-success">已支付</span>
+								(流水号: {$html['order']['transaction_id']})
+								{/if}
+							{/if}
+						</p>
+						<p>联盟积分：
+							$ {$html['order']['order_union_score']}
+						</p>
+						<p>商铺积分：
+							$ {$html['order']['order_shop_score']}
+						</p>
+						<p>优惠券：</p>
+						<p>折扣券：</p>
+					</td>
+					<td class="hide">
+						<p>商品名称：</p>
+						<p>商品总额：
+
+						</p>
+						<p>商品类型：
+						</p>
+						<p>运费：</p>
+					</td>
+					<td>
+						<p>奖励联盟积分：{$html['order']['reward_union_score']}</p>
+						<p>奖励联盟余额：{$html['order']['reward_union_amount']}</p>
+						<p>奖励店铺积分：{$html['order']['reward_score']}</p>
+						<p>奖励店铺赠额：{$html['order']['reward_amount']}</p>
+						<p>奖励优惠券：</p>
+						<p>联盟推送：</p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<table class="table order-info order-good-info">
+				<thead class="">
+				<tr>
+					<th width="140px"></th>
+					<th width="450px">商品</th>
+					<th width="150px">数量</th>
+					<th width="200px">商城价格</th>
+					<th width="200px">积分</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>
+						<img src="{php echo tomedia($html['good']['thumbnail'])}" width="100">
+					</td>
+					<td>
+						{$html['good']['title']}
+					</td>
+					<td>
+						X 1
+					</td>
+					<td>
+						¥ 18 + 22积分
+					</td>
+					<td>
+						<p>店铺 ： 18</p>
+						<p>联盟 ： 0</p>
+					</td>
+					<td>
+						<div class="btn-group">
+							<a href="javascript:void(0);" title="退货退款" data-id="{$html['good']['id']}" data-order-num="{$html['order']['order_num']}" class="btn btn-danger">退货/退款</a>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>
+
+					</td>
+					<td>
+						<p>商品总额：</p>
+						<p>返现：</p>
+						<p>返积分：</p>
+						<p>应付总额：<span class="color-red f-25 fw-800">¥ 78</span></p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	var USER_INFO_API = "{php echo createUserWebUrl('UserInfo')}";
+
+	require(['bootstrap.switch','Smoke'],function($,Smoke){
+		//点击用户信息
+		$(".userinfo").on("click", function (e) {
+			e.stopPropagation();
+			var btn = $(this);
+			var openid = btn.data("openid");
+			$.get(USER_INFO_API,{openid : openid}, function (res) {
+				var json = JSON.parse(res);
+				if(json.status == 200){
+
+					if(json.data == null || json.data == false){
+						Smoke.smkAlert({
+							text: "系统出错:用户信息不存在!",
+							type: 'danger'
+						});
+					}else{
+						$("#nickname").val(json.data.nickname);
+						$("#realname").val(json.data.realname);
+						$("#mobile").val(json.data.mobile);
+						$("#birthday").val(json.data.birthday);
+						$("#union-card-sn").val(json.data.sn);
+						$("#openid").val(openid);
+						$("#order-user-modal").modal("show");
+					}
+				}else{
+					Smoke.smkAlert({
+						text: json.message,
+						type: 'danger'
+					});
+				}
+
+
+
+			});
+
+		});
+
+		//更改订单状态
+		$(".opt-gift-order").on("click",function(){
+			var btn = $(this);
+			var url = btn.data('url');
+			var orderNum = $(this).data('order-num');
+			var data = {
+				order_num : orderNum
+			};
+			$.post(url,data, function(result){
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					alert(json.message);
+					return false;
+				}else{
+					btn.attr("disabled","disabled");
+					var html = '<span class="label label-success">已审核</span>';
+					btn.parent().siblings("td[data-option='status']").children(".status").html(html);
+				}
+			});
+		});
+	});
+</script>
+{template 'common/footer'}

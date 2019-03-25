@@ -1,0 +1,193 @@
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+	<li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('tplsetup', array('op'=>'display'));}">模板列表</a></li>
+	<li {if $op == 'creat'}class="active"{/if}><a href="{php echo $this->createWebUrl('tplsetup', array('op'=>'creat'));}">添加模板</a></li>
+	{if $op == 'edit'}
+    <li class="active"><a href="javascript:">编辑模板</a></li>
+    {/if}
+</ul>
+
+{if $op == 'display'}
+<div class="main">
+	<div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="{$_GPC['c']}">
+                <input type="hidden" name="a" value="{$_GPC['a']}">
+                <input type="hidden" name="do" value="{$_GPC['do']}">
+                <input type="hidden" name="m" value="{$_GPC['m']}">
+                <input type="hidden" name="op" value="{$op}">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">关键字</label>
+                    <div class="col-xs-12 col-sm-5 col-md-8 col-lg-5">
+                        <input class="form-control" name="so_keyword" id="" type="text" value="{$_GPC['so_keyword']}" placeholder="模板名称">
+                    </div>
+                    <div class="col-xs-12 col-sm-2 col-md-1 col-lg-1">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+            </form>
+		</div>
+	</div>
+    <div class="panel panel-default">
+        <div class="panel-heading">模版消息 - 模版设置</div>
+        <div class="panel-body">
+            <div class="table-responsive panel-body">
+                <table class="table table-hover" style="min-width: 300px;">
+                    <thead class="navbar-inner">
+                        <tr>
+                            <th class="col-sm-1">模板名称</th>
+                            <th class="col-sm-2">模板ID</th>
+                            <th class="col-sm-1">添加时间</th>
+                            <th class="col-sm-1 text-right">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loop $displayListRs $key $item}
+                        <tr>
+                            <td>
+                                {$item['tpl_name']}
+                            </td>
+                            <td>
+                                {$item['tpl_wx_id']}
+                            </td>
+                            <td>
+                            	{php echo date('Y-m-d',$item['addtime']);}
+                            </td>
+                            <td style="text-align:right;">
+                    <a href="{php echo $this->createWebUrl('tplsetup', array('op'=>'edit', 'id'=>$key));}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;
+                    <a href="{php echo $this->createWebUrl('tplsetup', array('op'=>'delete', 'id'=>$key));}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+                            </td>
+                        </tr>
+                        {/loop}
+                        {if empty($displayListRs)}
+                        <tr>
+                            <td colspan="4">
+                                尚未添加模板
+                            </td>
+                        </tr>
+                        {/if}
+                    </tbody>
+                </table>
+                {$pager}
+            </div>
+        </div>
+    </div>
+</div>
+{/if} <!-- end of display -->
+
+{if $op == 'creat' || $op == 'edit'}
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-default">
+			<div class="panel-heading">模版消息 - 模版设置</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">模板名称</label>
+					<div class="col-xs-12 col-sm-4">
+						<input type="text" name="formdata[tpl_name]" class="form-control" value="{$dataRow['tpl_name']}" />
+					</div>
+				</div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">模板ID</label>
+					<div class="col-xs-12 col-sm-4">
+						<input type="text" name="formdata[tpl_wx_id]" class="form-control" value="{$dataRow['tpl_wx_id']}" />
+					</div>
+				</div>
+				<div class="yd_mypage_single">
+                	<div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">模板字段</label>
+                        
+                        <div class="col-xs-12 col-sm-9 col-md-10 col-lg-11" id="yd_FieldBox" style="padding:0;">
+                        {loop $dataRow['field_arr'] $key $item}
+                        	<div class="col-sm-2 col-xs-2">
+                                <div class="input-group form-group">
+                                    <span class="input-group-addon">字段名</span>
+                                    <input type="text" name="field_des[]" class="form-control" value="{$item[3]}" placeholder="中文名" />
+                                </div>
+                            </div>
+                        	<div class="col-sm-2 col-xs-2">
+                                <div class="input-group form-group">
+                                    <span class="input-group-addon">字段值</span>
+                                    <input type="text" name="field_name[]" class="form-control" value="{$item[0]}" placeholder="英文名" />
+                                </div>
+                            </div>
+                            <div class="col-sm-5 col-xs-6">
+                                <div class="input-group form-group">
+                                    <span class="input-group-addon">内容</span>
+                                    <input type="text" name="field_val[]" class="form-control" value="{$item[1]}" placeholder="可留空 变量：当前时间{time}、当前日期{date}、换行符\n" />
+                                </div>
+                            </div>
+                            <div class="col-sm-2 col-xs-2">
+                                <div class="input-group form-group">
+                                    <span class="input-group-addon">颜色</span>
+                                    <input type="text" name="field_color[]" class="form-control" value="{$item[2]}" />
+                                </div>
+                            </div>
+                        {/loop}
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label"> </label>
+                        <div class="col-sm-9 col-xs-12" >
+                            <a href="javascript:ydMyPageAddField();" class='btn btn-primary' id='add-field' style="margin-top:10px;margin-bottom:10px;"title="添加一组"><i class='fa fa-plus'></i> 添加一组</a> 
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-1 control-label">拾取颜色</label>
+					<div class="col-xs-2 col-sm-2" style="margin-right:0; padding-right:0;">
+						<input type="text" class="form-control" id="textColor" />
+					</div>
+                    <div class="col-xs-1 col-sm-1">
+						<input type="text" class="form-control" id="selectColor" />
+					</div>
+                    <span class="help-block">复制此代码到对应的字段颜色即可</span>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-1">
+                    	<input type="hidden" name="id" value="{$dataRow['tpl_id']}" />
+						<input name="submit" type="submit" value="保存模板" class="btn btn-primary" />
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		util.colorpicker( $("#selectColor"), function(color){
+			$("#textColor").val(color);
+		});
+		$('#form').submit(function(){
+			var result = true;
+			if($('input[name="formdata[tpl_name]"]').val() == ''){
+				result = false;
+				util.message('未填写名称.');
+			}
+			if($('input[name="formdata[tpl_wx_id]"]').val() == ''){
+				result = false;
+				util.message('未填写ID.');
+			}
+			
+			return result;
+		});
+	});
+});
+							
+function ydMyPageAddField(){
+	var addHtml='<div class="col-sm-2 col-xs-2"><div class="input-group form-group"><span class="input-group-addon">字段名</span><input type="text" name="field_des[]" class="form-control" placeholder="中文名" /></div></div><div class="col-sm-2 col-xs-2"><div class="input-group form-group"><span class="input-group-addon">字段值</span><input type="text" name="field_name[]" class="form-control" placeholder="英文名" /></div></div><div class="col-sm-5 col-xs-6"><div class="input-group form-group"><span class="input-group-addon">内容</span><input type="text" name="field_val[]" class="form-control" placeholder="可留空 变量：当前时间{time}、当前日期{date}、换行符\n" /></div></div><div class="col-sm-2 col-xs-2"><div class="input-group form-group"><span class="input-group-addon">颜色</span><input type="text" name="field_color[]" class="form-control" value="#3385FF" /></div></div>';
+	
+	$("#yd_FieldBox").append(addHtml);
+}
+
+</script>
+{/if} <!-- end of create -->
+
+{template 'common/footer'}

@@ -1,0 +1,389 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="{FX_URL}app/resource/css/style.css">
+<link rel="stylesheet" type="text/css" href="{FX_URL}app/resource/css/detail.css">
+<link rel="stylesheet" type="text/css" href="{FX_URL}app/resource/components/swiper/swiper.min.css">
+<script type="text/javascript" src="{FX_URL}app/resource/components/swiper/swiper.min.js"></script>
+<style type="text/css">
+.latecolor{color:#ff9900}
+.latecolorbg{background-color:#ff9900}
+.lateborder{border:1px solid#ff9900}
+.addressXX{color:#000;line-height:22px}
+.tag{position:absolute;left:0;bottom:0;background-color:rgba(0,0,0,0.6);display:inline-block;z-index:2;width:100%;height:35px;padding:5px 7px;border-left:3px solid#348379;}
+.tag span{font-size:18px;font-weight:bold;line-height:1.5;text-align:left;color:#fff;}
+.bodybox{height:80px;}
+.box-float{ display:none;}
+</style>
+<script type="text/javascript">
+wx.ready(function () {
+	sharedata = {
+		title: "我参加了 {if $activity['sharetitle']!=''}{$activity['sharetitle']}{else}{$activity['title']}{/if}",
+		desc: "{if $activity['sharedesc']!=''}{$activity['sharedesc']}{else}敢来就能轻松赢大奖,还在等什么,快和大家分享这个天大的惊喜！{/if}",
+		link: "{$_W['siteurl']}",
+		imgUrl: "{if $activity['sharepic']!=''}{php echo tomedia($activity['sharepic']);}{else}{php echo tomedia($activity['thumb']);}{/if}",
+		success: function(){
+{if $config['creditstatus']==1 && $activity['prize']['share_times']>0}
+			$.post("{php echo $this->createMobileUrl('detail', array('credit'=>$activity['prize']['share_credit'],'share_times'=>$activity['prize']['share_times'],'op'=>'share'))}",function(d) {
+				if (d.result==1){
+					util.alert('恭喜您获取 '+d.data+' 积分', ' ');
+				}else if(d.result==2){
+					util.alert(d.data, ' ');
+				}
+			},"json");
+{/if}
+		},
+		cancel: function(){
+
+		}
+	};
+	wx.onMenuShareAppMessage(sharedata);
+	wx.onMenuShareTimeline(sharedata);
+});
+</script>
+<body>
+{template 'common/followed'}
+<nav class="mui-bar mui-bar-tab" id="bar">
+    <a class="mui-tab-item{if $_GPC['do']=='index'} mui-active{/if}" href="{php echo $this->createMobileUrl('index')}">
+        <span class="mui-icon mui-ext-icon mui-icon-fanhui"></span>
+        <span class="mui-tab-label"></span>
+    </a>
+    <!--<a class="mui-tab-item{if $_GPC['do']=='index'} mui-active{/if}">
+        <span class="mui-icon mui-ext-icon mui-icon-pinglun"></span>
+        <span class="mui-tab-label"></span>
+    </a>--> 
+    <a class="mui-tab-item{if !empty($favorite['id'])} mui-active{/if}" href="javascript:setProperty('#favorite',{$activity['id']},'favorite')" id="favorite" data="{if !empty($favorite['id'])}1{else}0{/if}">
+        <span class="mui-icon mui-ext-icon mui-icon-favorite"></span>
+        <span class="mui-tab-label"></span>
+    </a>
+    <a class="mui-tab-item{if $_GPC['do']=='ucenter'} mui-active{/if}" href="javascript:_system._guide(true);">
+        <span class="mui-icon mui-ext-icon mui-icon-fenxiang"></span>
+        <span class="mui-tab-label"></span>
+    </a>    
+</nav>
+<div id="touchbtn" style="position:absolute; bottom:55px;right:5px;z-index:999;width: 57px; height:57px;opacity:0.65">
+    <a href="{php echo $this->createMobileUrl('member', array('activityid'=>$activityid,'op'=>'home'))}" >
+       <span class="mui-ext-icon mui-icon-person" style=" width: 57px; height:57px;line-height:38px;color:#FFF;font-size:36px; text-align:center; background:#FF7B33; display: block; padding: 5px;border-radius: 50%;border: 2px solid #fff; box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.21);"></span>
+    </a>
+</div>
+<div class="basic-box box-float">
+        <div class="mui-col-xs-7 mui-left">
+            <div class="buy-box">
+                <div class="price" style="display:none"><span class="rmb-num">0.01 元</span></div>
+                <div class="num">名额{if $activity['personnum']>0}<span class="rmb-num"> {$activity['personnum']}人</span>{else}不限{/if}</div>
+            </div>
+            <div class="end-date">
+            {if $total == $activity['personnum'] && $activity['personnum']>0}
+            	<span style="font-weight:bold">名额已满</span>
+            {else}
+                {if TIMESTAMP < strtotime($activity['joinstime'])}
+                {php echo date('m月d日 H:i',strtotime($activity['joinstime']))} 开始报名
+                {elseif TIMESTAMP > strtotime($activity['joinetime'])}
+                报名结束
+                {else}
+                <span style="font-weight:bold">报名截止：</span>{php echo date('m月d日 H:i',strtotime($activity['joinetime']))}
+                {/if}            
+            {/if}
+            </div>
+        </div>
+        {if $jion['id']!=''}
+        <div class="mui-head-ext mui-right" style=" margin-right:15px;">
+            <img src="{php echo tomedia($_W['fans']['avatar']);}" />
+        </div>
+        {else}
+        <div class="mui-col-xs-4 mui-padded-top-10 mui-right">
+            {if strtotime($activity['joinetime']) >= TIMESTAMP && TIMESTAMP >= strtotime($activity['joinstime']) && ($total < $activity['personnum'] || $activity['personnum']==0)}
+                <a href="{if $config['guanzhu_join']==2 && empty($_W['fans']['follow'])}javascript:;{else}{php echo $this->createMobileUrl('join', array('activityid'=>$activityid))}{/if}" class="mui-btn mui-btn-block mui-btn-orange{if $config['guanzhu_join']==2} js-join{/if}">我要报名</a>
+            {/if}               
+        </div>
+        {/if}
+        <div style="clear:both;"></div>
+</div>
+<div class="mui-content">
+<div class="mui-scroll">
+    <div class="swiper-container">
+		<div class="swiper-wrapper">
+      	{loop $activity['atlas'] $row}	
+            <div class="swiper-slide"><img src="{php echo tomedia($row);}"></div>
+      	{/loop}
+        </div>
+        <div class="tag"><span>{$activity['title']}</span></div>
+	</div>
+    
+    <div class="bodybox">
+      <div class="basic-box box-fixed">
+        <div class="mui-col-xs-7 mui-left">
+            <div class="buy-box">
+                <div class="price" style="display:none"><span class="rmb-num">0.01 元</span></div>
+                <div class="num">名额{if $activity['personnum']>0}<span class="rmb-num"> {$activity['personnum']}人</span>{else}不限{/if}</div>
+                
+            </div>
+            <div class="end-date">
+            {if $total == $activity['personnum'] && $activity['personnum']>0}
+            	<span style="font-weight:bold">名额已满</span>
+            {else}
+                {if TIMESTAMP < strtotime($activity['joinstime'])}
+                {php echo date('m月d日 H:i',strtotime($activity['joinstime']))} 开始报名
+                {elseif TIMESTAMP > strtotime($activity['joinetime'])}
+                报名结束
+                {else}
+                <span style="font-weight:bold">报名截止：</span>{php echo date('m月d日 H:i',strtotime($activity['joinetime']))}
+                {/if}
+            {/if}
+            </div>
+        </div>
+        {if $jion['id']!=''}
+        <div class="mui-head-ext mui-right" style=" margin-right:15px;">
+            <img src="{php echo tomedia($_W['fans']['avatar']);}" />
+        </div>
+        {else}
+        <div class="mui-col-xs-4 mui-padded-top-10 mui-right">
+            {if strtotime($activity['joinetime']) >= TIMESTAMP && TIMESTAMP >= strtotime($activity['joinstime']) && ($total < $activity['personnum'] || $activity['personnum']==0)}
+                <a href="{if $config['guanzhu_join']==2 && empty($_W['fans']['follow'])}javascript:;{else}{php echo $this->createMobileUrl('join', array('activityid'=>$activityid))}{/if}" class="mui-btn mui-btn-block mui-btn-orange{if $config['guanzhu_join']==2} js-join{/if}">我要报名</a>
+            {/if}               
+        </div>
+        {/if}
+        <div style="clear:both;"></div>
+      </div>
+    </div>
+	
+    <div class="content">
+        <div class="M_detail">
+        	<div class="mod_tab"><span>有{$total}人报名成功</span></div>
+            <div class="detail-item detail-more">
+            <a href="{php echo $this->createMobileUrl('userlist', array('activityid'=>$activityid))}" class="more-user">
+            {loop $records $row}
+            {if $row['pic']==''}
+            <img class="bm-user" src="{php echo tomedia($row['headimgurl']);}" />
+            {else}
+            <img class="bm-user" src="{php echo tomedia($row['pic']);}" />
+            {/if}
+            {/loop}
+            </a>
+            </div>
+        </div>
+        
+        <!-- 基本信息 -->
+        <div class="msgDiv" style="margin-top:15px;border-bottom:1px solid #eee"><img style="width:14px;vertical-align:top;margin-top:3px" src="{FX_URL}app/resource/images/shop.png">主办单位：<font color="#666">{$activity['unit']}</font></div>
+        
+        <div class="msgDiv"><img src="{FX_URL}app/resource/images/icon-time.png">活动时间：{if TIMESTAMP < strtotime($activity['endtime'])}{php echo date('m月d日 H:i',strtotime($activity['starttime']))}~{php echo date('m月d日 H:i',strtotime($activity['endtime']))}
+        {else}<font color="#c3c3c3">活动结束</font>{/if}</div>
+        <div class="msgDiv"><img src="{FX_URL}app/resource/images/icon-address.png">活动地址：{$activity['address']}</div>
+        {if $activity['lng']!='' && $activity['lng']!='lat'}
+        <a href="http://apis.map.qq.com/uri/v1/marker?marker=coord:{$activity['lat']},{$activity['lng']};title:{$activity['unit']};addr:{$activity['address']}&referer=myapp" style="color:#46cec0;"><div class="msgDiv" style="margin-top:1px"><img style="vertical-align:top;margin-top:3px" src="{FX_URL}app/resource/images/icon-position.png">查看地图导航</div></a>{/if}
+        {if $activity['tel']!=''}
+        <a href="tel:{$activity['tel']}" style="color:#46cec0">
+        <div class="msgDiv" style="margin-top:1px"><img style="vertical-align:top;margin-top:3px" src="{FX_URL}app/resource/images/icon-tel.png">点击咨询</div></a>
+        {/if}
+        <div class="M_detail">
+        <div class="mod_tab"><span>活动说明</span></div>
+        <div class="M_detail-con">
+        {$activity['detail']}
+        </div>
+        <!-- 评论待定 -->
+        </div>
+        <div style="height:40px"></div>
+    </div>
+</div>
+</div>
+<div id="cover"></div>
+<div id="guide"><img src="{FX_URL}app/resource/images/guide.png"></div>
+  <script>
+	//nav激活
+	mui.init();
+	mui('.mui-bar-tab').on('tap', 'a',
+	function() {
+		var $this = $(this);
+		if (this.getAttribute('href') != null) {
+			console.log(this.getAttribute('href'));
+			location.href = this.getAttribute('href');
+			if(typeof($this.attr('data'))=="undefined"){
+				return false;
+			}
+		} else {
+			return false;
+		}
+	})
+	/*收藏 */
+	function setProperty(obj,id,op){
+		$.post("{php echo $this->createMobileUrl('detail')}"
+			,{activityid:id,op:op,data:$(obj).attr('data')}
+			,function(d){
+				if (op=='favorite'){	
+					if(d.data==1){
+						if(d.result=='1'){;
+							util.toast('收藏成功');
+							$(obj).attr("data",d.data);
+						}else{
+							util.toast('收藏失败','','error');
+						}
+					}else{
+						if(d.result=='1'){;
+							util.toast('取消收藏成功');
+							$(obj).attr("data",d.data);
+							$(obj).toggleClass("mui-active");
+						}else{
+							util.toast('取消收藏失败','','error');
+						}
+					}
+				}
+			}
+			,"json"
+		);
+	}
+	/* 浮标拖动动作 */
+	var drag = document.getElementById('touchbtn'),
+	winWeight = window.innerWidth,
+	winHeight = window.innerHeight - 50,
+	middleWin = winWeight / 2,
+	middleHin = winHeight / 6,
+	endTouchX = 0,
+	endTouchY = 0,
+	iTime = 0;
+	function touchMove(ev) {
+		ev.preventDefault();
+		var ev = ev.touches[0];
+		drag.style.top = (ev.pageY - 30) + 'px';
+		drag.style.left = (ev.pageX - 30) + 'px';
+		endTouchX = ev.pageX;
+		endTouchY = ev.pageY;
+	}
+	drag.addEventListener('touchstart',
+	function(ev) {
+		clearTimeout(iTime);
+		$(drag).fadeTo(50, 1);
+		document.addEventListener('touchmove', touchMove, false);
+		document.addEventListener('touchend',
+		function(ev) {
+			document.ontouchmove = null;
+			document.ontouchend = null;
+			if (endTouchY < middleHin && endTouchX > 80 && endTouchX < winWeight - 80) { //停靠上边
+				//drag.style.top = '2px';
+				$(drag).stop().animate({
+					top: '2px'
+				},
+				160,
+				function() {
+					iTime = setTimeout(function() {
+						$(drag).fadeTo(600, 0.65)
+					},
+					3800);
+				});
+			} else if (endTouchY > middleHin * 5 && endTouchX > 80 && endTouchX < winWeight - 80) { //停靠下边
+				//drag.style.top = 'auto';
+				//drag.style.bottom = '2px';
+				$(drag).stop().animate({
+					top: winHeight - 59 + 'px'
+				},
+				160,
+				function() {
+					iTime = setTimeout(function() {
+						$(drag).fadeTo(600, 0.65)
+					},
+					3800);
+				});
+			} else {
+				if (endTouchX > 0 && endTouchX < middleWin) { //停靠左边
+					//$(drag).css({'left':5}); 
+					$(drag).stop().animate({
+						left: '2px'
+					},
+					160,
+					function() {
+						iTime = setTimeout(function() {
+							$(drag).fadeTo(600, 0.65)
+						},
+						3800);
+					});
+	
+				} else if (endTouchX != 0) { //停靠右边
+					//drag.style.left = 'auto';
+					//drag.style.right = '20px';
+					$(drag).stop().animate({
+						left: winWeight - 59 + 'px'
+					},
+					160,
+					function() {
+						iTime = setTimeout(function() {
+							$(drag).fadeTo(600, 0.65)
+						},
+						3800);
+					});
+				}
+			}
+			document.removeEventListener('touchmove', touchMove, false);
+		},
+		false)
+	},
+	false)
+	
+	//报名框浮动
+	//window.onscroll = function () {Scroll();}
+	$('.mui-content').on('scroll',function() {Scroll();});
+	function Scroll() {
+		//var Y = $(".basic-box").height() + 220;
+		//alert($('.mui-content').scrollTop());
+		var Y = $(".swiper-container").height();
+		if ($(".mui-content").scrollTop() >= Y) {
+			$(".box-float").css({"position":"fixed","top":"0","display":"block","padding":"10px 2%","width":"100%","box-shadow":"0px 0px 4px #999","background":"rgba(255,255,255,0.98)"});
+			$(".box-fixed").css({"display":"none"});
+		} else {
+			$(".box-float").css({"position":"relative","width":"100%","display":"none","box-shadow":"0px 0px 0px","padding":"10px 2%"});
+			$(".box-fixed").css({"display":"block"});
+		}
+	}
+	//轮播图开启
+	var swiper = new Swiper(".swiper-container", {
+		loop: true,
+		autoplay: 3000
+	});
+	//全屏遮盖支持内容滑动
+	var _system = {
+		$: function(id) {
+			return document.getElementById(id);
+		},
+		_client: function() {
+			return {
+				w: document.documentElement.scrollWidth,
+				h: document.documentElement.scrollHeight,
+				bw: document.documentElement.clientWidth,
+				bh: document.documentElement.clientHeight
+			};
+		},
+		_scroll: function() {
+			return {
+				x: document.documentElement.scrollLeft ? document.documentElement.scrollLeft: document.body.scrollLeft,
+				y: document.documentElement.scrollTop ? document.documentElement.scrollTop: document.body.scrollTop
+			};
+		},
+		_cover: function(show) {
+			if (show) {
+				this.$("cover").style.display = "block";
+				this.$("cover").style.width = (this._client().bw > this._client().w ? this._client().bw: this._client().w) + "px";
+				this.$("cover").style.height = (this._client().bh > this._client().h ? this._client().bh: this._client().h) + "px";
+			} else {
+				this.$("cover").style.display = "none";
+			}
+		},
+		_guide: function(click) {
+			this._cover(true);
+			this.$("guide").style.display = "block";
+			this.$("guide").style.top = (_system._scroll().y + 5) + "px";
+			window.onresize = function() {
+				_system._cover(true);
+				_system.$("guide").style.top = (_system._scroll().y + 5) + "px";
+			};
+			if (click) {
+				_system.$("cover").onclick = function() {
+					_system._cover();
+					_system.$("guide").style.display = "none";
+					_system.$("cover").onclick = null;
+					window.onresize = null;
+				};
+			}
+		},
+		_zero:function(n){
+			return n<0?0:n;
+		}
+	}
+  </script>
+  </body>
+</html>

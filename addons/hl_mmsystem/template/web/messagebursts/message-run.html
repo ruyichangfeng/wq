@@ -1,0 +1,275 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messagebursts')}"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content"style="margin-top: 15px;">
+                                    <form class="form-horizontal form-validate" enctype="multipart/form-data">
+                                        <div class="alert alert-info">
+                                            <p><i class="fa  fa-lg fa-bomb" style="color: red"></i>根据选择的用户群体不同，发送时间会不相同，发送期间请耐心等待! </p>
+                                            <p><i class="fa  fa-lg fa-bomb" style="color: red"></i>模板消息群发有风险，请谨慎使用，大用户量建议使用公众平台推送!</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label must" >任务名称：</label>
+                                            <div class="col-xs-3">
+                                                <input type="text"  class="form-control" value="{$item['mt_title']}" disabled="disabled"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 10px;">
+                                            <label class="col-sm-2 control-label must" >进程数：</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class='form-control-static'><span class="label label-success" style="font-size: large">{$processnum}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 15px;">
+                                            <label class="col-sm-2 control-label must" >发送总条数：</label>
+                                            <div class="col-xs-4">
+                                                <div class='form-control-static'>{if !empty($item['mt_sendNum'])}<span class="label label-primary" style="font-size: large">{$item['mt_sendNum']}</span>{else}<span class="label label-primary" style="font-size: large">发送列表为空，请检查是否生成了发送列表</span>{/if}</div>
+                                            </div>
+                                            <label class="col-sm-1 control-label must" >未发送条数：</label>
+                                            <div class="col-xs-4">
+                                                <div class='form-control-static' id="remain"><span class="label label-info" style="font-size: large">{$remainnum}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label must" >发送成功条数：</label>
+                                            <div class="col-xs-4">
+                                                <div class='form-control-static' id ='success' ><span class="label label-success" style="font-size: large">{$item['mt_successNum']}</span></div>
+                                            </div>
+                                            <label class="col-sm-1 control-label must" >发送失败条数：</label>
+                                            <div class="col-xs-4">
+                                                <div class='form-control-static' id ='fail' style="color: red"><span class="label label-danger" style="font-size: large">{$item['mt_failNum']}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label must" >发送状态</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class='form-control-static' id="status"><span class="label label-warning" style="font-size: 12px;">{$status}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label must" >发送进度</label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class='form-control-static' id="jindu">
+                                                    {$jindu}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label" ></label>
+                                            <div class="col-sm-9 col-xs-12">
+                                                <div class="help-block">
+                                                    <input type="button" id="Send" value="开始" class="btn btn-primary"  {if $item['mt_status']!=0 && $item['mt_sendNum'] != '0'}onclick="send()"{else}disabled="disabled"{/if} />
+                                                    <input type="button" id="Pause" value="暂停" class="btn btn-danger"  {if $item['mt_status']!=0 && $item['mt_sendNum'] != '0'}onclick="pause()"{else}disabled="disabled"{/if}/>
+                                                    <input type="button" id="setTime" value="定时" class="btn btn-warning"  {if $item['mt_status']!=0 && $item['mt_sendNum'] != '0'}onclick="setT()"{else}disabled="disabled"{/if} />
+                                                    <input type="button"  onclick='history.back()' style='margin-left:10px;' value="返回列表" class="btn btn-success" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info procesinfo" style="display: none;">
+                                            {loop $countTask['info'] $p}
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label must" ><span class="label label-primary" style="font-size: 12px">进程 {$p['procesid']}</span>  <span class="label label-info" style="font-size: 12px">待发送</span></label>
+                                                <div class="col-sm-9 col-xs-12">
+                                                    <div class='form-control-static'>
+                                                        <span class="p_remain" class="label label-warning" style="font-size: large">{$p['remain']}</span>  <span class="label label-primary" style="font-size: large" id="count_{$p['procesid']}" >{$p['count']}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/loop}
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+function setT(){
+    new $.flavr({
+        content     : '多少分钟后发送？',
+        dialog      : 'prompt',
+        prompt      : { placeholder: '单位：分钟。请填写数字！' },
+        onConfirm   : function( $container, $prompt ){
+            var ex = /^[0-9]*[1-9][0-9]*$/;
+            var str = $prompt.val();
+            if (ex.test(str)) {
+                doTime(str);
+            }else{
+                new $.flavr('请输入正确的格式');
+                return false;
+            }
+            
+        },
+        onCancel    : function(){}
+    });
+}
+function doTime(s){
+    new $.flavr('定时已生效，请勿关闭当前页面！如需停止计时，请刷新');
+    $("#setTime").attr("disabled", true);
+    var wait = s*60;
+    var interval = setInterval(function(){
+        var time = --wait;
+        var djs = sec_to_time(time);
+        $("#status").html("<span class='label label-danger'  style='font-size: large'>定时已生效，将在 "+djs+" 后发送...</span>");
+        if(time <= 0) {
+            send();
+            clearInterval(interval);
+        };
+    }, 1000);
+}
+
+function sec_to_time(s) {
+    var t;
+    if(s > -1){
+        var hour = Math.floor(s/3600);
+        var min = Math.floor(s/60) % 60;
+        var sec = s % 60;
+        if(hour < 10) {
+            t = '0'+ hour + ":";
+        } else {
+            t = hour + ":";
+        }
+    
+        if(min < 10){t += "0";}
+        t += min + ":";
+        if(sec < 10){t += "0";}
+        //t += sec.toFixed(2);
+        t += sec.toFixed();
+    }
+    return t;
+}
+</script>
+<script type="text/javascript">
+    var id = {$id};
+    var count = {php echo intval($item['mt_sendNum'])};
+    var failnum = {php echo intval($item['mt_failNum'])};
+    var successnum = {php echo intval($item['mt_successNum'])};
+    var remain = {php echo intval($remainnum)};
+    var pagecount = {php echo intval($item['mt_pageCount'])};
+    var hasnext=1;
+    var sendstatus =0; //0正常,1暂停
+    var jindu =0; //0正常,1暂停
+    var doneprocessnum = {$countTask["processnum"]}; //需要完成的进程数
+
+    function send(){
+        sendstatus =0;
+        $("#status").html("<span class='label label-warning'>开始发送...</span>");
+        $("#Send").attr("disabled", true);
+        $("#setTime").attr("disabled", true);
+        $(".procesinfo").show();
+        sendmessage(0);
+    }
+
+    function pause(){
+        if(sendstatus >0){
+            return;
+        }
+        sendstatus=1;
+        location.reload()
+        $("#status").html("<span class='label label-warning'>暂停中</span>");
+        $("#Send").attr("disabled", false);
+    }
+
+    function sendmessage(procesid){
+        var btn = $('input[type=button]');
+        if(btn.attr('sending')=='1'){
+            return;
+        }
+        if(sendstatus==1){
+            return;
+        }
+        if(hasnext==0){
+            return;
+        }
+        {loop $countTask['info'] $p}
+        if(procesid == 0 || procesid == "{$p['procesid']}"){
+            procesSend("{$p['procesid']}", "{$p['sid']}", "{$p['eid']}");
+        }
+        {/loop}
+        
+    }
+    
+    function procesSend(procesid,sid,eid)
+    {
+        $.post("{php echo $this->createWebUrl('messagebursts',array('op'=>'fetch'))}"
+            ,{id:id,pagecount:pagecount,startid:sid,endid:eid}
+            ,function(d){
+                if(d.status==0) {
+                    new $.flavr(d.onmessag);
+                    return;
+                }
+                successnum = successnum + d.result.successnum;
+                failnum = failnum + d.result.failnum;
+                remain = remain -  d.result.count;
+                var obj = procesid-1;
+                var p_remain_obj = $(".p_remain").eq(obj);
+                var p_remain = p_remain_obj.text() - d.result.count;
+                jindu =  (count-remain)/count*100
+                
+              $("#jindu").html(jindu.toFixed(2)+'%');
+                //$("#jindu").html("<div style='width: "+jindu.toFixed(2)+"%' aria-valuemax='100' aria-valuemin='0' aria-valuenow='"+jindu.toFixed(2)+"' role='progressbar' class='progress-bar'> <span class='sr-only'>"+jindu.toFixed(2)+"% 发送成功</span></div>");
+
+
+                $("#success").html(successnum);
+                $("#fail").html(failnum);
+                $("#remain").html(remain);
+                p_remain_obj.text(p_remain);
+                console.log(d.result);
+                if(d.result.hasnext==0){
+                    doneprocessnum = doneprocessnum-1;
+                    console.log(doneprocessnum);
+                    if(doneprocessnum <= 0){
+                        console.log('done');
+                        sendstatus=2;
+                        $("#status").html("<span class='label label-warning'>已完成</span>");
+                        $("#Send").attr("disabled", false);
+                        $("#setTime").attr("disabled", false);
+                        sendDone();
+                    }
+                    return;
+                }
+                if(sendstatus==0){
+                    sendmessage(procesid);
+                }else{
+                    $("#status").html("<span class='label label-warning'>已暂停</span>");
+                }        
+            }
+        ,"json");
+    }
+    
+    function sendDone()
+    {
+        $.post("{php echo $this->createWebUrl('messagebursts',array('op'=>'done'))}"
+            ,{id:id}
+            ,function(d){
+                if(d.status == 1){
+                    console.log('Send Done');
+                }
+            }
+        ,"json");
+    }
+</script>
+{template 'web/common/footer'}

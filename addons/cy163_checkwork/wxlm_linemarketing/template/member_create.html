@@ -1,0 +1,247 @@
+{template 'common/header'}
+<style type="text/css">.xhred{ color:#F00;}</style>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo $this->createWebUrl('member', array('op'=>'display'));}">店员信息管理</a></li>
+    <li class="active">{if isset($member_list[member_id])}<a href="javascript:;">编辑店员</a>{else}<a href="{php echo $this->createWebUrl('member', array('op'=>'create'));}">添加店员{/if}</a></li>
+</ul>
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" id="form">
+		<div class="panel panel-primary" style="margin-bottom:0px;">
+			<div class="panel-heading">{if isset($member_list[member_id])}编辑店员信息{else}添加店员{/if}</div>
+			<div class="panel-body">
+				<div class="form-group" style="display:none;">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="member[member_id]" class="form-control" value="{$member_list['member_id']}" />
+					</div>
+				</div>
+                 <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>店员姓名</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="text" name="member[member_name]" class="form-control" value="{$member_list['member_name']}" maxlength="25" />
+					</div>
+				</div>
+				<div class="form-group" id="password">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>店员电话</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<input type="tel" name="member[member_tel]"  class="form-control" value="{$member_list['member_tel']}" maxlength="25"  placeholder=""/>
+					</div>
+				</div>
+				<div class="form-group" id="password">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>粉丝编号</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<div class="input-group">
+					      	<input type="text" name="member[member_openid]" id="member_openid" readonly class="form-control" value="{$member_list['member_openid']}">
+					      	<span class="input-group-btn">
+					      	  <button class="btn btn-default" type="button" onclick="searchShow()" >选择粉丝</button>
+					      	</span>
+					    </div>
+					</div>
+				</div>
+				<link rel="stylesheet" href="{RES}public/css/multiple-select.css" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>所属门店</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+					<input type="hidden" name="member[member_storeid]" class="form-control" value="{$member_list['member_storeid']}" />
+ 						<select id="ms" multiple="multiple">
+	                            {loop $store_list $key $item}
+							    <option value="{$item['store_id']}" {if in_array($item['store_id'],$member_list['member_storeid'])}selected="selected"{/if} class="opt">{$item['store_title']}</option>
+	                            {/loop}
+                        </select>
+					</div>
+				</div>
+				<script src="{RES}public/js/jquery.min.js"></script>
+				<script src="{RES}public/js/multiple-select.js"></script>
+                <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>状态</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_state]" id="member_state" value="1" {if $member_list['member_state'] == 1||$member_list['member_state'] == ''} checked="checked"{/if}> 正常
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_state]" id="member_state" value="2" {if $member_list['member_state'] == 2} checked="checked"{/if}> 冻结
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>可用积分限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_credit1state]" id="member_credit1state" value="1" {if $member_list['member_credit1state'] == 1 ||$member_list['member_credit1state'] == ''} checked="checked"{/if}> 开启（默认）
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_credit1state]" id="member_credit1state" value="2" {if $member_list['member_credit1state'] == 2} checked="checked"{/if}> 关闭
+						</label>
+						<span class="help-block">关闭后则不限制当前店铺可使用的奖励积分数量</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="xhred">*</span>可用余额限制</label>
+					<div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_credit2state]" id="member_credit2state" value="1" {if $member_list['member_credit2state'] == 1 ||$member_list['member_credit2state'] == ''} checked="checked"{/if}> 开启（默认）
+						</label>
+						<label class="radio-inline">
+						  <input type="radio" name="member[member_credit2state]" id="member_credit2state" value="2" {if $member_list['member_credit2state'] == 2} checked="checked"{/if}> 关闭
+						</label>
+						<span class="help-block">关闭后则不限制当前店铺可使用的奖励余额数量</span>
+					</div>
+				</div>
+                <div class="form-group">
+					<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+						<input type="button" value="返回" class="btn btn-info" style="width:100px;" onClick="backindex()" />
+						<input type="hidden" name="token" value="{$_W['token']}" />
+                        <!-- <input type="hidden" id="member_level_y" value="{$member_list['member_level']}" /> -->
+					</div>
+				</div>
+			</div>
+		</div>
+    </form>
+
+   <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="tanchukuang">
+  		<div class="modal-dialog modal-lg" role="document">
+	    <div class="modal-content" style="padding: 2em;">
+	      	<div class="panel panel-primary">
+             <div class="panel-heading" style="padding-top:0px; padding-bottom:0px;">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:#FFF; width:100%; line-height:40px;display:block;">
+                    筛选 ↓  （点击可展开）
+                </a>
+            </div>
+            <div class="panel-body">
+                <form action="" method="post" class="form-horizontal form" id="fansform">
+	                <div class="form-group">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="昵称/电话号/openID" id="search_info">
+                                    <span class="input-group-btn">
+        								<button class="btn btn-default" onclick="searchStaff()" type="button">搜索</button>
+     								</span>
+                                </div>
+                            </div>
+					</div>
+                </form>
+            </div>
+        </div>	
+		<div class="panel panel-primary">
+			<div class="panel-heading">粉丝信息</div>
+			<div class="panel-body">
+				<div class="table-responsive panel-body">
+					<table class="table table-hover table-responsive" style="min-width: 300px;">
+						<thead class="navbar-inner">
+							<tr>
+								<th style="width:12%;">粉丝编号</th>
+								<th style="width:10%;">头像</th>
+								<th style="width:15%;">粉丝</th>
+								<th style="width:15%;">手机号</th>
+								<th style="width:30%;">openid</th>
+                                <th style="width:20%;">注册时间</th>  
+								<th style="width:10%;">操作</th>
+							</tr>
+						</thead>
+						<tbody id="fanslist">
+							<tr>
+								<td colspan="9">
+									请填写筛选条件！
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	    </div>
+  </div>
+</div>
+</div>
+<script>
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		$('#form').submit(function(){
+			if($('input[name="member[member_name]"]').val() == ''){
+				util.message('请填写店员姓名');
+				return false;
+			}	
+		    if($('input[name="member[member_tel]"]').val() == ''){
+				util.message('请填写店员电话');
+				return false;
+			}
+			if($('input[name="member[member_openid]"]').val() == ''){
+				util.message('请填写粉丝编号');
+				return false;
+			}
+			if($('input[name="member[member_storeid]"]').val() == ''){
+				util.message('请选择所属门店');
+				return false;
+			}
+			if($('input:radio[name="member[member_storeid]"]:checked').val() == ''){
+				util.message('请选择所属门店');
+				return false;
+			}
+			return true;
+		});
+	});
+});
+$(function() {
+    $('#ms').change(function() {
+        	$('input[name="member[member_storeid]"]').val($(this).val());
+        }).multipleSelect({
+            width: '100%'
+        });
+    });
+function searchStaff()
+{
+	if($('#search_info').val()!="")
+	{
+		$.ajax({  
+        type:"POST",
+        url: "{php echo $this->createWebUrl('ajaxfans');}",
+        data:{search:$('#search_info').val()},
+        dataType:"json",
+        // dataType:"text",
+        async:false,
+        success: function(data){
+        	$("#fanslist").empty();
+        	if(data.rs.length>0)
+        	{
+        		var op="";
+        		for(var i=0; i<data.rs.length; i++){ 
+             		
+             		op+="<tr>";
+             		op+="<td>"+data.rs[i].uid+"</td>";
+             		op+="<td><img src='"+data.rs[i].avatar+"' style='width:40px;'/></td>";
+             		op+="<td>"+data.rs[i].nickname+"</td>";
+             		op+="<td>"+data.rs[i].mobile+"</td>";
+             		op+="<td>"+data.rs[i].openid+"</td>";
+             		op+="<td>"+data.rs[i].addtime+"</td>";
+             		op+="<td><button type='button' class='btn btn-info  memberorder-cancel ' style='color:white;' onClick=\"checkedlist('"+data.rs[i].openid+"')\">选中</button></td>";
+                 		op+="</tr>";
+                	}
+                	$("#fanslist").append(op);
+            	}else
+            	{
+                 	op="<tr>";
+                 	op+="<td colspan='9'>信息不存在！</td>";
+                 	$("#fanslist").append(op);
+            	}
+           	}
+        });
+	}else{
+		alert('请填写筛选条件！');
+	}	
+}
+function checkedlist(openid)
+{
+	$('#member_openid').val(openid);
+	$("#tanchukuang").modal('hide');
+}
+function backindex()
+{
+	window.location.href="{php echo $this->createWebUrl('member', array('op'=>'display'));}";
+}
+function searchShow() {
+
+    $('#tanchukuang').modal('show');
+}
+</script>
+{template 'common/footer'}

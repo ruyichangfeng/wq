@@ -1,0 +1,117 @@
+{template 'public/header'}
+{template 'public/comhead'}
+
+<ul class="nav nav-tabs">
+    <li><a href="{php echo $this->createWebUrl('field', array('op' => 'fieldset_display'))}">返回表单列表</a></li>
+    <li {if $operation == 'field_post'}class="active"{/if}><a href="{php echo $this->createWebUrl('field', array('op' => 'field_post','fieldset_id'=>$fieldset_id))}">添加字段</a></li>
+    <li {if $operation == 'field_display'}class="active"{/if}><a href="{php echo $this->createWebUrl('field', array('op' => 'field_display','fieldset_id'=>$fieldset_id))}">字段管理</a></li>
+</ul>
+{if $operation == 'field_post'}
+<div class="main">
+    <form action="{php echo $this->createWebUrl('field', array('op' => 'field_post','fieldset_id'=>$fieldset_id))}" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$info['id']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                字段编辑
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="name" class="form-control" value="{$info['name']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段类型</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <select name="type">
+                                <option value="1" {if $info['type'] == 1}selected{/if}>文本框</option>
+                                <option value="2" {if $info['type'] == 2}selected{/if}>下拉框</option>
+                            </select>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">验证方式</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <select name="verify">
+                                <option value="0">不验证</option>
+                                <option value="1" {if $info['verify'] == 1}selected{/if}>必填</option>
+                                <option value="2" {if $info['verify'] == 2}selected{/if}>数字</option>
+                                <option value="3" {if $info['verify'] == 3}selected{/if}>手机号</option>
+                            </select>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段配置</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="config" class="form-control" value="{$info['config']}" />
+                        <div class="help-block">如果类型为下拉选项时，可配置下拉选项的值，多个值用 | 隔开</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">字段排序</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="sorting" class="form-control" value="{$info['sorting']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-3" />
+            <input type="hidden" name="id" class="form-control" value="{$info['id']}" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+{elseif $operation == 'field_display'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i>刷新</a>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <form action="" method="fieldset_post" class="form-horizontal form" >
+            <input type="hidden" name="storeid" value="{$storeid}" />
+            <div class="table-responsive panel-body">
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:80px;">id</th>
+                        <th>标题</th>
+                        <th>类型</th>
+                        <th>排序</th>
+                        <th style="width:100px;text-align:right;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $row}
+                    <tr>
+                        <td><div class="type-parent">{$row['id']}&nbsp;&nbsp;</div></td>
+                        <td><div class="type-parent">{$row['name']}</div></td>
+                        <td><div class="type-parent">{if $row['type'] == 1}文本框{elseif $row['type'] == 2}下拉框{/if}</div></td>
+                        <td><div class="type-parent">{$row['sorting']}</div></td>
+                        <td style="text-align:right;">
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('field', array('op' => 'field_post', 'id' => $row['id'],'fieldset_id'=>$fieldset_id))}" title="编辑">改</a>&nbsp;&nbsp;
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('field', array('op' => 'field_delete', 'id' => $row['id'],'fieldset_id'=>$fieldset_id))}" onclick="return confirm('确认删除吗？');return false;" title="删除">删</a>
+                        </td>
+                    </tr>
+                    {/loop}
+                    <tr>
+                        <td colspan="3">
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    {$pager}
+</div>
+{/if}
+{template 'common/footer'}

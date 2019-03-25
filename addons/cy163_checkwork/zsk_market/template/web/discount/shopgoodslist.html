@@ -1,0 +1,177 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}js/util.js"></script>
+<!-- <script type="text/javascript" src="{ZSK_STATIC}layui/laydate/laydate.js"></script> -->
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+	.accountab{ 
+		padding:8px 10px; 
+	}
+	.sortab td{vertical-align: middle !important;}
+	.layui-layer-content{
+		background-color: #f4f4f4;
+	}
+	._pro_rigth{
+		float: left;width: 80%;
+	}
+	._pro_rigth_layout{
+		width: 100%;margin-top: 10px;height: 30px;line-height: 30px;
+	}
+	._pro_rigth_one{
+		margin-left: 10px;float: left;width: 5%;
+	}
+	._pro_rigth_two{
+		float: left;margin-left: 10px;width: 5%;
+	}
+	._pro_rigth_three{
+		float: left;margin-left: 10px;width:45%;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;height: 35px;
+	}
+	._pro_rigth_four{
+		float: left;margin-left: 10px;width: 20%
+	}
+	._pro_rigth_five{
+		float: left;margin-left: 10px;width: 10%
+	}
+	._pro_left{
+		width: 100%;margin: -20px;height: calc(100% + 40px);
+	}
+	._pro_left_layout{
+		float: left;width: 20%;background-color: #fff;height: 100%;overflow: auto;text-align: center;
+	}
+	._pro_left_li{
+		width: 100%;height: 40px;line-height:40px;cursor:pointer;
+	}
+	._pro_rigth_input{
+		width: 40px;height: 20px;
+	}
+	._pro_right_img{
+		width: 20px;height: 20px;
+	}
+</style>
+<div class="panel panel-info">
+	<!-- <div class="panel-heading" ></div> -->
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('discount.selectoutshop');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" name="name" placeholder="请输入商品名称">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit"  form="keyform">搜索</button>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<p>
+			<span></span>
+		</p>
+		<table class="layui-table">
+			<tbody>
+				<tr>
+					<td>
+						<div style="float: left;line-height: 30px;">
+							{$shopname['name']}	
+						</div>
+					<!-- <td></td> -->
+					<div style="text-align: right;float: right;">
+						<a href="javascript:void(0);" class="linkbtn" onclick="allsussessOk({$_GPC['shopid']},{$_GPC['activityid']})">一键同意</a>
+						<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="allremove0({$_GPC['shopid']},{$_GPC['activityid']})">一键拒绝</a>
+					</div>
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+		<table class="layui-table">
+			<thead>
+				<tr>  
+					<th style="width: 33%;">报名商品名称</th> 
+					<th style="width: 33%;">报名商品数量</th>   
+					<th style="width: 33%;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $memberlist $index $item}
+				<tr> 
+					<td>{$item['name']}</td> 
+					<td>{$item['goodsnum']}</td> 
+					<td>  
+						<?php if($item['judgeid']==0){?>
+							<a href="javascript:void(0);" class="linkbtn" onclick="sussessOk({$item['id']},{$item['activityid']},{$item['shopid']})">同意</a>
+							<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="remove0({$item['id']})">拒绝</a> 
+						<?php }else{?>
+							<?php if($item['judgeid']==1){?>
+								<div class="linkbtn">已同意</div>
+							<?php }else{?>
+								<div class="linkbtn linkbtn-orange">已拒绝</div>
+							<?php }?>
+						<?php }?>
+					</td>
+				</tr>
+				{/loop}
+				<tr>
+					<td colspan="8">
+					{template 'public/pagenation'}	
+					</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+<script type="text/javascript">
+	function sussessOk(id,activityid,shopid){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('discount.sussessOk');?>",
+			dataType:"JSON",
+			type:"POST",
+			data:{id:id,activityid:activityid,shopid:shopid},
+			success:function(res){
+				if(res.code > 0){
+					window.location.reload()
+				}else{
+					layer.alert(res.msg);
+					return false;
+				}
+			}
+		})
+	}
+	function remove0(id){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('discount.remove0');?>",
+			dataType:"JSON",
+			type:"POST",
+			data:"id="+id,
+			success:function(res){
+				console.log(res)
+				window.location.reload()
+			}
+		})		
+	}
+	function allsussessOk(shopid,activityid){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('discount.allsuccess');?>",
+			dataType:"JSON",
+			type:"POST",
+			data:"shopid="+shopid+"&activityid="+activityid,
+			success:function(res){
+				console.log(res)
+				window.location.reload()
+			}
+		})		
+	}
+	function allremove0(shopid,activityid){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('discount.allremove0');?>",
+			dataType:"JSON",
+			type:"POST",
+			data:"shopid="+shopid+"&activityid="+activityid,
+			success:function(res){
+				console.log(res)
+				window.location.reload()
+			}
+		})		
+	}
+</script> 
+{template 'public/footer'} 

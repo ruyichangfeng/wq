@@ -1,0 +1,249 @@
+{template 'common/header'}
+<link rel="stylesheet" href="{MODULE_URL}public/libs/ionic/css/ionic.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/libs/vux/vux.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/iconfont.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/common.css"/>
+<link rel="stylesheet" href="{MODULE_URL}public/css/index.css"/>
+<div class="page-group">
+    <style>
+        .st{position:absolute;top:20%;left: 20%;z-index:100000;opacity:0.75;color:white;background: rgba(68, 68, 68, 0);background-image: initial;background-position-x: initial;background-position-y: initial;background-size: initial;background-repeat-x: initial;background-repeat-y: initial;background-attachment: initial;background-origin: initial;background-clip: initial;background-color: rgba(68, 68, 68, 0);}
+        .page-group{background-color: #f4f4f4;}
+        .h44{height:54px;background-color:#f4f4f4;}
+        #advSwiper{height:150px;overflow:hidden;}
+        .swiper-slide{overflow:hidden;}
+        #advSwiper img{width:100%;max-height:2000px !important;}
+        .meepo_tabs .meepo_tab-item{width: 50%;float: right;margin-top: 15px;}
+        .all{position:absolute;z-index:99999;width: 100%;height: 100%;opacity: 0.75;background-color: #000000;}
+    </style>
+    <div class="page page-current" id="page-index">
+        <div class="content infinite-scroll native-scroll" data-distance="10" style="padding-bottom: 0px;">
+            <!--滑动广告--->
+            {php $advs = M('advs')->getList(1," AND position = 'adv'");}
+            <div class="swiper-container" id="advSwiper">
+                <div class="swiper-wrapper">
+                    {loop $advs['list'] $adv}
+                    <a href="{php echo $adv['link']}" class="swiper-slide">
+                        <img src="{php echo tomedia($adv['image'])}" />
+                    </a>
+                    {/loop}
+                </div>
+            </div>
+            <script>
+                require(['swiper'],function(){
+                    var swiper = new Swiper('#advSwiper',{
+                        autoplay: 2000,
+                    });
+                });
+            </script>
+            <!--滑动广告--->
+            <!--分类-->
+            <div class="j-rmd-types rmd-types">
+                {php $cats = M('advs')->getList(1," AND position = 'navs'");}
+                {loop $cats['list'] $cat}
+                <a href="{php echo $cat['link']}" class="external">
+                    <img src="{php echo tomedia($cat['image'])}" alt="">
+                    <span>{$cat['title']}</span>
+                </a>
+                {/loop}
+            </div>
+            <!--分类-->
+            <!--轮播-->
+            <div class="x_new_publish">
+                <div class="left-icon">
+                    <i class="icon iconfont">&#xe614;</i>
+                </div>
+                {php $announcements = M('announcement')->getall();}
+                <ul class="x_newest_publish" id="publishData">
+                    {loop $announcements $announcement}
+                    <li><span><a href="{php echo $announcement['link']}">{$announcement['title']}</a></span></li>
+                    {/loop}
+                </ul>
+            </div>
+            <!--轮播-->
+            <style>
+                .x_new_publish{width:100%;height:40px;position:relative;overflow:hidden;background:#fff no-repeat 5% center;background-size:20px}
+                .x_new_publish:before {content: " ";position: absolute;left: 0;top: 0;width: 100%;height: 1px;border-top: 1px solid #e1e1e1;color: #C7C7C7;-webkit-transform-origin: 0 0;transform-origin: 0 0;-webkit-transform: scaleY(0.5);transform: scaleY(0.5);}
+                .x_new_publish:after {content: " ";position: absolute;left: 0;bottom: 0;width: 100%;height: 1px;border-bottom: 1px solid #e1e1e1;color: #C7C7C7;-webkit-transform-origin: 0 100%;transform-origin: 0 100%;-webkit-transform: scaleY(0.5);transform: scaleY(0.5);}
+                .x_new_publish .left-icon{position: absolute;padding-left: 15px;line-height: 40px;}
+                .x_new_publish .left-icon .iconfont{font-size: 24px;color: #d93a55;}
+                .x_newest_publish{width:100%;line-height:40px;position: absolute;padding-left: 15px;float: left;padding-left: 50px;}
+                .x_newest_publish li{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+                .c0 {padding-bottom: 0;border-top: 1px dashed #eee;margin-top: 3px;padding-top: 0px;padding-bottom: 12px;}
+                .list{background-color:#f4f4f4;}
+            </style>
+            <script type="text/javascript">
+                function newnotice(){var a=0;$($(".x_newest_publish li")[0]).clone(!0).insertAfter($($(".x_newest_publish li")[$(".x_newest_publish li").length-1]));setInterval(function(){a-=40;a>=40*-($(".x_newest_publish li").length-2)?$(".x_newest_publish").animate({marginTop:a},2E3):$(".x_newest_publish").animate({marginTop:a},2E3,function(){a=0;$(".x_newest_publish").css({marginTop:0})})},4E3)};
+                $(function () {
+                    newnotice();
+                });
+            </script>
+            <div class="item item-divider item-icon-right" style="padding-bottom: 0px;">
+                推荐课程
+                <a href="{php echo $this->createMobileUrl('manage')}" class="dark icon" style=";font-size:0.8em;"> >>> </a>
+            </div>
+            {php $list = M('manage')->getList(1," AND ishot = :ishot",array(':ishot'=>1));}
+            {loop $list['list'] $li}
+            {php $member = M('teacher')->getInfo($li['teacher_id']);}
+            <div class="list" style="padding-bottom: 0px;">
+                <div class="item item-thumbnail-left" style="padding-bottom: 0px;border: none;">
+                    <img onclick="window.location.href='{php echo $this->createMobileUrl('teacher_detail',array('teacher_id'=>$member['id']))}'" src="{php echo tomedia($member['avatar'])}">
+                    <h2 class="title" onclick="window.location.href='{php echo $this->createMobileUrl('manage_detail',array('manage_id'=>$li['id']))}'" >
+                        {$li['title']}
+                        {php $time = M('manage_time')->getInfo($li['time_id'])}
+                        {php $week = M('manage_week')->getInfo($li['week_id'])}
+                        <span style="float: right;color: #fff;background-color: #8c6b5b;padding: 3px;">{php echo date('H:i',$time['start_time'])}-{php echo date('H:i',$time['end_time'])}</span>
+                        <span style="float: right;color: #fff;background-color: #8c6b5b;padding: 3px;">{$week['title']}</span>
+                    </h2>
+                    <p style="white-space: normal;border: none;" onclick="window.location.href='{php echo $this->createMobileUrl('manage_detail',array('manage_id'=>$li['id']))}'" >{$li['desc']}</p>
+                    <p style="margin-bottom: 4px;border: none;" onclick="window.location.href='{php echo $this->createMobileUrl('manage_detail',array('manage_id'=>$li['id']))}'" >
+                        <a href="#" class="subdued">{$li['read_num']} 浏览</a>
+                        <a href="#" class="subdued">{$li['share_num']} 分享</a>
+                    </p>
+                </div>
+                <div class="item tabs tabs-secondary tabs-icon-left" style="margin:0px;padding:0px;border: none;">
+                    <a class="tab-item like" data-id="{php echo $li['id']}" style="padding-top: 0px;opacity: 1;font-size: 0.8em;border: none;" href="javascript:;">
+                        {php $mylike=M('manage_like')->getMy($li['id'])}
+                        <i class="icon {if !empty($mylike)}ion-ios-star{else}ion-ios-star-outline{/if}"></i>
+                        喜欢(<span>{$li['goods_num']}</span>)
+                    </a>
+                    <a class="tab-item collect" data-id="{php echo $li['id']}" style="padding-top: 0px;opacity: 1;font-size: 0.8em;border: none;" href="javascript:;">
+                        {php $mycollect=M('manage_collect')->getMy($li['id'])}
+                        <i class="icon {if !empty($mycollect)}ion-ios-paw{else}ion-ios-paw-outline{/if}"></i>
+                        收藏(<span>{$li['collect_num']}</span>)
+                    </a>
+                    <a class="tab-item" style="padding-top: 0px;opacity: 1;font-size: 0.8em;border: none;" href="javascript:;" onclick="window.location.href='{php echo $this->createMobileUrl('manage_detail',array('manage_id'=>$li['id']))}'">
+                        {php $mylog=M('manage_log')->getMy($li['id'])}
+                        <i class="icon {if !empty($mylog)}ion-ios-clock{else}ion-ios-clock-outline{/if}"></i>
+                        预约
+                    </a>
+                </div>
+            </div>
+            {/loop}
+            <div class="item item-divider item-icon-right" style="padding-bottom: 0px;">
+                热门教练
+                <a href="{php echo $this->createMobileUrl('teacher')}" class="dark icon" style=";font-size:0.8em;"> >>> </a>
+            </div>
+            <div class="hd" id="teacher">
+                <style>
+                    .box1 {height: 70px;position: relative;}
+                    .box1-item{width: 50px;height: 50px;margin-top:10px;border-radius:50%;margin-left:5px;margin-right:5px;background-color: #ccc;display: inline-block;margin-left: 15px;float: left;text-align: center;line-height: 50px;}
+                    .box1-item img{width:50px;height:50px;border-radius:50%;}
+                </style>
+                <scroller lock-y :scrollbar-x=false>
+                    <div class="box1" style="width: {{teachers_width}}px;background-color:#fff;">
+                        <div class="box1-item" onclick="window.location.href='{php echo $this->createMobileUrl('teacher_detail')}&teacher_id={{i.id}}'" v-for="i in teachers">
+                            <img :src="i.avatar" alt=""/>
+                        </div>
+                    </div>
+                </scroller>
+                <div class="item item-divider item-icon-right" style="padding-bottom: 0px;">
+                    动感单车
+                    <a href="{php echo $this->createMobileUrl('seat')}" class="dark icon" style=";font-size:0.8em;"> >>> </a>
+                </div>
+                <style>
+                    .box2 {height: 70px;position: relative;}
+                    .box2-item{width: 50px;height: 50px;margin-top:10px;border-radius:50%;margin-left:5px;margin-right:5px;background-color: #ccc;display: inline-block;margin-left: 15px;float: left;text-align: center;line-height: 50px;}
+                    .box2-item img{width:50px;height:50px;border-radius:50%;}
+                </style>
+                <scroller lock-y :scrollbar-x=false>
+                    <div class="box2" style="width:{{footers_width}}px;background-color:#fff;">
+                        <div class="box2-item" v-for="i in footers">
+                            <img :src="i.image" alt=""/>
+                        </div>
+                    </div>
+                </scroller>
+            </div>
+            <div class="h44"></div>
+        </div>
+        {template 'common/footerbar'}
+    </div>
+</div>
+<script>
+    require([
+        '{MODULE_URL}public/libs/vue.min.js',
+        '{MODULE_URL}public/libs/vux/components/scroller/index.js',
+        "{MODULE_URL}public/libs/jquery_weui/jquery-weui.js"
+    ],function(Vue,scroller){
+        Vue.component('scroller', scroller);
+        var footers = {php echo json_encode($adv1['list'])};
+        var count2 = footers.length;
+
+        var teachers = {php echo json_encode($adv2['list'])};
+        var count = teachers.length;
+
+        $('.like').click(function(){
+            var id = $(this).data('id');
+            var _that = $(this);
+            $.get("{php echo $this->createMobileUrl('manage',array('act'=>'like'))}&manage_id="+id,function(data){
+                //window.location.href = "{php echo $_W['siteurl']}";
+                $.toast(data.message);
+                setTimeout(function(){
+                    $('.weui_toast').remove();
+                },1000);
+                if(data.status == 0){
+                    var goods_num = _that.find('span').html();
+                    goods_num = parseInt(goods_num)+1;
+                    _that.find('span').html(goods_num);
+                    _that.find('.icon').removeClass('ion-ios-star-outline').addClass('ion-ios-star');
+                }else{
+                    var goods_num = _that.find('span').html();
+                    goods_num = parseInt(goods_num)-1;
+                    _that.find('span').html(goods_num);
+                    _that.find('.icon').removeClass('ion-ios-star').addClass('ion-ios-star-outline');
+                }
+            },'json');
+        });
+
+        $('.collect').click(function(){
+            var id = $(this).data('id');
+            var _that = $(this);
+            $.get("{php echo $this->createMobileUrl('manage',array('act'=>'collect'))}&manage_id="+id,function(data){
+                //window.location.href = "{php echo $_W['siteurl']}";
+                $.toast(data.message);
+                setTimeout(function(){
+                    $('.weui_toast').remove();
+                },1000);
+                if(data.status == 0){
+                    var goods_num = _that.find('span').html();
+                    goods_num = parseInt(goods_num)+1;
+                    _that.find('span').html(goods_num);
+                    _that.find('.icon').removeClass('ion-ios-paw-outline').addClass('ion-ios-paw');
+                }else{
+                    var goods_num = _that.find('span').html();
+                    goods_num = parseInt(goods_num)-1;
+                    _that.find('span').html(goods_num);
+                    _that.find('.icon').removeClass('ion-ios-paw').addClass('ion-ios-paw-outline');
+                }
+            },'json');
+        });
+
+        var vm = new Vue({
+            el:"#teacher",
+            data:{
+                teachers:teachers,
+                teachers_width:count * 100,
+                footers:footers,
+                footers_width:count2 * 100,
+            }
+        });
+    });
+</script>
+<script>
+    require(['swiper'],function(Swiper){
+        var loading = false;
+        var page = 1;
+        function addItems(page) {
+            var ajaxurl = "{php echo $this->createMobileUrl('index',array('act'=>'more'))}";
+            $.post(ajaxurl,{},function(data){
+                if(data.status == 1){
+                    $(".ul_1").append(data.html);
+                    page = page + 1;
+                }else{
+                    $('.loading_more').html('全部数据加载完毕');
+                }
+            });
+        }
+        addItems(page);
+    });
+</script>
+{template 'common/footer'}

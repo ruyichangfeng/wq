@@ -1,0 +1,249 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li class="active"><a href="{php echo  $this->createWebUrl('message', array('foo'=>'index'));}">短信设置</a></li>    
+</ul>
+
+<div class="clearfix">    
+    <form id="theform" class="form form-horizontal" action="{php echo $this->createWebUrl('message', array('foo'=>'ok'));}" method="post">
+    <input type="hidden" name="id" value="{$item['id']}">
+            <div class="panel-heading">
+            	短信设置
+            </div>
+            <div class="panel-body">
+            	<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">短信平台</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<select name="platform" id="platform" class="form-control  input-s-lg" onchange="check()">
+                            <option value="1" {if $item[platform] == 1} selected {/if}>短信宝</option>
+                            <option value="2" {if $item[platform] == 2} selected {/if}>阿里大鱼</option>
+                        </select>
+                        <span class="help_block">如果没有，<a href="http://www.smsbao.com/reg?r=10226" target="_blank">点此进行申请</a></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">
+                        <span id="bao1" style="display:{if $item[platform] == 1 || $item[platform] ==''} block {else} none {/if};">
+                            用户名
+                        </span>
+                        <span id="aly1" style="display:{if $item[platform] == 2} block {else} none {/if};">
+                            App Key
+                        </span>
+                    </label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="plat_name" id="plat_name" value="{$item['plat_name']}" placeholder="" class="form-control">
+                        <span class="help_block">
+                            <span id="bao_1" style="display:{if $item[platform] == 1 || $item[platform] ==''} block {else} none {/if};">
+                                在短信宝注册用户的用户名
+                            </span>
+                            <span id="aly_1" style="display:{if $item[platform] == 2} block {else} none {/if};">       阿里大鱼安全配置中的App Key
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">
+                        <span id="bao2" style="display:{if $item[platform] == 1 || $item[platform] ==''} block {else} none {/if};">
+                            密码
+                        </span>
+                        <span id="aly2" style="display:{if $item[platform] == 2} block {else} none {/if};">
+                            App Serve
+                        </span>
+                    </label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="password" name="plat_pwd" id="plat_pwd" value="" placeholder="不修改不用填写" class="form-control">
+                        <span class="help_block">
+                            <span id="bao_2" style="display:{if $item[platform] == 1 || $item[platform] ==''} block {else} none {/if};">在短信宝注册用户时的密码</span>
+                            <span id="aly_2" style="display:{if $item[platform] == 2} block {else} none {/if};">阿里大鱼安全配置中的App Serve</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div id="tempid_show" style="display:{if $item[platform] == 1} none {else} block {/if}">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">模板ID</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <input type="text" name="tempid" id="tempid" value="{$item['tempid']}" placeholder="" class="form-control">
+                            <span class="help_block"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">签名</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <input type="text" name="qianming" id="qianming" value="{$item['qianming']}" placeholder="【欣媒互动】" class="form-control">
+                        <span class="help_block">（必填，格式必须是“【XXXX】”）</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">标签说明</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <span style="color:red;">
+                        1.订单编号：{ordernumber}、 服务类别：{order}、 服务时间：{ftime}、服务地点：{fadr}、预约所填联系人：{username}、预约所填电话：{fmobile}、预计价格：{money}、 用户昵称：{nickname}、 下单时间：{addtime}；<br>
+                        2.在服务人员抢单后，除上述标签以外，还有服务人员姓名：{name}，服务人员报价：{offer}<br>
+                        3.在服务完成以后，除上述标签以外，还有服务人员确认价格：{suremoney}；
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">填写说明</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <span>
+                        短信宝：直接填写完整的短信内容即<br>
+                        阿里大鱼：1.在阿里大鱼平台创建短信模板时，标签名称必须与本模块标签一致，例如本模块内的订单时间标签为 <span style="color:red;">{ftime}</span> ,则在阿里大鱼里面必须用<span style="color:red;">${ftime}</span><br>
+                        2.只需填写模板里面用到的变量名，用"||"隔开,如：<span style="color:red;">{order}||{ftime}||{name}</span>
+
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">短信验证码内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea name="code_content" id="code_content" class="form-control" rows="6" placeholder="不启动不用填写">{$item[code_content]}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">派单短信内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea name="pai_content" id="pai_content" class="form-control" rows="6" placeholder="如果项目有派单模式，必须在此添加短信内容(标签)">{$item[pai_content]}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">用户下单短信通知</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="message1" value="1" {if $item[message1] == 1} checked {/if}>启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="message1" value="0" {if $item[message1] == 0} checked {/if}>不启用
+                            </label>
+                        </div>
+                        <span style="color:red;">（谨慎选择!启用后，用户下单会给所有范围内的服务人员发送短信，如果服务人员较多
+会产生较大短信量）</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">下单短信内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<textarea name="message1_content" id="message1_content" class="form-control" rows="6" placeholder="不启动不用填写">{$item[message1_content]}</textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">抢单短信通知</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="message2" value="1" {if $item[message2] == 1} checked {/if}>启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="message2" value="0" {if $item[message2] == 0} checked {/if}>不启用
+                            </label>
+                        </div>
+                        <span style="color:red;">（启用后，有服务人员抢单后，会给用户发送一条短信）</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">抢单短信内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<textarea name="message2_content" id="message2_content" class="form-control" rows="6" placeholder="不启动不用填写">{$item[message2_content]}</textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">选定服务人员短信通知</label>
+                    <div class="col-sm-9 col-xs-12">
+                    	<div>
+                            <label class="radio-inline">
+                                <input type="radio" name="message3" value="1" {if $item[message3] == 1} checked {/if}>启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="message3" value="0" {if $item[message3] == 0} checked {/if}>不启用
+                            </label>
+                        </div>
+                        <span style="color:red;">（启用后，用户选定服务人员后，会给服务人员发送一条短信）</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">外卖下单短信内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea name="message4_content" id="message4_content" class="form-control" rows="6" placeholder="不启动不用填写">{$item[message3_content]}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">外卖下单短信通知</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <div>
+                            <label class="radio-inline">
+                                <input type="radio" name="message4" value="1" {if $item[message4] == 1} checked {/if}>启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="message4" value="0" {if $item[message4] == 0} checked {/if}>不启用
+                            </label>
+                        </div>
+                        <span style="color:red;">（启用后，用户下单以后，会给商铺负责人发送一条短信）</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">外卖下单短信内容(标签)</label>
+                    <div class="col-sm-9 col-xs-12">
+                        <textarea name="message4_content" id="message4_content" class="form-control" rows="6" placeholder="不启动不用填写">{$item[message4_content]}</textarea>
+                    </div>
+                </div>
+                
+            </div>    
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" type="submit" value="保存" class="btn btn-primary btn-block" />
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            
+            
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+function check(){
+    var platform = $("#platform").val();
+    if(platform == 1){
+        $("#bao1").css('display','block'); 
+        $("#aly1").css('display','none'); 
+        $("#bao_1").css('display','block');
+        $("#aly_1").css('display','none'); 
+        $("#bao2").css('display','block'); 
+        $("#aly2").css('display','none'); 
+        $("#bao_2").css('display','block'); 
+        $("#aly_2").css('display','none'); 
+        $("#tempid_show").css('display', 'none');
+    }else{
+        $("#bao1").css('display','none'); 
+        $("#aly1").css('display','block'); 
+        $("#bao_1").css('display','none');
+        $("#aly_1").css('display','block'); 
+        $("#bao2").css('display','none'); 
+        $("#aly2").css('display','block'); 
+        $("#bao_2").css('display','none'); 
+        $("#aly_2").css('display','block'); 
+        $("#tempid_show").css('display', 'block');
+    }
+}
+
+</script>
+{template 'common/footer'}

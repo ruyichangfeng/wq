@@ -1,0 +1,184 @@
+   {template 'header'}
+
+<script src="../addons/bsht_tbk/res/js/main.js"></script>
+ 
+
+	<div id="msv">
+     <link rel="stylesheet" type="text/css" href="{$res}static/jwap/css/newpulic.css" />
+    </div>
+
+
+
+
+
+    <div id="goods">
+     <section class="goods" id="pageCon">
+      <ul class="goods-list list_box clear" id="list_box">
+      </ul>
+     </section>
+	 
+	 {php $tpage=$_GPC['page'];}
+     {if empty($_GPC['page'])}{php $tpage=1;$npage=$tpage-1;$npage2=$tpage+1;}{else}{php $npage=$tpage-1;$npage2=$tpage+1;}{/if}
+	 
+	 <div id="list_more" class="loading" style="margin-top:10px">
+	 <span class="am-text-secondary doclick" id="list_more2">查看更多</span>
+	 </div>
+
+    </div>
+ 
+		
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+
+
+var limit = {$tpage};
+
+function get_list(ty){
+    
+
+
+    if(ty==1){
+	   $("#pageCon .list_box").html('');
+	}else{
+	   $("#list_more2").html('<span class="am-icon-spinner am-icon-spin"></span> 卖命加载中...');
+	   
+	}
+
+
+	$.ajax({
+	    type : "post",
+	    url : "{php echo $this->createMobileUrl('list_all_ajax',array('op'=>'list','cate_id'=>$cate_id))}",
+	    data : {
+	    	limit:limit,
+	    },
+        dataType : "json",		
+	    success : function(data) {
+	    	if(data.status==200){
+
+					var list = data.content;
+						var content = '';
+						for(var i=0; i<list.length; i++){
+
+                            
+
+
+
+         content += '<li class="picCon"><a class="goods-a" href="'+list[i]['url']+'" target="_self">'
+		 +'<img class="loazd lazy-bk" src="../addons/bsht_tbk/res/images/load.gif" data-bk="'+list[i]['pic']+'{$setting['maxpic']}.jpg" /><span style="background:url('+list[i]['icon']+') no-repeat 0 0;height:0;overflow:hidden; padding-bottom:15px; width: 15px;position:absolute;bottom:5px; right:5px;z-index:15;"></span></a>'
+		 +'<a href="'+list[i]['url']+'" target="_self">'
+		 +'<h3>'+list[i]['title']+'</h3>'
+         +'<div class="list-price buy">'
+         +'<span class="price-new"><i>券后 ￥</i>'+list[i]['jiage']+'</span>'
+         +'<!--span class="qhj" style="margin-left:5px">'+list[i]['tag']+'</span-->'
+         +'<a id="J_weixin" href="'+list[i]['url']+'" target="_self" class="coupon"><span class="good-btn" style="color:#999">销量'+list[i]['itemmsell']+'</span></a>'
+         +'</div></a>'
+         +'<div class="lingquan">'
+         +'<a id="J_weixin" href="'+list[i]['yhjurl']+'" target="_self" class="coupon"><span>'+list[i]['jiage2']+'元券</span></a>'
+         +'</div></li>';
+
+
+
+
+						}
+                        $("#pageCon .list_box").append(content);
+						
+						var aa = $(".goods-list li").innerWidth();
+                        $(".goods-list li img").css('height',aa);
+						if(list.length=={if $setting['pageno']}{$setting['pageno']}{else}10{/if}){
+							$("#list_more2").html('点击查看更多');
+						}else{
+							$("#list_more2").html('没有更多记录！');
+							//$("#list_more2").fadeOut(500);
+						}		
+	                    limit++;
+
+						
+
+
+lazy_img();
+		    }else if(data.status==-103){
+	    		$("#list_more2").html('<span onclick="location.reload();">没有更多记录，点击刷新！</span>');
+				
+
+	    	}else if(data.status==301){
+	    		$("#list_more2").html('没有更多记录');
+				
+				
+	    	}else{
+			    $("#list_more2").html('没有更多记录！');
+				
+			}    	
+	    },
+	    error : function(xhr, type) {
+
+	    }
+	});
+	    
+
+}
+
+
+get_list(0);
+
+
+$(".doclick").off("click").on("click",function(){
+       
+	   get_list(0);
+
+
+});
+
+
+
+$(window).scroll(function () {
+var scrollTop = $(this).scrollTop();
+var scrollHeight = $(document).height();
+var windowHeight = $(this).height();
+if (scrollTop + windowHeight == scrollHeight) {
+setTimeout(get_list(0),1000);
+}
+});
+
+
+
+});    
+
+
+function yhjjumpurl(obj){
+{if $setting['skin1tip']==1} 
+ var url = obj.name;
+ //alert(url);
+ layer.open({
+  type: 2,
+  title: false,
+  shadeClose: true,
+  shade: 0.8,
+  area: ['85%', '85%'],
+  content: url
+}); 
+{/if}
+}
+</script>
+
+
+<script>        
+  var swiper = new Swiper('.swiper-container', {
+            pagination: '.swiper-pagination',
+            paginationClickable: true,
+            loop: true,
+			effect:'flip',
+			autoplay:5000,
+        });
+  var swiper2 = new Swiper('.swiper2', {
+            slidesPerView: 'auto',
+            paginationClickable: true,
+            freeMode: true,
+			autoplay:3000,
+			pagination: '.swiper-pagination',
+            
+  });
+</script>
+
+    {template 'foot'}
+	{template 'footer'}

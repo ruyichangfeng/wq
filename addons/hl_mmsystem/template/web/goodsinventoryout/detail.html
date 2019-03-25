@@ -1,0 +1,363 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('goodsinventoryout',array('op' => 'detail','id' => $id))}"></a></h5>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="tabs-container">
+                            <ul class="nav nav-tabs">
+
+                                <li  class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="false"><i class="fa fa-shopping-cart"></i>采购记录</a>
+                                </li>
+                                <!--<li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"><i class="fa fa-retweet"></i>调拨记录</a>-->
+                                <!--</li>-->
+                                <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false"><i class="fa fa-hourglass-start"></i>盘点记录</a>
+                                </li>
+                                <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false"><i class="fa fa-pencil-square"></i>销售记录</a>
+                                </li>
+                                <li class=""><a data-toggle="tab" href="#tab-5" aria-expanded="false"><i class="fa fa-pencil-square"></i>顾客退货</a>
+                                </li>
+
+                            </ul>
+                            <div class="tab-content">
+                                <div id="tab-1" class="tab-pane active">
+                                    <div class="panel-body">
+                                        <table id="getGoodsInventoryInListTabledata" data-mobile-responsive="true"></table>
+                                    </div>
+                                </div>
+                                <!--<div id="tab-2" class="tab-pane">-->
+                                <!--<div class="panel-body">-->
+                                <!--<table id="getGoodsInventorytransferTabledata" data-mobile-responsive="true"></table>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <div id="tab-3" class="tab-pane">
+                                    <div class="panel-body">
+                                        <table id="getGoodsInventorytransferTabledata" data-mobile-responsive="true"></table>
+                                    </div>
+                                </div>
+                                <div id="tab-4" class="tab-pane">
+                                    <div class="panel-body">
+                                        <table id="getGoodsConsumeTableData" data-mobile-responsive="true"></table>
+                                    </div>
+                                </div>
+                                <div id="tab-5" class="tab-pane">
+                                    <div class="panel-body">
+                                        <table id="memberreturninvoiceTableData" data-mobile-responsive="true"></table>
+                                        <input type="hidden" value="{$id}" id="goodsid" name="goodsid"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function(){
+        getGoodsInventoryInListTabledata();//采购记录
+        getGoodsInventorytransferTabledata();//盘点记录
+        getGoodsConsumeTableData()//销售记录
+        memberreturninvoiceTableData();//退货记录
+    });
+
+    function getGoodsInventoryInListTabledata(){
+
+        $('#getGoodsInventoryInListTabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getGoodsInventoryInListTabledata'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'gii_InventoryInCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'gii_inventorytype',
+                title: '单据类型',
+                align: "center",
+                valign: "middle",
+                formatter:formattertype
+            },{
+                field: 'giid_goodsNumber',
+                title: '数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'gii_addTime',
+                title: '创建日期',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },
+            ]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+                goodsid:$("#goodsid").val(),
+
+            };
+            return temp;
+        }
+        function formattertype(value, row, index) {
+
+            if(value == 1){
+
+                var result = "<span><i class='badge badge-primary'>采购入库</i></span>";
+            }else{
+
+                var result = "<span><i class='badge badge-danger'>退货</i></span>";
+
+            }
+            return result;
+        }
+
+    }
+    function getGoodsInventorytransferTabledata(){
+
+        $('#getGoodsInventorytransferTabledata').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getGoodsInventorytransferTabledata'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'gic_InventoryChangeCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'id',
+                title: '店面',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'goo_number',
+                title: '库存数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'gic_number',
+                title: '盘点数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_getPoint',
+                title: '误差数量',
+                align: "center",
+                valign: "middle",
+                formatter:formatterquantity
+            },{
+                field: 'gic_addTime',
+                title: '盘点日期',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },
+            ]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+                goodsid:$("#goodsid").val(),
+
+            };
+            return temp;
+        }
+        function formatterquantity (value, row, index) {
+            var rowgoo = row.goo_number;
+            var rowgic = row.gic_number;
+            var newnumber = rowgoo - rowgic;
+            return newnumber;
+        }
+
+
+    }
+    function getGoodsConsumeTableData(){
+
+        $('#getGoodsConsumeTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getGoodsConsumeTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'sc_invoiceCode',
+                title: '单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'cid_consumeNumber',
+                title: '销售数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_consumeType',
+                title: '销售方式',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_addTime',
+                title: '销售时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },
+            ]
+        });
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+                goodsid:$("#goodsid").val(),
+
+            };
+            return temp;
+        }
+
+    }
+    function memberreturninvoiceTableData(){
+        $('#memberreturninvoiceTableData').bootstrapTable({
+            url: '{php echo $this->createWebUrl('systeminvoicemanage', array('op' => 'getMemberReturnInvoiceTableData'));}',
+            method:"post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache:false,  //是否使用缓存
+            search:false, //显示搜索框
+            clickToSelect: true,
+            showPaginationSwitch:false,//是否显示数据条数选择框
+            striped:true,//隔行变色
+            queryParamsType:'',
+            queryParams: querygoodsParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber:1,                       //初始化加载第一页，默认第一页
+            pageSize: 10,                       //每页的记录行数（*）
+            pageList: [10, 20, 40, 100],
+            pagination: true,
+            height: 556,
+            selectItemName:"id",
+            uniqueId: "id",
+            columns: [{
+                field: 'mri_membererueninvoiceCode',
+                title: '退货单据号',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'sc_invoiceCode',
+                title: '消费单据',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_returnnumber',
+                title: '退货数量',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_note',
+                title: '退货备注',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_returntotalprice',
+                title: '退货总价格',
+                align: "center",
+                valign: "middle"
+            }, {
+                field: 'mri_returntotalintegral',
+                title: '退会总积分',
+                align: "center",
+                valign: "middle"
+            },{
+                field: 'mri_addTime',
+                title: '退货时间',
+                align: "center",
+                valign: "middle",
+                formatter:consumeinvoiceaddTime
+            },]
+        });
+        //得到查询的参数
+        function querygoodsParamspage (params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+                searchGoodsNamestr: $("#search_goodsKeyword").val(),//后台请求传的查询参数
+                searchGoodsTypestr:$("#search_goodsTypeId").val(),
+                goodsid:$("#goodsid").val(),
+            };
+            return temp;
+        };
+
+    }
+    function consumeinvoiceaddTime(value, row, index) {
+        if(value){
+            return new Date(parseInt(value) * 1000).toLocaleString().replace(/:\d{1,2}$/,'');
+        }else{
+            return "--";
+        }
+
+    }
+</script>
+{template 'web/common/footer'}

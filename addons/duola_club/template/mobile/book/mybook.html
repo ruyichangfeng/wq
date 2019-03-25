@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta content="telephone=no" name="format-detection" />
+    <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>{$school['title']}</title>
+    {php echo register_jssdk();}
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+    <link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+    <link rel="stylesheet" href="{OSSURL}public/mobile/css/resetnew.css">
+    <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{OSSURL}public/mobile/js/tx.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/swipe.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+    <script src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<body>
+<style>
+    body > a:first-child,body > a:first-child img{width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+    body{padding-bottom: 0 !important;}
+    #wrap.user_list .user > a::before{ content: ""; display: inline-block; float: left; height: 29px;width:29px; margin:5px 10px 10px 10px; vertical-align: middle; background-image: url({OSSURL}public/mobile/img/user_icon.png); background-size:  auto 35px;}
+    #wrap.user_list .my_order::before{ background-color:#fe6c27;background-position: 0 0;}
+    #wrap.user_list .my_inf::before{   background-color:#ffba00;background-position: -13px -3px;}
+    #wrap.user_list .my_count::before{ background-color:#47ace9;background-position: -50px -3px;}
+    #wrap.user_list .my_score::before{ background-color:#ed4f2b;background-position: -85px -3px;}
+    #wrap.user_list .my_lianxi::before{ background-color:#53ccb9;background-position: -124px -3px;}
+    #wrap.user_list .jiankong::before{ background-color:#0d43bf;background-position: -159px -3px;}
+    #wrap.user_list .bjphoto::before{ background-color:#9853cc;background-position: -194px -3px;}
+    #wrap.user_list .liuyan::before{ background-color:#e31a47;background-position: -230px -3px;}
+    #wrap.user_list .qingjia::before{ background-color:#cf5f0e;background-position: -263px -3px;}
+    #wrap.user_list .checklog::before{ background-color:#fb793a;background-position: -300px -3px;}
+    #wrap.user_list .check::before{ background-color:#0da43c;background-position: -338px -3px;}
+    #wrap.user_list .yijian::before{ background-color:#0e7ecf;background-position: -372px -3px;}
+    #wrap.user_list .head .pdetail{height:90px; padding:10px 0 0 20px; -webkit-box-sizing:border-box;}
+    #wrap.user_list .head .pdetail .img-circle{float:left; width:66px; height:86px; overflow:hidden; margin-right:20px;}
+    #wrap.user_list .head .pdetail .img-circle span{font-size:14px;line-height:10px;padding-left: 5px;color: #E8ECF1;font-weight: bolder;}
+    #wrap.user_list .head .pdetail .img-circle img{border-radius:50%;width:66px;height:66px;}
+    #wrap.user_list .head .pdetail .pull-left span{display:block; color:#FFF; line-height:20px;}
+    #wrap.user_list .head .pdetail .pull-left span.name{font-size:20px; display:inline-block; max-width:150px; height:25px; line-height:25px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; word-break:keep-all;padding-top: 20px;}
+    #wrap.user_list .head .pdetail .pull-left span.type{font-size:14px;}
+    #wrap.user_list .head .pdetail .pull-right span{display:block; color:#FFF; line-height:20px;}
+    #wrap.user_list .head .pdetail .pull-right span.name{font-size:20px; display:inline-block; max-width:150px; height:25px; line-height:25px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; word-break:keep-all;padding-top: 20px;padding-right: 30px;}
+    #wrap.user_list .head .pdetail .pull-right span.type{font-size:14px;}
+    .page span{
+        display: block;
+    }
+    .weui-navbar__item{
+        padding: 0;
+        font-size: 12px;
+    }
+</style>
+<div id="wrap" class="user_list" style="padding-bottom:55px;">
+    <div id="bg"></div>
+    <!-- 修改开始 -->
+    <div class="head">
+        <div class="pdetail">
+            <input type="hidden" id="bigImage" name="bigImage"/>
+            <div class="img-circle" onclick="uploadImg(this);">
+                <img src="{if !empty($students['icon'])}{php echo tomedia($students['icon'])}{else}{php echo tomedia($_W['fans']['tag']['avatar']);}{/if}">
+                <!--<span class="type">修改头像</span>-->
+            </div>
+            <div class="pull-left">
+                <span class="name">{$item['nickname']}</span>
+            </div>
+            <div  class="pull-right" style="padding-top: 10px;padding-right: 20px;text-align:center;">
+                <img src="{MODULE_URL}public/mobile/img/gifts_yellow.png" style="width:32px;height: 32px;">
+                <a href="./index.php?i=9&c=entry&do=index&m=jing_cash&schoolid={$schoolid}"><span class="type" style="font-size: 12px;">增加闲书币</span></a>
+            </div>
+        </div>
+    </div>
+    <div class="page">
+        <div class="page__bd">
+            <div class="weui-tab">
+                <div class="weui-navbar">
+                    <div class="weui-navbar__item">
+                        <a href="{php echo $this->createMobileUrl('myonsalebook', array('schoolid' => $schoolid, 'status' => 2,'onSaleAmount' => $userAccount['onSaleAmount'],'balance' => $userAccount['balance']), true)}">
+                            <span>我的闲书库</span>
+                            <span>{$userAccount['onSaleAmount']}</span>
+                        </a>
+                    </div>
+                    <div class="weui-navbar__item">
+                        <a href="{php echo $this->createMobileUrl('scorelist', array('schoolid' => $schoolid,'credittype' => 'credit2','type' => 'record','period' => 1), true)}">
+                            <span>我的闲书币</span>
+                            <span>{$balance}</span>
+                        </a>
+                    </div>
+                    <div class="weui-navbar__item">
+                        <a href="./index.php?i=9&c=entry&do=index&m=jing_cash&schoolid={$schoolid}">
+                            <span>我的押金</span>
+                            <span>{$result['credit2']}</span>
+                        </a>
+                    </div>
+                    <div class="weui-navbar__item">
+                        <a href="{$jian_url}">
+                            <span>我的简记</span>
+                            <span>{$countJj}</span>
+                        </a>
+                    </div>
+                </div>
+                <!--<div class="weui-tab__panel">-->
+
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel" style="margin-top: 50px">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_small-appmsg">
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" href="{php echo $this->createMobileUrl('myunsalebook', array('schoolid' => $schoolid, 'status' => 1,'onSaleAmount' => $userAccount['onSaleAmount'],'balance' => $userAccount['balance']), true)}">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/trans_01.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">待上架闲书列表
+                                {if $unsalebooks['unsaleCount'] > 0}
+                                <span class="weui-badge" style="margin-left: 5px;">{$unsalebooks['unsaleCount']}</span>
+                                {/if}
+                            </p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;">完善闲书信息</span>
+                    </a>
+                    <a class="weui-cell weui-cell_access" href="{php echo $this->createMobileUrl('myonsalebook', array('schoolid' => $schoolid, 'status' => 2,'onSaleAmount' => $userAccount['onSaleAmount'],'balance' => $userAccount['balance']), true)}">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/up_book.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">已上架闲书列表</p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;">上架获闲书币</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_small-appmsg">
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" href="{php echo $this->createMobileUrl('bookscore', array('schoolid' => $schoolid), true)}">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/comment.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">待评价订单
+                                {if $count > 0}
+                                <span class="weui-badge" style="margin-left: 5px;">{$count}</span>
+                                {/if}
+                            </p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_small-appmsg">
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" href="http://simplife.cc/app/./index.php?i=9&c=entry&schoolid=8&do=booklog&m=duola_club">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/book_log4.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">我的读书轨迹</p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_small-appmsg">
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" href="http://simplife.cc/app/index.php?i=9&c=entry&do=findList&m=junsion_simpledaily">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/write.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">简记专栏</p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;"></span>
+                    </a>
+                    <a class="weui-cell weui-cell_access" href="http://simplife.cc/app/index.php?i=9&c=entry&cid=1&do=index_article&m=wei_info_href">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/book_help2.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">闲书教程
+                                <!--{if $unsalebooks['unsaleCount'] > 0}-->
+                                <!--<span class="weui-badge" style="margin-left: 5px;">{$unsalebooks['unsaleCount']}</span>-->
+                                <!--{/if}-->
+                            </p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;">新手必读</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_small-appmsg">
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" href="{php echo $this->createMobileUrl('dispatchMobileBook', array('schoolid' => $schoolid,'op' => 'userInfoUpdate','type' => 'bookUser'), true)}">
+                        <div class="weui-cell__hd"><img src="{MODULE_URL}public/mobile/img/person_info.png" alt="" style="width:20px;margin-right:5px;display:block"></div>
+                        <div class="weui-cell__bd weui-cell_primary">
+                            <p style="font-size: 15px;">修改个人设置</p>
+                        </div>
+                        <span class="weui-cell__ft" style="font-size: 12px;"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{php include $this->template('footer');}
+</body>
+<script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+<script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.11.3.min.js?v=4.9"></script>
+<script type="text/javascript">
+    var PB = new PromptBox();
+    WeixinJSHideAllNonBaseMenuItem();
+    /**微信隐藏工具条**/
+    function WeixinJSHideAllNonBaseMenuItem(){
+        if (typeof wx != "undefined"){
+            wx.ready(function () {
+
+                wx.hideAllNonBaseMenuItem();
+            });
+        }
+    }
+    //扫码录入图书信息
+    function scanBarCode(){
+        wx.scanQRCode({
+
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+
+            success: function (res) {
+
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+
+                window.location.href = "{php echo $this->createMobileUrl('addbook',array('schoolid'=>$schoolid))}"+'&isbn='+result;
+            }
+        });
+    }
+
+    //检查是否还有未处理的订单
+    function checktransferorder(){
+        var hasOrder = "{$orderCount}";
+        if(hasOrder > 0){
+            PB.prompt('您还有未处理的易书订单,请前往处理!');
+            window.location.href = "{php echo $this->createMobileUrl('mybookorder', array('schoolid' => $schoolid,'is_accept_exchange' => 2), true)}";
+        }else{
+            window.location.href = "{php echo $this->createMobileUrl('bookmap', array('schoolid' => $schoolid,'is_accept_exchange' => 2), true)}";
+        }
+
+    }
+</script>
+</html>

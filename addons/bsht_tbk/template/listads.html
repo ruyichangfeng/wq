@@ -1,0 +1,254 @@
+{template 'header'}
+{if $op == 'display'}
+<script src="../addons/bsht_tbk/res/js/MagicZoom.js"></script>
+<div class='container' style='padding: 0 5px 10px; margin: 0; width: 100%'>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="{php echo $this->createWebUrl('listads');}">广告列表</a></li>
+
+		<li><a href="{php echo $this->createWebUrl('listads',array('op'=>'post'));}">添加/编辑广告</a></li>
+	</ul>
+
+
+</div>
+
+
+<form action="./index.php" method="get" class="form-horizontal" role="form">
+			<input type="hidden" name="c" value="site" />
+			<input type="hidden" name="a" value="entry" />
+        	<input type="hidden" name="m" value="bsht_tbk" />
+        	<input type="hidden" name="do" value="listads" />
+    <div style="padding:15px;">
+        <table class="table table-hover">
+            <thead class="navbar-inner">
+                <tr style="width:100%">
+				    <th style="width:3em;">
+                        <input type="checkbox" id="checkall"/>
+                    </th>
+					<th style="width:90px;">序号</th>
+				    <th width="80" style="text-align:center">ID</th>
+					<th width="100" style="text-align:center">广告图</th>
+					<th width="auto" style="text-align:left">广告名称</th>
+					<th style="width:90px">跳转提示</th>
+					<th style="width:90px">状态</th>
+
+					<th style="width:90px">点击</th>
+					<th style="width:90px">分享</th>
+					<th width="20%" style="text-align:right">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $row}
+
+
+                <tr>
+				   <td><input type="checkbox" name="ids[]" value="{$row['id']}"/></td>
+                   <td><input type="text" name="displayorder[{$row['id']}]" value="{$row['displayorder']}"  style="width:50px;font-size:10px;text-align: center;"></td>
+                    <td style="text-align:center">{$row['id']}</td>
+					<td style="text-align:center">{if $row['thumb']}<img src="{php echo tomedia($row['thumb']);}" style="width:50px">{/if}</td>
+					<td style="text-align:left">{$row['title']}<br>链接地址：{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=show_ads&m=bsht_tbk&id={$row['id']}</span></td>
+					
+
+<td>{if $row['isjump']}<label class="label label-success isjump" data-id='{$row["id"]}'>提示</label>{else}<label class="label label-default isjump" data-id='{$row["id"]}'>不提示</label>{/if}</td>	
+
+
+<td>{if $row['status']}<label class="label label-success isstatus" data-id='{$row["id"]}'>启用</label>{else}<label class="label label-default isstatus" data-id='{$row["id"]}'>禁用</label>{/if}</td>	
+
+
+<td>
+<label class="label label-success">点击：{$row["hit"]}</label>
+</td>
+
+<td>
+<label class="label label-info">分享：{$row["share"]}</label>
+</td>
+
+
+<td style="text-align:right">
+
+					
+
+					<a class="btn   btn-default" title="编辑" href="{php echo $this->createWebUrl('listads',array('op'=>'post','id'=>$row['id']))}" ><i class="fa fa-edit"></i> 编辑</a>
+					
+					<a class="btn  btn-danger" rel="tooltip" href="javascript:void();" onclick="drop_confirm('您确定要删除吗?删除不可恢复，同时删除所有相关数据！', '{php echo $this->createWebUrl('listads',array('op'=>'del','id'=>$row['id']))}');" title="删除"><i class="fa fa-times"></i></a>
+</td>
+                </tr>
+                {/loop}
+
+				<tr>
+	                <td colspan="9" style="text-align: left !important;">
+	                	<input name="token" type="hidden" value="{$_W['token']}" />
+	                    <!--input type="submit" class="btn btn-primary" name="submit" value="提交排序" /-->
+
+						<a data-href="{php echo $this->createWebUrl('listads',array('op'=>'delall'))}" href="javascript:;" class="btn btn-danger mutdelete">删除选中</a>
+	                </td>
+	            </tr>
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</form>
+</div>
+<script>
+function drop_confirm(msg, url){
+            if (confirm(msg)){
+            window.location = url;
+            }
+            }
+
+require(['util'],function(util){
+
+$('.mutdelete').click(function(){
+            var url = $(this).data('href');
+            var ids = [];
+            var idss = [];
+            $('input:checkbox[name="ids[]"]').each(function() {
+                var _that = $(this)[0];
+                if(_that.checked){
+                    ids = ids.concat($(this).val());
+                }else{
+                    idss = idss.concat($(this).val());
+                }
+            });
+            console.log(ids);
+            if(confirm("您确定要删除么？")){
+                $.post(url,{ids:ids},function(data){
+                    util.message("删除成功","{php echo $_W['siteurl']}",'success');
+                },'json');
+            }
+        });
+
+
+
+
+$("#checkall").click(function(){
+            console.log('checkall');
+            $('input[name="ids[]"').each(function(){
+                var _that = $(this)[0];
+                if(_that.checked){
+                    _that.checked = false;
+                }else{
+                    _that.checked = true;
+                }
+            });
+        });
+
+
+$("#checkallbottom").click(function(){
+            $("#checkall").click();
+        });
+
+
+
+$('.isstatus').click(function(){
+	var label = $(this);
+	$.ajax({
+		url:'{php echo $this->createWebUrl("listads",array("op"=>"status"))}',
+		type:'post',
+		data:{id:label.attr('data-id')},
+		success:function(status){
+			if(status == '1'){
+				if(label.hasClass('label-success')){
+					label.removeClass('label-success').addClass('label-default');
+					label.text('禁用');
+				}else{
+					label.removeClass('label-default').addClass('label-success');
+					label.text('启用');
+				}
+			}
+		}
+	});
+  });
+
+
+$('.isjump').click(function(){
+	var label = $(this);
+	$.ajax({
+		url:'{php echo $this->createWebUrl("listads",array("op"=>"isjump"))}',
+		type:'post',
+		data:{id:label.attr('data-id')},
+		success:function(status){
+			if(status == '1'){
+				if(label.hasClass('label-success')){
+					label.removeClass('label-success').addClass('label-default');
+					label.text('不提示');
+				}else{
+					label.removeClass('label-default').addClass('label-success');
+					label.text('提示');
+				}
+			}
+		}
+	});
+  });
+
+
+
+});
+</script>
+{elseif $op == 'post'}
+<div class='container' style='padding: 0 5px 10px; margin: 0; width: 100%'>
+	<ul class="nav nav-tabs">
+		<li><a href="{php echo $this->createWebUrl('listads');}">广告列表</a></li>
+
+		<li class="active"><a href="{php echo $this->createWebUrl('listads',array('op'=>'post'));}">添加/编辑广告</a></li>
+	</ul>
+
+
+<div class="panel panel-info">
+		<div class="panel-body">
+			<form action="" method="post" class="form-horizontal" role="form">
+			<input type="hidden" name="id" value="{$row[id]}">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">广告名称</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="title" type="text" value="{$row['title']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">广告链接</label>
+				<div class="col-sm-4">
+					<input class="form-control" required="required" name="jumpurl" type="text" value="{$row['jumpurl']}">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">排序</label>
+				<div class="col-sm-4">
+					<input class="form-control" name="displayorder" type="number" min="0" value="{if $row['displayorder']}{$row['displayorder']}{else}0{/if}">
+				</div>
+			</div>
+
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">跳转提示</label>
+				<div class="col-sm-4">
+					<label><input type="radio" name="isjump" checked="checked" value="0"> 不提示</label>
+					<label style="margin-left: 10px;"><input type="radio" name="isjump" {if $row['isjump'] || empty($row['isjump'])}checked="checked"{/if} value="1"> 提示</label>
+					<span class="help-block">跳转是指是否开启微信浏览器的第三方浏览器打开提示</span>
+				</div>
+				
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">状态</label>
+				<div class="col-sm-4">
+					<label><input type="radio" name="status" checked="checked" value="0"> 禁用</label>
+					<label style="margin-left: 10px;"><input type="radio" name="status" {if $row['status'] || empty($row['status'])}checked="checked"{/if} value="1"> 启用</label>
+				</div>
+			</div>
+
+            <div class="form-group" >
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">广告图片</label>
+                    <div class="col-sm-6 col-xs-12">
+                        {php echo tpl_form_field_image('thumb', $row['thumb']);}
+                        <span class="help-block"></span> </div>
+            </div>
+
+			<button type="submit" class="btn btn-primary" name="submit" value="提交">保存</button>
+			<input type="hidden" name="token" value="{$_W['token']}" />
+			</form>
+	</div>
+</div>
+
+</div>
+{/if}
+{template 'footer'}

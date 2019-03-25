@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta content="telephone=no" name="format-detection" /> 
+<meta name="google-site-verification" content="DVVM1p1HEm8vE1wVOQ9UjcKP--pNAsg_pleTU5TkFaM">
+<style>
+	body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
+	body{padding-bottom: 0 !important;}		
+</style>
+<meta id="viewport" name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+<title>课程详情</title>
+<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weixin.css">
+<link rel="stylesheet" href="{OSSURL}public/mobile/css/reset.css">
+<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/weui.css">
+<link type="text/css" rel="stylesheet" href="{OSSURL}public/mobile/css/greenStyle.css?v=4.80120" />
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="{MODULE_URL}public/mobile/js/jquery.js"></script>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
+	<script   src="{MODULE_URL}public/mobile/js/zepto.min.js"></script>
+	<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+	<script   src="{MODULE_URL}public/mobile/js/weui.min.js"></script>
+</head>
+<style>
+.count_inf #main .count_num{ height:75px; font:12px/44px "黑体";color:#999; padding: 0 0 0 10px;}
+.count_inf #main .count_num > div.btn{float: right; width:70px; height: 30px; background-color: #7bb52d; color: #fff; margin-top: 17px; margin-right: 10px; font: 16px/30px "黑体"; text-align: center;-webkit-border-radius: 3px; border-radius: 3px;}
+.count_inf .count_add {padding-left: 30px;background: url({OSSURL}public/mobile/img/address.png) no-repeat 10px center;background-size: 10px auto;}
+.count_inf .count_phone {padding-left: 30px;background: url({OSSURL}public/mobile/img/phone.png) no-repeat 10px center;background-size: 11px auto;}	
+.count_inf dl a {padding-right: 10px;display: block;background: url({OSSURL}public/mobile/img/arrow_right.png) no-repeat right center;background-size: 8px 12px;}
+.count_hot::before{content: ""}
+.blackBg{position:fixed;top:0;left:0;right:0;bottom:0;background:black;z-index:89;filter:alpha(opacity:30);opacity:0.3;display:none;}
+.selectList{position:fixed;width:80%;height:50%;max-height:70%;overflow:hidden;background:white;border:1px solid #e9e9e9;z-index:90;display:none;left:10%;top:50%;}
+.selectList .double{position:relative;width:100%;height:50%;display:none;overflow:hidden;}
+.selectList .single{position:relative;width:100%;height:100%;display:none;overflow:hidden;}
+.selectList ul{width:100%;height:auto;overflow:auto;}
+.selectList ul li{height:50px;line-height:50px;border-bottom:1px solid #e9e9e9;padding:0 10px;}
+.selectList ul li.selected{border-left:5px solid #ffc74e;}
+.selectList ul li span.le{height:50px;line-height:50px;float:left;font-size:16px;}
+.selectList ul li span.ri{float:right;width:30px;height:30px;margin:10px;}
+.selectList .btnBox{width:100%;height:50px;}
+.selectList .btn{position:absolute;width:100%;height:50px;bottom:0;left:0;}
+.selectList .btn button{height:40px;line-height:40px;text-align:center;background:-webkit-gradient(linear,0% 0%,0% 100%,color-stop(0.5,#e7e7e7), color-stop(1,#dedbde));border:1px solid #a4a4a4;border-top:1px solid #c6c6c6;}
+.selectList .single .btn button{width:80%;margin:5px 10%;}
+.selectList .double .btn button{width:35%;margin:5px 0 5px 10%;}
+.selectList .double .btn .box{width:50%;height:100%;background:#e9e9e9;float:left;}
+.selectList .double .btn .box span{display:block;height:50px;line-height:50px;text-align:center;cursor:pointer;}
+.selectList .double .btn .box span.ok{margin-right:1px;}
+</style>
+<body>
+    <div id="wrap" class="count_inf">
+        <dl id="main">
+            <dt class="count_tit">{$item['name']}</dt>
+            <dd class="count_inf" onclick="gototinfo();">
+                <div class="teacher">
+                    <div style=" background-image:url({if !empty($teacher['thumb'])}{php echo tomedia($teacher['thumb'])}{else}{php echo tomedia($_W['fans']['tag']['avatar']);}{/if})"></div>
+                    <p>{$teacher['tname']}</p>
+                </div>
+                <ul>
+                    <li><label>日期：</label>{php echo date('Y/m/d',$item['start'])}-{php echo date('Y/m/d',$item['end'])}</li>
+                    <li><label>科目：</label>{if !empty($item['xq_id'])}{$category[$item['xq_id']]['sname']}/{$category[$item['bj_id']]['sname']}/{$category[$item['km_id']]['sname']}{else}{$category[$item['km_id']]['sname']}{/if}</li>
+                    <li><label>教室：</label>{$item['adrr']}</li>
+                </ul>
+				<div style="clear:both"></div>
+            </dd>
+
+       {if $school['issale'] == 1 || $school['issale'] == 2 || $school['issale'] == 3 || $school['issale'] == 4}
+			{if $item['is_hot']==1 && $item['end']>TIMESTAMP}
+			<dd class="count_num">
+				{php $datas = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$item['id']."' And status = 2 "); $rest = $item['minge'] - $datas - $item['yibao'];}
+				<span value="" class="count_hot" style="font-size:12px;height: 16px; padding:0 9px;-webkit-border-radius: 16px; border-radius: 16px; vertical-align: text-bottom; line-height: 16px; color: #fff;  display: inline-block;">精品课</span>
+				<span value="" class="count_leave" style="font-size: 12px;">{if $rest > 0}{$rest}个名额{else}0个名额{/if}</span>
+				<!--<div class="btn" onclick="{if count($user) > 1}showSelectBox('bjList'){elseif !empty($userinfo['mobile']) || !empty($student['mobile'])}checkSigeup(){else}Sigeup(){/if}">报名</div>-->
+				<div class="btn" onclick="showKe()">报名</div>
+				{if $item['is_welfare'] == 0}
+				<ul class="weui-media-box__info" style="margin-top: 1px;margin-bottom: 3px;">
+					<li class="weui-media-box__info__meta">一人班:<strong style="color: #EF4F4F">¥{$item['cose']}</strong></li>
+					<li class="weui-media-box__info__meta">两人班:<strong style="color: #EF4F4F">¥{$item['cose2']}</strong></li>
+					<li class="weui-media-box__info__meta">三人班:<strong style="color: #EF4F4F">¥{$item['cose3']}</strong></li>
+				</ul>
+				{else}
+				<span style="color: red;font-size: 15px;">免费</span>
+				{/if}
+			</dd>
+            {else if $item['ishot'] == 0 && !$isfull && $item['end']>TIMESTAMP}
+			<dd class="count_num">
+				{php $datas = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$item['id']."' And status = 2 "); $rest = $item['minge'] - $datas - $item['yibao'];}
+				<span value="" class="count_hot" style="font-size:12px;height: 16px; padding:0 9px;-webkit-border-radius: 16px; border-radius: 16px; vertical-align: text-bottom; line-height: 16px; color: #fff;  display: inline-block;">热报</span>
+				<span value="{if $rest > 0}{$rest}个名额{else}0个名额{/if}" class="count_leave"></span>
+                <!--<div class="btn" onclick="{if  count($user) > 1}showSelectBox('bjList'){elseif !empty($userinfo['mobile']) || !empty($student['mobile'])}checkSigeup(){else}Sigeup(){/if}">报名</div>-->
+				<div class="btn" onclick="showKe()">报名</div>
+				{if $item['is_welfare'] == 0}
+				<ul class="weui-media-box__info" style="margin-top: 1px;margin-bottom: 3px;">
+					<li class="weui-media-box__info__meta">一人班:<strong style="color: #EF4F4F">¥{$item['cose']}</strong></li>
+					<li class="weui-media-box__info__meta">两人班:<strong style="color: #EF4F4F">¥{$item['cose2']}</strong></li>
+					<li class="weui-media-box__info__meta">三人班:<strong style="color: #EF4F4F">¥{$item['cose3']}</strong></li>
+				</ul>
+				{else}
+				<span style="color: red;font-size: 15px;">免费</span>
+				{/if}
+			</dd>
+			{else if $isfull && $item['ishot'] ==0}
+			<dd class="count_num">
+				{php $datas = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$item['id']."' And status = 2 "); $rest = $datas + $item['yibao'];}
+				<span>已报{if $rest > 0} {$rest} {else} 0 {/if}人</span>
+                <span value="已满" class="count_none" style="font-size:12px;">
+                </span>
+				<div class="btn_null">报名</div>
+			</dd>
+            {else}
+			<dd class="count_num">
+                <span>结束</span>
+                <span value="已满" class="count_none" style="font-size:12px;">
+                </span>
+				<div class="btn_null">报名</div>
+			</dd>			
+            {/if} 
+		{/if} 	
+        </dl>
+        <dl class="count_tips">
+            <dt>{if $item['is_welfare'] == 1}活动说明{else}课程说明{/if}</dt>
+			<dd>{$item['class_describe']}</dd>
+			<!--<dd class="count_add"><a href="#" id="map">{$school['address']}</a></dd>-->
+			<!--<dd class="count_phone"><a href="tel:{$school['tel']}" class="phone">{$school['tel']}</a></dd>-->
+        </dl>
+        <!--dl class="count_eval">
+            <dt><a href="javascript:void(0)" id="allPinglun">老师评价<span>(0人评价)</span></a></dt>
+        </dl-->
+        <dl class="count_outline">
+            <dt><a href="{php echo $this->createMobileUrl('kcdg', array('id' => $item['id'],'schoolid' => $schoolid), true)}" >{if $item['is_welfare'] == 1}活动大纲{else}课程大纲{/if} <span class="outline_link" id="syllabus">查看详情</span></a></dt>
+        </dl>
+        <dl class="counts">
+            <dt>{if $item['is_welfare'] == 1}活动时间表{else}课程表{/if}</dt>
+            <div>
+			{loop $list $item1}
+                      <dd class="{if $item['date'] > TIMESTAMP}click{/if}">第<span>{$item1['nub']}</span>课<br/>{php echo date('m月d',$item1['date'])}</br>{if !empty($category[$item1['sd_id']])}{$category[$item1['sd_id']]['sname']}{/if}</dd>           
+			{/loop}
+                                <div style="clear:both"></div>
+            </div>
+        </dl>
+    </div>
+    <div class="user_info" id="user_info" style="display:none;">
+	   <div>
+			<ul>
+				<p>请输入好友手机号码</p>
+				<li class="user_name">
+					<input type="text" placeholder="请输入您好友的手机号码"  value="">
+				</li>
+				<a onclick="addMore()" class="weui-cell weui-cell_link" id="addMore">
+					<div class="weui-cell__bd">添加更多</div>
+				</a>
+				<div class="btn" onclick="Tijiao();">确定</div>
+			</ul>
+			<span id="close" onclick="Close();">×</span>
+	   </div>
+    </div>		
+	<input id="userid" name="userid" type="hidden" value="{$its['id']}">
+	<input id="umobile" name="umobile" type="hidden" value="{if !empty($userinfo)}{$userinfo['mobile']}{/if}">
+	<div class="sendParam sendParam_wot pr" onclick="showSelectBox('bjList')">
+		<span class="locationCon address f15" closestatus="0"><i class="iconloc bj_icon_background-position float_left"></i></span>
+		<span class="sendSelectParamOperBtn pa address f15 c9" closestatus="0" id="bjListShow"></span>
+		<input id="bjListValue" name="bjListValue" type="hidden" value="{$bj_id}"/>
+		<span class="sendParamOperBtn pa address f15 c9" closestatus="0"><i class="iconloc fx_icon_background-position float_left"></i></span>
+	</div>
+	<div class="blackBg" onclick="closeBox();"></div>
+	<div class="selectList">
+		<div class="double" id="bjList">
+			<div class="checkAll" onclick="isCheckAll(this);">
+				<span name="checkAll" class="le">全选</span>
+				<span class="ri"><img alt="check" src="{OSSURL}public/mobile/img/check.png" /></span>
+			</div>
+			<ul>
+				{loop $user $student}
+				<li onclick="isCheck(this);"><span name="checkName" class="le">{$student['s_name']}</span><span class="ri"><img alt="check" src="{OSSURL}public/mobile/img/check.png" /></span><input type=hidden name="check" value="{$student['sid']}" /></li>
+				{/loop}
+			</ul>
+			<div class="btnBox"></div>
+			<div class="btn">
+				<div class="box">
+					<span class="ok" onclick="saveChecked('bjList');" style="color: green;">确认</span>
+				</div>
+				<div class="box">
+					<span onclick="closeBox();" style="color: red">取消</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page__bd" style="display: none" id="courseinfo">
+		<div class="weui-cells__title">请选择</div>
+	<div class="weui-cells weui-cells_radio">
+		<label class="weui-cell weui-check__label" for="x11">
+			<div class="weui-cell__bd">
+				<p>一人班</p>
+			</div>
+			<div class="weui-cell__ft" onclick="selectClass(1)">
+				<input type="radio" class="weui-check" name="radio1" id="x11" value="1">
+				<span class="weui-icon-checked"></span>
+			</div>
+		</label>
+		<label class="weui-cell weui-check__label" for="x12">
+			<div class="weui-cell__bd">
+				<p>两人班</p>
+			</div>
+			<div class="weui-cell__ft" onclick="selectClass(2)">
+				<input type="radio" name="radio1" class="weui-check" id="x12" value="2">
+				<span class="weui-icon-checked"></span>
+			</div>
+		</label>
+		<label class="weui-cell weui-check__label" for="x13">
+			<div class="weui-cell__bd">
+				<p>三人班</p>
+			</div>
+			<div class="weui-cell__ft" onclick="selectClass(3)">
+				<input type="radio" name="radio1" class="weui-check" id="x13" value="3">
+				<span class="weui-icon-checked"></span>
+			</div>
+		</label>
+	</div>
+	</div>
+	<!--弹框提示-->
+	<div id="dialogs">
+		<!--BEGIN dialog1-->
+		<div class="js_dialog" id="iosDialog1" style="display: none;">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog">
+				<div class="weui-dialog__hd"><strong class="weui-dialog__title">温馨提示</strong></div>
+				<div class="weui-dialog__bd">您需要邀请好友拼团才能报名</div>
+				<div class="weui-dialog__ft">
+					<a  onclick="askFreind()" class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
+					<a  onclick="cancelShow()" class="weui-dialog__btn weui-dialog__btn_default">取消</a>
+				</div>
+			</div>
+		</div>
+		<!--END dialog1-->
+	</div>
+	<input id="classSize" name="classSize" type="hidden" value="">
+	{php include $this->template('footer');}
+<script>	
+	var PB = new PromptBox();
+	var userid =  $("#userid").val();
+	var oss = 'http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/';
+    function checkSigeup(checkedids) {
+			PB.prompt("正在报名中请稍等！~","forever");
+				var satr = "{$school['issale']}";				
+				var url = "{php echo $this->createMobileUrl('order', array('schoolid' => $schoolid), true)}";			
+			if (satr == 3 || satr == 4){			
+				var url = "{php echo $this->createMobileUrl('myclass', array('schoolid' => $schoolid, 'bj_id' => $student['bj_id'], 'xq_id' => $student['xq_id']), true)}";			
+			}
+			if(checkedids != null && checkedids != ""){
+				var rest = "{$rest}";
+				if(checkedids.split(',').length > rest){
+					PB.prompt('您选择的学生数超过了剩余名额！');
+					return false;
+				}
+			}
+            if (userid == '') {
+			    PB.prompt('请先绑定您的学生信息！','forever');
+                window.location.href = "{php echo $this->createMobileUrl('bangding', array('schoolid' => $schoolid), true)}";
+                return false;
+            } else {
+				var submitData = {
+					schoolid : "{$schoolid}",
+					weid     : "{$_W['uniacid']}",
+					openid   : "{$openid}",
+					uid      : "{$fan['uid']}",
+					kcid     : "{$item['id']}",
+					sid      : "{$student['id']}",
+					user     : "{$its['id']}",
+					sids     : checkedids
+					};
+				$.post("{php echo $this->createMobileUrl('payajax',array('op'=>'sigeup'))}",submitData,function(data){
+
+					if(data.result){
+						PB.prompt(data.msg);
+						if(data.directSelf == true){
+							window.location.href = "{php echo $this->createMobileUrl('kc', array('schoolid' => $schoolid), true)}";
+						}else{
+							window.location.href = url;
+						}
+
+					}else{
+						PB.prompt(data.msg);
+						closeBox();
+					}
+				},'json');
+            }
+    }
+    function Tijiao() {
+		var reg=/^(0|86|17951)?(13[0-9]|15[012356789]|17[0-9]|18[0-9]|14[57])[0-9]{8}$/;
+		var mobiles = new Array();
+		$("#user_info ul li").each(function(index){
+			var mobile =$(this).children().first().val();
+			if (mobile == "" || mobile == undefined || mobile == null || !reg.test(mobile)) {
+				alert('第'+(index+1)+'个手机号有误或为空！');
+				return false;
+			}
+			mobiles.push(mobile);
+		});
+
+		if(mobiles.length <= 0){
+			return ;
+		}
+
+		//查询手机号信息
+		window.location.href = "{php echo $this->createMobileUrl('kcinfo',array('op'=>'searchFreinds','schoolid' => $schoolid,'id' => $id))}"+"&mobiles="+mobiles.join(',')+"&classSize="+$("#classSize").val();
+    }	
+	function Sigeup() {
+            if (userid == '') {
+			    PB.prompt('请先绑定您的学生信息！','forever');
+                window.location.href = "{php echo $this->createMobileUrl('bangding', array('schoolid' => $schoolid), true)}";
+                return false;
+            } else {	
+				$('#user_info').show();
+			}
+	}
+	function Close(){
+	   $('#user_info').hide();
+	}
+	function gototinfo(){
+	  window.location.href = "{php echo $this->createMobileUrl('tcinfo', array('schoolid' => $schoolid, 'tid' => $teacher['id']), true)}";
+	}
+	function isCheck(obj,id){
+		var alt = $(obj).find("img").attr("alt");
+		if(alt == "check"){
+			$(obj).find("img").attr("alt","checked");
+			$(obj).find("img").attr("src",oss+"public/mobile/img/checked.png");
+			$(obj).find("input").attr("name","checked");
+			$(obj).find("span[class=le]").attr("name","checkedName");
+		}else{
+			$(obj).find("img").attr("alt","check");
+			$(obj).find("img").attr("src",oss+"public/mobile/img/check.png");
+			$(obj).find("input").attr("name","check");
+			$(obj).find("span[class=le]").attr("name","checkName");
+		}
+		if($('input[name=checked]').length===$('.selectList').find('li').length){
+			$(".checkAll").find("img").attr("alt","checked");
+			$(".checkAll").find("img").attr("src",oss+"public/mobile/img/checked.png");
+		}else{
+			$(".checkAll").find("img").attr("alt","check");
+			$(".checkAll").find("img").attr("src",oss+"public/mobile/img/check.png");
+		}
+	}
+	function isSelect(obj){
+		$(obj).parent().children().removeAttr("class");
+		$(obj).parent().find("span[class=le]").attr("name","selectName");
+		$(obj).parent().find("input[type=hidden]").attr("name","select");
+		$(obj).attr("class","selected");
+		$(obj).find("span[class=le]").attr("name","selectedName");
+		$(obj).find("input[type=hidden]").attr("name","selected");
+		saveSelected(obj);
+		closeBox();
+	}
+
+	function saveChecked(obj){
+		var checkedListValue = $("#"+obj).find("input[type=hidden][name=checked]");
+		var checkedListName = $("#"+obj).find("span[class=le][name=checkedName]");
+		var checkedids = "";
+		for (var i = 0; i < checkedListValue.length; i++) {
+			if(i == checkedListValue.length -1){
+				checkedids += checkedListValue.eq(i).val();
+			}else{
+				checkedids += checkedListValue.eq(i).val() + ",";
+			}
+		}
+		if(checkedListName.length == 0){
+			jTips("请选择一个！");
+			return;
+		}
+		$("#"+obj+"Value").val(checkedids);
+		checkSigeup(checkedids);
+	}
+
+	function saveSelected(obj){
+		var boxName = $(obj).parent().parent().attr("id");
+		var selectedName = $(obj).find("span[class=le][name=selectedName]");
+		var selectedValue = $(obj).find("input[type=hidden][name=selected]");
+		$("#"+boxName+"Show").html(selectedName.html());
+		$("#"+boxName+"Value").val(selectedValue.val());
+	}
+
+	function showSelectBox(obj){
+		if($("#"+obj).find("ul").children().length > 0){
+//		if(obj=="stuList")$(".checkAll").css("display","none");
+			$(".selectList").css("display","block");
+			$(".blackBg").css("display","block");
+			$("#"+obj).css("display","block");
+			var height = 0;
+			if($("#"+obj).attr("class") == "double"){
+				$("#"+obj).css("height",$(".selectList").height());
+				$("#"+obj).find("ul").css("height",$(".selectList").height()-100);
+				var objList;
+				if($("#"+obj+"Value").val() != ""){
+					objList = $("#"+obj+"Value").val().split(",");
+					var liList = $("#"+obj).find("li");
+					for (var j = 0; j < liList.length; j++) {
+						for (var i = 0; i < objList.length; i++) {
+							if(objList[i] == liList.eq(j).find("input[type=hidden]").val()){
+								liList.eq(j).find("input[type=hidden]").attr("name","checked");
+								liList.eq(j).find("span[class=le]").attr("name","checkedName");
+								break;
+							}else{
+								liList.eq(j).find("input[type=hidden]").attr("name","check");
+								liList.eq(j).find("span[class=le]").attr("name","checkName");
+							}
+						}
+					}
+				}else{
+					$("#"+obj).find("input[type=hidden]").attr("name","check");
+					$("#"+obj).find("span[class=le]").attr("name","checkName");
+				}
+			}else{
+				$("#"+obj).css("height",$(".selectList").height());
+				$("#"+obj).find("ul").css("height",$(".selectList").height());
+			}
+			$(".selectList").css("margin-top",-$("#"+obj).parent().height()/2);
+		}
+	}
+
+	function closeBox(){
+		$(".selectList").css("display","none");
+		$(".blackBg").css("display","none");
+		$(".single").css("display","none");
+		$(".double").css("display","none");
+		$(".double").css("height","auto");
+		$(".double").find("ul").css("height","auto");
+	}
+
+	function isCheckAll(obj){
+		var alt = $(obj).find("img").attr("alt");
+		if(alt == "check"){
+			$(".ri").find("img").attr("alt","checked");
+			$(".ri").find("img").attr("src",oss+"public/mobile/img/checked.png");
+			$("li").find("input").attr("name","checked");
+			$("li").find("span[class=le]").attr("name","checkedName");
+		}else{
+			$(".ri").find("img").attr("alt","check");
+			$(".ri").find("img").attr("src",oss+"public/mobile/img/check.png");
+			$("li").find("input").attr("name","check");
+			$("li").find("span[class=le]").attr("name","checkName");
+		}
+	}
+	function showKe(){
+		$("#courseinfo").show();
+	}
+	function selectClass(size){
+		//判断下当前人数是否够参加
+		var count = "{$currentStudentCount}";
+		if(count < size){
+			$("#classSize").val(size);
+			$("#iosDialog1").fadeIn(200);
+		}else{
+			showSelectBox('bjList');
+		}
+	}
+	function cancelShow(){
+		$("#iosDialog1").fadeOut(200);
+	}
+	function askFreind(){
+		$("#iosDialog1").fadeOut(200);
+		$("#user_info").fadeIn(200);
+	}
+	function addMore(){
+		$("#addMore").before("<li class='user_name'>"+
+		"<input type='text' placeholder='请输入您好友的手机号码' value=''>"+
+				"</li>");
+	}
+</script>	
+</body>
+</html>

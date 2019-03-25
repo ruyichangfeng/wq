@@ -1,0 +1,344 @@
+{template 'common/header'}
+<body>
+{template 'common/followed'}
+<nav class="mui-bar mui-bar-tab" id="bar">
+    <a class="mui-tab-item{if $_GPC['do']=='index'} mui-active{/if}" href="{php echo $this->createMobileUrl('index')}">
+        <span class="mui-icon mui-ext-icon mui-icon-home"></span>
+        <span class="mui-tab-label">首页</span>
+    </a>
+    <a class="mui-tab-item{if $_GPC['op']=='activity'} mui-active{/if}" href="{php echo $this->createMobileUrl('member', array('op'=>'activity'))}">
+        <span class="mui-icon mui-ext-icon mui-icon-activity"></span>
+        <span class="mui-tab-label">我的活动</span>
+    </a>
+    <a class="mui-tab-item{if $_GPC['op']=='member'} mui-active{/if}" href="{php echo $this->createMobileUrl('member', array('activityid'=>$activityid,'op'=>'home'))}">
+        <span class="mui-icon mui-ext-icon mui-icon-person"></span>
+        <span class="mui-tab-label">个人中心</span>
+    </a>
+</nav>
+
+<div class="mui-content">
+<div id="slider" class="mui-slider">   
+    <header class="mui-bar mui-bar-nav">
+      <div class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+        <div class="mui-scroll">
+            <a class="mui-control-item mui-active" href="#item1mobile" data='0'>全部</a>
+            <a class="mui-control-item" href="#item2mobile" data='1'>未开始</a>
+            <a class="mui-control-item" href="#item3mobile" data='2'>已开始</a>
+            <a class="mui-control-item" href="#item4mobile" data='3'>已结束</a>
+            <a class="mui-control-item" href="#item5mobile" data='4'>已取消</a>
+            <div id="sliderProgressBar" class="mui-slider-progress-ext"></div>
+        </div>
+      </div>
+    </header>
+    <div class="mui-slider-group">
+        <div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+            <div class="mui-scroll-wrapper-ext">
+                <div class="mui-scroll-ext">
+                    <div class="list-content">
+                    
+                    </div>
+                </div>
+             </div> 
+        </div>
+        
+        <div id="item2mobile" class="mui-slider-item mui-control-content">
+             <div class="mui-scroll-wrapper-ext">
+                <div class="mui-scroll-ext">
+                    <div class="list-content">
+                        <div class="mui-loading">
+                            <div class="mui-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+        <div id="item3mobile" class="mui-slider-item mui-control-content">
+             <div class="mui-scroll-wrapper-ext">
+                <div class="mui-scroll-ext">
+                    <div class="list-content">
+                        <div class="mui-loading">
+                            <div class="mui-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+        <div id="item4mobile" class="mui-slider-item mui-control-content">
+             <div class="mui-scroll-wrapper-ext">
+                <div class="mui-scroll-ext">
+                    <div class="list-content">
+                        <div class="mui-loading">
+                            <div class="mui-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+        <div id="item5mobile" class="mui-slider-item mui-control-content">
+             <div class="mui-scroll-wrapper-ext">
+                <div class="mui-scroll-ext">
+                    <div class="list-content">
+                        <div class="mui-loading">
+                            <div class="mui-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+        
+    </div>
+</div>
+</div>
+<div class="page" style="display:none"></div>
+<script>
+//初始化滚动区域
+$('.mui-content').css('overflow','hidden');
+$('.mui-slider-group').height($(window).height() + $(window).scrollTop());
+//nav激活
+mui.init();
+mui('.mui-bar-tab').on('tap', 'a',
+function() {
+	var $this = $(this);
+	if (this.getAttribute('href') != null) {
+		console.log(this.getAttribute('href'));
+		location.href = this.getAttribute('href');
+	} else {
+		return false;
+	}
+})
+
+//取消订单
+$(document).on('click','.cancel',function(){
+	var recordid = $(this).attr('rid');
+	var activityid = $(this).attr('aid');
+	util.confirm('确认取消报名？', ' ', function(e) {
+	if (e.index == 1) {
+		$.post("{php echo $this->createMobileUrl('member')}&op=activity&ac=cancel&",{recordid:recordid,activityid:activityid},function(d){
+			if(d.result == 1){
+				util.toast('报名取消成功');
+				setTimeout(function () {
+					location.href = "{php echo $this->createMobileUrl('member', array('op'=>'activity'))}";
+				}, 1000);
+			}else{
+				util.toast('报名取消失败');
+			}
+		},"json");
+	} else {}
+	})
+});
+
+//上拉加载活动列表
+var loadItem=function(id,status){
+    var counter = 0;
+    // 每页展示4个
+    var num = 10;
+    var pageStart = 0,pageEnd = 0,thispage = 1,thispages = 50;
+    // dropload
+    $(id).find('.mui-scroll-ext').dropload({
+        scrollArea : $(id).find('.mui-scroll-wrapper-ext'),
+        loadDownFn : function(me){
+            $.ajax({
+                type: 'GET',
+                url: "{php echo $this->createMobileUrl('member')}&page="+thispage+"&psize="+thispages+"&op=activity&ac=ajax&status="+status,
+                dataType: 'json',
+                success: function(data){
+					//alert(type);
+                    var result = '', joinstime = '', joinetime = '', starttime = '', endtime = '', stime = new Date();
+                    counter++;
+                    pageEnd = num * counter;
+                    pageStart = pageEnd - num;
+                    for(var i = pageStart; i < pageEnd; i++){
+						if (data.tpage == 0){
+								result = '<div class="no-orders-at-all">'
+								+'<div class="head-block">'
+								+'    <div class="blank-icon mui-ext-icon mui-icon-mhuodong"></div>'
+								+'    <p class="hint">当前没有任何信息</p>'
+								+'    <p class="recommend-hint"></p>'
+								+'</div></div>';
+								// 锁定
+								me.lock();
+								// 无数据
+								me.noData();
+								break;
+						}
+						joinstime = new Date(data.lists[i].joinstime.replace(/-/g, "/"));
+						joinetime = new Date(data.lists[i].joinetime.replace(/-/g, "/"));
+						starttime = new Date(data.lists[i].starttime.replace(/-/g, "/"));
+						endtime   = new Date(data.lists[i].endtime.replace(/-/g, "/"));
+						jointime  = new Date(data.lists[i].jointime.replace(/-/g, "/"));
+						//alert(joinstime);
+						sToend1 = joinetime.format('MM月dd日 hh:mm');
+						sToend2 = starttime.format('MM月dd日 hh:mm')+'~'+endtime.format('MM月dd日 hh:mm');
+						result+= '<div class="field">'
+						+'    <div class="field-head">'
+						+'        <span class="field-head-name"><i class="icon iconfont icon-shop"></i> '+data.lists[i].unit+'</span>'
+						+'        <span class="field-head-status field-head-status-light">'+(data.lists[i].status==5 ? '<font color="#666">已取消</font>':(starttime > stime ? '未开始' : (stime>endtime ? '<font color="#666">已结束</font>': '已开始')))+'</span>'
+						+'    </div>'
+						+'    <a class="field-item" href="javascript:void();">'
+						+'    <div class="avatar" style="background-image:url('+"{$_W['attachurl']}"+data.lists[i].thumb+')"></div>'
+						+'    <div class="contentt">'
+						+'        <p class="delivery_tip">'+data.lists[i].title+'</p>'
+						+'        <p class="order-time">'+starttime.format('MM月dd日 hh:mm')+'~'+endtime.format('MM月dd日 hh:mm')+'</p>'
+						+'        <p class="price" style="display:none">￥22.90</p>'
+						+'        <p class="pp_time" id="pp_'+status+'_'+thispage+'_'+i+'"></p>'
+						+'    </div>'
+						+'    <i class="field-arrow icon-arrow-right"></i></a>'
+						+'    <div class="field-console">'
+						+'        <div class="field-console-btns">'
+						+'            '+(stime>starttime || data.lists[i].status==5 ? '': '<div class="mui-btn mui-btn-outlined cancel" rid="'+data.lists[i].id+'" aid="'+data.lists[i].activityid+'">取消报名</div>')
+						+'            <div class="mui-btn mui-btn-warning" rid="'+data.lists[i].id+'" style="display:none">去支付</div>'
+						+'            <a href="'+"{php echo $this->createMobileUrl('detail')}&activityid="+data.lists[i].activityid+'" class="mui-btn mui-btn-warning">查看详情</a>'
+						+'        </div>'
+						+'    </div>'
+						+'</div>'
+						+'<script>FreshTime("#pp_'+status+'_'+thispage+'_'+i+'","'+data.lists[i].starttime+'","'+data.lists[i].endtime+'");var sh;sh=setInterval(function(){FreshTime("#pp_'+status+'_'+thispage+'_'+i+'","'+data.lists[i].starttime+'","'+data.lists[i].endtime+'")},1000);<\/script>';
+                        if((i + 1) >= data.lists.length && thispage == data.tpage){
+                            // 锁定
+                            me.lock();
+                            // 无数据
+                            me.noData();
+                            break;
+                        }else if((i + 1) >= data.lists.length) {
+							thispage++;
+							counter = 0;
+							pageEnd = 0;
+							pageStart =0;
+						}
+                    }
+					
+					$(id).find('.list-content').append(result);
+					// 每次数据加载完，必须重置
+					me.resetload();
+                    
+                },
+                error: function(xhr, type){
+                    // alert('加载失败，请刷新下重试!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });
+        }
+    });
+}
+loadItem('#item1mobile',$('.mui-control-item.mui-active').attr("data"));
+
+//滑动效果
+mui.init({swipeBack: false});
+(function(m) {
+	var htmlFont = $("html").css("font-size").replace('px',''),
+		itemWidth = new Array(),
+		itemID =  new Array(),
+		transX = 0;
+		$(".mui-control-item").each(function(key){
+			itemWidth[key]=$(this).width();//初始化每个control-item的宽度
+			itemID[key]=document.getElementById('item'+(key+1)+'mobile');//初始slider-item,ID
+		});
+		//alert($(itemID[0]).find('.mui-scroll-wrapper-ext').html());
+		$('#sliderProgressBar').css("width",itemWidth[0]);
+		document.getElementById('slider').addEventListener('slide', function(e) {
+		var sn = e.detail.slideNumber,//初始化当前被激活的item序号
+			itemX=0;
+		//初始化每次进度条滑动的距离
+		for (var i = 0; i < sn; i++  ){
+			itemX += itemWidth[i];
+		}
+		transX = itemX/htmlFont+0.76*sn;
+		if (sn >= 1) {
+			$('#sliderProgressBar').stop().animate({left:transX+'rem'},100);
+			if (itemID[sn].querySelector('.mui-loading')) {
+				setTimeout(function() {
+					$('#sliderProgressBar').stop().animate({width:itemWidth[sn]},100);
+					itemID[sn].querySelector('.list-content').innerHTML = '';
+					loadItem(itemID[sn],$('.mui-control-item.mui-active').attr("data"));
+				}, 100);
+				
+			}else{
+				setTimeout(function() {
+					$('#sliderProgressBar').stop().animate({left:transX+'rem',width:itemWidth[sn]},100);
+				}, 100);
+				}
+		} else{
+			setTimeout(function() {
+				$('#sliderProgressBar').stop().animate({left:'0rem',width:itemWidth[0]},100);
+			}, 100);
+		}
+	});
+})(mui);
+
+//获取单个活动参加的人数
+function getJoinnum(id) {
+	var num;
+	$.ajax({
+		type: 'GET',
+		url: "{php echo $this->createMobileUrl('member')}&activityid="+id+"&op=activity&ac=getjoinnum",
+		dataType: 'json',
+		async:false, 
+		success: function(data){
+			num = data.num;
+			}
+	});
+	return num;
+}
+
+//格式化日期
+Date.prototype.format = function(format) {
+    var o = {
+        "M+": this.getMonth() + 1,
+        "d+": this.getDate(),
+        "h+": this.getHours(),
+        "m+": this.getMinutes(),
+        "s+": this.getSeconds(),
+        "q+": Math.floor((this.getMonth() + 3) / 3),
+        "S": this.getMilliseconds()
+    }
+    if (/(y+)/.test(format)) {
+        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    }
+    for (var k in o) {
+        if (new RegExp("(" + k + ")").test(format)) {
+            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+        }
+    }
+    return format;
+}
+
+
+//计时
+function FreshTime(id,starttime,endtime){
+	var st = starttime.replace(/-/g,"/"),//开始时间
+	    et = endtime.replace(/-/g,"/");//结束时间
+		st = new Date(st);//开始时间
+	    et = new Date(et);//结束时间
+		console.log(st);
+	var nowtime = new Date(),//当前时间
+		start_time = parseInt(st.getTime()),
+		end_time = parseInt(et.getTime()),
+		now_time = parseInt(nowtime.getTime()),
+		lefttime = 0; 
+	if (start_time > now_time){
+		lefttime = parseInt((start_time - now_time)/1000);
+	}else if(end_time > now_time){
+		lefttime = parseInt((end_time - now_time)/1000);
+	}
+	//var bar_width =  (1-(lefttime/3600))*100+"%"; //计算进度条百分比
+	if (lefttime > 0) {
+		hh=parseInt((lefttime/3600));
+		mm=parseInt((lefttime/60)%60);
+		ss=parseInt(lefttime%60);
+		if (start_time > now_time){
+			$(id).html('剩余<span id="ti_time_hour">'+hh+'</span>:<span id="ti_time_min">'+mm+'</span>:<span id="ti_time_sec">'+ss+'</span>开始');
+		}else if(end_time > now_time){
+			$(id).html('剩余<span id="ti_time_hour">'+hh+'</span>:<span id="ti_time_min">'+mm+'</span>:<span id="ti_time_sec">'+ss+'</span>结束');
+		}
+		//$('#progressbar').css("width",bar_width);
+	}else{
+		$(id).html('<font color="#FF0000">活动结束</font>');
+	}
+}
+</script>
+</body>
+</html>

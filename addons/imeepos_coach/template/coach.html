@@ -1,0 +1,58 @@
+{template 'common/header'}
+{template 'navs/coach'}
+<style>
+    .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {overflow: visible !important;}
+    .dropdown-menu{min-width:4em;}
+    .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {white-space: normal !important;overflow: visible !important;}
+    .dropdown{display:inline-block !important;}
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        预约管理
+    </div>
+    <div class="panel-body">
+        <table st-table="items" class="table table-striped table-condensed" style="display:auto;">
+            <thead>
+            <tr>
+                <th style="width:6em;">头像</th>
+                <th style="width:12em;">预约课程</th>
+                <th style="width:12em;">预约时间</th>
+                <th style="width:8em;">昵称</th>
+                <th style="width:8em;">手机号码</th>
+                <th style="width:5em;">状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list['list'] $li}
+            <tr>
+
+                {php $member = M('member')->getInfo($li['openid']);}
+                <td><img src="{php echo tomedia($member['avatar'])}" style="width:4em;height:4em;" alt=""/></td>
+                <td>
+                    {php $manage=M('manage')->getInfo($li['manage_id'])}
+                    <label class="label label-info">{$manage['title']}</label>
+                    {php $week=M('manage_week')->getInfo($manage['week_id'])}
+                    <label class="label label-info">{$week['title']}</label>
+                    {php $time=M('manage_time')->getInfo($manage['time_id'])}
+                    <label class="label label-info">{php echo date('H:i',$time['start_time'])}-{php echo date('H:i',$time['end_time'])}</label>
+                </td>
+                <td>
+                    <label class="label label-info">{php echo date('Y-m-d H:i',$li['create_time'])}</label>
+                </td>
+                <td>{$li['realname']}</td>
+                <td>{$li['mobile']}</td>
+                <td>
+                    <label class="label label-danger">{if $li['status']==1}已签到{else if $li['status']==2}迟到{else if $li['status'] == 3}旷课{else}未签到{/if}</label>
+                </td>
+                <td>
+                    <a href="{php echo $this->createWebUrl('coach',array('act'=>'delete','id'=>$li['id']))}" class="btn btn-danger">删除</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {php echo $list['pager']}
+    </div>
+</div>
+{template 'common/footer'}

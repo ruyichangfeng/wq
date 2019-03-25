@@ -1,0 +1,189 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+    .form-control { width:60%}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'index'))}">客户管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'followup'))}">跟进管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('user', array('page' => 'student'))}">学员管理</a>
+        </li>
+        <li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="qw_microedu" />
+                <input type="hidden" name="do" value="user" />
+                <input type="hidden" name="page" value="index" />
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 control-label">手机号码</label>
+                    <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+                        <input type="text" name="mobile" value="{$mobile}" class="form-control">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 control-label">家长姓名</label>
+                    <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+                        <input type="text" name="xm" value="{$xm}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 ">
+                    <button type="submit" class="btn btn-primary  col-lg-offset-6" name="submit" value="提交">查询</button>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            客户列表
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:20%;">家长姓名</th>
+                    <th class="text-center" style="width:15%;">手机号</th>
+                    <th class="text-center" style="width:10%;">子女数量</th>
+                    <th class="text-center" style="width:10%;">合同数量</th>
+                    <th class="text-center" style="width:15%;">顾问姓名</th>
+                    <th class="text-center" style="width:25%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $parentlist $key $item}
+                <tr style="cursor: pointer">
+                        <td class="text-center">{$item['id']}</td>
+                        <td class="text-center">{$item['fullname']}</td>
+                        <td class="text-center">{$item['mobile']}</td>
+                        <td class="text-center">2</td>
+                        <td class="text-center">2</td>
+                        <td class="text-center">{$item['con_fullname']}</td>
+                    <td class="text-center">
+                        <a href="" class="btn btn-primary btn-sm chakanxq" title="查看详细"><i class="fa fa-plus"></i>查看详细</a></a>
+                        <a href="{php echo $this->createWebUrl('user', array('page' => 'add','pid'=>$item['id']))}" class="btn btn-primary btn-sm" title="添加子女"><i class="fa fa-plus"></i> 添加子女</a></a>
+                        <a href="{php echo $this->createWebUrl('user', array('page' => 'create','idd'=>$item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;
+                        <a href="{php echo $this->createWebUrl('user', array('page' => 'del','op'=>'parent','pid'=>$item['id']))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="text-right">
+                <a href="{php echo $this->createWebUrl('user', array('page' => 'create'))}" class="btn btn-md btn-default"><i class="fa fa-plus"></i> 增加家长</a>
+            </div>
+            {$pager}
+        </div>
+    </div>
+</div>
+<div class="modal fade parent_detail" tabindex="-1" role="dialog" aria-labelledby="parent_detail" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+                <!--<h4 class="modal-title" id="myModalLabel">客户详情</h4>-->
+            <!--</div>-->
+            <!--<div class="modal-body">-->
+                <!--<p>家长姓名：王大笨</p>-->
+                <!--<p>手机号：18615254000</p>-->
+                <!--<p>性别：男</p>-->
+                <!--<p>家庭地址：山东省济南市高新区舜泰广场</p>-->
+                <!--<p>顾问姓名：王小花</p>-->
+                <!--<p>手机号：18615254000</p>-->
+                <!--<p>合同数量：2</p>-->
+                <!--<p>剩余课时：22</p>-->
+                <!--<div class="panel panel-default">-->
+                    <!--<div class="panel-heading">-->
+                        <!--子女详情-->
+                    <!--</div>-->
+                    <!--<div class="panel-body">-->
+                        <!--<table class="table table-hover">-->
+                            <!--<thead class="navbar-inner">-->
+                            <!--<tr>-->
+                                <!--<th class="text-center" style="width:10%;">序号</th>-->
+                                <!--<th class="text-center" style="width:25%;">姓名</th>-->
+                                <!--<th class="text-center" style="width:20%;">性别</th>-->
+                                <!--<th class="text-center" style="width:25%;">年龄</th>-->
+                                <!--<th class="text-center" style="width:20%;">是否试听</th>-->
+                            <!--</tr>-->
+                            <!--</thead>-->
+                            <!--<tbody>-->
+                            <!--<tr>-->
+                                    <!--<td class="text-center">1</td>-->
+                                    <!--<td class="text-center">王小锤</td>-->
+                                    <!--<td class="text-center">男</td>-->
+                                    <!--<td class="text-center">5</td>-->
+                                    <!--<td class="text-center">是</td>-->
+                            <!--</tr>-->
+                            <!--</tbody>-->
+                        <!--</table>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+{template 'common/footer'}
+<script>
+    require(['bootstrap']);
+    $("document").ready(function(){
+        $(".chakanxq").each(function(){
+            var ttt = $(this);
+           $(this).click(function(){
+               var id = ttt.parent().parent().find("td").eq(0).text();
+               var Url = "{php echo $this->createWeburl('user')}";
+               var vdata = {caozuo:"parentxq",id:id};
+               $.post(Url,vdata,function(data){
+                   if(data.error==1){
+                       $(".modal-content").empty();
+                       var parent_xq = data.parent_xq;
+                       var stulist = data.stulist;
+                       if(parent_xq.gender==1){
+                           var sex = "男";
+                       }else{
+                           var sex = "女";
+                       }
+                       var stustr = '';
+                       var stusex = '';
+                       $.each(stulist,function (key,vo) {
+                           if(vo.gender==1){
+                               stusex='男';
+                           }else{
+                               stusex='女';
+                           }
+                          stustr+= '<tr><td class="text-center">'+vo.id+'</td><td class="text-center">'+vo.fullname+'</td><td class="text-center">'+stusex+'</td><td class="text-center">'+vo.age+'</td><td class="text-center">是</td></tr>';
+                       });
+                        var vhtml = '<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button><h4 class="modal-title" id="myModalLabel">客户详情</h4></div>' +
+                                '<div class="modal-body"><p>家长姓名：'+parent_xq.fullname+'</p><p>手机号：'+parent_xq.mobile+'</p><p>性别：'+sex+'</p><p>家庭地址:'+parent_xq.address+'</p><p>顾问姓名：'+parent_xq.con_fullname+'</p><p>手机号：'+parent_xq.con_mobile+'</p><p>合同数量：2</p><p>剩余课时：22</p>' +
+                                '<div class="panel panel-default"><div class="panel-heading">子女详情</div><div class="panel-body">' +
+                                '<table class="table table-hover"><thead class="navbar-inner"><tr>' +
+                                '<th class="text-center" style="width:10%;">序号</th><th class="text-center" style="width:25%;">姓名</th><th class="text-center" style="width:20%;">性别</th><th class="text-center" style="width:25%;">年龄</th><th class="text-center" style="width:20%;">是否试听</th></tr></thead><tbody>' +
+                                stustr +
+                                '</tbody></table></div></div></div>' +
+                                '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>';
+                       $(".modal-content").append(vhtml);
+                       $('.parent_detail').modal('show');
+                       return false;
+                   }else{
+                       alert(data.message);
+                   }
+               },'json');
+               return false;
+           })
+        })
+    })
+</script>

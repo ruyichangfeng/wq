@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+    <style type="text/css">
+        .list{background-color: #fff;margin-bottom: 10px;}
+        .list .userinfo{height:78px;border-bottom: 1px solid #f8f8f8;padding: 10px;overflow: hidden;}
+        .list .userinfo .info{width: 80%;float: left;}
+        .list .userinfo .info p{color: #333;line-height: 26px;}
+        .list .userinfo .info .p1{font-size: 13px;}
+        .list .userinfo .info .p2{color: #888;font-size: 12px;}
+        .list .userinfo .info .p3 span{font-size: 12px;background-color: #F67916;color: #fff;padding:3px;border-radius: 3px;margin-right: 5px;}
+        .list .userinfo .review{width: 20%;float: right;text-align: center;line-height: 78px;}
+        .list .userinfo .review span{background-color: #f66216;color: #fff;padding: 5px 8px;border-radius: 3px;}
+        .list .userinfo p{font-size: 14px;color: #333;line-height: 26px;height: 26px;overflow: hidden;}
+        
+        .empty{margin-top: 100px;text-align: center;}
+        .empty i:before{color: #dedede;font-size: 5em;}
+        .empty p{text-align: center;color: #999;line-height: 30px;font-size: 14px;}
+
+        .pager{margin-bottom: 10px;}
+        .pager .pager-left{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-right{background-color: #F8F8F8;height: 36px;}
+        .pager .pager-left .pager-pre{width: 60%;background-color: #fff;border-radius: 3px;}
+        .pager .pager-right .pager-next{width: 60%;background-color: #fff;border-radius: 3px;border:none;}
+
+        .reviewinfo{display:none;position: fixed;top: 0;z-index: 501;width: 100%;height: 100%;background-color: rgba(0,0,0,.3);}
+        .reviewinfo .con{background-color: #fff;width: 70%;margin: 0 auto;margin-top:10%;padding:15px;border-radius: 3px;text-align: center;overflow: overlay;max-height: 80%;}
+        .reviewinfo .con p{color: #888;font-size: 14px;}
+        .reviewinfo .con .lookimage{display: none;float: right;font-size: 12px;color: #f66216;}
+        .reviewinfo .prove{height: 70px;overflow: overlay;margin:0;width: 100%;padding:0;}
+        .reviewinfo .prove p{text-align: left;color: #333;font-size:12px;}
+        .reviewinfo .field{font-size: 13px;color: #666;margin:10px 0;text-align: left;}
+        .reviewinfo .field span{display: block;}
+        .reviewinfo .con textarea{width:96%;height:60px;padding:5px 2%;border-radius: 3px;margin:5px 0;     border-color: #f0f0f0;resize: none;}
+        .reviewinfo .con .points{display:block;border:1px solid #f0f0f0;border-radius: 3px;}
+        .reviewinfo .con input{display: block;width: 94%;padding: 3%;border:0;}
+        .reviewinfo .con a{display: block;padding: 5px 10px;background: #18b4ed;border-radius: 3px;color: #fff;margin-top: 10px;width: 38%;float: left;}
+
+        .weui_msg_com{height: 100%;}
+        .weui_msg_com .weui_msg_src{overflow: overlay;max-height: 80%;}
+        .weui_msg_com .weui_msg_src img{margin-bottom: 5px;}
+    </style>
+    
+</head>
+<body ontouchstart  class="page-bg">
+    <div class="searchbar_wrap"></div> 
+    <div class="list">
+        {loop $tasklist $i $v}
+        <div class="userinfo">
+            <div class="info">
+                <p class="p1">{$v['task_title']}</p>
+                <p class="p2">{$v['username']}-{$v['mobile']} {php echo date("m-d h:i",$v['receive_time']);}领取</p>
+                <p class="p3"><span>{$v['navtitle']}</span><span>{if $v['task_points'] > 0}+{$v['task_points']}{/if}</span></p>
+            </div>
+            <div class="review"><span onclick="review({$i})">审核</span></div>
+        </div>
+        {/loop}
+    </div>
+    {if empty($tasklist)}
+    <div class="empty">
+        <i class="weui_icon_msg weui_icon_info"></i>
+        <p>没有数据，先浏览其他项目吧</p>
+    </div>
+    {/if}
+    <div class="page-bd-15">
+        <div class='pager'>
+            <div class="pager-left">
+                {if $prevPage}<div class="pager-pre"><a class="pager-nav" href="{$prevPage}">上一页</a></div>{/if}
+            </div>
+            {if $allpage}<div class="pager-cen">{$page}/{$allpage}</div>{/if}
+            <div class="pager-right">
+                {if $nextPage}<div class="pager-next"><a class="pager-nav" href="{$nextPage}">下一页</a></div>{/if}
+            </div>
+        </div> 
+    </div>
+    <div class="reviewinfo">
+        <div class="con">
+            <p>用户说明<span class="lookimage">查看图片</span></p>
+            <div class="prove"><p></p></div>
+            <p>表单资料</p>
+            <div class="field"></div>
+            <p>审核评语</p>
+            <textarea id="content" placeholder="请输入评语"></textarea>
+            <p>增减{$setting['points_name']}</p>
+            <span class="points"><input type="text" id="points" placeholder="正数增加积分,负数减少积分"></span>
+            <a class="err" style="background-color:#ED1818;">不通过</a>
+            <a class="succ" style="float: right;">通过</a>
+        </div>
+    </div>
+    <div class="weui_msg_img hide" id='msg'>
+        <div class="weui_msg_com">
+        <div onclick="$('#msg').fadeOut();" class="weui_msg_close"><i class="icon icon-95"></i></div>
+        <div class="weui_msg_src"><img src=""></div>
+        </div>
+    </div>
+    {template 'style1/footer'}
+    <script type="text/javascript">
+        $('.searchbar_wrap').searchBar({
+            cancelText:"取消",
+            searchText:"{if $_GPC['key']}{$_GPC['key']}{else}关键字{/if}",
+            onsubmit:function(value){
+                window.location.href="{php echo $this->createMobileUrl('me', array('op'=>'reviewtask'), true)}&key="+value;
+            }
+        });
+        var taskjson = {$taskjson};
+        function review(i){
+            $("#content").val("");
+            $("#points").val("");
+            if(taskjson[i].prove){
+                $(".prove p").html(taskjson[i].prove);
+            }else{
+                $(".prove p").html("用户没有填写说明");
+            }
+            
+            if(taskjson[i].field){
+                var field = '';
+                $.each(taskjson[i].field,function(i,e){
+                    field +='<span>'+e.name+'：'+e.value+'</span>';
+                });
+                $(".field").html(field);
+            }else{
+                $(".field").html("无");
+            }
+            
+            if(taskjson[i].image){
+                $(".lookimage").show();
+                $(".lookimage").attr("imageid",i);
+            }
+            $(".err").unbind("click");
+            $(".succ").unbind("click");
+            $(".err").one("click",function(){
+                getreviewtask(taskjson[i].id,0);
+            });
+            $(".succ").one("click",function(){
+                getreviewtask(taskjson[i].id,1);
+            });
+            $(".reviewinfo").show();
+        }
+        $(".reviewinfo").click(function(){
+            $(".reviewinfo").hide();
+            $(".lookimage").hide();
+        });
+        $(".con").click(function(e){
+            e.stopPropagation();
+        });
+        $(".lookimage").click(function(e){
+            var i = $(this).attr("imageid");
+            var img;
+            $.each(taskjson[i].image,function(i,e){
+                img += '<img src="{$_W['attachurl']}'+e+'">';
+            });
+            $(".weui_msg_src").html(img);
+            $('#msg').fadeIn();
+        });
+        function getreviewtask(id,type){
+            $(".reviewinfo").hide();
+            $(".lookimage").hide();
+            $.showLoading();
+            var data = {};
+            data.evaluate = $("#content").val();
+            data.points = $("#points").val();
+            console.log(data);
+            $.ajax({
+                url:"{php echo $this->createMobileUrl('me', array('op'=>'getreviewtask'), true)}&type="+type+"&id="+id,
+                type:"post",
+                data:data,
+                dataType: 'json',
+                success:function(data){
+                    $.hideLoading();
+                    if(data.status){
+                        $.toast("操作成功");
+                        setTimeout(function(){
+                            location.reload();
+                        },2000);
+                    }else{
+                        $.toast(data.info,"forbidden");
+                    }
+                },
+                error:function(){
+                    $.hideLoading();
+                    $.toast("网络错误","forbidden");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+  {template 'public/header'}
+  <script type="text/javascript" src="{ZSK_STATIC}js/jquery.qrcode.min.js"></script>
+ <style type="text/css">
+ 	.mmmtab td{
+ 		padding: 10px 10px;
+ 	}
+ 	.maill{text-align: right !important;width: 30%;vertical-align: middle !important;}
+ 	.mailr{text-align: left !important;width: 70%;vertical-align: middle !important;}
+ </style>
+ <div class="panel panel-info">
+	<div class="panel-heading">接收账号信息</div>
+	<div class="panel-body">
+		<form action="<?php echo $this->routeUrl('shop.saveNotice');?>&active=email" id="noticeForm"  method="post">
+		<table class="layui-table" style="width: 80%;">
+			<tr>
+				 <th>通知方式</th>
+				 <th>账号/OpenID/手机</th>
+				 <th>昵称</th>
+				 <th>备注</th>
+				 <th>操作</th>
+			</tr> 
+			<?php 
+			$hasMail=false;?>
+			{loop $pushers $index $user}
+			<tr>
+				<td>
+					<?php if(intval($user['type'])==1){
+						$hasMail=true;
+						echo "邮箱";
+					}else if(intval($user['type'])==2){
+						echo "公众号推送";
+					}else if(intval($user['type'])==3){
+						echo "短信";
+					}?>
+				</td>
+				<td>
+					<?php if(intval($user['type'])==1){
+						echo $user['email'];
+					}else if(intval($user['type'])==2){
+						echo $user['openid'];
+					}else if(intval($user['type'])==3){
+						echo $user['mobile'];
+					}?>
+				</td>
+				<td>
+					{$user['nickname']}
+				</td>
+				<td>
+					{$user['remark']}
+				</td>
+				<td>
+					<a href="javascript:void(0);" onclick="editRemark({$user['id']},'{$user['remark']}')" class="linkbtn">备注</a>
+					<a href="javascript:void(0);" onclick="pushTest({$user['id']})" class="linkbtn">推送测试</a>
+					<a href="javascript:void(0);" onclick="delPusher({$user['id']})" class="linkbtn linkbtn-red">删除</a>
+				</td>
+			</tr>
+			{/loop}
+		</table>
+		
+		</form>
+		 
+	</div>
+</div>
+<div class="panel panel-info">
+	<div class="panel-heading">邮件提醒</div>
+	<div class="panel-body">
+		<form action="<?php echo $this->routeUrl('shop.saveNotice');?>&active=email" id="noticeForm"  method="post">
+		<table>
+			<tr>
+				 
+				<td style="vertical-align: top; ">
+					<table class="mmmtab">
+						 
+						
+						<tr>
+							<td>收件人</td>
+							<td>
+								<?php 
+						if(!$hasMail){ ?>
+						<input type="text" name='mailpusher' style="width: 300px;" value=""  class="form-control" form="noticeForm"  placeholder="收件人邮箱" >
+						<?php } ?><br/>
+								<span href="javascript:void(0);" style="margin-left: 10px;">为保证推送效率，接收邮箱暂只允许设置一个</span>
+ 		
+							</td>
+							<td>
+								<input type="submit" class="mybtn" value="保存" form="noticeForm">
+							</td>
+						</tr>
+						
+					</table>
+				</td>
+			</tr> 
+			
+		</table>
+		
+		</form>
+		 
+	</div>
+</div>
+<div class="panel panel-info">
+	<div class="panel-heading">公众号提醒</div>
+	<div class="panel-body">
+		<form action="<?php echo $this->routeUrl('shop.saveNotice');?>&active=email" id="noticeForm"  method="post">
+		 
+		<table style="width: 80%;">
+			<tr>
+				 
+				<td style="vertical-align: top; ">
+					<table class="mmmtab" style="width: 100%;">
+						 
+						<tr id="noauth" style="display: <?php if(intval($shop['wx_auth_uniacid'])){echo "none";}?>">
+							<td  colspan="2">
+								<table class="mmmtab">
+									<?php if($shop['parentid']=="0"){ ?>
+									<tr>
+										<td  style=" width:90px;">公众号appid</td>
+										<td><input type="text" name='wx_appid' style="width: 300px;" value="<?php echo ($shop['wx_appid']);?>" form="noticeForm" class="form-control"  placeholder="用于订单提醒" ></td>
+									</tr>
+									<tr>
+										<td>公众号secret</td>
+										<td  style=" width:90px;"><input type="text" name='wx_secret' style="width: 300px;" value="<?php echo ($shop['wx_secret']);?>"  class="form-control" form="noticeForm" placeholder="用于订单提醒" ></td>
+									</tr>
+								<?php  } ?>
+									<tr>
+										<td style="vertical-align: top;">扫码绑定</td>
+										<td  style=" width:250px;"> <?php
+				 	 $url0=$_W['siteroot'].'app/index.php?i='.$_W['uniacid'].'&c=entry&do=bindNotice&m=zsk_market&shopid='.getShopID(); 
+				   	?> 
+				   <div id="qrcode" style="width: 150px;height: 150px;"></div>
+		        	 </td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr id="auth"  style="display: <?php if(intval($shop['wx_auth_uniacid'])<1){echo "none";}?>">
+							<td  colspan="2">
+								<table style="width: 100%;">
+									<tr>
+									<td style=" width:90px;">搜索粉丝</td>
+									<td>
+										<div class="input-group">
+									      <input type="text" name="nickname" id="nickname" placeholder="昵称" value="{$params['name']}" class="form-control" style="display: inline-block;" form="###dwwqe" />
+									      <span class="input-group-btn">
+									        <button class="btn btn-default" type="button"  onclick="getfans()">搜索</button> 
+									      </span>
+									    </div>   
+									</td>
+								</tr>
+								<tr>
+									<td style=" width:90px;vertical-align: top;">搜索结果<br/><span style="color:#999;font-size: 12px;">最多显示五条</span></td>
+									<td> 
+		 								<table class="table" id="fanstab">
+		 									
+		 									 
+		 								</table>
+									</td>
+								</tr>
+
+								</table>
+							</td>
+						</tr>
+						
+					</table>
+				</td>
+			</tr> 
+			
+		</table>
+		
+		</form>
+		 
+	</div>
+</div>
+ 
+<div style="display: none;" id="mail-dlg">
+	
+	<table class="table table-bordered">
+		<tr>
+			<td class="maill">收件人</td>
+			<td class="mailr">
+				<input type="email" name="email" placeholder="例如：admin@qq.com" class="form-control" style="width: 100%;" />
+				<input type="hidden" name="type" value="1">
+			</td>
+		</tr>
+		<tr>
+			<td class="maill">备注</td>
+			<td class="mailr">
+				<input type="text" name="remark" placeholder="发给谁的" class="form-control" style="width:100%;"/>
+			</td>
+		</tr>
+	</table> 
+</div> 
+<script type="text/javascript">
+	function subNo(){ 
+		modalDlg("是否继续？",function(){
+			$("#noticeForm").submit();
+		});   	 
+	 
+	}
+	jQuery(function(){
+		$("#qrcode").qrcode({
+			render: "canvas", 
+			width: 150, //宽度
+			height:150, //高度
+			text: "{$url0}" //任意内容
+		}); 
+	})
+	function getfans(){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('shop.getfansbynick');?>",
+			data:{nickname:$("#nickname").val(),uniacid:$("#fansuniacid").val()},
+			dataType:"json",
+			type:"post",
+			success:function(d){
+				var html="<tr><th>头像</th><th>昵称</th><th>地区</th><th>操作</th></tr>";
+				$.each(d,function (i,v){
+					html+="<tr><td><img class='avatar' src='"+v.avatar+"'/></td><td>"+v.nickname+"</th><td>"+v.address+"</td><td><a class='linkbtn' href='#' onclick='addFansPusher(\""+v.openid+"\",\""+v.nickname+"\")'>设置推送</a> </td></tr>";
+				}); 
+				$("#fanstab").html(html);
+			}
+		})
+	}
+	function addRec(){
+		var html='<form  action="<?php echo $this->routeUrl('shop.addpusher');?>&active=email" method="post" id="pusheremail">';
+		html+=$("#mail-dlg").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#pusheremail").submit();
+		});   
+	}
+	function mailTest(){
+		modalDlg("是否发送测试信息？",function(){
+			window.location.href='<?php  echo $this->routeUrl("shop.mailtest");?>';
+			//$("#mailtestForm").submit();
+		});
+		 
+	}
+	function editRemark(id,remark){
+		layer.prompt({title: '请填写备注', formType: 2,value: remark}, function(text, index){
+			if(text){
+				$.ajax({
+					url:"<?php echo $this->routeUrl('shop.editRemark');?>",
+					data:{id:id,remark:text},
+					dataType:"json",
+					type:"post",
+					success:function(d){
+						layer.close(index);
+						if(d.code){
+							layer.msg(d.msg);
+							setTimeout(function(){
+								window.location.reload();
+							}, 2000);
+						}else{
+							layer.msg(d.msg);
+						}
+					}
+				})
+			}else{
+				layer.alert('请填写备注');
+				return false;
+			}
+
+		});
+
+
+	}
+	function pushTest(uid){
+		modalDlg("是否发送测试信息？",function(){
+			window.location.href='<?php  echo $this->routeUrl("shop.pushTest");?>&uid='+uid;
+			//$("#mailtestForm").submit();
+		});
+	}
+	function delPusher(aid){
+		modalDlg("是否删除？",function(){
+			window.location.href='<?php  echo $this->routeUrl("shop.delPusher");?>&id='+aid;
+			 
+		});
+	}
+	function addFansPusher(openid,nickname){
+		modalDlg("是否让 "+nickname+" 接收推送消息？",function(){
+			window.location.href="<?php echo $this->routeUrl('shop.addWxPusher');?>&nickname="+nickname+"&openid="+openid;
+		})
+	}
+	function chgAuth(op){
+		var sts=$(op).val();
+		if(sts=='0'){
+			$("#noauth").css("display","table-row");
+			$("#auth").css("display","none"); 
+		}else{
+			$("#noauth").css("display","none");
+			$("#auth").css("display","table-row"); 
+		}
+	}
+</script> 
+ {template 'public/footer'}

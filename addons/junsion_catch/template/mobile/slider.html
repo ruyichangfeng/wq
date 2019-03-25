@@ -1,0 +1,147 @@
+<style>
+
+/*J-album样式*/
+#J-album {
+	margin: 0 auto;
+	/*background-color: #FFFFFF;*/
+	width: 100%;
+	overflow: hidden;
+}
+
+#J-album-wp {
+	width: 100%;
+	margin: 0 auto;
+	height: auto;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.scroller {
+	height: auto;
+	overflow: hidden;
+}
+
+.scroller ul {
+	display: block;
+	overflow: hidden;
+	height: auto;
+	margin: auto;
+	padding: 0;
+	text-align: center;
+}
+
+.scroller li {
+	width: auto;
+	height: auto;
+	display: block;
+	float: left;
+	text-align: center;
+}
+
+#J-album-nav {
+	float: right;
+	right: 3%;
+	margin-top: -20px;
+	padding: 0;
+	position: relative;
+	width: auto;
+	z-index: 300;
+}
+
+#indicator>li {
+	display: block;
+	float: left;
+	list-style: none;
+}
+
+#indicator {
+	display: block;
+	margin: 0 8px;
+	padding: 0;
+	width: auto;
+}
+
+#indicator>li {
+	text-indent: -9999em;
+	width: 8px;
+	height: 8px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	background: #888;
+	overflow: hidden;
+	margin-right: 4px;
+}
+
+#indicator>li.active {
+	background: #DDDDDD;
+}
+
+#indicator>li:last-child {
+	margin: 0;
+}
+</style>
+<div id="J-album">
+	<div id="J-album-wp">
+		<!-- 轮播s -->
+		<div class="scroller" id="scroller">
+			<ul id="thelist">
+				{loop $slide $item}
+				<li>
+					<a href="{if empty($item['link'])}#{else}{$item['link']}{/if}"> 
+						<img src="{php echo toimage($item['picurl'])}" />
+					</a>
+				</li> 
+				{/loop}
+			</ul>
+		</div>
+	</div>
+	<div id="J-album-nav">
+		<ul id="indicator">
+		{php $flag = false;} 
+		{loop $slide $item} 
+			{if !$flag}
+			<li class="active">1</li>
+			{php $flag = true;} 
+			{else}
+			<li>1</li>
+			{/if} 
+		{/loop}
+		</ul>
+	</div>
+	<div class="clr"></div>
+</div>
+<script type="text/javascript" src="{$MOBILE}js/iscroll.js"></script>
+<script type="text/javascript">
+		var myScroll;
+		function loaded() {
+			myScroll = new iScroll('J-album-wp', {
+				snap : true,
+				momentum : false,
+				hScrollbar : false,
+				onScrollEnd : function() {
+					document.querySelector('#indicator > li.active').className = '';
+					document.querySelector('#indicator > li:nth-child(' + (this.currPageX + 1) + ')').className = 'active';
+				}
+			});
+		}
+
+		document.addEventListener('DOMContentLoaded', loaded, false);
+		var count = document.getElementById("thelist").getElementsByTagName("img").length;
+		for ( i = 0; i < count; i++) {
+			document.getElementById("thelist").getElementsByTagName("img").item(i).style.cssText = " width:" + document.body.clientWidth + "px";
+
+		}
+
+		document.getElementById("scroller").style.cssText = " width:" + document.body.clientWidth * count + "px";
+		setInterval(function() {
+			myScroll.scrollToPage('next', 0, 400, count);
+		}, 3500);
+
+		window.onresize = function() {
+			for ( i = 0; i < count; i++) {
+				document.getElementById("thelist").getElementsByTagName("img").item(i).style.cssText = " width:" + document.body.clientWidth + "px";
+			}
+			document.getElementById("scroller").style.cssText = " width:" + document.body.clientWidth * count + "px";
+		}
+</script>

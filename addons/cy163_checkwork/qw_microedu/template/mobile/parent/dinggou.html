@@ -1,0 +1,145 @@
+{template 'header'}
+<div id="dinggou">
+    <nav class="mui-bar mui-bar-footer choose-buy-bottom">
+        <div class="mui-pull-left">
+            已选择<span id="xuan">0</span>项  共<span id="money">0</span>元
+        </div>
+        <div class="mui-pull-right bottom-btn">
+            <a href="javascript:sub();" class="choose-buy-bottom-btn">确定</a>
+        </div>
+    </nav>
+    <script type="text/javascript">
+        function sub()
+        {
+            var ids = $('#id').val();
+            if(ids != '')
+            {
+                $('#form').submit();
+            }
+            else
+            {
+                mui.alert('请选择要购买的合同');
+            }
+        }
+
+        function dian(obj)
+        {
+            var qian_id = 'qian_'+$(obj).val();
+            var qian = $("#"+qian_id+"").val();
+
+            var chkIds = "";
+            $("input:checkbox:checked").each(function(i){
+                chkIds += $(this).val() + ",";
+            });
+
+            $('#ids').val(chkIds);
+
+            if($(obj).is(':checked'))
+            {
+                //加
+                var x = $('#xuan').text();
+                var m = $('#money').text();
+                var xuan = x*1 + 1*1;
+                var money = m*1 + qian*1;
+                $('#xuan').text(xuan);
+                $('#money').text(money);
+            }
+            else
+            {
+                //减
+                var x = $('#xuan').text();
+                var m = $('#money').text();
+                var xuan = x*1 - 1*1;
+                var money = m*1 - qian*1;
+                $('#xuan').text(xuan);
+                $('#money').text(money);
+            }
+        }
+    </script>
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">订购合同</h1>
+    </div>
+    <div class="mui-content">
+        <div id="slider" class="mui-slider dinggou-content">
+
+            <div class="mui-slider-group">
+                <div id="item1" class="mui-slider-item mui-control-content mui-active">
+                    <div id="scroll1" class="mui-scroll-wrapper">
+                        <div class="mui-scroll">
+                            <div class="choose-buy">
+                                <form class="mui-input-group" id="form" method="post" action="<?php echo $this->createMobileUrl('pay') ?>">
+                                    <input type="hidden" name="ids" id="ids">
+                                    {if $contracts}
+                                        {loop $contracts $i $c}
+                                            <div class="mui-input-row mui-checkbox">
+                                                <h4 class="zuopin-title">{$c['contract_name']}</h4>
+                                                <div class="gray buy-list">
+                                                    {loop $c['type'] $index $c_two}
+                                                        <img src="{MODULE_URL}assets/img/icon-time.png" /> {$c_two['classhour_name']} : {$c_two['amount']}
+                                                        <br />
+                                                    {/loop}
+                                                </div>
+                                                <h3 class="red mui-pull-right ke-price">￥{$c['contract_price']}</h3>
+                                                <div class="mui-table-view-cell jiazhang-collapse mui-collapse">
+                                                    <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a>
+                                                    <div class="mui-collapse-content gray">
+                                                        {$c['contract_description']}
+                                                    </div>
+                                                </div>
+                                                <input value="{$c['id']}" type="checkbox" onclick="dian(this)">
+                                                <input value="{$c['contract_price']}" type="hidden" id="qian_{$c['id']}">
+                                            </div>
+                                        {/loop}
+                                    {else}
+                                        <div class="mui-input-row mui-checkbox">
+                                            <h4 class="zuopin-title" style="text-align:center;">暂无合同</h4>
+                                        </div>
+                                    {/if}
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function($) {
+        $('.mui-scroll-wrapper').scroll({
+            indicators: true //是否显示滚动条
+        });
+        var html2 = '<div class="choose-buy"> <form class="mui-input-group"> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" disabled="disabled"> </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" disabled="disabled"> </div> </form> </div>';
+        var html3 = '<div class="choose-buy"> <form class="mui-input-group"><div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">10月机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" > </div> <div class="mui-input-row mui-checkbox"> <h4 class="zuopin-title">机器人手工制作课</h4> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 课时：40小时 <img src="{MODULE_URL}assets/img/icon-time.png" /> VIP课时：20小时 </div> <div class="gray buy-list"> <img src="{MODULE_URL}assets/img/icon-time.png" /> 活动课时：18小时 </div> <h3 class="red mui-pull-right ke-price">￥200</h3> <div class="mui-table-view-cell jiazhang-collapse mui-collapse"> <a href="#" class=""><span class="mui-icon mui-icon-arrowdown"></span></a> <div class="mui-collapse-content gray"> <p>啥啥啥啥啥 10课时</p> <p>它它它它它 20课时</p> <p>牛牛牛 20课时</p> </div> </div> <input name="checkbox1" value="Item 3" type="checkbox" disabled="disabled"> </div> </form> </div>';
+        var item2 = document.getElementById('item2');
+        var item3 = document.getElementById('item3');
+        document.getElementById('slider').addEventListener('slide', function(e) {
+            if (e.detail.slideNumber === 1) {
+                if (item2.querySelector('.mui-loading')) {
+                    setTimeout(function() {
+                        item2.querySelector('.mui-scroll').innerHTML = html2;
+                    }, 500);
+                }
+            } else if (e.detail.slideNumber === 2) {
+                if (item3.querySelector('.mui-loading')) {
+                    setTimeout(function() {
+                        item3.querySelector('.mui-scroll').innerHTML = html3;
+                    }, 500);
+                }
+            }
+        });
+        var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+        $('.mui-input-group').on('change', 'input', function() {
+            if (this.checked) {
+                sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+                //force repaint
+                sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+            }
+        });
+    })(mui);
+</script>
+{template 'footer'}

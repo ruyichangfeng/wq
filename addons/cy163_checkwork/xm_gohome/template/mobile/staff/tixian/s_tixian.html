@@ -1,0 +1,167 @@
+{template 'staff/header'}
+
+</head>
+<body>
+<div id="page0" class="ub ub-ver bga">
+    <div class="c-gre3 ub ub-ver ub-ac ub-pc" style=" padding:2rem 0rem 3rem 0rem ">
+    	<div><i class="iconfont icon-licaishouyi t-yel" style="font-size:5rem"></i> </div>
+        <div class="umar-t ulev1 t-yel">提现</div>
+        
+    </div>
+    <div class="ub-f1">
+    	<!--
+        <form class="form-horizontal ub ub-f1 ub-ver" id="form1" action="{php echo $this->createMobileUrl('tixianok', array())}" method="post" onSubmit="return checkform()">
+        <input type="hidden" name="tixian" value="{$count}" >
+           -->
+        <input type="hidden" name="openid" id="openid" value="{$openid}" >
+        <input type="hidden" name="staff_id" id="staff_id" value={$id}>
+        <div class="uinn8 umar-t1 tx-c">
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div class="tx-c umar-t ulev1">请选择结算区间</div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                        结算类型
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <select name="type" id="type">
+                                <option value="1" selected>项目提现结算</option>
+                                <option value="2">商铺提现结算</option>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                        开始时间
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="datetime-local" name="start" id="start" placeholder="开始时间" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+            <ul class="userlist c-wh uc-a15 umar-b">
+                <li class="ub ub-ac">
+                    <div style="width:4.5rem">
+                        结束时间
+                    </div>
+                    <div class="ub ub-f1 ub-ac ubb ubl b-bla01 uinn">
+                        <div class="ub ulev0 ub-f1 ">
+                            <input type="datetime-local" name="end" id="end" placeholder="结束时间" class="uinn ulev0 ub-f1 block" />
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+    	</div>
+        
+        <div class="uinn8 ub">
+            <input name="submit" type="submit" onClick="tixian()" value="提现" class="c-gre3 uc-a1 ub-f1 btnn block t-wh ulev0" style="padding:0.75rem 3rem" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+        <!--</form>-->
+    </div>
+    
+    <div class="" style="height:3.125rem"></div>
+    <div id="footer" class="fix0 c-foot" style="width:100%; bottom:0; z-index:999">
+        <div class="ub">
+            <a href ="{php echo $this->createMobileUrl('Validate', array())}" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-shouye ulev1"></i> 
+                    <span class="block ulev-1" style="">首页</span>
+                </div>
+            </a>
+            <a href ="{php echo $this->createMobileUrl('stafforder', array('foo'=>'order1', 'id'=>$id))}" class="ub ub-pc block t-gre1 t-wh" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-dingdan ulev1 t-gre1"></i> 
+                    <span class="block ulev-1 t-gre1" style="">订单</span>
+                </div>
+            </a>
+            <a href ="{php echo $this->createMobileUrl('staffmoney', array('foo'=>'index', 'id'=>$id))}" class="ub ub-pc block" style="width:33.33%">
+                <div class="ub ub-ver ub-ac ub-pc">
+                    <i class="iconfont icon-licaishouyi ulev1"></i> 
+                    <span class="block ulev-1" style="">财务</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+</div>
+
+{template 'public/footerjs'}
+<script type="text/javascript">
+function checkform(){
+	var money = document.getElementById('money').value;			
+	if(money == ''){
+		alert("请输入提现金额");
+		return false;
+	}			
+}
+
+function tixian(){
+	var xianzhi = "{$xianzhi}";
+	var staff_id = document.getElementById('staff_id').value;
+    var type = document.getElementById('type').value;
+    var start1 = document.getElementById('start').value;
+	var end1 = document.getElementById('end').value;
+	if(start1 == ''){
+		alert('请选择开始时间！');
+		return false;
+	}
+	if(end1 == ''){
+		alert('请选择结束时间！');
+		return false;	
+	}
+	$.ajax({
+		url: "{php echo $this->createMobileUrl('tixian', array('foo'=>'checktixian'));}",
+		type:"POST",
+		data:{"staff_id":staff_id,"type":type,"start":start1,"end":end1},
+		dataType:"json",
+		success: function(res){
+			if(res < xianzhi){
+				alert('系统起点结算金额为'+xianzhi+'元,你的结算金额('+res+'元)未达到起点结算金额！');
+				return false;
+			}
+			if(res > 0){
+				if(window.confirm('你选择的时间段有'+res+'元可以结算，你确定申请结算吗？')){
+					var openid = document.getElementById('openid').value;
+					$.ajax({
+						url: "{php echo $this->createMobileUrl('tixian', array('foo'=>'ok'));}",
+						type:"POST",
+						data:{"money":res,"openid":openid,"start":start1,"end":end1,"type":type,"staff_id":staff_id},
+						dataType:"json",
+						success: function(res1){
+							if(res1==1){
+								alert('结算申请成功！');
+								window.location.href = "{php echo $this->createMobileUrl('Validate',array())}";
+							}else{
+								alert('结算申请失败！');
+								return false;
+							}
+						}
+					});
+				}else{
+					return false;
+				}
+			}else{
+				alert('你暂无可提现金额！');
+				return false;
+			}
+		}
+	});
+}
+</script>
+
+</body>
+</html>

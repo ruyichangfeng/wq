@@ -1,0 +1,144 @@
+{template 'style5/header'}
+<body class="max-width bg-f2">
+<div class="page">
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+        <h1 class="title txt-fff">购物车</h1>
+    </header>
+    <div class="content">
+        {loop $list $item}
+        {php $price += $item['totalprice'];}
+        {php $goods = $item['goods']}
+        <div class="list-block shopcart-list-block media-list">
+            <ul>
+                <li>
+                    <label class="label-checkbox item-content">
+                        <input type="checkbox" name="my-radio">
+                        <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                        <div class="item-inner lable-shop-name">
+                            超市特惠
+                        </div>
+                    </label>
+                </li>
+            </ul>
+            <ul class="shopcart-list-info">
+                <li>
+                    <a href="#" class="item-content">
+                        <div class="item-media">
+                            <img src="{php echo tomedia($goods['thumb']);}" style='width: 5rem;height: 5rem;'>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{$goods['title']}</div>
+                            </div>
+                            <div class="item-subtitle"><span class="shop-cart-price">{$goods['marketprice']}</span></div>
+                        </div>
+                    </a>
+                    <a class="shop-close p-close" onclick="deleteShopCart('{$goods['title']}',{$item['id']})" href="javascript:void(0);">×</a>
+                </li>
+            </ul>
+            <ul>
+                <li class="item-content">
+                    <div class="item-inner shopcart-foot-price">
+                        小计：<em>{$item['totalprice']}</em>
+                    </div>
+                    <div class="item-inner">
+                        <div class="option">
+                            <label class="btn-del " onclick="reduceNum({$item['id']})"></label>
+                            <input type="text" value="{$item['total']}" class="total" price="{$goods['marketprice']}" pricetotal="{$item['totalprice']}" id="goodsnum_{$item['id']}" cartid='{$item['id']}'>
+                            <label class="btn-add" onclick="addNum({$item['id']})"></label>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {php $n++;}
+        {/loop}
+    </div>
+    <footer class="shopcart-footer">
+        <div class="shopcart-footer-list">
+            <label class="label-checkbox item-content">
+                <input type="checkbox" name="my-radio">
+                <div class="item-media"><i class="icon icon-form-checkbox"></i> <span>全选</span></div>
+            </label>
+        </div>
+        <div class="shopcart-footer-list">
+            <div class="shopcart-footer-info ">
+                <p class="color-danger">合计：<span>{if $price}¥{$price}{else}0.00{/if}</span></p>
+                <span class="color-gray">(不含运费)</span>
+            </div>
+            <div class="shopcart-js bg-danger" onclick="window.location.href='{php echo $this->createMobileUrl('shopping',array('op' => 'confirm'))}'">
+                去结算
+            </div>
+        </div>
+    </footer>
+
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="UTF-8"></script>
+
+<script>
+    function deleteShopCart(_basketName,_prodId){
+        var _basketName =_basketName;
+        if(confirm("删除后不可恢复, 确定要删除'"+_basketName+"'吗？")){
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('shopping',array('op'=>'mycart','operation'=>'remove'))}",
+                data: {"cartids":_prodId},
+                type:'post',
+                async : true, //默认为true 异步
+                dataType : 'json',
+                error:function(data){
+                },
+                success:function(data){
+                    if(data.result==1){
+                        window.location.reload();
+                        return ;
+                    }else{
+                        floatNotify.simple("删除失败");
+                        return false;
+                    }
+
+                }
+            });
+        }
+    }
+    function addNum(id){
+        var num = parseInt( $("#goodsnum_" + id).val() ) + 1;
+        $("#goodsnum_" + id).val(num);
+        var price = parseFloat( $("#singleprice_"+id).html() ) * num;
+        $("#goodsprice_" + id).html(price);
+        canculate();
+        var id = id;
+        updateCart(id,num);
+    }
+    function reduceNum(id){
+        var num = parseInt( $("#goodsnum_" + id).val() );
+        if(num-1<=0){
+            return;
+        }
+        num--;
+        $("#goodsnum_" + id).val(num);
+        var price = parseFloat( $("#singleprice_"+id).html() ) * num;
+        $("#goodsprice_" + id).html(price);
+        canculate();
+        var id = id;
+        updateCart(id,num);
+    }
+    function canculate(){
+        var total = 0;
+        $(".singletotalprice").each(function(){
+            total+=parseFloat( $(this).html() );
+        });
+
+        $("#pricetotal").html(total);
+    }
+    function updateCart(id,num){
+        var url = "{php echo $this->createMobileUrl('shopping',array('op'=>'mycart','operation'=>'update'), true)}"+ "&id=" + id+"&num=" + num;
+        $.getJSON(url, function(s){
+            if(s.result==1){
+                // tip("只能购买 " + s.maxbuy + " 件!");
+                window.location.reload();
+                return;
+            }
+        });
+    }
+</script>
+</html>

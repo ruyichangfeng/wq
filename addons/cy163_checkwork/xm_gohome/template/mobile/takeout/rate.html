@@ -1,0 +1,405 @@
+{template 'public/header'}
+
+<body data-spy="scroll" data-target="#myScrollspy">
+  <!--加载进度开始-->
+  <div id="pageLoader" class="weui_loading_toast">
+    <div class="weui_mask_transparent"></div>
+    <div class="weui_toast">
+      <div class="weui_loading"> 
+        <!-- :) -->
+        <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+        <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+      </div>
+      <p class="weui_toast_content">数据加载中</p>
+    </div>
+  </div>
+  <!--加载进度结束-->
+  
+  <div class="ub ub-ver page"> 
+  <!--头部 star-->
+  <header class="ub ub-ac ub-pc fixed ub-fh pro_header" style="top:0; left:0; z-index:999">
+    <div class="ub uinn"><i onClick="history.go(-1)" class="iconfont icon-xiangzuo ulev1"></i></div>
+    <div class="ub-f1 uinn uc-a1"><span class="shop_name">店铺名称</span> </div>
+    <div class="ub uinn"><i class="icon-sousuo iconfont ulev1"></i></div>
+    <div class="ub uinn" id='away'>
+
+    {if $this->getKeep($item['id'], $openid) == 1}
+      <i onClick="keep({$item['id']})" class="icon-wujiaoxing iconfont ulev1 "></i>
+    {else}
+      <i onClick="away({$item['id']})" class="icon-wujiaoxing iconfont ulev1 t-blu"></i>
+    {/if}
+    </div>
+  </header>
+  <!--头部 end-->
+
+  <div class="ub ub-ver" >
+    <!--顶部区域-->
+      <div class="ub ub-ac ub-ver ub-img1" style=" background-image:url({MODULE_URL}static/takeout/images/pro_bg/1.jpg); padding:2rem 0">
+        <div class="logo_box">
+          {if $item['coverpic'] == ''}
+            <img src="{MODULE_URL}static/takeout/images/nopic.jpg" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+          {else}
+            {if strstr($item['coverpic'],'images')}
+                <img src="{$_W['attachurl']}{$item['coverpic']}" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+            {else}
+                <img src="{$_W['attachurl']}gohome/coverpic/{$item['coverpic']}" width="285" height="190" class=" uc-a50 uba2 b-wh50">
+            {/if}
+          {/if}
+        </div>
+       <div class="ulev1 t-wh umar-t">{$item['merchant_name']}</div>
+       <div class="ulev-2 umar-t">
+           {if $xing == ''}
+             {php echo $this->getXing(5)}
+             <font class="ulev0 t-wh">5分</font>
+           {else}
+             {php echo $this->getXing($xing)}
+             <font class="ulev0 t-wh">{$xing}分</font>
+           {/if}
+       </div>
+       <div class="ulev-2 umar-t ub ub-ac">
+           {if $item['new_disc'] == 1}
+            <span class="ub youhui c-org t-wh ub-ac ub-pc uc-a15 umar-l">首</span>
+           {/if}
+           {if $item['man1_disc'] == 1 || $item['man2_disc'] == 1 || $item['man3_disc'] == 1}
+            <span class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15 umar-l">减</span>
+           {/if}
+           {if $item['disc'] == 1}
+            <span class="ub youhui c-blu t-wh ub-ac ub-pc uc-a15 umar-l">折</span>
+           {/if}
+           <span class="ub youhui c-wh uc-a50 ub-ac ub-pc umar-l" data-toggle="modal" 
+     data-target="#myModal"><i class="iconfont icon-xiala1 ulev-4"></i></span>
+       </div>
+      </div>
+    </div>
+
+  <!--主体部分 star-->
+  <div class="ub ub-ver">
+  <!--选项卡-->
+    <div class="uinn11 ubb ub tx-c top-tab b-bla01 tab_xuanka">
+        <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'page', 'id'=>$id))}" class=" ub-f1 uinn t-gra block ubr b-bla01">商品</a>
+        <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'rate', 'id'=>$id))}" class="ubr b-bla01 ub-f1 uinn t-gra block active">评价</a>
+        <a href="{php echo $this->createMobileUrl('takeout', array('foo'=>'info', 'id'=>$id))}" class=" ub-f1 uinn t-gra block">详情</a>
+    </div>
+    
+    <!--评价列表-->
+    <div class="ub ub-ver">
+    <!--评分-->
+      <div class="umar-b umar-t c-wh uinn ub ub-f1 ub-ac ubb ubt b-bla01">
+        <div class="ub ub-ver ub-ac uinn1 ubr b-bla01">
+         <div class="ulev4 t-red">{php echo ($xing+$fxing)/2;}</div>
+         <div class="ulev-5 t-dgra t-line18">综合评分</div>
+         <div class="ulev-5 t-dgra t-line18"></div>
+        </div>
+        <div class="ub-f1 ulev-4 ub ub-ac ub-ver">
+          <div class="uinn2">
+            <span class="ulev-4 t-gra">服务态度</span>
+            {if $fxing == ''}
+              {php echo $this->getXing(5)}
+              <font class="ulev0 t-wh">5分</font>
+            {else}
+              {php echo $this->getXing($fxing)}
+              <font class="ulev0 t-wh">{$fxing}分</font>
+            {/if}
+          </div>
+           <div class="uinn2">
+            <span class="ulev-4 t-gra">商家评分</span>  
+            {if $xing == ''}
+              {php echo $this->getXing(5)}
+              <font class="ulev0 t-wh">5分</font>
+            {else}
+              {php echo $this->getXing($xing)}
+              <font class="ulev0 t-wh">{$xing}分</font>
+            {/if}
+          </div>
+          
+        </div>
+      </div>
+    
+      <!--评论列表-->
+      <div class="umar-b umar-t c-wh uinn11 ub ub-f1 ub-ver ubt b-bla01">
+        <div class="ub ub-f1 uinn1 ub-ver ulev-4 ubb b-bla01">
+          <div class="ub ub-ac uinn11 ub-f1 umar-b">
+            <a onClick="getComment(0)" class="c-blu t-wh uinn2 uc-a15 umar-l">全 部</a>
+            <a onClick="getComment(1)" class="c-blu3 t-dgra uinn2 uc-a15 umar-l">满意</a>
+            <a onClick="getComment(2)" class="c-gra1 t-dgra uinn2 uc-a15 umar-l">不满意</a>
+          </div>
+          <!--
+          <div class="ub ub-ac uinn11 ub-f1 kk-check" style="border-top:1px dotted #ddd">
+          <input name="hh" type="radio" id="hh1" value="">
+          <label class="block uinn3" for="hh1"><i class="iconfont icon-gouxuan"></i> 只看有内容的评价</label>
+          </div>
+          -->
+        </div>
+    
+    <!--列表开始-->
+    <div class="ub ub-ver uinn11" id="show">
+  
+    
+    </div>
+    <!--列表结束-->
+
+    <div id="more" style="display:none;">
+      <div class="ub ub-pc uc-a1 ub-f1 btnn" onClick="getMore()" style="margin-bottom:0.5em; height:2em; line-height:2em;" type="submit"><span class="ulev0 tx-c">点击加载更多</span>
+      </div>
+    </div>
+
+  </div>
+  </div>
+  <input type="hidden" name="merchantid" id="merchantid" value="{$item[id]}">
+  <!--主体部分 end-->
+  <!--弹出框--> 
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true" style="top:30%">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        {if $item['new_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15">首</div>
+           <div class="ub-f1 umar-l t-gra">新用户立减{php echo $this->getDiscInfo($item['id'], 'new_disc')}元</div>
+        </div >
+        {/if}
+        {if $item['man1_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_1')}减{php echo $this->getDiscInfo($item['id'], 'jian_1')}</div>
+        </div >
+        {/if}
+
+        {if $item['man2_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_2')}减{php echo $this->getDiscInfo($item['id'], 'jian_2')}</div>
+        </div >
+        {/if}
+
+        {if $item['man3_disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">减</div>
+           <div class="ub-f1 umar-l t-gra">在线支付满{php echo $this->getDiscInfo($item['id'], 'man_3')}减{php echo $this->getDiscInfo($item['id'], 'jian_3')}</div>
+        </div >
+        {/if}
+
+        {if $item['disc'] == 1}
+        <div class="ub-f1 ubb b-bla01 uinn212 block ub ub-ac active">
+           <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">折</div>
+           <div class="ub-f1 umar-l t-gra">折扣商品打{php echo $this->getDiscInfo($item['id'], 'disc')}折</div>
+        </div >
+        {/if}
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal -->
+   </div>
+  
+  </div>   
+
+{template 'public/footerjs'}
+<script type="text/javascript" src="{MODULE_URL}static/js/baidutmp.js"></script>
+<script id='near' type="text/template">
+    <%for(var i=0;i<json.length;i++){%>
+        <!--循环开始-->
+        <div class="ub ub-f1 ub-pc ubb b-bla01 uinn1">
+        <div class="ub">
+        <%if(json[i].avatar == ''){%>
+        <img src="{MODULE_URL}static/takeout/images/nopic.jpg" width="285" height="190" class="rate_img uc-a50 uba b-bla01">
+        <%}else{%>
+        <img src="<%=json[i].avatar%>" width="285" height="190" class="rate_img uc-a50 uba b-bla01">
+        <%}%>
+        </div>
+         <div class="ub-f1 umar-l ub ub-ver">
+          <div class="ub-f1 ub ub-ac">
+            <div class="ub-f1"><%=json[i].nickname%></div><div class="ub ulev-2 t-gra"><%=json[i].addtime%></div>
+          </div>
+          <div class="ub-f1">
+            <%if(json[i].xing == 1){%>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <%}%>
+            <%if(json[i].xing == 2){%>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <%}%>
+            <%if(json[i].xing == 3){%>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <%}%>
+            <%if(json[i].xing == 4){%>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-dgra ulev-2"></i>
+            <%}%>
+            <%if(json[i].xing == 5){%>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <i class="iconfont icon-wujiaoxing t-org ulev-2"></i>
+            <%}%>
+            
+            <font class="ulev-2 t-dgra umar-l">1小时27分钟送达</font>
+          </div>
+          <div class="ub-f1 t-line15 umar-t uinn11"><%=json[i].comment%></div>
+          <%if(json[i].reply != ''){%>
+            <div class="ub-f1 c-gra1 uinn212 ulev-2 t-gra">商家回复：<%=json[i].reply%></div>
+          <%}%>
+          <div class="ub ub-f1 ub-ver">
+          
+          </div>
+            <div class="ub-f1 uinn ub ub-ac ulev-4 ub-pc t-dgra" id="showtext"></div>
+          </div>
+         </div>
+        </div>
+        <!--循环结束-->
+    <%}%>           
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  getInit();
+}); 
+
+var forumPage = 1;
+var merchantid = $("#merchantid").val();
+
+function getInit(){
+  forumPage = 1;
+
+  var data = {};
+  data['forumPage'] = forumPage;
+  data['merchantid'] = merchantid;
+  var grade = localStorage['grade'];
+  if(grade == '' || grade == 'undefined'){
+    grade = 0;
+  }
+  data['grade'] = grade;
+
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('takeout', array('foo'=>'getRate'));}",
+    type:"POST",
+    data: data,
+    dataType:"json",
+    success: function(res){
+      if(res == 0){
+        document.getElementById('pageLoader').style.display = 'none';
+        document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_msg weui_icon_warn"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无数据</h2></div></div>';
+      }else{
+        var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        document.getElementById('show').innerHTML = near; 
+        document.getElementById('pageLoader').style.display = 'none';
+        if(json.length == 10){
+          document.getElementById('more').style.display = "block";  
+        }
+      }
+    }
+  });
+}
+
+
+function getMore(){
+  forumPage = forumPage + 1;
+  merchantid = $("#merchantid").val();
+
+  var data = {};
+  data['forumPage'] = forumPage;
+  data['merchantid']= merchantid;
+  var grade = localStorage['grade'];
+  data['grade'] = grade;
+  
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('takeout', array('foo'=>'getRate'));}",
+    type:"POST",
+    data: data,
+    dataType:"json",
+    success: function(res){
+      if(res == "0"){
+        document.getElementById('more').innerHTML = '已无数据';
+      }else{
+        var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        $("#show").append(near); 
+        if(json.length<10){
+          document.getElementById('more').innerHTML = "<div class='tx-c'>已无数据</div>";  
+        }else{
+          document.getElementById('more').style.display = "block";  
+        }
+      }
+    }
+  });
+}
+
+function keep(id){
+  $.ajax({
+      url:"{php echo $this->createMobileUrl('takeout', array('foo'=>'keep'))}",
+      type:"POST",
+      data: {"id":id},
+      dataType:"json",
+      success: function(res){
+        if(res == 1){
+          alert('收藏成功');
+          window.location.reload();
+          return false;
+        }else if(res == 2){
+          alert('已收藏');
+          return false;
+        }else{
+          alert('收藏失败');
+          return false;
+        }
+      }
+  });
+}
+
+function away(id){
+  if(window.confirm('你确定要取消收藏吗？')){
+    $.ajax({
+        url:"{php echo $this->createMobileUrl('takeout', array('foo'=>'away'))}",
+        type:"POST",
+        data: {"id":id},
+        dataType:"json",
+        success: function(res){
+          if(res == 1){
+            alert('取消收藏成功');
+            window.location.reload();
+            return false;
+          }else if(res == 2){
+            alert('已取消收藏');
+            return false;
+          }else{
+            alert('取消收藏失败');
+            return false;
+          }
+        }
+    });
+  }else{
+    return false;
+  }
+}
+
+function getComment(id){
+  document.getElementById('pageLoader').style.display = 'block';
+  localStorage['grade'] = id;
+  getInit();
+}
+</script>
+</body>
+</html>

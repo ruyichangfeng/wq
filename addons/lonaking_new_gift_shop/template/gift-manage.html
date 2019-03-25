@@ -1,0 +1,197 @@
+{template 'common/header'}
+<script type="text/javascript" src="../web/resource/js/lib/bootstrap.min.js"></script>
+<style type="text/css">
+	table thead tr th,table tbody tr td{
+		text-align: center;
+	}
+	table tbody tr{
+		line-height: 30px;
+	}
+</style>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+		<a href="{php echo $this->createWebUrl('GiftEdit');}" class="btn btn-success btn-sm pull-right"><i class="glyphicon glyphicon-plus"></i> 添加礼品</a>
+	</ul>
+	<div class="panel panel-info">
+		<div class="panel-heading">条件筛选</div>
+		<div class="panel-body">
+			<form action="" method="post" class="form-horizontal form" role="form">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">礼品名称</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="title" value="{$_GPC['title']}" placeholder="请输入礼品名称，支持模糊查询"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">购买方式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="buy_type" value="0" {if $_GPC['buy_type'] == '0'}checked="true"{/if}> 全部
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="buy_type" value="1" {if $_GPC['buy_type'] == '1'}checked="true"{/if}> 积分
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="buy_type" value="2" {if $_GPC['buy_type'] == '2'}checked="true"{/if}> 余额
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="buy_type" value="3" {if $_GPC['buy_type'] == '3'}checked="true"{/if}> 积分+余额
+						</label>
+						<span class="help-block">设置礼品开放兑换或者停止兑换</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">礼品模式</label>
+					<div class="col-sm-8">
+						<select name="type" class='form-control'>
+							<option value="0" {if $_GPC['type'] == 0} selected{/if}>全部</option>
+							<option value="1" {if $_GPC['type'] == 1} selected{/if}>微信红包(认证服务号可用)</option>
+							<option value="2" {if $_GPC['type'] == 2} selected{/if}>虚拟物品(卡、券)</option>
+							<option value="3" {if $_GPC['type'] == 3} selected{/if}>实物礼品</option>
+							<option value="4" {if $_GPC['type'] == 4} selected{/if}>自领礼品(用户前往某地自行领取)</option>
+							<option value="5" {if $_GPC['type'] == 5} selected{/if}>话费</option>
+							<option value="5" {if $_GPC['type'] == 6} selected{/if}>流量</option>
+						</select>
+					</div>
+				</div>
+				<input name="token" type="hidden" value="{$_W['token']}" /> <input
+					type="submit" class="btn btn-primary col-lg-1 pull-right" name="submit" value="搜索" />
+			</form>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="" style="padding 15px">
+				<form action="" class="table-responsive" method="post">
+					<table class="table table-hover">
+						<thead class="navbar-inner">
+							<tr>
+								<th width="5%">#</th>
+								<th width="130px">二维码</th>
+								<th width="15%">名称</th>
+								<th width="15%">价格</th>
+								<th width="200px">类型</th>
+								<th>剩余</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $page['data'] $gift}
+								<tr class="">
+									<td data-id="{$gift['id']}">{$gift['id']}</td>
+									<td class="qrcode-init" data-text="{php echo $_W['siteroot'].'app'.substr($this->createMobileUrl('Good',array('id'=>$gift['id'])),1)}"></td>
+									<td>
+										<p>{$gift['title']}</p>
+										<p class="text-primary">
+											{if $gift['type'] == 1}
+												{if $gift['hb_mode'] == 1}
+													{$gift['hb_amount']}元红包
+												{elseif $gift['hb_mode'] == 2}
+													{$gift['hb_random_min']}~{$gift['hb_random_max']}元随机红包
+												{/if}
+											{/if}
+											{if $gift['type'] == 5}
+												{$gift['hf_amount']}元话费
+											{/if}
+											{if $gift['type'] == 6}
+												{$gift['ll_amount']}M流量
+											{/if}
+											{if $gift['type'] == 7}
+												{$gift['raffle_score_amount']}积分奖励
+											{/if}
+										</p>
+									</td>
+									<td>
+										{if $gift['buy_type'] == 1 || $gift['buy_type'] == 3}
+										<p><span class="label label-primary">{$gift['score']} {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span></p>
+										{/if}
+										{if $gift['buy_type'] == 2 || $gift['buy_type'] == 3}
+										<p><span class="label label-success">{$gift['money']} 元</span></p>
+										{/if}
+									</td>
+									<td>
+										<p>
+											<span class="label label-danger">
+												{if $gift['type'] == 1}
+													{if $gift['hb_mode'] == 1}定额红包
+														{elseif $gift['hb_mode'] == 2}随机红包
+													{/if}
+												{elseif $gift['type'] == 2}虚拟物品
+												{elseif $gift['type'] == 3}实物礼品
+												{elseif $gift['type'] == 4}自领礼品
+												{elseif $gift['type'] == 5}话费
+												{elseif $gift['type'] == 6}流量
+												{/if}
+											</span>
+										</p>
+										{if $gift['type'] == 2}<p><a href="{php echo $this->createWebUrl('QuanManage',array('gift_id'=>$gift['id']));}" class="btn btn-success btn-xs"> 查看所有卡券 </a></p>{/if}
+										<p>
+											{if $gift['raffle']}
+												<span class="label label-success">抽奖</span>
+												<span class="label label-info">{$gift['raffle_chance']}%</span>
+												<span class="label label-warning">共{$gift['raffle_max']}件，已中奖{$gift['raffle_hit']}件</span>
+											{/if}
+										</p>
+									</td>
+									<td>
+										<p>
+											<span class="label label-primary">剩余{$gift['num']}</span>
+										</p>
+										<p>
+											{if $gift['status'] == 0}
+											<span class="label label-danger">停止</span>
+											{elseif $gift['status'] == 1}
+											<span class="label label-success">在售</span>
+											{/if}
+										</p>
+									</td>
+									<!--<td>{if $gift['auto_success'] == '1'}<span class="label label-danger">自动通过</span>{else}<span class="label label-success">人工审核</span>{/if}</td>-->
+									<td>
+										<a href="{php echo $this->createWebUrl('GiftEdit',array('id'=>$gift['id']));}" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-edit"> 修改</i></a>
+										<a href="javascript:void(0);" data-url="{php echo $this->createWebUrl('HardRemove',array('opt'=>'gift','id'=>$gift['id']));}"  class="btn btn-danger btn-sm del-button"><i class="glyphicon glyphicon-trash"> 删除</i></a>
+									</td>
+								</tr>
+							{/loop}
+						</tbody>
+					</table>
+				</form>
+				{$page['pager']}
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+	require(['jquery','jquery.qrcode'],function ($){
+
+		$(".qrcode-init").each(function (i,o) {
+			var content = $(o).data("text");
+			$(o).qrcode({
+				width: 100,
+				height: 100,
+				text: content
+			});
+		});
+
+		$(".del-button").on("click",function(){
+			var btn = $(this);
+			var url = btn.data('url')
+			var tr = btn.parent().parent();
+			$.post(url,function(result){
+				var json = eval('('+result+')');
+				if(json.status != 200){
+					util.message(json.message);
+					return false;
+				}else{
+					//移除dom
+					tr.remove();
+				}
+			});
+
+		});
+	});
+</script>
+
+{template 'common/footer'}

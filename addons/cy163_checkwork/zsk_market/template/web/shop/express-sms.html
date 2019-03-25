@@ -1,0 +1,232 @@
+  {template 'public/header'}
+  <script type="text/javascript" src="{ZSK_STATIC}js/jquery.qrcode.min.js"></script>
+ <style type="text/css">
+ 	.mmmtab td{
+ 		padding: 10px 10px;
+ 	}
+ 	.maill{text-align: right !important;width: 30%;vertical-align: middle !important;}
+ 	.mailr{text-align: left !important;width: 70%;vertical-align: middle !important;}
+ 	.top{
+ 		margin-top: 50px;
+ 	}
+ 	.topcolor{
+ 		background-color:#eee;
+ 		line-height: 40px;
+ 	}
+ </style>
+ <div class="panel panel-info">
+	<div class="panel-heading">群发短信设置</div>
+	<div class="col-md-12 top">
+		<div class="col-md-6" style="margin-top: 20px">
+			<form class="form-horizontal" action="<?php echo $this->routeUrl('expressinfo.addsms');?>" id="baseForm"  method="post">
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">接收人</label>
+			    <div class="col-sm-10">
+			      <input type="text" name="mobile" class="form-control">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">短信内容</label>
+			    <div class="col-sm-10">
+			      <textarea rows="10" cols="30" name="smscontent" class="form-control"></textarea>
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <!-- <div class="col-sm-offset-2 col-sm-4"> -->
+			      <!-- <button type="button" class="btn btn-default">取消</button> -->
+			    <!-- </div> -->
+			     <div class="col-sm-offset-8 col-sm-4">
+			      <button type="submit" class="btn btn-primary">确认</button>
+			    </div>
+			  </div>
+			</form>
+		</div>
+		<div class=" col-sm-offset-1 col-md-4">
+			<form class="form-horizontal">
+			 <!--  <div class="form-group">
+			    <label>sql语句</label>
+			    <textarea rows="5" cols="30" class="form-control"></textarea>
+			  </div>
+			  <div class="form-group">
+			    <div class="col-sm-offset-2 col-sm-4">
+			      <button type="button" class="btn btn-default">取消</button>
+			    </div>
+			     <div class="col-sm-offset-1 col-sm-4">
+			      <button type="button" class="btn btn-primary">确认</button>
+			    </div>
+			  </div> -->
+			  <div class="col-sm-12" style="padding:0">
+			  	<div class="col-sm-12 topcolor" >
+				  	<div class="col-sm-2">
+						<input type="checkbox" id="check">
+				  	</div>
+				  	<div class="col-sm-4" style="border-left: 3px solid #fff">
+				  		姓名
+				  	</div>
+				  	<div class="col-sm-4" style="border-left: 3px solid #fff">
+				  		手机号
+				  	</div>
+				</div>
+				<div id="userlist">
+					<?php foreach($memberlist as $v){?>
+					<div class="col-sm-12" style="border:1px solid #eee;line-height: 40px;margin-top: 10px;">
+					  	<div class="col-sm-2">
+							<input type="checkbox" name="test" value="{$v['mobile']}" onclick="checkemail(this)">
+					  	</div>
+					  	<div class="col-sm-4" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
+					  		{$v['nickname']}
+					  	</div>
+					  	<div class="col-sm-5" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
+					  		{$v['mobile']}
+					  	</div>
+					</div>
+					<?php }?>
+				</div>
+			  </div>
+			</form>
+					{if $page['count']>0}
+				 <div id="form-pagenation">
+				 	{loop $params $index $papapa}
+				 	<input type="hidden" name="{$index}"   value="{$papapa}">
+				 	{/loop}	
+				共&nbsp;{$page["pagecount"]}&nbsp;</span>页，当前第&nbsp;{$page["page"]}&nbsp;</span>页&nbsp;&nbsp;
+				{if $page['page']>1}
+					<a class="linkbtn" href="javascript:void(0);" onclick="toPageUrl(<?php echo intval($page['page']-1);?>)">上一页</a>
+				{else}
+					<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >上一页</a>
+				{/if}
+				{if $page['page']<$page['pagecount']}
+					<a class="linkbtn" href="javascript:void(0);"  onclick="toPageUrl(<?php echo intval($page['page']+1);?>)">下一页</a>
+				{else}
+					<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >下一页</a>
+				{/if}
+					<label class="linkbtn" onclick="toPageUrl2()">转到</label>
+					<input type="number" name="page"  min="1" max="{$page['pagecount']}" style="border-bottom: 1px solid #999;width: 50px;" value="{$page['page']}"  id="page-page">
+					<label  class="linkbtn">页</label>
+				 </div>
+				 <script type="text/javascript">
+				 	function toPageUrl2(){
+				 		if(parseInt($("#page-page").val())>0){
+				 			var page = $("#page-page").val()
+				 			$.ajax({
+					 			url:"<?php echo $this->routeUrl('expressinfo.batchsms');?>",
+					 			type:"post",
+					 			dataType:"json",
+					 			data:"page="+page,
+					 			success:function(res){
+					 				var data='共&nbsp;'+res["pagecount"]+'&nbsp;</span>页，当前第&nbsp;'+res["page"]+'&nbsp;</span>页&nbsp;&nbsp;'
+									if(res['page']>1){
+										var data2 = '<a class="linkbtn" href="javascript:void(0);" onclick="toPageUrl('+parseInt(res['page']-1)+')">上一页</a>';
+									}else{
+										var data2='<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >上一页</a>';
+									}
+									if(res['page']<res['pagecount']){
+										var  data3 = '<a class="linkbtn" href="javascript:void(0);"  onclick="toPageUrl('+parseInt(res['page']+1)+')">下一页</a>'
+									}else{
+										var data3 = '<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >下一页</a>'
+									}
+										var data4 = '<label class="linkbtn" onclick="toPageUrl2()">转到</label><input type="number" name="page"  min="1" max="'+res['pagecount']+'" style="border-bottom: 1px solid #999;width: 50px;" value="'+res['page']+'"  id="page-page"><label  class="linkbtn">页</label>';
+									var data = data+data2+data3+data4;
+									$("#userlist").empty();
+									$.each( res['memberlist'], function(i, n){
+									 	var userlist = '<div class="col-sm-12" style="border:1px solid #eee;line-height: 40px;margin-top: 10px;"><div class="col-sm-2"><input type="checkbox" name="test" value="'+n.phone+'" onclick="checkemail(this)"></div><div class="col-sm-4" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">'+n.name+'</div><div class="col-sm-5" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">'+n.phone+'</div></div>';
+									 	$("#userlist").append(userlist);
+									});
+									$("#form-pagenation").empty();
+				 					$("#form-pagenation").append(data);
+								}
+							})
+				 		}
+				 	}
+				 	function toPageUrl(page){
+				 		$.ajax({
+				 			url:"<?php echo $this->routeUrl('expressinfo.batchsms');?>",
+				 			type:"post",
+				 			dataType:"json",
+				 			data:"page="+page,
+				 			success:function(res){
+				 				// console.log(res)
+				 				var data='共&nbsp;'+res["pagecount"]+'&nbsp;</span>页，当前第&nbsp;'+res["page"]+'&nbsp;</span>页&nbsp;&nbsp;'
+								if(res['page']>1){
+									var data2 = '<a class="linkbtn" href="javascript:void(0);" onclick="toPageUrl('+parseInt(res['page']-1)+')">上一页</a>';
+								}else{
+									var data2='<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >上一页</a>';
+								}
+								if(res['page']<res['pagecount']){
+									// console.log(res['page'])
+									var  data3 = '<a class="linkbtn" href="javascript:void(0);"  onclick="toPageUrl('+parseInt(res['page']+1)+')">下一页</a>'
+								}else{
+									var data3 = '<a class="linkbtn" href="javascript:void(0);" disabled="true" style="color:#999999;" >下一页</a>'
+								}
+									var data4 = '<label class="linkbtn" onclick="toPageUrl2()">转到</label><input type="number" name="page"  min="1" max="'+res['pagecount']+'" style="border-bottom: 1px solid #999;width: 50px;" value="'+res['page']+'"  id="page-page"><label  class="linkbtn">页</label>';
+								var data = data+data2+data3+data4;
+								$("#userlist").empty();
+								$.each( res['memberlist'], function(i, n){
+									 	var userlist = '<div class="col-sm-12" style="border:1px solid #eee;line-height: 40px;margin-top: 10px;"><div class="col-sm-2"><input type="checkbox" name="test" value="'+n.phone+'" onclick="checkemail(this)"></div><div class="col-sm-4" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">'+n.name+'</div><div class="col-sm-5" style="border-left: 3px solid #fff;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">'+n.phone+'</div></div>';
+									 	$("#userlist").append(userlist);
+									});
+								$("#form-pagenation").empty();
+			 					$("#form-pagenation").append(data);
+							}
+						})
+				 	}
+				 </script>
+			{else}
+				没有搜索到相关记录.
+			{/if}
+		</div>
+	</div>
+</div>
+ <script type="text/javascript">
+ 	//翻页
+ 	function go(id){
+ 		$.ajax({
+ 			url:"<?php echo $this->routeUrl('expressinfo.batchsms');?>",
+ 			type:"post",
+ 			dataType:"json",
+ 			data:"page="+id,
+ 			success:function(res){
+ 				
+ 			}
+ 		})
+ 	}
+ 	$(".form").click(function(){
+ 		$("#formid").submit();
+ 	})
+ 	$(function(){
+ 		localStorage.removeItem("email");
+ 	})
+ 	$("#check").click(function(){
+ 		if($("#check").is(":checked")){
+			$("input[type='checkbox']").prop("checked",true);
+				var chk_value =[]; 
+			    $('input[name="test"]:checked').each(function(){ 
+			        chk_value.push($(this).val()); 
+			    }); 
+				localStorage.setItem("email",JSON.stringify(chk_value))
+	 	}else{
+	 		$("input[type='checkbox']").prop("checked",false);
+	 		localStorage.removeItem("email") 
+	 	}
+	 	setemail()
+ 	})
+ 	function checkemail(elm){
+ 		var value = $(elm).val();
+ 		var chk_value = JSON.parse(localStorage.getItem("email"))
+ 		if(!chk_value){
+ 			var chk_value =[]; 
+ 		}
+ 		if($(elm).is(":checked")==true){
+ 			chk_value.push(value); 
+ 		}else{
+ 			chk_value.splice($.inArray(value,chk_value),1); 
+ 		}
+ 		localStorage.setItem("email",JSON.stringify(chk_value))
+ 		setemail()
+ 	}
+ 	function setemail(){
+ 		var chk_value = JSON.parse(localStorage.getItem("email"))
+ 		$("input[name='mobile']").val(chk_value)
+ 	}
+ </script>
+ {template 'public/footer'}

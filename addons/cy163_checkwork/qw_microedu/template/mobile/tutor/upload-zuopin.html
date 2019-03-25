@@ -1,0 +1,129 @@
+{template 'header'}
+<div id="upload-zuopin">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">上传作品</h1>
+    </div>
+    <div class="mui-page-content">
+        <div class="mui-input-row">
+            <textarea id="textarea-upload" rows="5" style="margin-top:14%;" placeholder="说点什么吧"></textarea>
+            <input type="hidden" id="schedule_id" value="{$schedule_id}">
+            <input type="hidden" id="child_id" value="{$child_id}">
+        </div>
+        <div class="upload-zuopin-btn">
+            <div class="newpic"></div>
+            <div class="upload_all"><img src="{MODULE_URL}assets/img/upload-zuopin-btn.png" /><div class="uploadsrc" style="display: none;"></div></div>
+        </div>
+        <div class="upload-submit-btn">
+            <a href="javascript:;" class="mui-btn mui-btn-success mui-btn-block btn-save">提交</a>
+        </div>
+        <script type="text/javascript">
+            function sub(obj)
+            {
+                //这里缺少一个上传图片
+                $(obj).attr('href', '#');
+                var val = $('#textarea-upload').val();
+                var schedule_id = $('#schedule_id').val();
+                var child_id = $('#child_id').val();
+
+                if(val)
+                {
+                    if(schedule_id && child_id)
+                    {
+                        $.post("<?php echo $this->createMobileUrl('tutor', array('action' => 'project')) ?>", {
+                            val : val,
+                            schedule_id : schedule_id,
+                            child_id : child_id
+                        }, function (response)
+                        {
+                            if (response.status == 'success')
+                            {
+                                mui.alert('评价成功', function ()
+                                {
+                                    history.back();
+                                });
+                            }
+                            else
+                            {
+                                mui.alert('评价失败，请重试！');
+                                $(obj).attr('href', 'javascript:sub(this);');
+                            }
+                        }, "json");
+                    }
+                }
+                else
+                {
+                    mui.alert('请输入评价内容');
+                    $(obj).attr('href', 'javascript:sub(this);');
+                }
+            }
+        </script>
+    </div>
+</div>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{php echo register_jssdk(false);}
+<script>
+    wx.ready(function(){
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+    });
+    var images = {localIds:[],serverId:[]};
+    $(".upload_all").click(function(){
+        wx.chooseImage({
+            count: 9, // 默认9
+            sizeType: ['compressed'],
+            success: function (res) {
+                images.localIds = res.localIds;
+                var i = 0; var length = images.localIds.length;
+                var upload = function() {
+                    //显示图片
+                    var vhtml ='<div class="upload-img" style="background: url('+images.localIds[i]+') 50% no-repeat;background-size:cover;"></div>';
+                    $(".newpic").append(vhtml);
+                    wx.uploadImage({
+                        localId:images.localIds[i],
+                        isShowProgressTips: 1, // 默认为1，显示进度提示
+                        success: function(res) {
+                            images.serverId.push(res.serverId);
+                            //alert(res.serverId);
+                            //如果还有照片，继续上传
+                            i++;
+                            if (i < length) {
+                                upload();
+                            }
+                        }
+                    });
+                };
+                upload();
+            }
+        });
+    })
+    $(".btn-save").click(function(){
+        var schedule_id = "{$schedule_id}";
+        var child_id = "{$child_id}";
+        var pval = $('#textarea-upload').val();
+        if($.trim(pval)==""){
+            mui.alert("请输入内容");
+            return false;
+        }
+        if(images.serverId.length==0){
+            mui.alert("请上传作品");
+            return false;
+        }
+        var Url = "{php echo $this->createMobileurl('tutor', array('action' => 'project'))}";
+        var vdata = {   uploadsrc:images.serverId,
+                        schedule_id : schedule_id,
+                        child_id : child_id,
+                        val:pval
+                    };
+        $.post(Url,vdata,function(data){
+            if(data.status=='success'){
+                history.back();
+            }else{
+                mui.alert("请重试");
+                return false;
+            }
+        },'json');
+    })
+</script>
+{template 'footer'}

@@ -1,0 +1,105 @@
+{template 'common/header'}
+<style type="text/css">
+	.mytable1{width:80%;height: 100px;margin:0 auto;}
+	 
+	.mytable1 td{vertical-align: middle; padding: 10px 10px;}
+	.mytable1 .left{width: 35%;text-align: right;}
+	.mytable1 .right{width: 64%;text-align: left;}
+</style>
+<script type="text/javascript" src="{PUB}util.js"></script>
+<link rel="stylesheet" type="text/css" href="{PUB}main.css"/>
+<div>
+<div class="panel panel-info">
+	<div class="panel-heading" style="text-align: center;font-size: 16px;font-weight: 600;">{$form['name']}</div>
+	<div class="panel-body">
+		<div class="row"> 
+			<form action="<?php echo $this->createWebUrl('formOrder');?>&fid={$_GPC['fid']}" method="post">
+			<div class="col-xs-11 col-sm-11"> 
+				<label>关键字</label>
+				<input type="text" name="name" id="name" class="forminput" style=""  value="<?php echo $params['key'];?>" placeholder='请输入关键字'>
+				<label>&nbsp;&nbsp;&nbsp;&nbsp;状态</label>
+				<select name='status' class="forminput">
+					<option value="0" <?php if(intval($params['status'])==0){ echo 'selected=true';}?> >未处理</option>
+					<option value="1" <?php if(intval($params['status'])==1){ echo 'selected=true';}?> >已处理</option>
+				</select>
+				<button class="mybtn" type="submit" >搜索</button> 
+			</div>  
+			</form>
+		</div> 
+	</div>
+</div>
+<table class="table table-bordered">
+	<thead>
+		
+		<tr>
+			{loop $fields $index $fff}
+			<th>{$fff['label']}</th> 
+			{/loop}
+			<th>时间</th>
+			<th>操作</th>
+		</tr>
+		
+	</thead>
+	<tbody>
+		{loop $record $index1 $item}
+		<tr>
+			<?php $val0="";?>
+			{loop $fields $index2 $fff}
+			<td> 
+				{loop $values $index3 $val}
+					<?php 
+					
+					if($val['fieldname']==$fff['name']&&$item['id']==$val['recordid']){
+						echo $val['value']; 
+						if($index2=="0"){
+							 
+							$val0=$val['value'];
+						}
+					}
+					?> 
+				{/loop}
+			</td> 
+			
+			{/loop}
+			 <td>
+				<?php echo date("Y-m-d H:i:s",$item['date']);?>
+			</td>
+			<td> 
+				<a href="<?php echo $this->createWebUrl('recordDet');?>&fid={$form['id']}&rid={$item['id']}" class="linkbtn"  >详细</a>
+				<?php if($item['status']!="1"){?>
+				<a href="javascript:void(0);" onclick="mark({$item['id']},'{$val0}' )" class="linkbtn">处理</a>
+				<?php }?>
+			</td>
+		</tr>
+		{/loop}
+		 <tr>
+		 	<td colspan="<?php echo count($fields)+2;?>" align="center">
+		 		{template 'public/pagenation'}
+		 	</td>
+		 </tr>
+	</tbody>
+
+</table>
+<div id="hidview" style="display: none;" class="s">
+	<table class="mytable1">
+		<tr>
+			<td class="left">表单名称</td>
+			<td class="right"><input type="text" name="name" class="forminput" valid="length|1|20" placeholder="20字以内"></td>
+		</tr>
+		<tr>
+			<td class="left">网页标题</td>
+			<td  class="right"><input type="text" name="title" class="forminput" valid="length|1|20" placeholder="20字以内"></td>
+		</tr>
+	</table>
+</div>
+</div>
+
+<script type="text/javascript">
+	function mark(id,name){
+		modalDlg("<span style='color:#ff4444;'>是否标记 "+name+" 为已处理？</span>",function (){
+			window.location.href="<?php echo $this->createWebUrl('markRecord');?>&fid={$form['id']}&rid="+id;
+		});
+	}
+	 
+</script>
+{template 'common/footer'}

@@ -1,0 +1,94 @@
+{template 'web/common/header-base-index'}
+{template 'web/messagebursts/common'}
+
+<div class="wrapper wrapper-content" style="padding-top: 0px;padding-bottom: 0px;" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>模板消息群发</h5>
+                    <h5 style="float: right"><a class="glyphicon glyphicon-refresh" href="{php echo $this->createWebUrl('messagebursts')}"></a></h5>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class=""><a  href="{php echo $this->createWebUrl('messagebursts',array('op'=>application))}" aria-expanded="true"><i class="fa fa-lg  fa-stack-exchange" style="color: #01a901" ></i>申请列表</a></li>
+                                    <li class="active"><a href="{php echo $this->createWebUrl('messagebursts')}"><i class="fa fa-lg fa-tasks" style="color: crimson"></i>群发任务</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagemobanmanage')}"><i class="fa fa-lg fa-meetup"  style="color:#06c28b"></i>模板设置</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageallmanage')}"><i class="fa fa-lg fa-weixin"  style="color:orange"></i>微信公众号模板库</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messagetrigger')}"><i class="fa fa-lg fa-clock-o"  style="color:green"></i>定时触发</a></li>
+                                    <li class=""><a href="{php echo $this->createWebUrl('messageprocess')}"><i class="fa fa-lg fa-cogs"  style="color:dodgerblue"></i>进程设置</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="page-heading" style="margin-top: 10px;">
+    <span class="pull-right">
+		<a class='btn btn-default btn-sm' href="{php echo $this->createWebUrl('messagebursts')}"> 返回列表</a>
+	</span>
+                                        <h4>消息群发日志 <small>总数: {$total}</small></h4>
+                                    </div>
+                                    <form action="./index.php" method="get" class="form-horizontal" role="form">
+                                        <input type="hidden" name="c" value="site" />
+                                        <input type="hidden" name="a" value="entry" />
+                                        <input type="hidden" name="m" value="hl_mmsystem" />
+                                        <input type="hidden" name="do" value="messagebursts" />
+                                        <input type="hidden" name="op"  value="showsign" />
+                                        <input type="hidden" name='id' value="{$_GPC['id']}" >
+
+                                        <div class="page-toolbar row m-b-sm m-t-sm">
+                                            <div class="col-sm-7 pull-right">
+                                                <select name="status" class='form-control select-sm select2' style="width:150px;" data-placeholder="发送状态">
+                                                    <option value="" {if empty($_GPC['status'])}selected{/if} >全部</option>
+                                                    <option value="1" {if $_GPC['status']==1}selected{/if} >未发送</option>
+                                                    <option value="3" {if $_GPC['status']==3}selected{/if} >发送成功</option>
+                                                    <option value="4" {if $_GPC['status']==4}selected{/if} >发送失败</option>
+                                                </select>
+                                                <div class="input-group pull-right" style="width:300px; margin-top: -34px;">
+                                                    <input type="text" class="form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入openid"> <span class="input-group-btn">
+				<button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    {if count($list)>0}
+                                    <form action="" method="post" >
+                                        <table class="table table-bordered table-hover table-responsive" style="margin-top: 10px;">
+                                            <thead>
+                                            <tr>
+                                                <th style="width:150px">openid</th>
+                                                <th style="width:150px">用户昵称</th>
+                                                <th style="width:80px">状态</th>
+                                                <th>日志记录</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {loop $list $row}
+                                            <tr>
+                                                <td>{$row['ms_openid']}</td>
+                                                <td>{$row['ms_nickname']}</td>
+                                                <td>{if $row['ms_status']==1}<span class="label label-info">未发送</span> {else if $row['ms_status']==3}<span class="label label-success">发送成功</span> {else if $row['ms_status']==4}<span class="label label-danger">发送失败</span>{/if}</td>
+                                                <td  style="word-break:break-all">{$row['log']}</td>
+                                            </tr>
+                                            {/loop}
+                                            </tbody>
+                                        </table>
+                                        {$pager}
+                                        {else}
+                                        <div class='panel panel-default' style="margin-top: 10px;">
+                                            <div class='panel-body' style='text-align: center;padding:30px;'>
+                                                暂时没有任何任务!
+                                            </div>
+                                        </div>
+                                        {/if}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{template 'web/common/footer'}

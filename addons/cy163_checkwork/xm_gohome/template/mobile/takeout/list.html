@@ -1,0 +1,410 @@
+{template 'public/header'}
+
+<body ontouchstart>
+<!--加载进度开始-->
+<div id="pageLoader" class="weui_loading_toast">
+  <div class="weui_mask_transparent"></div>
+  <div class="weui_toast">
+    <div class="weui_loading"> 
+      <!-- :) -->
+      <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+      <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+    </div>
+    <p class="weui_toast_content">数据加载中...</p>
+  </div>
+</div>
+<!--加载进度结束-->
+<div class="ub ub-ver page wm_list" id="page0"> 
+  <!--头部 star-->
+  <header class="ub ub-ver fixed ub-fh c-wh bb_list" style="top:0; left:0; z-index:999">
+    <div class="ubb b-bla01 ub ub-ac ub-pc uinn">
+      <a class="ub-f1 block" onclick="history.go(-1)"><i class="iconfont icon-xiangzuo"></i> {$item[type_name]}</a>
+      <a class="ub" href="{php echo $this->createMobileUrl('search',array('foo'=>'index'))}">
+        <i class="iconfont icon-sousuo t-dgra"></i>
+      </a>
+    </div>
+
+    <div class="ubb b-bla01 ub ub-ac ub-pc ub-fh">
+      <div class="ub ub-ac ub-pc ubr b-bla01">
+        <a class="dropdown-toggle btn" id="dropdownMenu1" 
+            data-toggle="dropdown">
+            全部分类<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+            <li role="presentation">
+               <a role="menuitem" tabindex="-1" id="type0" class="acitve" onClick="chcekType(0,0,{php echo count($list1)})">全部</a>
+            </li>
+            {php $n=0;}
+            {loop $list1 $vo1}
+            {php $n+=1;}
+            <li role="presentation">
+               <a role="menuitem" tabindex="-1" id="type{$n}" class="" onClick="chcekType({$vo1[id]},{$n},{php echo count($list1)})">{$vo1[type_name]}</a>
+            </li>
+            {/loop}
+        </ul>
+      </div>
+      <input type="hidden" id="type_id" value="{$type_id}">
+      
+
+      <div class="ub ub-ac ub-pc ubr b-bla01">
+        <a class="dropdown-toggle btn" id="dropdownMenu2" 
+          data-toggle="dropdown">
+          全城<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" href="#" onClick="checkadr(0)" class="acitve">无限制</a>
+          </li>
+          {loop $list3 $vo3}
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" href="#" onClick="checkadr({$vo3[id]})">{$vo3['adr_name']}</a>
+          </li>
+          {/loop}
+        </ul>
+      </div>
+
+      <div class="ub ub-ac ub-pc ubr b-bla01">
+        <a  class="dropdown-toggle btn" id="dropdownMenu3" 
+          data-toggle="dropdown">
+          推荐商圈<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3">
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" id="lido0" class="acitve" onClick="checkLido(0,0,{php echo count($list2)})">不限制</a>
+          </li>
+          {php $m=0;}
+          {loop $list2 $vo2}
+          {php $m+=1;}
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" id="lido{$m}" onClick="checkLido({$vo2[id]},{$m},{php echo count($list2)})">{$vo2['lido_name']}</a>
+          </li>
+          {/loop}
+        </ul>
+      </div>
+      
+      <div class="ub ub-ac ub-pc">
+        <a  class="dropdown-toggle btn" id="dropdownMenu4" 
+          data-toggle="dropdown">
+          排序<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu4">
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" href="#" onClick="checks(1)" class="acitve">销量最高</a>
+          </li>
+          <!--
+          <li role="presentation">
+             <a role="menuitem" tabindex="-1" href="#" onclick="checks(2)">速度最快</a>
+          </li>
+         
+          -->
+         </ul>
+      </div>
+
+    </div>
+  </header>
+  <!--头部 end--> 
+
+  <div style="height:4rem"></div>
+  <!--列表 star-->
+  <div class="ub ub-ver ub-f1" >
+    <div class="ub ub-ac ub-pc uinn212">
+      <div class="ub-f1" id="adr">定位中...</div>
+      <div class="ub" onClick="reload()"><i class="iconfont icon-shuaxin t-dgra"></i></div>
+    </div>
+    
+    <div class="ub ub-f1 ub-ver  c-wh">
+      <ul class="wm_fav_ul" id="show">
+          
+      </ul>
+
+      <div id="more" style="display:none;">
+        <div class="uinn13 tx-c block ubb b-bla01" onClick="getMore()">
+          <font class="ulev-2 t-blu2">点击加载更多</font>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <!--列表end-->
+
+  <input type="hidden" name="mapkey" id="mapkey" value="{php echo $this->getBase('qq_ak');}">
+
+{template 'public/footerjs'}
+<script type="text/javascript" src="{MODULE_URL}static/js/baidutmp.js"></script>
+<script id='near' type="text/template">
+    <%for(var i=0;i<json.length;i++){%>
+          <!--循环开始-->
+          <li class="uinn212 ubb b-bla01 ub-f1 ub ub-pc"> 
+            <a class="ub picbox ub-img1 uba b-bla01" style="background-image:url(<%=json[i].icon%>)" href="<%=json[i].url%>">
+            </a>
+            <div class="ub-f1 umar-l umar-r">
+              <a class=" ub ub-ver" href="<%=json[i].url%>">
+                <div class="ub-f1 ub ub-ac">
+                  <div class="ub-f1 font-b"><%=json[i].merchant_name%></div>
+                  <div class="ub t-gra ulev-2">< <%=json[i].juli%></div>
+                </div>
+                <div class="ub-f1 ub ub-pc ub-ac">
+                  <div class="ub-f1 ulev-2 umar-t">
+                    <%for(var j=0;j<json[i].xing;j++){%>
+                      <i class="iconfont icon-wujiaoxing t-org"></i> 
+                    <%}%>
+                    <font class="t-gra">销量<%=json[i].ordersum%>单</font>
+                  </div>
+                  <div class="ub ulev-2 t-gra"></div>
+                </div>
+                <div class="ub-f1 ub ub-pc ub-ac t-line10 ubb b-bla01 uinn11">
+                  <div class="ub-f1 ulev-2 t-gra">起送价 ￥<%=json[i].merchant_price%> 
+                    <font class="t-dgra">|</font> 配送费 ￥<%=json[i].merchant_song%>
+                  </div>
+                  <div class="ub ulev-2 t-blu uba b-blu uc-a15">
+                    <i class="iconfont icon-motuoche"></i>快速配送
+                  </div>
+                </div>
+              </a>
+              <div class="ub ub-f1 ub-ver umar-t">
+                <div class="absolute expend">
+                  <a href="javascript:void();" onclick="displayPanel(this);" class="arrow-down block"></a>
+                </div>
+                <div class="slidePanel">
+                  <dl>
+                      <%if(json[i].new_disc == 1){%>
+                        <dd class="ub-f1 ub ub-pc ub-ac ulev-2" >
+                            <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">首</div>
+                            <div class="ub-f1 umar-l">新用户立减<%=json[i].new_disc_money%>元</div>
+                        </dd>
+                      <%}%>
+                      <%if(json[i].man1_disc == 1){%>
+                        <dd class="ub-f1 ub ub-pc ub-ac ulev-2" >
+                            <div class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15">减</div>
+                            <div class="ub-f1 umar-l">在线支付满<%=json[i].man1%>减<%=json[i].jian1%></div>
+                        </dd>
+                      <%}%>
+                      <%if(json[i].man2_disc == 1){%>
+                        <dd class="ub-f1 ub ub-pc ub-ac ulev-2" >
+                            <div class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15">减</div>
+                            <div class="ub-f1 umar-l">在线支付满<%=json[i].man2%>减<%=json[i].jian2%></div>
+                        </dd>
+                      <%}%>
+                      <%if(json[i].man3_disc == 1){%>
+                        <dd class="ub-f1 ub ub-pc ub-ac ulev-2" >
+                            <div class="ub youhui c-red1 t-wh ub-ac ub-pc uc-a15">减</div>
+                            <div class="ub-f1 umar-l">在线支付满<%=json[i].man3%>减<%=json[i].jian3%></div>
+                        </dd>
+                      <%}%>
+
+                      <%if(json[i].disc == 1){%>
+                        <dd class="ub-f1 ub ub-pc ub-ac ulev-2">
+                          <div class="ub youhui c-org t-wh ub-ac ub-pc uc-a15">折</div>
+                          <div class="ub-f1 umar-l">折扣商品打<%=json[i].disc_money%>折</div>
+                        </dd>
+                      <%}%>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </li>
+          <!--循环结束-->
+    <%}%>           
+</script>
+
+<script type="text/javascript">
+wx.ready(function () {
+  getInit();
+  if(localStorage['adr_m']){
+    $("#adr").html(localStorage['adr_m']);
+  }
+  setTimeout('getAdr()', 1000);
+});
+
+function getAdr(){
+  wx.getLocation({
+      type: 'gcj02',
+      success: function (res) {
+        lat = res.latitude;
+        lng = res.longitude;
+        localStorage['lat'] = lat;
+        localStorage['lng'] = lng;
+        var mapkey = $("#mapkey").val();
+        if(mapkey == ''){
+           alert('获取地址失败，腾讯地图密钥未设置！');
+        }
+        $.ajax({
+          url:"http://cloud.n3.cn/gohome/address.php",
+          type:"POST",
+          data:{"lat":lat,"lng":lng,"mapkey":mapkey},
+          dataType:"jsonp",
+          jsonp:"jsoncallback",
+          success:function(res){
+            $("#adr").html(res.address);
+            localStorage['adr_m'] = res.address;
+            getInit();
+          },
+          error:function(){
+            alert('error!');
+          }
+        });
+      } 
+  });
+}
+
+var forumPage = 1;
+function getInit(){
+  forumPage = 1;
+
+  var data = {};
+  data['forumPage'] = forumPage;
+  data['lat'] = localStorage['lat'];
+  data['lng'] = localStorage['lng'];
+  var type_id = localStorage['type_id'];
+  if(type_id == ""){
+    type_id = "{$type_id}";
+  }
+  data['type_id'] = type_id;
+  
+  var adr_id = localStorage['adr_id'];
+  data['adr_id'] = adr_id;
+
+  var lido_id = localStorage['lido_id'];
+  data['lido_id'] = lido_id;
+
+  var xiao = localStorage['xiao'];
+  data['xiao'] = xiao;
+
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('takeout', array('foo'=>'getList'));}",
+    type:"POST",
+    data: data,
+    dataType:"json",
+    success: function(res){
+      if(res == 0){
+        document.getElementById('pageLoader').style.display = 'none';
+        document.getElementById('show').innerHTML = '<div class="weui_msg"><div class="weui_icon_area"><i class="weui_icon_msg weui_icon_warn"></i></div><div class="weui_text_area"><h2 class="weui_msg_title">暂无商铺</h2></div></div>';
+      }else{
+        var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        document.getElementById('show').innerHTML = near; 
+        document.getElementById('pageLoader').style.display = 'none';
+        if(json.length == 10){
+          document.getElementById('more').style.display = "block";  
+        }
+      }
+    }
+  });
+}
+
+function getMore(){
+  forumPage = forumPage + 1;
+    
+  var data = {};
+  data['forumPage'] = forumPage;
+  data['lat'] = localStorage['lat'];
+  data['lng'] = localStorage['lng'];
+  var type_id = localStorage['type_id'];
+  data['type_id'] = type_id;
+  
+  var adr_id = localStorage['adr_id'];
+  data['adr_id'] = adr_id;
+
+  var lido_id = localStorage['lido_id'];
+  data['lido_id'] = lido_id;
+
+  var xiao = localStorage['xiao'];
+  data['xiao'] = xiao;
+  
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('takeout', array('foo'=>'getList'));}",
+    type:"POST",
+    data: data,
+    dataType:"json",
+    success: function(res){
+      if(res == "0"){
+        document.getElementById('more').innerHTML = '已无数据';
+      }else{
+        var json = eval(res);
+        var near = baidu.template("near",{json:json});
+        $("#show").append(near); 
+        if(json.length == 10){
+          //document.getElementById('more').innerHTML = "<div class='tx-c'>已无数据</div>";  
+        //}else{
+          document.getElementById('more').style.display = "block";  
+        }
+      }
+    }
+  });
+}
+
+function chcekType(id,k,all){
+  for (var i = 0; i < all; i++) {
+    $("#type"+i).removeClass("acitve");  
+  }
+  $("#type"+k).addClass("acitve");
+  localStorage['type_id'] = id;
+
+  localStorage['adr_id']  = '';
+  localStorage['lido_id'] = '';
+  localStorage['xiao']    = '';
+  document.getElementById('pageLoader').style.display = 'block';
+  getInit();
+}
+
+function checkLido(id,k,all){
+  for (var i = 0; i < all; i++) {
+    $("#lido"+i).removeClass("acitve");  
+  }
+  $("#lido"+k).addClass("acitve");
+  localStorage['lido_id'] = id;
+
+  localStorage['type_id'] = '';
+  localStorage['adr_id']  = '';
+  localStorage['xiao']    = '';
+  document.getElementById('pageLoader').style.display = 'block';
+  getInit();
+}
+
+function reload(){
+  localStorage['type_id'] = '';
+  localStorage['lido_id'] = '';
+  window.location.reload();
+}
+
+function checks(id) {
+  if(id == 1){
+    localStorage['xiao'] = 1;
+    
+    localStorage['type_id'] = '';
+    localStorage['adr_id']  = '';
+    localStorage['lido_id'] = '';
+    document.getElementById('pageLoader').style.display = 'block';
+    getInit();
+  }
+}
+
+function checkadr(id) {
+  localStorage['type_id'] = '';
+  localStorage['lido_id'] = '';
+  localStorage['xiao']    = '';
+  if(id == 0){
+    localStorage['adr_id'] = '';
+    document.getElementById('pageLoader').style.display = 'block';
+    getInit();
+  }else{
+    localStorage['adr_id'] = id;
+    document.getElementById('pageLoader').style.display = 'block';
+    getInit();
+  }
+}
+
+</script>
+
+</body>
+</html>

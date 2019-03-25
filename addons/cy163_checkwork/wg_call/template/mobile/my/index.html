@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-title" content="xx">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>个人中心</title>
+    <link rel="stylesheet" href="{STATIC_ROOT}/css/style.css">
+    <link rel="stylesheet" href="{STATIC_ROOT}/css/collect.css">
+    <link rel="stylesheet" href="{STATIC_ROOT}/css/confirmorder.css">
+</head>
+<body>
+
+{template 'public/footer_nav'}
+
+
+<div class="call">
+    <div id="addressList" class="address_list" style="display: block">
+        <div class="address change-address" data-id="3">
+            <ul class="selected" style="padding-left: 20px;">
+                <li class="address-detail"><?php echo $address['address'] ? $address['address'] : '编辑我的收货地址';?></li>
+                <li class="address-user"><strong>{$address['name']}-{$address['mobile']}</strong></li>
+                <li class="edit" onclick="">编辑</li>
+
+            </ul>
+        </div>
+    </div>
+    <ul class="exchange-area" id="prize-list" style="width: 100%;">
+    </ul>
+</div>
+
+<div class="mask "></div>
+<div class="pop-2 " style="height: 260px;">
+    <p class="pop-tit">温馨提示</p>
+    <p class="pop-txt"><input placeholder="姓名" id="name" value="{$address['name']}"  style="border: 1px;"></p>
+    <p class="pop-txt"><input placeholder="地址" id="address" value="{$address['address']}" style="border: 1px;"></p>
+    <p class="pop-txt"><input placeholder="电话" id="mobile" value="{$address['mobile']}"  style="border: 1px;"></p>
+    <button class="pop-btn">确定</button>
+</div>
+
+</body>
+<script src="{STATIC_ROOT}/js/jquery.js"></script>
+<script src="{STATIC_ROOT}/js/template.min.js"></script>
+{template 'public/more_new'}
+
+<script id="prize-detail" type="text/html">
+    <%for(var i in list){%>
+    <div class="fav_item">
+        <a class="fav_link fav_link_goods" style="padding-left: 20px;padding-bottom: 5px">
+            <span class="more_notice btn" style="border: 0;color: red;">- <%=list[i].need_call%> </span>
+            <p class="name"><%=list[i].name%></p>
+            <p class="name" style="color: #c1c1c1">
+                <%=list[i].express_status_value%>
+                <% if(list[i].express_num){%>
+                <%=list[i].express_num%>
+                <%}%>
+            </p>
+        </a>
+    </div>
+    <%}%>
+</script>
+<script>
+    $(function(){
+        $('.edit').click(function () {
+            $('.mask').addClass('active');
+            $('.pop-2').addClass('active');
+        });
+        var url = "{php echo $this->createMobileUrl('my',['op' => 'moreprize'])}";
+        var address = "{php echo $this->createMobileUrl('address')}";
+        initLoadingData_new(true, url, 1, $('#prize-detail').html(), 'prize-list');
+        $('.pop-btn').click(function () {
+            $.post(address,{
+                name:$('#name').val(),
+                address:$('#address').val(),
+                mobile:$('#mobile').val()
+            },function (data) {
+                location.reload();
+            });
+        });
+    })
+</script>
+{template 'public/share'}
+</html>

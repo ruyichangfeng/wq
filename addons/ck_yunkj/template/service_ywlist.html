@@ -1,0 +1,276 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	{template 'servic_yw_header'}
+</ul>
+<style>
+	#modeladd li,#modelal li{ padding-top:5px; padding-bottom:5px; list-style: none;}
+	.t_input{ height:30px; border: 1px solid #cccc; line-height: 30px; border-radius: 5px;}
+	.bati{float:left; line-height:35px;}
+</style>
+{if $op == 'edit'}
+<div class="main">
+	
+        <div class="panel panel-default">
+            <div class="panel-heading">申请业务信息</div>
+            <div class="panel-body">
+			
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公司名称</label>
+					<div class="col-sm-10">
+					  <p class="form-control-static">
+					  {if $kehu_show}
+					  {loop $kehu_show $value}
+					  {$value['compname']}
+					  {/loop}
+					  {else}
+					  <font color="#CC0000">不存在或者已删除</font>
+					  {/if}
+					  </p>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属类型</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">{$category[$srdb['type']]['name']}</p>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">要求办结时间</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">{$srdb['endtimes']}</p>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">紧急程度</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">
+					  {if $srdb['urgency']}<font color="#CC0000">加急</font>
+					  {else}正常
+					  {/if}
+					  </p>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">描述</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">{$srdb['content']}</p>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">附件</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">
+					  	{if $srdb['download']}
+					  		<a href="../attachment/{$srdb['download']}" target="_blank">点击下载附件</a>
+					  	{else}
+							无
+						{/if}
+					  </p>
+					</div>
+                </div>
+				{if $srdb['ygid']}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">领取员工信息</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static"><b>头像：</b>
+							{if $usershow[avatar]}
+							<img src="{php echo tomedia($usershow[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+							{else}
+							<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+							{/if}
+						</p>
+						<p class="form-control-static"><b>姓名：</b>{$staff_show['name']}</p>
+						<p class="form-control-static"><b>手机号码：</b>{$staff_show['phone']}</p>
+                    </div>
+                </div>
+				{else}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">分配员工</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<p class="form-control-static">未分配有员工，<a href="{php echo $this->createWebUrl('service_allocation2', array('did' => $srdb[id]));}" >快去分配吧</a>!</p>
+                    </div>
+                </div>
+				{/if}
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">申请时间</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">{php echo date('Y-m-d H:i', $srdb['dateline']);}</p>
+					</div>
+                </div>
+				
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">状态</label>
+                    <div class="col-sm-10">
+					  <p class="form-control-static">
+						{if $srdb[yguid]}
+							已领取，
+							{if $srdb[succeed]}
+								已完成，
+								{if $srdb[sfpj]}已评价{else}<font color="#CC0000">未评价</font>{/if}
+							{else}
+								<font color="#006600">进行中</font>
+							{/if}
+						{else}
+							<font color="#CC0000">未领取</font>
+						{/if}
+					  </p>
+					</div>
+                </div>
+                
+            </div>
+        </div>
+
+</div>
+
+<!--完成进度 start-->
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			  <table class="table">
+				<tr>
+					<th width="100">头像</th>
+					<th width="150">姓名</th>
+					<th >进度留言</th>
+					<th width="150">发布时间</th>
+				</tr>
+				{loop $list_progress $key $value}
+				<tr >
+					<td>
+						{if $usershow[avatar]}
+						<img src="{php echo tomedia($usershow[avatar]);}" onerror="this.src='./resource/images/nopic.jpg'; this.title='缩略图片未上传.'" style="max-width:80px;"/>
+						{else}
+						<img src="../addons/{$_GPC['m']}/template/noavatar_middle.gif" style="max-width:80px;"/>
+						{/if}
+					</td>
+					<td>{$value[name]}</td>
+					<td>{$value['content']}</td>
+					<td>{php echo date('Y-m-d H:i', $value['dateline']);}</td>
+				</tr>
+				{/loop}
+			  </table>
+		</div>
+	</div>
+</div>
+<!--完成进度 end-->
+
+{else}
+
+<div class='main'>
+   	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-inline" role="form">
+			<input type="hidden" name="c" value="{$_GPC['c']}">
+			<input type="hidden" name="a" value="{$_GPC['a']}">
+			<input type="hidden" name="do" value="{$_GPC['do']}">
+			<input type="hidden" name="m" value="{$_GPC['m']}">
+			  <div class="form-group">
+				<label for="exampleInputEmail2">搜索关键字</label>
+				<input type="txt" class="form-control" name="keyword"  value="{$_GPC['keyword']}" placeholder="请输入关键字">
+			  </div>
+			  <div class="form-group">
+				<label for="exampleInputName2">申请客户UID</label>
+				<input type="text" class="form-control" name="uid" value="{$_GPC['uid']}" placeholder="请输入客户UID">
+			  </div>
+			  <div style="width:100%; height:10px;"></div>
+			  <div class="form-group">
+				<label for="exampleInputEmail2">结果排序</label>
+				<select name="ordersc" class="form-control">
+					<option value="" >不限</option>
+					<option value="desc" $ordersc[desc] >递减</option>
+					<option value="asc" $ordersc[asc] >递增</option>
+				</select>
+				<select name="psize" class="form-control">
+					<option value="20" $perpages[20]>每页显示20个</option>
+					<option value="50" $perpages[50]>每页显示50个</option>
+					<option value="100" $perpages[100]>每页显示100个</option>
+				</select>
+			  </div>
+			  <button type="submit" class="btn btn-default">搜索</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+	function checkAll(form, name) {
+		for(var i = 0; i < form.elements.length; i++) {
+			var e = form.elements[i];
+			if(e.name.match(name)) {
+				e.checked = form.elements['chkall'].checked;
+			}
+		}
+	}
+</script>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form method="post" class="form">
+	<input name="token" type="hidden" value="{$_W['token']}" />
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="80">选择</th>
+			<th>申请时间</th>
+			<th>公司名称</th>
+			<th>紧急程度</th>
+			<th>所属类型</th>
+			<th>要求办结时间</th>
+			<th>状态</th>
+			<th width="150">操作</th>
+		</tr>
+		{loop $list $key $value}
+		{php $attyshow = pdo_get('mc_members', array('uid' => $value['uid'],'uniacid' => $_W['uniacid']));}
+		<tr >
+			<td><input type="checkbox" name="ids[]" value="{$value[id]}"></td>
+			<td>{php echo date('Y-m-d H:i', $value['dateline']);}</td>
+			<td>{if $attyshow}{$value['compname']}{else}<font color="#CC0000">不存在或者已删除</font>{/if}</td>
+			<td>
+				{if $value['urgency']}<font color="#CC0000">加急</font>
+				{else}正常
+				{/if}
+			</td>
+			<td>{$category[$value['type']]['name']}</td>
+			<td>{$value['endtimes']}</td>
+			<td>
+				{if $value[yguid]}
+					已领取，
+					{if $value[succeed]}
+						已完成，
+						{if $value[sfpj]}已评价{else}<font color="#CC0000">未评价</font>{/if}
+					{else}
+						<font color="#006600">进行中</font>
+					{/if}
+
+				{else}
+					<font color="#CC0000">未领取</font>
+				{/if}
+			</td>
+			<td>
+				<a href="{$urlt}&op=edit&id={$value[id]}">查看</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[id]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="8">{$pager}</td>
+		</tr>
+		{/if}
+		<tr >
+			<td colspan="8" align="center">
+				<input type="checkbox" id="chkall" name="chkall" onclick="checkAll(this.form, 'ids')">全选 &nbsp;&nbsp;
+				<input type="radio" name="optype" value="1">删除
+				<input type="submit" name="listsubmit" value="提交" class="btn btn-default">
+			</td>
+		 </tr>
+	  </table>
+	</div>
+	</form>
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

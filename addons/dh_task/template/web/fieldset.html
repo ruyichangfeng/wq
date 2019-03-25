@@ -1,0 +1,75 @@
+{template 'public/header'}
+{template 'public/comhead'}
+
+<ul class="nav nav-tabs">
+    <li {if $operation == 'fieldset_post'}class="active"{/if}><a href="{php echo $this->createWebUrl('field', array('op' => 'fieldset_post'))}">添加表单</a></li>
+    <li {if $operation == 'fieldset_display'}class="active"{/if}><a href="{php echo $this->createWebUrl('field', array('op' => 'fieldset_display'))}">表单管理</a></li>
+</ul>
+{if $operation == 'fieldset_post'}
+<div class="main">
+    <form action="{php echo $this->createWebUrl('field', array('op' => 'fieldset_post'))}" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{$info['id']}" />
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                内容编辑
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">表单名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="name" class="form-control" value="{$info['name']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-3" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+{elseif $operation == 'fieldset_display'}
+<div class="main">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i>刷新</a>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <form action="" method="fieldset_post" class="form-horizontal form" >
+            <input type="hidden" name="storeid" value="{$storeid}" />
+            <div class="table-responsive panel-body">
+                <table class="table table-hover">
+                    <thead class="navbar-inner">
+                    <tr>
+                        <th style="width:80px;">id</th>
+                        <th>标题</th>
+                        <th style="width:200px;text-align:right;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level-list">
+                    {loop $list $row}
+                    <tr>
+                        <td><div class="type-parent">{$row['id']}&nbsp;&nbsp;</div></td>
+                        <td><div class="type-parent">{$row['name']}&nbsp;&nbsp;</div></td>
+                        <td style="text-align:right;">
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('field', array('op' => 'field_display', 'fieldset_id' => $row['id']))}" title="字段管理">字段管理</a>&nbsp;&nbsp;
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('field', array('op' => 'fieldset_post', 'id' => $row['id']))}" title="编辑">改</a>&nbsp;&nbsp;
+                            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('field', array('op' => 'fieldset_delete', 'id' => $row['id']))}" onclick="return confirm('确认删除吗？');return false;" title="删除">删</a>
+                        </td>
+                    </tr>
+                    {/loop}
+                    <tr>
+                        <td colspan="3">
+                            <input type="hidden" name="token" value="{$_W['token']}" />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    {$pager}
+</div>
+{/if}
+{template 'common/footer'}

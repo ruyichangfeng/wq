@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$userlist['title']}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui" />
+    <link rel="stylesheet" href="{$resroot}css/ewm.css"/>
+    <link href="{$resroot}css/load.css" rel="stylesheet"/>
+</head>
+{php echo register_jssdk(false);} <!-- 放到其他引入的 js 之前 -->
+<body>
+<!----加载动画---->
+<section class="load">
+    <div class="loading1">
+        <span class="s1"></span>
+        <span class="s2"></span>
+    </div>
+    <div class="load_logo">
+        <div class="inner" id="logo"></div>
+    </div>
+    <div class="data figure" id="loading_figure">0%</div>
+</section>
+<div class="box1">
+<img src="{$bj}" style="width: 100%; height: 100%; position: absolute;top:0; left:0" />
+   
+    <div class="box">
+    <div class="ewm">
+        <img src="{$log}"/>
+    </div>
+    {if $userlist['logo']}
+    <div class="logo" style="width: 2.55rem; position: absolute;top:-59%; left:50%; margin-left: -1.275rem;">
+        <img src="{$logo}" style="width: 100%;"/>
+    </div>
+    {/if}
+    <div class="bottom">
+        <p>{$zfcon}</p>
+    </div>
+        </div>
+</div>
+</body>
+<script src="{$resroot}js/zepto.js"></script>
+<script src="{$resroot}js/config.js"></script>
+
+<script>
+//加载动画
+    $(function(){
+        $(".box1").height($(document).height());
+        $(".box1").hide();
+        var sdl_boot = function() {
+            var time = window.setTimeout(function(){
+                $('.load').hide();
+                $(".box1").show();
+                $("body").css("height","auto");
+                var h=$(".M2center ul").height()+10;
+                $(".M2foot").height(h);
+
+                // $("body").css("background","transparent");
+            },500);
+            var time = window.setTimeout(function(){
+                $('.p1_4').css("-webkit-animation","largen2 2s 0s infinite linear both");
+            },4000);
+        };
+        function now () {
+            return Date.now ? Date.now() : +new Date();
+        }
+        var sdl = function(imgs) {
+            if (imgs.length === 0) return sdl_boot();
+            var requestAnimationFrame =
+                    window.requestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
+                    function (callback) { window.setTimeout(callback, 1000 / 60); };
+            var logo = document.getElementById('logo');
+            var loading_figure = document.getElementById('loading_figure');
+            var startTime = now();
+            var minTime = 1000; //loading出现的最小时间。
+            var count = 0;
+            var total = imgs.length;
+            var starting = false;
+            for (var i = 0, len = imgs.length; i < len; i++) {
+                var dom = sdl.cache[imgs[i]] = new Image();
+                dom.onload = (function(dom, src) {
+                    return function() {
+                        count += 1;
+                        dom.onload = null;
+                        delete sdl.cache[src]
+                    }
+                }(dom, imgs[i]));
+                dom.src = imgs[i];
+            }
+            function loopCheck () {
+                if (starting) return;
+                var fakePst = Math.min((now() - startTime) / minTime, 1);
+                var pst = (fakePst + count / total) / 2;
+                loading_figure.innerHTML = Math.round(pst * 100) + '%';
+                if (pst >= 1) {
+                    sdl_boot();
+                    starting = true;
+                } else {
+                    requestAnimationFrame(loopCheck);
+                }
+            }
+            loopCheck();
+        }
+        sdl.cache = {};
+
+
+        var page_info = {
+            image_list: [
+                '{$log}',
+                '{$bj}',
+            ]
+        }
+        sdl(page_info['image_list']);
+    })
+</script>
+<script>
+	wx.ready(function () {
+		sharedata = {
+			title: "{$userlist['title']}",
+			desc: "{$content}",
+			link: "{$tzurl}",
+			imgUrl: "{$log}",
+			success: function(){
+			//	alert('success');
+			},
+			cancel: function(){
+			//	alert('cancel');
+			}
+		};
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+	});
+</script>
+</html>

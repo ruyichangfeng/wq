@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微早教-家长端-消息中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}assets/css/app.css">
+</head>
+<body>
+<div id="message">
+    <div class="mui-bar mui-bar-tab dialog-input">
+        <div class="mui-col-sm-2 mui-col-xs-2" style="display: inline-table;">
+            <img src="{MODULE_URL}assets/img/dialog-keyboard.png" class="dialog-input-img" />
+        </div>
+        <div class="mui-col-sm-7 mui-col-xs-7" style="display: inline-table;">
+            <input type="text" class="mui-input-row" name="message" placeholder="说点什么吧" />
+        </div>
+        <div class="mui-col-sm- mui-col-xs-2 mui-text-center" style="display: inline-table;">
+            <a href="javascript:;" class="btn-save" style="width:100%;">发送</a>
+        </div>
+        <div class="mui-clearfix"></div>
+    </div>
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">在线咨询</h1>
+    </div>
+    <div class="mui-content">
+        <div class="jiazhang-dialog">
+            {loop $message_list $index $item}
+            {if $item['from_user']==$from_user}
+            <div class="jiazhang-dialog-title">{$item['sendtime']}</div>
+            <div class="mui-pull-left">
+                <img src="{php echo tomedia($from_user_xq['avatar'])}" class="kehu-img" /></div>
+            <div class="dialog dialog-zixun">
+                <img src="{MODULE_URL}assets/img/jiazhang-dialogbg.png" class="dialog-img" />
+                <div class="dialog-header dialog-left"></div>
+                <div class="dialog-content dialog-left">
+                    <span>{$item['content']}</span>
+                </div>
+                <div class="dialog-footer dialog-left"></div>
+            </div>
+            <div class="mui-clearfix"></div>
+            {/if}
+            {if $item['from_user']==$to_user}
+            <div class="jiazhang-dialog-title">{$item['sendtime']}</div>
+            <div class="mui-pull-left mui-text-right dialog-reply">
+                <img src="{MODULE_URL}assets/img/jiazhang-dialogbg-right.png" class="dialog-img-right" />
+                <div class="dialog-header dialog-right"></div>
+                <div class="dialog-content dialog-right">
+                    <span>{$item['content']}</span>
+                </div>
+                <div class="dialog-footer dialog-right"></div>
+            </div>
+            <div class="dialog dialog-zixun-right">
+                <img src="{php echo tomedia($users_xq['avatar'])}" class="kehu-img" />
+            </div>
+            <div class="mui-clearfix"></div>
+            {/if}
+            {/loop}
+        </div>
+    </div>
+</div>
+<script src="{MODULE_URL}assets/js/mui.min.js"></script>
+<script src="{MODULE_URL}assets/js/mui.view.js "></script>
+<script src="https://cdn.jsdelivr.net/jquery/2.2.4/jquery.min.js"></script>
+<script>
+    mui.init({
+        swipeBack:true //启用右滑关闭功能
+    });
+</script>
+<script>
+    $(".btn-save").click(function(){
+        var message = $("input[name='message']").val().trim();
+        if(message==""){
+            alert("请输入发送信息内容");
+            $("input[name='message']").val("");
+            return false;
+        }
+        var to_user = "{$from_user}";
+        var Url = "{php echo $this->createMobileurl('consultant')}";
+        var data = {caozuo:'sendmessage',to_user:to_user,content:message};
+        $.post(Url,data,function(data){
+            if(data.error==1){
+                //alert(data.message);
+                location.reload();
+            }else{
+                alert(data.message);
+            }
+        },'json');
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	{template 'servic_yw_header'}
+	<li class="active" style="margin-left:100px;"><a href="{$urlt}&op=add" >添加业务类型</a></li>
+</ul>
+
+{if $op == 'add' || $op == 'edit'}
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+	<input type="hidden" name="token" value="{$_W['token']}" />
+    	<input type="hidden" name="cid" value="{$srdb['cid']}" />
+		<input type="hidden" name="pid" value="0" />
+        <div class="panel panel-default">
+            <div class="panel-heading">{if $op == 'add'}添加业务类型{elseif $op == 'edit'}修改业务类型{/if} </div>
+            <div class="panel-body">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">名称</label>
+                    <div class="col-xs-12 col-sm-9" >
+						<input type="txt" class="form-control" id="name" name="name" value="{$srdb[name]}" style="width:400px;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">序号</label>
+                    <div class="col-xs-12 col-sm-9" >
+                    	<input type="txt" class="form-control" id="listorder" name="listorder" value="{$srdb[listorder]}" style="width:60px;">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group col-sm-12 col-xs-12">
+			<input type="submit" name="{$op}_submit" value="保 存" class="btn btn-primary col-lg-1" onclick='return formcheck()' />
+		</div>
+  </form>
+</div>
+{else}
+<script language="javascript" type="text/javascript">
+function checkAll(form, name) {
+	for(var i = 0; i < form.elements.length; i++) {
+		var e = form.elements[i];
+		if(e.name.match(name)) {
+			e.checked = form.elements['chkall'].checked;
+		}
+	}
+}
+</script>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form method="post" class="form">
+	<input name="token" type="hidden" value="{$_W['token']}" />
+	<div class="table-responsive">
+	  <table class="table">
+		<tr>
+			<th width="50">选择</th>
+			<th width="50">ID</th>
+			<th width="100">序号</th>
+			<th >名称</th>
+			<th width="120">操作</th>
+		</tr>
+		{loop $list $key $value}
+		<tr >
+			<td><input type="checkbox" name="ids[]" value="{$value[cid]}"></td>
+			<td>{$value[cid]}</td>
+			<td><input type="text" name="listorder[{$value[cid]}]" value="{$value[listorder]}" size="10" class="form-control"/></td>
+			<td><input type="text" name="name[{$value[cid]}]" value="{$value[name]}" class="form-control" style="width:300px;"/></td>
+			<td>
+				<a href="{$urlt}&op=edit&id={$value[cid]}">编辑</a> &nbsp;|&nbsp; 
+				<a href="{$urlt}&op=delete&id={$value[cid]}">删除</a>
+			</td>
+		</tr>
+		{/loop}
+		{if $pager}
+		<tr >
+			<td colspan="5">{$pager}</td>
+		</tr>
+		{/if}
+		<tr >
+			<td colspan="5" align="center">
+				<input type="checkbox" id="chkall" name="chkall" onclick="checkAll(this.form, 'ids')">全选 &nbsp;&nbsp;
+				<input type="radio" name="optype" value="1">修改
+				<input type="submit" name="listsubmit" value="提交" class="btn btn-default">
+			</td>
+		 </tr>
+	  </table>
+	</div>
+	</form>
+  </div>
+</div>
+{/if}
+
+{template 'common/footer'}

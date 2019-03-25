@@ -1,0 +1,194 @@
+<include file="Public/header.html"/>
+</head>
+<body>
+    <div class="x-body">
+        <form class="layui-form">
+               
+                
+              <div class="layui-form-item">
+			    <div class="layui-inline">
+			      <label class="layui-form-label">用户头像</label>
+			      <div class="layui-input-inline">
+			      	  <button type="button" class="layui-btn" onclick="$('#avatar').click();">
+					     <i class="layui-icon">&#xe67c;</i>上传图片
+					 </button>
+					  <input type="hidden"  id="avatar_val"  value="" >
+					  <input style="display: none;" type="file" id="avatar"  onchange="previewImage(this,1,'avatar_val')"   multiple  class="input-file">
+	                <div>
+	                   <img id="imghead1" border="0"  style="margin-top: 5px;max-height:100px;"                   	
+	                   <?php 
+	                   	   if( empty($member['avatar']) ){
+	                   	   	   echo 'src="__ROOT__/Public/images/z_add.png"   onclick="$(\'#avatar\').click();"';
+	                   	   }else{
+	                   	       echo 'src="'.$member['avatar'].'"';
+	                   	   }
+	                    ?>
+	                   >
+			      </div>
+			    </div>
+          
+        	  <div class="layui-form-item">
+                <label  class="layui-form-label">用户昵称 </label>
+                <div class="layui-input-block">
+                    <input type="text"  lay-verify="required"  name="nickname" autocomplete="off" value="{$member['nickname']}"  class="layui-input">
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+              	
+              	 	<div class="layui-inline">
+		                <label class="layui-form-label">出生日期 </label>
+		                <div class="layui-input-inline">
+		                	<input type="text" name="birthday" id="birthday"  value="{$member['birthday']}"  placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+		                </div>
+	                </div> 
+	               
+	                  <div class="layui-inline">
+					      <label class="layui-form-label">性别</label>
+					      <div class="layui-input-block">
+					        <input type="radio" name="sex" value="1" <?php  if($member['sex']==1){ echo 'checked'; } ?>  title="男">
+                            <input type="radio" name="sex" value="2" <?php  if($member['sex']==2){ echo 'checked'; } ?> title="女">
+                            <input type="radio" name="sex" value=""  <?php  if(empty($member['sex'])){ echo 'checked'; } ?> title="保密">
+					      </div>
+					 </div>
+	             
+               </div>
+        	 
+        	  <div class="layui-form-item">
+                <label  class="layui-form-label">真实姓名 </label>
+                <div class="layui-input-block">
+                    <input type="text"  name="name" autocomplete="off" value="{$member['name']}"  class="layui-input">
+                </div>
+              </div>
+        	 
+        	  <div class="layui-form-item">
+                <label  class="layui-form-label">身份证号 </label>
+                <div class="layui-input-block">
+                    <input type="text"  name="idcard" autocomplete="off"   value="{$member['idcard']}"  class="layui-input">
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label  class="layui-form-label">联系手机 </label>
+                <div class="layui-input-block">
+                    <input type="tel"  name="telephone"  lay-verify="required|phone"  autocomplete="off" value="{$member['telephone']}"  class="layui-input">
+                </div>
+              </div>
+        	 
+             <div class="layui-form-item">
+                <label  class="layui-form-label">电子邮箱 </label>
+                <div class="layui-input-block">
+                    <input type="text"  name="email"   autocomplete="off" value="{$member['email']}" class="layui-input">
+                </div>
+             </div>
+             
+             <input type="hidden"  name="id" value="{$member['id']}" />
+             
+             <div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+               <button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+            </div>
+            
+        </form>
+    </div>
+    
+    <include file="Public/footer.html"/>
+    <script type="text/javascript" src="__ROOT__/Public/js/tools.js"></script> 
+    <script>
+    	
+    	
+        layui.use(['form','layer','laydate'], function(){
+           $ = layui.jquery;
+           var form = layui.form;
+           var layer = layui.layer;
+           var laydate = layui.laydate;
+             
+           laydate.render({
+		     elem: '#birthday'
+		   });
+		   
+          
+          form.on('submit(save)', function(data){
+              
+                var tjing = parent.layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form = document.forms[0];
+	  		    var formData = new FormData(form);  
+			    if($("#avatar_val").val()!=''){
+			      formData.append("avatar",convertBase64UrlToBlob($("#avatar_val").val()));
+				} 
+              
+               $.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Member/do_member')}",
+					data: formData,
+					processData : false,         
+			        contentType : false,   
+					dataType: 'text',
+					success: function(data){
+					   parent.layer.close(tjing);
+					   if(data == '1'){
+		              	 var index = parent.layer.getFrameIndex(window.name);
+		                 parent.layer.msg('提交成功', {icon: 1,offset: '40%',time:2000,shade: 0.3},function(){ 
+					        parent.location.reload();
+						 })
+		               }else if(data == '2'){
+		              	 parent.layer.msg('提交失败', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		               }else{
+		              	 parent.layer.msg(data, {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		               }
+					}
+				});	
+              
+            return false;
+          });
+         
+          
+        });
+        
+    function convertBase64UrlToBlob(urlData){
+	    var bytes=window.atob(urlData.split(',')[1]);    
+	    var ab = new ArrayBuffer(bytes.length);
+	    var ia = new Uint8Array(ab);
+	    for (var i = 0; i < bytes.length; i++) {
+	        ia[i] = bytes.charCodeAt(i);
+	    }
+	    return new Blob( [ab] , {type : 'image/jpg'});
+    }
+    
+        
+   function previewImage(file,flag,ob){
+     var img =$('#imghead'+flag);
+     var oFile = file.files[0]; 
+    
+     if(!new RegExp("(jpg|jpeg|png)+","gi").test(oFile.type)){  
+          layer.msg("图片上传：文件类型必须是JPG、JPEG、PNG", {icon: 2,offset: '40%',time:2000,shade: 0.3});
+          return;  
+     }
+     var reader = new FileReader();  
+     var tjing =  parent.layer.msg('图片加载中', {icon: 16,shade: 0.3,time: 60*1000});
+     reader.onload = function(e) {  
+        var base64Img= e.target.result;
+        var _ir=ImageResizer({  
+        resizeMode:"auto"  
+        ,dataSource:base64Img  
+        ,dataSourceType:"base64"  
+        ,maxWidth:1200   
+        ,maxHeight:1200 
+        ,onTmpImgGenerate:function(img){ }   
+        ,success:function(resizeImgBase64,canvas){
+		parent.layer.close(tjing);
+		img.attr("src",resizeImgBase64);  
+	    $('#'+ob).val(resizeImgBase64.substr(22));
+		
+        },debug:false});            
+     };  
+     reader.readAsDataURL(oFile);  
+   }
+    
+        
+        
+    </script>
+  
+</body>
+
+</html>

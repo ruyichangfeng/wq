@@ -1,0 +1,82 @@
+{template 'header'}
+<div id="listun-details">
+    <div class="mui-navbar-inner mui-bar mui-bar-nav">
+        <button type="button" class="mui-left mui-action-back mui-btn  mui-btn-link mui-btn-nav mui-pull-left">
+            <span class="mui-icon mui-icon-left-nav"></span>返回
+        </button>
+        <h1 class="mui-center mui-title">课程详情</h1>
+    </div>
+    <div class="mui-content">
+        <div class="guwen-xueyuan-content">
+            <h4 class="mui-ellipsis zuopin-title">{$attendance[0]['class_name']}</h4>
+            <h5 class="gray"><img src="{MODULE_URL}assets/img/icon-time.png" /> {$attendance['0']['timeslot']}</h5>
+            <p class="mui-h6 mui-ellipsis gray"><img src="{MODULE_URL}assets/img/icon-position.png" />{$attendance[0]['campus']}{$attendance[0]['classroom']}</p>
+        </div>
+        <ul class="mui-table-view">
+            {if $attendance}
+            {loop $attendance $child}
+            <li class="mui-table-view-cell guwen-collapse">
+                <img class="mui-media-object mui-pull-left guwen-huiyuan-img" src="{if $child['avatar']}{$child['avatar']}{else}{MODULE_URL}assets/img/icon-wzj.png{/if}">学生：{$child['fullname']}（{$child['age']}岁）
+                {if $child['attendance_status'] == 4}<span class="badge-teacher">假</span>{/if}
+                {if $child['attendance_status'] == 5}<span class="badge-teacher badge-test">试</span>{/if}
+                <p class="mui-pull-right red">{$child['remaining_hours']}</p>
+                <p>家长：{$child['parent_name']}     手机：{$child['parent_mobile']}</p>
+
+                <div class="teacher-btn-group">
+                    {if $child['project_status'] == 0}
+                        <a href="{php echo $this->createMobileUrl('tutor', array('page' => 'upload-zuopin','schedule_id'=> $child['schedule_id'],'child_id' => $child['child_id']))}" class="btn-upload">上传作品</a>
+                    {else}
+                        <a href="javascript:;" class="btn-upload mui-disabled">已上传作品</a>
+                    {/if}
+
+                    {if $child['comment_status'] == 0}
+                        <a href="{php echo $this->createMobileUrl('tutor', array('page' => 'pingjia','tutor_id' => $child['tutor_id'],'attendance_id' => $child['attendance_id']))}" class="btn-pingjia">评价</a>
+                    {else}
+                        <a href="javascript:;" class="btn-pingjia mui-disabled">已评价</a>
+                    {/if}
+                </div>
+
+            </li>
+            {/loop}
+            {else}
+            <div class="guwen-xueyuan-content mui-text-center">
+                暂无
+            </div>
+            {/if}
+        </ul>
+    </div>
+</div>
+<div id="erweima" class="mui-popover">
+    <div class="guwen-erweima">
+        <img src="{MODULE_URL}assets/img/guwen-erweima.png" />
+    </div>
+</div>
+<script>
+    function checkIn(attendanceId, status, element)
+    {
+        $.ajax({
+            dataType: "json",
+            type: "post",
+            url: "{php echo $this->createMobileUrl('tutor', array('action' => 'postAttendance'))}",
+            data: {attendanceId: attendanceId, status: status},
+            success: function (response)
+            {
+                if (response.status == 'success')
+                {
+                    mui.alert('操作成功', function () {
+                        window.location.reload();
+                    });
+                }
+                else
+                {
+                    mui.alert('操作失败，请重试');
+                }
+            },
+            error: function ()
+            {
+                mui.alert('操作失败，请重试');
+            }
+        });
+    }
+</script>
+{template 'footer'}

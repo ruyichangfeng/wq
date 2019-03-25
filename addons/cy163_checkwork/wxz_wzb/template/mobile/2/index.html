@@ -1,0 +1,317 @@
+<html lang="en" style="font-size: 14px;"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/2/css/roomControl.css">
+        <link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/2/css/swiper-3.3.1.min.css">
+        <script type="text/javascript" src=" https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <title>{$setting['title']}</title>
+        <style>
+        	.dropload-down .dropload-noData {
+              text-align: center;
+              color: #B5B5B5;
+          }
+          .dropload-load {
+              text-align: center;
+              color: #B5B5B5;
+          }
+        </style>
+    </head>
+    <body>
+
+        <div class="wrap">
+
+            <!-- 首部主播个人信息 start-->
+            <div class="control-header clearfix">
+            	<div class="swiper-container1">
+				  <div class="swiper-wrapper">
+				  {loop $banner $k $va}
+					<div class="swiper-slide blue-slide"><a href="{$va['url']}" style="height:100%"><img src="{php echo tomedia($va['img'])}" width="100%" height="160" class="swiper-lazy"></a></div>
+				{/loop}
+				  </div>
+				</div>
+            </div>
+            <!-- 主播的二维码 -->
+            <div class="mask-box user-qr-box">
+                <div class="click-mask click-qr"></div>
+                <div class="qr-box-in">
+                    <p class="qr-title">主播的二维码</p>
+                    <img src="">
+                    <p class="qr-res">长按识别二维码</p>
+                    <div class="qr-btn">+</div>
+                </div>
+            </div>
+            <!-- 主播个人信息 end -->
+            <!-- tab切换 start -->
+            <!-- 导航文字 -->
+            <div class="swiper-container swiper-container-horizontal swiper-container-free-mode swiper-container-android">
+                <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
+                    <div class="swiper-slide swiper-slide-active" value="0" >全部</div>
+					{loop $lists $row}
+                    <div class="swiper-slide swiper-slide-next" value="{$row['id']}" >{$row['title']}</div>
+					{/loop}
+				</div>
+            </div>
+            <!-- 导航内容 -->
+            <!-- 内容区域 -->
+            <div class="nav-con">
+                <!-- 全部 -->
+                <!-- <div class="dropload-load" style="display: block;"><span class="loading"></span>加载中...</div> -->
+                <div class="nav-con-list clearfix" style="display:block;">
+                    <ul>
+                        <div class="content">
+                            <div class="NotUesed">
+							
+						</div>
+                       </div>
+                    </ul>
+                </div>
+            </div>
+            <!-- tab切换 end -->
+            <!-- 底部固定的推广直播间和个人中心按钮 -->
+            <!-- 推广直播间 -->
+            <div class="mask-box footer-generalize-block">
+                <img src="{MODULE_URL}template/mobile/2/image/generalize.png" alt="">
+            </div>
+
+            <div class="control-footer clearfix">
+                <p class="footer-generalize"><i class="iconfont">
+               </i>推广直播间</p>
+                <p class="footer-center-line"></p>
+                <a href="{php echo $this->createMobileUrl('center')}"><p class="footer-user-center"><i class="iconfont"></i>个人中心</p></a>
+            </div>
+        </div>
+        <script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/swiper-3.3.1.jquery.min.js"></script>
+        <script type="text/javascript" src="{MODULE_URL}template/mobile/2/js/dropload.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: "{$_W['account']['jssdkconfig']['appId']}",
+		timestamp: "{$_W['account']['jssdkconfig']['timestamp']}",
+		nonceStr: "{$_W['account']['jssdkconfig']['nonceStr']}",
+		signature: "{$_W['account']['jssdkconfig']['signature']}",
+		jsApiList: ['getLocation','onMenuShareAppMessage','onMenuShareTimeline','hideMenuItems','previewImage'] // 必填，需要使用的JS接口列表，
+        });
+    wx.ready(function(){
+        wx.onMenuShareAppMessage({
+            title: "{$setting['list_share_title']}",
+		  desc: "{$setting['list_share_desc']}",
+		  link: "{php echo $_W['siteroot'].str_replace('./','app/',$this->createMobileurl('index',array('share_uid' => $uid,'rid'=>$rid)))}",
+		  imgUrl: "{php echo $_W['attachurl'].$setting['list_share_img']}",
+            success: function () { 
+            },
+            cancel: function () { 
+            }
+        });
+        wx.onMenuShareTimeline({
+           title: "{$setting['list_share_title']}",
+		  desc: "{$setting['list_share_desc']}",
+		  link: "{php echo $_W['siteroot'].str_replace('./','app/',$this->createMobileurl('index',array('share_uid' => $uid,'rid'=>$rid)))}",
+		  imgUrl: "{php echo $_W['attachurl'].$setting['list_share_img']}",
+            success: function () {
+            },
+            cancel: function () { 
+            }
+        });
+        wx.hideMenuItems({
+            menuList: [
+                'menuItem:readMode', 
+                'menuItem:openWithSafari',
+                'menuItem:copyUrl',
+                'menuItem:exposeArticle',
+                'menuItem:share:qq',
+                'menuItem:profile',
+                'menuItem:addContact',
+                'menuItem:share:QZone',
+            ]
+        });
+    });
+});
+$(window).resize(infinite);
+function infinite() {
+    var htmlWidth = $('html').width();
+    if (htmlWidth >= 640) {
+        $("html").css({"font-size" : "24px"});
+    } else {
+        var fSize = Math.ceil(40 / 1080 * htmlWidth)
+        $("html").css({"font-size" : fSize + "px"});
+    }
+}infinite();
+
+var jinzhi = 0;
+document.addEventListener("touchmove",function(e){
+    if(jinzhi == 1){
+        ////e.preventDefault();
+        e.stopPropagation();
+    }
+},false);
+$(".care-weixin").on('click',function(event) {
+    //event.preventDefault();
+    $(".user-qr-box").show();
+    jinzhi = 1;
+});
+$(".qr-btn").on('click', function(event) {
+    //event.preventDefault();
+    $(".user-qr-box").hide();
+    jinzhi = 0;
+});
+$(".click-qr").on('click', function(event) {
+    //event.preventDefault();
+    $(".user-qr-box").hide();
+    jinzhi = 0;
+});
+
+// swiper引入tab
+$(document).ready(function () {
+    var mySwiper = new Swiper ('.swiper-container', {
+        direction: 'horizontal',
+        slidesPerView : 4.5,
+        freeMode : true,
+    })
+	var mySwiper = new Swiper ('.swiper-container1',{
+		loop: false,
+		autoplay: 3000
+	})
+})
+// tab切换
+$(".swiper-wrapper div").on('click', function(event) {
+    //event.preventDefault();
+    $(this).css({color: '#31ac84',borderBottom: '0.2rem solid #31ac84'}).siblings().css({color: '#666',borderBottom: '0.2rem solid #fff'});
+    $(".nav-con>li").eq($(this).index()).show().siblings().hide();
+    $('.NotUesed').empty();
+    $('.dropload-down').remove();
+    load($(this).attr('value'));
+});
+//推广直播间按钮
+$(".footer-generalize").click(function(event) {
+    $(".footer-generalize-block").show();
+    jinzhi = 1;
+});
+$(".footer-generalize-block").click(function(event) {
+    $(".footer-generalize-block").hide();
+    jinzhi = 0;
+});
+//各个直播间图片高度确定
+var timer1 = setTimeout(function(){
+var imgHeight = parseInt(($(".list-box-img img").width())*0.546);
+$(".list-box-img").height(imgHeight);
+clearTimeout(timer1);
+}, 1)
+
+load(0);
+var u = navigator.userAgent;
+
+var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //android终端或者uc浏览器
+
+var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+
+
+function load(cid){
+     var page = 0;
+        var lock=0;
+        $('.content').dropload({
+        scrollArea : window,
+        loadDownFn : function(me){
+            $.ajax({
+                type: 'POST',
+                url: "{php echo $this->createMobileUrl('getlive')}",
+                data:{page:page,cid:cid},
+                dataType: 'json',
+             
+                success: function(data){
+                  var str='';
+                	 $.each(data.msg,function(index,value){
+						if(!value.start_at){
+							value.start_at = value.dateline;
+						}
+                	 	var start=new Date(value.start_at*1000);
+                	 	var end=new Date(value.end_at*1000);
+                	 	var dateline=new Date(value.start_at*1000);
+						var nowtime = (new Date).getTime()/1000;
+                	 	 var time=dateline.getFullYear()+'-'+(dateline.getMonth()+1)+'-'+dateline.getDate()+' '+(dateline.getHours()<10?'0'+dateline.getHours():dateline.getHours())+':'+(dateline.getMinutes()<10?'0'+dateline.getMinutes():dateline.getMinutes())+':'+(dateline.getSeconds()<10?'0'+dateline.getSeconds():dateline.getSeconds());          
+   str+='<li class="con-list-box clearfix" id="topic'+value.id+'">';
+  
+   if(value.islinkurl==0){
+		str+='<a href="./index.php?i='+value.uniacid+'&c=entry&m=wxz_wzb&do=index2&rid='+value.rid+'">';
+	}else{
+		str+='<a href="'+value.linkurl+'">';
+	}
+   
+
+   str+='<div class="list-box-img"><img src="'+value.img+'"/><p class="list-img-status">';
+
+   if(value.livestatus==0){
+	   console.log(value.start_at);
+	   console.log(nowtime);
+		if(value.start_at > nowtime){
+			str+='即将开播';
+		}else if(value.start_at < nowtime && value.end_at > nowtime){
+			str+='正在直播';
+		}else{
+			str+='回播';
+		}
+   }else{
+		if(value.livestatus==1)
+		{
+			str+='即将开播';
+		}
+		else if(value.livestatus==2)
+		{
+			str+='正在直播';
+		}
+		else
+		{
+			str+='回播';
+		}
+   }
+   
+   str+='</p></div><h2 class="list-title">'+value.title+'</h2><p class="list-time">'+time+'</p></a><div class="list-bottom clearfix"><p class="list-bottom-pv"><i class="iconfont fonteye">&#xe8c2;</i>&nbsp;'+value.total_num+'次浏览</p>';
+              
+	if(value.islinkurl==0){
+		str+='<a href="./index.php?i='+value.uniacid+'&c=entry&m=wxz_wzb&do=index2&rid='+value.rid+'"><p class="list-bottom-btn">进入直播间</p></a>';
+	}else{
+		str+='<a href="'+value.linkurl+'"><p class="list-bottom-btn">进入直播间</p></a>';
+	}
+                        
+                     
+
+
+
+                    
+
+                     str+='</div></li>';
+                      
+                });
+                    $('.NotUesed').append(str);  
+                    page++;
+                     
+                   
+                    if(data.msg.length<5)
+                    {
+                      me.lock();
+                        // 无数据
+                        me.noData();
+
+                    }
+                    
+                    me.resetload();
+
+                    // 每次数据加载完，必须重置
+                    
+                },
+                error: function(xhr, type){
+                    //alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });
+        }
+    });
+}
+        </script>
+    <div style="display:none;">
+<script src="https://s13.cnzz.com/z_stat.php?id=1273392991&web_id=1273392991" language="JavaScript"></script>
+</div>
+</body>
+</html>

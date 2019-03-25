@@ -1,0 +1,181 @@
+{if $active == 'list'}
+<style>
+.layui-table td {
+    text-align: center;
+}
+.select-pane .layui-inline{
+    margin: 0;
+}
+</style>
+<fieldset class="layui-elem-field">
+    <legend>积分记录</legend>
+    <div class="layui-field-box">
+        <div class="layui-form-item select-pane">
+            <form action="" method="post" class="layui-form layui-form-pane">
+                <div class="layui-inline" style="margin-bottom: -10px;">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">账单号</label>
+                        <div class="layui-input-inline mb5 w120">
+                            <input type="text" name="orderno" class="layui-input" value="{$_GPC['orderno']}" placeholder="请输入账单号">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label mb5">操作人</label>
+                        <div class="layui-input-inline mb5 w120">
+                            <select name="author">
+                                <option value="all" {if $_GPC['author']=="all"}selected{/if}>所有操作人</option>
+                                <option value="1" {if $_GPC['author']==1}selected{/if}>管理员</option>
+                                <option value="2" {if $_GPC['author']==2}selected{/if}>店长</option>
+                                <option value="3" {if $_GPC['author']==3}selected{/if}>普通会员</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-inline mb5 w150">
+                            <select name="ctype">
+                                <option value="all" {if $_GPC['ctype']=="all"}selected{/if}>所有类型</option>
+                                <option value="1" {if $_GPC['ctype']==1}selected{/if}>现金充值</option>
+                                <option value="2" {if $_GPC['ctype']==2}selected{/if}>后台充值</option>
+                                <option value="3" {if $_GPC['ctype']==3}selected{/if}>支付宝充值</option>
+                                <option value="4" {if $_GPC['ctype']==4}selected{/if}>微信充值</option> 
+                                <option value="5" {if $_GPC['ctype']==5}selected{/if}>现金消费</option>
+                                <option value="6" {if $_GPC['ctype']==6}selected{/if}>余额消费</option>
+                                <option value="7" {if $_GPC['ctype']==7}selected{/if}>支付宝消费</option>
+                                <option value="8" {if $_GPC['ctype']==8}selected{/if}>微信消费</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间</label>
+                        <div class="layui-input-inline mb5 w150">
+                            <input class="layui-input" placeholder="无限制" id="starttime" name="starttime" value="{if $_GPC['starttime']}{$_GPC['starttime']}{else}{/if}" lay-key="1">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">截止时间</label>
+                        <div class="layui-input-inline mb5 w150">
+                            <input class="layui-input" placeholder="无限制" id="endtime" name="endtime" value="{if $_GPC['endtime']}{$_GPC['endtime']}{else}{/if}" lay-key="2">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <div class="layui-input-inline mb5 w120">
+                            <button class="layui-btn">搜索</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="c" value="site">
+                    <input type="hidden" name="a" value="entry">
+                    <input type="hidden" name="m" value="hy_supstore">
+                    <input type="hidden" name="do" value="storemanage" />
+                    <input type="hidden" name="op" value="account" />
+                    <input type="hidden" name="type" value="credit1" />
+                    <input type="hidden" name="page" value="1">
+                </div>
+            </form>
+        </div>
+        <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+            <table class="layui-table">
+                <thead>
+                    <tr>
+                        <th width="50">编号</th>
+                        <th width="80">会员名称</th>
+                        <th width="80">账单号</th>
+                        <th width="60">渠道</th>
+                        <th width="60">操作人</th>
+                        <th width="80">类型</th>
+                        <th width="80">积分数</th>
+                        <th width="100">创建时间</th>
+                        <th width="80">备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loop $list $item}
+                    <tr>
+                        <td>{$item['id']}</td>
+                        <td style="text-align:center;">
+                            <img src="{if !empty($item['avatar'])}{$item['avatar']}{else}resource/images/noavatar_middle.gif{/if}" style=" height:38px; border-radius:50%;">
+                            <br>
+                            <a href="{php echo $this->createWebUrl('credit1', array('op'=>'list','uid'=>$item['uid']))}">{$item['nickname']}</a>
+                        </td>
+                        <td>{$item['orderno']}</td>
+                        <td>{$item['storename']}</td>
+                        <td style="text-align:center;">{if $item['author']==1}管理员{elseif $item['author']==2}店长{elseif $item['author']==3}普通会员{/if}</td>
+                        <td style="text-align:center;">
+                            {if $item['type']==1}{if $item['chaneltype']==1}现金{elseif $item['chaneltype']==2}后台{elseif $item['chaneltype']==3}支付宝{elseif $item['chaneltype']==4}微信{/if}充值{elseif $item['type']==2}{if $item['chaneltype']==1}现金{elseif $item['chaneltype']==2}余额{elseif $item['chaneltype']==3}支付宝{elseif $item['chaneltype']==4}微信{/if}消费{/if}
+                        </td>
+                        <td style="text-align:center;">
+                            {if $item['credit1type'] == 1}<green>+{$item['credit1']}个</green>{else}<red>-{$item['credit1']}个</red>{/if}
+                        </td>
+                        <td style="text-align:center;">{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+                        <td style="text-align:center;">{$item['content']}</td>
+                    </tr>
+                    </tr>
+                    {/loop} {if empty($list)}
+                    <tr>
+                        <td colspan="20" style=" color:red; font-weight:bold; text-align:center; line-height:40px">暂无信息</td>
+                    </tr>
+                    {/if}
+                    <tr>
+                        <td colspan="20" class="fenye">{$pager}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['laydate','form', 'layer','element'], function() {
+    var $ = layui.jquery,
+        form = layui.form,
+        layer = layui.layer,
+        laydate = layui.laydate,
+        element = layui.element;
+
+        laydate.render({
+            elem: '#starttime',
+            done: function(value, date, endDate){
+                var starttime = value;
+                var endtime = $('#endtime').val();
+                
+                var arys= new Array(); 
+                var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                if(starttime != null && endtime != null) { 
+                    arys=starttime.split('-'); 
+                    var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                    arys=endtime.split('-'); 
+                    var endtime=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                    if(startdate > endtime) { 
+                        layer.msg("开始日期不能大于结束日期");
+                        $('#starttime').val('');
+                        return; 
+                    }
+                }
+            }
+        });
+
+        laydate.render({
+            elem: '#endtime',
+            done: function(value, date, endDate){
+                var starttime = $('#starttime').val();
+                var endtime = value;
+                
+                var arys= new Array(); 
+                var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                if(starttime != null && endtime != null) { 
+                    arys=starttime.split('-'); 
+                    var startdate=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                    arys=endtime.split('-'); 
+                    var endtime=new Date(arys[0],parseInt(arys[1]-1),arys[2]); 
+                    if(startdate > endtime) { 
+                        layer.msg("结束日期不能小于开始日期");
+                        $('#endtime').val('');
+                        return; 
+                    }
+                }
+            }
+        });
+
+        $('#starttime,#endtime').attr("readOnly","true");
+});
+</script>
+{/if}

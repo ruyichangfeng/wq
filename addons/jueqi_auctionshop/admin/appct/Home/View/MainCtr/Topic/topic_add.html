@@ -1,0 +1,138 @@
+<include file="Public/header.html"/>
+<link rel="stylesheet" type="text/css" href="__ROOT__/Public/lib/layui/css/modules/laydate/default/laydate.css" >
+</head>
+<body>
+    <div class="x-body">
+        <form class="layui-form">
+			
+			<div class="layui-form-item"  >
+                <label  class="layui-form-label">话题 </label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="required" autocomplete="off" value="{$topic['title']}"  class="layui-input" style="width: 83%;" placeholder="老板甩个锅给你，是背还是不背？">
+                </div>
+                <div style="color: red;clear:both;margin-left: 108px;">注意：每次押注少的一方为胜利方,胜利方得双倍奖励。</div>
+            </div>
+			
+<!--			<div class="layui-form-item"  >
+                <label  class="layui-form-label">倍率 </label>
+                <div class="layui-input-block">
+                    <input type="text" name="rate" lay-verify="number" autocomplete="off" value="{$topic['rate']}"  class="layui-input" style="width: 83%;">
+                </div>
+                <div style="color: red;clear:both;margin-left: 108px;">注意：获胜方获得的奖励为 （x注*比率*倍率）+本金，倍率必须为大于等于1的整数</div>
+            </div>-->
+			<input type="text" value="1" name="rate" style="display: none;">
+			<div class="layui-form-item">
+			    <div class="layui-inline">
+			      	<label class="layui-form-label">开始时间</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="start_time" lay-verify="required" class="layui-input" id="test1" placeholder="yyyy-MM-dd HH:mm:ss" value="<?php echo  date('Y-m-d H:i:s', $topic['start_time']); ?>" <?php if($id){echo 'disabled="disabled"';}?> >
+			      	</div>
+			      	<label class="layui-form-label">结束时间</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="end_time" lay-verify="required" class="layui-input" id="test2" placeholder="yyyy-MM-dd HH:mm:ss" value="<?php echo  date('Y-m-d H:i:s', $topic['end_time']); ?>" <?php if($id){echo 'disabled="disabled"';}?> >
+			      </div>			      	
+			    </div>
+			    <div style="color: red;clear:both;margin-left: 108px;">注意：每次会选取开始时间最早的话题作为本期话题，请不要和其他话题时间冲突。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结束时间为本期话题结束的时间，奖品自动结算。</div>
+			</div>
+			
+			<div class="layui-form-item">
+			    <div class="layui-inline">
+			      	<label class="layui-form-label">比率</label>
+			      	<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="num" lay-verify="number" value="{$topic['num']}" placeholder="4">
+			      	</div>
+			      	<label class="layui-form-label">奖励类型</label>
+			      	<div class="layui-input-inline">
+						<select name="status">
+					     	<option <?php if($topic['status']==1){ echo 'selected'; } ?> value="1" >虚拟锤</option>
+					     	<option <?php if($topic['status']==3){ echo 'selected'; } ?> value="3" >积分</option>					    
+					 	</select>
+			      	</div>
+			    </div>
+			    <div style="color: red;clear:both;margin-left: 108px;">注意：多少虚拟锤等于一注（单位：虚拟锤/注）</div>
+			</div>
+						
+			<div class="layui-form-item">
+			    <div class="layui-inline">
+			      	<label class="layui-form-label">红方</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="red" lay-verify="required" class="layui-input"  placeholder="背" value="{$topic['red']}">
+			      	</div>
+			      	<label class="layui-form-label">描述</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="red_desc" lay-verify="required" class="layui-input" placeholder="不能得罪老板" value="{$topic['red_desc']}">
+			      	</div>
+			    </div>
+			</div>
+			
+			<div class="layui-form-item">
+			    <div class="layui-inline">
+			      	<label class="layui-form-label">蓝方</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="blue" lay-verify="required" class="layui-input"  placeholder="不背" value="{$topic['blue']}">
+			      	</div>
+			      	<label class="layui-form-label">描述</label>
+			      	<div class="layui-input-inline">
+						<input type="text" name="blue_desc" lay-verify="required" class="layui-input" placeholder="做人要有骨气" value="{$topic['blue_desc']}">
+			      	</div>
+			    </div>
+			</div>
+			
+            <div class="layui-form-item" style="display: none;">
+              	<label for="L_sign" class="layui-form-label"></label>
+               	<button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit></button>
+            </div>
+            
+            <input type="hidden"  name="id" value="{$topic['id']}" />             
+        </form>
+    </div>
+    <script type="text/javascript" src="__ROOT__/Public/lib/layui/lay/modules/laydates.js?2018"></script>
+    <include file="Public/footer.html"/>
+    <script type="text/javascript" src="__ROOT__/Public/js/jquery.min.js"></script>
+    <script>
+      	layui.use(['form','layer'], function(){
+           	var form = layui.form;
+           	var layer = layui.layer;
+         
+        	laydate.render({
+		    	elem: '#test1' //指定元素
+		    	,type: 'datetime'
+		    	,min:  new Date().getTime()
+		  	});
+		  	laydate.render({
+		    	elem: '#test2' //指定元素
+		    	,type: 'datetime'
+		    	,min:  new Date().getTime()
+		  	});
+		   	form.on('submit(save)', function(data){                
+				var tjing = parent.layer.msg('提交中...', {icon: 16,shade: 0.3,time: 60*1000}); 
+		        var form = document.forms[0];
+	  		    var formData = new FormData(form);  
+
+				$.ajax({
+			        url: "{:U('Home/MainCtr/Topic/do_topic')}",
+			        type : "POST",
+			        data :formData,
+			        dataType:"text",
+			        processData : false,         
+			        contentType : false,      
+			        success:function(data){
+			            parent.layer.close(tjing);
+		               	if(data == '1'){
+		                 	parent.layer.msg('提交成功', {icon: 1,offset: '40%',time:2000,shade: 0.3},function(){ 
+					        	parent.location.reload();
+						 	})
+		               	}else if(data == '2'){
+		              	 	parent.layer.msg('提交失败', {icon: 2,offset: '40%',time:2000,shade: 0.3});
+		               	}else{
+							layer.msg(data, {icon: 2,offset: '40%',time:2000,shade: 0.3});
+						}
+			        }
+			    });
+					
+            	return false;
+          	});
+    	});
+    </script>  
+</body>
+</html>

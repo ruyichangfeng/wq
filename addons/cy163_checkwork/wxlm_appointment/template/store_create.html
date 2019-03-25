@@ -1,0 +1,412 @@
+{template 'common/header'}
+<style>
+    .stress_red {
+        color: red;
+    }
+
+    #container {
+        width:800px;
+        height:400px;
+    }
+</style>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp"></script>
+
+<ul class="nav nav-tabs">
+    <li {if $op == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op'=>'display'));}">门店管理</a></li>
+    <li {if $op == 'create'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op'=>'create'));}">添加门店</a></li>
+    {if $op == 'modify'}
+    <li {if $op == 'modify'}class="active"{/if}><a href="#">编辑门店</a></li>
+    {/if}
+</ul>
+
+<div class="main">
+    <form action="{php echo $this->createWebUrl('store', array('op'=>create));}" method="post" class="form-horizontal form" id="form">
+        <div class="panel panel-primary">
+            <div class="panel-heading">门店信息</div>
+            <div class="panel-body">
+                <div class="form-group" style="display:none;">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">ID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_id]" class="form-control" value="{$store['store_id']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>门店名称</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_name]" class="form-control" value="{$store['store_name']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>门店图</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_form_field_image('store[store_pic]', $store['store_pic'])}
+                    </div>
+                </div>
+
+                <div class="form-group {if empty($storetype)}hide{/if}">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>门店类型</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="store[store_typeid]" class="form-control" >
+                            <option value="" selected>请选择</option>
+                            {loop $storetype $key $item}
+                            <option value="{$item['storetype_id']}" {if $store['store_typeid'] == $item['storetype_id']}selected{/if}>{$item['storetype_title']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>所属商圈</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="store[store_circleid]" class="form-control" id="circle">
+                            <option value="" selected>请选择</option>
+                            {loop $circles $key $item}
+                            <option value="{$item['circle_id']}" {if $store['store_circleid'] == $item['circle_id']}selected{/if}>{$item['circle_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>所属商家</label>
+                    <div class=" col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <select name="store[store_businessid]" class="form-control" id="">
+                            <option value="" selected>请选择</option>
+                            {loop $business $key $item}
+                            <option value="{$item['business_id']}" {if $store['store_businessid'] == $item['business_id']}selected{/if}>{$item['business_name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>选择负责人</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_admin_name]" class="form-control" value="{$store['store_admin_name']}" onclick="searchShow()" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>负责人openID</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" readonly name="store[store_admin_openid]" class="form-control" value="{$store['store_admin_openid']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>联系电话</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_tel]" class="form-control" value="{$store['store_tel']}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>详细地址</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_address]" class="form-control" value="{$store['store_address']}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style=""><span class="stress_red">*</span>门店坐标</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <div class="row clearfix">
+                            <div class="col-xs-4 col-sm-4">
+                                <input type="text" name="store[store_log]" value="{$store['store_log']}" class="form-control" placeholder="地理经度">
+                            </div>
+                            <div class="col-xs-4 col-sm-4">
+                                <input type="text" name="store[store_lat]" value="{$store['store_lat']}" class="form-control" placeholder="地理纬度">
+                            </div>
+                            <div class="col-xs-4 col-sm-4">
+                                <button type="button" class="btn btn-default" onclick="showMap()">获取坐标</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {if !empty($card)}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>会员卡使用次数</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="number" name="store[store_card_count]" class="form-control" value="{if empty($store['store_card_count'])}3{else}{$store['store_card_count']}{/if}" />
+                    </div>
+                </div>
+                {/if}
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>首页推荐</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="store_index1" class="radio-inline">
+                            <input type="radio" name="store[store_index]" id="store_index1" value="1" {if $store['store_index'] == 1 || $store['store_index'] == '' }checked{/if}/>否
+                        </label>
+                        <label for="store_index2" class="radio-inline">
+                            <input type="radio" name="store[store_index]" id="store_index2" value="2" {if $store['store_index'] == 2}checked{/if}/>是
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="reason">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red">*</span>推荐理由</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <input type="text" name="store[store_index_reason]" class="form-control" value="{$store['store_index_reason']}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label"><span class="stress_red"></span>门店评论审核</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        <label for="store_comment1" class="radio-inline">
+                            <input type="radio" name="store[store_comment_state]" id="store_comment1" value="1" {if $store['store_comment_state'] == 1 || $store['store_comment_state'] == '' }checked{/if}/>否
+                        </label>
+                        <label for="store_comment2" class="radio-inline">
+                            <input type="radio" name="store[store_comment_state]" id="store_comment2" value="2" {if $store['store_comment_state'] == 2}checked{/if}/>是
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2  control-label" style="">门店详情</label>
+                    <div class="col-xs-12 col-sm-7 col-md-8 col-lg-8">
+                        {php echo tpl_ueditor('store[store_info]',$store['store_info'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+                        <input name="submit" type="submit" value="提交" class="btn btn-primary" style="width:100px;"/>
+                        <input type="hidden" name="token" value="{$_W['token']}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="myModal-search" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-body">
+            <form action="" method="post" class="form-horizontal form" id="form1">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">选择负责人</div>
+                    <div class="panel-body">
+                        <div class="form-group" style="margin-bottom: 0">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="昵称/电话号/openID" id="search_info">
+                                    <span class="input-group-btn">
+        <button class="btn btn-default" onclick="searchstore()" type="button">搜索</button>
+      </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive panel-body">
+                            <table class="table table-hover table-responsive" style="min-width: 300px;">
+                                <thead class="navbar-inner">
+                                <tr>
+                                    <th style="">昵称</th>
+                                    <th></th>
+                                    <th style="">电话</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th style="">操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody id="search_content">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: center">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" style="width:100px;">关闭</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModal-map" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div style="width: 100%;background-color: grey">
+            <div class="clearfix" style="width: 800px">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;float: left">
+                    <div class="input-group">
+                        <input id="address" type="textbox" class="form-control" value="">
+                        <span onclick="codeAddress()" class="input-group-addon">search</span>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="padding-right: 0;float: right">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <input type="text" name="store[store_log]" value="{$store['store_log']}" class="form-control" placeholder="地理经度">
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="padding-right: 0">
+                        <input type="text" name="store[store_lat]" value="{$store['store_lat']}" class="form-control" placeholder="地理纬度">
+                    </div>
+                </div>
+
+            </div>
+            <div id="container"></div>
+            <p style="color: white">输入地址，点击search进行地址解释。</p>
+        </div>
+
+    </div>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+    $(function () {
+
+        init();
+        reasonState();
+
+    })
+
+    //显示搜索框
+    function searchShow() {
+
+        $('#myModal-search').modal('show');
+    }
+    //门店负责人ajax请求
+    function searchstore() {
+
+        var info = $('#search_info').val();
+
+        $.ajax({
+            url:"{php echo $this->createWebUrl('ajaxFans', array())}"+"&content="+info,
+            type:"get",
+            success:function(data){
+
+                $('#search_content').html(data);
+
+            }
+        });
+
+    }
+    //选择门店负责人
+    function chooseFans(openid, nickname, avatar) {
+
+
+        if (openid == '')
+        {
+            alert('未找到粉丝信息');
+            return false;
+        }
+
+        $('input[name="store[store_admin_openid]"]').val(openid);
+        $('input[name="store[store_admin_name]"]').val(nickname);
+        $('#myModal-search').modal('hide');
+    }
+
+    $('input[name="store[store_index]"]').change(function () {
+
+        reasonState();
+    })
+
+    function reasonState() {
+
+        var reason = $('input:radio[name="store[store_index]"]:checked').val();
+
+        if (reason == 1)
+        {
+            $('#reason').hide();
+
+        } else if(reason == 2)
+        {
+            $('#reason').show();
+        }
+    }
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#form').submit(function(){
+
+                if($('input[name="store[store_name]"]').val() == ''){
+                    util.message('未填门店名称.');
+                    return false;
+                }
+                if($('input[name="store[store_pic]"]').val() == ''){
+                    util.message('未上传门店图.');
+                    return false;
+                }
+                if($('select[name="store[store_typeid]"]').val() == ''){
+                    util.message('未选择门店分类.');
+                    return false;
+                }
+                if($('select[name="store[store_circleid]"]').val() == ''){
+                    util.message('未选择所属商圈.');
+                    return false;
+                }
+                if($('select[name="store[store_businessid]"]').val() == ''){
+                    util.message('未选择所属商家.');
+                    return false;
+                }
+                if($('input[name="store[store_admin_openid]"]').val() == ''){
+                    util.message('未填写门店负责人.');
+                    return false;
+                }
+                if($('input[name="store[store_tel]"]').val() == ''){
+                    util.message('未填写负责人联系电话.');
+                    return false;
+                }
+                if($('input[name="store[store_address]"]').val() == ''){
+                    util.message('未填写门店详细地址.');
+                    return false;
+                }
+                if($('input[name="store[store_log]"]').val() == ''){
+                    util.message('未填写门店经度.');
+                    return false;
+                }
+                if($('input[name="store[store_lat]"]').val() == ''){
+                    util.message('未填写门店纬度.');
+                    return false;
+                }
+                if ($('input:radio[name="store[store_index]"]:checked').val() == 1)
+                {
+                    if($('input[name="store[store_address]"]').val() == '')
+                    {
+                        util.message('未填推荐理由.');
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        });
+    });
+
+
+    /**一下为地图功能***/
+    function showMap() {
+
+        $('#myModal-map').modal('show');
+    }
+    var geocoder,map,marker = null;
+    var init = function() {
+        var center = new qq.maps.LatLng('{$lat}', '{$log}');
+        map = new qq.maps.Map(document.getElementById('container'),{
+            center: center,
+            zoom: 15
+        });
+        qq.maps.event.addListener(map, 'click', function(event) {
+//            alert('您点击的位置为: [' + event.latLng.getLat() + ', ' +
+//                event.latLng.getLng() + ']');
+            $('input[name="store[store_lat]"]').val(event.latLng.getLat());
+            $('input[name="store[store_log]"]').val(event.latLng.getLng());
+
+        });
+        //调用地址解析类
+        geocoder = new qq.maps.Geocoder({
+            complete : function(result){
+                map.setCenter(result.detail.location);
+                var marker = new qq.maps.Marker({
+                    map:map,
+                    position: result.detail.location
+                });
+            }
+        });
+    }
+
+
+    function codeAddress() {
+        var address = document.getElementById("address").value;
+        //通过getLocation();方法获取位置信息值
+        geocoder.getLocation(address);
+    }
+
+</script>
+
+
+{template 'common/footer'}

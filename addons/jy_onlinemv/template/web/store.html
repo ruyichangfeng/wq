@@ -1,0 +1,496 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op' => 'display'))}">视频管理</a></li>
+	<li {if $operation == 'post'}class="active"{/if}><a href="{php echo $this->createWebUrl('store', array('op' => 'post'))}">{if $id==0}添加视频{else}修改视频{/if}</a></li>
+</ul>
+<div class="main">
+	
+	{if $operation == 'display'}
+	<div class="panel panel-info">
+		<div class="panel-heading">搜索</div>
+
+		<div class="panel-body">
+
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+	        	<input type="hidden" name="m" value="jy_onlinemv" />
+	        	<input type="hidden" name="do" value="store" />
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">关键词</label>
+					<div class="col-xs-12 col-sm-8 col-lg-9">
+						<input class="form-control" name="keyword" id="" type="text" placeholder="请输入视频名称或分类名称">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">排序</label>
+					<div class="col-xs-12 col-sm-8 col-lg-9">
+						<select name="sort" class="form-control">
+							<option value="0">请选择</option>
+							<option value="1">访问量</option>
+							<option value="2">点赞数</option>
+							<option value="3">评论数</option>
+						</select>
+					</div>
+				</div>
+
+				
+				<div class="form-group">
+				 	<div class=" col-xs-12 col-sm-2 col-lg-2">
+
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+
+					</div>
+				</div>
+			</form>
+		</div>
+    	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">视频详细数据  |  总数:{$total}</div>
+		<div class="panel-body table-responsive">
+
+		    <form action="" method="post" onsubmit="">
+
+			<table class="table table-hover">
+
+				<thead class="navbar-inner">
+
+					<tr>
+						<th style="width:10%;">显示顺序</th>
+						<th style="width:20%;">视频名</th>
+						<th style="width:20%;">视频分类</th>
+						<th style="width:5%;">URL</th>
+						<th style="width:5%;">分享量</th>
+						<th style="width:5%;">访问量</th>
+						<th style="width:5%;">点赞数</th>
+						<th style="width:5%;">评论数</th>
+						<th style="width:5%;">视频状态</th>
+						<th style="width:20%;">操作</th>
+					</tr>
+
+				</thead>
+				<tbody id="main">
+					{loop $list $item}
+
+					<tr>
+						<td class="text-center">
+							<input style="width:80px" type="text" name="displayorder[{$item['id']}]" value="{$item['displayorder']}">
+						</td>
+					    <td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{$item['videoname']}</p>
+			            </td>
+			            <td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>
+								{if $item['pname']}
+								<span style="background-color:#53A93F;color:#ffffff;padding:2px 3px;border-radius:2px;">{$item['pname']}</span>--
+								{/if}
+								{$item['catename']}
+							</p>
+	                	</td>
+	                	
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<a title="url" class="btn btn-info btn-sm" onclick="displayUrl('{php echo $_W['siteroot']."app/".substr($this->createMobileUrl('showDetail',array('id'=>$item['id'])),2)}');">url</a>
+						</td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{$item['share']}</p>
+	                	</td>
+	                	<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{$item['visit']}</p>
+	                	</td>
+	                	 <td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{$item['dolike']}</p>
+	                	</td>
+	                	 <td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{$item['comnum']}</p>
+	                	</td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>{if !empty($item['enabled'])}显示{else}<span style="color:red">隐藏</span>{/if}</p>
+						</td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<span>
+								<a href="{php echo $this->createWebUrl('store',array('op'=>'post','id'=>$item['id']));}"><div class="btn btn-info">编辑</div></a>&nbsp;
+								<a onclick="return confirm('此操作不可恢复，确认吗？'); return false;" href="{php echo $this->createWebUrl('store',array('op'=>'delete','id'=>$item['id']));}"><div class="btn btn-danger">删除</div></a>
+								<!-- <a href="{php echo $this->createWebUrl('usertore', array('id'=>$item['id']));}" class="btn btn-default btn-primary" >用户数据</a> -->
+								<a href="{php echo $this->createWebUrl('store', array('op'=>'usertore','id'=>$item['id']));}" class="btn btn-default btn-primary" >用户数据</a>
+							</span>
+						</td>
+					</tr>
+					{/loop}
+					<tr>
+						<td></td>
+						<td colspan="8">
+							<input name="submit" type="submit" class="btn btn-primary" value="提交">
+							<input type="hidden" name="token" value="{$_W['token']}" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			{$pager}
+			</form>
+	    </div>
+
+	</div>
+
+	{/if}
+
+	{if $operation == 'post'}
+		<form action="" method="post" class="form-horizontal form"
+		enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$item['id']}" />
+		<div class="panel panel-info">
+
+			<div class="panel-heading">
+				编辑门店
+			</div>
+			<div class="panel-body">
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+					<div class="col-sm-5">
+						<input type="number" name="displayorder" class="form-control" value="{$item['displayorder']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频名称</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="videoname" class="form-control" value="{$item['videoname']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频访问次数</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="number" name="visit" class="form-control" value="{$item['visit']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">访问url</label>
+					<div class="col-sm-5">
+						<label>
+							<a id="needCopy" href="javascript:">{php echo $_W['siteroot']."app/".substr($this->createMobileUrl('showDetail',array('id'=>$id)),2)}</a>
+						</label>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频所属类型</label>
+					<div class="col-sm-7 col-xs-12">
+						<select name="mdcateid" class="form-control">
+							<option value="0">请选择类型</option>
+							{loop $types $row}
+							<option value="{$row['id']}" {if $row['id']==$item['mdcateid']} selected {/if}>{$row['catename']}</option>
+							{/loop}
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频所属标签</label>
+					<div class="col-sm-7 col-xs-12">
+						{loop $lables $row}
+							<input type="checkbox" name="lid[]" {if $row['checked'] === 'true'}checked{/if} value="{$row['id']}" style="margin-left:15px;" />{$row['name']}
+						{/loop}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频logo</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_form_field_image('logo', $item['logo']);}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频宣传图</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_form_field_image('thumb', $item['thumbs']);}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频简介</label>
+					<div class="col-sm-7 col-xs-12">
+						<textarea name="remark" style="width:100%;height:50px;">{$item['remark']}</textarea>
+						<span class="help-block">20字以内</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">视频详情</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_ueditor('details',$item['details'])}
+						<span class="help-block">
+		                    小工具:
+		                    <a href="http://wxedit.yead.net/" target="_blank" title="新窗口打开">易点微信编辑器</a> &nbsp;
+		                    <a href="http://www.135editor.com/" target="_blank" title="新窗口打开">135微信编辑器</a> &nbsp;(利用第三方编辑器，获得更好显示效果)
+		                 </span>
+					</div>
+				</div>
+				{if $setting['type'] == 1}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">正式视频地址</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="l_video_address" class="form-control" value="{$item['l_video_address']}" />
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">试看视频地址</label>
+					<div class="col-sm-7 col-xs-12">
+						<!-- {php echo tpl_ueditor('s_video_address',$item['s_video_address'])} -->
+						<input type="text" name="s_video_address" class="form-control" value="{$item['s_video_address']}" />
+					</div>
+				</div>
+				{/if}
+
+				{if $setting['type'] == 2}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">正式视频地址</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_ueditor('l_video_address',$item['l_video_address'])}
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">试看视频地址</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_ueditor('s_video_address',$item['s_video_address'])}
+					</div>
+				</div>
+				{/if}
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否显示</label>
+					<div class="col-sm-7 col-xs-12">
+						<label for="enabled1" class="radio-inline"><input type="radio" name="enabled" value="1" id="enabled1" {if !empty($item['enabled']) && $item['enabled'] == 1}checked="true"{/if} /> 是</label>
+	                    &nbsp;&nbsp;&nbsp;
+	                    <label for="enabled2" class="radio-inline"><input type="radio" name="enabled" value="0" id="enabled2"  {if empty($item['enabled']) || $item['enabled'] == 0}checked="true"{/if} /> 否</label>
+					</div>
+				</div>
+
+				<div class="form-group" {if $setting['unitprice'] != 1}style="display:none;"{/if}>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否收费</label>
+					<div class="col-sm-7 col-xs-12">
+						<label for="is_charge1" class="radio-inline"><input type="radio" onclick="url_show()" name="is_charge" value="1" id="is_charge1" {if !empty($item['is_charge']) && $item['is_charge'] == 1}checked="true"{/if} /> 是</label>
+	                    &nbsp;&nbsp;&nbsp;
+	                    <label for="is_charge2" class="radio-inline"><input type="radio" onclick="url_hide()" name="is_charge" value="0" id="is_charge2"  {if empty($item['is_charge']) || $item['is_charge'] == 0}checked="true"{/if} /> 否</label>
+					</div>
+				</div>
+
+				<div class="form-group" id="vprice" {if ($item['is_charge'] != 1) || ($setting['unitprice'] != 1)}style="display:none;"{/if}>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">价格</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="vprice" class="form-control" value="{$item['vprice']}" />
+						<span class="help-block">单位:元</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+	function url_hide(){
+		$("#vprice").hide();
+	}
+	function url_show(){
+		$("#vprice").show();
+	}
+</script>
+		{if !empty($id)}
+		<div class="panel panel-info">
+
+			<div class="panel-heading">
+				章节衔接
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">打开其它章节衔接</label>
+					<div class="col-sm-7 col-xs-12">
+						<div class="col-sm-7 col-xs-12">
+						   <label class="radio-inline">
+								<input type="radio" value="2" name="isopenm" {if $item['isopenm']==2||empty($item['isopenm'])}checked{/if}/> 关闭
+							</label>
+							<label class="radio-inline">
+								<input type="radio" value="1" name="isopenm" {if $item['isopenm']==1}checked{/if}/> 开启
+							</label>
+							<span class="help-block">可与相关视频衔接</span>
+						</div>
+						
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">模块编辑文字</label>
+					<div class="col-sm-7 col-xs-12">
+						<div class="col-sm-7 col-xs-12">
+						   <input type="text" name="mdwz" class="form-control" value="{$item['mdwz']}" />
+						</div>
+						
+					</div>
+				</div>
+
+				
+						{if $md}
+						{loop $md $m}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">链接设置</label>
+					<div class="col-sm-7 col-xs-12">
+						<div class="input-group" >
+							<div class="input-group-addon">章节</div>
+							<input type="text" class="form-control" name="btnc" value="{$m['btncon']}" />
+							<div class="input-group-addon">章节标题</div>
+							<input type="text" class="form-control" name="content" value="{$m['content']}" />
+							<div class="input-group-addon">章节链接</div>
+							<input type="text" class="form-control" name="url" value="{$m['url']}" />
+							<div class="input-group-addon" onclick="bc_yr(this)" data-yureid="{$m['id']}" style="background-color: #4cc0c1;color: #fff;font-weight: bold">保存</div>
+							<div class="input-group-addon" onclick="del_yr(this)" data-yureid="{$m['id']}" style="background-color: #fb6b5b;color: #fff;font-weight: bold">删除</div>
+						</div>
+					</div>
+				</div>
+						{/loop}
+						{else}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">链接设置</label>
+					<div class="col-sm-7 col-xs-12">
+						<div class="input-group" >
+							<div class="input-group-addon">章节</div>
+							<input type="text" class="form-control" name="btnc" value="" />
+							<div class="input-group-addon">章节标题</div>
+							<input type="text" class="form-control" name="content" value="" />
+							<div class="input-group-addon">章节链接</div>
+							<input type="text" class="form-control" name="url" value="" />
+							<div class="input-group-addon" onclick="bc_yr(this)" data-yureid="{$m['id']}" style="background-color: #4cc0c1;color: #fff;font-weight: bold">保存</div>
+							<div class="input-group-addon" onclick="del_yr(this)" data-yureid="{$m['id']}" style="background-color: #fb6b5b;color: #fff;font-weight: bold">删除</div>
+						</div>
+					</div>
+				</div>
+						{/if}
+
+					
+
+				<div class="form-group" id="yure">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+					<div class="col-sm-7 col-xs-12">
+						<div class="help-block"><span class="btn btn-success" onclick="new_yr()">添加新设置</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{/if}
+
+		<div class="form-group">
+			<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+			<div class="col-sm-9 col-xs-12">
+				<input name="submit" type="submit" value="提交" class="btn btn-primary span3">
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</form>
+	{/if}
+</div>
+<script type="text/javascript">
+	function displayUrl(lurl) {
+		require(['jquery', 'util'], function($, u) {
+			var content = '<p class="form-control-static" style="word-break:break-all">菜单使用链接(需要oAuth): <br>' + lurl + '</p>';
+			var footer =
+					'<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>' +
+					'<button type="button" class="btn btn-primary">复制菜单链接</button>' ;
+			var diaobj = u.dialog('查看URL', content, footer);
+			diaobj.find('.btn-default').click(function() {
+				diaobj.modal('hide');
+			});
+			diaobj.on('shown.bs.modal', function(){
+				u.clip(diaobj.find('.btn-primary')[0], lurl);
+			});
+			diaobj.modal('show');
+		});
+	}
+</script>
+{if !empty($id)}
+<script type="text/javascript">
+require(['jquery', 'util'], function($, util){
+	$(function(){
+		util.clip($('#needCopy')[0], $('#needCopy').text());
+	});
+});
+</script>
+{/if}
+{if !empty($id)}
+<script type="text/javascript">
+
+function new_yr(){
+	$("#yure").prepend('<div class="form-group"><label class="col-xs-12 col-sm-3 col-md-2 control-label">链接设置</label><div class="col-sm-7 col-xs-12"><div class="input-group"><div class="input-group-addon">章节</div><input type="text" name="btnc" class="form-control" value="" /><div class="input-group-addon">章节标题</div><input type="text" class="form-control" name="content" value="" /><div class="input-group-addon">章节链接</div><input type="text" name="url" class="form-control" value="" /><div class="input-group-addon" onclick="bc_yr(this)" style="background-color: #4cc0c1;color: #fff;font-weight: bold">保存</div><div class="input-group-addon" onclick="del_yr(this)" style="background-color: #fb6b5b;color: #fff;font-weight: bold">删除</div></div></div></div>');
+}
+
+function del_yr(obj)
+	{
+		var self=obj;
+		var yureid=$(self).data('yureid');
+		if(!yureid)
+		{
+			$(self).parent().parent().parent().remove();
+			alert("删除成功!");
+		}
+		else
+		{
+			$.post("{php echo $_W['siteroot'].'web/'.substr($this->createWebUrl('storemdel',array('id'=>'$id')),2)}"+"&yureid="+yureid,function(data){
+	              if (data == 1) {
+	              	  $(self).parent().parent().remove();
+	                  alert("删除成功!");
+	              }
+	              else{
+	                  alert("删除失败!错误日志为："+data);
+	              }
+	          });
+		}
+	}
+function bc_yr(obj)
+	{
+		var self=obj;
+		var btnc=$(self).parent().find("input[name='btnc']").val();
+		var url=$(self).parent().find("input[name='url']").val();
+		var content=$(self).parent().find("input[name='content']").val();
+		if(content==''){
+			alert('文案内容不能为空');
+			return false;
+		}
+		if(btnc)
+		{
+			if(url)
+			{
+				var yureid=$(self).data('yureid');
+				$.post(
+				"{php echo $_W['siteroot'].'web/'.substr($this->createWebUrl('storemad',array('op'=>'add','id'=>$id)),2)}",
+				{btnc:btnc,content:content,url:url,yureid:yureid},
+				function(data){
+					console.log(data);
+		              if (data.status == 1) {
+		              	  $(self).data('yureid',data.yureid);
+		              	  $(self).next('div').data('yureid',data.yureid);
+		                  alert("保存成功!");
+		              }
+		              else if (data.status==2)
+		              {
+		                  alert("保存失败!");
+		              }
+		              else{
+		                  alert("保存失败!");
+		              }
+		          },'json');
+
+			}
+			else
+			{
+				alert("保存失败!链接不能为空！");
+			}
+		}
+		else
+		{
+			alert("保存失败!内容不能为空！");
+		}
+	}
+</script>
+{/if}
+{template 'common/footer'}

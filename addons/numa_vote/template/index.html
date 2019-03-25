@@ -1,0 +1,711 @@
+{template 'common/header'}  
+{template 'common_header'}    
+{if $operation == 'post'}
+<div class="main">
+	 <ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active"><a href="#jcsz" aria-controls="jcsz" role="tab" data-toggle="tab">基础设置</a></li>
+				<li role="presentation"><a href="#sssm" aria-controls="sssm" role="tab" data-toggle="tab">活动说明</a></li>		
+				<li role="presentation"><a href="#jxsz" aria-controls="jxsz" role="tab" data-toggle="tab">奖项设置</a></li>
+				<li role="presentation"><a href="#cygz" aria-controls="cygz" role="tab" data-toggle="tab">参与规则</a></li>
+				<li role="presentation"><a href="#kzzd" aria-controls="kzzd" role="tab" data-toggle="tab">扩展字段</a></li>
+				<li role="presentation"><a href="#fxsz" aria-controls="fxsz" role="tab" data-toggle="tab">分享设置</a></li>
+				<li role="presentation"><a href="#qtsz" aria-controls="qtsz" role="tab" data-toggle="tab">其他设置</a></li>
+	</ul> 
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="application_form">
+		<div class="panel panel-default">
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<!-- 基础设置 -->
+					<div role="tabpanel" class="tab-pane active" id="jcsz"> 
+							<div class="panel-body"> 
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>投票活动标题</label>
+									<div class="col-sm-6 col-xs-12">
+										<input type="text" name="title" class="form-control" check-type="required" value="{$vote['title']}" required-message="请填写投票活动标题"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>活动起止日期</label>
+									<div class="col-sm-6 col-xs-12">
+									 			{php echo tpl_form_field_daterange('time', array('start' => alinuma_toDate($vote['begin_time'],'Y-m-d H:i'),'end'=> alinuma_toDate($vote['end_time'],'Y-m-d H:i')),true);}
+										</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>活动开始前提示</label>
+									<div class="col-sm-6 col-xs-12">
+										<input type="text" name="begin_tip" class="form-control" check-type="required" value="{$vote['begin_tip']}" placeholder="请填写活动开始前提示" required-message="请填写活动开始前提示"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>活动结束后提示</label>
+									<div class="col-sm-6 col-xs-12">
+										<input type="text" name="end_tip" class="form-control" check-type="required" value="{$vote['end_tip']}" placeholder="请填写活动结束后提示" required-message="请填写活动结束后提示"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>报名起止日期</label>
+									<div class="col-sm-6 col-xs-12">
+									 			{php echo tpl_form_field_daterange('bmtime', array('start' => alinuma_toDate($vote['begin_time_bm'],'Y-m-d H:i'),'end'   => alinuma_toDate($vote['end_time_bm'],'Y-m-d H:i')),true);}
+										</div>
+								</div>
+								<div class="form-group">
+									<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>封面图片</label>
+									<div class="col-sm-6 col-xs-12">
+										{php echo tpl_form_field_image('top_image', $vote['top_image'], '', array('extras' => array('text' => 'readonly')))}
+									</div>
+								</div>  
+								<div class="form-group">
+					                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">强制关注公众号</label>
+					                    <div class="col-sm-8">
+											<div class="btn-group" data-toggle="buttons">
+												 <label data-value="1" class="btn-must-guanzhu btn btn-default {if $vote['must_guanzhu'] == '1'} active{/if}">
+					                                		<input type="radio" name="must_guanzhu" value="1" autocomplete="off"  {if $vote['must_guanzhu'] == "1"}checked{/if}>开启
+					                            </label>
+					                             <label data-value="0" class="btn-must-guanzhu btn btn-default {if empty($vote['must_guanzhu'])} active{/if}">
+					                                		<input type="radio" name="must_guanzhu" value="0" autocomplete="off"  {if empty($vote['must_guanzhu'])}checked{/if}>关闭
+					                            </label> 
+					                        </div>
+											<span class="help-block"> 
+													<b style=" color:red;">设置为强制关注公众号，需要指定关注地址</b><br/> 
+													<b style=" color:blue;">如果不强制关注，且公众号不具备网页授权，系统将默认第三方授权</b><br/>
+											 </span>
+										</div>
+				                </div> 
+				                <div class="form-group must_guanzhu"  {if empty($vote['must_guanzhu'])}style="display:none"{/if}>
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">公众号二维码</label>
+	            				 			<div class="col-sm-8"> 
+	            				 					{php echo tpl_form_field_image('guanzhu_image', $vote['guanzhu_image'], '', array('extras' => array('text' => 'readonly')))}
+								 			</div>   
+				                </div>    
+				                <div class="form-group must_guanzhu" {if empty($vote['must_guanzhu'])}style="display:none"{/if}>
+											<label class="col-xs-12 col-sm-3 col-md-2 control-label">关注提示语</label>
+											<div class="col-sm-6 col-xs-12">
+												<textarea name="guanzhu_comm" class="form-control" cols="70">{$vote['guanzhu_comm']}</textarea>
+												<span class="help-block">如果上传了公众号二维码则此处可填写类似"识别上方二维码或点击确定 进入公众号 回复XXX 关键词投票"</span>
+											</div>
+								</div> 
+				                <div class="form-group must_guanzhu"  {if empty($vote['must_guanzhu'])}style="display:none"{/if}>
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">关注地址</label>
+	            				 			<div class="col-sm-8">
+													 <input type="text" name="guanzhu_url" check-type="url" url-message="填写正确的关注地址" class="form-control" value="{php echo $vote['guanzhu_url'];}" placeholder="填写关注地址" />
+													 <span class="help-block">微信一键关注地址参照百度经验，<a href="http://jingyan.baidu.com/article/e75057f2f5ecf9ebc91a89f3.html" target="_blank">http://jingyan.baidu.com/article/e75057f2f5ecf9ebc91a89f3.html</a></span>
+											 </div>
+				                </div>   
+								 <div class="form-group no_guanzhu"  {if  $vote['must_guanzhu']=="1"}style="display:none"{/if}>
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">授权获取方式</label>
+	            				 			<div class="col-sm-8">
+			            				 			 	<label data-value="1" class=" btn btn-default {if $vote['auth_type'] == '1'} active{/if}">
+							                                	<input type="radio" name="auth_type" value="1" autocomplete="on"  {if $vote['auth_type'] == "1"}checked{/if}>已是认证服务号
+							                            </label>
+							                           <label data-value="0" class="btn btn-default {if $vote['auth_type']==2} active{/if}">
+							                                	<input type="radio" name="auth_type" value="2" autocomplete="off"  {if $vote['auth_type'] == "2"}checked{/if}>借权使用
+							                            </label>
+							                             <label data-value="0" class="btn btn-default {if  $vote['auth_type']==3} active{/if}">
+							                                	<input type="radio" name="auth_type" value="3" autocomplete="off"  {if $vote['auth_type'] == "3"}checked{/if}>使用云授权
+							                            </label>  
+													    <span class="help-block">借权使用时请先进行借权设置，<a href="{php echo wurl('profile/passport')}" target="_blank">设置</a></span>
+											 </div>
+				                </div>   
+								<div class="form-group">
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">每天投票数</label>
+	            				 			<div class="col-sm-6">
+													 <input type="text" name="everyday_count" class="form-control" value="{php echo $vote['everyday_count'];}" placeholder="填写每天投票数，为空或0表示不限制" />
+													<span class="help-block"><b style=" color:red;">每个会员每天可以投票总数，0或空为不限制</b></span>
+											 </div>
+				                  </div>  
+				                  <div class="form-group">
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">每人每个选手投票数</label>
+	            				 			<div class="col-sm-6">
+													 <input type="text" name="limit_num" class="form-control" value="{php echo $vote['limit_num'];}" placeholder="填写每人每个选手投票数，为空或0表示不限制" />
+													<span class="help-block"><b style=" color:red;">每个会员对每个选手投票数，0或空为不限制</b></span>
+											 </div>
+				                  </div> 
+				                  <div class="form-group">
+	            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">选手每天票数上限</label>
+	            				 			<div class="col-sm-6">
+													 <input type="text" name="vote_num" class="form-control" value="{php echo $vote['vote_num'];}" placeholder="填写选手每天票数上限，为空或0表示不限制" />
+													<span class="help-block"><b style=" color:red;">每个选手每天最多被投票上限，0或空为不限制</b></span>
+											 </div>
+				                  </div>
+									<div class="form-group">
+										<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">开启广告位</label>
+										<div class="col-sm-8">
+											<div class="btn-group" data-toggle="buttons">
+												<label data-value="1" class="btn-open-adv btn btn-default {if $vote['adv_open'] == '1'} active{/if}">
+													<input type="radio" name="adv_open" value="1" autocomplete="off"  {if $vote['adv_open'] == "1"}checked{/if}>开启
+												</label>
+												<label data-value="0" class="btn-open-adv btn btn-default {if empty($vote['adv_open'])} active{/if}">
+													<input type="radio" name="adv_open" value="0" autocomplete="off"  {if empty($vote['adv_open'])}checked{/if}>关闭
+												</label>
+											</div>
+											<span class="help-block">
+												<b style=" color:red;">开启后在选手报名页面底部展示广告位</b><br/>
+											 </span>
+										</div>
+									</div>
+									<div class="form-group adv-type" {if empty($vote['adv_open'])}style='display:none'{/if}>
+										<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">广告位类型</label>
+										<div class="col-sm-8">
+											<div class="btn-group" data-toggle="buttons">
+												<label data-value="1" class="btn-adv-type btn btn-default {if $vote['adv_type'] == '1'} active{/if}">
+													<input type="radio" name="adv_type" value="1" autocomplete="off"  {if $vote['adv_type'] == "1"}checked{/if}>图片
+												</label>
+												<label data-value="2" class="btn-adv-type btn btn-default {if $vote['adv_type'] == '2'} active{/if}">
+													<input type="radio" name="adv_type" value="2" autocomplete="off"  {if $vote['adv_type']=="2"}checked{/if}>视频
+												</label>
+											</div>
+											<span class="help-block">
+												<b style=" color:red;">默认为图片广告，如果选择视频广告请填写视频文件地址</b><br/>
+											</span>
+										</div>
+									</div>
+									<div class="form-group adv-type-image" {if $vote['adv_open']==1 && $vote['adv_type']==1}style="display:block"{else}style="display:none"{/if}>
+										<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">广告图片</label>
+										<div class="col-sm-8">
+											{php echo tpl_form_field_image('adv_image', $vote['adv_image'], '', array('extras' => array('text' => 'readonly')))}
+										</div>
+									</div>
+									<div class="form-group adv-type-image" {if $vote['adv_open']==1 && $vote['adv_type']==1}style="display:block"{else}style="display:none"{/if}>
+											<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">图片跳转地址</label>
+											<div class="col-sm-8">
+												<input type="text" name="adv_url" check-type="url" url-message="填写正确的图片跳转地址" class="form-control" value="{php echo $vote['adv_url'];}" placeholder="填写图片跳转地址" />
+											</div>
+									</div>
+									<div class="form-group adv-type-video" {if $vote['adv_open']==1 && $vote['adv_type']==2}style="display:block"{else}style="display:none"{/if}>
+										<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">广告视频文件地址</label>
+										<div class="col-sm-8">
+											<input type="text" name="adv_video" check-type="url" url-message="填写正确的视频文件地址" class="form-control" value="{php echo $vote['adv_video'];}" placeholder="填写视频文件地址" />
+										</div>
+									</div>
+									<div class="form-group">
+					                    <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">前端报名</label>
+					                    <div class="col-sm-8">
+											<div class="btn-group" data-toggle="buttons">
+												 <label data-value="1" class="btn-baoming-open btn btn-default {if $vote['baoming_open'] == '1'} active{/if}">
+					                                	<input type="radio" name="baoming_open" value="1" autocomplete="off"  {if $vote['baoming_open'] == "1"}checked{/if}>开启
+					                            </label>
+					                              <label data-value="0" class="btn-baoming-open btn btn-default {if empty($vote['baoming_open'])} active{/if}">
+					                                	<input type="radio" name="baoming_open" value="0" autocomplete="off"  {if empty($vote['baoming_open'])}checked{/if}>关闭
+					                            </label> 
+					                        </div>
+											<span class="help-block"> 
+												<b style=" color:red;">开启前端报名后，选手可在前端页面进行报名</b><br/> 
+											 </span>
+										</div>
+				                  </div>     
+				                  <div class="form-group baoming_content" {if empty($vote['baoming_open'])}style="display:block"{else}style="display:none"{/if}>
+				                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">报名流程</label>
+					                    <div class="col-sm-8">
+				               							   {php echo tpl_ueditor('baoming_content', $vote['baoming_content']);}
+				                          </div>
+				                  </div>   
+							</div>
+					</div>
+					<div  role="tabpanel" class="tab-pane" id="sssm">
+								<div class="panel-body"> 
+										<div class="form-group">
+						                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">活动简介</label>
+							                    <div class="col-sm-8">
+						               					 {php echo tpl_ueditor('description', $vote['description']);}
+						                          </div>
+						                  </div>   
+						                  <div class="form-group">
+						                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">活动流程</label>
+							                    <div class="col-sm-8">
+						               					 {php echo tpl_ueditor('flow', $vote['flow']);}
+						                          </div>
+						                  </div>   
+								</div>
+					</div>
+					<div  role="tabpanel" class="tab-pane" id="jxsz">
+								<div class="panel-body"> 
+											<div class="form-group">
+						                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">奖项设置</label>
+							                    <div class="col-sm-8">
+						               					 {php echo tpl_ueditor('awards', $vote['awards']);}
+						                          </div>
+						                  </div> 
+								 </div>
+					</div>
+					<div  role="tabpanel" class="tab-pane" id="cygz" >
+								<div class="panel-body"> 
+										 <div class="form-group">
+						                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">投票规则</label>
+							                    <div class="col-sm-8">
+						               					 {php echo tpl_ueditor('voterule', $vote['voterule']);}
+						                          </div>
+						                  </div> 
+						                   <div class="form-group">
+						                 		 <label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">参赛规则</label>
+							                    <div class="col-sm-8">
+						               					 {php echo tpl_ueditor('competition_rules', $vote['competition_rules']);}
+						                          </div>
+						                  </div> 
+								</div>
+					</div>
+					<div  role="tabpanel" class="tab-pane" id="kzzd" >
+								<div class="panel-body">
+										<div class="form-group">
+								 		 			<label class="col-xs-12 col-sm-2 col-md-2 control-label">字段扩展：</label>
+													 <div  class="col-sm-9" > 
+													 		 <table   width="100%" border="0"  cellpadding="3" class="table table-hover" >
+															     <thead class="navbar-inner">  
+																        <tr class="text-c">
+																		          <th width="30%">字段名称</th> 
+																		          <th width="15%">字段类型</th>
+																		          <th width="10%">是否必须</th>
+																		          <th width="15%">默认值</th> 
+																		          <th width="15%">选项</th> 
+																		          <th width="15%">操作</th>
+																        </tr> 
+															       </thead>
+															       <tbody  id="fields">
+															       		{loop $extend_field_list $field}
+															       		          <tr>
+																						<td><input type="hidden"  name="field_id[]" value="{$field['id']}" /><input type="text" class="input-text form-control" style="width:100%" name="field_name[]" value="{$field['name']}" pattern="required" /></td>
+																						<td>
+																								<select name="field_type[]" class="select-box form-control">
+																										{loop $field_types  $k_type $type}
+																												<option value="{$k_type}" {if $k_type==$field['type']}selected{/if} >{$type}</option>
+																										{/loop}
+																								</select>
+																						</td>
+																						<td>
+																									<select name="field_require[]" class="select-box form-control">
+																											<option value="0" {if $field['is_required']==0}selected{/if}   >否</option>
+																											<option value="1" {if $field['is_required']==1}selected{/if}>是</option>
+																									</select>
+																						</td>
+																						 <td>
+																								 <input type="text" class="input-text form-control" style="width:100%" name="field_default[]" value="{$field['default']}" pattern="required" /> 
+																						</td>
+																						<td>
+																								 {if $field['type']=='radio' || $field['type']=='checkbox' || $field['type']=='select'}
+																								 		<input type="button" class="btn-set-option input-text form-control"  value="设置选项值" data-url="{php echo $this->createWebUrl('api',array('op'=>'option'))}" data-title="设置项目" data-width="700" data-height="500"   /> 
+																								 		<input type="hidden" name="field_options[]" value="{$field['options']}"  />
+																								 {else}
+																											 <input type="hidden" name="field_options[]" value=""  />
+																								 {/if}
+																						</td>
+																					   <td class="btn_min text-c" align="center" >
+																					   			<a href="javascript:void(0)" class="icon-arrow-up fa fa-arrow-up" title="上升"></a>&nbsp;
+																					   			<a href="javascript:void(0)" class="icon-arrow-down fa fa-arrow-down" title="下降"></a>&nbsp;
+																					   			<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a>
+																					   	</td>
+																				</tr>
+															       		{/loop}
+															       </tbody>
+															  </table> 
+															   <div style="margin-top:10px">
+															     		<input type="button"   value="添加字段"  class="btn btn-success radius col-lg-2" id="addFieldButton" />
+															  </div> 
+													 </div>  
+											</div>
+								</div>
+					</div>
+					<div  role="tabpanel" class="tab-pane" id="fxsz" >
+								<div class="panel-body">
+										<div class="form-group">
+			            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">分享标题</label>
+			            				 			<div class="col-sm-6">
+															 <input type="text" name="share_title" class="form-control" value="{php echo $vote['share_title'];}" placeholder="填写分享投票活动时的显示标题" />
+															<span class="help-block"></span>
+													 </div>
+						                  </div>   
+						                  <div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享描述</label>
+													<div class="col-sm-6 col-xs-12">
+																<textarea name="share_desc" class="form-control" cols="70" row="5" placeholder="例:#name# 正在参加 #activity_title# 投票活动,目前排名#rank#,快来帮TA投一票吧!">{$vote['share_desc']}</textarea>
+																<p class="help-block" style='color:red'>可用占位符:<br/>
+																	<span>#name# 代表 选手名称</span><br/>
+																	<span>#activity_title# 代表 活动名称</span><br/>
+																	<span>#rank# 代表 当前排名</span><br/>
+																	<span>#no# 代表 选手编号</span><br/><span>#num# 代表 选手票数</span>
+															     </p>
+													</div> 
+											</div>    
+										 <div class="form-group">
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享图片</label>
+												<div class="col-sm-6 col-xs-12">
+													{php echo tpl_form_field_image('share_logo', $vote['share_logo'], '', array('extras' => array('text' => 'readonly')))}
+												</div>
+											</div>    
+								 </div>
+					</div>  
+					<div  role="tabpanel" class="tab-pane" id="qtsz">
+								<div class="panel-body"> 
+								 	  <div class="form-group">
+		            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">主题样式</label>
+		            				 			<div class="col-sm-6">
+														<select name="tpl_id" class="form-control">
+																<option value="default" {if $vote['tpl_id']=='default'}selected{/if}>默认样式</option>
+																<option value="theme1" {if $vote['tpl_id']=='theme1'}selected{/if}>样式一</option>
+																<option value="theme2"  {if $vote['tpl_id']=='theme2'}selected{/if}>样式二</option>
+																<option value="theme3"  {if $vote['tpl_id']=='theme3'}selected{/if}>样式三</option>
+														</select>
+														<span class="help-block"></span>
+												 </div>
+					                    </div>  
+									  <div class="form-group">
+		            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">每页显示数量</label>
+		            				 			<div class="col-sm-6">
+														 <input type="text" name="listrows" class="form-control" value="{php echo $vote['listrows'];}" placeholder="填写每页显示选手数量" />
+														<span class="help-block"><b style=" color:red;">每页显示选手数量</b></span>
+												 </div>
+					                    </div>  
+					                    <div class="form-group">
+		            				 			<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">活动浏览量</label>
+		            				 			<div class="col-sm-6">
+														 <input type="text" name="viewnums" class="form-control" value="{php echo $vote['viewnums'];}" placeholder="填写活动浏览量" />
+														<span class="help-block"><b style=" color:red;">活动浏览量</b></span>
+												 </div>
+					                    </div>  
+					                    <div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">统计代码</label>
+													<div class="col-sm-6 col-xs-12">
+															<textarea name="tongji" class="form-control" cols="70" row="5">{$vote['tongji']}</textarea>
+													</div>
+										 </div> 
+										 <div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">仅限以下省份</label>
+													<div class="col-sm-6 col-xs-12">
+																<textarea name="limit_province" class="form-control" cols="70">{$vote['limit_province']}</textarea>
+																<span class="help-block"> 
+																		<b style=" color:red;">不填写，则表示投票不限制所在省份</b><br/> 
+																		<b style=" color:red;">如果多个省份请填写省份名称，多个以"|"分开,例如：浙江|山东</b><br/> 
+																 </span>
+													</div>
+										</div> 
+										<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">仅限以下城市(此为地级市非县区)</label>
+													<div class="col-sm-6 col-xs-12">
+																<textarea name="limit_city" class="form-control" cols="70">{$vote['limit_city']}</textarea>
+																<span class="help-block"> 
+																		<b style=" color:red;">不填写，则表示投票不限制所在城市</b><br/> 
+																		<b style=" color:red;">如果多个城市请填写城市名称，多个以"|"分开,例如：宁波|杭州|温州</b><br/> 
+																 </span>
+													</div>
+										</div> 
+					                     <div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label" for="">赞助商</label>
+													<div class="col-xs-8 col-sm-9">
+																 <table   width="100%" border="0"  cellpadding="3" class="table table-hover" >
+															     <thead class="navbar-inner">  
+																        <tr class="text-c">
+																		        <th>标题</th> 
+																	          	<th style="width:160px;">操作</th>
+																        </tr> 
+															       </thead> 
+															       <tbody id="sponsors">
+															       			  {loop $sponsors $sponsor} 
+																		           <tr class="text-c">
+																		           	   		<td class="text-l"><input type="hidden" name="sponsor_ids[]" value="{$sponsor['id']}"/>{$sponsor['name']}</td>
+																		           	   		<td class="btn_min"  >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up  fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down  fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>
+																		           </tr> 
+																	        {/loop}
+															       </tbody> 
+															  </table>  
+															  <div style="margin-top:10px">
+															     		<input type="button"   value="添加赞助商"  class="btn btn-success radius col-lg-2"  onclick="alinuma.openWindow(this)" data-url="{php echo $this->createWebUrl('sponsor',array('op'=>'choice','single'=>2))}" data-title="选择赞助商" data-width="930" data-height="550"  />
+															  </div>  
+													</div>
+									  	  </div> 	  
+								</div>
+					</div>
+		</div>
+		<div class="panel-body">
+							<div class="form-group">
+										<label class="col-xs-12 col-sm-3 col-md-2 control-label" for=""></label>
+									    <div class="col-xs-8 col-sm-9">
+												<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+												<input type="hidden" name="token" value="{$_W['token']}" />
+										</div>
+							</div>
+		 </div> 
+	</form>
+	<script type="text/javascript">
+	 var type_options = "{$type_options}"; 
+	 var setoption_url = "{php echo $this->createWebUrl('api',array('op'=>'option'))}";
+	 var adv_type = "{$vote['adv_type']}";
+	 var adv_open = "{$vote['adv_open']}";
+	 $(function(){
+            //自定义form表单的id
+		    //$('#application_form').validation();
+		    
+		    $(".btn-baoming-open").click(function(){ 
+		    	   if($(this).attr("data-value")==0){
+		    		      $(".baoming_content").show();
+		    	   }else{
+		    		   $(".baoming_content").hide();
+		    	   }
+		    })
+
+		 	$(".btn-open-adv").click(function(){
+                if($(this).attr("data-value")==1){
+                    $(".adv-type").show();
+                    if(adv_type==1){
+                        $(".adv-type-video").hide();
+                        $(".adv-type-image").show();
+					}else if(adv_type==2){
+                        $(".adv-type-image").hide();
+                        $(".adv-type-video").show();
+					}
+                }else{
+                    $(".adv-type").hide();
+                    $(".adv-type-image").hide();
+                    $(".adv-type-video").hide();
+                }
+			})
+			 $(".btn-adv-type").click(function(){
+				 if($(this).attr("data-value")==1){
+					 $(".adv-type-image").show();
+					 $(".adv-type-video").hide();
+				 }else{
+                     $(".adv-type-image").hide();
+                     $(".adv-type-video").show();
+				 }
+			 })
+		     $(".btn-must-guanzhu").click(function(){ 
+		    	   if($(this).attr("data-value")==1){
+		    		      $(".must_guanzhu").show();
+		    		      $(".no_guanzhu").hide();
+		    	   }else{
+		    		   	  $(".must_guanzhu").hide();
+		    		   	  $(".no_guanzhu").show();
+		    	   }
+		      })
+		     $("#fields").on("change",".type-option",function(){
+		    	    var value = $(this).val();
+		    	    if(value=='radio' || value=='select' || value=='checkbox'){
+		    	    	  $(this).parents("tr").find(".btn-set-option").show();
+		    	    }else{
+		    	    	$(this).parents("tr").find(".btn-set-option").hide();
+		    	    }
+		     })
+			 $("#addFieldButton").on("click",function(){ 
+				     var str="";
+				     str +='<tr>';
+				     		str +='<td><input type="hidden"  name="field_id[]" value="0" /><input type="text" class="input-text form-control" style="width:100%" name="field_name[]" pattern="required" /></td>';
+				     		str +='<td><select name="field_type[]" class="type-option select-box form-control">'+type_options+'</select></td>';
+				     		str +='<td><select name="field_require[]" class="select-box form-control"><option value="0">否</option><option value="1">是</option></select></td>';
+				     		str +='<td><input type="text" class="form-control" style="width:100%" name="field_default[]" value="" pattern="required" /></td>';
+							str +='<td><input type="button" style="display:none" class="btn-set-option input-text form-control" data-url="'+setoption_url+'"  value="设置选项值" data-title="设置项目" data-width="700" data-height="500"  /><input type="hidden" name="field_options[]" value=""  /></td>';
+					 		str +='<td class="btn_min text-c" align="center" >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>';
+				     str +='</tr>';
+    			    $("#fields").append(str);
+	    				bindEvent();
+	    				return false;
+			 });   
+		    $("#fields").on("click",'.btn-set-option',function(){
+		    	   var url = setoption_url;
+		    	   var index = $(this).parents('tr').index();
+		    	   var values = $(this).next("input").val();
+		    	   //获取该行的位置
+		    	   url = url+"&rowid="+index+"&vals="+values; 
+		    	   $(this).attr("data-url",url);
+		    	    alinuma.openWindow($(this)[0]);
+		    })
+   })
+  function set_option(rowid,tem,num,index){
+		 	$("#fields").find("tr").eq(rowid).find("input[name='field_options[]']").val(tem);
+		 	alinuma.closeFrame(index);
+	 }
+  function bindEvent() {
+				  $(".icon-arrow-down").off();
+				  $(".icon-arrow-up").off();
+				  $(".icon-remove").off();  
+				  $(".icon-arrow-down").on("click",function() {
+				    var current_tr = $(this).parents("tr");
+				    current_tr.insertAfter(current_tr.next());
+				  });
+				    $(".icon-arrow-up").on("click",function() {
+				    var current_tr = $(this).parents("tr");
+				    if(current_tr.prev().prev().html()!=null)current_tr.insertBefore(current_tr.prev());
+				  });
+				    $(".icon-remove").on("click",function(){ 
+				      $(this).parents("tr").remove(); 
+				    });
+		}
+		 //改变行数的类型 
+	   bindEvent();		 
+	   function add_msgs(msgs,nums,flag,winid){ 
+			  msgs = msgs.split("|"); 
+			  var str_ths =''; 
+			  var msg_array = new Array();
+			  var spec_items = '';  
+			  if(nums>0){   
+					  for(i in msgs){ 
+						    var msg = msgs[i].split(":"); 
+						    if(flag=="1"){
+						    	str_ths +='<tr class="text-c">'
+						                +'<td class="text-l"><input type="hidden" name="sponsor_ids[]" value="'+ msg[0]+'" />'+msg[1]+'</td>'
+						                +'<td class="btn_min" align="center" >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>'
+						               +'</tr>'; 
+						    }else {
+						    	str_ths +='<tr class="text-c">'
+						                +'<td class="text-l"><input type="hidden" name="sponsor_ids[]" value="'+ msg[0]+'" />'+msg[1]+'</td>'
+						                +'<td class="btn_min" align="center" >&nbsp;<a href="javascript:void(0)" class="icon-arrow-up  fa fa-arrow-up" title="上升"></a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="icon-arrow-down  fa fa-arrow-down" title="下降"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)"  class="icon-remove fa fa-times" title="删除"></a></td>'
+						               +'</tr>'; 
+						    } 
+					  } 
+				 	$("#sponsors").append(str_ths);   
+			   }
+			   bindEvent();
+			   alinuma.closeFrame(winid);  
+		} 		 
+	</script>
+</div> 
+{elseif $operation == 'display'}
+<ul class="nav nav-tabs">
+		    <li class="active"><a href="{php echo $this->createWebUrl('vote')}">投票活动列表</a></li>
+		    <li><a href="{php echo $this->createWebUrl('vote',array('op'=>'post'))}">添加投票活动</a></li>
+</ul> 
+<div class="main">
+<div class="panel panel-info">
+				<div class="panel-heading">活动地址：{php echo $_W['siteroot']."app/index.php?c=entry&i=".$_W['uniacid']."&do=index&m=numa_vote&id=活动ID"}</div> 
+       </div>
+	<div class="panel panel-info">
+				<div class="panel-heading">筛选</div>
+				<div class="panel-body">
+					<form action="./index.php" method="get" class="form-inline" role="form">
+						<input type="hidden" name="c" value="site" />
+						<input type="hidden" name="a" value="entry" />
+						<input type="hidden" name="m" value="numa_vote" />
+						<input type="hidden" name="do" value="vote" /> 
+						<div class="form-group">
+								 <div class="col-xs-12 col-sm-12 col-lg-12">
+											<select name="opt_type" class='form-control'>
+														<option value="">请选择</option>
+														<option value="title" {if $_GPC['opt_type']=='title'}selected{/if} >投票标题</option> 
+											</select>  
+											<input class="form-control" name="keywords" id="" type="text" value="{$_GPC['keywords']}">
+									</div>
+						</div> 
+						<div class="form-group">  
+							<div class="col-xs-12 col-sm-2 col-lg-2">
+								<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+							</div> 
+						</div>  
+					</form>
+				</div>
+       </div>
+       <div class="panel panel-default">
+				<div class="panel-body table-responsive">
+					<table class="table table-hover">
+						<thead class="navbar-inner">
+							<tr class="text-c">
+								<th style="width:5%;">ID</th>
+								<th style="">活动标题</th> 
+								<th style="width:10%">图标</th>
+								<th style="width:13%;">活动起止</th>
+								<th style="width:13%;">报名起止</th>  
+								<th style="width:8%;">浏览量</th> 
+								<th style="width:18%;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							{loop $data_list $item}
+							<tr class="text-c">
+								<td>{$item['id']}</td>
+								<td>{$item['title']}</td> 
+								<td><img src="{php echo tomedia($item['top_image']);}" class="preview" width='100px' height="30" style='padding:1px;border: 1px solid #ccc;float:left;' /></td>
+								<td>{php echo alinuma_toDate($item['begin_time'],'Y-m-d H:i')}<br/>{php echo alinuma_toDate($item['end_time'],'Y-m-d H:i')}</td>
+								<td>{php echo alinuma_toDate($item['begin_time_bm'],'Y-m-d H:i')}<br/>{php echo alinuma_toDate($item['end_time_bm'],'Y-m-d H:i')}</td>
+								 <td>{$item['viewnums']}</td>  
+								<td style="text-align:center;">
+												<a href="{php echo $this->createWebUrl('vote', array('id' => $item['id'], 'op' => 'post'))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;
+											    <a href="{php echo $this->createWebUrl('vote', array('id' => $item['id'], 'op' => 'delete'))}" onclick="return confirm('同时删除该投票活动所有相关数据，且不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>&nbsp;
+									  			<a href="{php echo $this->createWebUrl('vote', array('id'=>$item['id'], 'op' => 'itemlist'))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="选手列表"><i class="fa fa-list-ul"></i></a>&nbsp;
+											    <a href="{php echo $this->createWebUrl('item', array('aid' => $item['id'], 'op' => 'post'))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="新增选手"><i class="fa fa-plus"></i></a>&nbsp;
+									</td>
+							</tr>
+							{/loop}
+						</tbody>
+					</table>
+					{$pager}
+			 </div>
+	</div>
+</div> 
+{elseif $operation=='itemlist'}
+		<ul class="nav nav-tabs">
+		    		<li><a href="{php echo $this->createWebUrl('vote')}">投票活动列表</a></li>
+		    		<li class="active"><a href="{php echo $this->createWebUrl('vote',array('op'=>'itemlist','id'=>$aid))}">选手列表</a></li>
+		</ul> 
+		<div class="main">
+			<div class="panel panel-info">
+						<div class="panel-heading">筛选</div>
+						<div class="panel-body">
+							<form action="./index.php" method="get" class="form-inline" role="form">
+								<input type="hidden" name="c" value="site" />
+								<input type="hidden" name="a" value="entry" />
+								<input type="hidden" name="m" value="numa_vote" />
+								<input type="hidden" name="do" value="vote" /> 
+								<input type="hidden" name="op" value="itemlist" /> 
+								<input type="hidden" name="id" value="{$aid}" /> 
+								<div class="form-group">
+										 <div class="col-xs-12 col-sm-12 col-lg-12">
+													<select name="opt_type" class='form-control'>
+																<option value="">请选择</option>
+																<option value="name" {if $_GPC['opt_type']=='name'}selected{/if} >选手名称</option> 
+																<option value="activity_id" {if $_GPC['opt_type']=='activity_id'}selected{/if} >活动ID</option> 
+																<option value="activity_title" {if $_GPC['opt_type']=='activity_title'}selected{/if} >活动名称</option> 
+																<option value="no" {if $_GPC['opt_type']=='no'}selected{/if} >选手编号</option> 
+																<option value="mobile" {if $_GPC['opt_type']=='mobile'}selected{/if} >手机号码</option> 
+													</select>  
+													<input class="form-control" name="keywords" id="" type="text" value="{$_GPC['keywords']}">
+													 <select name="sort" class='form-control'>
+																<option value="">默认排序</option>
+																<option value="1" {if $_GPC['sort']=='1'}selected{/if} >票数由高到低</option> 
+																<option value="2" {if $_GPC['sort']=='2'}selected{/if} >编号由低到高</option>  
+													</select>   
+													<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button> 
+													<span  class="btn btn-warning" onclick="$('#export_form').submit()"  ><i class="fa fa-sign-out">导出</i></span>
+											</div>
+								</div>   
+							</form>
+							<form id="export_form" action="{php echo $this->createWebUrl('item',array('op'=>'export'))}" method="post">
+									<input type="hidden" name="aid" value="{$aid}" />
+							</form>
+						</div>
+		       </div>
+		       <div class="panel panel-default">
+						<div class="panel-body table-responsive">
+							<table class="table table-hover">
+								<thead class="navbar-inner">
+									<tr class="text-c">
+										<th style="width:5%;">ID</th> 
+										<th style="width:8%;">选手编号</th>
+										<th style="width:10%;">选手名称</th>
+										<th style="width:10%;">联系电话</th> 
+										<th style="width:5%">图片</th> 
+										<th style="width:8%;">总票数</th>
+										<th style="width:8%;">浏览量</th> 
+										<th style="width:8%;">状态</th> 
+										<th style="width:10%;">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									{loop $data_list $item}
+									<tr class="text-c">
+											<td>{$item['id']}</td> 
+											<td>{$item['no']}</td>
+											<td>{$item['name']}</td>
+											<td>{$item['mobile']}</td>
+											<td><img src="{php echo tomedia($item['thumb']);}" class="preview" width='50px' height="30" style='padding:1px;border: 1px solid #ccc;float:left;' /></td>
+											<td>{$item['num']}</td>
+											<td>{$item['viewnums']}</td>  
+											<td>{if $item['status']==1}<label class="label label-success radius">正常</label>{else}<label class="label label-warning radius">被禁</label>{/if}</td>
+											<td style="text-align:center;">
+															<a href="{php echo $this->createWebUrl('item', array('id' => $item['id'], 'op' => 'post','aid'=>$item['activity_id']))}"class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;
+														    <a href="{php echo $this->createWebUrl('item', array('id' => $item['id'], 'op' => 'delete'))}" onclick="return confirm('同时删除该选手所有相关数据，且不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+											 </td>
+									</tr>
+									{/loop}
+								</tbody>
+							</table>
+							{$pager}
+					 </div>
+			</div>
+		</div> 
+{/if}
+{template 'common/footer'}

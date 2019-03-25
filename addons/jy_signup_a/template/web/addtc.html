@@ -1,0 +1,383 @@
+{template 'common/header'}
+{template 'web/nav'}
+
+<style>
+	.nameSpan{display: inline-block;width: 18%}
+	.leftW{margin-left: 10%}
+	#gbin1-list{margin-bottom: 10px}
+</style>
+
+<div class="main">
+
+
+	<form action="" method="post" class="form-horizontal form"
+		enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$item['id']}" />
+		<div class="panel panel-info">
+
+			<div class="panel-heading">
+				[{$item['hdname']}]活动信息
+			</div>
+			<div class="panel-body">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动标题</label>
+					<div class="col-sm-7 col-xs-12">
+						<label>{$item['hdname']}</label>
+					</div>
+				</div>
+
+				{if !empty($item['thumb'])}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动介绍图</label>
+					<div class="col-sm-7 col-xs-12">
+						{loop $item['thumb'] $t}
+							<img src="{php echo tomedia($t)}" style="width: 200px">
+						{/loop}
+					</div>
+				</div>
+				{/if}
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动类型</label>
+					<div class="col-sm-7 col-xs-12">
+						{loop $hdcate $row}
+							{if $row['id']==$item['hdcateid']}
+								<label>{$row['name']}</label>
+							{/if}
+						{/loop}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动所属品牌</label>
+					<div class="col-sm-7 col-xs-12">
+						{loop $brands $row}
+							{if $row['id']==$item['brand_id']}
+								<label>{$row['title']}</label>
+							{/if}
+						{/loop}
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="panel panel-danger">
+
+			<div class="panel-heading">
+				套餐信息
+			</div>
+			<div class="panel-body">
+				{if !empty($tcid)}
+		        <div class="form-group">
+		          <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">访问地址</label>
+		          <div class="col-sm-8 col-xs-12">
+		            <a href="{php echo $_W['siteroot'] . 'app/' .substr($this->createMobileUrl('detail', array('id' => $item['id'], 'weid' => $weid)),2)}" target="_blank">{php echo $_W['siteroot'] . 'app/' .substr($this->createMobileUrl('detail', array('id' => $item['id'], 'weid' => $weid)),2)}</a>
+		          </div>
+		        </div>
+		        <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+					<div class="col-sm-7 col-xs-12">
+						<a href="{php echo $this->createWebUrl('pl', array('id' =>$item['id'] , 'op'=>'add'))}"><div class="btn btn-info">该套餐评论</div></a>
+					</div>
+				</div>
+		        {/if}
+
+		        <div class="form-group" id="mdids" {if empty($mendian)}style="display:none"{/if}>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动适用门店</label>
+					<div class="col-sm-7 col-xs-12" id="mds" >
+					{loop $mendian $m}
+						<input type="checkbox" name="mendian_ids[]" value="{$m['id']}" {if in_array($m['id'],$mendian_ids)}checked{/if}>{$m['mendianname']}&nbsp;&nbsp;&nbsp;
+					{/loop}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动套餐名称</label>
+					<div class="col-sm-7 col-xs-12">
+						{if !empty($tcid)}
+						<input type="text" name="tcname" class="form-control" value="{$item['tcname']}" />
+						{else}
+						<input type="text" name="tcname" class="form-control" value="" />
+						{/if}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动可参与人数</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="renshu" class="form-control" value="{$item['renshu']}" />
+						<span>0代表活动数量为无限</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动时间</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="time" class="form-control"
+							   value="{$item['time']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动时间区间</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_form_field_daterange('time2', array('start'=>date('Y-m-d',$item['starttime']),'end'=>date('Y-m-d',$item['endtime'])));}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动地址</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="address" class="form-control"
+							   value="{$item['address']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">导航地址</label>
+					<div class="col-sm-7 col-xs-12">
+						{php $location=array('lng'=>$item['lng'],'lat'=>$item['lat'])}
+
+						{php echo tpl_form_field_coordinate('location',$location);}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">报名截止时间</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_form_field_date('deadline', date('Y-m-d H:i',$item['deadline']) , true);}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">区域选择</label>
+					<div class="col-sm-7 col-xs-12">
+						{php echo tpl_form_field_district('reside', array('province' => $item['province'], 'city' => $item['city'], 'district' => $item['dist'] ));}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动类别</label>
+					<div class="col-sm-7 col-xs-12">
+						<select class="form-control" name="hdtype" id="hdtype" onchange="hdtype2()" >
+							<option value="0">免费报名</option>
+							<option value="1" {if $item['price']>0} selected {/if}>付费报名</option>
+							<option value="2" {if $item['jifen']>0} selected {/if}>积分报名</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group" id="type1">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动门票价钱</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="price" class="form-control" value="{$item['price']}" />
+						<span>如果为0代表无需门票</span>
+					</div>
+				</div>
+
+				<div class="form-group" id="type2">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动所需积分</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="jifen" class="form-control" value="{$item['jifen']}" />
+						<span>如果为0代表无需积分</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">报名后可否退款/积分</label>
+					<div class="col-sm-7 col-xs-12">
+
+						<label for="enabled1" class="radio-inline"><input type="radio" name="tk" value="1" id="enabled1" {if !empty($item['tk']) && $item['tk'] == 1}checked="true"{/if} /> 可以</label>
+	                    &nbsp;&nbsp;&nbsp;
+	                    <label for="enabled2" class="radio-inline"><input type="radio" name="tk" value="0" id="enabled2"  {if empty($item['tk']) || $item['tk'] == 0}checked="true"{/if} /> 不可以</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">选中后可否取消报名</label>
+					<div class="col-sm-7 col-xs-12">
+						<label for="enabled3" class="radio-inline"><input type="radio" name="qx" value="1" id="enabled3" {if !empty($item['qx']) && $item['qx'] == 1}checked="true"{/if} /> 可以</label>
+	                    &nbsp;&nbsp;&nbsp;
+	                    <label for="enabled4" class="radio-inline"><input type="radio" name="qx" value="0" id="enabled4"  {if empty($item['qx']) || $item['qx'] == 0}checked="true"{/if} /> 不可以</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">报名后是否需要审核入选</label>
+					<div class="col-sm-7 col-xs-12">
+						<label for="enabled5" class="radio-inline"><input type="radio" name="shenhe" value="1" id="enabled5" {if !empty($item['shenhe']) && $item['shenhe'] == 1}checked="true"{/if} /> 需要</label>
+	                    &nbsp;&nbsp;&nbsp;
+	                    <label for="enabled6" class="radio-inline"><input type="radio" name="shenhe" value="0" id="enabled6"  {if empty($item['shenhe']) || $item['shenhe'] == 0}checked="true"{/if} /> 不需要</label>
+	                    <span style="color:red;margin-left:40px"> 备注:如果入选人数达到活动可参与人数上限，则即使用户付款/报名后也无法直接入选成功，建议开启不需要审核功能时，设置可入选人数为无限</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动参与人数数量</label>
+					<div class="col-sm-7 col-xs-12">
+						{$item['num']}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动使用评论</label>
+					<div class="col-sm-7 col-xs-12">
+						{$item['pl']}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动人气（喜欢）</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="sc" class="form-control" value="{$item['sc']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动浏览量</label>
+					<div class="col-sm-7 col-xs-12">
+						<input type="text" name="pv" class="form-control" value="{$item['pv']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动描述</label>
+					<div class="col-sm-7 col-xs-12">
+						<textarea class="form-control" name="description" id="description" rows="5">{$item['description']}</textarea>
+						<span class="help-block">
+		                    小工具:
+		                    <a href="http://wxedit.yead.net/" target="_blank" title="新窗口打开">易点微信编辑器</a> &nbsp;
+		                    <a href="http://www.135editor.com/" target="_blank" title="新窗口打开">135微信编辑器</a> &nbsp;(利用第三方编辑器，获得更好显示效果)
+		                 </span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动描述</label>
+					<div class="col-sm-7 col-xs-12 gbin1-list">
+					{loop $ziliao $a}
+						<div class="form-control" id="gbin1-list" style="overflow:hidden;height:auto">
+							<div><span class="nameSpan">{$a['id']} : {$a['name']} ({if $a['type']==1}多选{/if}{if $a['type']==2}填空{/if}{if $a['type']==3}下拉菜单{/if}{if $a['type']==4}市区街道{/if}{if $a['type']==5}三级联动{/if}{if $a['type']==6}手机{/if}{if $a['type']==7}姓名{/if})</span>
+								<span class="CheckedSpan leftW"><input type="checkbox" name="attr_hd[]" value="1_{$a['id']}" {if !empty($attr_arr2) && in_array($a['id'],$attr_arr2)}checked{/if}>必选</span>
+								<span class="CheckedSpan leftW"><input type="checkbox" name="attr_hd[]" value="0_{$a['id']}" {if !empty($attr_arr) && in_array($a['id'],$attr_arr)}checked{/if}>可选</span>
+							</div>
+						</div>
+					{/loop}
+					{loop $attr $a}
+						<div class="form-control" id="gbin1-list" style="overflow:hidden;height:auto">
+							<div><span class="nameSpan">{$a['id']} : {$a['name']} ({if $a['type']==1}多选{/if}{if $a['type']==2}填空{/if}{if $a['type']==3}下拉菜单{/if}{if $a['type']==4}市区街道{/if}{if $a['type']==5}三级联动{/if}{if $a['type']==6}手机{/if}{if $a['type']==7}姓名{/if})</span>
+								<span class="CheckedSpan leftW"><input type="checkbox" name="attr_hd[]" value="1_{$a['id']}" {if !empty($attr_arr2) && in_array($a['id'],$attr_arr2)}checked{/if}>必选</span>
+								<span class="CheckedSpan leftW"><input type="checkbox" name="attr_hd[]" value="0_{$a['id']}" {if !empty($attr_arr) && in_array($a['id'],$attr_arr)}checked{/if}>可选</span>
+							</div>
+						</div>
+					{/loop}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+					<div class="col-sm-9 col-xs-12">
+						<input name="submit" type="submit" value="提交" class="btn btn-primary span3">
+						<input type="hidden" name="token" value="{$_W['token']}" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</form>
+	<script>
+		$(function(){
+            {if $item['price']>0}
+				$("#type1").show();
+				$("#type2").hide();
+            {else}
+            	{if $item['jifen']>0}
+            		$("#type1").hide();
+					$("#type2").show();
+            	{else}
+            		$("#type1").hide();
+					$("#type2").hide();
+            	{/if}
+            {/if}
+        });
+
+		$("input[name='attr_hd[]']").bind("click",function(){
+			var index = $("input[name='attr_hd[]']").index(this);
+			if($(this).is(":checked")){
+				$(this).parent().siblings().find("input").prop("checked",false);
+			}
+		});
+		$(".CheckedSpan").bind("click",function(event){
+			var self = this;
+			if(event.target==self){
+				if($(self).find("input").is(":checked")){
+					$(self).find("input").prop("checked",false);
+				}else{
+					$(self).siblings().find("input").prop("checked",false);
+					$(self).find("input").prop("checked",true);
+				}
+	        }
+		});
+		function mdids()
+		{
+
+			var brand_id=$("#brand_id").val();
+			if(brand_id != 0){
+				$.post("{php echo $_W['siteroot'].substr($this->createWebUrl('huodong',array('op'=>'mdids','id'=>$id)),2)}"+"&brand_id="+brand_id,function(data){
+	                if (data.status == 1) {
+
+	                	$("#mdids").show();
+	                	$("#mds").html('').append(data.log);
+	                }
+	                else {
+	                    alert("获取门店信息失败！"+data);
+	                }
+	            },'json');
+			}
+			else
+			{
+				$("#mdids").hide();	
+			}
+		}
+
+		function hdtype2()
+		{
+			var type=$("#hdtype").val();
+			if(type==0)
+			{
+				$("#type1").hide();
+				$("#type2").hide();
+			}
+			if(type==1)
+			{
+				$("#type1").show();
+				$("#type2").hide();
+			}
+			if(type==2)
+			{
+				$("#type1").hide();
+				$("#type2").show();
+			}
+		}
+	</script>
+
+	<script type="text/javascript" src="../addons/jy_signup_a/js/jquery.sortable.js"></script>
+	<script>
+		$('.gbin1-list').sortable().bind('sortupdate', function() {});
+	</script>
+
+	<script>
+	require(['jquery', 'util'], function($, u){
+		$(function(){
+			u.editor($('#description')[0]);
+		});
+	});
+	</script>
+
+</div>
+
+
+{template 'common/footer'}

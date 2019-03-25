@@ -1,0 +1,94 @@
+{template 'public/header'} 
+<style type="text/css">
+	.glyphicon{cursor: pointer;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >发现</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<form action="<?php echo  $this->routeUrl('find.listview');?>" method="post" id="keyform">
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group">
+			      <input type="text" class="form-control" value="<?php echo $params['content']; ?>" name="content" placeholder="搜索摘要">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default"  type="submit"  >搜索</button>
+			        <a href="javascript:void(0);" class="btn btn-default"  onclick="findEdit(0,2)">添加专题</a>
+			        <a href="javascript:void(0);" class="btn btn-default"  onclick="findEdit(0,1)">添加发现</a>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div> 
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th style="width: 200px;">发布时间</th>
+					<th style="width: 100px;">类型</th> 
+					<th style="width:400px;">摘要</th>   
+					<th style="">状态</th> 
+					<th  >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $finds $index $item}
+				<tr style="height: 80px;overflow: hidden;"> 
+					<td>{$item['createtime']}</td> 
+					<td>
+						<?php if($item['type']=="3"){ ?>
+						<span class="label-red">买家秀</span>
+						<?php  }else if($item['type']=="2"){ ?>
+						<span class="label-blue">专题</span>
+						<?php }else{ ?>
+						<span class="label-green">发现</span>
+					    <?php } ?> </td> 
+					</td>
+					<td style="width: 600px;height: 80px;overflow: hidden;">{$item['content']}</td>  
+					 
+					<td>
+						<?php if($item['status']=="1"){ ?>
+						<a href="javascript:void(0);" class="linkbtn linkbtn-green" onclick="changeStatus({$item['id']},0)" >显示</a>
+						<?php  }else{ ?>
+						<a href="javascript:void(0);" class="linkbtn linkbtn-gray" onclick="changeStatus({$item['id']},1)">隐藏</a>
+						<?php } ?> </td> 
+					<td>  
+						
+						<a href="javascript:void(0);" class="linkbtn" onclick="findEdit({$item['id']},{$item['type']})" >编辑</a>
+						 
+						<a href="javascript:void(0);" class="linkbtn linkbtn-orange" onclick="remove0({$item['id']},'{$item['name']}')">删除</a>
+					</td>
+				</tr>
+				 
+				{/loop}
+				 <tr>
+				 	<td colspan="5">
+				 		{template "public/pagenation"}
+				 	</td>
+				 </tr>
+			</tbody>
+
+		</table>
+	</div>
+	
+</div> 
+	 
+<script type="text/javascript">
+	function changeStatus(id,status){
+		var msg="隐藏";
+		if(parseInt(status)==1)msg="显示";
+		modalDlg("是否 "+msg,function(){
+			window.location.href="<?php echo $this->routeUrl('find.changeStatus');?>&fid="+id+"&status="+status;
+		});
+	}
+ 
+	function findEdit(id,type){ 
+		 window.location.href="<?php echo $this->routeUrl('find.editView');?>&fid="+id+"&type="+type;
+	}
+	function remove0(id,text){
+	modalDlg("是否删除该记录?",function(){
+		window.location.href="<?php echo $this->routeUrl('find.delfind');?>&fid="+id;
+		 
+	});
+}
+	 
+</script> 
+{template 'public/footer'} 

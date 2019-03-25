@@ -1,0 +1,111 @@
+{template "base/child_header"}
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <colgroup>
+            <col width="10%">
+            <col width="9%">
+            <col width="9%">
+            <col width="9%">
+            <col width="25%">
+            <col >
+        </colgroup>
+        <thead>
+        <tr>
+            <th>封面</th>
+            <th>插件名</th>
+            <th>版本</th>
+            <th>状态</th>
+            <th>描述</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody class="news_content">
+        {loop $pluginList $plugin}
+        <tr>
+            <td><img style="height: 60px;border-radius: 30px;" src="{$plugin['cover']}"> </td>
+            <td>{$plugin['name']}</td>
+            <td>{$plugin['version']}</td>
+            <td>
+                {if $plugin['status']==1}
+                    已安装
+                {else if $plugin['status']==2}
+                    已停用
+                {else}
+                    未安装
+                {/if}
+            </td>
+            <td>{$plugin['desc']}</td>
+            <td>
+                {if $plugin['status']==1}
+                <a class="layui-btn layui-btn-normal layui-btn-mini p_stop" data-id="{$plugin['plugin_str']}">
+                    停用
+                </a>
+                {else if $plugin['status']==2}
+                <a class="layui-btn layui-btn-normal layui-btn-mini p_resume" data-id="{$plugin['plugin_str']}">
+                    启用
+                </a>
+                {else}
+                <a class="layui-btn layui-btn-mini p_install" data-id="{$plugin['plugin_str']}">
+                    <i class="iconfont icon-edit"></i> 安装
+                </a>
+                {/if}
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+</div>
+<div id="page"></div>
+<script>
+    layui.use(['jquery',"layer"], function(){
+
+        var $ = layui.jquery;
+        layer = layui.layer;
+        //停用
+        $(".p_stop").on("click",function(){
+            var _this = $(this);
+            layer.confirm('确认停用插件？',{icon:3, title:'提示信息'},function(index){
+                var id =_this.attr("data-id");
+                $.post("{php echo $this->createWebUrl('pluginAct')}&d=stop&pl="+id,function(response){
+                    layer.msg(response.msg,{icon: response.code});
+                    if(response.code==1){
+                        setTimeout(function(){
+                            location.reload();
+                        },2000);
+                    }
+                },'json');
+            });
+        });
+        //启用
+        $(".p_resume").on("click",function(){
+            var _this = $(this);
+            layer.confirm('确认启用插件？',{icon:3, title:'提示信息'},function(index){
+                var id =_this.attr("data-id");
+                $.post("{php echo $this->createWebUrl('pluginAct')}&d=resume&pl="+id,function(response){
+                    layer.msg(response.msg,{icon: response.code});
+                    if(response.code==1){
+                        setTimeout(function(){
+                            location.reload();
+                        },2000);
+                    }
+                },'json');
+            });
+        });
+        //安装
+        $(".p_install").on("click",function(){
+            var _this = $(this);
+            layer.confirm('确认安装插件？',{icon:3, title:'提示信息'},function(index){
+                var id =_this.attr("data-id");
+                $.post("{php echo $this->createWebUrl('pluginAct')}&d=install&pl="+id,function(response){
+                    layer.msg(response.msg,{icon: response.code});
+                    if(response.code==1){
+                        setTimeout(function(){
+                            location.reload();
+                        },2000);
+                    }
+                },'json');
+            });
+        });
+    });
+</script>
+{template "base/child_footer"}

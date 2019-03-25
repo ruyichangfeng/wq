@@ -1,0 +1,134 @@
+{template 'public/header'} 
+<style type="text/css">  
+	.form-input{width:150px;display:inline-block;margin:auto 15px;}
+</style> 
+</style>
+ <div class="panel panel-info">
+	<div class="panel-heading">
+		<ol class="crumb">
+		  <li><a href="<?php echo $this->routeUrl('goods.index');?>">商品管理</a></li>
+		  <?php if(intval($goods['id'])>0){?>
+		   <li class="active">{$goods['name']}</li>
+		  <?php }?>
+		  <li class="active">评论管理</li>
+		</ol></div>
+	<div class="panel-body" id="pbody">
+		 <div class="row form-row">
+		 	<form action="<?php echo  $this->routeUrl('comment.ordercomment');?>" method="post" id="keyform"> 
+			  <div class="col-xs-6 col-sm-4 paddingx">
+			    <div class="input-group" style="width: 350px;">
+			     <input type="text" name="date" placeholder="评论时间" value="{$param['date']}" class="form-control" style="width:60%;display: inline-block;" autocomplete="false" id="date" readonly="" />
+			     <select class="form-control" name="flower" style="width:40%;display: inline-block;" >
+					<option value="">全部</option> 
+					<option value="1" <?php if($param['flower']=='1'){echo "selected='selected'";}?>>差评</option>  
+					<option value="2" <?php if($param['flower']=='2'){echo "selected='selected'";}?>>中评</option> 
+					<option value="3" <?php if($param['flower']=='3'){echo "selected='selected'";}?>>好评</option>
+				</select> 
+			      <span class="input-group-btn">
+			       <button class="btn btn-default" style="display: inline-block;" onclick="search()" form="keyform">搜索</button>
+			      </span>
+			    </div> 
+			  </div>  
+			</form>	 
+		</div>
+
+		<table id="caseTab" class="layui-table">
+			<tr>
+				<th >昵称</th>
+				<th>订单编号</th>
+				<th style="width: 50px;">评价</th> 
+				<th>内容</th> 
+				<th>缩略图</th>
+				<th>时间</th> 
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+			{loop $list $index $item}
+			<tr>
+				<td style="width: 100px;word-break: break-all;">{$item['nickname']}</td>
+				<td  style="width:90px;word-break: break-all;">
+					<a href="<?php echo $this->routeUrl('order.detail1')?>&order={$item['ordernum']}" class="linkbtn" style="word-break: break-all;font-size: 13px;">{$item['ordernum']}</a></td>
+				<td style="width: 70px;"><?php 
+					if(intval($item['flower'])==3){ ?>
+					 <span class="label-green">好评</span>
+					<?php }else if(intval($item['flower'])==2){?>
+					<span class="label-blue">中评</span>
+					<?php }else{ ?>
+<span class="label-red">差评</span>
+<?php 				} ?> </td>
+				<td style="width:250px;word-break: break-all;">{$item['content']} </td>
+				<td style="width: 190px;">{loop $item['pics'] $index $pic}
+					<?php if(strlen($pic)>10){ ?>
+
+						<img src="{$_W['attachurl']}{$pic}" style="margin-bottom:5px;display:inline-block;width: 50px;height: 50px;">
+					<?php  }?>
+					
+					{/loop}
+				</td> 
+				<td style="width:150px;">{$item['datetime']}</td>
+				<td style="width: 50px;">
+					<?php 
+					if(intval($item['status'])==1){ ?>
+					<a href="javascript:void(0);" onclick="chgStatus({$item['id']},'{$item['nickname']}',0)" class='linkbtn linkbtn-green'>显示</a>
+					<?php }else{?>
+					<a href="javascript:void(0);" onclick="chgStatus({$item['id']},'{$item['nickname']}',1)" class='linkbtn linkbtn-gray'>隐藏</a>
+					<?php } ?> 
+				</td>
+				<td> 
+					<?php if(intval($item['isfind'])==0){ ?>
+					<a href="javascript:void(0);" onclick="tofind({$item['id']})" class='linkbtn'>推荐到发现</a> 
+					<?php }else{ ?>
+					<span  class='label-green'>已推荐</span> 
+					<?php } ?>
+					
+					<a href="javascript:void(0);" onclick="delComment({$item['id']},'{$item['nickname']}',1)" class='linkbtn linkbtn-orange'>删除</a> 
+				</td>
+			</tr>
+			{/loop} 
+			<tr>
+				<td colspan="8" style="text-align: center;">
+					{template 'public/pagenation'}
+				</td>
+			</tr>
+		</table>
+	</div>
+
+</div>
+ 
+<script type="text/javascript">
+ 	function chgStatus(id,name,sts){
+		var msg="隐藏";
+		if(parseInt(sts)==1)msg="显示";
+		modalDlg("是否将 <span style='color:#1E9FFF;'> "+name+"</span> 的评论"+msg,function(){
+			window.location.href="<?php echo $this->routeUrl('comment.chgGoodsComment');?>&gid={$goods['id']}&cid="+id+"&status="+sts;
+		});
+	}
+	function delComment(id,name,sts){ 
+		modalDlg("是否删除 <span style='color:#1E9FFF;'> "+name+"</span> 的评论?",function(){
+			window.location.href="<?php echo $this->routeUrl('comment.delOrderComment');?>&gid={$goods['id']}&cid="+id+"&status="+sts;
+		});
+	}
+	function tofind(id){ 
+		modalDlg(" <span style='color:#1E9FFF;'>是否推荐到发现栏目中？<br/>(如果订单有多个商品，则默认跳转第一个商品)</span> ",function(){
+			window.location.href="<?php echo $this->routeUrl('comment.tofind');?>&cid="+id;
+		});
+	}
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+		 layui.use('laydate', function(){
+	  var laydate = layui.laydate;
+	  
+	  //执行一个laydate实例
+	  laydate.render({
+	  	value:"<?php if(!empty($_GPC['date'])) { echo $_GPC['date'];}?>",
+	  	type:"date",
+	    elem: '#date' //指定元素
+	  }); 
+	});
+	 layui.use('form', function(){
+  var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  form.render();
+   
+}); 
+</script>

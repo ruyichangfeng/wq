@@ -1,0 +1,109 @@
+{template 'common/header'}
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li{if $_GPC['do'] == 'manage'} class="active"{/if}><a href="{php echo $this->createWebUrl('index',array('op'=>'manage'));}">智慧表单管理</a></li>
+		<li{if $_GPC['do'] == 'post'} class="active"{/if}><a href="{php echo url('platform/reply/post',array('m'=>$this->module['name']));}">添加智慧表单</a></li>
+		<li{if $_GPC['do'] == 'list'} class="active"{/if}><a href="{php echo $this->createWebUrl('list',array('op'=>'list','rid'=>$rid));}">提交名单</a></li>
+	</ul>
+	
+<div class="panel panel-default">
+<div class="panel-heading">
+	<div class="row-fluid">
+    	
+    </div>
+</div>
+	<div style="position:relative">
+		<div class="panel-body table-responsive">
+			<table class="table table-hover" style="position:relative;min-width:1300px;">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:60px;">序号</th>
+					<th style="width:240px;">昵称/OPENID</th>
+					<th style="width:140px;">时间</th>
+					<th class="hide">内容</th>
+					{$ths}
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $row}
+				<tr>
+					<td>{$row['id']}</td>
+					<td>{if empty($row['nickname'])}{$row['openid']}{else}{$row['nickname']}{/if}</td>
+					<td>{php echo date('Y/m/d H:i',$row['createtime']);}</td>
+					<td class="hide"><input type="hidden" value='{$row["fields"]}' class="field"></td>
+					{$tds}
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+</div>
+{$pager}
+</div>
+<script>
+require(['jquery', 'util', 'json2'], function ($, u, j) {
+	show_image_modal = function(btn){
+		var img = $(btn).find("img").attr("src");
+		util.message('<img width=538px src="'+ img + '">');
+		util.dialog('','<img width=568px src="'+ img + '">');
+	};
+	var showimages = function(row,k,files){
+		var i = 4 + parseInt(k);
+		var s = "";
+		for (var j in files){
+			if (files[j].length > 0){
+				s = s + '<a href="javascript:void(0);" onclick="show_image_modal(this);"><img height=25px src="' + u.tomedia(files[j]) + '"></a>&nbsp;';
+			}			
+		}
+		$(row).find("td:eq(" + i + ")").html(s);
+	};
+	var getimages = function(row,k,sn,value){
+		var id = $(row).find("td:eq(0)").html();
+		$.ajax({
+			type: "POST",
+			url : "{php echo $this->createWebUrl('list', array('op' => 'downloadmedias'))}",
+			data : {
+				orderid : id,
+				field : sn,
+				mediaids : value.serverIds
+			},
+			dataType: "json",
+			success : function (data) {
+				var files = data.data;
+				files = files.split(";");
+				showimages(row,k,files);
+			}
+		});
+	};
+	$(document).ready(function () {
+		$(".field").each(function(){
+			var field = $(this).val();
+			field = eval("(" + field + ")");
+			var row = $(this).parent().parent();
+			for (var k in field){
+				var content = field[k].value;
+				var i = 4 + parseInt(k);
+				$(row).find("td:eq(" + i + ")").html(content);
+			}
+		});
+		$(".field").each(function(){
+			var field = $(this).val();
+			field = eval("(" + field + ")");
+			var row = $(this).parent().parent();	
+			for (var k in field){
+				if (field[k].inputtype == 9){
+					var content = field[k].value;
+					var v = eval("(" + content + ")");
+					if (v.images){
+						showimages(row,k,v.images.split(";"));
+					}else{
+						getimages(row,k,field[k].sn,v);
+					}
+				}
+			}			
+		});
+	});
+});
+</script>
+{template 'common/footer'}

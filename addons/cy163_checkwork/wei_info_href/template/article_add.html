@@ -1,0 +1,105 @@
+{template 'common/header'}
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li><a href="{php echo $this->createWebUrl('article');}">文章管理</a></li>
+        <li class="active"><a href="{php echo $this->createWebUrl('article_add');}">{php echo $data['id']>0?'编辑':'添加';}文章</a></li>
+    </ul>
+<form action="{php echo $this->createWebUrl('article_add');}" class="form-horizontal form" method="post" enctype="multipart/form-data">
+<input type="hidden" name="id" value="{$data['id']}" />
+<div class="clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">基本信息</div>
+        <div class="panel-body">
+      <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">所属分类</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <select name="category_id" id="category_id">
+                        {loop $category_list $row}
+                        <option value="{$row['id']}" {if $row['id']==$data['category_id']}selected="selected"{/if}>{$row['title']}</option>
+                        {/loop}
+                        </select>
+                    </div>
+                </div>        
+      <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章标题</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control" placeholder="" name="title" value="{$data['title']}">
+                    </div>
+                </div>  
+<script>
+function chg_con_type(type) {
+	$('#div_con_content').hide();
+	$('#div_con_link').hide();
+	
+	if (type == 'D') {
+		$('#div_con_content').show();
+	} else {
+		$('#div_con_link').show();
+	}
+}
+</script>
+      <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章内容</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <select name="con_type" id="con_type" onchange="chg_con_type(this.value)">
+                        	<option value="D" {if $data['con_type'] == 'D'}selected="selected"{/if}>自定义</option>
+                            <option value="L" {if $data['con_type'] == 'L'}selected="selected"{/if}>链接形式</option>
+                        </select>                        
+                    </div>
+                </div> 
+      <div class="form-group" id="div_con_content" style="display:none">
+			<label class="col-xs-12 col-sm-3 col-md-2 control-label">h5页面内容</label>
+			<div class="col-sm-8">
+				<textarea name="content" class="form-control richtext" cols="70" rows="10">{$data['content']}</textarea>
+                <span class="help-block">h5在线编辑工具：http://bj.96weixin.com/</span>
+                
+			</div>
+	  </div>               
+                                
+      <div class="form-group" id="div_con_link" style="display:none">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章链接地址</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control" placeholder="" name="link" value="{$data['link']}">
+                    </div>
+                </div>                                                                                               
+      <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">文章Logo</label>
+                    <div class="col-sm-8 col-xs-12">
+                    {if $data['logo'] != ''}
+                    	<img src="{$logo_pic}" width="272" height="280" />
+                    <br />
+                    {/if}
+                        <input id="logo" class="am-input-sm" type="file" name="logo" accept="image/*" />&nbsp;比例：300 * 300
+                    </div>
+                </div>
+      <div class="form-group">
+                    <label class="col-xs-12 col-sm-4 col-md-3 col-lg-2 control-label">有效日期</label>
+                    <div class="col-sm-8 col-xs-12">
+                        {php echo tpl_form_field_daterange('datelimit', array('start'=>date('Y-m-d',$data['startdate']),'end'=>date('Y-m-d',$data['enddate'])), false)}
+                    </div>
+                </div>                 
+            
+	  </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-12">
+            <input name="submit" type="submit" value="提交" class="btn btn-primary col-lg-1">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript">
+    	 require(['jquery', 'util'], function($, u){
+
+		$(function(){
+
+			u.editor($('.richtext')[0]);
+
+		});
+
+            });
+    
+</script>
+<script>chg_con_type('{$data['con_type']}');</script>
+{template 'common/footer'}

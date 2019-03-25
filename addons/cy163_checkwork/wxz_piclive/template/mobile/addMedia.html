@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>演讲直播间</title>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta name="format-detection" content="address=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../addons/wxz_piclive/template/mobile/media/style.css">
+    <link rel="stylesheet" href="../addons/wxz_piclive/template/mobile/media/qlCommon.css">
+
+    <link rel="stylesheet" href="../addons/wxz_piclive/template/mobile/media/live.css">
+    <script src="../addons/wxz_piclive/template/mobile/media/jquery-1.11.2.ql.min.js"></script>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="../addons/wxz_piclive/template/mobile/media/live.js"></script>
+    <script src="../addons/wxz_piclive/template/mobile/media/wtCommon.js"></script>
+    <script src="../addons/wxz_piclive/template/mobile/media/angular.min.js"></script>
+    <link rel="stylesheet" href="../addons/wxz_piclive/template/mobile/media/mobiscroll.custom-2.16.1.min.css">
+    <script src="../addons/wxz_piclive/template/mobile/media/mobiscroll.custom-2.16.1.min.js"></script>
+    <script src="../addons/wxz_piclive/template/mobile/media/clipboard.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../addons/wxz_piclive/template/mobile/media/indexstyleadd.css">
+</head>
+<body class="gra_1">
+
+<div id="" class="main_box_7">
+    <ul class="nav_list list_1">
+        <li><span class="title_2">演讲视频</span><span class="flex"><a class="list_btn_1 changeVideo" href="javascript:;"><p
+                class="send_video_text"
+        ></p></a></span></li>
+        <li><span class="title_2">演讲标题</span><span class="flex"><a class="list_btn_1 changeLiveName"
+                                                                   href="javascript:;"><p>{$live['title']}</p></a></span>
+        </li>
+        <li><span class="title_2">演讲内容简介</span><span class="flex"><a class="list_btn_1 changeIntro" href="javascript:;"><p>{$live['desc']}</p></a></span>
+        </li>
+        <li><span class="title_2">封面图片</span><span class="flex"><a class="list_btn_2 changeLiveLogo"
+                                                                   href="javascript:;"><i class="live_logoshow"><img
+                src="{$live['cover_pic']}"/></i></a></span></li>
+    </ul>
+    
+</div>
+<div class="wt_footer_2">
+    <a class="addbtn_bottom" href="javascript:;" onclick="save();">保存</a>
+</div>
+
+
+<div class="qlMsgTips changeBox">
+    <div class="main">
+        <div class="qlMT_top2">演讲视频</div>
+        <div class="qlMT_content">
+		<span class="change_video_box ">
+			<img src="{$live['cover_pic']}" id="change_video"/><i class="marker" style="display:none;"></i>
+			<form name="form2" id="upform2">
+			<input type="file" class="input-files1" id="upvideo"
+                   name="video"
+                   accept="video/*"
+                   onchange="upmyvideo({echo $this->createMobileurl('addmedia',array('op'=>'upload'))});">
+                <input type="hidden" class="video_id" name="video_id" value="{$live['video_id']}"/>
+		</form>
+		</span>
+
+        </div>
+        <div class="qlMTBottom">
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_cancel">取消</a></span>
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_confirm addbtn_img">确定</a></span>
+        </div>
+    </div>
+</div>
+
+<div class="qlMsgTips changeFLogoBox">
+    <div class="main">
+        <div class="qlMT_top2">封面图片</div>
+        <div class="qlMT_content">
+		<span class="change_img_box ">
+			<img src="{$live['cover_pic']}" id="change_img"/><i class="marker" style="display:none;"></i>
+			<form name="form1" id="upform1">
+			<input type="file" class="input-files " id="upimg"                    accept="image/*"
+
+                   onchange="upimage('{eval echo $this->genUrl('mobile','apply/uploadImg',array('rid'=>$id))}')"
+                   style="height: 118px;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    opacity: 0;
+    z-index: 2;
+    cursor: pointer;
+    width: 118px;">
+		</form>
+		</span>
+
+        </div>
+        <div class="qlMTBottom">
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_cancel">取消</a></span>
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_confirm addbtn_img">确定</a></span>
+        </div>
+    </div>
+</div>
+
+
+<!--修改名字-->
+<div class="qlMsgTips changeFNameBox">
+    <div class="main">
+        <div class="qlMT_top">演讲标题</div>
+        <div class="qlMT_content">
+            <input class="qlMT_input nextliveTalker" value="{$live['title']}" name="title"
+                   placeholder="请输入演讲内容简介,最多输入32个字"
+                   onkeyup=" if($(this).val().length > 32) $(this).val($(this).val().substr(0,32))"/>
+        </div>
+        <div class="qlMTBottom">
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_cancel">取消</a></span>
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_confirm addbtn_title">确定</a></span>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript"
+        src='../addons/wxz_piclive/template/mobile/media/uploadWithSDK.js'></script>
+<script type="text/javascript" src='../addons/wxz_piclive/template/mobile/media/qiniu.min.js'></script>
+<!--修改简介-->
+<div class="qlMsgTips changeIntroBox">
+    <div class="main">
+        <div class="qlMT_top">演讲内容简介</div>
+        <div class="qlMT_content">
+            <textarea class="qlMT_textarea reply_textarea" name="intro" placeholder="请输入演讲内容简介,最多输入200个字"
+                      onkeyup=" if($(this).val().length > 200) $(this).val($(this).val().substr(0,200))">{$live['desc']}</textarea>
+        </div>
+        <div class="qlMTBottom">
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_cancel">取消</a></span>
+            <span class="boxFlex"><a href="javascript:;" class="addbtn_confirm addbtn_intro">确定</a></span>
+        </div>
+    </div>
+</div>
+<script>
+    var clipboard = new Clipboard('.copy', {
+        target: function () {
+            return document.querySelector('.push');
+        }
+    });
+
+    clipboard.on('success', function (e) {
+        alert('复制成功')
+    });
+
+    clipboard.on('error', function (e) {
+        console.log(e);
+    });
+
+    $(".changeVideo").click(function () {
+        $("#upvideo").click();
+    });
+    $(".changeLiveLogo").click(function () {
+        $("#upimg").click();
+    })
+</script>
+<script>
+
+    function upmyvideo(url) {
+        var token = "{$qiniuConfig['token']}";
+        var domain = "{$qiniuConfig['url']}";
+        var config = {
+            useCdnDomain: true,
+            disableStatisticsReport: false,
+            retryCount: 6
+        };
+        var putExtra = {
+            fname: "",
+            params: {},
+            mimeType: null
+        };
+
+        var file = $("#upvideo")[0].files[0];
+        var finishedAttr = [];
+        var key = file.name;
+        var putExtra = {
+            fname: "",
+            params: {},
+            mimeType: null
+        };
+        var error = function (err) {
+            console.log(err);
+            $(".send_video_text").html("上传出错");
+            $(".send_video_text").css("color", 'red');
+        };
+
+        var complete = function (res) {
+            console.log(res);
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {'persistentId': res.persistentId},
+                dataType: 'json',
+                success: function (data) {
+                    $(".send_video_text").html("上传成功");
+                    $(".send_video_text").css("color", 'green');
+                    $(".video_id").val(data.id);
+                }
+            });
+        };
+
+        var next = function (response) {
+            var chunks = response.chunks || [];
+            var total = response.total;
+            // 这里对每个chunk更新进度，并记录已经更新好的避免重复更新，同时对未开始更新的跳过
+            for (var i = 0; i < chunks.length; i++) {
+                if (chunks[i].percent === 0 || finishedAttr[i]) {
+                    continue;
+                }
+                if (compareChunks[i].percent === chunks[i].percent) {
+                    continue;
+                }
+                if (chunks[i].percent === 100) {
+                    finishedAttr[i] = true;
+                }
+            }
+            var percent = total.percent.toFixed(2);
+            $(".send_video_text").html("上传进度:" + percent + "%");
+            $(".send_video_text").css("color", 'blue');
+            compareChunks = chunks;
+        };
+
+        var subObject = {
+            next: next,
+            error: error,
+            complete: complete
+        };
+
+        putExtra.params["x:name"] = key.split(".")[0];
+        observable = qiniu.upload(file, key, token, putExtra, config);
+
+        subscription = observable.subscribe(subObject);
+    }
+
+    $(function () {
+        $(".addbtn_title").click(function () {
+            var title = $("input[name='title']").val();
+            $(".changeLiveName p").html(title);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_intro").click(function () {
+            var intro = $("textarea[name='intro']").val();
+            $(".changeIntro p").html(intro);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_sid").click(function () {
+            var sid = $("input[name='sid']").val();
+            $(".sid p").html(sid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_easy").click(function () {
+            var easyid = $("input[name='easyid']").val();
+            $(".easyid p").html(easyid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_ssid").click(function () {
+            var ssid = $("input[name='ssid']").val();
+            $(".ssid p").html(ssid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_tid").click(function () {
+            var tid = $("input[name='tid']").val();
+            $(".tid p").html(tid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_uid").click(function () {
+            var uid = $("input[name='uid']").val();
+            $(".uid p").html(uid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_liveid").click(function () {
+            var liveid = $("input[name='liveid']").val();
+            $(".liveid p").html(liveid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_hy_roomid").click(function () {
+            var hy_roomid = $("input[name='hy_roomid']").val();
+            $(".hyroomid p").html(hy_roomid);
+            $(".qlMsgTips").hide();
+        })
+        $(".addbtn_hj_roomid").click(function () {
+            var hj_roomid = $("input[name='hj_roomid']").val();
+            $(".hjroomid p").html(hj_roomid);
+            $(".qlMsgTips").hide();
+        })
+
+
+        $(".addbtn_cancel").click(function () {
+            $(".qlMsgTips").hide();
+        })
+
+
+        $(".changeIntro").click(function () {
+            $(".changeIntroBox").show();
+        })
+
+        $(".CommontType").click(function () {
+            $(".CommontTypeBox").show();
+        })
+
+        $(".reward").click(function () {
+            $(".RewardBox").show();
+        })
+        $(".livestatus").click(function () {
+            $(".LivestatusBox").show();
+        })
+    })
+
+    function save() {
+        var video_id = $(".video_id").val();
+        if (!video_id || video_id == 0) {
+            $(document).minTipsBox({
+                tipsContent: '请等待视频上传完毕保存',
+                tipsTime: 1
+            })
+            return false;
+        }
+        var title = $("input[name='title']").val();
+        if (!title) {
+            $(document).minTipsBox({
+                tipsContent: '请填写演讲标题',
+                tipsTime: 1
+            })
+            return false;
+        }
+        var intro = $("textarea[name='intro']").val();
+        if (!intro) {
+            $(document).minTipsBox({
+                tipsContent: '请填写演讲内容简介',
+                tipsTime: 1
+            })
+            return false;
+        }
+        var img = $(".live_logoshow img").attr('src');
+        if (!img) {
+            $(document).minTipsBox({
+                tipsContent: '请上传封面图片',
+                tipsTime: 1
+            })
+            return false;
+        }
+        $('.addbtn_bottom').removeAttr('onclick');
+        $.ajax({
+            type: "POST",
+            url: "{eval echo $this->genUrl('mobile','apply/save',array('rid'=>$id))}')",
+            data: {
+                video_id: video_id,
+                title: title,
+                intro: intro,
+                img: img,
+            },
+            dataType: 'json',
+            success: function (data) {
+                $(document).minTipsBox({
+                    tipsContent: '保存成功',
+                    tipsTime: 1
+                });
+                window.location.href="{eval echo $this->genUrl('mobile','user/index')}";
+            }
+        })
+    }
+
+    function upimage(url) {
+        $("#send_msg_text").val('');
+        $("#mune").empty().removeClass('btn-sub').addClass('iconfont showfun').html('&#xe612;');
+        $(".browlist").slideUp('fast');
+        $(".allgift").slideUp('fast');
+        $(".showfunction").slideUp('fast');
+        hideflag = true;
+        var fd = new FormData();
+        var ajax = new XMLHttpRequest();
+        fd.append("upload", 1);
+        fd.append("upload", $("#upimg")[0].files[0]);
+        ajax.open("post", url, true);
+        ajax.send(fd);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                var r = eval('(' + this.responseText + ')');
+                $("#change_img").attr('src', r.url);
+                var img = $(".change_img_box img").attr('src');
+                $(".live_logoshow img").attr('src', r.url);
+            }
+        }
+    }
+</script>
+</body>
+</html>

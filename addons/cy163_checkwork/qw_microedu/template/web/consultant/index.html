@@ -1,0 +1,159 @@
+{template 'common/header'}
+<style>
+    .fen { border:none;}
+    .fen>li.active>a, .fen>li.active>a:hover, .fen>li.active>a:focus { border:1px solid transparent;}
+    .fen>li>a { border-radius:0;padding:10px 30px;}
+</style>
+<div class="main">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="{php echo $this->createWebUrl('campus', array('page' => 'index'))}">校区管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('tutor', array('page' => 'index'))}">教师管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('period', array('page' => 'index'))}">课时管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('contract', array('page' => 'index'))}">合同课程管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('order', array('page' => 'index'))}">排课管理</a>
+        </li>
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs fen">
+        <li class="active">
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'index'))}">顾问管理</a>
+        </li>
+        <li>
+            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'team'))}">顾问组管理</a>
+        </li>
+    </ul>
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site" />
+                <input type="hidden" name="a" value="entry" />
+                <input type="hidden" name="m" value="qw_microedu" />
+                <input type="hidden" name="do" value="consultant" />
+                <input type="hidden" name="page" value="index" />
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 control-label">手机号码</label>
+                    <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+                        <input type="text" name="mobile" value="{$mobile}" class="form-control">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 control-label">姓名</label>
+                    <div class="col-sm-4 col-md-4 col-lg-4 col-xs-12">
+                        <input type="text" name="xm" value="{$xm}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <label class="radio-inline">性别</label>
+                    <label class="radio-inline"><input type="radio" name="sex" value="1" /> 男</label>
+                    <label class="radio-inline"><input type="radio" name="sex" value="0" /> 女</label>
+                </div>
+                <div class="form-group col-sm-12 ">
+                    <button type="submit" class="btn btn-primary  col-lg-offset-6" name="submit" value="提交">查询</button>
+                    <input type="hidden" name="token" value="{$_W['token']}" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <style>
+        .label{cursor:pointer;}
+    </style>
+    <div class="panel panel-default">
+        <div class="panel-body table-responsive">
+            <h4>顾问列表</h4>
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th class="text-center" style="width:5%;">序号</th>
+                    <th class="text-center" style="width:8%;">姓名</th>
+                    <th class="text-center" style="width:10%;">手机号</th>
+                    <th class="text-center" style="width:5%;">性别</th>
+                    <th class="text-center" style="width:15%;">出生日期</th>
+                    <th class="text-center" style="width:15%;">身份证号</th>
+                    <th class="text-center" style="width:15%;">地址</th>
+                    <th class="text-center" style="width:10%;">佣金比例</th>
+                    <th class="text-center" style="width:7%;">所在组</th>
+                    <th class="text-center" style="width:15%;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $conlist $key $item}
+                <tr>
+                    <td class="text-center">{$item['id']}</td>
+                    <td class="text-center consultant-name">{$item['fullname']}</td>
+                    <td class="text-center">{$item['mobile']}</td>
+                    <td class="text-center">{$item['gender']}</td>
+                    <td class="text-center">{php echo date('Y-m-d',$item['dob'])}</td>
+                    <td class="text-center">{$item['ic']}</td>
+                    <td class="text-center">{$item['address']}</td>
+                    <td class="text-center cash"><input class= "cashedit" style="border:none;width:40px;display: inline-block;padding:5px 10px;" value="{$item['rate']}" />%</td>
+                    <td class="text-center">组名</td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <a href="javascript:;" class="btn btn-primary btn-sm edit-cash" data-toggle="tooltip" data-placement="top" title="修改佣金">修改佣金</a>
+                            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'edit','idd'=>$item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;
+                            <a href="{php echo $this->createWebUrl('consultant', array('page' => 'del','con_id'=>$item['id'],'op'=>'consultant'))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+                <!--<tr>-->
+                    <!--<td class="text-center">2</td>-->
+                    <!--<td class="text-center consultant-name">顾问姓名2</td>-->
+                    <!--<td class="text-center">12345678901</td>-->
+                    <!--<td class="text-center">男</td>-->
+                    <!--<td class="text-center">1991-09-10</td>-->
+                    <!--<td class="text-center">370322199109103111</td>-->
+                    <!--<td class="text-center">山东省济南市高新区舜泰广场</td>-->
+                    <!--<td class="text-center cash"><input style="border:none;width:40px;display: inline-block;padding:5px 10px;" value="15" />%</td>-->
+                    <!--<td class="text-center">这里是组名</td>-->
+                    <!--<td class="text-center">-->
+                        <!--<a href="javascript:;" class="btn btn-primary btn-sm edit-cash" data-toggle="tooltip" data-placement="top" title="修改佣金">修改佣金</a>-->
+                        <!--<a href="{php echo $this->createWebUrl('consultant', array('page' => 'edit'))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;-->
+                        <!--<a href="javascript:;" onclick="return confirm('此操作不可恢复，确认删除？');return false;" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>-->
+                    <!--</td>-->
+                <!--</tr>-->
+                </tbody>
+            </table>
+            <div class="text-right">
+                <a href="{php echo $this->createWebUrl('consultant', array('page' => 'edit'))}" class="btn btn-md btn-default"><i class="fa fa-plus"></i> 增加顾问</a>
+            </div>
+            {$pager}
+        </div>
+    </div>
+</div>
+{template 'common/footer'}
+<script>
+    $("document").ready(function(){
+        $(".edit-cash").each(function(){
+            var ttt = $(this);
+            ttt.click(function(){
+                var cid = ttt.parent().parent().parent().find("td").eq(0).text();
+                var cash = ttt.parent().parent().parent().find(".cashedit").val();
+                var cash = parseInt(cash);
+                if(cash<1){
+                    alert("请输入合适的数字@");
+                    return false;
+                }
+                var Url = "{php echo $this->createWebUrl('consultant')}";
+                var Vdata = {cid:cid,cash:cash,caozuo:"editcash"};
+                $.post(Url,Vdata,function(data){
+                    if(data.error==1){
+                        alert(data.message);
+                    }else{
+                        alert(data.message);
+                    }
+                },'json');
+            })
+        })
+    })
+</script>

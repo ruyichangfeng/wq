@@ -1,0 +1,74 @@
+{template 'style5/header'}
+<body class="max-width bg-f5 ">
+<header class="bar bar-nav bg-green">
+    <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+    <h1 class="title txt-fff">我的拼车</h1>
+</header>
+<div class="content">
+    <div class="list-block media-list carM-list-block mt0" id="data-list">
+
+    </div>
+</div>
+<script type="text/html" id="xq_list">
+    {{# for(var i = 0, len = d.list.length; i < len; i++){ }}
+    <ul onclick="window.location.href='{php echo $this->createMobileUrl('car',array('op' => 'add'))}&id={{d.list[i].id}}'">
+        <li>
+            <a class="item-content">
+                <div class="item-inner">
+                    <div class="item-title-row">
+                        <div class="item-title">
+                            <span class="color-success">【我是{{# if(d.list[i].type == 1){ }}司机{{# }else{ }} 乘客{{# } }}】&nbsp;&nbsp;</span> {{ d.list[i].title }}
+                        </div>
+                    </div>
+                    <div class="item-title-row">
+                        <div class="item-title">
+                            <label>发布地址：</label>{{ d.list[i].regionname }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+        <li class="item-content">
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-subtitle">发布日期：{{ d.list[i].datetime }} </div>
+                    <div class="item-after"><a class="repair-del fled-del-btn" onclick="delectFun({{d.list[i].id}})">删除</a></div>
+                </div>
+            </div>
+        </li>
+    </ul>
+    {{# } }}
+
+</script>
+<script>
+    $(document).ready(function() {
+        loaddata("{php echo $this->createMobileUrl('car',array('op' => 'my'))}", $("#data-list"),'xq_list', true);
+    });
+</script>
+<script>
+    function delectFun(id) { //删除对象
+        if (window.confirm('你确定要删除对象吗？')) {
+            $.ajax({
+                async: true,
+                url: "{php echo $this->createMobileUrl('car',array('op' => 'delete'))}",
+                dataType: "json",
+                type: "POST",
+                data: {
+                    id: id
+                },
+                success: function() {
+                    window.location.href="{php echo $this->createMobileUrl('home')}";
+                },
+                error: function() {
+                    alert("请求错误！")
+                }
+            })
+
+        } else {
+            //alert("取消");
+            return false;
+        }
+    }
+</script>
+<script>$.config = {autoInit: true}</script>
+{template 'style5/footer'}

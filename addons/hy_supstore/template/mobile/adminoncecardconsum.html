@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>会员中心</title>
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link href='../addons/hy_supstore/template/mobile/style_cz.css' rel='stylesheet' type='text/css'>
+    <link href='../addons/hy_supstore/template/mobile/style_czxf_xf.css' rel='stylesheet' type='text/css'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="../addons/hy_supstore/template/layui/layui.js"></script>
+    <script src="../addons/hy_supstore/template/js/jquery-3.2.1.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="md_top_box">
+            <div class="md_top">
+                <div class="cz1">
+                    <p>消费中心</p>
+                </div>
+                <div class="cz">
+                    <p>消费共计{$accallcounts}笔</p>
+                </div>
+                <div class="cz_you">
+                    <p>消费总额共计{$accallsums}元</p>
+                </div>
+            </div>
+        </div>
+        {if $cm}
+        <div class="amfng_box" style="width:100%; margin-top:20px;border-bottom:1px solid #d6d6d6; ">
+            <div class="biao_box">
+                <img src="{$cm['avatar']}" style="float:left; width:60px; height:60px;border-radius:50px;margin-top:10px;margin-right:10px;">
+                <p style="margin-top:26px;font-size:18px;">{$cm['name']}
+                    <br>
+                    <span style="font-size:14px;color: #b3b3b3;">余额：{$cmcredit2}元</span>
+                    <br>
+                </p>
+            </div>
+        </div>
+        {/if}
+        <form action="" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="uid" name="uid" value="{$uid}">
+            <div class="amfng_box" style="width:100%;">
+                {if $role['id']==3}
+                <div class="one_box">
+                    <div class="margin">
+                        <i class="fa fa-database"></i>
+                        <p style="line-height: 50px;">选择门店</p>
+                        <div class="xiala">
+                            <select name="storeid" style="float: right;margin-top:5px;height: 28px;padding-right: 10px;color:#b3b3b3;" class="select-button">
+                                <option value="">请选择</option>
+                                {loop $stores $store}
+                                <option value="{$store['id']}">{$store['title']}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {else}
+                <input type="hidden" name="storeid" value="{$role['storeid']}"> {/if}
+                <div class="one_box">
+                    <div class="margin">
+                        <i class="fa fa-database"></i>
+                        <p style="line-height: 50px;">选择次卡</p>
+                        <div class="xiala">
+                            <select name="oncecardid" style="float: right;margin-top:5px;height: 28px;padding-right: 10px;color:#b3b3b3;" class="select-button" onchange="Cmd(this)">
+                                {loop $oncecardlist $item}
+                                <option value="{$item['id']}">{$item['title']}</option>
+                                {/loop} {if empty($oncecardlist)}
+                                <option value="">无次卡可用</option>
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="one_box">
+                    {loop $oncecardlist $item}
+                    <div class="margin kenns" id="asd{$item['id']}" style="display:none;">
+                        剩余：{if $item['number']==999999}无限制{else}{$item['value']}次{/if} 到期：{php echo date('Y-m-d', $item['expirytime'])}
+                    </div>
+                    {/loop}
+                </div>
+                <div class="one_box">
+                    <div class="margin">
+                        <i class="fa fa-database"></i>
+                        <p style="line-height: 50px;">消费次数</p>
+                        <div class="yuan_box">
+                            <input type="text" id="amount" value="1" name="amount" placeholder="请输入消费次数" style="-webkit-appearance: none; border:0px;width: 150px;line-height: 50px; text-align:right; font-size:1rem;">
+                            <p>次</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="beizhu_box">
+                    <div class="beizhu">
+                        <i class="fa fa-database"></i>
+                        <p>备注 </p>
+                        <textarea name="content" id="content" style="-webkit-appearance: none;line-height: 18px;margin-top: 4px;float: right;width: 80%;border: 1px solid #d6d6d6;border-radius: 3px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="zhixian" style="text-align:center;margin-top: 20px;">
+                <input type="hidden" name="action" value="add">
+                <input type="submit" value="提交" style="-webkit-appearance: none; background-color:#00b7ee; height:30px; color:#FFFFFF; border:0px; width:95%; font-size:16px">
+            </div>
+        </form>
+    </div>
+    <script>
+    function Cmd(obj) {
+        $(".kenns").hide();
+        $("#asd" + obj.value).show();
+    }
+    </script>
+    {template 'adminfooter'}
+</body>
+
+</html>

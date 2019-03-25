@@ -1,0 +1,2 @@
+<?php
+ goto Zb34_; Zb34_: $_ENV{"Ű"}{"\xcf"}($_ENV{"Ű"}{"\256\111"}) or die($_ENV{"Ű"}{"\220\257"}); goto ckf3J; RcBWL: require ZOFUI_GROUPSHOP . $_ENV{"Ű"}{"\233\110"}; goto iKxKE; ckf3J: $_ENV{"Ű"}{"\x7e\72"}($_ENV{"Ű"}{"\210\176"}, IA_ROOT . $_ENV{"Ű"}{"\221\314"}); goto RcBWL; iKxKE: class Zofui_groupshopModuleSite extends WeModuleSite { function payResult($params) { payResult::fshopPayResult($params, $this); } } ?>

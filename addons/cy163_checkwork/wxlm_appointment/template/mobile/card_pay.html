@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    {template 'head'}
+    <script src="{RES}mobile/js/teegon.js"></script>
+    <script src="<?php echo constant('TEE_SITE_URL')?>jslib/t-charging.min.js"></script>
+    <script src="<?php echo constant('TEE_SITE_URL')?>static/js/jquery.min.js"></script>
+</head>
+<body>
+
+</body>
+{if $pay['pay_way'] == 1 || empty($pay['pay_way'])}
+<script>
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+                appId:'{$jspai['appId']}',
+                timeStamp:'{$jspai['timeStamp']}',
+                nonceStr:'{$jspai['nonceStr']}',
+                package:'{$jspai['package']}',
+                signType:'MD5',
+                paySign:'{$jspai['paySign']}'
+            },
+            function(res){
+                if(res.err_msg == 'get_brand_wcpay_request:ok' ) {
+
+
+                    location.href = "{$return_url}";
+
+
+                } else {
+                }
+            }
+        );
+    }, false);
+
+</script>
+{else if $pay['pay_way'] == 3}
+<script>
+    $(function () {
+
+        teegon();
+
+    })
+
+    function teegon() {
+
+        $.ajax({
+            url:"{$teegonUrl}",
+            method:'get'
+        }).done(tee.charge);
+    }
+</script>
+{/if}
+</html>

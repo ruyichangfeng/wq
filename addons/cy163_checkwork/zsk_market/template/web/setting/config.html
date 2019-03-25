@@ -1,0 +1,116 @@
+{template 'public/header'} 
+<script type="text/javascript" src="{ZSK_STATIC}js/jquery.qrcode.min.js"></script>
+ <style type="text/css">
+ 	.mmmtab td{
+ 		padding: 10px 10px;
+ 	}
+ 	.layui-form-switch{width: 54px;height: 26px;line-height: 26px}
+ 	.maill{text-align: right !important;width: 30%;vertical-align: middle !important;}
+ 	.mailr{text-align: left !important;width: 70%;vertical-align: middle !important;}
+	.notice{display: block;color:orange;}
+	.layui-tab-item{padding-top: 20px;}
+</style>
+ <div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title"> 
+  	<li>系统配置说明</li>
+  </ul>
+  <div class="layui-tab-content"  > 
+      
+    <div class="layui-tab-item layui-show">
+    	<p style="font-size: 13px;color:#ff4444;">部分功能需要以下配置</p>
+    	<table class="layui-table">
+    		<tr>
+    			<th style="width: 120px;">配置项</th>
+    			<th style="width:120px;">检测结果</th>
+    			<th style="width: 240px;">关联功能</th>
+    			<th>说明</th>
+    		</tr>
+    		<tr>
+    			<td>SSL证书（https）</td>
+    			<td>
+    				<?php if(intval($chk['https'])>0){ ?>
+    				<span class="label-green">正常</span>
+    				<?php }else if(intval($chk['https'])< 0){ ?>
+    				<span class="label-orange">失败</span>
+    				<?php }else{ ?>
+    				<span class="label-gray">未检测</span>
+    				<?php } ?>
+
+    			</td>
+    			<td>小程序前端</td>
+    			<td>微信小程序只支持https链接</td>
+    		</tr>
+    		<tr>
+    			<td>PHP 5.6+</td>
+    			<td>
+    				<?php if(intval($chk['version_php'])>0){ ?>
+    				<span class="label-green">正常</span>
+    				<?php }else if(intval($chk['version_php'])< 0){ ?>
+    				<span class="label-orange">版本过低</span>
+    				<?php }else{ ?>
+    				<span class="label-gray">未检测</span>
+    				<?php } ?>
+    				<?php if(intval($chk['func_exec'])< 0){ ?> 
+    				<span class="label-orange">shell_exec被禁用</span> 
+    				<?php } ?>
+    				<?php if(!$chk['file_write']){ ?> 
+    				<span class="label-orange">写入权限不足</span> 
+    				<?php } ?>
+    			</td>
+    			<td>系统稳定性</td>
+    			<td>建议使用php5.6及以上版本，并开启拓展mbstring、openssl,开启函数 shell_exec</td>
+    		</tr>
+    		<tr>
+    			<td>定时任务</td>
+    			<td><span class="label-gray">非检测范围</span></td>
+    			<td>
+    				<p>拼团活动、秒杀提现、</p>
+    				<p>代理提成核算、自动收货</p>
+    			</td>
+    			<td>一个站点只需由服务器管理员设置一次即可。执行频率为10分钟1次<br/>
+    		<p>使用&nbsp;“&nbsp;<a href="https://www.aliyun.com/product/jiankong" target="__block" class="layui-btn layui-btn-xs">阿里云 · 云检测</a>&nbsp;”&nbsp;或&nbsp;“<a href="https://cloud.tencent.com/product/cat" target="__block"  class="layui-btn layui-btn-xs">腾讯云 · 云拨测</a>&nbsp;”&nbsp; 或&nbsp;“&nbsp;<a class="layui-btn layui-btn-xs" href="http://jk.cloud.360.cn" target="__blank">360网站监控</a>&nbsp;”&nbsp;创建定时任务时,选择"HTTP监控" 监控对象写下面的URL方式，监测点只选择一个，然后点确认即可开始执行定时任务</p>
+
+<p>URL方式：<b>{$_W['rootdirectory']}core/task/run.php</b></p></td>
+    		</tr>
+    		<tr>
+    			<td>openssl</td>
+    			<td>
+    				<?php if(intval($chk['openssl_php'])>0&&intval($chk['openssl_local'])>0){ ?>
+    				<span class="label-green">正常</span>
+    				<?php }else if(intval($chk['openssl_local'])< 0){ ?>
+    				<span class="label-orange">系统组件解析失败</span>
+    			 
+    				<?php }else if(intval($chk['openssl_php'])< 0){ ?>
+    				<span class="label-orange">PHP调用openssl失败</span>
+    				<?php }else{ ?>
+    				<span class="label-gray">未检测</span>
+    				<?php } ?>
+    			</td>
+    			<td>银行卡提现</td>
+    			<td>openssl分为两部分，一是系统自带的组件，二是PHP调用系统组件需要使用的php拓展</td>
+    		</tr>
+            <tr>
+                <td colspan="4">
+                    <input type="button" class="layui-btn layui-btn-xs" onclick="checkdb()" value="检查数据库"/>
+                </td>
+            </tr>
+    	</table>
+    </div>
+  </div>
+</div>    
+ <script type="text/javascript">
+     function checkdb(){
+        $.ajax({
+            url:"<?php echo $this->createWebUrl('checkdb');?>",
+            type:"post",
+            success:function(data){
+                alert("检测完成")
+            },
+            error:function(e){
+
+            }
+        })
+     }
+ </script>
+{template 'public/footer'} 
+ 

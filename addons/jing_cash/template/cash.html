@@ -1,0 +1,64 @@
+{template 'common/header'}
+<div class="main">
+<ul class="nav nav-tabs">
+	<li class="active"><a href="">提现记录</a></li>
+</ul>	
+	<div style="padding:15px;">
+		<form action="" method="post">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th align="center" style="width:20px;text-align:center;">id</th>						
+                    <th align="center" style="width:80px;text-align:center;">openid</th>
+					<th align="center" style="width:40px;text-align:center;">金额</th>
+					<th align="center" style="width:40px;text-align:center;">手续费</th>
+					<th align="center" style="width:60px;text-align:center;">状态</th>
+					<th align="center" style="width:60px;text-align:center;">充值时间</th>
+					<th align="center" style="width:80px;text-align:center;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $row}
+					<tr>		
+						<td align="center" style="text-align:center;">{$row['id']}</td>
+                        <td align="center" style="text-align:center;{if $row['status'] == '0'}color:red;{/if}">{$row['openid']}</td>
+						<td align="center" style="font-size:12px; color:#666; text-align:center;">{$row['money']}</td>
+						<td align="center" style="font-size:12px; color:#666; text-align:center;">{if $row['fee']}{$row['fee']}{else}0{/if}</td>
+						<td align="center" style="font-size:12px; color:#666; text-align:center;{if $row['status'] == '0'}color:red;{/if}">{if $row['status'] == '1'}提现成功{else if $row['status'] == '-1'}审核未通过{else}待审核{/if}</td>
+						<td align="center" style="font-size:12px; color:#666; text-align:center;">{php echo date('Y-m-d H:i:s',$row['createtime'])}</td>
+						<td align="center" style="font-size:12px; color:#666; text-align:center;">
+							<a href="./index.php?c=stat&a=credit2&do=stat&num=2&time%5Bstart%5D={php echo date('Y-m-d',strtotime("-1 month"))}&time%5Bend%5D={php echo date('Y-m-d')}&user={php echo mc_openid2uid($row['openid'])}" target="_blank">余额记录</a>
+							{if $row['status'] == '0'}
+							<a onclick="cash({$row['id']},1)">允许提现</a>
+							<a onclick="cash({$row['id']},2)">拒绝提现</a>
+							{/if}
+						</td>
+					</tr>
+				{/loop}
+			</tbody>
+		</table>
+	</form>
+		{$pager}
+	</div>
+</div>
+<script type="text/javascript">
+	function cash(id,type){
+		require(['jquery', 'util'], function($, u){
+			$.ajax({
+				url: '{php echo $this->createWebUrl('cashajax')}',
+				type: 'post',
+				dataType: 'json',
+				data: {id: id,type:type},
+				success:function(data){
+					if (data.status == 1) {
+						u.message(data.msg, '{$_W['siteurl']}', 'success');
+					}else{
+						u.message(data.msg, '{$_W['siteurl']}', 'error');
+					}
+				}
+			});			
+			
+		});
+	}
+</script>
+{template 'common/footer'}

@@ -1,0 +1,384 @@
+{template 'common/header'}
+<style>
+	.supportImg{width:15px;vertical-align:top;margin-left:10px}
+	.footer2{
+		width: 88%;
+		height: 60px;
+		position: fixed;
+		background: #66CCCC;
+		border-top: 1px solid #ccc;
+		right:0;
+		bottom: 0;
+		overflow: hidden;
+	}
+	.footer2>div{width: 33%;float: left;line-height: 60px;text-align: center;color: #fff;font-weight: bold}
+	#sureBtn{
+		background: #FF6600;
+		padding: 6px 20px;
+		color: #fff;
+		border-radius: 3px;
+		cursor: pointer;
+	}
+</style>
+<ul class="nav nav-tabs">
+    <li{if $op == 'display'} class="active"{/if}><a href="{php echo $this->createWebUrl('business');}">未审核商家入驻管理</a></li>
+    <li{if $op == 'through'} class="active"{/if}><a href="{php echo $this->createWebUrl('business',array('op'=>'through'));}">已通过商家入驻管理</a></li>
+    <li{if $op == 'nopass'} class="active"{/if}><a href="{php echo $this->createWebUrl('business',array('op'=>'nopass'));}">未通过商家入驻管理</a></li>
+    {if $op == 'add'}<li class="active"><a href="{php echo $this->createWebUrl('business',array('op'=>'add','id'=>$_GPC['id']));}">审核商家入驻信息</a></li>{/if}
+</ul>
+<div class="main">
+	
+	{if $op == 'display'}
+	<div class="panel panel-default">
+		<div class="panel-heading">商家详细数据  |  总数:{php echo count($list)} <a href="{php echo $this->createWebUrl('bmexport')}"><span style="margin-left:200px" class="btn btn-default">导出数据</span></a></div>
+		<div class="panel-body table-responsive">
+
+		    <form action="" method="post" onsubmit="">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th  style="width:20%;">商家名称</th>
+						<th  style="width:20%;">商家电话</th>
+						<th style="width:30%;">商家信息</th>
+						<th style="width:10%;">提交时间</th>
+						<th style="width:10%;">状态</th>
+						<th style="width:10%;">操作</th>
+					</tr>
+				</thead>
+				<tbody id="main">
+					{loop $list $item}
+					<tr>
+						<td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 7}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+			            <td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 6}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>
+								{if !empty($item['zl'])}
+									{php $i=1;}
+									{loop $item['zl'] $row}
+										{if !empty($row['zhi'])}
+										<div style="white-space:normal">{$i}、{$row['name']} : 
+											{if $row['type']!=8}{$row['zhi']}{else}
+									 		<button class='btn btn-xs btn-info' type="button" data-toggle="modal" data-target="#myModal" data-src="{php echo tomedia($row['zhi'])}">图片</button>
+											{/if}
+										</div>
+									{php $i++}
+									{/if}
+									{/loop}
+								{/if}
+							</p>
+						</td>
+						
+						<td>
+							{php echo date('Y-m-d H:i',$item['createtime'])}
+						</td>
+						<td>
+							{if $item['zl'][0]['state'] == 0}
+								审核中
+							{/if}
+							{if $item['zl'][0]['state'] == 1}
+								<p style="color:#008000">审核通过</p>
+							{/if}
+							{if $item['zl'][0]['state'] == 2}
+								<p style="color:#FF0000">审核不通过</p>
+							{/if}
+						</td>
+						<td>
+							
+								<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('business',array('op'=>'add','id'=>$item['id']));}">审核通过</a>&nbsp;
+								<a  href="{php echo $this->createWebUrl('business', array('op' => 'delete','id' => $item['id']))}" onclick="return confirm('确认删除此信息吗？');return false;" title="删除" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"><i class="fa fa-times">删除</i></a>
+							
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+			</form>
+	    </div>
+	</div>
+	{/if}
+
+	{if $op == 'through'}
+	<div class="panel panel-default">
+		<div class="panel-heading">商家详细数据  |  总数:{php echo count($list)} <a href="{php echo $this->createWebUrl('bmexportpass')}"><span style="margin-left:200px" class="btn btn-default">导出数据</span></a></div>
+		<div class="panel-body table-responsive">
+
+		    <form action="" method="post" onsubmit="">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th  style="width:20%;">商家名称</th>
+						<th  style="width:20%;">商家电话</th>
+						<th style="width:30%;">商家信息</th>
+						<th style="width:10%;">提交时间</th>
+						<th style="width:10%;">状态</th>
+						<th style="width:10%;">操作</th>
+					</tr>
+				</thead>
+				<tbody id="main">
+					{loop $list $item}
+					<tr>
+						<td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 7}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+			            <td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 6}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>
+								{if !empty($item['zl'])}
+									{php $i=1;}
+									{loop $item['zl'] $row}
+										{if !empty($row['zhi'])}
+										<div style="white-space:normal">{$i}、{$row['name']} : 
+											{if $row['type']!=8}{$row['zhi']}{else}
+									 		<button class='btn btn-xs btn-info' type="button" data-toggle="modal" data-target="#myModal" data-src="{php echo tomedia($row['zhi'])}">图片</button>
+											{/if}
+										</div>
+									{php $i++}
+									{/if}
+									{/loop}
+								{/if}
+							</p>
+						</td>
+						
+						<td>
+							{php echo date('Y-m-d H:i',$item['createtime'])}
+						</td>
+						<td>
+							{if $item['zl'][0]['state'] == 0}
+								审核中
+							{/if}
+							{if $item['zl'][0]['state'] == 1}
+								<p style="color:#008000">审核通过</p>
+							{/if}
+							{if $item['zl'][0]['state'] == 2}
+								<p style="color:#FF0000">审核不通过</p>
+							{/if}
+						</td>
+						<td>
+							
+								<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('business',array('op'=>'add','id'=>$item['id']));}">审核通过</a>&nbsp;
+								<a  href="{php echo $this->createWebUrl('business', array('op' => 'delete','id' => $item['id']))}" onclick="return confirm('确认删除此信息吗？');return false;" title="删除" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"><i class="fa fa-times">删除</i></a>
+							
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+			</form>
+	    </div>
+	</div>
+	{/if}
+
+	{if $op == 'nopass'}
+	<div class="panel panel-default">
+		<div class="panel-heading">商家详细数据  |  总数:{php echo count($list)} <a href="{php echo $this->createWebUrl('bmexportnopass')}"><span style="margin-left:200px" class="btn btn-default">导出数据</span></a></div>
+		<div class="panel-body table-responsive">
+
+		    <form action="" method="post" onsubmit="">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th  style="width:20%;">商家名称</th>
+						<th  style="width:20%;">商家电话</th>
+						<th style="width:30%;">商家信息</th>
+						<th style="width:10%;">提交时间</th>
+						<th style="width:10%;">状态</th>
+						<th style="width:10%;">操作</th>
+					</tr>
+				</thead>
+				<tbody id="main">
+					{loop $list $item}
+					<tr>
+						<td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 7}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+			            <td>
+							<p>
+								{if !empty($item['zl'])}
+									{loop $item['zl'] $row}
+										{if $row['type'] == 6}
+											{$row['zhi']}
+										{/if}
+									{/loop}
+								{/if}
+							</p>
+			            </td>
+						<td style="white-space:normal; word-break:break-all;overflow:hidden">
+							<p>
+								{if !empty($item['zl'])}
+									{php $i=1;}
+									{loop $item['zl'] $row}
+										{if !empty($row['zhi'])}
+										<div style="white-space:normal">{$i}、{$row['name']} : 
+											{if $row['type']!=8}{$row['zhi']}{else}
+									 		<button class='btn btn-xs btn-info' type="button" data-toggle="modal" data-target="#myModal" data-src="{php echo tomedia($row['zhi'])}">图片</button>
+											{/if}
+										</div>
+									{php $i++}
+									{/if}
+									{/loop}
+								{/if}
+							</p>
+						</td>
+						
+						<td>
+							{php echo date('Y-m-d H:i',$item['createtime'])}
+						</td>
+						<td>
+							{if $item['zl'][0]['state'] == 0}
+								审核中
+							{/if}
+							{if $item['zl'][0]['state'] == 1}
+								<p style="color:#008000">审核通过</p>
+							{/if}
+							{if $item['zl'][0]['state'] == 2}
+								<p style="color:#FF0000">审核不通过</p>
+							{/if}
+						</td>
+						<td>
+							
+								<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('business',array('op'=>'add','id'=>$item['id']));}">审核通过</a>&nbsp;
+								<a  href="{php echo $this->createWebUrl('business', array('op' => 'delete','id' => $item['id']))}" onclick="return confirm('确认删除此信息吗？');return false;" title="删除" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"><i class="fa fa-times">删除</i></a>
+							
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+			{$pager}
+			</form>
+	    </div>
+	</div>
+	{/if}
+
+	{if $op == 'add'}
+		<div class="panel panel-default">
+			<div class="panel-heading">商家详细数据</div>
+			<div class="panel-body table-responsive">
+
+			    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+					<input type="hidden" name="bid" value="{$b_info['id']}" />
+					<div class="panel panel-default">
+						
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">商家信息</label>
+								<div class="col-sm-5">
+									{if !empty($b_info['zl'])}
+										{php $i=1;}
+										{loop $b_info['zl'] $row}
+											<div style="white-space:normal">{$i}、{$row['name']} : {if $row['type']!=8}{$row['zhi']}{else}
+										 <button class='btn btn-xs btn-info' type="button" data-toggle="modal" data-target="#myModal" data-src="{php echo tomedia($row['zhi'])}">图片</button>
+										{/if}</div>
+										{php $i++}
+										{/loop}
+									{/if}
+								</div>
+							</div>
+						</div>
+
+
+						<div class="panel-body">
+							<div class="form-group">
+								<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">是否通过</label>
+								<div class="col-sm-5">
+									<label for="enabled11" class="radio-inline"><input type="radio" name="status" value="1" id="enabled11" {if !empty($b_info['zl'][0]['state']) && $b_info['zl'][0]['state'] == 1}checked="true"{/if} /> 是</label>
+				                    &nbsp;&nbsp;&nbsp;
+				                    <label for="enabled10" class="radio-inline"><input type="radio" name="status" value="2" id="enabled10"  {if empty($b_info['zl'][0]['state']) || $b_info['zl'][0]['state'] == 2}checked="true"{/if} /> 否</label>
+				                    
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group col-sm-12">
+							<input type="hidden" name="token" value="{$_W['token']}" />
+							
+							<input type="submit" class="btn btn-primary col-lg-1" name="submit" value="提交" />
+						</div>
+
+					</div>
+				</form>
+		    </div>
+		</div>
+	{/if}
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">图片展示</h4>
+      </div>
+      <div class="modal-body">
+         <img  id="mimng" alt="" width="100%;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script>
+	$(function(){
+			$('#myModal').on('show.bs.modal', function (event) {
+			  var button = $(event.relatedTarget) // Button that triggered the modal
+			  var src = button.data('src') // Extract info from data-* attributes
+			  $("#mimng").attr('src',src);
+
+			})
+	})
+</script>
+
+{template 'common/footer'}

@@ -1,0 +1,397 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('goodssupplier', array('op' => 'list'))}"></a>&nbsp;&nbsp;&nbsp;添加供应商</h5>
+                    <a class="btn btn-outline btn-default" style="float: right;margin-top: -10px;" href="{php echo $this->createWebUrl('goodssupplier',array('op' => 'add'))}">
+                        <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                </div>
+
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="goodssupplierscript">
+                        <input type="hidden" name="id" id="hidden_goodsSupplierId" value="{$item['id']}">
+                        <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 10px;padding-right: 10px;">
+                            <label for="supplierName" class="col-sm-1 control-label">供应商名称</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="supplierName" class="form-control" value="{$item['gs_supplierName']}" id='supplierName' placeholder="请输入供应商名称" />
+                            </div>
+                            <label for="supplierName" class="col-sm-1 control-label">供应商分类</label>
+                            <div class="col-xs-3">
+                                <select class="form-control m-b" name="supplierTypeId" id="supplierTypeId">
+                                    <option value="0">请选择</option>
+                                    {loop $goodssuppliertype $supplierTypeitem}
+                                    <option value="{$supplierTypeitem['id']}" {if $supplierTypeitem['id'] == $item['gs_supplierTypeId']}selected ='selected'{/if}>{$supplierTypeitem['gst_name']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                            <label for="supplierName" class="col-sm-1 control-label">供应商编号</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="supplierNumber" class="form-control" value="{$item['gs_supplierNumber']}" id='supplierNumber' placeholder="请输入供应商编号" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed" style="margin-top: 5px; margin-bottom: 5px;"></div>
+                        <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 10px;padding-right: 10px;">
+                            <label for="supplierName" class="col-sm-1 control-label">期初应付款</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="supplierPayable" class="form-control" value="{$item['gs_supplierPayable']}" id='supplierPayable'  />
+                            </div>
+                            <label for="supplierName" class="col-sm-1 control-label">期初预付款</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="supplierPrepayments" class="form-control" value="{$item['gs_supplierPrepayments']}" id='supplierPrepayments' />
+                            </div>
+                            <label for="supplierName" class="col-sm-1 control-label">增值税率（单位：%）</label>
+                            <div class="col-xs-3">
+                                <input type="text" name="supplierAppreciationTax" class="form-control" value="{$item['gs_supplierAppreciationTax']}" id='supplierAppreciationTax' placeholder="请输入税率（单位：%）" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed" style="margin-top: 5px; margin-bottom: 5px;"></div>
+                        <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 10px;padding-right: 10px;">
+                            <label for="supplierName" class="col-sm-1 control-label">联系地址</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="supplierAddress" class="form-control" value="{$item['gs_supplierAddress']}" id='supplierAddress'  />
+                            </div>
+                            <label for="supplierName" class="col-sm-1 control-label">备注</label>
+                            <div class="col-xs-5">
+                                <input type="text" name="supplierNote" class="form-control" value="{$item['gs_supplierNote']}" id='supplierNote' />
+                            </div>
+
+                        </div>
+                        <div class="hr-line-dashed" style="margin-top: 5px; margin-bottom: 5px;"></div>
+                        <div class="form-group">
+                            <div class="btn-group hidden-xs" id="addContactToolbar" role="group">
+                                <button type="button" class="btn btn-outline btn-primary" id="btn_addGoodsSupplierContacts">
+                                    <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 新增联系人
+                                </button>
+                            </div>
+                            <table id="goodsSupplierContactsTableData" data-mobile-responsive="true"></table>
+                        </div>
+                        <div class="form-group" style="margin-top: 5px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;padding-left: 10px;padding-right: 10px;">
+                            <label for="" class="col-sm-3 control-label"></label>
+                            <div class="col-xs-9">
+                                <button name="button_saveGoodsSupplierData" type="button" class="btn btn-primary btn-w-m" id="button_saveGoodsSupplierData" onclick="button_Data()">提交</button>
+                                <input name="submit_saveGoodsSupplierData" type="submit" value="提交" class="btn btn-primary btn-w-m" id="submit_saveGoodsSupplierData">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        var goodsSupplierId = $("#hidden_goodsSupplierId").val();
+        var editRowUrl =''
+        editRowUrl = "{php echo $this->createWebUrl('goodssupplier', array('op' => 'ajaxUpdateRowData'))}";
+        var editUrl =''
+        if(goodsSupplierId){
+            editUrl = "{php echo $this->createWebUrl('goodssupplier', array('op' => 'goodssuppliercontactlist'))}&goodsSupplierid=" + goodsSupplierId ;
+        }
+        else{
+            editUrl = "{php echo $this->createWebUrl('goodssupplier', array('op' => 'goodssuppliercontactlist'))}";
+        }
+        /****联系人数据列表----start  **/
+        $('#goodsSupplierContactsTableData').bootstrapTable({
+            url: editUrl,
+            method: "post",
+            dataType: "json",
+            contentType: "application/x-www-form-urlencoded",
+            cache: false,  //是否使用缓存
+            search: false, //显示搜索框
+            showPaginationSwitch: false,//是否显示数据条数选择框
+            toolbar: '#addContactToolbar',
+            striped: true,//隔行变色
+            queryParamsType: '',
+            queryParams: queryParamspage,//传递参数（*）
+            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            pageNumber: 1,                       //初始化加载第一页，默认第一页
+            pageSize: 11,                       //每页的记录行数（*）
+            pageList: [11, 22, 44, 88],
+            pagination: true,
+            height: 320,
+            selectItemName: "id",
+            uniqueId: "id",
+            columns: [{
+                field: 'gsc_supplierContact',
+                title: '联系人',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '联系人',
+                    validate: function (v) {
+                        if (!/^[\u4E00-\u9FFF]+$/.test(v)) return '只能输入中文';
+
+                    }
+                }
+                //sortable: true
+            }, {
+                field: 'gsc_supplierPhone',
+                title: '联系电话',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '联系电话',
+                    validate: function (v) {
+                        if (!/^1[3|4|5|7|8][0-9]{9}$/.test(v)) return '请输入正确的手机号';
+                    }
+                }
+            }, {
+                field: 'gsc_supplierTel',
+                title: '固定电话',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '固定电话',
+                    validate: function (v) {
+                        if (!/^0\d{2,3}-\d{7,8}$/.test(v)) return '电话格式如：0371-68787027';
+
+                    }
+                }
+            },{
+                field: 'gsc_supplierWechat',
+                title: '微信号',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'text',
+                    title: '微信号',
+                    validate: function (v) {
+                        if (!/^[^\u4e00-\u9fa5]+$/.test(v)) return '请输入正确的微信号';
+                    }
+                }
+            },{
+                field: 'gsc_primary',
+                title: '是否主要联系人',
+                align: "center",
+                valign: "middle",
+                editable: {
+                    type: 'select',
+                    source: [
+                        {value: 1, text: '是'},
+                        {value: 0, text: '否'},
+                    ]
+                }
+            },{
+                field: 'id',
+                title: '操作',
+                align: "center",
+                valign: "middle",
+                formatter: actionFormatter
+            },],
+            onEditableSave: function (field, row, oldValue, $el) {
+                //alert(JSON.stringify(row));
+                $.ajax({
+                    type: "post",
+                    url: editRowUrl,
+                    data: {row: row},
+                    //data: row,
+                    dataType: 'JSON',
+                    success: function (data, status) {
+                        if (status == "success") {
+                            swal({
+                                title: "操作成功！",
+                                text: data.error,
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: true
+                            }, function () {
+                                $("#goodsSupplierContactsTableData").bootstrapTable('refresh');
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal("修改失败", "请刷新当前页面重试。", "error");
+                    },
+                    complete: function () {
+
+                    }
+
+                });
+            }
+        });
+
+        //得到查询的参数
+        function queryParamspage(params) {
+            var temp = {  //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: params.pageSize,  //页面大小
+                pageNumber: params.pageNumber, //页码
+            };
+            return temp;
+        };
+
+        //操作按钮渲染设置
+        function actionFormatter(value, row, index) {
+            var id = value;
+            var result = "";
+            result += "<button type=\"button\" class='btn btn-xs btn-danger' onclick=\"DeleteByContacts('" + id + "')\" title='删除'><span class='glyphicon glyphicon-remove'></span></button>";
+            return result;
+        }
+        /****联系人数据列表----end  **/
+    });
+
+    function refreshSupplierContactsTableData() {
+        $("#goodsSupplierContactsTableData").bootstrapTable('refresh');
+    }
+    //新增联系人数据
+    $("#btn_addGoodsSupplierContacts").click(function () {
+        $('#goodsSupplierContactsTableData').bootstrapTable('insertRow', {
+            index: $('#goodsSupplierContactsTableData').bootstrapTable('getOptions').totalRows,
+            row: {
+                gsc_supplierContact: '请输入联系人',
+                gsc_supplierPhone: '请输入手机号',
+                gsc_supplierTel: '请输入固定电话',
+                gsc_supplierWechat: '请输入微信号',
+                gsc_primary: 0,
+            }
+        });
+        $('#goodsPackageDetailTableData').bootstrapTable('resetView');
+        var goodsSupplier_Id = $("#hidden_goodsSupplierId").val();
+        //alert(goodsSupplier_Id);
+        $.ajax({
+            type: "post",
+            dataType: 'jsonp',
+            url: "{php echo $this->createWebUrl('goodssupplier', array('op' => 'ajaxAddGoodsSupplierContacts'))}",
+            data: {goodsSupplierId: goodsSupplier_Id},
+            //data: {},
+            success: function (data) {
+
+            },
+            complete: function () {
+                refreshSupplierContactsTableData();
+                //swal("添加成功", "请关闭重新操作！", "success");
+            }
+
+        });
+    });
+    /****联系人列表功能菜单----start  **/
+    function DeleteByContacts(supplierid) {
+        var supplierid = parseInt(supplierid);
+        swal({
+                title: "确定删除吗？",
+                text: "你将无法恢复该数据信息！",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "取消删除！",
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定删除！",
+                closeOnConfirm: false
+            },
+            function () {
+                $.ajax({
+                    type: "post",
+                    url: "{php echo $this->createWebUrl('goodssupplier', array('op' => 'ajaxdelete', 'storeid' => $storeid))}",
+                    data: {supplierid: supplierid},
+                    success: function (data, status) {
+                        if (status == "success") {
+                            swal({
+                                title: "操作成功！",
+                                text: data.error,
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: true
+                            }, function () {
+                                $("#goodsSupplierContactsTableData").bootstrapTable('refresh');
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal("操作有误", "请选择要删除的项目！", "error");
+                    },
+                    complete: function () {
+                        $("#goodsSupplierContactsTableData").bootstrapTable('refresh');
+                    }
+
+                });
+            });
+    }
+    /****联系人列表功能菜单----start  **/
+</script>
+<script>
+    $(document).ready(function(){
+        $("#submit_saveGoodsSupplierData").hide();
+        $("#button_saveGoodsSupplierData").show();
+
+    });
+    function  button_Data(){
+        var supplierTypeId = parseInt($("#supplierTypeId").val());
+        if(supplierTypeId != 0){
+            $("#submit_saveGoodsSupplierData").show();
+            $("#button_saveGoodsSupplierData").hide();
+        }else{
+            swal("请确认供货商分类", "","error");
+        }
+
+    }
+
+    $("#goodssupplierscript").validate({
+        rules: {
+            supplierName: {
+                required: true,
+                maxlength:20,
+            },
+            supplierNumber: {
+                required:true,
+                number:true,
+                digits:true,
+                maxlength:20,
+            },
+            supplierPayable: {
+                required:true,
+                number:true,
+            },
+            supplierPrepayments: {
+                required:true,
+                number:true,
+            },
+            supplierAppreciationTax: {
+                required:true,
+                number:true,
+                max:100,
+            },
+            supplierAddress: {
+                required: true,
+            },
+        },
+        messages: {
+            supplierName: {
+                required: "请填写供货商名称",
+                maxlength:"不能大于20个字符",
+            },
+            supplierNumber: {
+                required: "请输入编号",
+                number: "只能输入数字",
+                maxlength:"不能大于20个字符",
+            },
+            supplierPayable: {
+                required:"请输入应付款",
+                number:"只能输入数字",
+            },
+            supplierPrepayments: {
+                required: "请输入预付款",
+                number:"只能输入数字",
+            },
+            supplierAppreciationTax: {
+                required: "请输入增值税率",
+                number:"只能输入数字",
+                max:"不能大于100",
+            },
+            supplierAddress: {
+                required: "请输入地址",
+            },
+
+
+        }
+    });
+</script>
+
+{template 'web/common/footer'}
+
+

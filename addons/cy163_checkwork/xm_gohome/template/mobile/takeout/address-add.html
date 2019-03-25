@@ -1,0 +1,131 @@
+{template 'public/header'}
+
+<body data-spy="scroll" data-target="#myScrollspy">
+<div class="ub-f1">
+   <input type="hidden" name="id" id="id" value="{$item['id']}">
+   <input type="hidden" name="orderid" id="orderid" value="{$orderid}">
+   <input type="hidden" name="url" id="url" value="{php echo $this->createMobileUrl('address', array('foo'=>'list','orderid'=>$orderid))}">
+
+   <div class="ub ub-ver"><!--联系人-->
+    <div class="ub-f1 uinn212 ulev-4">联系人</div>
+     <div class="ub ub-f1 ub-ver c-wh ubt b-bla01">
+      
+      <div class="ub ub-f1 ub-ac ub-pc uinn212 ubb b-bla01">
+       <div class="ub wid3 ulev-1">姓名：</div>
+       <div class="ub-f1"><input name="realname" id="realname" type="text" value="{$item['realname']}" class="ub-fh" placeholder="请输入姓名"></div>
+      </div>
+      
+      <div class="ub ub-f1 ub-ac ub-pc uinn ubb b-bla01 ff-check">
+       <div class="ub wid3"></div>
+       <div class="ub-f1 ub">
+        <input name="sex" type="radio" id="hh1" value="1" {if $item['sex'] == 1} checked {/if}>
+        <label class="block uinn3 ulev0 t-dgra" for="hh1"><i class="iconfont icon-gouxuan ulev1"></i> 先生</label>
+        <input name="sex" type="radio" id="hh2" value="2" {if $item['sex'] == 2} checked {/if}>
+        <label class="block uinn3 ulev0 umar-l1 t-dgra" for="hh2"><i class="iconfont icon-gouxuan ulev1"></i> 女士 </label>
+        </div>
+      </div>
+
+      <div class="ub ub-f1 ub-ac ub-pc uinn212 ubb b-bla01">
+       <div class="ub wid3 ulev-1">手机：</div>
+       <div class="ub-f1"><input name="mobile" id="mobile" type="tel" value="{$item['mobile']}" class="ub-fh" placeholder="请输入收货手机号码，以便配送员联系您"></div>
+      </div>
+
+    </div>
+   </div>
+   
+   <div class="ub ub-ver"><!--收货地址-->
+    <div class="ub-f1 uinn212 ulev-4">收货地址</div>
+     <div class="ub ub-f1 ub-ver c-wh ubt b-bla01">
+      <div class="ub ub-f1 ub-ac ub-pc uinn212 ubb b-bla01">
+       <div class="ub ulev-1">小区/大厦/学校：</div>
+       <div class="ub-f1"><input name="adr_city" id="adr_city" type="text" value="{$item['adr_city']}" class="ub-fh" placeholder="例：发展大道10号东方杰座"></div>
+      </div>
+      <div class="ub ub-f1 ub-ac ub-pc uinn212 ubb b-bla01">
+       <div class="ub ulev-1">楼号-门牌号：</div>
+       <div class="ub-f1"><input name="adr_room" id="adr_room" type="text" value="{$item['adr_room']}" class="ub-fh" placeholder="例：16号楼427室"></div>
+      </div>    
+    </div>
+   </div>
+
+   <div class="ub ub-ver umar-t">
+      <div class="ub ub-f1 ub-ver c-wh ubt b-bla01">
+      <div class="ub ub-f1 ub-ac ub-pc uinn ubb b-bla01 ff-check">
+       <div class="ub-f1 ub">
+        <input name="type" type="radio" id="hh3" value="1" {if $item['type'] == 1} checked {/if}>
+        <label class="block uinn3 ulev0 t-dgra" for="hh3"><i class="iconfont icon-gouxuan ulev1"></i> 设为默认地址</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="fixed ub-fh uinn13 c-wh" style="left:0; bottom:0; z-index:9999" >
+      <div class="ub-f1 uinn uba b-bla01 uc-a15 umar-l umar-r ulev0 c-red1 t-wh tx-c block" onClick="submit()">保存</div>
+  </div>
+
+</div>   
+
+
+{template 'public/footerjs'}
+<script type="text/javascript">
+function submit(){
+  var id = $("#id").val();
+  var orderid = $("#orderid").val();
+  var realname = $("#realname").val();
+  var sex = $('input[name="sex"]:checked').val();
+  var mobile = $("#mobile").val();
+  var adr_city = $("#adr_city").val();
+  var adr_room = $("#adr_room").val();
+  var type = $('input[name="type"]:checked').val();
+
+  if(realname == ''){
+    alert('请输入姓名');
+    return false;
+  }
+  if(sex == ''){
+    alert('请输入性别');
+    return false;
+  }
+  if(mobile == ''){
+    alert('请输入收货手机号码，以便配送员联系您');
+    return false;
+  }
+  if (!/^1[34578]{1}[0-9]{9}/.test(mobile)) {
+    alert('请输入正确的手机号码！');
+    return false;
+  }
+  if(adr_city == ''){
+    alert('请输入收货地址');
+    return false;
+  }
+
+  var data = {};
+  data['id'] = id;
+  data['realname'] = realname;
+  data['sex']      = sex;
+  data['mobile']   = mobile;
+  data['adr_city'] = adr_city;
+  data['adr_room'] = adr_room;
+  data['type']  = type;
+  $.ajax({
+    url: "{php echo $this->createMobileUrl('address', array('foo'=>'addok'));}",
+    type:"POST",
+    data:data,
+    dataType:"json",
+    success: function(res){
+      if(res == "1"){
+        alert('提交地址成功');
+        window.location.href = "{php echo $this->createMobileUrl('takeorder', array('foo'=>'myorder'))}";
+      }else if(res == "2"){
+        var url = $("#url").val();
+        window.location.href = url;
+      }else{
+        alert('提交地址失败！');
+        return false;
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

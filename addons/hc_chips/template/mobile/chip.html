@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>{if $chip['type']==0}众筹券{/if}</title>
+<link href="../addons/hc_chips/style/css/theme.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="../addons/hc_chips/style/css/list.css">
+</head>
+<body>
+<section>
+	<div class="m_card">
+		<div class="com"><table border="0" cellpadding="0" cellspacing="0"><tr><td><img src="{if empty($member['openid'])}{$_W['attachurl']}{$member['headimgurl']}{else}{$member['headimgurl']}{/if}" /></td><td><span>{php echo base64_decode($member['realname'])}</span></td></tr></table></div>
+		<div class="tit">{if $chip['type']==0}众筹券{/if}</div>
+		<div class="tim">有效期：{php echo date('Y-m-d', $chip['starttime'])}-{php echo date('Y-m-d', $chip['endtime'])}</div>
+	</div>
+	<div class="m_step"></div>
+	<ul class="m_list"><li><a href="{php echo $this->createMobileUrl('rule', array('id'=>$chip['id'], 'op'=>'detail'))}">卡券详情</a></li>
+		<li><a href="{$rule['gzurl']}">查看公众号</a></li>
+		<li>
+		<div class="phn"><a href="tel:{$rule['mobile']}"><span class="icon i_phone"></span></a></div>
+		<h3>联系客服</h3>
+		<p>tel：{$rule['mobile']}</p>
+		</li>
+	</ul>
+	<div class="footer"><a class=" btn btn-block" {if $isjoin == 1 || $flag == 0 || $flag == 2}onclick="startchips();" style="background-color:gray;"{else}href="{php echo $this->createMobileUrl('chip', array('op'=>'chip', 'id'=>$chip['id']))}"{/if}>{if $flag==0}活动未开始{elseif $flag==2}活动已结束{else}开始众筹{/if}</a></div>
+</section>
+<div class="khhuodong gyStyle2">
+	<h3>众筹排行榜</h3>
+	<p class="shomingk">
+	</p>
+	<div class="kanjialist">
+		<div class="listMain">
+			<div class="topbiaoti clearfix">
+				<a class="col1" href="javascript:;">序号</a>
+				<a class="col2 kandiaojine1" href="javascript:;">手机号</a>
+				<a class="col3" href="javascript:;">众筹金额</a>
+			</div>
+			<div class="bordery">
+				<div class="listx">
+					<ul class="ul1">
+					{if !empty($mychip) && $mychip['status']==0}
+						<li class="clearfix" onclick="pay({$mychip['id']});" style="background-color:#E2FF4A;">
+							<div class="lefttext">未付款</div>
+							<div class="kanhoujia">
+								<span>{php echo haha($mychip['mobile'])}</span>
+							</div>
+							<div class="szimgSize"><img src="../addons/hc_chips/style/images/jinbitp1.png" alt="图片">
+								<span>{$mychip['joinmoney']}</span>
+							</div>
+						</li>
+					{/if}
+					{loop $takechips $key $t}
+					{php $key++}
+						<li class="clearfix" {if $t['mid']==$member['id']}style="background-color:#E2FF4A;"{/if}>
+							<div class="lefttext">{if $t['mid']==$member['id']}我{else}{$key}{/if}</div>
+							<div class="kanhoujia">
+								<span>{php echo haha($t['mobile'])}</span>
+							</div>
+							<div class="szimgSize"><img src="../addons/hc_chips/style/images/jinbitp1.png" alt="图片">
+								<span>{$t['joinmoney']}</span>
+							</div>
+						</li>
+					{/loop}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<script>
+function startchips(){
+	if({$flag}==0){
+		alert('活动未开始！');
+		return;
+	}
+	if({$flag}==2){
+		alert('活动已结束！');
+		return;
+	}
+	if({$isjoin}==1){
+		alert('你已经参与该众筹，请勿重复参加！');
+		return;
+	}
+}
+function pay(id){
+	if({$flag}==2){
+		alert('活动已结束！');
+		return;
+	}
+	if (confirm('是否去付款？')){
+		window.location.href = "{php echo $this->createMobileUrl('chip', array('op'=>'pay'), true);}&id="+id;
+	} else {
+		return;
+	}
+}
+</script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{php $signPackage=$_W['account']['jssdkconfig'];}	
+<script>
+wx.config({
+	debug: false,   
+	appId: '<?php echo $signPackage["appId"];?>',
+	timestamp: '<?php echo $signPackage["timestamp"];?>',
+	nonceStr: '<?php echo $signPackage["nonceStr"];?>',
+	signature: '<?php echo $signPackage["signature"];?>',
+	jsApiList: ['checkJsApi','onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ','onMenuShareWeibo',]
+});
+
+wx.ready(function () {
+	var shareData = {
+		title: "{$chip['title']}",
+		desc: "{$chip['description']}",
+		link: "{php echo $_W['siteroot'].'app/'.$this->createMobileUrl('chip', array('op'=>'join', 'id'=>$chip['id']))}",
+		imgUrl: "{$_W['attachurl']}{$chip['picture']}",
+		trigger: function (res) {},
+		complete: function (res) {},
+		success: function (res) {},
+		cancel: function (res) {},
+		fail: function (res) {}
+	};
+	wx.onMenuShareAppMessage(shareData);
+	wx.onMenuShareQQ(shareData);
+	wx.onMenuShareWeibo(shareData);
+	wx.onMenuShareTimeline(shareData);
+});
+</script>
+</html>

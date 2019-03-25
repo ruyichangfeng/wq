@@ -1,0 +1,123 @@
+{template 'inc/header'}
+<script type="text/javascript">
+{if $_SESSION['posi']==''}
+$(function(){
+	if({WEIXIN}==1){
+		wx.ready(function() {
+		   wx.getLocation({
+		        type: 'wgs84',// 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		        success: function (res) {
+		            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+
+		            if(latitude&&longitude){
+			            $.ajax({
+			            	type: 'POST',
+				    		url: "{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('getlalo'),2)}"+"&rad="+Math.random(),
+					    	data: {latitude:latitude,longitude:longitude},
+					    	success:function(datas){
+					    		if(datas.statue==1){
+					    			window.location.href="{php echo $_W['siteroot'].'app/'.substr($this->createMobileUrl('showDetail',array('id'=>$id)),2)}";
+					    		}
+					    	},
+					    	error:function(datas){
+
+						    },
+					    	dataType:'json',
+			            })
+			        }
+		    	},
+		    	error: function(res){
+		    	}
+	    });
+
+	 });
+	}
+})
+{/if}
+</script>
+<body>
+	<header class="swiper-container">
+		<div class="swiper-wrapper">
+			{loop $infos['thumb'] $item}
+				<div class="swiper-slide"><img src="{php echo tomedia($item)}" width="100%"></div>
+			{/loop}
+        </div>
+        <div class="showname">{$title}</div>
+        <div class="showtype">{$typename['catename']}</div>
+	</header>
+	<section>
+		<div class="storeinfo">
+			<div class="s-name">
+				<div class="nm" style="{if $setting['color']} color:{$setting['color']}; {/if}">基本信息</div>
+				<div class="star">
+					<ul>
+						<?php for($i=1;$i<=$infos['xj'];$i++){?>
+						<li><img src="{NEARBY_IMAGE}x.png" width="100%"></li>
+						<?php }?>
+					</ul>
+				</div>
+			</div>
+			<div class="poi">
+				<div class="pi"><img src="{NEARBY_IMAGE}dd.png" width="100%"></div>
+				<div class="txt">{$infos['province']}{$infos['city']}{$infos['address']}</div>
+			</div>
+			<div class="poi" style="margin-top:5px;">
+				<div class="pi" style="margin-left:3px;"><img src="{NEARBY_IMAGE}tel2.png" width="80%"></div>
+				<div class="txt" style="margin-left:-3px;">{$infos['tel']}</div>
+			</div>
+		</div>
+
+		<div class="showcontent">
+			<div class="title" style="{if $setting['color']} color:{$setting['color']}; {/if}" >详细信息</div>
+			<div class="content">
+				{php echo htmlspecialchars_decode($infos['remark']);}
+			</div>
+		</div>
+	</section>
+	<div class="copyright"><a href="{$setting['copyrighturl']}" style="{if $setting['color']} color:{$setting['color']}; {/if}" >&copy{$setting['copyright']}</a></div>
+	<footer>
+		<?php 
+				$infos['remark']= htmlspecialchars_decode($infos['remark']);
+				$infos['remark']= preg_replace("/<(.*?)>/","",$infos['remark']); 
+		?>
+		{if $infos['lat']&&$infos['lng']}
+		<a href="http://api.map.baidu.com/marker?location={$infos['lat']},{$infos['lng']}&title={$infos['storename']}&name={$infos['storename']}&content={$infos['remark']}&output=html&src=weiba|weiweb" >
+			<div class="nav" style="{if $setting['color']} background-color:{$setting['color']}; {/if}">
+				<div class="abc"><img src="{NEARBY_IMAGE}dww.png">
+				一键导航</div>
+			</div>
+		</a>
+		{else}
+		<div class="nav nodh" style="{if $setting['color']} background-color:{$setting['color']}; {/if}">
+			<div class="abc"><img src="{NEARBY_IMAGE}dww.png">
+			一键导航</div>
+		</div>
+		{/if}
+		<a data="{$infos['tel']}" class="tele">
+			<div class="tels" style="{if $setting['color']} background-color:{$setting['color']}; {/if}">
+				<div class="abc">
+				<img src="{NEARBY_IMAGE}telw.png">
+				一键拨号</div>
+			</div>
+		</a>
+	</footer>
+</body>
+<script src="{NEARBY_JS}swiper.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container');
+
+    $(".tele").click(function(){
+    	var a = $(this).attr("data");
+    	if(a){
+    		window.location.href = "tel:"+a;
+    	}else{
+    		swal('商家很懒，未标明电话号码!');
+    	}
+    })
+
+    $(".nodh").click(function(){
+    	swal('商家很懒，未标明地址!');
+    })
+</script>
+</html>

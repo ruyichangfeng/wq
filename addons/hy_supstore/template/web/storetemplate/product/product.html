@@ -1,0 +1,325 @@
+{if $active == 'update' || 'add'}
+<link href="./resource/css/bootstrap.min.css" rel="stylesheet">
+<link href="./resource/css/common.css" rel="stylesheet">
+<script type="text/javascript">
+if (navigator.appName == 'Microsoft Internet Explorer') {
+    if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
+        alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+    }
+}
+window.sysinfo = {
+    'uniacid': '{$_W['uniacid']}',
+    'acid': '{$_W['account']['acid']}',
+    'uid': '{$_W['uid']}',
+    'isfounder': '{$_W['isfounder']}',
+    'family': 'v',
+    'siteroot': '{$_W['siteroot']}',
+    'siteurl': '{$_W['siteurl']}',
+    'attachurl': '{$_W['attachurl']}',
+    'attachurl_local': '{$_W['attachurl_local']}',
+    'attachurl_remote': '{$_W['attachurl_remote']}',
+    'module': { 'url': '', 'name': '' },
+    'cookie': { 'pre': 'mendian' },
+};
+</script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/util.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/app/common.min.js"></script>
+<script type="text/javascript" src="{$_W['siteroot']}web/resource/js/require.js"></script>
+<script type="text/javascript" src="../addons/hy_supstore/template/web/js/lazyload.min.js"></script>
+<style>
+body{
+    background-color: #fff;
+    min-width: auto !important;
+}
+.layui-elem-field legend{
+    margin: 0 0 0 20px;
+    border-bottom: 0;
+    width: auto;
+}
+.imgs-box{
+    height: 80px;
+    width: 300px;
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+@media screen and (max-width:1600px){
+    .layui-btn.delete-btn{margin-left: 0 !important;}
+}
+@media screen and (max-width:1200px) {
+    .imgs-box{
+        width: 300px;
+    }
+    .delete-btn{
+        margin-left: 0 !important;
+    }
+}
+@media screen and (max-width:1024px) {
+    .imgs-box{
+        width: 200px;
+    }
+    .delete-btn{
+        margin-left: 0 !important;
+    }
+}
+.imgs-box .imgs-box-content{
+    min-width: 200px;
+    line-height: 63px;
+    height: 63px;
+    overflow: hidden;
+}
+.layui-table img{
+    max-height: 55px !important;
+}
+</style>
+{/if}
+{if $active == 'list'}
+<fieldset class="layui-elem-field">
+    <legend>产品列表</legend>
+    <div class="layui-field-box">
+        <blockquote class="layui-elem-quote layui-quote-nm" style="color: #666; font-size: 14px;line-height: 30px; display: none; position: relative;" id="createUrlBlock">生成产品详情url：<input type="text" style="border: 0;display: inline-block; width: 76%;background-color: #fff;" id="createUrl" disabled="disabled"> <div class="right" style="position: absolute; top: 15px; right: 15px; background-color: #fff; padding-left: 15px;"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm mr10" onclick="createUrl()" >复制</a> <input type="text" style="position: absolute;top: 0;left: 0;opacity: 0;z-index: -10;" id="copyUrl"><a href="javascript:void(0);" class="layui-btn layui-btn-primary layui-btn-sm" onclick="closeUrl()" id="closeUrl">关闭</a></div></blockquote>
+        <table class="layui-table" id="productTable" style="text-align: center;">
+            <colgroup>
+                <col width="60">
+                <col width="50">
+                <col width="100">
+                <col width="100">
+                <col width="100">
+                <col width="160">
+                <col width="60">
+                <col width="80">
+                <col width="80">
+                <col width="100">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>排序</th>
+                    <th>标题</th>
+                    <th>分类</th>
+                    <th>主图</th>
+                    <th>轮播图</th>
+                    <th>价格</th>
+                    <th>修改时间</th>
+                    <th>生成url</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $key $value}
+                <tr>
+                    <td>{$value['id']}</td>
+                    <td>{$value['rank']}</td>
+                    <td>{$value['name']}</td>
+                    <td>{$value['category_name']}</td>
+                    <td><img class="lazyload" data-original="{$_W['attachurl']}{$value['img_url']}" alt=""></td>
+                    <td>
+                        <div class="imgs-box">
+                            <div class="imgs-box-content" {if count($value['carousel_urls']) > 4}style="width: {php echo count($value['carousel_urls'])*100}px; line-height:63px; text-align:left;"{/if}>
+                            {loop $value['carousel_urls'] $k $val}
+                                <img class="lazyload" data-original="{$_W['attachurl']}{$val}" alt="">
+                            {/loop}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{$value['price']}</td>
+                    <td>{php echo date('Y-m-d H:i:s',$value['update_time'])}</td>
+                    <td><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-primary" onclick="showCreatUrl({$value['id']})">生成</a></td>
+                    <td><a href="{php echo $this->createWebUrl('storemanage', array('op'=>'product','type'=>'product','storeid'=>$storeinfo['id'],'active'=>'update','id'=>$value['id']))}" class="layui-btn layui-btn-sm layui-btn-normal">修改</a><a href="javascript:void(0);" class="layui-btn layui-btn-sm layui-btn-danger delete-btn" onclick="deleteProduct({$value['id']})">删除</a></td>
+                </tr>
+                {/loop}
+                {if count($list) == 0}
+                <tr><td colspan="10" style="color: red;text-align: center;line-height: 50px;font-weight: bold;">列表数据为空</td></tr>
+                {/if}
+            </tbody>
+        </table>
+        {$pagination}
+    </div>
+</fieldset>
+<script>
+//懒加载
+$('img.lazyload').lazyload({threshold:200,effect:"fadeIn"});
+//layui
+layui.use(['layer','flow'], function() {
+    var layer = layui.layer;//弹层
+});
+//删除
+function deleteProduct(id) {
+    layer.confirm('您确定删除数据吗?', function() {
+        $.post('{php echo $this->createWebUrl("product", array("op"=>"delete"))}', { id: id }, function(data) {
+            if(data == true){
+                layer.msg('删除产品成功', function() {
+                    window.location.reload();
+                });
+            }else{
+                layer.msg('删除产品失败 '+data, function() {
+                    window.location.reload();
+                });
+            }
+        })
+    })
+}
+//生成url
+function showCreatUrl(id){
+    var url = '{$_W["siteroot"]}app/index.php?i={$_W["uniacid"]}&c=entry&op=info&id='+id+'&do=product&m=hy_supstore';
+    $('#createUrl').val(url);
+    $('#createUrlBlock').show();
+}
+//复制url
+function createUrl(){
+    var text = document.getElementById("createUrl").value;
+    var input = document.getElementById("copyUrl");
+    input.value = text; // 修改文本框的内容
+    input.select(); // 选中文本
+    document.execCommand("copy"); // 执行浏览器复制命令
+    layer.msg('复制成功');
+}
+//关闭url
+function closeUrl(){
+    //关闭弹窗
+    $('#closeUrl').parent().parent().hide();
+}
+</script>
+{elseif $active == 'update'}
+
+<fieldset class="layui-elem-field">
+    <legend>修改选项</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" method="post" action="{php echo $this->createWebUrl('storemanage', array('op'=>'product','type'=>'product','active'=>'update','storeid'=>$storeinfo['id']))}" enctype="multipart/form-data">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="productName" required lay-verify="required" placeholder="请输入产品名称" autocomplete="off" class="layui-input" style="width: 60%" value="{$row['name']}">
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{$row['id']}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类:</label>
+                <div class="layui-input-block">
+                    <div style="width: 60%;">
+                        <select name="productClass" lay-verify="required">
+                            <option value="0" data-depth="0">产品基类</option>
+                            {loop $listCategory $key $value}
+                            <option value="{$value['id']}" data-depth="{$value['depth']}" {if $row['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">主图</label>
+                <div class="layui-input-block tpl-form-field" style="width: 60%;">
+                    {php echo tpl_form_field_image('productMain',$row['img_url'],$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">500x500最好</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">轮播图</label>
+                <div class="layui-input-block tpl-form-field" style="width: 60%;">
+                    {php echo tpl_form_field_multi_image('productCarousel',$row['carousel_urls'],array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">500x500最好 按图片的顺序依次加载轮播图</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">详情</label>
+                <div class="layui-input-block" style="width: 60%;">
+                {php echo tpl_ueditor('productDetails', $row['details'], array('height'=>300,'width'=>'100%'));}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="productPrice" required lay-verify="required" placeholder="请输入产品价格" autocomplete="off" class="layui-input" style="width: 30%;" value="{$row['price']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="orderNum" placeholder="请输入排序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;" value="{$row['rank']}">
+                    <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" value="提交">立即生成</button>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['form'], function() {
+    var form = layui.form;
+});
+</script>
+{elseif $active == 'add'}
+
+<fieldset class="layui-elem-field">
+    <legend>添加选项</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" method="post" action="{php echo $this->createWebUrl('storemanage', array('op'=>'product','type'=>'product','active'=>'add','storeid'=>$storeinfo['id']))}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="productName" required lay-verify="required" placeholder="请输入产品名称" autocomplete="off" class="layui-input" style="width: 60%">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类:</label>
+                <div class="layui-input-block">
+                    <div style="width: 60%;">
+                        <select name="productClass" lay-verify="required">
+                            <option value="0" data-depth="0">产品基类</option>
+                            {loop $listCategory $key $value}
+                            <option value="{$value['id']}" data-depth="{$value['depth']}" {if $row['category_id'] == $value['id']}selected{/if}><?php $str='';for($i=0;$i<$value['depth'];$i++){ $str .= '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';}; echo $str;?>{$value['name']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">主图</label>
+                <div class="layui-input-block" style="width: 60%;">
+                    {php echo tpl_form_field_image('productMain','',$_W['siteroot'].'web/resource/images/nopic.jpg',array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">500x500最好</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">轮播图</label>
+                <div class="layui-input-block" style="width: 60%;">
+                    {php echo tpl_form_field_multi_image('productCarousel','',array('height'=>38,'width'=>'100%'));}
+                    <span class="help-block">500x500最好 按图片的顺序依次加载轮播图</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">详情</label>
+                <div class="layui-input-block" style="width: 60%;">
+                {php echo tpl_ueditor('productDetails', $value = '请输入文章内容', array('height'=>300,'width'=>'100%'));}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="productPrice" required lay-verify="required" placeholder="请输入产品价格" autocomplete="off" class="layui-input" style="width: 30%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序:</label>
+                <div class="layui-input-block">
+                    <input type="number" name="orderNum" placeholder="请输入产品序号" autocomplete="off" class="layui-input" style="width: 30%; float: left; margin-right: 10px;">
+                    <div class="layui-form-mid layui-word-aux">数字越大越靠前 默认为0</div>
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <div class="layui-input-block">
+                <button class="layui-btn" name="submit" value="提交">立即生成</button>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script>
+layui.use(['form'], function() {
+    var form = layui.form;
+});
+</script>
+{/if}

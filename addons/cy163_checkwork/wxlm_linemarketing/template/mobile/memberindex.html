@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" />
+<title>{$config['pc_member_title']}</title>
+{template '../pc/head'}
+</head>
+
+<body class="bodybg pc-testindex-bg">
+		{template '../pc/header'}
+		<div class="row pc-index-content clearfix">
+			<div class="col-sm-4 col-md-4 col-lg-4 pc-index-content-left">
+				{template '../pc/nav'}
+			</div>
+			<div class="col-sm-8 col-md-8 col-lg-8 pc-index-content-right">
+				<div class='content-right-title' style="font-weight: bold;">
+					发放奖励
+				</div>
+				<div class="row mconshow" style="margin: 0px;font-size: 14px;margin: 20px auto;">
+				    <div class="col-xs-3 mconshow-a" style="padding:0px;">可用积分:{$jifen}</div>
+				    <div class="col-xs-3 mconshow-b">已发积分:{if $credit1count['count']==''}0{else}{$credit1count['count']}{/if}</div>
+				    <div class="col-xs-3 mconshow-b">可用余额:{$yue}元</div>
+				    <div class="col-xs-3 mconshow-a">已发余额:{if $credit2count['count']==''}0{else}{$credit2count['count']}{/if}元</div>
+				</div>
+				<div class="row" style="margin-top:20px;">
+					<div class="col-xs-3 m_box_p1">
+						<div class="mtitle">
+							消费类型
+						</div>
+					</div>
+					<div class="col-xs-8">
+						<div class="btn-group" style="width:100%;">
+							<select class="form-control " id="spending">
+									<option value="" >请选择</option>
+								{loop $spending_list $key $item}
+									<option value="{$item['spending_id']}" {if $item['store_id']==$store_id }selected{/if}>{$item['spending_title']}</option>
+								{/loop}
+							</select>
+						</div>
+					</div>
+				</div>
+			
+			    <div class="m_bg1" style="margin-top:10px;">
+			    <div class="row">
+					<div class="col-xs-3 m_box_p1">
+						<div class="mtitle">
+							消费金额
+						</div>
+					</div>
+					<div class="col-xs-8">
+			            <div class="input-group">
+			                <span class="input-group-addon">￥</span>
+			                <input type="number" id="money" class="form-control"  value="" maxlength="9"  style="text-align:right" step="0.01">
+			                <span class="input-group-addon">元</span>
+			            </div>
+					</div>
+				</div>
+			    </div>
+			    <div class="m_box_w1" style="margin-top: 10px;text-align: center;">
+			       <a href="javascript:getqrcode();" style="display: inline-block;width: 40%;"><img src="{RES}public/images/m_btn2.png" class="m_btn_a" style="width: 100%;"/></a>
+			    </div>
+				<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="tanchukuang">
+				  <div class="modal-dialog modal-sm" role="document">
+				    <div class="modal-content" style="text-align: center;">
+				    	<div>
+				    		<img src="" alt="" id="qrcodeimg" style="margin:1em auto 0em;">
+				    	</div>
+				    	<div id="tishi" style="font-size: 1.1em;margin: 2em 0em;">
+				    		
+				    	</div>
+				    </div>
+				  </div>
+				</div>
+			    
+			</div>
+			</div>
+		</div>
+	<script>
+		
+
+		function getqrcode()
+  		{
+  			/* 消费类型  消费金额 */
+  			var type= $('#spending option:selected').val(),
+  				number=$('#money').val();
+  			if(storeid=='')
+  			{
+  				alert('未获取到门店信息，请重新进入!');
+  			}else if (type=='')	
+  			{
+  				alert('请填写消费类型!');
+  			}else if (number==0){
+  				alert('请填写消费金额')
+  			}else{
+  				$.ajax({  
+		        type:"POST",
+		        url: "{php echo $this->createMobileUrl('ajaxpcgetqrcode');}",
+		        data:{type:type,number:number,storeid:storeid},
+		        dataType:"json",
+		        async:false,
+		        success: function(data){
+		        	if(data.result=='success')
+		        	{
+		        		 $('#tanchukuang').modal('show');
+		        		 $('#qrcodeimg').addClass('show');
+		        		 $('#qrcodeimg').attr('src',data.qr);
+ 						 $('#tishi').html('扫描上方二维码赠送'+data.jifen+data.type);
+		        	}else if(data.result=='error'){
+		        		op=data.rs1+'<br>'+data.rs2+'<br>'+data.rs3;
+		        		$('#tanchukuang').modal('show');
+		        		$('#qrcodeimg').removeClass('show');
+		        		$('#qrcodeimg').addClass('hide');
+		        		$('#tishi').html(op);
+		        	}else{
+		        		$('#tanchukuang').modal('show');
+		        		$('#qrcodeimg').removeClass('show');
+		        		$('#qrcodeimg').addClass('hide');
+		        		$('#tishi').html(data.rs);
+		        	}
+		        }
+	        	});
+  			}	
+  		}  
+	</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+{template 'style5/header'}
+<body class="max-width bg-f2">
+<div class="page">
+    <!-- 标题栏 -->
+    <header class="bar bar-nav bg-green">
+        <a class="icon icon-left pull-left txt-fff" href="javascript:history.go(-1);"></a>
+        <h1 class="title txt-fff">新增地址</h1>
+    </header>
+
+    <!-- 这里是页面内容区 -->
+    <div class="content">
+        <div class="list-block" style="margin:0">
+            <ul>
+                {if $xqset['code'] && $xqset['room']}
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">注册码:</div>
+                            <div class="item-input">
+                                <input type="text" name='code' id='code' placeholder="请输入注册码" value="{$item['code']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {/if}
+                {if $xqset['room']}
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">手机号码:</div>
+                            <div class="item-input">
+                                <input type="text" name='mobile' id='mobile' placeholder="请输入与物业处所留手机号一致" value="{$item['mobile']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">房号:</div>
+                            <div class="item-input">
+                                <select class="weui_select" name="address" id="address" style="margin-left:-15px;">
+                                    <!-- {loop $rooms $room}
+                                    <option value="{$room['room']}">{$room['room']}</option>
+                                {/loop} -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {else}
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">栋/幢:</div>
+                            <div class="item-input">
+                                <input type="text" name='build' id='build' placeholder="例如：1栋就输入1" value="{$item['build']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">单元:</div>
+                            <div class="item-input">
+                                <input type="text" name='unit' id='unit' placeholder="例如：1单元就输入1" value="{$item['build']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">室:</div>
+                            <div class="item-input">
+                                <input type="text" name='room' id='room' placeholder="例如：101室就输入101" value="{$item['build']}">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                {/if}
+            </ul>
+        </div>
+        <div class="content-block">
+            <div class="row">
+                <a href="#" class="button button-big button-fill button-success" id="showToast">提交</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var code_status ="{$xqset['code']}";
+    $("#code").keyup(function() {
+        var code = $("#code").val();
+        var regionid = "{$mem['regionid']}";
+        if (code) {
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('register',array('op' => 'room'))}",
+                dataType: 'json',
+                data: {
+                    code: code,
+                    regionid: regionid
+                },
+                success: function(s) {
+                    var data = JSON.parse(s.content);
+
+                    if (s.status == 1) {
+                        $.each(data, function(index, value) {
+                            var content = "<option value=\"" + value.room + "\" >" + value.room + "</option>";
+                            $("#address").html(content);
+                        });
+
+
+                    };
+                    if (s.status == 2) {
+                        $('.weui_dialog_bd').text('与物业提供的注册码不一致,请联系物业修改。');
+                        $('#dialog2').show();
+                        setTimeout(function() {
+                            $('#dialog2').hide();
+                            window.location.reload();
+                        }, 3000);
+                    };
+
+                }
+            })
+        };
+
+    });
+    if (code_status == 0) {
+        $("#mobile").keyup(function() {
+            var mobile = $("#mobile").val();
+            var regionid = "{$mem['regionid']}";
+            if (mobile) {
+                $.ajax({
+                    url: "{php echo $this->createMobileUrl('register',array('op' => 'room'))}",
+                    dataType: 'json',
+                    data: {
+                        mobile: mobile,
+                        regionid: regionid
+                    },
+                    success: function(s) {
+                        var data = JSON.parse(s.content);
+
+                        if (s.status == 1) {
+                            $.each(data, function(index, value) {
+                                var content = "<option value=\"" + value.room + "\" >" + value.room + "</option>";
+                                $("#address").html(content);
+                            });
+
+
+                        };
+                        if (s.status == 2) {
+                            $('.weui_dialog_bd').text('与物业预留的手机号码不一致,请联系物业修改。');
+                            $('#dialog2').show();
+                            setTimeout(function() {
+                                $('#dialog2').hide();
+                                window.location.reload();
+                            }, 3000);
+                        };
+
+                    }
+                })
+            };
+
+        });
+
+    };
+    $(function() {
+        $("#showToast").click(function(event) {
+            var build = $("#build").val();
+            if (build == '') {
+                alert('请填写楼栋');
+                return false
+            };
+            var unit = $("#unit").val();
+            if (unit == '') {
+                alert('请填写单元');
+                return false
+            };
+            var room = $("#room").val();
+            if (room == '') {
+                alert('请填写房号');
+                return false
+            };
+            var address = $("#address").val();
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('member',array('op' => 'addr'))}",
+                dataType: 'json',
+                data: {
+                    build:build,
+                    unit:unit,
+                    room:room,
+                    address:address
+                },
+                success: function(s) {
+                    if (s.status == 1) {
+                        $('#loadingToast').show();
+                        setTimeout(function() {
+                            $('#loadingToast').hide();
+                            window.location.href = "{php echo $this->createMobileUrl('member')}";
+                        }, 30);
+                    }
+                }
+            })
+
+
+        });
+
+    })
+</script>
+
+<script type="text/javascript" src="{MODULE_URL}template/mobile/style5/static/js/light7.js" charset="utf-8"></script>
+{template 'style5/footer'}

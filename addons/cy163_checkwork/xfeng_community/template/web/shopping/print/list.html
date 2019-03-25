@@ -1,0 +1,55 @@
+{template 'web/common/header'}
+<ul class="nav nav-tabs">
+    <li  class="active"><a href="{php echo $this->createWebUrl('shopping', array('op' => 'print','operation' => 'list'));}">管理打印机</a></li>
+    <li><a href="{php echo $this->createWebUrl('shopping', array('op' => 'print','operation' => 'add'));}">添加打印机</a></li>
+</ul>
+<div class="panel panel-default">
+    <div class="panel-body table-responsive">
+        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+            <thead class="navbar-inner">
+            <tr>
+                <th style="width:40px;">终端编号</th>
+                <th style="width:60px;">用户名</th>
+                <th style="width:60px;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $list $item}
+            <tr>
+                <td>{$item['deviceNo']}</td>
+                <td>{$item['xqusername']}</td>
+
+                <td>
+                    <a title="删除" class="btn btn-primary btn-sm" onclick="del('{$item['id']}')" ><i class="fa fa-trash-o text-sg"></i> 删除</a>
+                    <a class="btn btn-primary btn-sm"  href="{php echo $this->createWebUrl('shopping',array('op' => 'print','id' => $item['id'],'operation' => 'add'))}"><i class="fa fa-edit"></i> 编辑</a>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {$pager}
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function del(id){
+        var id=id;
+        var url = "{php echo $this->createWebUrl('shopping',array('op' => 'print','operation' => 'delete'),true)}";
+        $.post(url,
+            {
+                id:id
+            },
+            function(msg){
+                if (msg.status == 1) {
+                    setTimeout(function(){
+                        window.location.reload();
+                    },100);
+                };
+
+            },
+            'json');
+    }
+
+</script>
+{template 'web/common/footer'}

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+    {template 'head'}
+    <script src="{RES}mobile/js/teegon.js"></script>
+    <script src="<?php echo constant('TEE_SITE_URL')?>jslib/t-charging.min.js"></script>
+    <script src="<?php echo constant('TEE_SITE_URL')?>static/js/jquery.min.js"></script>
+    <title>{php echo $this->config['system_name']}</title>
+
+</head>
+
+<body>
+<div class="box">
+	<div class="tops">
+    	<div class="col-xs-2 text01-l">
+			<a href="javascript:" onclick="history.back(); ">
+            	<img src="{RES}mobile/images/back-white.png">
+            </a>
+        </div>
+        <div class="col-xs-8 text01-c">收银台</div>
+    </div>
+	<div class="cont">
+		<div class="pay-con">
+        	<ul class="pay-t">
+            	<li>
+                	<div class="col-xs-4 pay-text01">订单编号</div>
+                    <div class="col-xs-8 pay-text02">{$order['order_number']}</div>
+                </li>
+                <li>
+                	<div class="col-xs-4 pay-text01">订单金额</div>
+                    <div class="col-xs-8 pay-text03">￥{$order['order_pay_money']}</div>
+                </li>
+            </ul>
+            <ul class="pay-b">
+                <a href="javascript:pay('{$pay['pay_way']}')"><li>
+                	<div class="col-xs-3 pay-image01">
+                    	<img src="./resource/images/wx-icon.png">
+                    </div>
+                    <div class="col-xs-7">
+                    	<div class="pay-text04">微信支付</div>
+                    	<div class="pay-text05">微信支付安全快捷</div>
+                    </div>
+                    <div class="col-xs-2 pay-image02">
+                    	<img src="{RES}mobile/images/right.png">
+                    </div>
+                </li>
+                </a>
+                <!--<li id="menu">-->
+                	<!--<div class="col-xs-3 pay-image01">-->
+                    	<!--<img src="{RES}mobile/images/pay-teegon.png">-->
+                    <!--</div>-->
+                    <!--<div class="col-xs-7">-->
+                    	<!--<div class="pay-text04">天工支付</div>-->
+                    	<!--<div class="pay-text05">天工扫码，微信/支付宝</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-xs-2 pay-image02">-->
+                    	<!--<img src="{RES}mobile/images/right.png">-->
+                    <!--</div>-->
+                <!--</li>-->
+                <!--<li id="list">-->
+                	<!--<div class="col-xs-6">-->
+                        <!--<div class="col-xs-5 pay-image03">-->
+                            <!--<img src="./resource/images/wx-icon.png">-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-7">-->
+                            <!--<div class="pay-text06">微信支付</div>-->
+                            <!--<div class="pay-text07">方便快捷</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-xs-6">-->
+                        <!--<div class="col-xs-5 pay-image03">-->
+                            <!--<img src="{RES}mobile/images/pay-zhi.png">-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-7">-->
+                            <!--<div class="pay-text06">支付宝支付</div>-->
+                            <!--<div class="pay-text07">扫码付款</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</li>-->
+                <!--<li>-->
+                	<!--<div class="col-xs-3 pay-image01">-->
+                    	<!--<img src="images/icon03.png">-->
+                    <!--</div>-->
+                    <!--<div class="col-xs-7">-->
+                    	<!--<div class="pay-text04">微信支付</div>-->
+                    	<!--<div class="pay-text05">微信支付安全快捷</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-xs-2 pay-image02">-->
+                    	<!--<img src="images/right.png">-->
+                    <!--</div>-->
+                <!--</li>-->
+
+            </ul>
+        </div>
+    </div>
+    {template 'foot'}
+</div>
+<script>
+	$("#menu").click(function(){
+		$("#list").toggle();
+	})
+
+    function pay(way) {
+
+	   $.ajax({
+	       url:'{php echo $this->createMobileUrl("checkorder", array("order_number"=>$order["order_number"]))}',
+           type:'get',
+           success:function (data) {
+
+	           if (data == 1)
+               {
+                   if (way == 1)
+                   {
+                        wxpay();
+
+                   } else if (way == 2)
+                   {
+                       window.location.href = '{$url}';
+
+                   } else if (way == 3)
+                   {
+
+                       teegon();
+                   }
+
+               } else
+               {
+                   alert('订单已经支付, 请选择其他订单');
+               }
+
+
+           }
+       })
+
+    }
+
+    function wxpay() {
+
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+                appId:'{$jspai['appId']}',
+                timeStamp:'{$jspai['timeStamp']}',
+                nonceStr:'{$jspai['nonceStr']}',
+                package:'{$jspai['package']}',
+                signType:'MD5',
+                paySign:'{$jspai['paySign']}'
+            },
+            function(res){
+                if(res.err_msg == 'get_brand_wcpay_request:ok' ) {
+
+
+                    location.href = "{$return_url}";
+
+
+                } else {
+                }
+            }
+        );
+    }
+
+    function teegon() {
+
+        $.ajax({
+            url:"{$teegonUrl}",
+            method:'get'
+        }).done(tee.charge);
+    }
+</script>
+</body>
+</html>

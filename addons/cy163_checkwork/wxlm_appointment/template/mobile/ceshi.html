@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>门店预约-首页</title>
+    {template 'head'}
+    <link href="{RES}mobile/css/style_admin.css" rel="stylesheet" type="text/css">
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{RES}mobile/css/default.css">
+    <link media="all" rel="stylesheet" type="text/css" href="{RES}mobile/css/fileinput.css"  />
+        
+	<style type="text/css">
+		#fg2-imgbox {
+		position: relative;
+		}
+		.article {
+		position: absolute;
+		background: white;
+		padding: 4px;
+        }
+        .form-control{
+            margin-top: 0;
+        }
+        .file-preview{
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+        .file-caption-main{
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 10px;
+        }
+        .file-drop-zone-title{
+            background: url(images/file.png) center center no-repeat;
+        }
+        .fileinput-remove{
+            display: none;
+        }
+        .file-actions{
+            display: none;
+        }
+        .file-thumbnail-footer{
+            display: none;
+        }
+        .fileinput-upload-button{
+            display: none;
+        }
+	</style>
+</head>
+<body style="background: url(images/bac.png) repeat-y;padding-bottom: 40px;">
+    <div class="fg2-index-title">商户进入</div>
+                <div class="htmleaf-container">
+                    <form action="" method="post" enctype="multipart/form-data" id="form">
+                        <input id="file-zh" name="file-zh[]" type="file" multiple>
+                    </form>
+                </div>
+
+    <input type="text" class="form-control"  placeholder="输入内容" style="margin-top: 20px;">
+    <input type="text" class="form-control" placeholder="输入内容" style="margin-top: 10px;">
+    <a href="javascript:submitForm();" class="fg2-index-sub">先提交认证 </a>
+    <div class="fg2-index-text" style="font-size: 16px;"><span style="color: red;">*</span>上传营业执照、店铺资料、手持身份证和授权书</div>
+    <!--<script src="js/jquery2.2.3.min.js"></script>-->
+
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="{RES}mobile/js/fileinput.js" type="text/javascript"></script>
+        <!--简体中文-->
+    <script src="{RES}mobile/js/zh.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+
+     $('#file-zh').fileinput({
+        language: 'zh',
+        uploadUrl: '#',
+        allowedFileExtensions : ['jpg', 'png','gif'],
+    });
+  $(".file-drop-zone-title").html(" ");
+
+
+		$(function(){
+			$("#fg2-imgbox").pinterest_grid({
+				// no_columns: 10,
+                padding_x: 0,
+                padding_y: 0,
+                margin_bottom: 0,
+                single_column_breakpoint: 200
+			});	
+		});
+	</script>
+    <script type="text/javascript">
+    var $li=$("<li></li>");
+      function setImagePreviews(avalue) {
+        var docObj = document.getElementById("doc");
+        var dd = document.getElementById("fg2-imgbox");
+        dd.innerHTML = "";
+        var fileList = docObj.files;
+        for (var i = 0; i < fileList.length; i++) {       
+            dd.innerHTML += "<div  class='article' style='float:left'> <img id='img" + i + "'  /> </div>";
+            var imgObjPreview = document.getElementById("img"+i); 
+            if (docObj.files && docObj.files[i]) {
+                //火狐下，直接设img属性
+                imgObjPreview.style.display = 'block';
+                imgObjPreview.style.width = '100%';
+                // imgObjPreview.style.height = '180px';
+                //imgObjPreview.src = docObj.files[0].getAsDataURL();
+                //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
+                imgObjPreview.src = window.URL.createObjectURL(docObj.files[i]);
+            }
+            else {
+                //IE下，使用滤镜
+                docObj.select();
+                var imgSrc = document.selection.createRange().text;
+                var localImagId = document.getElementById("img" + i);
+                //必须设置初始大小
+                localImagId.style.width = "100%";
+                // localImagId.style.height = "180px";
+                //图片异常的捕捉，防止用户修改后缀来伪造图片
+                try {
+                    localImagId.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                    localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
+                }
+                catch (e) {
+                    alert("您上传的图片格式不正确，请重新选择!");
+                    return false;
+                }
+                imgObjPreview.style.display = 'none';
+                document.selection.empty();
+            }
+        }  
+
+        return true;
+    }
+    function submitForm() {
+
+          $('#form').submit();
+    }
+    </script>
+</body>
+</html>

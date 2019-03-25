@@ -1,0 +1,152 @@
+
+<!DOCTYPE>
+<html>
+  <head>
+     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1, minimum-scale=1, user-scalable=no"/> 
+	<title>{if !empty($_W['page']['sitename'])}{$_W['page']['sitename']}{else}{$_W['account']['name']}{/if}{if !empty($title)}{$title} {/if}</title>
+  </head>
+<body>
+<script src="{$res}static/jwap/js/jquery-1.8.0.js"></script>
+<script src="{$res}js/show_ads.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+<script type="text/javascript">
+	if(navigator.appName == 'Microsoft Internet Explorer'){
+		if(navigator.userAgent.indexOf("MSIE 5.0")>0 || navigator.userAgent.indexOf("MSIE 6.0")>0 || navigator.userAgent.indexOf("MSIE 7.0")>0) {
+			alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
+		}
+	}
+	window.sysinfo = {
+		{if !empty($_W['uniacid'])}'uniacid': '{$_W['uniacid']}',{/if}
+		{if !empty($_W['acid'])}'acid': '{$_W['acid']}',{/if}{if !empty($_W['openid'])}'openid': '{$_W['openid']}',{/if}
+		{if !empty($_W['uid'])}'uid': '{$_W['uid']}',{/if}
+		'siteroot': '{$_W['siteroot']}',
+		'siteurl': '{$_W['siteurl']}',
+		'attachurl': '{$_W['attachurl']}',
+		'attachurl_local': '{$_W['attachurl_local']}',
+		'attachurl_remote': '{$_W['attachurl_remote']}',
+		{if defined('MODULE_URL')}'MODULE_URL': '{MODULE_URL}',{/if}
+		'cookie' : {'pre': '{$_W['config']['cookie']['pre']}'}
+	};
+	// jssdk config 对象
+	jssdkconfig = {php echo json_encode($_W['account']['jssdkconfig']);} || {};
+	// 是否启用调试
+	jssdkconfig.debug = false;
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'hideMenuItems',
+		'showMenuItems',
+		'hideAllNonBaseMenuItem',
+		'showAllNonBaseMenuItem',
+		'translateVoice',
+		'startRecord',
+		'stopRecord',
+		'onRecordEnd',
+		'playVoice',
+		'pauseVoice',
+		'stopVoice',
+		'uploadVoice',
+		'downloadVoice',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'getNetworkType',
+		'openLocation',
+		'getLocation',
+		'hideOptionMenu',
+		'showOptionMenu',
+		'closeWindow',
+		'scanQRCode',
+		'chooseWXPay',
+		'openProductSpecificView',
+		'addCard',
+		'chooseCard',
+		'openCard',
+		'openAddress'
+	];
+	</script>
+<link rel="stylesheet" href="{$res}css/show_ads.css" type="text/css">
+
+
+        <div class="beatHeader android" id="landingHeader">
+        </div>
+        <div class="beatMain">
+            <div class="imgContainer">
+                <img src="{php echo tomedia($show['thumb']);}" style="height:auto"/> 
+            </div> 
+            <p class="activeTitle">{$show['title']}</p>
+            <p class="activeContent"> </p>
+            <div class="moonTitleContainer">
+                <span>{$userinfo['nickname']}</span> 
+                发现这个主题不错，并分享给你
+            </div>
+           <p style="font-size:12px;color:rgba(0,0,0,.4);text-align:center;">你可以通过右上角“…”的浏览器打开 </p>
+        </div>
+        <script>
+            (function(){
+                var ua = navigator.userAgent.toLowerCase();  
+                var beatHeader = document.getElementById('landingHeader'); 
+                if (/iphone|ipad|ipod/.test(ua)) {
+                     beatHeader.className = 'beatHeader ios'; 
+                } else if (/android/.test(ua)) {
+                }
+              setTimeout(function(){
+              	 goldlog.record('/wap.89.9','','','H1733420');
+              },500)
+            })();
+        </script>
+		
+		
+<script type="text/javascript">
+	$(function(){
+
+{if $_GPC['do']=='show_ads'}
+var url = "{php echo $this->createMobileUrl('hit_ajax',array('id'=>$_GPC['id'],'act'=>'ads'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if}
+
+
+	wx.config(jssdkconfig);
+	var $_share = {php echo json_encode($_share);};
+	if(typeof sharedata == 'undefined'){
+		sharedata = $_share;
+	} else {
+		sharedata['title'] = $_share['title'];
+		sharedata['desc'] = $_share['desc'];
+		sharedata['link'] = $_share['link'];
+		sharedata['imgUrl'] = $_share['imgUrl'];
+	}
+	
+	wx.ready(function () {
+
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+
+        sharedata.success = function(){
+
+{if $_GPC['do']=='show_ads'}
+var url = "{php echo $this->createMobileUrl('share_ajax',array('id'=>$_GPC['id'],'act'=>'ads'));}";		
+$.post(url, function(dat){
+dat = eval('('+dat+')');
+});
+{/if} 
+
+	    }
+
+
+	});
+
+	});
+</script>	
+		
+		
+		</body></html>

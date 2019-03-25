@@ -1,0 +1,128 @@
+{template 'web/common/header'}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <div class="ibox-title">
+                        <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('goodsinventorychange', array('op' => 'gicadd'))}"></a>&nbsp;&nbsp;&nbsp;商品盘点</h5>
+                        <a class="btn btn-outline btn-default" style="float: right" href="{php echo $this->createWebUrl('goodsinventorychange',array('op' => 'gicadd','id' => $id))}" >
+                            <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form action="" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return check(this);" id="goodsinventorychangeForm">
+                        <input type="hidden" name="id" value="{$goodslistone['id']}">
+                        <div class="form-group">
+                            <label  class="col-sm-3 control-label">盘点数量</label>
+                            <div class="col-xs-2">
+                                <input type="text" name="gicnumber" id='gicnumber' class="form-control" value="" placeholder="请输入盘点数量"/>
+                                <!--<input type="hidden" name="goodsnumber" id='goodsnumber' class="form-control" value="{$goodslistone['goo_number']}"/>-->
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="changetype" class="col-sm-3 control-label">盘点类型</label>
+                            <div class="col-xs-2">
+                                <select class="form-control m-b" name="changetype" id="changetype" value="">
+                                    <option value="0"disabled="disabled">请选择</option>
+                                    <option value="1">盘盈</option>
+                                    <option value="2">盘亏</option>
+                                    <option value="3">领用</option>
+                                    <option value="4">报废</option>
+                                    <option value="5">其他</option>
+                                </select>
+                            </div>
+                            <label for="title" class="col-sm-1 control-label">盘点方式</label>
+                            <div class="col-sm-3">
+                                    <div class="radio radio-info radio-inline">
+                                        <input type="radio" name="status" id="status1" value="1" {if $item['gic_InventoryPlusOrLosr']==1 || empty($item['gic_InventoryPlusOrLosr'])}checked="checked" {/if}>
+                                        <label for="status1"> 增加 </label>
+                                    </div>
+                                    <div class="radio radio-inline radio-danger">
+                                        <input type="radio" name="status" id="status2" value="2" {if $item['gic_InventoryPlusOrLosr']==2 }checked="checked" {/if}>
+                                        <label for="status2"> 减少 </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label  class="col-sm-3 control-label" style="display: none;">选择店面</label>
+                            <div class="col-xs-2"  style="display: none;">
+                                <select class="form-control m-b" name="gicstore" id="giistore">
+                                {loop $storesql $itemstore}
+                                    <option value="{$itemstore['id']}" {if $itemstore['id'] == $goodslistone['store_id']}selected ='selected'{/if}>{$itemstore['sto_name']}</option>
+                                {/loop}
+                                </select>
+                            </div>
+                            <label  class="col-sm-3 control-label">选择供应商</label>
+                            <div class="col-xs-4">
+                                <select class="form-control m-b" name="gicgoodssupplier" id="giigoodssupplier" >
+                                    {loop $suppliersql $itemsupplier}
+                                    <option value="{$itemsupplier['id']}" {if $itemsupplier['id'] == $goodslistone['goodssupplier_id']}selected ='selected'{/if}>{$itemsupplier['gs_supplierName']}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label  class="col-sm-3 control-label">盘点原因</label>
+                            <div class="col-xs-7">
+                                <input type="text" name="reason" id='reason' class="form-control" value="" placeholder="请输入盘点原因..."/>
+                            </div>
+
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-5 control-label"></label>
+                            <div class="col-sm-7">
+                                <input name="submit" type="submit" value="提交" class="btn btn-primary btn-w-m">
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {if empty($_GPC['id'])}
+<script>
+    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+    setTimeout(function(){
+        parent.layer.close(index); //再执行关闭
+    }, 1000);
+
+</script>
+{/if}
+<script>
+    $("#goodsinventorychangeForm").validate({
+        rules: {
+            gicnumber: {
+                required: true,
+                digits:true,
+
+            },
+            changetype: {
+                required: true,
+                digits:true,
+
+            },
+        },
+        messages: {
+            gicnumber: {
+                required: "请输入盘点数量",
+            },
+            messages: {
+                changetype: {
+                    required: "请选择盘点类型",
+                },
+        }
+    });
+</script>
+
+
+{template 'web/common/footer'}

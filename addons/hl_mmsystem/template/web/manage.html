@@ -1,0 +1,327 @@
+{template 'web/common/header-base-index'}
+<div class="wrapper wrapper-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-success pull-right">月</span>
+                        <h5>各店铺总收入金额</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="no-margins">{php echo $total_memberNowMonthMoneyCount}元</h1>
+                                <div class="font-bold text-navy" style="padding-bottom: 33px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-info pull-right">所有</span>
+                        <h5>总商户数</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="no-margins">{php echo $storetotal}个</h1>
+                                <div class="font-bold text-navy" style="padding-bottom: 33px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-info pull-right">所有</span>
+                        <h5>总会员数</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="no-margins">{php echo $storemembertotal}人</h1>
+                                <div class="font-bold text-navy" style="padding-bottom: 33px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-info pull-right">版本信息：{HLMMS_VERSION}-{HLMMS_RELEASE}</span>
+                        <h5><i class="fa fa-info-circle"></i> 软件版本&版权信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>版本信息：{HLMMS_VERSION}-{HLMMS_RELEASE}</p>
+                                <p>授权版本：<button type="button" class="btn btn-danger btn-xs">{$SystemSignData['SignStyle']}</button>
+                                    {$btn_buyAction}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>系统状态：{$SystemSignData['SignStatus']}{$btn_resultStatusTime} </p>
+                                <p>有效期至：{$SystemSignData['SignEndDate']} </p>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>会员总数前五名统计图</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="echarts" id="echarts-pie-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>总收入统计图</h5>
+                    </div>
+                    <div class="ibox-content">
+
+                        <div class="echarts" id="echarts-bar-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>店铺流水统计</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="panel-body">
+                            {loop $storelist $storeitem}
+                            <div class="panel-group" id="accordion">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne_{$storeitem['id']}">  <h5 class="panel-title">
+                                            {$storeitem['set_storeName']}(点击折叠)
+                                        </h5>
+                                        </a>
+                                    </div>
+                                    <div id="collapseOne_{$storeitem['id']}" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <div class="ibox float-e-margins">
+                                                        <div class="ibox-title">
+                                                            <span class="label label-success pull-right">今天，昨天</span>
+                                                            <h5>收入金额（元）</h5>
+                                                        </div>
+                                                        <div class="ibox-content">
+                                                            <h2 class="font-bold no-margins">{php echo util::getAllStoreDetailTransfer(1,$storeitem['id']);}元</h2>
+                                                            <div class="font-bold text-navy">昨天{php echo util::getAllStoreDetailTransfer(2,$storeitem['id']);}元相比前天
+                                                                <input type="hidden" value="{php echo $bak_total_memberYestodatMoneyCount =  util::getAllStoreDetailTransfer(3,$storeitem['id'])}"/>
+                                                                <input type="hidden" value="{php echo $bak_total_memberBeforeYestodatMoneyCount =  util::getAllStoreDetailTransfer(4,$storeitem['id'])}"/>
+                                                                {if $bak_total_memberYestodatMoneyCount > $bak_total_memberBeforeYestodatMoneyCount}
+                                                                <i class="fa fa-level-up"></i>
+                                                                {else}
+                                                                <i class="fa fa-level-down"></i>
+                                                                {/if}
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="ibox float-e-margins">
+                                                        <div class="ibox-title">
+                                                            <span class="label label-info pull-right">全部</span>
+                                                            <h5>会员</h5>
+                                                        </div>
+                                                        <div class="ibox-content">
+                                                            <h2 class="no-margins">{php echo util::getAllStoreDetailTransfer(5,$storeitem['id']);}，{php echo util::getAllStoreDetailTransfer(6,$storeitem['id']);}，{php echo util::getAllStoreDetailTransfer(7,$storeitem['id']);} 人</h2>
+                                                            <div class="font-bold text-navy">正常，未激活，过期会员<i class="fa fa-level-up"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="ibox float-e-margins">
+                                                        <div class="ibox-title">
+                                                            <span class="label label-primary pull-right">本月</span>
+                                                            <h5>收入金额（元）</h5>
+
+                                                        </div>
+                                                        <div class="ibox-content">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <h2 class="no-margins">&yen; {php echo util::getAllStoreDetailTransfer(8,$storeitem['id']);}元</h2>
+                                                                    <div class="font-bold text-navy">本月收入
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <h2 class="no-margins">&yen;{php echo util::getAllStoreDetailTransfer(9,$storeitem['id']);}元</h2>
+                                                                    <div class="font-bold text-navy">全年营业总金额
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="ibox float-e-margins">
+                                                        <div class="ibox-title">
+                                                            <span class="label label-primary pull-right">截止今天</span>
+                                                            <h5>库存预警</h5>
+                                                        </div>
+                                                        <div class="ibox-content">
+
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <h2 class="no-margins">{php echo util::getAllStoreDetailTransfer(10,$storeitem['id']);} 个 ，{php echo util::getAllStoreDetailTransfer(11,$storeitem['id']);} 件</h2>
+                                                                    <div class="font-bold text-navy">所有实物商品数量及库存总数
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <h2 class="no-margins">{php echo util::getAllStoreDetailTransfer(12,$storeitem['id']);} 件</h2>
+                                                                    <div class="font-bold badge badge-danger">库存预警商品总数
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/loop}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+<script>
+
+    function buySignOrder(signvalue) {
+        var index = parent.layer.open({
+            type: 2,
+            title: '购买授权',
+            area : ['900px' , '700px'],
+            content: '{php echo $this->createWebUrl('buysignorder')}&signType='+signvalue
+        });
+        parent.layer.full(index);
+    }
+
+</script>
+
+
+<!-- ECharts -->
+<script src="{HLMMS_JS}plugins/echarts/echarts-all.js"></script>
+
+<!-- ECharts demo data -->
+<script>
+    $(function () {
+
+        var barChart = echarts.init(document.getElementById("echarts-bar-chart"));
+        var baroption = {
+            title : {
+                text: '平台每月总收入统计图'
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['总金额']
+            },
+            grid:{
+                x:30,
+                x2:40,
+                y2:24
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'总金额',
+                    type:'bar',
+                    data:[0.00, 0.00, 0.00, 0.00, 0.00, 0.00,0.0, 0.0,0.0, 0.0, 0.0,0.00],
+                    markPoint : {
+                        data : [
+                            {type : 'max', name: '最大值'},
+                            {type : 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine : {
+                        data : [
+                            {type : 'average', name: '平均值'}
+                        ]
+                    }
+                }
+            ]
+        };
+        barChart.setOption(baroption);
+        window.onresize = barChart.resize;
+
+        var pieChart = echarts.init(document.getElementById("echarts-pie-chart"));
+        var pieoption = {
+            title : {
+                text: '各门店会员统计图',
+                subtext: '饼状占比',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data:{$storeNameJsonData}
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'会员总数',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:{$storeDataJsonData}
+                }
+            ]
+        };
+        pieChart.setOption(pieoption);
+        $(window).resize(pieChart.resize);
+
+
+    });
+</script>
+
+</body>
+
+</html>

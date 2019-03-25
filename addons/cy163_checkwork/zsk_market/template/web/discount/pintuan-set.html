@@ -1,0 +1,154 @@
+{template 'public/header'} 
+<style type="text/css">
+	#proForm label{
+		display: inline-block;padding-right: 15px;
+		width: 72px;
+	}
+	#proForm label{
+		display: inline-block;padding-right: 15px;
+	}
+	#proForm .layui-input{
+		display: inline-block;width: 150px;
+	}
+</style>
+<div class="layui-tab layui-tab-card" style="margin: 10px 10px;">
+  <ul class="layui-tab-title">
+    <li class="layui-this">拼团分类</li>
+    <li>顶部轮播</li> 
+  </ul>
+  <div class="layui-tab-content"  >
+  
+    <div class="layui-tab-item layui-show">
+    	<button class="layui-btn layui-btn-normal" type="button" style="display: inline-block;" onclick="editCate()">添加分类</button> 
+    	<table class="layui-table ">
+			<thead>
+				<tr>
+					<th >分类名称</th> 
+					<th >排序</th>    
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $cates $index $item}
+				<tr>
+					<td>{$item['name']}</td>
+					<td>{$item['sort']}</td>  
+					 
+					<td>   
+						<a href="javascript:void(0);" onclick="delcate({$item['id']})" class='linkbtn linkbtn-red'>删除</a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+    </div> 
+    <div class="layui-tab-item">
+    	{php echo tpl_form_field_images1('picture','',2);}
+    	<a class="layui-btn layui-btn-normal"  style="display: inline-block;" href="javascript:void(0);"
+    	 onclick="addPic()">添加轮播</a> 
+    	 <table class="layui-table ">
+			<thead>
+				<tr>
+					<th >图片</th> 
+					<th >状态</th> 
+					<th >操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $swipers $index $item}
+				<tr>
+					<td><img src="{$_W['attachurl']}{$item['picture']}"/></td>
+					 
+					<td> </td> 
+					<td>  
+						<a href="<?php echo $this->routeUrl('discount.editpintuanswiper');?>&sid={$item['id']}" class='linkbtn' style="display: none;">编辑</a>
+						<a href="javascript:void(0);" onclick="delswiper({$item['id']})" class='linkbtn linkbtn-red'>删除</a>
+					</td>
+				</tr>
+				{/loop}
+			</tbody>
+		</table>
+    </div>
+  </div>
+</div>  
+<div id="editbox"  style="display: none;">
+	<label > 分类名称</label>
+	<input type="text" name="name"    class="layui-input"><br/>
+	<br/> 
+	<label  > 排序</label>
+	<input type="text" name="sort" value="" class="layui-input" >
+</div>
+<script type="text/javascript">
+	
+</script>
+{template 'public/footer'}
+<script type="text/javascript">
+	 function editCate(id=0,name="",sort=""){ 
+		var html = '<form id="proForm" action="<?php echo $this->routeUrl('discount.savePintuanCate');?>" method="post">'+$("#editbox").html()+'</form>';
+		modalDlg(html,function(){
+			$("#proForm").submit();
+		});
+		//window.location.href="<?php echo $this->routeUrl('goods.editcase');?>&goodsid={$goods['id']}&oid="+id;
+	}
+	function editCase(id){
+		window.location.href="<?php echo $this->routeUrl('goods.editcase');?>&goodsid={$goods['id']}&oid="+id;
+	}
+	function getOpts(){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('goods.getOptions0');?>&goodsid={$goods['id']}",
+			type:"post",
+			dataType:"json",
+			success:function(d){
+				var html="";
+				$.each(d,function(i,v){
+					html+="<option value='"+v.id+"'>"+v.name+"</option>";
+				});
+				$(".opt2").html(html);
+			}
+		})
+	};
+	function delswiper(id){
+		modalDlg("是否删除？",function(){ 
+			 window.location.href='<?php echo  $this->routeUrl('discount.delpintuanswiper');?>&sid='+id;
+		});
+	} 
+	function delcate(id){
+		modalDlg("是否删除分类？",function(){ 
+			 window.location.href='<?php echo  $this->routeUrl('discount.delpintuancate');?>&cid='+id;
+		});
+	} 
+	function addProperty(){
+		var html = '<form id="proForm" action="<?php echo $this->routeUrl('goods.saveOption');?>&goodsid={$goods['id']}&parentid=0" method="post">'+$("#procase").html()+'</form>';
+		modalDlg(html,function(){ 
+			 
+				$("#proForm").submit();
+			
+		});
+	}
+	var layer;
+	 layui.use(['form','layer'], function(){
+ 		 var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功 
+  		layer=layui.layer;
+  	}); 
+	 function addPic(){
+	 	public_imgclick("picture",2)
+	 	$(".pbpicturesc").click(function(){
+	 		$(".img-container input:checkbox:checked").each(function(){
+            var path = $(this).val();
+            var imgsrc =host+"/attachment/"+path;
+            	$.ajax({
+				url:"<?php echo $this->routeUrl('discount.savePintuanSwiper');?>",
+				type:"post",
+				dataType:"json",
+				data:{picture:path},
+				success:function(data){
+					layer.msg("上传成功");
+					window.setTimeout(function(){
+						history.go(0)
+					},2000);
+				}
+			})
+    			})
+	 	})
+	} 
+</script>

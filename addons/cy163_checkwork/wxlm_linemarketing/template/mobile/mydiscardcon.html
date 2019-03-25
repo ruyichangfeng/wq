@@ -1,0 +1,97 @@
+{template 'head2'}
+<title>{$title}</title>
+<script>
+         wx.ready(function () {
+            sharedata = {
+                title: "{$config['mobile_card_sharetitle']}",
+                desc: "{$config['mobile_card_sharedesc']}",
+                link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('Carddis',array('parent'=>$openid)))}",
+                imgUrl: "{php echo tomedia($config['mobile_card_shareimg'])}",
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function(){
+                },
+                cancel: function(){
+                }
+            };
+            wx.onMenuShareAppMessage(sharedata);
+            wx.onMenuShareTimeline(sharedata);
+            wx.onMenuShareQQ(sharedata);
+            wx.onMenuShareWeibo(sharedata);
+            wx.onMenuShareQZone(sharedata);
+        }); 
+     </script>   
+</head>
+
+<body>
+<div class="box">
+	<div class="bag01_show-con">
+		<img src="{php echo tomedia($discard['discountcard_thumb'])}">
+        <div class="bag01_show-text">
+        	<div class="bag01_show-text01">{$discard['discountcard_title']}</div>
+   <!--          <div class="bag01_show-text02">￥{$discard['discountcard_price']}{if $discard['discountcard_paytype']==1}积分{else if $discard['discountcard_paytype']==2}余额{else}元{/if}</div> -->
+<!--             <div class="bag01_show-text04">可用门店：{$storestr}</div>
+            <div class="bag01_show-text04">{$str1}</div>
+            <div class="bag01_show-text04">{$str3}</div>
+            <div class="bag01_show-text04">{$str4}</div> -->
+            <div class="bag01_show-text03">福利讲解</div>
+            <div style="width: 100%;margin: 2px 6px;">
+                 {php echo htmlspecialchars_decode($discard['discountcard_content'])}
+            </div>
+             
+        </div>
+        <div class="bag01_show-foot">
+        	<input type="button" value="立即购买"  onClick="buycard({$discard['discountcard_id']},{$discard['discountcard_paytype']},{$discard['discountcard_price']})">
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="msgModal1" tabindex="-1" role="dialog" aria-labelledby="msgModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="msgModalLabel">提示</h4>
+      </div>
+      <div class="modal-body">
+          <div class="container-fluid" id="modalMSG" style='text-align: center;margin-bottom: 0em auto;'>
+              <img src="../attachment/{$config['public_qrcode']}" style='width:100%;'/>
+              <br>
+              扫描上方二维码关注公众号!
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+</body>
+<script>
+    function buycard(cid,type,money)
+    {
+
+        if({$follow}==1)
+        {
+            if(type==1)
+            {
+                if(confirm("确定花费"+money+"积分兑换折扣卡？"))
+                {
+                    url="{php echo $this->createMobileUrl('buynow');}";
+                    location.href=url+"&cid="+cid;
+                }
+            }  
+            else{
+                url="{php echo $this->createMobileUrl('buynow');}";
+                location.href=url+"&cid="+cid;
+            }
+        }else{
+            $('#msgModal1').modal('show'); 
+        }
+        
+    }
+    
+</script>
+</html>

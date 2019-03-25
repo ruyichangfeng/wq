@@ -1,0 +1,117 @@
+<include file="Public/header.html" />
+</head>
+
+<body>
+	<div class="x-body">
+		<form class="layui-form">
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">金额 </label>
+				<div class="layui-input-block">
+					<input type="text" lay-verify="required" name="ordermoney" autocomplete="off" value="{$order['ordermoney']}" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">商品名称 </label>
+				<div class="layui-input-block">
+					<input type="text" name="goodsname" autocomplete="off" value="{$order['goodsname']}" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label for="role" class="layui-form-label">
+                        <span class="x-red">*</span>状态
+                    </label>
+				<div class="layui-input-inline">
+					<select name="status">
+						<option value="0" <?php if($order[ 'status']=='0' ){ echo 'selected';};?> >尚未支付</option>
+						<option value="1" <?php if($order[ 'status']=='1' ){ echo 'selected';};?> >支付成功</option>
+						<option value="2" <?php if($order[ 'status']=='2' ){ echo 'selected';};?> >支付失败</option>
+					</select>
+					<div class="layui-unselect layui-form-select layui-form-selected">
+						<div class="layui-select-title"><input type="text" placeholder="请选择角色" value="" readonly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>
+						<dl class="layui-anim layui-anim-upbit" style="">
+							<dd lay-value="尚未支付" class="">尚未支付</dd>
+							<dd lay-value="支付成功" class="">支付成功</dd>
+							<dd lay-value="支付失败" class="">支付失败</dd>
+						</dl>
+					</div>
+				</div>
+				<span style="color: red; font-size: 12px;font-weight:bold">失败原因：{$order['errormsg']}</span>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+                    <label for="content" class="layui-form-label">
+                     	备注
+                    </label>
+                    <div class="layui-input-block">
+                         <textarea  id="remark" name="remark" autocomplete="off" class="layui-textarea" style="height: 80px;">{$order['remark']}</textarea>
+                    </div>
+                </div>
+
+			
+
+			<input type="hidden" name="id" value="{$order['id']}" />
+
+			<div class="layui-form-item" style="display: none;">
+                <label for="L_sign" class="layui-form-label"></label>
+               <button class="layui-btn" id="submitBtn" key="set-mine" lay-filter="save" lay-submit> </button>
+            </div>
+
+		</form>
+	</div>
+
+	<include file="Public/footer.html" />
+
+	<script>
+		layui.use(['form', 'layer'], function() {
+			$ = layui.jquery;
+			var form = layui.form;
+			var layer = layui.layer;
+
+			form.on('submit(save)', function(data) {
+
+				$.ajax({
+					type: 'POST',
+					url: "{:U('Home/MainCtr/Order/do_order')}",
+					data: data.field,
+					dataType: 'text',
+					success: function(data) {
+						if(data == '1') {
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.msg('提交成功', {
+								icon: 1,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							}, function() {
+								parent.location.reload();
+							})
+						} else if(data == '2') {
+							parent.layer.msg('提交失败', {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						} else {
+							parent.layer.msg(data, {
+								icon: 2,
+								offset: '40%',
+								time: 2000,
+								shade: 0.3
+							});
+						}
+					}
+				});
+
+				return false;
+			});
+
+		});
+	</script>
+
+</body>
+
+</html>

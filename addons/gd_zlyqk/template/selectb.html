@@ -1,0 +1,48 @@
+{template "base/child_header"}
+<div class="layui-form news_list">
+    <table class="layui-table">
+        <colgroup>
+            <col width="80">
+            <col >
+        </colgroup>
+        <tbody class="news_content">
+        {loop $lbs $l}
+        <tr>
+            <td style="text-align: center !important;">
+                <input type="checkbox" name="checked" value="{$l['id']}" data-name="{$l['name']}" lay-skin="primary" lay-filter="choose">
+            </td>
+            <td align="left">{$l['name']}</td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn save" >选取</button>
+        </div>
+    </div>
+</div>
+<div id="page"></div>
+
+<script>
+    layui.use(['form','jquery','laypage'], function(){
+
+        var id="{$_GPC['id']}";
+        var $ = layui.jquery;
+        $(".save").click(function(){
+            var $checkbox = $('.news_list tbody input[type="checkbox"][name="checked"]:checked');
+            if($checkbox.is(":checked")){
+                var str="";
+                var ids="";
+                $checkbox.each(function(){
+                    str += '<a href="javascript:" data-id="'+$(this).val()+'">'+$(this).attr('data-name')+'</a>&nbsp;&nbsp;';
+                    ids += (ids=="")?$(this).val():","+$(this).val();
+                });
+                parent.setlb(str,ids,id);
+            }else{
+                parent.setlb("",0,id);
+            }
+        });
+    });
+</script>
+{template "base/child_footer"}

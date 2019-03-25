@@ -1,0 +1,128 @@
+{template 'web/common/header'}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5><a class="glyphicon glyphicon-arrow-left" href="{php echo $this->createWebUrl('wechatcardpackage')}"></a>引导会员添加微信卡包设置</h5>
+                    <h5 style="float: right">
+                        <a class="btn btn-outline btn-default" style="float: right;margin-top: -10px;" href="{php echo $this->createWebUrl('wechatcardpackage', array('op' => 'wechatcardpackageset'))}">
+                            <i class="fa fa-refresh" style="color: #0abc89"></i>  刷新本页</a>
+                    </h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="" method="post" class="form-horizontal form" id="setformdata">
+                        <table class="table table-hover" ng-controller="advAPI" style="width:100%;" cellspacing="0" cellpadding="0">
+                            <thead>
+                            <tr>
+                                <td class="col-md-2">设置项目</td>
+                                <td class="col-md-3">说明</td>
+                                <td class="col-md-4">参数值</td>
+                                <td class="col-md-3">是否启用</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="title">是否启用</td>
+                                <td>设置微信端会员中心是否开启引导会员添加微信会员卡到卡包</td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="wcps1" class="js-switch_1" {if $set['wcps1']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">优惠券链接</td>
+                                <td>微信卡包内微信会员卡优惠券查看链接</td>
+                                <td>
+                                    <input type="text"   class="form-control"  name="wcps[wcps2]" value="{$set['wcps2']['value']}" required />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="wcps3" class="js-switch_2" {if $set['wcps3']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">自助买单链接</td>
+                                <td>微信卡包内微信会员卡自助买单查看链接</td>
+                                <td>
+                                    <input type="text"   class="form-control"  name="wcps[wcps4]" value="{$set['wcps4']['value']}" required />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="wcps5" class="js-switch_3" {if $set['wcps5']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">会员中心链接</td>
+                                <td>微信卡包内微信会员卡会员中心查看链接</td>
+                                <td>
+                                    <input type="text"   class="form-control"  name="wcps[wcps6]" value="{$set['wcps6']['value']}" required />
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="wcps7" class="js-switch_4" {if $set['wcps7']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title">引导弹窗图</td>
+                                <td>设置微信端会员中心弹出窗显示广告图片</td>
+                                <td>
+                                    {php echo tpl_form_field_image('wcps[wcps8]', $set['wcps8']['value'])}
+                                    <span class="help-block">建议比例:324像素 * 354像素<span style="color: red"></span></span>
+                                </td>
+                                <td>
+                                    <input type="checkbox" id="wcps9" class="js-switch_5" {if $set['wcps9']['value']}checked='checked'{/if} />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label"></label>
+                            <div class="col-sm-7">
+                                <button type="submit" class="btn btn-w-m btn-primary" name="submit" value="提交">提交</button>
+                                <input type="hidden" name="token" value="{$_W['token']}" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(':checkbox').on('change', function (e, state) {
+            $this = $(this);
+            var hlsetkey = $this.attr('id');
+            var status = this.checked ? 1 : 0;
+            $this.val(status);
+            var agaxurl = "{php echo $this->createWebUrl('updatekey')}";
+            var dataparam = {
+                'hlsetkey': hlsetkey,
+                'status': status,
+            };
+            $.ajax({
+                url: agaxurl,
+                data: dataparam,
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data['message']['code'] == 0) {
+                        swal("更新成功！", "","success");
+                    } else {
+                        swal("新增成功！", "","success");
+                    }
+                }
+            });
+
+        });
+        $('.btn').hover(function () {
+            $(this).tooltip('show');
+        }, function () {
+            $(this).tooltip('hide');
+        });
+
+    });
+</script>
+{template 'web/common/footer'}

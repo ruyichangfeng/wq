@@ -1,0 +1,202 @@
+{template 'common/header'}
+<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/css/common.css">
+<article id="scene">
+    <!-- ======================================首页====================================== -->
+<div id="black" onclick="$('#box').hide();$('#black').hide();"></div>
+<div id="box">
+	<form>
+		<input type="text" id="txtjoinid" placeholder="请输入作品编号" >
+		<input type="button" id="searchbtn" value="搜索" class="bot" >
+	</form>
+	<div class="tips">分享搜索成功面页拉票更容易哦~</div>
+</div>
+    <section id="index" class="index transition active">
+        <div class="mainimg">
+            <img class="img-responsive" src="{php echo tomedia($data['picture'])}" />
+            <div class="total">
+                <div class="col-xs-4 col-md-4">报名人数<br>{php echo ($data['join_count'] + $data['add_join_count'])}</div>
+                <div class="col-xs-4 col-md-4">投票人数<br>{php echo ($data['vote_count'] + $data['add_vote_count'])}</div>
+                <div class="col-xs-4 col-md-4">访问量<br>{php echo ($data['access_count'] + $data['add_access_count'])}</div>
+            </div>
+        </div>
+        <div class="index_datetime">
+            {$datetimestr}
+        </div>
+        <div class="index_info"> 
+            <div>
+                <p>
+                    <i class="glyphicon glyphicon-bookmark"></i>&nbsp;{$data['title']}</p>
+            </div>
+            <div>
+                <p>
+                    <i class="glyphicon glyphicon-time"></i>&nbsp;{$data['start_time']} ~ {$data['end_time']}</p>
+            </div>
+            <a href="javascript:$('#rule').topage()" >
+            <div>
+                <p>
+                    <i class="glyphicon glyphicon-info-sign"></i>&nbsp;活动介绍
+                </p>
+            </div>
+            </a>
+        </div>
+        <!-- 参与者列表 -->
+        <div id="list" class="list transition listindex0">
+            <div id="listmenu" class="menu">
+                <div class="col-xs-6 col-md-6 active">最新参与</div>
+                <div class="col-xs-6 col-md-6">人气选择</div>
+            </div>
+            <div class="contentlist">
+                <div id="newlist" class="orderlist">
+                    <div class="leftlist"></div>
+                    <div class="rightlist"></div>
+                </div>
+                <div id="hotlist" class="orderlist">
+                    <div class="leftlist"></div>
+                    <div class="rightlist"></div>
+                </div>
+            </div>
+            <div class="load">
+                正在加载中……
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================报名====================================== -->
+    <section id="joinbox" class="transition joinbox">
+        <!-- 活动报名 -->
+        <div class="join">
+            <div class="top">活动报名</div>
+            <div class="form">
+                <form action="{php echo $this->createMobileUrl('join',array('voteid'=>$voteid,'ischeck'=>$data['is_check']))}" method="POST">
+                    <div class="form-group">
+                        <label class="sr-only" for="txtname">姓名</label>
+                        <input type="text" class="form-control" id="txtname" name="username" placeholder="请输入您的姓名" value="{$_W['fans']['nickname']}">
+		                <span id="spanname" class="span-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="txttelphone">手机号</label>
+                        <input type="text" class="form-control" id="txttelphone" name="telephone" placeholder="请输入您的手机号">
+                        <span id="spanphone" class="span-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="voteimg" class="sr-only">活动图片</label>
+                        {php echo tpl_form_field_image('image');}
+                        <span id="spanimg" class="span-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtdescribe" class="sr-only"></label>
+                        <textarea class="form-control" id="txtdescribe" name="resume" rows="3" maxlength="100" placeholder="你可以在为您上传的照片添加描述~"></textarea>
+                        <span id="spantext" class="span-error"></span>
+                    </div>
+                    <input type="button" class="btn btn-default btn1" id="joinsubmit" value="确认提交" />
+                    <input type="button" class="btn btn-default btn2" onclick="location.href='{php echo $this->createMobileUrl('index',array('voteid'=>$voteid))}'" value="返回首页" />
+                    <input name="token" type="hidden" value="{$_W['token']}" />
+                </form>
+            </div>
+        </div>
+        <!-- 审核中 -->
+        <div class="checking">
+            <img src="{MODULE_URL}template/img/icon/checking.png">
+            <p>正在审核中，请稍后</p>
+        </div>
+        <!-- 报名成功 -->
+        <div class="joinok">
+            <img src="{MODULE_URL}template/img/icon/ok.png">
+            <p>恭喜您，报名成功</p>
+            <br>
+            <span>您的编号为
+                <span class="font-orange">1025</span>，赶紧去找人帮您投票吧</span>
+            <br>
+            <a href="{php echo $this->createMobileUrl('index',array('voteid'=>$voteid))}">返回首页</a>
+        </div>
+        <!-- 详情 -->
+        <div class="detail">
+            <div class="order">
+                <div class="orderimg">
+                    <img src="" />
+                    <div class="info">
+                    </div>
+                </div>
+                <div class="imgcss">
+                    <img src="{MODULE_URL}template/img/icon/quotesleft.png" />
+                    <span class="desc">
+                    </span>
+                    <img src="{MODULE_URL}template/img/icon/quotesright.png" />
+                </div>
+                <div class="orderfooter clearfix">
+                    <a href="#" class="btn1">
+                        <img src="{MODULE_URL}template/img/icon/like_white.png" />给TA投票</a>
+                    <a href="javascript:$('.sharehelp').show();" class="btn2">
+                        <img src="{MODULE_URL}template/img/icon/share.png" />为TA拉票</a>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+    </section>
+    <!-- ======================================排行====================================== -->
+    <section id="ranking" class="transition ranking">
+        <div class="top">
+            排行榜
+        </div>
+        <div class="table">
+            <table>
+                <tr class="headtr">
+                    <td>&nbsp;</td>
+                    <td>名次</td>
+                    <td style="width:28%">封面图</td>
+                    <td style="width:18%">编号</td>
+                    <td style="width:18%">姓名</td>
+                    <td style="width:18%">票数</td>
+                </tr>
+                {loop $rankings $key $item}
+                <tr class="bodytr {if $mydata['id']==$item['id']}active{/if}">
+                    <td class="text-right">
+                        <img class="fpimg" src="{if $key==0}{MODULE_URL}template/img/icon/ranking1.png{elseif $key==1}{MODULE_URL}template/img/icon/ranking2.png{elseif $key==2}{MODULE_URL}template/img/icon/ranking3.png{/if}"
+                        />
+                    </td>
+                    <td>{php echo ++$key}</td>
+                    <td>
+                        <img class="fmtimg" src="{php echo tomedia($item['image'])}" />
+                    </td>
+                    <td>{$item['id']}</td>
+                    <td>{$item['username']}</td>
+                    <td>{$item['display_poll_count']}</td>
+                </tr>
+                {/loop}
+            </table>
+        </div>
+    </section>
+    <!-- ======================================规则====================================== -->
+    <section id="rule" class="transition rule">
+        <div class="head">活动规则介绍</div>
+        <div class="content">
+            {php echo html_entity_decode($data['introduce'])}
+        </div>
+    </section>
+    <!-- ======================================底部====================================== -->
+    <div id="votefooter" class="votefooter">
+        <ul class="row">
+			<li class="col-xs-3 col-md-3" topage="index"><i class="glyphicon glyphicon-home"></i><br/>首页</li>
+            <li class="col-xs-3 col-md-3" topage="ranking"><i class="glyphicon glyphicon-stats"></i><br/>排行</li>
+
+            <div class="col-xs-3 col-md-3"><i class="glyphicon glyphicon-search" onclick="$('#box').show();$('#black').show();" ></i><br/>搜索</div>
+            <li class="col-xs-3 col-md-3" topage="joinbox"><i class="glyphicon glyphicon-plus-sign"></i><br/>报名</li>            <li class="col-xs-3 col-md-3" topage="rule"><i class="glyphicon glyphicon-info-sign"></i><br/>规则</li>
+        </ul>
+    </div>
+    <div class="sharehelp"></div>
+</article>
+{template 'common/footer'}
+<script src="{MODULE_URL}template/js/common.js"></script>
+<script>
+    var title = "{$data['title']}";
+    var imgurl = "{php echo tomedia($data['picture'])}";
+    var projectname = "{MODULE_ID}";
+    var rootpath = "{$_W['siteroot']}";
+    var modulepath = "{MODULE_URL}";
+    var myjoinid = "{$mydata['id']}";
+    var myjoinstate = "{$mydata['check_state']}"; //0待审核 1审核成功 2审核失败
+    var voteid = "{$voteid}";
+    var joinid = "{$joinid}";
+    var start = 0;
+    var limit = 10;
+</script>

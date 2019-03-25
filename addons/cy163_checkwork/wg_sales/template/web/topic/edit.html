@@ -1,0 +1,129 @@
+{template 'common/header'}
+<div class="clearfix">
+    <form id="theforms" class="form form-horizontal" action="" method="post">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                编辑文章
+            </div>
+            <div class="panel-body">
+                <div class="panel-body">
+                    <input type="hidden" id="id" class="form-control span7" name="id" value="{$topic['id']}">
+                    <div class="form-group url-hide" style="<?php if($slider['jump']==1){echo 'display:none;';}?>">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">展现类型</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <select id="category" name="category_id" class="form-control" style='width:20%;'>
+                                {loop $article_type $id $row}
+                                <option <?php if($topic['type'] == $id){ echo 'selected';}?> value="{$id}">{$row}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">标题</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <input placeholder="不能为空" type="text" id="title" class="form-control span7" name="title" value="{$topic['title']}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">摘要</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <textarea placeholder="不能为空" type="text" id="text" class="form-control span7" name="text">{$topic['text']}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <input placeholder="整数" type="number" id="display_order" class="form-control span7" name="display_order" value="{$topic['display_order']}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">顶部展示图</label>
+                        <div class="col-sm-9 col-xs-12">
+                            {php echo $this->form_field_image('pic',$topic['image'])}
+                            <div style="color: red;">最佳尺寸：220*145px，比例（1.5：1）</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-md-2 col-lg-1">
+                        <input name="submit" id="submit_form" type="submit" value="保存" class="btn btn-primary btn-block" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+require(['jquery','datetimepicker'], function ($,UM) {
+
+    $('.time_pick').datetimepicker({
+        format: 'Y-m-d H:i:s',
+        language: 'zh-CN',
+        step:10,
+        startDate:new Date()
+
+    });
+
+    $('#jump').change(function () {
+        if($(this).val()==0) {
+            $('.url-show').hide();
+            $('.url-hide').show();
+        }else{
+            $('.url-show').show();
+            $('.url-hide').hide();
+        }
+    });
+    $("#theforms").submit(function(e){
+        if($.trim($('#title').val()) == '') {
+            alert('标题不能为空');
+            return false;
+        }
+        if($("#jump").val() == 1 && $("#url").val() == "") {
+            alert('跳转地址不能为空');
+            return false;
+        }
+        if($("#jump").val() == 0 && $("#article_id").val() <= 0) {
+            alert('文章ID不能为空');
+            return false;
+        }
+        if($("[name='pic']").val() == '') {
+            alert('图片不能为空');
+            return false;
+        }
+
+        var startTime=$("#start").val();
+        var start=new Date(startTime.replace("-", "/").replace("-", "/"));
+        var endTime=$("#end").val();
+        var end=new Date(endTime.replace("-", "/").replace("-", "/"));
+        if(end<=start){
+            alert('结束时间要大于开始时间');
+            return false;
+        }
+    });
+    var url_article = "{php echo $this->createWebUrl('article', ['_wg' => 'getOne'])}";
+    $('#spider_news').click(function () {
+        var article_id = $('#article_id').val();
+        $.post(url_article,{article_id:article_id,category_id:$('#category').val()},function (data) {
+            if(data.code!=0) {
+                alert(data.msg);
+            } else {
+                $('#title').val(data.data.title);
+                if(data.data.image.length > 0) {
+                    $("[name='pic']").val(data.data.image[0].url);
+                    $("[name='pic']").attr("filename",data.data.image[0].url);
+                    $("[name='pic']").attr("url",data.data.image[0].url);
+                    $('.img-responsive').attr('src', data.data.image[0].url);
+                } else {
+                    $("[name='pic']").val('');
+                    $('.img-responsive').attr('src', '');
+                }
+            }
+        },'JSON');
+    });
+
+});
+</script>
+{template 'common/footer'}

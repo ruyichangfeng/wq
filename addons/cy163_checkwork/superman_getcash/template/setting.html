@@ -1,0 +1,273 @@
+{template 'common/header'}
+<div class="main">
+	<form class="form-horizontal form" id="form2" action="" method="post" enctype="multipart/form-data">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				基本参数
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">开启</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<label class="checkbox-inline">
+							<input type="radio" name="base[open]" value="1" {if $this->module['config']['base']['open']}checked{/if}> 是
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="base[open]" value="0" {if !$this->module['config']['base']['open']}checked{/if}> 否
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">允许重复申请</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<label class="checkbox-inline">
+							<input type="radio" name="base[allow_repeat]" value="1" {if $this->module['config']['base']['allow_repeat']}checked{/if}> 是
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="base[allow_repeat]" value="0" {if !$this->module['config']['base']['allow_repeat']}checked{/if}> 否
+						</label>
+						<span class="help-block">当有正在处理中的提现申请时，是否允许再次提交提现申请</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				提现参数
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">最低提现金额</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<div class="input-group">
+							<input type="text" class="form-control" name="getcash[min]" value="{php echo $this->module['config']['getcash']['min']}" />
+							<div class="input-group-addon">元</div>
+						</div>
+						<span class="help-block">满足最低提现金额要求时，方可申请提现，否则无法申请提现，支持填写最低1元</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">提现比率</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<div class="input-group">
+							<input id="getcash_radio" type="number" class="form-control" name="getcash[ratio]" min="0" step="0.01" value="{php echo $this->module['config']['getcash']['ratio']}">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-default">
+									<span class="getcash_type_title">{php echo $credits[$this->module['config']['getcash']['type']]['title']}</span>
+								</button>
+								<button type="button" class="btn btn-default">兑1元</button>
+							</div>
+						</div>
+						<span class="help-block">提现比率默认1:1</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">提现积分类型</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<select class="form-control" name="getcash[type]" id="getcash_type">
+							{loop $credits $key $item}
+							<option value="{$key}" data-getcash-type-title="{$item['title']}" {if $this->module['config']['getcash']['type']==$key}selected{/if} {if !$item['title']}disabled{/if}>{if $item['title']}{$item['title']}{else}未设置{/if}（{$key}）</option>
+							{/loop}
+						</select>
+						<span class="help-block">请选择提现的积分类型，申请提现时，将自动关联对应的积分类型，提现成功自动扣减对应积分</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">真实姓名必填</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<label class="checkbox-inline">
+							<input type="radio" name="getcash[realname]" value="1" {if $this->module['config']['getcash']['realname']}checked{/if}> 是
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="getcash[realname]" value="0" {if !$this->module['config']['getcash']['realname']}checked{/if}> 否
+						</label>
+						<span class="help-block">申请提现时需要填写收款账号姓名，微信支付时将校验姓名是否正确，如校验失败将无法支付，真实姓名为可选参数</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">微信公众号APPID</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<input type="text" class="form-control" name="getcash[wxpay][mch_appid]" value="{php echo $this->module['config']['getcash']['wxpay']['mch_appid']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">微信支付商户号</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<input type="text" class="form-control" name="getcash[wxpay][mchid]" value="{php echo $this->module['config']['getcash']['wxpay']['mchid']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">微信支付证书</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<input type="file" name="getcash[wxpay][apiclient_cert]" value="{php echo $this->module['config']['getcash']['wxpay']['apiclient_cert']}">
+						<span class="help-block">证书下载解压后，默认文件名为：apiclient_cert.pem</span>
+						<span class="help-block">
+							{if $this->module['config']['getcash']['wxpay']['apiclient_cert']!=''}
+							<a href="{php echo tomedia($this->module['config']['getcash']['wxpay']['apiclient_cert'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['wxpay']['apiclient_cert']}）</a><br/>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="getcash[wxpay][del_apiclient_cert]"> 删除
+							</label>
+							{/if}
+						</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">微信支付证书密钥</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<input type="file" name="getcash[wxpay][apiclient_key]" value="{php echo $this->module['config']['getcash']['wxpay']['apiclient_key']}">
+						<span class="help-block">证书下载解压后，默认文件名为：apiclient_key.pem</span>
+						<span class="help-block">
+							{if $this->module['config']['getcash']['wxpay']['apiclient_key']!=''}
+							<a href="{php echo tomedia($this->module['config']['getcash']['wxpay']['apiclient_key'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['wxpay']['apiclient_key']}）</a><br/>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="getcash[wxpay][del_apiclient_key]"> 删除
+							</label>
+							{/if}
+						</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">微信支付CA证书</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						<input type="file" name="getcash[wxpay][rootca]" value="{php echo $this->module['config']['getcash']['wxpay']['rootca']}">
+						<span class="help-block">证书下载解压后，默认文件名为：rootca.pem</span>
+						<span class="help-block">
+							{if $this->module['config']['getcash']['wxpay']['rootca']!=''}
+							<a href="{php echo tomedia($this->module['config']['getcash']['wxpay']['rootca'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['wxpay']['rootca']}）</a><br/>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="getcash[wxpay][del_rootca]"> 删除
+							</label>
+							{/if}
+						</span>
+					</div>
+				</div>
+				<!--支付宝批量付款接口-->
+				<!--<div class="alert alert-danger">
+					由于支付宝付款接口服务费较高（单笔费率0.5%，最低1元/笔，最高25元/笔），相比微信支付免费显得有点鸡肋，所以未开放付款接口，如有需要请联系客服定制。
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">
+						<a href="javascript:;" data-show="0" id="show_alipay_param">[+] 支付宝参数</a>
+					</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+					</div>
+				</div>
+				<script>
+					$('#show_alipay_param').click(function() {
+						var t = this;
+						var show = $(t).attr('data-show');
+						$('#alipay_wrap').toggle('slow', function(){
+							if (show == 0) {
+								$(t).attr('data-show', '1');
+								$(t).html('[-] 支付宝参数');
+							} else {
+								$(t).attr('data-show', '0');
+								$(t).html('[+] 支付宝参数');
+							}
+						});
+					});
+				</script>
+				<div id="alipay_wrap" style="display: none">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝ID</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="text" class="form-control" disabled name="getcash[alipay][partner]" value="{php echo $this->module['config']['getcash']['alipay']['partner']}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝安全校验码</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="text" class="form-control" disabled name="getcash[alipay][key]" value="{php echo $this->module['config']['getcash']['alipay']['key']}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝签名方式</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="text" class="form-control" disabled name="getcash[alipay][sign_type]" value="{php echo $this->module['config']['getcash']['alipay']['sign_type']}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝编码格式</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="text" class="form-control" disabled name="getcash[alipay][input_charset]" value="{php echo $this->module['config']['getcash']['alipay']['input_charset']}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝访问模式</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="text" class="form-control" disabled name="getcash[alipay][transport]" value="{php echo $this->module['config']['getcash']['alipay']['transport']}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝商户私钥证书</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="file" name="getcash[alipay][rsa_private_key]" value="{php echo $this->module['config']['getcash']['alipay']['rsa_private_key']}">
+							<span class="help-block">证书下载解压后，默认文件名为：rsa_private_key.pem</span>
+							<span class="help-block">
+								{if $this->module['config']['getcash']['alipay']['rsa_private_key']!=''}
+								<a href="{php echo tomedia($this->module['config']['getcash']['alipay']['rsa_private_key'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['alipay']['rsa_private_key']}）</a><br/>
+								<label class="checkbox-inline">
+									<input type="checkbox" name="getcash[alipay][del_rsa_private_key]"> 删除
+								</label>
+								{/if}
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝公钥证书</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="file" name="getcash[alipay][alipay_public_key]" value="{php echo $this->module['config']['getcash']['alipay']['alipay_public_key']}">
+							<span class="help-block">证书下载解压后，默认文件名为：alipay_public_key.pem</span>
+							<span class="help-block">
+								{if $this->module['config']['getcash']['alipay']['alipay_public_key']!=''}
+								<a href="{php echo tomedia($this->module['config']['getcash']['alipay']['alipay_public_key'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['alipay']['alipay_public_key']}）</a><br/>
+								<label class="checkbox-inline">
+									<input type="checkbox" name="getcash[alipay][del_alipay_public_key]"> 删除
+								</label>
+								{/if}
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 control-label">支付宝CA证书</label>
+						<div class="col-sm-6 col-md-8 col-xs-12">
+							<input type="file" name="getcash[alipay][cacert]" value="{php echo $this->module['config']['getcash']['alipay']['cacert']}">
+							<span class="help-block">证书下载解压后，默认文件名为：alipay_cacert.pem</span>
+							<span class="help-block">
+								{if $this->module['config']['getcash']['alipay']['cacert']!=''}
+								<a href="{php echo tomedia($this->module['config']['getcash']['alipay']['cacert'])}" target="_blank">点击下载（{php echo $this->module['config']['getcash']['alipay']['cacert']}）</a><br/>
+								<label class="checkbox-inline">
+									<input type="checkbox" name="getcash[alipay][del_cacert]"> 删除
+								</label>
+								{/if}
+							</span>
+						</div>
+					</div>
+				</div>-->
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label">提现说明</label>
+					<div class="col-sm-6 col-md-8 col-xs-12">
+						{php echo tpl_ueditor('getcash[desc]', $this->module['config']['getcash']['desc'])}
+						<span class="help-block">在申请提现页面说明提现步骤和流程，让会员了解提现过程，如：申请提现后，到账时间为3天</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input name="token" type="hidden" value="{$_W['token']}" />
+			<input type="submit" class="btn btn-primary" name="submit" value="提交" />
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+	require(['filestyle'], function($){
+		$(".form-group").find(':file').filestyle({buttonText: '上传文件'});
+	});
+	require(['jquery', 'util'],function($, u){
+		$("#getcash_type").change(function(){
+			var getcash_type_title = $(this).find("option:selected").attr('data-getcash-type-title');
+			$('.getcash_type_title').html(getcash_type_title);
+		});
+	});
+</script>
+{template 'common/footer'}

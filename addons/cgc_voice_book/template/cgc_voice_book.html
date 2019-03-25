@@ -1,0 +1,379 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+  <li {if $op== 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl($filename)}">绘本库管理</a></li>
+  <li {if $op== 'post' && empty($id)}class="active"{/if}><a href="{php echo $this->createWebUrl($filename,array('op'=>'post'))}">新建绘本</a></li>
+  {if !empty($id)}<li class="active"><a>编辑绘本</a></li> {/if}
+</ul>
+{if $op=='display'}
+
+<div id="modal-module-menus"  class="modal fade" tabindex="-1">
+   <div class="modal-dialog" style='width: 520px;'>
+       <div class="modal-content">
+           <div class="modal-header"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h3>选择同步日期</h3></div>
+           <div class="modal-body" >
+               <div class="row">
+                   <div class="input-group">
+                   		{php echo tpl_form_field_date('begindate', '', false);}
+                   		<span class="input-group-addon">至</span>
+						{php echo tpl_form_field_date('enddate', '', false);}
+                       <span class='input-group-btn'><button type="button" class="btn btn-default" onclick="init_import2();">同步</button></span>
+                   </div>
+               </div>
+               <div id="module-menus" style="padding-top:5px;"></div>
+            </div>
+            <div class="modal-footer"><a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a></div>
+        </div>
+    </div>
+</div>
+
+<form action="./index.php" id="form1" method="get" class="form-horizontal" role="form">
+<div class="panel panel-info">
+  <div class="panel-heading">筛选</div>
+  <div class="panel-body">
+      <input type="hidden" name="c" value="site" />
+      <input type="hidden" name="a" value="entry" />
+      <input type="hidden" name="m" value="{php echo $this->modulename}" />
+      <input type="hidden" name="do" value="{$filename}" />
+      
+            <div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">绘本名称</label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<input class="form-control" placeholder="" 
+					name="title"  type="text" value="{$_GPC['title']}">
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">绘本分类</label>
+				<div class="col-xs-12 col-sm-8 col-lg-9">
+					<select name="class" class="form-control">
+							<option value="">所有</option>
+							{loop $class_list $class}
+							<option value="{$class['id']}" {if $_GPC['class'] == $class['id']}selected{/if}>{$class['name']}</option>
+							{/loop}
+						</select>
+				</div>
+			</div>
+			
+		
+			
+	       <div class="form-group">
+				<div class=" col-xs-12 col-sm-2 col-lg-2" style="width:9%">
+					<button class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+				</div>					
+			</div>	
+
+  </div>
+</div>
+<div class="panel panel-info" style='display:none'>
+
+  <button  type="button" class="btn btn-default" onclick="init_import()">初始化记录</button>
+  
+  <button  type="button" class="btn btn-default" onclick="popwin = $('#modal-module-menus').modal();">云同步记录</button>
+  
+  <label><strong>全部记录:{$total}</strong></label>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">绘画本列表</div>
+  <div class="panel-body table-responsive" style="overflow: visible;">
+    <table class="table table-hover">
+      <thead class="navbar-inner">
+        <tr>
+           <th style="width:5%;">选择</th>
+          <th style="width: 15%;">绘本名称</th>
+          <th style="width: 10%;">分类</th>
+          <th style="width: 20%;">封面</th>
+          <th style="width: 15%;">音频地址</th>
+          <th style="width: 10%;">点击量</th>
+          <th style="width: 10%;">时间</th>
+          <th style="width: 20%;">操作</th>
+        </tr>
+      <tbody id="main">
+        {loop $list $row}
+        <tr>
+        	<td><input type="checkbox" name="id[]" value="{$row['id']}" class=""></td>
+          <td style="white-space: normal; word-break: break-all">{$row['title']}</td>
+          <td style="white-space: normal; word-break: break-all">{$row['class_name']}</td>
+          <td style="white-space: normal; word-break: break-all">
+          	<image src="{php echo tomedia($row['cover']);}" style="max-width: 100px; max-height: 100px; border: 1px dotted gray">
+          </td>
+          <td style="white-space: normal; word-break: break-all">{php echo tomedia($row['voice'])}</td>
+          <td style="white-space: normal; word-break: break-all">{$row['pv']}</td>
+          <td style="white-space: normal; word-break: break-all">{php echo date('Y-m-d H:i:s', $row['createtime'])}</td>
+          <td style="white-space: normal; word-break: break-all; overflow: visible;"> 
+          
+          	<div class="btn-group btn-group-sm">
+				<a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">入口 <span class="caret"></span></a>
+				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+					<li>
+						<a href="{$row['url']}" target="_blank"><i class="fa fa-external-link fa-fw"></i> 直接访问</a>
+					</li>
+					<li role="presentation">
+						<a href="javascript:;" onclick="displayUrl('{$row['url']}');"><i class="fa fa-link fa-fw"></i> 查看链接</a>
+					</li>
+					<li role="presentation">
+						<a href="javascript:;" onclick="displayQr('{php echo $_W['siteroot'] . 'web/'.substr($this->createWebUrl('qr', array('raw' => base64_encode($row['url']))),2)}');"><i class="fa fa-qrcode fa-fw"></i> 查看二维码</a>
+					</li>
+				</ul>
+			</div>       
+	   
+            <a href="{php echo $this->CreateWebUrl($filename,array('op'=>'post','id'=>$row['id']))}" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="编辑"><i class="fa fa-edit" ></i></a>
+            <a onclick="if(!confirm('确定删除，删除后数据不可恢复?')) return false;" href="{php echo $this->CreateWebUrl($filename,array('op'=>'delete','id'=>$row['id']))}" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="删除"><i class="fa fa-times"></i></a>
+          </td>
+        </tr>
+        {/loop}
+		<tr>
+						<td><input type="checkbox" name="" onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});"></td>
+						<td colspan="17">
+							<input type="hidden" id="op" name="op"/>
+						   	<a href="javascript:batch_del();" class="btn btn-default btn-primary" data-toggle="tooltip" data-placement="top" title="">批量删除</a>
+					   	
+						</td>
+					</tr>
+      </tbody>
+    </table>
+    </form>
+  </div>
+  {$pager}
+</div>
+</form>
+<script type="text/javascript">
+require(['bootstrap' ], function($) {
+  $('.btn').hover(function() {$(this).tooltip('show');},
+  function() {$(this).tooltip('hide');});
+});
+
+
+
+
+function fwUrl(url){
+  window.location.href=url;		
+}
+
+
+
+function displayUrl(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<p class="form-control-static" style="word-break:break-all">手机端链接: <br>'+ url + '</p>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>' + '<button type="button" class="btn btn-primary">复制直达链接</button>';
+    var diaobj = u.dialog('查看URL', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.on('shown.bs.modal', function() {u.clip(diaobj.find('.btn-primary')[0], url);});
+  diaobj.modal('show');
+  });
+}
+function displayQr(url) {
+  require(['jquery', 'util' ],function($, u) {
+    var content = '<div class="panel panel-default text-center"><img src="' + url + '" alt="二维码" class="img-rounded"></div>';
+    var footer = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>';
+    var diaobj = u.dialog('查看URL二维码', content, footer);
+    diaobj.find('.btn-default').click(function() {diaobj.modal('hide');});
+    diaobj.modal('show');
+  });
+}
+function delete_all() {
+  if (confirm('确认删除所有信息吗,删除完不可恢复?')) {
+    location.href = "{php echo $this->createWebUrl($filename, array('op' => 'delete_all'))}";
+  }
+}
+function batch_del() {
+  if (!confirm('确定批量删除吗?')){
+    return false;
+  }else {
+    $('#op').val('batch_del');
+    $('#form1').submit();
+  }
+}
+
+function init_import() {
+	  if (confirm('确认导入初始化绘画本?')) {
+	    location.href = "{php echo $this->createWebUrl($filename, array('op' => 'init'))}";
+	  }
+	}
+	
+	
+function init_import2() {
+	 
+	  var begindate = $("input[name='begindate']").val();
+	  var enddate = $("input[name='enddate']").val();
+	  if (confirm('确认同步 '+begindate+'至'+enddate+' 绘画本，同步成功后请自行修正分类?')) {
+	    location.href = "{php echo $this->createWebUrl($filename, array('op' => 'init','type'=>1))}"+"&begindate="+begindate+"&enddate="+enddate;
+	  }
+	}
+	
+$("#upfile").change(function(){
+  if($("#upfile").val() != ''){
+    $("#submit_form").submit();
+  }
+});
+
+function importhtml(){
+  $("#upfile").click();
+}
+
+</script>
+{/if}
+{if $op=='post'}
+<div class="main">
+  <form action="" method="post" class="form-horizontal form" id="form">
+    <div class="panel panel-default">
+      <div class="panel-heading">绘本</div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">绘本名称</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[title]" value="{$page_data['title']}" />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">绘本分类</label>
+          <div class="col-xs-12 col-sm-8">
+          	<select name="page_data[class]" class="form-control">
+				{loop $class_list $class}
+				<option value="{$class['id']}" {if $page_data['class'] == $class['id']}selected{/if}>{$class['name']}</option>
+				{/loop}
+			</select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+		    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">绘本封面</label>
+			  <div class="col-sm-5">
+			  {php echo tpl_form_field_image('page_data[cover]', $page_data['cover']);}
+					
+			</div>
+		 </div>
+		 
+		 <div class="form-group" style="display:">
+             <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
+             <div class="col-xs-12 col-sm-9">
+   			 <label class="radio-inline">
+   			 	<input type="radio" name="page_data[type]" value="0" {if empty($page_data['type'])||$page_data['type']==0} checked="checked" {/if}>音频
+   			 </label>
+                 <label class="radio-inline">
+                 	<input type="radio" name="page_data[type]" value="1" {if $page_data['type']==1} checked="checked" {/if}>腾讯视频
+                 </label>
+   			<span class="help-block">
+   			  
+   				腾讯视频链接地址获取：腾讯视频页面=》分享=》复制通用代码，截取iframe中的src即是视频链接地址。
+   			</span>
+             </div>
+       	</div>
+    
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">音频/视频链接</label>
+          <div class="col-xs-12 col-sm-8">
+          	{php echo tpl_form_field_audio('page_data[voice]', $page_data['voice']);}
+          </div>
+        </div>
+       
+		<div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">简介</label>
+          <div class="col-xs-12 col-sm-8">
+          	<textarea class="form-control" rows="" cols="" name="page_data[intro]">{$page_data['intro']}</textarea>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">点击量</label>
+          <div class="col-xs-12 col-sm-8">
+            <input type="text" class="form-control" name="page_data[pv]" value="{$page_data['pv']}" />
+          </div>
+        </div>
+        
+               
+    
+        
+        
+        <div class="form-group">
+          <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">绘本内容</label>
+          <div class="col-xs-12 col-sm-8">
+          	<table class='table'>
+          		<thead>
+          		<tr>
+          			<th>图片</th>
+          			<th>文字内容</th>
+          			<th style="width: 80px;">操作</th>
+          		</tr>
+          		</thead>
+          		<tbody id="rule_items">
+          		{loop $page_data['content'] $item}
+          		<tr>
+          			<td>{php echo tpl_form_field_image('content[img][]', $item['img']);}</td>
+          			<td>
+          				<textarea class="form-control" rows="5" cols="" name="content[text][]">{$item['text']}</textarea>
+          			</td>
+          			<td>
+                        <a href='javascript:;' onclick='removeRuleItem(this)'>
+                        	&nbsp;<i class='glyphicon glyphicon-remove'></i>删除
+                        </a>
+                    </td>
+          		</tr>
+          		{/loop}
+          		{if count($page_data['content'])==0}
+          		<tr>
+          			<td>{php echo tpl_form_field_image('content[img][]', $item['img']);}</td>
+          			<td>
+          				<textarea class="form-control" style="height: 150px;" name="content[text][]">{$item['text']}</textarea>
+          			</td>
+          			<td>
+                        <a href='javascript:;' onclick='removeRuleItem(this)'>
+                        	&nbsp;<i class='glyphicon glyphicon-remove'></i>删除
+                        </a>
+                    </td>
+          		</tr>
+          		{/if}
+          		</tbody>
+          	</table>
+          	 <a href="javascript:;" onclick="addRuleItem();"><i class="glyphicon glyphicon-plus" title="添加绘本内容"></i>添加绘本内容</a>
+          </div>
+        </div>
+            
+      </div>
+    
+        <div class="form-group">
+          <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10 col-sm-offset-3 col-md-offset-2 col-lg-offset-2">
+            <input type="hidden" name="id" value="{$id}" />
+            <input name="submit" type="submit" value="提交" class="btn btn-primary" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </form>
+</div>
+
+<div style="display: none;">
+	<table >
+		<tbody id="contenttable">
+		<tr>
+			<td>{php echo tpl_form_field_image('content[img][]', '');}</td>
+			<td>
+				<textarea class="form-control" rows="5" cols="" name="content[text][]"></textarea>
+			</td>
+			<td>
+	             <a href='javascript:;' onclick='removeRuleItem(this)'>
+	             	&nbsp;<i class='glyphicon glyphicon-remove'></i>删除
+	             </a>
+	         </td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	function addRuleItem() {
+	    $("#rule_items").append($('#contenttable').html());
+	}
+	
+	function removeRuleItem(obj) {
+	    $(obj).parent().parent().remove();
+	}
+</script>
+
+
+
+{/if}

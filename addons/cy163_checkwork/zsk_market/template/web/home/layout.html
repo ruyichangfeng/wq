@@ -1,0 +1,307 @@
+{template 'public/header'}  
+<style type="text/css">
+	.advertpic{width: 100px; }
+	.goodstb th,td{padding:3px 10px;}
+</style>
+<div class="panel panel-info">
+	<div class="panel-heading" >首页设置</div>
+	<div class="panel-body">
+		<div class="row form-row">
+			<button class="btn btn-default" onclick="delNewData()">0.清空新数据</button>
+			<button class="btn btn-default" onclick="moveData()" style="margin-left:20px;">1.转移旧版数据</button>
+			<button class="btn btn-default" onclick="removeData()" style="margin-left:20px;">2.删除旧数据</button>
+			<p style="color:#ff4444;margin-top:20px;">旧版首页将在六月份关闭，请尽快使用新版首页，目前新旧版本都会显示，创建新首页后将旧首页删除或隐藏即可</p>
+		</div> 
+		<table class="table ">
+			<thead>
+				<tr>
+					<th style="width: 120px;">广告位</th> 
+					<th style="width: 150px;">广告</th>  
+					<th style="width: 100px;">预览图</th> 
+					<th style="width: 150px;">类型 / 跳转类型</th> 
+					<th style="width: 80px;">状态</th>
+
+					<th style="width: 80px;">排序</th>
+					<th style="width: 150px;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $mods $index $item}
+				<tr>
+
+					<td style="width: 120px;word-break: break-all;">
+					<?php if(count($item['children'])>0){ ?>
+						<span class="glyphicon glyphicon-plus" aria-hidden="true" sts="0" onclick="swithParentSts(this)" pid="{$item['id']}" style="color:#999;padding-right: 10px;"></span>
+						<?php }else{ ?> 
+						<span style="padding-right: 10px;">&nbsp;&nbsp;</span>
+						<?php } ?>
+					{$item['title']}</td> 
+					<td> 
+					</td>
+					<td> 
+						 
+					</td>
+					<td>
+						{$item['typename']}
+					</td>
+				 
+					<td> 
+					<?php if(intval($item['status'])>0){ ?>
+						<a class="linkbtn " onclick="status(0,{$item['id']},'{$item['title']}')">显示</a>
+					<?php }else { ?>
+						<a class="linkbtn linkbtn-gray" onclick="status(1,{$item['id']},'{$item['title']}')">隐藏</a>
+					<?php } ?>
+					</td>
+					<td>
+						{$item['sort']}
+					</td>
+					<td> 
+						<?php 
+						$btn="广告";
+						if($item['type']=="navbar"){
+							$btn="导航";
+						}
+						if($item['type']=="goods"){
+							$btn="商品";
+						}
+						if($item['type']=="swiper"){
+							$btn="轮播";
+						}
+						if($item['type']=="topic"){
+							$btn="专题";
+						}
+						if($item['type']=="hotgoods"){
+							$btn="商品";
+						}
+						if($item['type']=="notice"){
+							$btn="公告";
+						}
+						?>
+					 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit0');?>&aid={$item['id']}" class='linkbtn'>编辑</a>
+						<?php if($item['type']=='goods'){ ?> 
+						<a href="javascript:void(0);" class='linkbtn' onclick="addGoods({$item['id']},0)">添加{$btn}</a>
+						<?php } ?>
+						<?php if($item['type']=='hotgoods'){ ?> 
+						<a href="javascript:void(0);" class='linkbtn' onclick="addGoods({$item['id']},1)">添加{$btn}</a>
+						<?php } ?>
+						<?php if($item['type']=='advert'){ ?> 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$item['id']}" class='linkbtn'>添加{$btn}</a>
+						<?php } ?>
+						<?php if($item['type']=='notice'){ ?> 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$item['id']}" class='linkbtn'>添加{$btn}</a>
+						<?php } ?>
+						<?php if($item['type']=='navbar'){ ?> 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$item['id']}" class='linkbtn'>添加{$btn}</a>
+						<?php } ?>
+						<?php if($item['type']=='swiper'){ ?> 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$item['id']}" class='linkbtn'>添加{$btn}</a>
+						<?php } ?>
+						
+						<?php if($item['type']=='topic'){ ?> 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&pid={$item['id']}" class='linkbtn'>添加{$btn}</a>
+						<?php } ?>
+						 
+						
+						  
+						<a href="javascript:void(0);" onclick="deladvert({$item['id']},'{$item['title']}')" class='linkbtn linkbtn-red'>删除</a>
+						 
+						
+					</td>
+				</tr>
+				{loop $item['children'] $index2 $item2}
+					<tr style="display: none;"  parentid="{$item2['parentid']}" class="children" >
+					<td> 
+					</td>
+					<td  style="width: 150px;word-break: break-all;"> 
+					{$item2['title']}</td> 
+					<td> 
+						<img src="{$_W['attachurl']}{$item2['picture']}" style ="width:60px;"/>
+					</td>
+					<td>
+						{$item2['typename']}
+					</td>
+				 
+					<td> 
+					<?php if(intval($item2['status'])>0){ ?>
+						<a class="linkbtn " onclick="status(0,{$item2['id']},'{$item2['title']}')">显示</a>
+					<?php }else { ?>
+						<a class="linkbtn linkbtn-gray" onclick="status(1,{$item2['id']},'{$item2['title']}')">隐藏</a>
+					<?php } ?>
+					</td>
+					<td>
+						{$item2['sort']}
+					</td>
+					<td> 
+					 
+						<a href="<?php echo $this->routeUrl('homeadvert.edit1');?>&aid={$item2['id']}" class='linkbtn'>编辑</a> 
+						<?php if(intval($item2['default'])<1){?>
+						<a href="javascript:void(0);" onclick="deladvert({$item2['id']},'{$item2['title']}')" class='linkbtn linkbtn-red'>删除</a>
+						<?php }?>
+						
+					</td>
+				</tr>
+				{/loop}
+				{/loop}
+ 
+			</tbody>
+
+		</table>
+	</div>
+</div>
+<div id="addbox" style="display: none;">
+	<table class="table table-bordered"  >
+		<tr>
+			<td style="width:110px;vertical-align: middle;">名称</td>
+			<td >
+				<input type="text" class="form-control" name="name">
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 110px;vertical-align: middle;">类型</td>
+			<td  >
+				<select class="form-control" name="type">
+					<option value="advert">图片</option>
+					<option value="goods">商品</option>
+					<option value="navbar">导航栏</option>
+					<option value="swiper">轮播</option>
+					<option value="notice">公告栏</option>
+					<option value="coupon">优惠券</option>
+					<option value="search">搜索按钮</option>
+				</select>
+			</td>
+		</tr> 
+		<tr>
+			<td style="width:110px;vertical-align: middle;">排序</td>
+			<td >
+				<input type="number" class="form-control" name="sort">
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 110px;vertical-align: middle;">显示标题</td>
+			<td  >
+				<select class="form-control" name="showtitle">
+					<option value="1">是</option>
+					<option value="0">否</option> 
+				</select>
+			</td>
+		</tr>  
+		<tr>
+			<td style="text-align:center;vertical-align: middle;font-size:13px;" colspan="2">
+				添加完成后可通过“编辑”设置图片比例，是否显示标题等
+			</td> 
+		</tr>
+	</table>
+</div>
+<div id="goodsbox" style="display: none;">
+	<table class="table table-bordered"  >
+		<tr>
+			<td style="width:110px;vertical-align: middle;">选择商品</td>
+			<td >
+				<div class="input-group">
+			      <input type="text" placeholder="输入商品名称或编号,从搜索结果中选择" value="" id="goodskey" class="form-control" style="display: inline-block;" />
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button" style="display: inline-block;" onclick="searchGoods()">搜索</button>  
+			      </span>
+			    </div>  
+			</td>
+		</tr> 
+		<tr>
+			<td style="width:110px;vertical-align: middle;">搜索结果</td>
+			<td id="goodssearchRes">
+				 
+			</td>
+		</tr> 
+		<tr>
+			<td style="width:110px;vertical-align: middle;">排序</td>
+			<td >
+				<input type="number" class="form-control" name="sort">
+			</td>
+		</tr>
+	</table>
+</div>
+<script type="text/javascript">
+	function moveData(){
+		modalDlg("是否开始进行数据迁移？",function(){
+			window.location.href="<?php echo $this->routeUrl('diy.moveOldData');?>";
+		});
+	}
+	function delNewData(){
+		modalDlg("是否删除新数据（出现重复数据时使用，请确保旧数据还在）？",function(){
+			window.location.href="<?php echo $this->routeUrl('diy.delNewData');?>";
+		});
+	}
+	function removeData(){
+		modalDlg("是否删除旧数据？请确保首页已完成迁移",function(){
+			window.location.href="<?php echo $this->routeUrl('diy.removeOldData');?>";
+			 
+		});
+	}
+	function edit0(id){ 
+		var html="<form id='adform' method='post' action='<?php echo $this->routeUrl('homeadvert.saveAdvert');?>'><input type='hidden' value='1' name='sts'/>";
+		html+=$("#addbox").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#adform").submit();
+		});
+		//window.location.href="<?php echo $this->routeUrl('homeadvert.edit0');?>&aid="+id;
+	}
+	function addGoods(pid,ishot){
+		var html="<form id='goodsform' method='post' action='<?php echo $this->routeUrl('homeadvert.saveAdvert');?>'><input type='hidden' value='"+pid+"' name='pid'/><input type='hidden' value='goods' name='jumptype'/><input type='hidden' value='1' name='sts'/>";
+		if(ishot>0){
+			html+="<input type='hidden' value='hotgoods' name='type'/>";
+		}else{
+			html+="<input type='hidden' value='goods' name='type'/>";
+		}
+		html+=$("#goodsbox").html();
+		html+="</form>";
+		modalDlg(html,function(){
+			$("#goodsform").submit();
+		});
+	}
+	function status(sts,id,name){
+		var msg="隐藏";
+		if(parseInt(sts)==1)msg="显示";
+		console.log(id);
+		modalDlg("是否将 "+name+" "+msg,function(){
+			window.location.href="<?php echo $this->routeUrl('homeadvert.chgStatus');?>&aid="+id+"&status="+sts;
+		});
+	}
+	function deladvert(id,name){
+		modalDlg("是否删除"+name+"?",function(){
+			window.location.href="<?php echo $this->routeUrl('homeadvert.delAdvert');?>&aid="+id;
+		});
+	}
+	function swithParentSts(parent){
+		var sts=parseInt($(parent).attr("sts"));
+		if(sts==1){
+			$(parent).attr("class","glyphicon glyphicon-plus");
+			$(parent).attr("sts","0");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","none");
+		}else{
+			$(parent).attr("class","glyphicon glyphicon-minus");
+			$(parent).attr("sts","1");
+			$(".children[parentid='"+parseInt($(parent).attr("pid"))+"']").css("display","table-row");
+		}
+	}
+	function searchGoods(){
+		$.ajax({
+			url:"<?php echo $this->routeUrl('goods.search3');?>",
+			data:{name:$("#goodskey",$("#goodsform")).val()},
+			type:"post",
+			dataType:"json",
+			success:function(data){
+				console.log(data)
+				var html='<table class="goodstb table table-bordered"><tr><th >编号</th><th >名称</th><th >图片</th><th >操作</th></tr>';
+
+				$.each(data,function(i,v){
+					html+='<tr><td style="width:80px;">'+v.number+'</td><td style="text-align:left;word-break:break-all;">'+v.name+'</td><td style="width:50px;"><img src="{$_W['attachurl']}'+v.picture+'" style="width:50px;height:50px;"></td> <td style="width:100px;text-align:left;vertical-align:middle;"> <label class="checkbox-inline"> <input type="radio" name="goodsnum" id="goodsradiobox'+v.id+'" value="'+v.number+'"> 选择 </label> </td> </tr>';
+				});
+				html+="</table>";
+				console.log(html);
+				$("#goodssearchRes",$("#goodsform")).html(html);
+			}
+		})
+	}
+</script>
+{template 'public/footer'}

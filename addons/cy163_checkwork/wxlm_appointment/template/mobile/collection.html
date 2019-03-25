@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{php echo $this->config['system_name']}</title>
+    <link rel="stylesheet" href="{RES}mobile/css/dz_style.css">
+    <link rel="stylesheet" href="{RES}mobile/css/collection.css">
+    {template 'head'}
+    <style>
+        .load
+        {
+            line-height: 40px;
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f2f2f2; padding-bottom: 60px">
+<div class="dz-filehead">
+    <a href="{php echo $this->createMobileUrl('mine')}"><img src="{RES}mobile/images/left-new.png" class="goback"></a>
+    我的收藏
+</div>
+<div class="collection_list">
+    {loop $collection_res $key $item}
+    <a href="{$item['url']}">
+        <div class="lw-clooect">
+            <div class="lw-clooect-left lw-clooect-left-{$item['type']}"></div>
+            <div class="lw-clooect-center"><span>{$item['name']}</span></div>
+            <div class="lw-clooect-right"> <img src="{RES}mobile/images/right.png" alt=""> </div>
+            <li class="clear"></li>
+        </div>
+    </a>
+    {/loop}
+</div>
+    {if $page > 0}
+    <a class="load" href="javascript:load()">加载更多</a>
+    {/if}
+    {template 'foot'}
+    
+
+</body>
+<script>
+    var page = '{$page}';
+
+    function load() {
+
+        if (page == 0)
+        {
+            $('.load').html('已经到最底部');
+
+            return false;
+
+        } else
+        {
+            page++;
+
+            $.ajax({
+
+                url:"{php echo $this->createMobileUrl('LoadCollection')}" + "&page=" + page,
+                type:"get",
+                success:function (data) {
+
+                    if (data == '')
+                    {
+                        page = 0;
+                        $('.load').html('已经到最底部');
+
+                    } else
+                    {
+                        $('.collection_list').append(data);
+                    }
+
+                }
+            })
+        }
+    }
+</script>
+</html>

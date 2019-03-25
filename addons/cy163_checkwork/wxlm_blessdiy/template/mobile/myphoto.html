@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<title>{$cfg['sharetitle']}</title>
+{template 'head'}
+<script type="text/javascript">
+	wx.ready(function () {
+		sharedata = {
+			title: "{$member['member_slogan']}",
+			desc: "{$cfg['sharedesc']}",
+			link: "{$_W['siteroot']}app/{php echo str_replace('./','',$this->createMobileUrl('myphoto', array('recphoto'=>1,'templet_id'=>$member['member_templetid'],'member_id'=>$member['member_id'])))}",
+			imgUrl: "{php echo tomedia($member['member_pic_blessphoto'])}",
+			type: '', // 分享类型,music、video或link，不填默认为link
+			dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+			success: function(){
+			},
+			cancel: function(){
+			}
+		};
+		wx.onMenuShareAppMessage(sharedata);
+		wx.onMenuShareTimeline(sharedata);
+		wx.onMenuShareQQ(sharedata);
+		wx.onMenuShareWeibo(sharedata);
+		wx.onMenuShareQZone(sharedata);
+	});	
+</script>
+</head>
+<body class="bodybg">
+    <div id="" class="container-fluid" style="margin-bottom:15px; margin-top: -23px;">
+        <div style="margin-bottom:10px;"></div>
+        <img src="{$member['member_pic_blessphoto']}" class="img-thumbnail">
+
+		{if $cfg['act_state']==1&&$state}
+			<a href="javascript:locationhref(1);" style="display:block;text-align: center;margin:10px 0px; "><img src="{if $cfg['bonusbutton']!=''}../attachment/{$cfg['bonusbutton']}{else}{RES}images/baocun.png{/if}" alt="" width="60%"></a>
+        {/if}
+        {if $cfg['act_state']==1&&!$state}
+			<div style="height: 40px;line-height: 40px;font-size: 14px;text-align: center;margin: 10px 0px 0px;">{if $cfg['responed1']!=''}{$cfg['responed1']}{else}您已经成功参与本活动，请耐心等待领奖通知{/if}</div>
+        {/if}
+
+
+        {if $cfg['sharedesc']!=''&&$cfg['shareurl']!=""&&$cfg['sharethumb']!=''}
+        <div style="padding: 20px 0px;">
+        	<p style="text-indent:2em">
+        		{$cfg['sharedesc']}
+        	</p>
+        </div>
+        <div style="text-align: center;">
+        	{if $cfg['shareurl']!=""&&$cfg['sharethumb']!=''}
+			<a href="{$cfg['shareurl']}">
+				<img src="../attachment/{$cfg['sharethumb']}" class="img-thumbnail">	
+			</a>
+			{else if $cfg['sharethumb']!=''}
+				<img src="../attachment/{$cfg['sharethumb']}" class="img-thumbnail">	
+			{/if}
+        </div>
+        {/if}
+
+    </div>
+{template 'foot-msg'}
+
+<div class="modal fade bs-example-modal-lg" id="bmModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <form action="" method="post" id="addform" onSubmit="return checksubmit();" >
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="msgModalLabel"><strong>请填写信息</strong></h4>
+	      </div>
+      	  <div class="modal-body">
+	          <div class="form-group">
+	              <label for="name">姓名</label>
+	              <input type="text" class="form-control" name="log[log_name]" id="name" placeholder="请填写真实姓名">
+	          </div>
+	          <div class="form-group">
+	              <label for="tel">电话</label>
+	              <input type="tel" class="form-control" name="log[log_mobile]" id="tel" placeholder="请填写联系电话" oninput="if(value.length>11)value=value.slice(0,11)">
+	          </div>
+	          <div class="hidden">
+	              <input type="hidden" class="form-control" name="log_templetid" value="{$templet['templet_id']}">
+	              <input type="hidden" class="form-control" name="qf" value="create">
+	          </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	        <button type="submit" class="btn btn-primary" >提交</button>
+	      </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+function locationhref(qf)
+{
+	if(qf==1)
+	{
+		$.ajax({  
+	        type:"GET",
+	        url: "{php echo $this->createMobileUrl('checkedmember', array('qf'=>'MobLogVal'));}",
+	        dataType:"json",
+	        async:false,
+	        success:function(data){
+	            // //清空联动数据
+	           if(data.result==2)
+	           {
+	           		$('#bmModal').modal('show');
+	           }else{
+	           		window.location.href=data.rs;
+	           }
+	        }
+	    });
+		
+	}
+}
+function checksubmit()
+{
+	if($('input[name="log[log_name]"]').val() == ''){
+   	    alert('请填写真实姓名');
+   	    return false;
+   	}
+   	if($('input[name="log[log_tel]"]').val() == ''){
+   	    alert('请填写联系电话');
+   	    return false;
+   	}
+   	return true;
+}
+
+
+</script>
+</body>
+
+</html>

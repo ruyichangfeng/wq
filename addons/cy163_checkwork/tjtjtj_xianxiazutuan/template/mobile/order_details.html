@@ -1,0 +1,157 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">		
+	<title>确认订单</title>
+	<link rel="stylesheet" href="{APP_TEMP_PATH}css/weui.css"/>
+	<link rel="stylesheet" href="{APP_TEMP_PATH}css/example.css"/>
+	<script src="{APP_TEMP_PATH}js/zepto.min.js"></script>
+    <script src="{APP_TEMP_PATH}js/example.js"></script>
+</head>
+<style type="text/css">
+	input{-webkit-appearance:none;}
+	*{margin: 0px; padding:0px;}
+	body{background-color: #eee;}
+	div	{display: block;}
+	a {text-decoration: none;}
+	.weui_cells_access{margin-top: 0px;}
+	.weui_cell_primary p {font-size: 15px; margin-left: 1%; margin-top: 4px; margin-bottom: 4px; color: #666;}
+	.weui_cell_primary p span{font-size: 16px;}
+	.weui_cells_access .weui_cell_ft:after {content: " "; display: inline-block; -webkit-transform: rotate(45deg); transform: rotate(45deg); height: 17px; width: 17px; border-width: 2px 2px 0 0; border-color: #c8c8cd; border-style: solid; position: relative; top: -2px; top: -1px; margin-left: .3em;}
+
+	.line {background-color: #fff; margin-top: -2px;}
+	.goods{width: 100%; height: 120px; background-color: #fff;}
+	.goods img { margin-top: 17px; margin-left: 10px; border: 1px solid #eee;}
+	.goods p {font-size: 13px; margin-left: 30%; margin-top: -75px;}
+	.goods .fr{width: 35%; float: right; margin-top: 80px; margin-right: 5%;}
+	.goods .fr p {font-size:15px; color: #f43530; }
+	.goods .fr p span{font-size: 20px;}
+
+	.number{width: 100%; height: 100px; background-color: #fff; margin-top: 2px;}
+	.number .fl{width: 30%; float: left; margin-top: 32px; margin-left: 5%;}
+	.number .fl p{font-size: 17px;color: #555; font-weight: bold;}
+	.number .fr{width: 45%; float: right; margin-top: 27px; margin-right: 5%;}
+	
+	#min{width: 30px; height: 30px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; font-size: 14px; border: 1px solid #888; background-color: #fff; color: #aaa; font-weight: bold; }
+	#min:hover{color: #f43530;}
+    #text_box{width: 50%; height: 30px; font-size: 15px;text-align: center; border: 1px solid #888; background-color: #fff; color: #555; font-weight: bold;}
+    #add{width: 30px; height: 30px; border-top-right-radius: 5px;border-bottom-right-radius: 5px; font-size: 14px; border: 1px solid #888; background-color: #fff; color: #aaa; font-weight: bold;}
+    #add:hover{color: #f43530;}
+
+    .money{width: 100%; height: 85px; background-color: #f9f9f9; margin-top: 2px;}
+    .money p{float: right; margin-top: 40px; margin-right: 5%; font-size: 15px; color: #888;}
+    .money p span {font-size: 20px; color:#f43530; }
+
+    .paybtn{margin-top: 25px; margin-bottom: 10px;}
+
+</style>
+<body>
+
+	<form action="" method="post" onsubmit="return check();">
+		<input name="token" type="hidden" value="{$_W['token']}"/>
+		<input type="hidden" name="groupid" value="{$groups['groupid']}" />
+		<input type="hidden" name="goodsid" value="{$groups['uid']}" />
+		<input type="hidden" name="orderid" value="{php echo genOrderId();}">
+		<input type="hidden" name="buyway" value="{if $_GPC['action'] == 'groups'}groups{else}single{/if}">
+		<input type="hidden" name="fee" value="{if $_GPC['action'] == 'groups'}{$groups['gprice']}{else}{$groups['sprice']}{/if}" />
+		<input type="hidden" name="aid" value="{$_SESSION['order']['address']['uid']}" />
+
+
+	<div class="weui_cells weui_cells_access">
+		<a class="weui_cell" href="{php echo $this->createMobileUrl('account', array('action' => 'address_select', 'prev' => getCurUrl()))}">
+        	<div class="weui_cell_bd weui_cell_primary">
+        		<p><span><strong>{$address['name']}</strong>&nbsp;{$address['mobile']}</span></p>
+        		<p>{$address['province']}{$address['city']}{$address['county']}{$address['address']}</p>
+        	</div>
+        	<div class="weui_cell_ft" width="5%" height="20">
+        	</div>
+        </a>
+	</div>
+	<div class="line">
+		<img src="{APP_TEMP_PATH}images/line.png" width="100%">
+	</div>
+
+	<div class="goods">
+		<img src="{$_W['attachurl']}{$groups['logo']}" width="80px" height="80px">
+		<p>{$groups['name']}</p>
+		<div class="fr">
+			<p><strong><span>{if $_GPC['action'] == 'groups'}{$groups['gprice']}{else}{$groups['sprice']}{/if}</span>&nbsp;/件 &nbsp;{if $_GPC['action'] == 'groups'}组团价{else}单买价{/if}</p></strong>
+		</div>
+	</div>
+    <div class="number">
+    	<div class="fl">
+    		<p>购买数量：</p>
+    	</div>
+    	<div class="fr">
+			<input id="min" name="" type="button" value="一" />  
+			<input id="text_box" class="goodsnums" name="goodsnums" type="text" value="1" readonly="readonly" />
+			<input id="add" name="" type="button" value="十" />
+		</div>
+	</div>
+
+
+	<div class="money">
+		<p><strong>价格：<span class="all_fee">{if $_GPC['action'] == 'groups'}{$groups['gprice']}{else}{$groups['sprice']}{/if}</span>&nbsp;元</strong></p>
+		<p><strong>物流：<span class="">{$usd}</span>&nbsp;元</strong></p>
+	</div>
+
+<!-- 	<div class="weui_cells_title">选择支付方式</div>
+        <div class="weui_cells weui_cells_radio payway">
+
+            <label class="weui_cell weui_check_label wechat" for="x11">
+            	<img src="{APP_TEMP_PATH}images/wechat.png" width="8%" height="22">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p style="margin-left:2%;">微信</p>
+                </div>
+                <div class="weui_cell_ft">
+                    <input type="radio" class="weui_check" name="radio1" id="x11">
+                    <span class="weui_icon_checked"></span>
+                </div>
+            </label>
+            <label class="weui_cell weui_check_label alipay" for="x12">
+            	<img src="{APP_TEMP_PATH}images/alipay.png" width="8%" height="22">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p style="margin-left:2%;">支付宝</p>
+                </div>
+                <div class="weui_cell_ft">
+                    <input type="radio" name="radio1" class="weui_check" id="x12" checked="checked">
+                    <span class="weui_icon_checked"></span>
+                </div>
+            </label>
+        </div> -->
+
+        <div class="bd spacing paybtn">
+			<input type="submit" name="create" value="立即支付" class="weui_btn weui_btn_warn"/>
+        </div>
+	</form>
+	<script>
+		function check() {
+			var aid = $('input[name="aid"]').val();
+			if (aid == '' || aid == 0) {
+				alert('请选择地址');
+				return false;
+			}
+			return true;
+		}
+		$(function(){
+			var singlelimit = {$groups['singlelimit']};
+			var price       = parseFloat($('input[name="fee"]').val());
+			$('#add').click(function(){
+				var n = parseInt($('.goodsnums').val());
+				if (n < singlelimit) {
+					$('.goodsnums').val(n+1);
+					$('.all_fee').text((n+1)*price);
+				}
+			});
+
+			$('#min').click(function(){
+				var n = parseInt($('.goodsnums').val());
+				if (n > 1) {
+					$('.goodsnums').val(n-1);
+					$('.all_fee').text((n-1)*price);
+				}
+			});
+		});
+	</script>
+</body>
+</html>

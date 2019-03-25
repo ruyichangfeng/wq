@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{$webinfo['title']}</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+	<link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui2.css"/>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/style1/css/weui3.css"/>
+    <script src="{MODULE_URL}template/mobile/style1/js/zepto.min.js"></script>
+	<style>
+		.me{background-color: #f66216;color: #fff;padding:20px 10px;}
+        .me .info .points{text-align: center;font-weight: 700;}
+        .me .info .point_propor{text-align: center;margin-top:8px;font-size: 14px;}
+        .me .info .point_propor span{font-size: 20px}
+        .weui_cells_form .weui_btn_primary{margin:30px 15px;background-color: #f66216;}
+        .weui_cells_form .weui_btn_primary:hover{background-color: #f66216;}
+        .weui_cells_form .weui_btn_primary.hover{background-color: #ccc;}
+        
+        .title{background: #fff;margin: 10px 0 0;padding: 10px;color: #333;font-size: 14px;}
+
+        .nopoints{margin-top: 20px;}
+        .nopoints .icon{text-align: center;}
+        .nopoints .icon i:before{color: #dedede;font-size: 5em;}
+        .nopoints .noinfo{text-align: center;}
+        .nopoints .noinfo .notit{color: #999;line-height: 30px}
+        .nopoints .noinfo .nodesc{color: #ccc;line-height: 20px}
+
+        .weui_tab{height: auto;}
+        .weui_tab_bd{padding-bottom: 0;}
+        .points_list li{height: 50px;padding:10px 0 10px 3%;list-style-type: none;background-color: #fff;font-size: 12px;line-height: 25px;border-bottom: 1px solid #f8f8f8;}
+        .points_list .info{width:70%;float: left;}
+        .points_list .info p{color: #888;}
+        .points_list .info .tit{font-size: 14px;color: #333;}
+        .points_list .points{width:30%;float:right;text-align: center;font-size: 18px;color: #F66216;}
+        .points_list .points span{color: #ccc;font-size: 12px;display: block;}
+	</style>
+	<script>
+	</script> 
+</head>
+<body ontouchstart  class="page-bg">
+    <div class="me">
+        <div class="info">
+            <p class="points">{$setting['points_name']} : {$fans['points']}</p>
+            <p class="point_propor">{$setting['point_propor']}{$setting['points_name']}<span> = </span>1元</p>
+        </div>
+    </div>
+    <div class="weui_cells weui_cells_form">
+        <from action="" id="form">
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                <label for="" class="weui_label">账户类型</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select class="weui_select" id="account_type">
+                    <option value="微信钱包">微信钱包</option>
+                    <option value="支付宝">支付宝</option>
+                    <option value="银行账户">银行账户</option>
+                </select>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">提现账户</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" id="account" value="{$fans['account']}" required emptytips="提现账户不能为空" placeholder="请输入提现账户"/>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">提现{$setting['points_name']}</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" id="point" required emptytips="提现{$setting['points_name']}不能为空" pattern="^[1-9]\d*$" notmatchtips="{$setting['points_name']}格式错误" placeholder="最少需提现{$setting['min_point']}{$setting['points_name']}"/>
+            </div>
+        </div>
+        </from>
+        <a href="javascript:;" class="weui_btn weui_btn_primary {if $setting['min_point'] > $fans['points'] || $recharge}hover{/if}">{if $setting['min_point'] > $fans['points']}{$setting['points_name']}不足{elseif $recharge}请等待申请{else}申请提现{/if}</a>
+    </div>
+    <div class="title">提现记录</div>
+    <div class="weui_tab">
+        <div class="weui_tab_bd">
+            <div class="weui_panel weui_panel_access">
+                <div class="weui_panel_bd points_list" ></div>
+            </div>
+        </div>
+    </div>
+    {template 'style1/footer'}
+    <script src="{MODULE_URL}template/mobile/style1/js/updown.js"></script>
+	<script type="text/javascript">
+        {if $setting['min_point'] <= $fans['points'] && empty($recharge)}
+        $(".weui_btn").click(function(){
+            var $form = $("#form");
+            $form.form();
+            $form.validate(function(error){
+                if(error){
+
+                }else{
+                    var account_type = $("#account_type").val();
+                    var account = $("#account").val();
+                    var point = $("#point").val();
+
+                    if(account_type && account){
+                        if(point>{$fans['points']}){
+                            $.alert("你输入的{$setting['points_name']}数不能大于剩余{$setting['points_name']}数");
+                        }else if(point < {$setting['min_point']}){
+                             $.alert("提现{$setting['points_name']}不能低于{$setting['min_point']}");
+                        }else{
+                            var data = {account_type:account_type,account:account,point:point};
+                            $.showLoading("请稍后");
+                            $.ajax({
+                                url:"{php echo $this->createMobileUrl('me', array('op'=>'get_point_propor'), true)}",
+                                type:"post",
+                                dataType:"json",
+                                data:data,
+                                success:function(data){
+                                    $.hideLoading();
+                                    if(data.status){
+                                        $.toast("申请成功");
+                                        setTimeout("location.reload()",2000);
+                                    }else{
+                                        $.toast(data.info,"forbidden");
+                                    }
+                                },
+                                error:function(){
+                                    $.hideLoading();
+                                    $.toast("网络错误","forbidden");
+                                }
+                            });
+                        }
+                    }else{
+                        $.alert("账户不能为空");
+                    }
+                }
+            });
+        });
+        {/if}
+        //获取历史积分兑换记录
+        $(function() {
+            //页数 
+             var page = 0;
+            // 每页展示10个
+             var size = 10;
+            $('.weui_panel').dropload({
+                scrollArea: window,
+                autoLoad: true,
+                //自动加载
+                domDown: { //上拉
+                    domClass: 'dropload-down',
+                    domRefresh: '<div class="dropload-refresh f15 "><i class="icon icon-20"></i>上拉加载更多</div>',
+                    domLoad: '<div class="dropload-load f15"><span class="weui-loading"></span>正在加载中...</div>',
+                    domNoData: '<div class="dropload-noData">已显示所有记录</div>'
+                },
+                loadDownFn: function(me) { //加载更多
+                    page++;
+                    var result = '';
+                    $.ajax({
+                        type: 'GET',
+                        url: "{php echo $this->createMobileUrl('me', array('op'=>'get_point_propors'), true)}"+"&page="+page+"&size="+size,
+                        dataType: 'json',
+                        success: function(data) {
+                            var arrLen = data?data.length:0;
+                            if (arrLen > 0) {
+                                for (var i = 0; i < arrLen; i++) {
+                                    var status;
+                                    if(data[i].status == 0){
+                                        status = "等待审核";
+                                    }else if(data[i].status == 1){
+                                        status = "已提现";
+                                    }else if(data[i].status == 2){
+                                        status = "未通过";
+                                    }
+                                    result+='<li>'
+                                        +'<div class="info"><p class="tit">'+data[i].time+'</p><p>消耗'+data[i].points+'{$setting['points_name']}</p></div>'
+                                        +'<div class="points">'+data[i].price+'元<span>'+status+'</span></div>'
+                                        +'</li>';
+                                }
+                                // 如果没有数据
+                            } else {
+                                if(page === 1){
+                                    var nopoints = '<div class="nopoints">'
+                                            +'<div class="icon">'
+                                                +'<i class="weui_icon_info"></i>'
+                                            +'</div>'
+                                        +'<div class="noinfo">'
+                                        +'<p class="f16 notit">没有任何提现记录</p>'
+                                        +'<p class="f13 nodesc">获得的积分可申请提现，将{$setting["points_name"]}变为现金</p></div>'
+                                        +'</div>';
+                                    $(".weui_tab_bd").html(nopoints);
+                                }else{
+                                    // 锁定
+                                    me.lock();
+                                    // 无数据
+                                    me.noData();
+                                }
+                            }
+                            $('.weui_panel_bd').append(result);
+                            // 每次数据加载完，必须重置
+                            me.resetload();
+                        },
+                        error: function(xhr, type) {
+                            alert('出现错误，请稍后再试!');
+                            // 即使加载出错，也得重置
+                            me.resetload();
+                        }
+                    });
+                }
+            });
+        });
+	</script>
+</body>
+</html>

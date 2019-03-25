@@ -1,0 +1,103 @@
+<include file="Public/header.html"/>
+</head>
+<body>   
+    <div class="x-body">
+        <form class="layui-form x-center" action="{:U('Home/MainCtr/Insider/m_list')}"  method="post"  style="width:800px">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">注册时间</label>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="开始日" value="{$s_jtime}" name="s_jtime" id="s_jtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input class="layui-input" placeholder="截止日" value="{$e_jtime}"  name="e_jtime" id="e_jtime">
+                </div>
+                <div class="layui-input-inline">
+                  <input type="text" name="telephone" value="{$telephone}"  placeholder="请输入手机号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:80px">
+                    <button class="layui-btn" type="submit"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+              </div>
+            </div> 
+        </form>      
+      	<table class="layui-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户昵称 </th>  
+                    <th>性别</th>
+                    <th>联系手机</th>   
+                    <th>注册时间</th>
+                    <th>资料完善</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            
+           <form id="delform">
+            <tbody id="formdata">
+              <volist name="list" id="v">	
+                 <tr>
+                    <td>{$v.id}</td>
+                    <td>{$v.nickname}</td>
+                    <td ><?php if($v['sex'] == 1){ echo '男';}elseif($vo['sex'] == 2){ echo '女'; }else{ echo '保密'; }  ?> </td>
+                    <td >{$v.telephone}</td>
+                    <td><?php echo  date('Y-m-d H:i:s', $v['add_time']); ?></td>
+                    <td class="td-status">
+                    	<?php 
+                    		if($v['name'] == ''){ 
+                    		    echo '<span class="layui-badge">未完善 </span>';
+                    		}else {
+                    			echo '<span class="layui-badge layui-bg-green">已完善 </span>';
+                    	    }
+                    	 ?>
+                    </td>
+                    <td class="td-manage">
+                    	<a title="选定" href="javascript:;" onclick="m_post('{$v.id}','{$v.nickname}','{$v.telephone}');" class="ml-5" style="text-decoration:none">
+                        	<i class="layui-icon">&#xe618;</i>
+                        </a>
+                    </td>
+                </tr>
+              </volist>  
+            </tbody>
+          </form> 
+        </table>             	
+        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>       
+        <div id="page"></div>
+    </div>
+     <include file="Public/footer.html"/>    
+     <script>
+        layui.use(['laydate','element','laypage','layer'], function(){
+          var laydate = layui.laydate;//日期插件
+          var laypage = layui.laypage;//分页
+          var layer = layui.layer;//弹出层
+          $ = layui.jquery; 
+		  
+		  laypage.render({
+		   elem: 'page',
+		   count: {$count},
+		   limit: {$limit},
+		   curr : {$page}, 
+		   jump: function(obj, first){
+			   if(!first){ 
+			    var $purl = "{:U('Home/MainCtr/Insider/m_list',array('page'=>'pageval','s_jtime'=>$s_jtime,'e_jtime'=>$e_jtime,'telephone'=>$telephone))}"
+			    window.location.href= $purl.replace('pageval',obj.curr);  			
+			   }
+			}
+		  });
+          //时间选择器
+		  laydate.render({
+		    elem: '#s_jtime'
+		    ,type: 'datetime'
+		  });
+		   laydate.render({
+		    elem: '#e_jtime'
+		    ,type: 'datetime'
+		  });	   
+       	});  
+       	function m_post(id,name,phone){       		
+       		parent.m_post(id,name,phone);	
+       	}
+</script>      
+</body>
+</html>

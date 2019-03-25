@@ -1,0 +1,728 @@
+{template 'common/header'}
+<style type="text/css">
+	.move {
+		cursor: move;
+	}
+</style>
+<link href="{$resource['prefix']}../css/poster.css" rel="stylesheet">
+<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+<div class="main">
+	<ul class="nav nav-tabs">
+		{template 'nav'}
+		<a href="{php echo $this->createWebUrl('MakePoster');}" target="_blank" class="btn btn-success btn-sm pull-right"><i class="glyphicon glyphicon-plus"></i> 测试海报（保存后测试） </a>
+	</ul>
+	{if $data['html']['font']}
+	<div class="alert alert-success">
+		字体文件已下载，若无效，<a href="{php echo $this->createWebUrl('DownloadFont')}" target="_blank"> 点击这里重新下载</a>。
+	</div>
+	{else}
+	<div class="alert alert-danger">
+		字体文件未下载，<a href="{php echo $this->createWebUrl('DownloadFont')}" target="_blank">点击这里下载字体文件</a>。
+	</div>
+	{/if}
+	<form class="form-horizontal form" id="setting-form" action="" method="post">
+		<div class="panel panel-default">
+			<div class="panel-heading">海报设置</div>
+			<div class="panel-body">
+
+
+
+				<div class="alert alert-success">
+					<h4>海报生成说明</h4>
+					<p>
+						下面的拖拽式拼接海报模式可能会存在误差，有可能与服务器生成的图片、文字的位置存在小偏差。
+					</p>
+					<p>
+						若出现“水印文字过大”、“水印图片过大”、“某某过大”等类似的错误提示，请您按照实际情况去修改排版
+					</p>
+					<p>
+						尽量不让昵称靠最右边显示，可能会存在少部分昵称比较长的用户，就会造成海报生成失败。
+					</p>
+
+					<p><h4>海报清晰度</h4></p>
+					<p>目前海报清晰度是最清晰的程度，由于微信下发海报图片时会压缩图片，如果您觉得清晰度不足，请提示用户下载原图！</p>
+					<p>海报头像宽度，系统最大可设置头像宽度为用户头像实际的宽度，若您设置的宽度已经大于用户头像的尺寸，则无效</p>
+
+				</div>
+				<div class="form-group">
+					<div class="col-sm-11 col-xs-12">
+						<table style='width:100%;'>
+							<tr>
+								<td style="" valign="top">
+									<div id="poster">
+										<img src="" class="bg" style="display: none;"/>
+										<div class="poster-demo" style="z-index:1000;left:0px;top:0px;width:100px;height:100px">
+											<img id="qrcode-move" width="120px" height="120px" class="qrcode move" src="http://weixin.mywntc.com/addons/lonaking_new_gift_shop/template/css/qrcode.jpg" />
+											<img id="avatar-move" width="80px" height="80px" style="" class="avatar move" src="http://weixin.mywntc.com/addons/lonaking_new_gift_shop/template/css/avatar.jpg" />
+											<div id="nickname-move" class="move" style="font-size:20px;color:#2d2dd6;position: absolute;" >我是昵称</div>
+											<div id="invite-code-move" class="move" style="font-size:20px;color:#ce643f;position: absolute;display: none;" >邀请码</div>
+										</div>
+									</div>
+								</td>
+								<td style="text-align: left">
+									<div class="panel panel-default">
+										<div class="panel-body">
+											<input type="radio" class="hide" name="data[poster_type]" value="1" checked="true">
+											<div class="form-group">
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
+												<div class="col-sm-9 col-xs-12">
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_type]" value="1" {if $data['poster_type'] == '1'}checked="true"{/if}> 服务号
+													</label>
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_type]" value="2" {if $data['poster_type'] == '2'}checked="true"{/if}> 订阅号
+													</label>
+													<span class="help-block"><code>订阅号：</code>二维码统一，但是体验与服务号无本质区别，不需要用户输入验证码(该功能购买后方可使用)</span>
+													<span class="help-block"><code>服务号：</code>二维码为专属二维码!</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示头像</label>
+												<div class="col-sm-9 col-xs-12">
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_has_avatar]" value="0" {if $data['poster_has_avatar'] == '0'}checked="true"{/if}> 不显示
+													</label>
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_has_avatar]" value="1" {if $data['poster_has_avatar'] == '1'}checked="true"{/if}> 显示
+													</label>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label">显示昵称</label>
+												<div class="col-sm-9 col-xs-12">
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_has_nickname]" value="0" disabled {if $data['poster_has_nickname'] == '0'}checked="true"{/if}> 不显示
+													</label>
+													<label class="radio-inline">
+														<input type="radio" name="data[poster_has_nickname]" value="1" {if $data['poster_has_nickname'] == '1'}checked="true"{/if}> 显示
+													</label>
+												</div>
+											</div>
+											<div class="nickname-container">
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称颜色</label>
+													<div class="col-sm-9 col-xs-12">
+														{php echo tpl_form_field_color('data[poster_name_color]',$data['poster_name_color'])}
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称文字大小</label>
+													<div class="col-sm-6">
+														<div class="input-group">
+															<input type="number" name="data[poster_name_font_size]" value="{$data['poster_name_font_size']}" class="form-control"/>
+															<div class="input-group-addon">px</div>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">头像宽度</label>
+													<div class="col-sm-6">
+														<div class="input-group">
+															<input type="number" name="data[poster_avatar_side]" value="{$data['poster_avatar_side']}" class="form-control"/>
+															<div class="input-group-addon">px</div>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">二维码宽度</label>
+													<div class="col-sm-6">
+														<div class="input-group">
+															<input type="number" name="data[poster_qrcode_side]" value="{$data['poster_qrcode_side']}" class="form-control"/>
+															<div class="input-group-addon">px</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<!--
+											<div class="invite-code-container">
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">邀请码颜色</label>
+													<div class="col-sm-9 col-xs-12">
+														{php echo tpl_form_field_color('data[poster_invite_code_color]',$data['poster_invite_code_color'])}
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="col-xs-12 col-sm-3 col-md-2 control-label">邀请码文字大小</label>
+													<div class="col-sm-6">
+														<div class="input-group">
+															<input type="number" name="data[poster_invite_code_font_size]" value="{$data['poster_invite_code_font_size']}" class="form-control"/>
+															<div class="input-group-addon">px</div>
+														</div>
+													</div>
+												</div>
+											</div>-->
+
+											<div class="form-group" id="posterbg">
+												<label class="col-xs-12 col-sm-3 col-md-2 control-label">海报背景</label>
+												<div class="col-sm-9 col-xs-12" id="poster-bg-input">
+													{php echo tpl_form_field_image('data[poster_bg]',$data['poster_bg'])}
+													<span class="help-block">海报背景尺寸必须为: 640px * 1080px，必须为jpg格式，请尽量将图片保持在100-200kb左右</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="panel panel-default">
+			<div class="panel-heading">订阅号海报设置</div>
+			<div class="panel-body">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">引导关注链接</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[follow_redirect]"
+							   value="{$data['follow_redirect']}" required/>
+						<span class="help-block">引导关注链接，一般为微信图文关注链接，用户可点击公众号名称关注</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">海报规则详细设置</div>
+			<div class="panel-body">
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">海报名称</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[title]"
+							   value="{$data['title']}" required/>
+						<span class="help-block">仅用于活动标识</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">模式</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[mode]" value="1" {if $data['mode'] == '1'}checked="true"{/if}> {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}海报
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[mode]" value="2" {if $data['mode'] == '2'}checked="true"{/if}> 现金海报
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[mode]" value="3" {if $data['mode'] == '3'}checked="true"{/if}> {if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}＋现金海报
+						</label>
+						<span class="help-block">海报活动吸粉奖励模式</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">新用户关注奖励{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" name="data[subscribe_rewards_score]"
+							   value="{$data['subscribe_rewards_score']}"/>
+						<span class="help-block">用户通过海报邀请关注，所获的{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}奖励</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">新用户关注提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[subscribe_tip]"
+							   value="{php echo htmlspecialchars_decode($data['subscribe_tip'])}">{php echo htmlspecialchars_decode($data['subscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符</span>
+						<span class="help-block">可用变量:用户昵称<code>#{nickname}#</code>;邀请人<code>#{invite_user_name}#</code></span>
+
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">奖励级别</label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="data[deep]" value="1" {if $data['deep'] == '1'}checked="true"{/if}> 一级
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[deep]" value="2" {if $data['deep'] == '2'}checked="true"{/if}> 二级
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="data[deep]" value="3" {if $data['deep'] == '3'}checked="true"{/if}> 三级
+						</label>
+						<span class="help-block">海报活动奖励级别</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">关注奖励{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">一级奖励</span>
+									<input type="text" class="form-control" name="data[follow_score]" value="{$data['follow_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}，二级奖励</span>
+									<input type="text" class="form-control" name="data[second_follow_score]" value="{$data['second_follow_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}，三级奖励</span>
+									<input type="text" class="form-control" name="data[third_follow_score]" value="{$data['third_follow_score']}" />
+									<span class="input-group-addon" style="border-left:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block"><code>一级奖励：</code>直接邀请用户关注奖励</span>
+						<span class="help-block"><code>二级奖励：</code>直接下级邀请用户关注奖励</span>
+						<span class="help-block"><code>三级奖励：</code>直接邀请的下级直接邀请用户关注奖励</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">取消关注扣除{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">一级扣除</span>
+									<input type="text" class="form-control" name="data[unfollow_score]" value="{$data['unfollow_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}，二级扣除</span>
+									<input type="text" class="form-control" name="data[second_unfollow_score]" value="{$data['second_unfollow_score']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}，三级扣除</span>
+									<input type="text" class="form-control" name="data[third_unfollow_score]" value="{$data['third_unfollow_score']}" />
+									<span class="input-group-addon" style="border-left:none;">{if $this->module['config']['score_name']}{php echo $this->module['config']['score_name']}{else}积分{/if}</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block"><code>一级惩罚：</code>直接邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>二级惩罚：</code>直接下级邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>三级惩罚：</code>直接邀请的下级直接邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>注意：</code>为了防止刷分，建议将关注奖励积分和取消关注扣除积分设置为一致</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">关注奖励余额</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">一级奖励</span>
+									<input type="text" class="form-control" name="data[follow_money]" value="{$data['follow_money']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">余额，二级奖励</span>
+									<input type="text" class="form-control" name="data[second_follow_money]" value="{$data['second_follow_money']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">余额，三级奖励</span>
+									<input type="text" class="form-control" name="data[third_follow_money]" value="{$data['third_follow_money']}" />
+									<span class="input-group-addon" style="border-left:none;">余额</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block"><code>一级奖励：</code>直接邀请用户关注奖励</span>
+						<span class="help-block"><code>二级奖励：</code>直接下级邀请用户关注奖励</span>
+						<span class="help-block"><code>三级奖励：</code>直接邀请的下级直接邀请用户关注奖励</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">取消关注扣除余额</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="row row-fix">
+							<div class="col-sm-10 col-xs-10">
+								<div class="input-group">
+									<span class="input-group-addon" style="border-right:none;">一级扣除</span>
+									<input type="text" class="form-control" name="data[unfollow_money]" value="{$data['unfollow_money']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">余额，二级扣除</span>
+									<input type="text" class="form-control" name="data[second_unfollow_money]" value="{$data['second_unfollow_money']}" />
+									<span class="input-group-addon" style="border-left:none;border-right:none;">余额，三级扣除</span>
+									<input type="text" class="form-control" name="data[third_unfollow_money]" value="{$data['third_unfollow_money']}" />
+									<span class="input-group-addon" style="border-left:none;">余额</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block"><code>一级惩罚：</code>直接邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>二级惩罚：</code>直接下级邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>三级惩罚：</code>直接邀请的下级直接邀请用户取消关注惩罚扣除</span>
+						<span class="help-block"><code>注意：</code>为了防止刷分，建议将关注奖励余额和取消关注扣除余额设置为一致</span>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">三级用户通知自定义</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">邀请1级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[invitor_subscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['invitor_subscribe_tip'])}">{php echo htmlspecialchars_decode($data['invitor_subscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、奖励积分<code>#{reward_score}#</code>、奖励余额/现金<code>#{reward_amount}#</code></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">邀请2级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[second_invitor_subscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['second_invitor_subscribe_tip'])}">{php echo htmlspecialchars_decode($data['second_invitor_subscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人的上级发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、奖励积分<code>#{reward_score}#</code>、奖励余额/现金<code>#{reward_amount}#</code></span>
+						<span class="help-block"><code>提示：</code>仅在奖励级别大于2级的时候有效</span>
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">邀请3级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[third_intivtor_subscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['third_intivtor_subscribe_tip'])}">{php echo htmlspecialchars_decode($data['third_intivtor_subscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人的上级发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、奖励积分<code>#{reward_score}#</code>、奖励余额/现金<code>#{reward_amount}#</code></span>
+						<span class="help-block"><code>提示：</code>仅在奖励级别为3级的时候有效</span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">取消关注1级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[invitor_unsubscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['invitor_unsubscribe_tip'])}">{php echo htmlspecialchars_decode($data['invitor_unsubscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、扣除积分<code>#{reward_score}#</code>、扣除余额/现金<code>#{reward_amount}#</code></span>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">取消关注2级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[second_invitor_unsubscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['second_invitor_unsubscribe_tip'])}">{php echo htmlspecialchars_decode($data['second_invitor_unsubscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人的上级发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、扣除积分<code>#{reward_score}#</code>、扣除余额/现金<code>#{reward_amount}#</code></span>
+						<span class="help-block"><code>提示：</code>仅在奖励级别大于2级的时候有效</span>
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">取消关注3级提示</label>
+					<div class="col-sm-8">
+						<textarea cols="10" rows="5" class="form-control" name="data[third_invitor_unsubscribe_tip]"
+								  value="{php echo htmlspecialchars_decode($data['third_invitor_unsubscribe_tip'])}">{php echo htmlspecialchars_decode($data['third_invitor_unsubscribe_tip'])}</textarea>
+						<span class="help-block">用户通过海报邀请关注，得到的关注提示,不要超过200个字符,该提示是给邀请人的上级发送的</span>
+						<span class="help-block">可用变量:被邀请用户昵称<code>#{nickname}#</code>、邀请人<code>#{invite_user_name}#</code>、扣除积分<code>#{reward_score}#</code>、扣除余额/现金<code>#{reward_amount}#</code></span>
+						<span class="help-block"><code>提示：</code>仅在奖励级别为3级的时候有效</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<input type="text" class="form-control hide" name="data[id]" value="{$data['id']}" />
+		<input type="text" class="form-control hide" name="data[uniacid]" value="{if $data['uniacid']}{$data['uniacid']}{else}{$_W['uniacid']}{/if}" />
+		<input type="text" class="form-control hide" name="data[create_time]" value="{if $data['create_time']}{$data['create_time']}{else}{php echo time();}{/if}"/>
+		<input type="text" class="form-control hide" id="poster_name_position_x" name="data[poster_name_position_x]" value="{$data['poster_name_position_x']}"/>
+		<input type="text" class="form-control hide" id="poster_name_position_y" name="data[poster_name_position_y]" value="{$data['poster_name_position_y']}"/>
+		<input type="text" class="form-control hide" id="poster_qrcode_position_x" name="data[poster_qrcode_position_x]" value="{$data['poster_qrcode_position_x']}"/>
+		<input type="text" class="form-control hide" id="poster_qrcode_position_y" name="data[poster_qrcode_position_y]" value="{$data['poster_qrcode_position_y']}"/>
+		<input type="text" class="form-control hide" id="poster_invite_code_position_x" name="data[poster_invite_code_position_x]" value="{$data['poster_invite_code_position_x']}"/>
+		<input type="text" class="form-control hide" id="poster_invite_code_position_y" name="data[poster_invite_code_position_y]" value="{$data['poster_invite_code_position_y']}"/>
+		<input type="text" class="form-control hide" id="poster_avatar_position_x" name="data[poster_avatar_position_x]" value="{$data['poster_avatar_position_x']}"/>
+		<input type="text" class="form-control hide" id="poster_avatar_position_y" name="data[poster_avatar_position_y]" value="{$data['poster_avatar_position_y']}"/>
+
+		<div class="form-group col-sm-12">
+			<input name="token" type="hidden" value="{$_W['token']}" />
+			<input type="submit" class="btn btn-primary col-lg-1" name="submit" value="提交" />
+		</div>
+	</form>
+</div>
+<script>
+	var POSTER = {php echo json_encode($data)};
+	$(function () {
+		var nickname = document.getElementById("nickname-move");  // 得到nickname对象
+		var avatar = document.getElementById("avatar-move");  // 得到nickname对象
+		var qrcode = document.getElementById("qrcode-move");  // 得到nickname对象
+		var invite_code = document.getElementById("invite-code-move");  // 得到nickname对象
+
+
+		nickname.style.left = parseInt(POSTER.poster_name_position_x)/2 + "px";
+		nickname.style.top = parseInt(POSTER.poster_name_position_y)/2 + "px";
+
+		avatar.style.left = parseInt(POSTER.poster_avatar_position_x)/2 + "px";
+		avatar.style.top = parseInt(POSTER.poster_avatar_position_y)/2 + "px";
+
+		qrcode.style.left = parseInt(POSTER.poster_qrcode_position_x)/2 + "px";
+		qrcode.style.top = parseInt(POSTER.poster_qrcode_position_y)/2 + "px";
+
+		invite_code.style.left = parseInt(POSTER.poster_invite_code_position_x)/2 + "px";
+		invite_code.style.top = parseInt(POSTER.poster_invite_code_position_y)/2 + "px";
+
+		console.log("starting to listen poster background image");
+		loopListener();
+	});
+	var currentBg = "";
+	var currentNicknameFontSize = 20;
+	var currentNicknameFontColor = "";
+	var currentInviteCodeFontSize = 20;
+	var currentInviteCodeFontColor = "";
+	function loopListener(){
+		var bg = $("#poster-bg-input input[name='data[poster_bg]']").val();
+		console.log("bg = "+bg);
+		var nickname_font_size = $(".nickname-container input[name='data[poster_name_font_size]']").val();
+		var nickname_font_color = $(".nickname-container input[name='data[poster_name_color]']").val();
+		var invite_code_font_size = $("input[name='data[poster_invite_code_font_size]']").val();
+		var invite_code_font_color = $("input[name='data[poster_invite_code_color]']").val();
+
+		var hasNickname = $("input[name='data[poster_has_nickname]']:checked").val();
+		var hasAvatar = $("input[name='data[poster_has_avatar]']:checked").val();
+
+		var avatarSide = $("input[name='data[poster_avatar_side]").val();
+		var qrcodeSide = $("input[name='data[poster_qrcode_side]").val();
+
+		if(avatarSide == null || avatarSide == undefined || avatarSide == ""){
+
+		}else{
+			//不为空的时候
+			var webAvatarSide = parseInt(avatarSide)/2;
+			$("#avatar-move").width(webAvatarSide+"px");
+			$("#avatar-move").height(webAvatarSide+"px");
+		}
+
+		if(qrcodeSide == null || qrcodeSide == undefined || qrcodeSide == ""){
+
+		}else{
+			//不为空的时候
+			var webQrcodeSide = parseInt(qrcodeSide)/2;
+			$("#qrcode-move").width(webQrcodeSide+"px");
+			$("#qrcode-move").height(webQrcodeSide+"px");
+		}
+
+
+
+		console.log("hasNickname = "+hasNickname+",hasAvatar="+hasAvatar);
+
+
+		if(hasAvatar == 0){
+			$("#avatar-move").addClass('hide');
+		}else{
+			$("#avatar-move").removeClass('hide');
+		}
+		if(hasNickname == 0){
+			$("#nickname-move").addClass('hide');
+		}else{
+			$("#nickname-move").removeClass('hide');
+		}
+
+		console.log("starting to check bg...");
+		var bgUrl = $("#poster-bg-input input[name='data[poster_bg]']").parent().siblings(".input-group").children().attr("src");
+		console.log("src="+bgUrl);
+
+		if(currentBg != bgUrl){
+			currentBg = bgUrl;
+			$("#poster img.bg").attr("src",currentBg);
+			$("#poster img.bg").show();
+			console.log("背景ok...");
+		}
+
+		console.log("starting to check nickname font size...");
+		if(currentNicknameFontSize != nickname_font_size && nickname_font_size != undefined && nickname_font_size != null && nickname_font_size != ""){
+			$("#nickname-move").css("font-size",nickname_font_size+"px");
+			currentNicknameFontSize = nickname_font_size;
+			console.log("nickname文字大小ok...")
+		}
+
+		console.log("starting to check nickname font color...");
+		if(currentNicknameFontColor != nickname_font_color && nickname_font_color != undefined && nickname_font_color != null && nickname_font_color != ""){
+			$("#nickname-move").css("color",nickname_font_color);
+			currentNicknameFontColor = nickname_font_color;
+			console.log("nickname文字颜色ok...")
+		}
+
+
+		console.log("starting to check invite code font size...");
+		if(currentInviteCodeFontSize != invite_code_font_size && invite_code_font_size != undefined && invite_code_font_size != null && invite_code_font_size != ""){
+			$("#invite-code-move").css("font-size",invite_code_font_size+"px");
+			currentInviteCodeFontSize = invite_code_font_size;
+			console.log("invite code 文字大小ok...")
+		}
+
+		console.log("starting to check invite code font color...");
+		if(currentInviteCodeFontColor != invite_code_font_color && invite_code_font_color != undefined && invite_code_font_color != null && invite_code_font_color != ""){
+			$("#invite-code-move").css("color",invite_code_font_color);
+			currentInviteCodeFontColor = invite_code_font_color;
+			console.log("invite code 文字颜色ok...")
+		}
+
+		setTimeout(function () {
+			loopListener();
+		},1000);
+
+
+	}
+</script>
+<script type="text/javascript">
+	$(function () {
+		var disX = disY = 0;                         // 鼠标距离div的左距离和上距离
+		var nickname = document.getElementById("nickname-move");  // 得到nickname对象
+		var avatar = document.getElementById("avatar-move");  // 得到nickname对象
+		var qrcode = document.getElementById("qrcode-move");  // 得到nickname对象
+		var invite_code = document.getElementById("invite-code-move");  // 得到nickname对象
+
+		// 鼠标按下nickname时
+		nickname.onmousedown = function(e) {
+			var evnt = e || event;                   // 得到鼠标事件
+			disX = evnt.clientX - nickname.offsetLeft;   // 鼠标横坐标 - nickname的left
+			disY = evnt.clientY - nickname.offsetTop;    // 鼠标纵坐标 - nickname的top
+
+			// 鼠标移动时
+			document.onmousemove = function(e) {
+				var evnt = e || event;
+				var x = evnt.clientX - disX;
+				var y = evnt.clientY - disY;
+				var window_width  = document.documentElement.clientWidth  - nickname.offsetWidth;
+				var window_height = document.documentElement.clientHeight - nickname.offsetHeight;
+				var nicknameFontSize = $("input[name='data[poster_name_font_size]']").val();
+				if(nicknameFontSize == null || nicknameFontSize == "" || nicknameFontSize == undefined){
+					nicknameFontSize = 20;
+				}else{
+					nicknameFontSize = parseInt(nicknameFontSize);
+				}
+				window_width = 320 - nicknameFontSize * 4 - 10;
+				window_height = 540 - nicknameFontSize - 10;
+				x = ( x < 0 ) ? 0 : x;                          // 当nickname到窗口最左边时
+				x = ( x > window_width ) ? window_width : x;    // 当nickname到窗口最右边时
+				y = ( y < 0 ) ? 0 : y;                          // 当nickname到窗口最上边时
+				y = ( y > window_height ) ? window_height : y;  // 当nickname到窗口最下边时
+				nickname.style.left = x + "px";
+				nickname.style.top  = y + "px";
+				$("#poster_name_position_x").val(x*2);
+				$("#poster_name_position_y").val(y*2);
+				console.log("x="+$("#poster_name_position_x").val()+",y="+$("#poster_name_position_y").val());
+			};
+
+			// 鼠标抬起时
+			document.onmouseup = function() {
+				document.onmousemove =null;
+				document.onmouup = null;
+			};
+
+			return false;
+		};
+
+
+		// 鼠标按下avatar时
+		avatar.onmousedown = function(e) {
+			var evnt = e || event;                   // 得到鼠标事件
+			disX = evnt.clientX - avatar.offsetLeft;   // 鼠标横坐标 - avatar的left
+			disY = evnt.clientY - avatar.offsetTop;    // 鼠标纵坐标 - avatar的top
+
+			// 鼠标移动时
+			document.onmousemove = function(e) {
+				var evnt = e || event;
+				var x = evnt.clientX - disX;
+				var y = evnt.clientY - disY;
+				var window_width  = document.documentElement.clientWidth  - avatar.offsetWidth;
+				var window_height = document.documentElement.clientHeight - avatar.offsetHeight;
+				window_width = 320 - 90;
+				window_height = 540 - 90;
+				x = ( x < 0 ) ? 0 : x;                          // 当avatar到窗口最左边时
+				x = ( x > window_width ) ? window_width : x;    // 当avatar到窗口最右边时
+				y = ( y < 0 ) ? 0 : y;                          // 当avatar到窗口最上边时
+				y = ( y > window_height ) ? window_height : y;  // 当avatar到窗口最下边时
+				avatar.style.left = x + "px";
+				avatar.style.top  = y + "px";
+
+				$("#poster_avatar_position_x").val(x*2);
+				$("#poster_avatar_position_y").val(y*2);
+				console.log("x="+$("#poster_avatar_position_x").val()+",y="+$("#poster_avatar_position_y").val());
+			};
+
+			// 鼠标抬起时
+			document.onmouseup = function() {
+				document.onmousemove =null;
+				document.onmouup = null;
+			};
+
+			return false;
+		};
+
+		// 鼠标按下qrcode时
+		qrcode.onmousedown = function(e) {
+			var evnt = e || event;                   // 得到鼠标事件
+			disX = evnt.clientX - qrcode.offsetLeft;   // 鼠标横坐标 - qrcode的left
+			disY = evnt.clientY - qrcode.offsetTop;    // 鼠标纵坐标 - qrcode的top
+
+			// 鼠标移动时
+			document.onmousemove = function(e) {
+				var evnt = e || event;
+				var x = evnt.clientX - disX;
+				var y = evnt.clientY - disY;
+				var window_width  = document.documentElement.clientWidth  - qrcode.offsetWidth;
+				var window_height = document.documentElement.clientHeight - qrcode.offsetHeight;
+				window_width = 320 - 130;
+				window_height = 540 - 130;
+				x = ( x < 0 ) ? 0 : x;                          // 当qrcode到窗口最左边时
+				x = ( x > window_width ) ? window_width : x;    // 当qrcode到窗口最右边时
+				y = ( y < 0 ) ? 0 : y;                          // 当qrcode到窗口最上边时
+				y = ( y > window_height ) ? window_height : y;  // 当qrcode到窗口最下边时
+
+				qrcode.style.left = x + "px";
+				qrcode.style.top  = y + "px";
+
+				$("#poster_qrcode_position_x").val(x*2);
+				$("#poster_qrcode_position_y").val(y*2);
+				console.log("x="+$("#poster_qrcode_position_x").val()+",y="+$("#poster_qrcode_position_y").val());
+
+			};
+
+			// 鼠标抬起时
+			document.onmouseup = function() {
+				document.onmousemove =null;
+				document.onmouup = null;
+			};
+
+			return false;
+		};
+
+		// 鼠标按下invite_code时
+		invite_code.onmousedown = function(e) {
+			var evnt = e || event;                   // 得到鼠标事件
+			disX = evnt.clientX - invite_code.offsetLeft;   // 鼠标横坐标 - invite_code的left
+			disY = evnt.clientY - invite_code.offsetTop;    // 鼠标纵坐标 - invite_code的top
+
+			// 鼠标移动时
+			document.onmousemove = function(e) {
+				var evnt = e || event;
+				var x = evnt.clientX - disX;
+				var y = evnt.clientY - disY;
+				var window_width  = document.documentElement.clientWidth  - invite_code.offsetWidth;
+				var window_height = document.documentElement.clientHeight - invite_code.offsetHeight;
+				var inviteCodeFontSize = $("input[name='data[poster_invite_code_font_size]']").val();
+				if(inviteCodeFontSize == null || inviteCodeFontSize == "" || inviteCodeFontSize == undefined){
+					inviteCodeFontSize = 20;
+				}else{
+					inviteCodeFontSize = parseInt(inviteCodeFontSize);
+				}
+
+				window_width = 320 - inviteCodeFontSize*3 - 10;
+				window_height = 540 - inviteCodeFontSize - 10;
+				x = ( x < 0 ) ? 0 : x;                          // 当invite_code到窗口最左边时
+				x = ( x > window_width ) ? window_width : x;    // 当invite_code到窗口最右边时
+				y = ( y < 0 ) ? 0 : y;                          // 当invite_code到窗口最上边时
+				y = ( y > window_height ) ? window_height : y;  // 当invite_code到窗口最下边时
+
+				invite_code.style.left = x + "px";
+				invite_code.style.top  = y + "px";
+				//poster_invite_code_position_x
+				$("#poster_invite_code_position_x").val(x);
+				$("#poster_invite_code_position_y").val(y);
+				console.log("x="+$("#poster_invite_code_position_x").val()+",y="+$("#poster_invite_code_position_y").val());
+			};
+
+			// 鼠标抬起时
+			document.onmouseup = function() {
+				document.onmousemove =null;
+				document.onmouup = null;
+			};
+
+			return false;
+		};
+
+
+	});
+</script>
+{template 'common/footer'}

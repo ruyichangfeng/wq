@@ -1,0 +1,209 @@
+{template 'common/myheader'}
+<link href="../addons/zofui_groupshop/public/css/group.css" rel="stylesheet">
+<div id="page_group" class="page page-current  page_group">
+	
+	<div class="content" >
+		
+			<header class="header-banner banner-success">
+				<div class="banner">
+					<div>
+						<div class="avatar-wrap">
+							<div class="avatar">
+								{if $groupinfo['gstatus'] == 1}
+									<img src="../addons/zofui_groupshop/public/images/tuan_pic1.png">
+								{elseif $groupinfo['gstatus'] == 2 || $groupinfo['gstatus'] == 4}
+									<img src="../addons/zofui_groupshop/public/images/tuan_pic3.png">
+								{elseif $groupinfo['gstatus'] == 3}
+									<img src="../addons/zofui_groupshop/public/images/tuan_pic2.png">
+								{/if}
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="banner-info">
+							{if $groupinfo['gstatus'] == 1}
+								{if !empty($isingroup)}
+									<p>再邀请<em>{$groupinfo['lastnumber']}</em>个小伙伴参与就组团成功了</p>
+								{else}
+									<p>终于等到你，快来<em>参团</em>吧！</p>
+									<p>还差<em>{$groupinfo['lastnumber']}</em>个小伙伴就可以组团成功啦</p>
+								{/if}
+							{elseif $groupinfo['gstatus'] == 2 || $groupinfo['gstatus']  == 4}
+								<p>团购失败了！</p>								
+							{elseif $groupinfo['gstatus'] == 3}
+								<p>团购已成功！</p>
+							{/if}
+						</div>
+					</div>				
+				</div>
+			</header>
+		
+			
+		<!--商品详情-->
+		<div class="goods-detail router">
+			<div class="head-bar">
+				<div class="time-info">
+					<span class="little-timer">
+						<span class="slogan">团购商品</span>
+					</span>
+				</div>
+			</div>
+			<a href="{php echo $this->createMobileUrl('good',array('id'=>$groupinfo['gid']))}" class="item">
+				<div class="image">
+					<div>
+						<img src="{php echo tomedia($groupinfo['pic'])}"  />
+					</div>
+				</div>
+				<div class="info">
+					<p class="name">{$groupinfo['title']}</p>
+					<div class="price-info">
+						<div>
+						
+							<p class="price">
+								<span class="member">团购价格：</span>
+								<span class="sale-price">{$groupinfo['groupprice']}</span></span>
+								<span class="member">元/件</span>
+							</p>
+							<p class="origin-price">商品原价：<del>￥{$groupinfo['oldprice']}</del></p>
+						</div>
+					</div>
+				</div>
+			</a>
+			
+		</div>
+    
+		<!--参团人员信息-->
+		<div class="member-info">
+			<div class="head-bar">
+				<div class="time-info">
+					{if $groupinfo['gstatus'] == 1}
+						<span class="little-timer lasttime" id="little_timer" data-time="{$groupinfo['overtime']}">
+							<span class="slogan">本团于</span>
+							<span class='number day' id='day'>00</span><span>天</span>
+							<span class='number hour' id='hour'>00</span><span>:</span>
+							<span class='number minite' id='minite'>00</span><span>:</span>
+							<span class='number second' id='second'>00</span><span class="slogan"> 后结束</span>
+						</span>
+					{else}
+						<span class="little-timer" id="little_timer" >
+							<span class="slogan">{if $groupinfo['gstatus'] == 3}本团已完成{else}本团已结束{/if}</span>
+						</span>						
+					{/if}
+				</div>
+			</div>
+			<div class="member-list">
+				{if $groupinfo['gstatus'] == 1}
+					<div class="flag">已有{php echo $groupinfo['fullnumber'] - $groupinfo['lastnumber']}人参团，还需要{$groupinfo['lastnumber']}人，下一个会是你么？</div>
+				{elseif $groupinfo['gstatus'] == 2 || $groupinfo['gstatus'] == 4}
+					<div class="flag">真是遗憾，组团失败了</div>
+				{elseif $groupinfo['gstatus'] == 3}
+					<div class="flag">小伙伴太给力了，已组团成功了</div>					
+				{/if}
+				<ul class="list">
+				{loop $member $k $item}
+					{if $k <= 1}
+						<li>
+							<span class="avatar captain" style="background-image:url({$item['headimgurl']});"></span>
+							<span class="name">{$item['nickname']}</span>
+							<span class="time">{php echo date('Y-m-d H:i',$item['paytime'])}</span>
+						</li>
+					{/if}
+				{/loop}	
+				</ul>
+			</div>
+			<div class="member-avatar">
+				<ul class="avatar-list">
+				{loop $member $k $item}
+					{if $k > 1}						
+					<li class="">
+						<img src="{$item['headimgurl']}">
+					</li>
+					{/if}
+				{/loop}
+				</ul>
+				<li class="group_moremember"><span class="ti-angle-down"></span></li>
+			</div>			
+		</div>
+		<!--活动说明-->
+		<div class="block">
+			<div class="guide">
+				<a href="javascript:;" class="more-rules">
+					<span>玩法说明</span>
+				</a>
+				<div class="procedure">
+					<div class="pb">
+						<span class="pb-seq">1</span>
+						<div class="pb-text">
+							<p>选择</p>
+							<p>心仪商品</p>
+						</div>
+					</div>
+					<div class="interval">
+						<span class="interval-arrow"></span>
+					</div>
+					<div class="pb {if $groupinfo['status'] == 1 && !$isingroup}orange{/if}">
+						<span class="pb-seq">2</span>
+						<div class="pb-text">
+							<p>支付开团</p>
+							<p>或参团</p>
+						</div>
+					</div>
+					<div class="interval">
+						<span class="interval-arrow"></span>
+					</div>
+					<div class="pb {if $groupinfo['status'] == 1 && $isingroup}orange{/if}">
+						<span class="pb-seq">3</span>
+						<div class="pb-text">
+							<p>等待好友</p>
+							<p>参团支付</p>
+						</div>
+					</div>
+					<div class="interval">
+						<span class="interval-arrow"></span>
+					</div>
+					<div class="pb {if $groupinfo['status'] == 3}orange{/if}">
+						<span class="pb-seq">4</span>
+						<div class="pb-text">
+							<p>达到人数</p>
+							<p>组团成功</p>
+						</div>
+					</div>
+				
+				</div>
+				<div class="rule-text">
+					<span class="light"></span>
+					<span>支付开团并喊好友参团，组团成功后等待商家发货；如组团失败，则系统自动将款项原路退还。</span>
+				</div>
+			</div>
+		</div>
+
+		<img class="group_plane" src="../addons/zofui_groupshop/public/images/fly.png">
+		
+	</div>
+	
+	<div class="group_bottom">
+		<ul class="fixed_bottom {if $_W['isajax']}router{/if}">
+			{if $_W['isajax']}
+			<a href="javascript:;"><li class="fl" id="gotoback"><span class="ti-angle-left">返回</span></li></a>	
+			{else}
+				{if empty($_SERVER['HTTP_REFERER']) || !empty($_GPC['toindex'])}
+					<a href="{php echo $this->createMobileUrl('index')}"><li class="fl"><span class="ti-angle-left">主页</span></li></a>
+				{else}
+					<a href="{php echo $_SERVER['HTTP_REFERER']}"><li class="fl"><span class="ti-angle-left">返回</span></li></a>
+				{/if}
+			{/if}
+		{if $groupinfo['gstatus'] == 1}
+			{if empty($isingroup)}
+				<a href="{php echo $this->createMobileUrl('good',array('id'=>$groupinfo['gid'],'groupid'=>$groupinfo['id']))}"><li class="fr back_ff5f27">我要参团</li></a>			
+				<a href="{php echo $this->createMobileUrl('good',array('id'=>$groupinfo['gid']))}"><li class="fr back_fdd000">独立开团</li></a>
+			{else}
+				<a href="{php echo $this->createMobileUrl('good',array('id'=>$groupinfo['gid']))}"><li class="fr back_ff5f27">再开个团</li></a>			
+				<a href="javascript:;" class="call_family"><li class="fr back_fdd000">喊好友参团</li></a>
+			{/if}
+		{else}
+			<a href="{php echo $this->createMobileUrl('good',array('id'=>$groupinfo['gid']))}"><li class="fr back_ff5f27">重新开团</li></a>
+		{/if}
+		</ul>
+	</div>
+</div>
+{template 'common/basic_footer'}

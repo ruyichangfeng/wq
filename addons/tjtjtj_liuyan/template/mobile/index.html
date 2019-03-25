@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+	<meta name="format-detection" content="telephone=no" />
+    <meta charset="utf-8">
+    <title>{php echo $setting['title']}</title>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://res.layui.com/layui/src/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="http://res.layui.com/lay/lib/layer/src/skin/layer.css">
+    <script src="{ASSETS_PATH}js/amazeui.lazyload.js"></script>
+    <script src="{ASSETS_PATH}js/timeago.js"></script>
+    <script src="{ASSETS_PATH}js/layer.js"></script>
+    <style>
+        .userimg
+        img { width:40px; height:40px;}
+        .img1
+        img {width:300px; height:230px;}
+        .content {border-bottom:1px solid #CCCCCC;}
+        .userimg1
+        img { width:80px; height:80px;}
+        .fatie
+        img{
+			position: fixed;
+    bottom: 20px;
+    right: 15px;
+    z-index: 100;
+    width: 72px;
+    height: 72px;
+
+        }
+    </style>
+
+<script type="text/javascript">
+    $(function(){
+        $('body').timeago();
+    });
+
+</script> 
+</head>
+<body style="margin: 0px;padding: 0px;">
+<!--顶部图片-->
+<div class="header" style="width:100%; height:230px;">
+    <div clss="img1" style="width:100%; height:200px;">
+
+        <img src="{php echo tomedia($setting['banner'])}" width="100%" height="200px;" >
+    </div>
+    <div class="img2" style="position:relative; width:75px; height:75px; margin-top:-50px; margin-left:68%; border: 3px solid #FFFFFF;">
+        <img src="{$user['headimg']}" width="75px;" height="75px;" >
+    </div>
+</div>
+<!--帖子栏目-->
+<!--<div style="width: 50%;height: 35px;border: solid 1px aqua;margin: auto">
+    <a href="{php echo $fabu_url}"><input type="text" style="width: 100%;height: 36px;border: solid 1px aqua;color: #09BB07" value="发布留言!"></a>
+</div>-->
+
+<div id="ajax_add" class="ajax_add">
+    {loop $result $val}
+<div class="content" style="width:100%; margin-top:20px;" onClick="show_info({$val['uid']},{$val['id']})">
+    <div class="userimg" style="margin-top:10px; width:40px; height:40px; margin-left:10px; border: 1px solid #336699;">
+        <img src="{$val['headimg']}" width="30px;" height="30px;" >
+
+    </div>
+    <div class="username" style="margin-left:60px; margin-top:-58px; color:#666666;">
+        <p style="font-size:0.9em;"><strong>{$val['user']}</strong></p>
+    </div>
+
+	<div class="time1" style="margin-left:60px; margin-top:-12px; color:#999999;">
+        <p style="font-size:0.8em;"><time class="timeago" datetime="{php echo date("Y-m-d H:i:s",$val['time'])}">about 9 hours later</time></p>
+    </div>
+
+    <div class="usercontent" style="margin-left:60px; margin-top:-10px; color: #333333; margin-right:5px;">
+        <p style="font-size:0.9em;">{$val['info']}</p>
+    </div>
+    <div class="userimg1" style="margin-left:60px; margin-top:-10px; margin-right:5px; margin-bottom:15px;" >
+
+        {loop $val['img'] $v}
+        {if $v['name'] != ""}
+        <img class="lazy" data-original="{$v['name']}" width="80px" height="80px">
+        {/if}
+        {/loop}
+    </div>
+</div>
+    {/loop}
+    <div class="apend"></div>
+</div>
+
+
+<!--<div id="loading" pageindex="2" style="width:100px;margin: auto;margin-top: 10px">
+    <span id="load_text">加载更多...</span>
+</div>
+-->
+
+<!--底部栏目-->
+	<div class="fatie" style="margin-top:-50px;">
+		<a href="{php echo $fabu_url}"><img src="http://pub.idqqimg.com/qqun/xiaoqu/mobile/img/../img/publish-detail-icon.png?6427bee5)"></a>
+	</div>
+
+	<div style="margin-top:60px; margin-bottom:10px; font-size:0.8em; color:#333333;">
+      <div align="center"><span><b>{php echo $site['copy']}</b></span>
+        </div>
+	</div>
+
+	<div id="fbform" style="width: 400px;height: 300px;border: solid 1px aqua;margin: auto;position: relative;display: none">
+
+	</div>
+    <input type="hidden" id="pageindex" value="2">
+</body>
+
+<script>
+
+
+    $(document).ready(function () {
+        $("#fabu").on('click',function () {
+            $("#fbform").show();
+        });
+
+    });
+
+    function show_info(uid,lid) {
+        window.location.href = "{php echo $show_url}&uid="+uid+"&lid="+lid;
+    }
+
+    $("img.lazy").lazyload();
+
+
+</script>
+
+<script>
+    var sroltop = 0;  //用来监听当前的加载事件是否在执行
+    var page = 1; //当前页码
+    $(document).ready(function () {
+
+        $(window).scroll(function(){
+            var srollPos = $(window).scrollTop();    //滚动条距顶部距离(页面超出窗口的高度)
+            totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
+            if(($(document).height()) <= totalheight) {
+                if(sroltop == 0)
+                {
+                    page+=1
+                    load_data();
+                }
+            }
+        });
+    });
+    function load_data() {
+        sroltop = 1;
+        $.ajax({
+            url : "{php echo $this->createMobileUrl('Ajax')}",type:"post",
+            data:{
+                page : page
+            },beforeSend:function () {
+            },success:function (res) {
+                sroltop = 0;
+                //layer.closeAll();
+                if(res != 0)
+                {
+                    var data = $.parseJSON(res);
+                    var html = '';
+                    var name='';
+                    var banner='';;
+                    $.each(data,function (k,v) {
+                         banner=v.img
+                        var info=v.info.substr(0,50)
+                        $.each(banner,function (d,a) {
+                            if(a.name!='') {
+                                name += '<img class="lazy" src="' + a.name + '" width="80px" height="80px" style="padding: 1px 3px;">'
+                            }else{
+                                name='';
+                            }
+                        });
+                        //alert(name);
+                        html += '<div class="content" style="width:100%; margin-top:20px;" onClick="show_info('+v.uid+','+v.id+')">'+
+                                '<div class="userimg" style="margin-top:10px; width:40px; height:40px; margin-left:10px; border: 1px solid #336699;"><img src="'+v.headimg+'" width="30px;" height="30px;" ></div>' +
+                                '<div class="username" style="margin-left:60px; margin-top:-58px; color:#666666;">'+
+                                '<p style="font-size:0.9em;"><strong>'+v.user+'</strong></p> </div>'+
+                                '<div class="time1" style="margin-left:60px; margin-top:-12px; color:#999999;">'+
+                                '<p style="font-size:0.8em;"><time class="timeago" datetime="'+v.time+'">about 9 hours later</time></p></div>'+
+                                '<div class="usercontent" style="margin-left:60px; margin-top:-10px; color: #333333; margin-right:5px;">'+
+                                '<p style="font-size:0.9em;">'+info+'...</p></div>'+
+                                '<div class="userimg1" style="margin-left:60px; margin-top:-10px; margin-right:5px; margin-bottom:15px;" >'+ name+'</div>'+
+                                '</div>'
+
+                    });
+                    $(".ajax_add").append(html);
+
+                    $('.timeago').each(function () {
+
+
+                        $(this).timeago();
+
+
+                    });
+                }
+                else
+                {
+                    sroltop = 1;
+                }
+
+            }
+        });
+    }
+</script>
+
+<!--html += '<div class="content" style="width:100%; margin-top:20px;" onClick="show_info(v.uid,v.id)">'+
+    '<div class="userimg" style="margin-top:10px; width:40px; height:40px; margin-left:10px; border: 1px solid #336699;">'+
+        '<img src="'+v.headimg+'" width="30px;" height="30px;" ></div>'+
+    '<div class="username" style="margin-left:60px; margin-top:-58px; color:#666666;">'+
+        '<p style="font-size:0.9em;"><strong>'+v.user+'</strong></p> </div>'+
+    '<div class="time1" style="margin-left:60px; margin-top:-12px; color:#999999;">'+
+        '<p style="font-size:0.8em;"><time class="timeago" datetime="{php echo date("Y-m-d H:i:s",v.time)}">about 9 hours later</time></p></div>'+
+    '<div class="usercontent" style="margin-left:60px; margin-top:-10px; color: #333333; margin-right:5px;">'+
+        '<p style="font-size:0.9em;">'+v.info+'</p></div></div>';-->
+</html>

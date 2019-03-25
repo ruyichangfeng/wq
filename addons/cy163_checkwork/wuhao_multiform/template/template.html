@@ -1,0 +1,457 @@
+{template 'common/header'}
+
+<div class="wrap" id="app">
+	<ul class="nav nav-tabs">			
+		<li class="active"><a href="#">添加模板</a></li>
+		<li><a href="{php echo $this->createWebUrl('listalltemplate', array());}">模板列表</a></li>
+		<!-- <li><a href="#">推送消息</a></li> -->
+	</ul>
+	<div class="panel panel-default">
+                <div class="panel-heading">                    
+                    <h3 class="panel-title">编辑模板<i style="color:red;">（无需添加标题）</i></h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" action="" >
+                    	<div class="form-group">
+                            <label class="col-sm-2 control-label">模板名称</label>
+
+                            <input type="hidden" name="length" id="length" value="{$data_template['length']}">
+                            <input type="hidden" name="data_detail" id="data_detail" value="{$data_template['data_detail']}">
+                            <input type="hidden" name="tname" id="tname" value="{$data_template['templatename']}">
+                            <input type="hidden" name="templateid" id="templateid" value="{$data_template['templateid']}">
+                            <input type="hidden" name="edittemplateurl" id="edittemplateurl" value="{php echo $this->createWebUrl('edittemplate')}">
+                            <input type="hidden" name="templateurl" id="templateurl" value="{php echo $this->createWebUrl('template')}">
+                            <input type="hidden" name="pagetype" id="pagetype" value="{$op}">
+
+                            <div class="col-sm-3">
+                                 <input type="text" v-model="templatename" class="form-control" placeholder="填写模板标题">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2">
+                                <label class="control-label">字段名称</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="control-label">内容</label>
+                            </div>
+                            <div class="col-sm-1">
+                                <label class="control-label">到分钟</label>
+                            </div>
+                            <div class="col-sm-2">
+                                <label class="control-label">类型</label>
+                            </div>
+                            <div class="col-sm-2">
+                                <label class="control-label">顺序</label>
+                            </div>
+                        </div>
+                        <template v-for="entry in data | orderBy  'order' order">
+                            <div class="form-group">
+                                <div class="col-sm-2">
+                                    <input type="text" name="title" v-model="entry['title']" class="form-control" placeholder="填写字段标题">
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==1">
+                                    <input type="text" v-model="entry['content']" class="form-control"  placeholder="填写字段内容">
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==2 || entry.type==3 || entry.type==4 || entry.type==13">
+                                    <input type="hidden" v-model="entry['startDate']">
+                                    <input type="hidden" v-model="entry['endDate']">
+                                    <button class="btn btn-default daterange daterange-time" type="button"><span class="date-title">点击设置时间</span> <i class="fa fa-calendar"></i></button>                                    
+                                </div>                                
+                                <div class="col-sm-4" v-if="entry.type==5">
+                                    <input onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" type="text" v-model="entry['content']" class="form-control" placeholder="填写字段内容">
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==6">
+                                    <input onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"  type="text" v-model="entry['content']" class="form-control" placeholder="填写字段内容">
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==7">
+                                    <select class="form-control" v-model="entry['content']">
+                                        <option v-for="tmp in entry.ext[entry.type].split(',')" v-bind:value="tmp">{{tmp}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4 radio" v-if="entry.type==8">
+                                    <label style="margin-right:8px;" v-for="tmp in entry.ext[entry.type].split(',')">
+                                        <input type="radio" v-model="entry['content']" v-bind:value="tmp">{{tmp}}</label>
+                                </div>
+                                <div class="col-sm-4 checkbox" v-if="entry.type==9">
+                                    <label style="margin-right:8px;"  v-for="tmp in entry.ext[entry.type].split(',')"><input type="checkbox" v-model="entry['contentarray']" v-bind:value="tmp">{{tmp}}</label>
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==10">
+                                    <select class="form-control" v-model="entry['content']">
+                                        <option v-for="tmp in entry.ext[entry.type].split(',')" v-bind:value="tmp">{{tmp}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==11"> 
+                                    <textarea rows="15" class="form-control" v-model="entry['content']"  placeholder="填写字段内容" ></textarea>
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==12"> 
+                                    <div class="input-group ">
+                                        <input name="img" value="" class="form-control" autocomplete="off" type="text">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"  @click="showImageDialog(this);">选择图片</button>
+                                        </span>
+                                    </div>
+                                    <div class="input-group " style="margin-top:.5em;">
+                                        <img src="./resource/images/nopic.jpg" onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'" class="img-responsive img-thumbnail" width="150">
+                                        <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" @click="deleteImage(this)">×</em>
+                                    </div>                                           
+                                </div>
+                                 <div class="col-sm-4" v-if="entry.type==14">
+                                    <input type="hidden" v-model="entry['province']">
+                                    <input type="hidden" v-model="entry['city']">
+                                    <input type="hidden" v-model="entry['district']">
+                                    
+                                    <select id="p" name="province" class="form-control" value="entry['province']"></select>
+                                
+                                    <select id="c" name="city" class="form-control" value="entry['city']"></select>
+                                
+                                    <select id="d" name="district" class="form-control" value="entry['district']"></select>
+                                        
+                                </div>
+                                <div class="col-sm-4" v-if="entry.type==15">
+                                    <div class="htmleaf-container">   
+                                        <input type="hidden" v-model="entry['content']">
+                                        <!-- <form enctype="multipart/form-data"> -->
+                                            <!-- <div class="form-group"> -->
+                                                <!-- <input type="hidden" name="matchid" id="matchid" value="{$matchid}"> -->
+                                        <input id="file-0" class="file" type="file" multiple data-min-file-count="1" value="entry['content']">
+                                            <!-- </div>                                             -->
+                                        <!-- </form> -->
+                                     </div>
+                                </div>
+                                <div class="col-sm-1 checkbox">
+                                    <input style="margin-left:0;" v-model="entry.timeflag" v-if="entry.type==13 || entry.type==4 || entry.type==3 || entry.type==2" type="checkbox" />
+                                </div>
+                                <div class="col-sm-2">
+                                    <select class="form-control" v-model="entry.type" @change="checkcomponent(entry)" >
+                                        <option v-for="tmp in cols" value="{{tmp.id}}">{{tmp.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <select @change="changeorder(entry)" v-model="entry.order" class="form-control">
+                                        <option v-for="tmp in length" v-bind:value="tmp+1">{{tmp+1}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-1">
+                                    <input type="button" class="btn btn-default" @click="delitem(entry)" value="删除">
+                                </div>
+                            </div>
+                            <!-- 下面是需要辅助数据时展开的行。-->
+                            <div class="form-group" v-if="entry.type==7">
+                                <label class="col-sm-4 col-sm-offset-3 control-label" >分组设置（请用,分割）</label>
+                                <div class="col-sm-4">
+                                    <input v-model="entry.ext[entry.type]" type="text" class="form-control" placeholder="用英文逗号分隔不同选项。">
+                                </div>
+                            </div>
+                            <div class="form-group" v-if="entry.type==8">
+                                <label class="col-sm-4 col-sm-offset-3 control-label" >单选框选项设置（请用,分割）</label>
+                                <div class="col-sm-4">
+                                    <input  v-model="entry.ext[entry.type]" type="text" class="form-control" placeholder="用英文逗号分隔不同选项。">
+                                </div>
+                            </div>
+                            <div class="form-group" v-if="entry.type==9">
+                                <label class="col-sm-4 col-sm-offset-3 control-label" >复选框选项设置（请用,分割）</label>
+                                <div class="col-sm-4">
+                                    <input  v-model="entry.ext[entry.type]" type="text" class="form-control" placeholder="用英文逗号分隔不同选项。" >
+                                </div>
+                            </div>
+                            <div class="form-group" v-if="entry.type==10">
+                                <label class="col-sm-4 col-sm-offset-3 control-label" >选择项设置（请用,分割）</label>
+                                <div class="col-sm-4">
+                                    <input  v-model="entry.ext[entry.type]" type="text" class="form-control" placeholder="用英文逗号分隔不同选项。">
+                                </div>
+                            </div>
+                        </template>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="button" class="btn btn-default" @click="submit" value="保存模板">
+                                <input type="button" class="btn btn-default" @click="add" value="添加字段">
+                                <input type="hidden" name="token" value="{$_W['token']}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+</div>
+<script type="text/javascript">
+//require(["http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.min.js"],function(Vue){
+require(["../addons/wuhao_multiform/template/js/vue.js"], function(Vue) {
+    new Vue({
+        el: '#app',
+        data: function() {
+            //pagetype 0:template.html,1:edittemplate.html,2:matches.html
+            return {
+                pagetype:0,
+                templatename:'',
+                length: 1,
+                data: [{
+                    'title': '',
+                    'order': 1,
+                    'content': '',
+                    'contentarray': [],
+                    'type': 1,
+                    'ext':[],
+                    'province':'河北省',
+                    'city':'',
+                    'district':'',
+                    'startDate':'',
+                    'endDate':'',
+                    'timeflag':false
+                }],
+                cols: [{
+                    'id': 1,
+                    'name': '文本框'
+                }, {
+                    'id': 2,
+                    'name': '时间'
+                // }, {
+                //     'id': 3,
+                //     'name': '报名时间'
+                // }, {
+                //     'id': 4,
+                //     'name': '签到时间'
+                // }, {
+                //     'id': 5,
+                //     'name': '人数'
+                // }, {
+                //     'id': 6,
+                //     'name': '价格'
+                // }, {
+                //     'id': 7,
+                //     'name': '分组'
+                }, {
+                    'id': 8,
+                    'name': '单选框'
+                }, {
+                    'id': 9,
+                    'name': '复选框'
+                }, {
+                    'id': 10,
+                    'name': '下拉选择'
+                }, {
+                    'id': 11,
+                    'name': '文本块'
+                }, {
+                    'id': 12,
+                    'name': '图片'
+                }, {
+                    'id': 14,
+                    'name': '地区'
+                }, {
+                    'id': 15,
+                    'name': '文件'
+                }]
+            }
+        },
+        ready: function() {
+            if($("#tname").val().length>0){
+                this.templatename=$("#tname").val();
+            }
+            if($("#length").val().length>0){
+                this.length=Number($("#length").val());
+            }
+            if($("#data_detail").val().length>0){
+                this.data=JSON.parse($("#data_detail").val());
+            }
+            if($("#pagetype").val().length>0){
+                this.pagetype=$("#pagetype").val();
+            }
+            
+            console.log(this.templatename);
+            console.log(this.length);
+            console.log(this.data);
+             require(['jquery', '../app/resource/js/app/district.js'], function($, d){
+                $(function(){
+                  var province=$("#p").val();
+                  var city=$("#c").val();
+                  var district=$("#d").val();
+                  console.log(province);
+                  console.log(city);
+                  console.log(district);
+                  d.render(
+                    {province: $('#p')[0], city: $('#c')[0], district: $('#d')[0]},
+                    // {province: '山西省', city: '太原市', district: '小店区'},
+                    {province: province, city: city, district: district},
+                    {withTitle: true}
+                  );
+                  // $("#province").val($('#p')[0]);
+                  // $("#city").val($('#c')[0]);
+                  // $("#district").val($('#d')[0]);
+                });
+            });
+        },
+        methods: {
+            submit:function(){              
+                var countT2 = 0;
+                var countT3 = 0;                
+                var countT5 = 0;
+                var countT6 = 0;
+                var countT13 = 0;
+                var countT14 = 0;
+                var countT15 = 0;
+                this.data.forEach(function(element, index) {                    
+                    // if(element.type==2)countT2++;
+                    // if(element.type==3)countT3++;
+                    // if(element.type==5)countT5++;
+                    // if(element.type==6)countT6++;
+                    // if(element.type==13)countT13++;
+                    if(element.type==14)countT14++;
+                    if(element.type==14)countT15++;
+                });
+                //if(countT2>1 || countT3>1 || countT5>1 || countT6>1 || countT13 >1){
+                if(countT14 >1 || countT15 >1){
+                    //alert('时间字段，报名时间字段，人数字段，价格，报到时间字段必须小于或者等于1个。');  
+                    alert('地区字段,文件字段必须小于或者等于1个。'); 
+                    return false;
+                }
+                //TODO
+                //alert(JSON.stringify(this.data));
+                var templateid=$("#templateid").val();
+                var url = "";
+                if(this.pagetype==0){
+                    url=$("#templateurl").val();
+                }else if(this.pagetype==1){
+                    url=$("#edittemplateurl").val();
+                }
+                $.ajax({
+                    "url":url,
+                    type:'POST',
+                    data:{templatename:this.templatename,length:this.length,data_detail:JSON.stringify(this.data),submit:1,templateid:templateid},                    
+                    dataType:'json',
+                    async:false,
+                    success:function(data){
+                        console.log(data);
+                        alert('模板操作成功');                                                
+                    },
+                    error: function (msg) {  
+                        alert(msg['responseText']);  
+                        console.log(msg);                       
+                    }
+                });
+            },
+            add: function() {
+                this.length++;
+                this.data.push({
+                    'title': '',
+                    'order': this.length,
+                    'content': '',
+                    'contentarray': [],
+                    'type': 1,
+                    'ext':[],
+                    'province':'',
+                    'city':'',
+                    'district':'',
+                    'startDate':'',
+                    'endDate':'',
+                    'timeflag':false
+                });
+            },
+            delitem: function(item) {
+                this.length--;
+                this.data.$remove(item);
+            },
+            changeorder: function(item){
+                var order = item.order;
+                item.order = 2000;
+                this.data.sort(function(a,b){
+                    return a.order-b.order;
+                });
+                this.data.forEach(function(element, index) {
+                    var targetorder=index+1;
+                    if(element.order==order && element.order==index+1){
+                        targetorder=index+2;
+                    }else if(element.order>order){
+                        targetorder=index+2;
+                    }
+                    element.order=targetorder;
+                });
+                item.order=order;
+            },
+            checkcomponent:function(entry){
+                if(entry.type==2 || entry.type==3 || entry.type==4 || entry.type==13){
+                    require(["daterangepicker"], function($){
+                        $(function(){
+                            $(".daterange.daterange-time").each(function(){
+                                var elm = this;
+                                var startD = $(elm).prev().prev().val();
+                                var endD = $(elm).prev().val();
+                                if(!startD){
+                                    startD = new Date();
+                                }
+                                if(!endD){
+                                    endD = new Date();
+                                }
+                                $(this).daterangepicker({
+                                    startDate: startD,
+                                    endDate: endD,
+                                    format: "YYYY-MM-DD HH:mm",
+                                    timePicker: false,
+                                    timePicker12Hour : false,
+                                    timePickerIncrement: 1,
+                                    minuteStep: 1
+                                }, function(start, end){
+                                    $(elm).find(".date-title").html(start.toDateTimeStr() + " 至 " + end.toDateTimeStr());
+                                    $(elm).prev().prev().val(start.toDateTimeStr());
+                                    $(elm).prev().val(end.toDateTimeStr());
+                                });
+                            });
+                        });
+                    });
+                }else if(entry.type==14){
+                    require(['jquery', '../app/resource/js/app/district.js'], function($, d){
+                        $(function(){
+                          var province=entry.province;
+                          var city=entry.city;
+                          var district=entry.district;
+                          console.log(province);
+                          console.log(city);
+                          console.log(district);
+                          d.render(
+                            {province: $('#p')[0], city: $('#c')[0], district: $('#d')[0]},
+                            // {province: '山西省', city: '太原市', district: '小店区'},
+                            {province: province, city: city, district: district},
+                            {withTitle: true}
+                          );
+                          // $("#province").val($('#p')[0]);
+                          // $("#city").val($('#c')[0]);
+                          // $("#district").val($('#d')[0]);
+                        });
+                    });
+                }
+            },
+            showImageDialog: function(elm, opts, options) {
+                    require(["util"], function(util){
+                        var btn = $(elm);
+                        var ipt = btn.parent().prev();
+                        var val = ipt.val();
+                        var img = ipt.parent().next().children();
+                        options = {'global':false,'class_extra':'','direct':true,'multiple':false};
+                        util.image(val, function(url){
+                            if(url.url){
+                                if(img.length > 0){
+                                    img.get(0).src = url.url;
+                                }
+                                ipt.val(url.attachment);
+                                ipt.attr("filename",url.filename);
+                                ipt.attr("url",url.url);
+                            }
+                            if(url.media_id){
+                                if(img.length > 0){
+                                    img.get(0).src = "";
+                                }
+                                ipt.val(url.media_id);
+                            }
+                        }, null, options);
+                    });
+            },
+            deleteImage : function(elm){
+                    require(["jquery"], function($){
+                        $(elm).prev().attr("src", "./resource/images/nopic.jpg");
+                        $(elm).parent().prev().find("input").val("");
+                    });
+            }
+        }
+    });
+});
+</script>
+
+{template 'common/footer'}

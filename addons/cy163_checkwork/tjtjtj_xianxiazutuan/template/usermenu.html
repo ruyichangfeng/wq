@@ -1,0 +1,141 @@
+{template 'common/header'}
+
+<div class="main">
+	<ul class="nav nav-tabs">
+		<li {if $_GPC['action'] == ''}class="active"{/if}>
+			<a href="{php echo $this->createWebUrl('usermenu')}">用户中心导航</a>
+		</li>
+		<li {if $_GPC['action'] == 'add'}class="active"{/if}>
+			<a href="{php echo $this->createWebUrl('usermenu', array('action' => 'add'))}">添加</a>
+		</li>
+		<li {if $_GPC['action'] == 'edit'}class="active"{/if}>
+			<a href="#">编辑</a>
+		</li>
+	</ul>
+</div>
+
+{if $_GPC['action'] == ''}
+<div class="main">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>编号</th>
+							<th>导航名</th>
+							<th>导航地址</th>
+							<th>导航LOGO</th>
+							<th>排序</th>
+							<th>操作</th>
+						</tr>
+					</thead>		
+					<tbody>
+					{loop $menus $menu}
+						<tr>
+							<td>{$menu['uid']}</td>
+							<td>{$menu['menu_name']}</td>
+							<td>{$menu['menu_href']}</td>
+							<td><img src="{$_W['attachurl']}{$menu['menu_logo']}" width="60" height="60"/></td>
+							<td>{$menu['sort']}</td>
+							<td>
+								<a class="btn btn-danger btn-sm" onclick="if (confirm('Confirm Delete?')) { location.href = '{php echo $this->createWebUrl('usermenu', array('action' => 'delete', 'uid' => $menu['uid']))}';}">删除</a>
+								<a class="btn btn-warning btn-sm" href="{php echo $this->createWebUrl('usermenu', array('action' => 'edit', 'uid' => $menu['uid']))}">编辑</a>
+							</td>
+						</tr>
+					{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+
+{if $_GPC['action'] == 'add'}
+<div class="main">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form action="{php echo $this->createWebUrl('usermenu', array('action' => 'create'))}" method="post">
+					<input type="hidden" value="{$_W['uniacid']}" name="sid"></input>
+					<div class="col-lg-12">
+			                                <label for="">导航名</label>
+			                                <input type="text" name="menu_name" class="form-control" value="" placeholder="" />
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">导航地址</label>
+			                                <input type="text" name="menu_href" class="form-control" value="http://" placeholder="" />
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">LOGO</label>
+			                                {php echo tpl_form_field_image('menu_logo');}
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">排序</label>
+			                                <input type="text" name="sort" class="form-control" value="0" placeholder="" />
+			                            </div>
+
+					<div class="col-lg-12" style="margin-top: 20px;">
+				                        <div class="col-sm-10">
+				                            <input name="token" type="hidden" value="{$_W['token']}"/>
+				                            <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+				                                <i class="fa fa-check-circle"></i> 提交
+				                            </button>
+				                        </div>
+			                    	</div>
+
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+
+{if $_GPC['action'] == 'edit'}
+<div class="main">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form action="{php echo $this->createWebUrl('usermenu', array('action' => 'update'))}" method="post">
+					<input type="hidden" value="{$menu['uid']}" name="uid"></input>
+					<div class="col-lg-12">
+			                                <label for="">导航名</label>
+			                                <input type="text" name="menu_name" class="form-control" value="{$menu['menu_name']}" placeholder="" />
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">导航地址</label>
+			                                <input type="text" name="menu_href" class="form-control" value="{$menu['menu_href']}" placeholder="" />
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">LOGO</label>
+			                                {php echo tpl_form_field_image('menu_logo', $menu['menu_logo']);}
+			                            </div>
+
+			                            <div class="col-lg-12">
+			                                <label for="">排序</label>
+			                                <input type="text" name="sort" class="form-control" value="{$menu['sort']}" placeholder="" />
+			                            </div>
+
+					<div class="col-lg-12" style="margin-top: 20px;">
+				                        <div class="col-sm-10">
+				                            <input name="token" type="hidden" value="{$_W['token']}"/>
+				                            <button type="submit" class="btn btn-success col-sm-2" name="submit" value="提交">
+				                                <i class="fa fa-check-circle"></i> 提交
+				                            </button>
+				                        </div>
+			                    	</div>
+
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+
+{template 'common/footer'}

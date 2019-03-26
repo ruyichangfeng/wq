@@ -3,8 +3,8 @@ defined('IN_IA') or exit('Access Denied');
 
 $config = array();
 
-$config['db']['master']['host'] = '47.105.61.233';
-$config['db']['master']['username'] = 'hdm140015291';
+$config['db']['master']['host'] = 'localhost';
+$config['db']['master']['username'] = 'root';
 $config['db']['master']['password'] = 'lmz@lp#<123';
 $config['db']['master']['port'] = '3306';
 $config['db']['master']['database'] = 'hdm140015291_db';
